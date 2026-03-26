@@ -10,8 +10,11 @@ export const metadata = buildPageMetadata({
   path: "/promises",
 });
 
-async function getPromisePresidents() {
-  return fetchInternalJson("/api/promises/presidents", {
+async function getPromisePresidents(showAll) {
+  const params = new URLSearchParams();
+  if (showAll) params.set("show_all", "1");
+
+  return fetchInternalJson(`/api/promises/presidents${params.toString() ? `?${params.toString()}` : ""}`, {
     ...withRevalidate(PUBLIC_REVALIDATE_SECONDS),
     errorMessage: "Failed to fetch promise presidents",
   });
@@ -55,8 +58,10 @@ function StatusStat({ label, count }) {
   );
 }
 
-export default async function PromisesPage() {
-  const data = await getPromisePresidents();
+export default async function PromisesPage({ searchParams }) {
+  const resolvedSearchParams = (await searchParams) || {};
+  const showAll = resolvedSearchParams.show_all === "1";
+  const data = await getPromisePresidents(showAll);
   const presidents = data.items || [];
 
   return (
@@ -66,23 +71,29 @@ export default async function PromisesPage() {
           <p className="eyebrow mb-4">Promise Tracker</p>
           <h1 className="text-4xl md:text-5xl font-bold">Promises by President</h1>
           <p className="text-base md:text-lg text-[var(--ink-soft)] mt-4 leading-8 max-w-3xl">
-            Review Promise Tracker records by presidency, then move into the promises, actions,
-            outcomes, and source-backed documentation associated with each administration.
+            Review Promise Tracker by presidency. The default view prioritizes promises with direct
+            or meaningful downstream Black-community impact, while still allowing access to the full archive.
           </p>
           <div className="mt-5 flex flex-wrap gap-2">
             <MetaPill>{presidents.length} presidents with tracked promises</MetaPill>
             <MetaPill>Chronological overview by term start</MetaPill>
-            <MetaPill>Status counts across delivered, in-progress, partial, failed, and blocked records</MetaPill>
+            <MetaPill>Relevance reflects how closely each promise is tied to Black-community outcomes</MetaPill>
           </div>
         </div>
       </section>
 
       <section className="mb-6 flex flex-wrap gap-3">
         <Link
-          href="/promises/all"
+          href={showAll ? "/promises/all?show_all=1" : "/promises/all"}
           className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
         >
           Browse All Promise Records
+        </Link>
+        <Link
+          href={showAll ? "/promises" : "/promises?show_all=1"}
+          className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
+        >
+          {showAll ? "Show Prioritized View" : "Show All Promises"}
         </Link>
       </section>
 
@@ -98,7 +109,7 @@ export default async function PromisesPage() {
           {presidents.map((president) => (
             <Link
               key={president.id}
-              href={`/promises/president/${president.slug}`}
+              href={showAll ? `/promises/president/${president.slug}?show_all=1` : `/promises/president/${president.slug}`}
               className="panel-link block rounded-[1.45rem] p-5"
             >
               <div className="flex items-start justify-between gap-4 flex-wrap">
@@ -113,6 +124,11 @@ export default async function PromisesPage() {
 
               <p className="text-sm text-[var(--ink-soft)] mt-3">
                 <TermRange start={president.term_start} end={president.term_end} />
+              </p>
+              <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
+                {showAll
+                  ? "Counts include every tracked promise currently linked to this presidency."
+                  : "Counts reflect the default EquityStack view, which prioritizes high- and medium-relevance promises."}
               </p>
 
               <div className="grid gap-3 mt-5 sm:grid-cols-2">

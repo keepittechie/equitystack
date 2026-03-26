@@ -1,3 +1,4 @@
+import Link from "next/link";
 import ReportsDashboard from "./ReportsDashboard";
 import { fetchInternalJson } from "@/lib/api";
 import { REPORT_REVALIDATE_SECONDS, withRevalidate } from "@/lib/cache";
@@ -127,6 +128,24 @@ export default async function ReportsPage() {
             <strong>Indirect Impact:</strong> Policies affecting broader systems with measurable downstream effects.
           </li>
         </ul>
+      </section>
+
+      <section className="card-surface rounded-[1.6rem] p-5 mb-8">
+        <div className="flex items-start justify-between gap-4 flex-wrap">
+          <div className="max-w-3xl">
+            <h2 className="text-lg font-semibold mb-2">Promise Tracker Reports</h2>
+            <p className="text-sm text-[var(--ink-soft)] leading-7">
+              Review the Black Impact Score, a Promise Tracker report that summarizes how tracked presidential
+              promises and outcomes affected Black communities.
+            </p>
+          </div>
+          <Link
+            href="/reports/black-impact-score"
+            className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
+          >
+            Open Black Impact Score
+          </Link>
+        </div>
       </section>
 
       <ReportsDashboard

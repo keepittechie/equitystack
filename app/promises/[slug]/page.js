@@ -1,6 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PromiseStatusBadge, ImpactBadge } from "@/app/components/policy-badges";
+import {
+  PromiseImpactDirectionBadge,
+  PromiseRelevanceBadge,
+  PromiseStatusBadge,
+  ImpactBadge,
+} from "@/app/components/policy-badges";
 import { fetchInternalJson } from "@/lib/api";
 import { PUBLIC_REVALIDATE_SECONDS, withRevalidate } from "@/lib/cache";
 import { buildPageMetadata } from "@/lib/metadata";
@@ -125,6 +130,8 @@ export default async function PromiseDetailPage({ params }) {
             </p>
             <div className="flex flex-wrap gap-2 mt-4">
               <PromiseStatusBadge status={promise.status} />
+              <PromiseRelevanceBadge relevance={promise.relevance} />
+              <PromiseImpactDirectionBadge impact={promise.impact_direction_for_curation} />
               <MetaPill>{promise.promise_type}</MetaPill>
               <MetaPill>{promise.campaign_or_official}</MetaPill>
               {promise.topic ? <MetaPill>{promise.topic}</MetaPill> : null}
@@ -134,10 +141,15 @@ export default async function PromiseDetailPage({ params }) {
         </div>
       </section>
 
-      {promise.notes ? (
+      {promise.notes || promise.overlap_note ? (
         <section className="card-surface rounded-[1.6rem] p-5 mb-6">
           <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Record Note</p>
-          <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">{promise.notes}</p>
+          {promise.notes ? (
+            <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">{promise.notes}</p>
+          ) : null}
+          {promise.overlap_note ? (
+            <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">{promise.overlap_note}</p>
+          ) : null}
         </section>
       ) : null}
 

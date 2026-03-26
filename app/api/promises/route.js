@@ -33,12 +33,14 @@ export async function GET(request) {
 
     const page = parsePage(searchParams.get("page"), 1);
     const pageSize = Math.min(parsePage(searchParams.get("page_size"), 12), 100);
+    const showAll = searchParams.get("show_all") === "1";
 
     const data = await fetchPromiseList({
       q,
       president,
       status,
       topic,
+      showAll,
       sort,
       page,
       pageSize,

@@ -8,7 +8,9 @@ function isPromiseTrackerSchemaMissing(error) {
 export async function GET(request, { params }) {
   try {
     const { slug } = await params;
-    const president = await fetchPromisePresidentDetail(slug);
+    const { searchParams } = new URL(request.url);
+    const showAll = searchParams.get("show_all") === "1";
+    const president = await fetchPromisePresidentDetail(slug, { showAll });
 
     if (!president) {
       return NextResponse.json({ error: "President not found" }, { status: 404 });

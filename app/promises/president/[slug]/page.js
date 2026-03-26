@@ -1,12 +1,15 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PromiseStatusBadge } from "@/app/components/policy-badges";
+import { PromiseRelevanceBadge, PromiseStatusBadge } from "@/app/components/policy-badges";
 import { fetchInternalJson } from "@/lib/api";
 import { PUBLIC_REVALIDATE_SECONDS, withRevalidate } from "@/lib/cache";
 import { buildPageMetadata } from "@/lib/metadata";
 
-async function getPromisePresident(slug) {
-  return fetchInternalJson(`/api/promises/presidents/${slug}`, {
+async function getPromisePresident(slug, showAll) {
+  const params = new URLSearchParams();
+  if (showAll) params.set("show_all", "1");
+
+  return fetchInternalJson(`/api/promises/presidents/${slug}${params.toString() ? `?${params.toString()}` : ""}`, {
     ...withRevalidate(PUBLIC_REVALIDATE_SECONDS),
     allow404: true,
     errorMessage: "Failed to fetch promise president",
@@ -15,7 +18,7 @@ async function getPromisePresident(slug) {
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
-  const president = await getPromisePresident(slug);
+  const president = await getPromisePresident(slug, false);
 
   if (!president) {
     return buildPageMetadata({
@@ -66,9 +69,11 @@ function formatTermRange(start, end) {
   return `${formatDate(start) || "Unknown"} to ${end ? formatDate(end) : "Present"}`;
 }
 
-export default async function PromisePresidentPage({ params }) {
+export default async function PromisePresidentPage({ params, searchParams }) {
   const { slug } = await params;
-  const president = await getPromisePresident(slug);
+  const resolvedSearchParams = (await searchParams) || {};
+  const showAll = resolvedSearchParams.show_all === "1";
+  const president = await getPromisePresident(slug, showAll);
 
   if (!president) {
     notFound();
@@ -84,10 +89,16 @@ export default async function PromisePresidentPage({ params }) {
           Back to Presidents
         </Link>
         <Link
-          href="/promises/all"
+          href={showAll ? "/promises/all?show_all=1" : "/promises/all"}
           className="inline-flex items-center rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
         >
           Browse All Promise Records
+        </Link>
+        <Link
+          href={showAll ? `/promises/president/${slug}` : `/promises/president/${slug}?show_all=1`}
+          className="inline-flex items-center rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
+        >
+          {showAll ? "Show Prioritized View" : "Show All Promises"}
         </Link>
       </div>
 
@@ -96,24 +107,30 @@ export default async function PromisePresidentPage({ params }) {
           <p className="eyebrow mb-4">Promise Tracker</p>
           <h1 className="text-3xl md:text-4xl font-bold">{president.president}</h1>
           <p className="text-base md:text-lg text-[var(--ink-soft)] mt-4 leading-8">
-            Promise Tracker groups this presidency’s records by status so you can review which
-            commitments were delivered, remain in progress, were partially realized, failed, or
-            were blocked.
+            Promise Tracker groups this presidency’s records by status. The default view prioritizes
+            promises with direct or meaningful downstream Black-community impact.
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
             {president.president_party ? <MetaPill>{president.president_party}</MetaPill> : null}
             <MetaPill>{formatTermRange(president.term_start, president.term_end)}</MetaPill>
-            <MetaPill>{president.total_tracked_promises} tracked promises</MetaPill>
+            <MetaPill>
+              {showAll ? president.total_tracked_promises : president.visible_promise_count} shown
+            </MetaPill>
           </div>
+          <p className="text-sm text-[var(--ink-soft)] mt-4 leading-7">
+            {showAll
+              ? "All tracked promises for this president are visible, including secondary and deprioritized records."
+              : "Low-relevance and overlapping records remain accessible through Show All."}
+          </p>
         </div>
       </section>
 
       <section className="grid gap-4 md:grid-cols-5 mb-8">
-        <MiniStat label="Delivered" value={president.delivered_count} />
-        <MiniStat label="In Progress" value={president.in_progress_count} />
-        <MiniStat label="Partial" value={president.partial_count} />
-        <MiniStat label="Failed" value={president.failed_count} />
-        <MiniStat label="Blocked" value={president.blocked_count} />
+        <MiniStat label="Delivered" value={showAll ? president.delivered_count : president.visible_delivered_count} />
+        <MiniStat label="In Progress" value={showAll ? president.in_progress_count : president.visible_in_progress_count} />
+        <MiniStat label="Partial" value={showAll ? president.partial_count : president.visible_partial_count} />
+        <MiniStat label="Failed" value={showAll ? president.failed_count : president.visible_failed_count} />
+        <MiniStat label="Blocked" value={showAll ? president.blocked_count : president.visible_blocked_count} />
       </section>
 
       <div className="space-y-8">
@@ -145,6 +162,9 @@ export default async function PromisePresidentPage({ params }) {
                           {promise.topic || "No topic"}
                         </p>
                         <h3 className="text-xl font-semibold mt-2">{promise.title}</h3>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        <PromiseRelevanceBadge relevance={promise.relevance} />
                       </div>
                     </div>
 
@@ -178,6 +198,9 @@ export default async function PromisePresidentPage({ params }) {
                       ) : (
                         <span>No action date recorded</span>
                       )}
+                      {promise.curation_priority === "merge_candidate" ? (
+                        <span>Overlapping record under editorial review</span>
+                      ) : null}
                     </div>
                   </Link>
                 ))}

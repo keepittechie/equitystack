@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { PromiseStatusBadge } from "@/app/components/policy-badges";
+import { PromiseRelevanceBadge, PromiseStatusBadge } from "@/app/components/policy-badges";
 import { fetchInternalJson } from "@/lib/api";
 import { PUBLIC_REVALIDATE_SECONDS, withRevalidate } from "@/lib/cache";
 import { buildPageMetadata } from "@/lib/metadata";
@@ -20,6 +20,7 @@ async function getPromises(searchParams) {
   if (searchParams.topic) params.set("topic", searchParams.topic);
   if (searchParams.page) params.set("page", searchParams.page);
   if (searchParams.sort) params.set("sort", searchParams.sort);
+  if (searchParams.show_all === "1") params.set("show_all", "1");
 
   const query = params.toString();
   return fetchInternalJson(`/api/promises${query ? `?${query}` : ""}`, {
@@ -77,6 +78,29 @@ function buildResetHref(searchParams, keyToRemove) {
   return query ? `/promises/all?${query}` : "/promises/all";
 }
 
+function buildShowAllHref(searchParams, showAll) {
+  const params = new URLSearchParams();
+
+  Object.entries(searchParams).forEach(([key, value]) => {
+    if (
+      key !== "page" &&
+      key !== "show_all" &&
+      value !== undefined &&
+      value !== null &&
+      value !== ""
+    ) {
+      params.set(key, String(value));
+    }
+  });
+
+  if (showAll) {
+    params.set("show_all", "1");
+  }
+
+  const query = params.toString();
+  return query ? `/promises/all?${query}` : "/promises/all";
+}
+
 function getActiveFilters(searchParams) {
   const filters = [];
 
@@ -89,6 +113,9 @@ function getActiveFilters(searchParams) {
   }
   if (searchParams.topic) {
     filters.push({ key: "topic", label: `Topic: ${searchParams.topic}` });
+  }
+  if (searchParams.show_all === "1") {
+    filters.push({ key: "show_all", label: "Showing all promises" });
   }
 
   return filters;
@@ -119,6 +146,7 @@ export default async function AllPromisesPage({ searchParams }) {
     has_next: false,
   };
   const activeFilters = getActiveFilters(resolvedSearchParams);
+  const showAll = resolvedSearchParams.show_all === "1";
 
   return (
     <main className="max-w-7xl mx-auto p-6">
@@ -127,12 +155,13 @@ export default async function AllPromisesPage({ searchParams }) {
           <p className="eyebrow mb-4">Promise Tracker</p>
           <h1 className="text-4xl md:text-5xl font-bold">All Promise Records</h1>
           <p className="text-base md:text-lg text-[var(--ink-soft)] mt-4 leading-8 max-w-3xl">
-            Browse all tracked promise records, filter by president or status, and move from the
-            broader record list into full detail pages for actions, outcomes, and source context.
+            Browse tracked promise records across presidents. The default view prioritizes promises
+            with direct or meaningful downstream Black-community impact, with an option to show all records.
           </p>
           <div className="mt-5 flex flex-wrap gap-2">
             <MetaPill>{data.pagination?.total || 0} tracked promises</MetaPill>
             <MetaPill>Distinct source counts across promise, action, and outcome records</MetaPill>
+            <MetaPill>High and Medium relevance appear by default</MetaPill>
           </div>
         </div>
       </section>
@@ -144,6 +173,12 @@ export default async function AllPromisesPage({ searchParams }) {
         >
           View Presidents
         </Link>
+        <Link
+          href={buildShowAllHref(resolvedSearchParams, !showAll)}
+          className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
+        >
+          {showAll ? "Show Prioritized View" : "Show All Promises"}
+        </Link>
       </section>
 
       <section className="card-surface rounded-[1.6rem] p-5 mb-8">
@@ -151,6 +186,7 @@ export default async function AllPromisesPage({ searchParams }) {
           <h2 className="text-xl font-semibold">Search and Filter</h2>
           <p className="text-sm text-[var(--ink-soft)] mt-1">
             Filter by president, status, or topic, or search across titles, summaries, and promise text.
+            Relevance reflects the degree to which a promise is tied to Black-community outcomes.
           </p>
         </div>
 
@@ -228,6 +264,16 @@ export default async function AllPromisesPage({ searchParams }) {
           </FilterField>
 
           <div className="md:col-span-4 flex flex-wrap gap-3">
+            <label className="inline-flex items-center gap-2 text-sm text-[var(--ink-soft)]">
+              <input
+                type="checkbox"
+                name="show_all"
+                value="1"
+                defaultChecked={showAll}
+                className="rounded border-[rgba(120,53,15,0.24)]"
+              />
+              Show all promises
+            </label>
             <button
               type="submit"
               className="rounded-full bg-[var(--accent)] text-white px-5 py-2 text-sm font-medium"
@@ -289,7 +335,10 @@ export default async function AllPromisesPage({ searchParams }) {
                   </p>
                   <h3 className="text-xl font-semibold mt-2">{promise.title}</h3>
                 </div>
-                <PromiseStatusBadge status={promise.status} />
+                <div className="flex flex-wrap gap-2">
+                  <PromiseRelevanceBadge relevance={promise.relevance} />
+                  <PromiseStatusBadge status={promise.status} />
+                </div>
               </div>
 
               <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
@@ -319,6 +368,9 @@ export default async function AllPromisesPage({ searchParams }) {
                   <span>Latest action: {formatDate(promise.latest_action_date)}</span>
                 ) : null}
                 {promise.is_demo ? <span>Demo seed data</span> : null}
+                {promise.curation_priority === "merge_candidate" ? (
+                  <span>Overlapping record under review</span>
+                ) : null}
               </div>
             </Link>
           ))}

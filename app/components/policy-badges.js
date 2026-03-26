@@ -79,3 +79,39 @@ export function PromiseStatusBadge({ status }) {
 
   return <span className={className}>{status}</span>;
 }
+
+export function PromiseRelevanceBadge({ relevance }) {
+  if (!relevance) return null;
+
+  let className =
+    "inline-flex items-center rounded-full px-3 py-1 text-xs font-medium border ";
+
+  if (relevance === "High") {
+    className += "bg-[rgba(120,53,15,0.08)] text-[var(--accent)] border-[rgba(120,53,15,0.18)]";
+  } else if (relevance === "Medium") {
+    className += "bg-blue-50 text-blue-700 border-blue-200";
+  } else {
+    className += "bg-stone-100 text-stone-700 border-stone-300";
+  }
+
+  return <span className={className}>{relevance} relevance</span>;
+}
+
+export function PromiseImpactDirectionBadge({ impact }) {
+  if (!impact) return null;
+
+  let className =
+    "inline-flex items-center rounded-full px-3 py-1 text-xs font-medium border ";
+
+  if (impact === "Positive") {
+    className += "bg-green-50 text-green-700 border-green-200";
+  } else if (impact === "Negative") {
+    className += "bg-red-50 text-red-700 border-red-200";
+  } else if (impact === "Blocked/Unrealized") {
+    className += "bg-stone-100 text-stone-700 border-stone-300";
+  } else {
+    className += "bg-yellow-50 text-yellow-700 border-yellow-200";
+  }
+
+  return <span className={className}>{impact}</span>;
+}
