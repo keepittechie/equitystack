@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { PromiseStatusBadge } from "@/app/components/policy-badges";
 import { fetchInternalJson } from "@/lib/api";
 import { buildExplainerJsonLd, serializeJsonLd } from "@/lib/structured-data";
 
@@ -102,6 +103,14 @@ function formatSourceDate(dateString) {
 
 function formatImpactMetric(value) {
   return Number(value || 0).toFixed(2);
+}
+
+function PromiseMetaPill({ children }) {
+  return (
+    <span className="inline-flex items-center rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-3 py-1 text-xs text-[var(--ink-soft)]">
+      {children}
+    </span>
+  );
 }
 
 function getRelatedExplainers(slug) {
@@ -327,6 +336,69 @@ export default async function ExplainerDetailPage({ params }) {
           <p className="text-[var(--ink-soft)]">No related policies linked yet.</p>
         )}
       </section>
+
+      {explainer.related_promises?.length > 0 && (
+        <section className="space-y-4">
+          <div>
+            <h2 className="text-2xl font-semibold">Related Promise Tracker</h2>
+            <p className="text-sm text-[var(--ink-soft)] mt-1">
+              This explainer is referenced in tracked presidential promises and can be used as
+              context for the broader promise record.
+            </p>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            {explainer.related_promises.map((promise) => (
+              <div key={promise.id} className="card-surface rounded-[1.35rem] p-4">
+                <div className="flex items-start justify-between gap-3 flex-wrap">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">
+                      {promise.president}
+                    </p>
+                    <Link
+                      href={`/promises/${promise.slug}`}
+                      className="font-semibold mt-2 inline-block"
+                    >
+                      {promise.title}
+                    </Link>
+                  </div>
+                  <PromiseStatusBadge status={promise.status} />
+                </div>
+
+                <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
+                  {promise.summary || "No summary added yet."}
+                </p>
+
+                <div className="flex flex-wrap gap-2 mt-4">
+                  <PromiseMetaPill>
+                    {promise.action_count} action{promise.action_count === 1 ? "" : "s"}
+                  </PromiseMetaPill>
+                  <PromiseMetaPill>
+                    {promise.source_count} distinct source{promise.source_count === 1 ? "" : "s"}
+                  </PromiseMetaPill>
+                  {promise.latest_action_date ? (
+                    <PromiseMetaPill>
+                      Latest action: {formatSourceDate(promise.latest_action_date)}
+                    </PromiseMetaPill>
+                  ) : null}
+                </div>
+
+                <div className="mt-4 flex flex-wrap gap-4 text-sm">
+                  <Link href={`/promises/${promise.slug}`} className="accent-link">
+                    Open promise record
+                  </Link>
+                  <Link
+                    href={`/promises/president/${promise.president_slug}`}
+                    className="accent-link"
+                  >
+                    View presidency context
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       <section className="space-y-4">
         <div className="flex items-end justify-between gap-4 flex-wrap">
