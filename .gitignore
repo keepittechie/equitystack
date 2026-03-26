@@ -44,3 +44,12 @@ next-env.d.ts
 python/__pycache__/
 python/scripts/__pycache__/
 python/venv/
+
+# Database dumps
+*.sql
+
+# PM2 logs
+*.log
+
+# Large/full DB dumps
+database/equitystack.sql
