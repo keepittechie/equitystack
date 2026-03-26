@@ -6,7 +6,7 @@ import { buildPageMetadata } from "@/lib/metadata";
 export const metadata = buildPageMetadata({
   title: "Black Impact Score",
   description:
-    "A Promise Tracker report summarizing how presidential promises and outcomes affected Black communities.",
+    "A Promise Tracker report summarizing presidential accountability for promises and outcomes tied to Black-community impacts.",
   path: "/reports/black-impact-score",
 });
 
@@ -161,8 +161,8 @@ export default async function BlackImpactScorePage() {
         <p className="eyebrow mb-4">Promise Tracker Report</p>
         <h1 className="text-4xl md:text-5xl font-bold">Black Impact Score</h1>
         <p className="text-base md:text-lg text-[var(--ink-soft)] mt-4 max-w-3xl leading-8">
-          This report summarizes how tracked presidential promises and their outcomes affected Black communities.
-          It emphasizes impact, not just whether a promise was kept.
+          This report measures presidential accountability for tracked promises tied to Black-community outcomes.
+          It weighs what was promised, what happened, and whether the result helped, harmed, or failed Black communities.
         </p>
         <div className="mt-5 flex flex-wrap gap-2">
           <MetaPill>{presidents.length} presidents scored</MetaPill>
@@ -176,9 +176,19 @@ export default async function BlackImpactScorePage() {
           <summary className="cursor-pointer text-lg font-semibold">Methodology</summary>
           <div className="mt-4 space-y-4">
             <p className="text-sm text-[var(--ink-soft)] leading-7">
-              The Black Impact Score uses Promise Tracker’s relevance curation plus a transparent weighting model.
-              Each promise contributes according to how closely it is tied to Black-community outcomes and whether the outcome was positive, negative, mixed, or blocked.
+              The Black Impact Score uses Promise Tracker's relevance curation and a transparent weighting model.
+              It is designed as a presidential accountability measure tied to Black-community outcomes, not a generic promise-keeping score.
             </p>
+
+            <div className="card-muted rounded-[1.25rem] p-4">
+              <h2 className="text-base font-semibold">How to read the score</h2>
+              <ul className="mt-3 space-y-2 text-sm text-[var(--ink-soft)]">
+                <li>Helpful promises delivered raise the score.</li>
+                <li>Helpful promises that were blocked or failed lower the score.</li>
+                <li>Harmful promises delivered lower the score.</li>
+                <li>Harmful promises that were blocked or failed are treated as neutral, not positive.</li>
+              </ul>
+            </div>
 
             {methodology ? (
               <>
