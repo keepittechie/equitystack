@@ -39,6 +39,8 @@ export function CompletenessBadge({ summary }) {
 export function ImpactBadge({ impact }) {
   if (!impact) return null;
 
+  const label = impact === "Mixed" ? "Mixed Impact" : impact;
+
   let className =
     "inline-flex items-center rounded-full px-3 py-1 text-xs font-medium border ";
 
@@ -54,7 +56,7 @@ export function ImpactBadge({ impact }) {
     className += "bg-stone-100 text-stone-700 border-stone-300";
   }
 
-  return <span className={className}>{impact}</span>;
+  return <span className={className}>{label}</span>;
 }
 
 export function PromiseStatusBadge({ status }) {
@@ -100,6 +102,8 @@ export function PromiseRelevanceBadge({ relevance }) {
 export function PromiseImpactDirectionBadge({ impact }) {
   if (!impact) return null;
 
+  const label = impact === "Mixed" ? "Mixed Impact" : impact;
+
   let className =
     "inline-flex items-center rounded-full px-3 py-1 text-xs font-medium border ";
 
@@ -113,5 +117,5 @@ export function PromiseImpactDirectionBadge({ impact }) {
     className += "bg-yellow-50 text-yellow-700 border-yellow-200";
   }
 
-  return <span className={className}>{impact}</span>;
+  return <span className={className}>{label}</span>;
 }

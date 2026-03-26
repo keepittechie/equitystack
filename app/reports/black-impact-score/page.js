@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PromiseImpactDirectionBadge } from "@/app/components/policy-badges";
 import { fetchInternalJson } from "@/lib/api";
 import { REPORT_REVALIDATE_SECONDS, withRevalidate } from "@/lib/cache";
 import { buildPageMetadata } from "@/lib/metadata";
@@ -52,6 +53,10 @@ function formatSignedScore(value) {
   return numeric > 0 ? `+${fixed}` : fixed;
 }
 
+function formatImpactDisplayLabel(label) {
+  return label === "Mixed" ? "Mixed Impact" : label;
+}
+
 function CountBarGroup({ title, counts }) {
   const entries = Object.entries(counts || {});
   const max = Math.max(...entries.map(([, count]) => Number(count || 0)), 0);
@@ -66,11 +71,12 @@ function CountBarGroup({ title, counts }) {
           {entries.map(([label, count]) => {
             const numericCount = Number(count || 0);
             const width = max > 0 ? `${(numericCount / max) * 100}%` : "0%";
+            const displayLabel = formatImpactDisplayLabel(label);
 
             return (
               <div key={label}>
                 <div className="flex items-center justify-between gap-3 text-sm">
-                  <span className="text-[var(--ink-soft)]">{label}</span>
+                  <span className="text-[var(--ink-soft)]">{displayLabel}</span>
                   <span className="font-medium">{numericCount}</span>
                 </div>
                 <div className="mt-2 h-2 rounded-full bg-[rgba(120,53,15,0.08)] overflow-hidden">
@@ -125,7 +131,11 @@ function PromiseDriverList({ title, items, emptyMessage }) {
           {items.slice(0, 3).map((promise) => (
             <div
               key={promise.slug}
-              className="rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 p-4"
+              className={`rounded-[1rem] border bg-white/85 p-4 ${
+                promise.impact_direction_for_curation === "Mixed"
+                  ? "border-[rgba(180,83,9,0.14)] bg-[linear-gradient(180deg,rgba(255,251,235,0.86),rgba(255,255,255,0.98))]"
+                  : "border-[rgba(120,53,15,0.1)]"
+              }`}
             >
               <div className="flex items-start justify-between gap-3 flex-wrap">
                 <div>
@@ -136,12 +146,21 @@ function PromiseDriverList({ title, items, emptyMessage }) {
                     {promise.title}
                   </Link>
                 </div>
-                <MetaPill>{formatSignedScore(promise.raw_score)}</MetaPill>
+                <div className="flex flex-wrap items-center justify-end gap-2">
+                  <PromiseImpactDirectionBadge impact={promise.impact_direction_for_curation} />
+                  <MetaPill>{formatSignedScore(promise.raw_score)}</MetaPill>
+                </div>
               </div>
 
               <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
                 {promise.summary || "No summary added yet."}
               </p>
+
+              {promise.impact_direction_for_curation === "Mixed" ? (
+                <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
+                  Mixed impact: documented gains with important limits or exclusions.
+                </p>
+              ) : null}
             </div>
           ))}
         </div>

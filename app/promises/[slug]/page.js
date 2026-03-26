@@ -88,6 +88,36 @@ function actionBadgeClasses(type) {
   }
 }
 
+function normalizeMixedText(value) {
+  if (!value) return null;
+
+  const normalized = String(value).replace(/\s+/g, " ").trim();
+  return normalized || null;
+}
+
+function getMixedImpactSummary(promise) {
+  const mixedOutcome = promise.outcomes?.find((outcome) => outcome.impact_direction === "Mixed");
+
+  if (!mixedOutcome) {
+    return {
+      gains: null,
+      limits: null,
+      fallback: "This record includes documented gains, but also meaningful limits or exclusions.",
+    };
+  }
+
+  const gains = normalizeMixedText(
+    mixedOutcome.measurable_impact || mixedOutcome.outcome_summary
+  );
+  const limits = normalizeMixedText(mixedOutcome.black_community_impact_note);
+
+  return {
+    gains,
+    limits,
+    fallback: "This record includes documented gains, but also meaningful limits or exclusions.",
+  };
+}
+
 export default async function PromiseDetailPage({ params }) {
   const { slug } = await params;
   const promise = await getPromise(slug);
@@ -95,6 +125,9 @@ export default async function PromiseDetailPage({ params }) {
   if (!promise) {
     notFound();
   }
+
+  const mixedImpactSummary =
+    promise.impact_direction_for_curation === "Mixed" ? getMixedImpactSummary(promise) : null;
 
   return (
     <main className="max-w-7xl mx-auto p-6">
@@ -140,6 +173,43 @@ export default async function PromiseDetailPage({ params }) {
           </div>
         </div>
       </section>
+
+      {mixedImpactSummary ? (
+        <section className="card-surface rounded-[1.6rem] p-5 mb-6 border-[rgba(180,83,9,0.12)] bg-[linear-gradient(180deg,rgba(255,251,235,0.9),rgba(255,255,255,0.98))]">
+          <div className="flex items-start justify-between gap-3 flex-wrap">
+            <div className="max-w-3xl">
+              <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">
+                Why this is mixed
+              </p>
+              <p className="text-sm text-[var(--ink-soft)] mt-2 leading-7">
+                Mixed records should not be read as simply positive or negative.
+              </p>
+            </div>
+            <PromiseImpactDirectionBadge impact={promise.impact_direction_for_curation} />
+          </div>
+
+          {mixedImpactSummary.gains && mixedImpactSummary.limits ? (
+            <div className="grid gap-4 md:grid-cols-2 mt-4">
+              <div className="card-muted rounded-[1.15rem] p-4">
+                <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Gains</p>
+                <p className="text-sm text-[var(--ink-soft)] mt-2 leading-7">
+                  {mixedImpactSummary.gains}
+                </p>
+              </div>
+              <div className="card-muted rounded-[1.15rem] p-4">
+                <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Limits</p>
+                <p className="text-sm text-[var(--ink-soft)] mt-2 leading-7">
+                  {mixedImpactSummary.limits}
+                </p>
+              </div>
+            </div>
+          ) : (
+            <p className="text-sm text-[var(--ink-soft)] mt-4 leading-7">
+              {mixedImpactSummary.fallback}
+            </p>
+          )}
+        </section>
+      ) : null}
 
       {promise.notes || promise.overlap_note ? (
         <section className="card-surface rounded-[1.6rem] p-5 mb-6">

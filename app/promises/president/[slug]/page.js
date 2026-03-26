@@ -1,6 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PromiseRelevanceBadge, PromiseStatusBadge } from "@/app/components/policy-badges";
+import {
+  PromiseImpactDirectionBadge,
+  PromiseRelevanceBadge,
+  PromiseStatusBadge,
+} from "@/app/components/policy-badges";
 import { fetchInternalJson } from "@/lib/api";
 import { PUBLIC_REVALIDATE_SECONDS, withRevalidate } from "@/lib/cache";
 import { buildPageMetadata } from "@/lib/metadata";
@@ -67,6 +71,14 @@ function formatDate(dateString) {
 
 function formatTermRange(start, end) {
   return `${formatDate(start) || "Unknown"} to ${end ? formatDate(end) : "Present"}`;
+}
+
+function promiseCardClasses(promise) {
+  if (promise.impact_direction_for_curation === "Mixed") {
+    return "panel-link block rounded-[1.35rem] p-5 border-[rgba(180,83,9,0.14)] bg-[linear-gradient(180deg,rgba(255,251,235,0.86),rgba(255,255,255,0.98))]";
+  }
+
+  return "panel-link block rounded-[1.35rem] p-5";
 }
 
 export default async function PromisePresidentPage({ params, searchParams }) {
@@ -178,7 +190,7 @@ export default async function PromisePresidentPage({ params, searchParams }) {
                   <Link
                     key={promise.id}
                     href={`/promises/${promise.slug}`}
-                    className="panel-link block rounded-[1.35rem] p-5"
+                    className={promiseCardClasses(promise)}
                   >
                     <div className="flex items-start justify-between gap-4 flex-wrap">
                       <div>
@@ -189,6 +201,7 @@ export default async function PromisePresidentPage({ params, searchParams }) {
                       </div>
                       <div className="flex flex-wrap gap-2">
                         <PromiseRelevanceBadge relevance={promise.relevance} />
+                        <PromiseImpactDirectionBadge impact={promise.impact_direction_for_curation} />
                       </div>
                     </div>
 
