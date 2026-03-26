@@ -408,8 +408,8 @@ export default async function ScorecardsPage({ searchParams }) {
 
       <SectionCard title="Schema Foundation">
         <p>
-          I added a first schema draft at <code>database/legislator_scorecards_schema.sql</code> to
-          support legislator records, bill positions, future-bill advocacy links, and precomputed
+          The legislator scorecard foundation now lives in the main database schema snapshot and
+          supports legislator records, bill positions, future-bill advocacy links, and precomputed
           score snapshots.
         </p>
         <p>

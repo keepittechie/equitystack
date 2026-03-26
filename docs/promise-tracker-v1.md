@@ -162,45 +162,20 @@ The count is distinct by `source_id`, so a source linked at more than one level 
 
 ## Deployment and Migration Notes
 
-### Schema Migration
-- [`database/promise_tracker_migration.sql`](/home/josh/Documents/GitHub/equitystack/database/promise_tracker_migration.sql)
+### Current Database Snapshot
+- [`database/equitystack.sql`](/home/josh/Documents/GitHub/equitystack/database/equitystack.sql)
 
-What it does:
-- creates `promises`
-- creates `promise_actions`
-- creates `promise_outcomes`
-- creates `promise_sources`
-- creates `promise_action_sources`
-- creates `promise_outcome_sources`
+Current repo convention:
+- the full database dump is the schema source of truth
+- Promise Tracker tables are included in that dump
+- standalone migration and seed helper files used during implementation may be archived or removed once the dump has been refreshed
 
-Important implementation note:
-- the existing `sources` table is not modified
-- Promise Tracker reuses `sources` through join tables
+### Remaining Promise Tracker Reference File
+- [`database/promise_tracker_import_batch_2_sources.md`](/home/josh/Documents/GitHub/equitystack/database/promise_tracker_import_batch_2_sources.md)
 
-### Demo Seed
-- [`database/promise_tracker_seed.sql`](/home/josh/Documents/GitHub/equitystack/database/promise_tracker_seed.sql)
-
-What it does:
-- inserts demo Promise Tracker records and linked actions, outcomes, and source joins
-- uses `INSERT IGNORE` for rerun safety on existing demo IDs
-
-### Content Update File
-- [`database/promise_tracker_seed_content_update.sql`](/home/josh/Documents/GitHub/equitystack/database/promise_tracker_seed_content_update.sql)
-
-What it does:
-- updates the existing seeded demo promise content only
-- does not change schema
-- does not insert new rows
-- does not change IDs or slugs
-
-### Rerun Caveats
-- the migration uses `CREATE TABLE IF NOT EXISTS`
-  - safe for reruns
-  - does not repair schema drift if a table already exists with the wrong shape
-- the seed file uses `INSERT IGNORE`
-  - safe for reruns
-  - does not update existing seeded rows
-- the content update file is the correct mechanism for revising seeded Promise Tracker copy after rows already exist
+What it is for:
+- manual source reconciliation for the approved Promise Tracker import batch
+- editorial reference, not an executable schema or migration file
 
 ## Manual Test Checklist
 

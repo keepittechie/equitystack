@@ -2,6 +2,8 @@
 
 This folder contains the daily legislative refresh pipeline plus the future-bill audit, AI review, safe-apply, recovery-suggestion, and missing-candidate discovery steps.
 
+Keep this folder focused on the active pipeline. Generated working artifacts belong under `reports/`, while website-side Promise Tracker schema and import SQL live in the repo-level `database/` folder.
+
 ## Daily pipeline
 
 Work from this directory:
@@ -89,6 +91,12 @@ Main outputs:
 
 - `reports/equitystack_pipeline_report.json`
 - `reports/equitystack_review_bundle.json`
+
+Working note:
+
+- `reports/` contains generated operator outputs and review bundles
+- rerunning the pipeline regenerates those files
+- one-off website import staging files are no longer kept in `python/`
 
 Useful variants:
 
