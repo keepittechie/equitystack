@@ -155,7 +155,7 @@ export default function MainLayout({ children }) {
               </h3>
               <div className="flex flex-col gap-2 text-sm">
                 <a
-                  href="https://github.com/keepittechie"
+                  href="https://github.com/keepittechie/equitystack"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-[var(--ink-soft)] hover:text-[var(--accent)]"
