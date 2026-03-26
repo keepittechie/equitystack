@@ -70,3 +70,7 @@ python3 scripts/import_approved_tracked_bills.py --apply --yes --link-imported-b
 The server wrapper command is `~/bin/equitystack`, which runs the same Python workflow from the deployed environment.
 
 Pipeline details, supporting scripts, and the full operator runbook are documented in [`python/README.md`](/home/josh/Documents/GitHub/equitystack/python/README.md).
+
+## Note
+
+This project uses demo and publicly sourced data only. No sensitive or private user data is stored in this repository.
