@@ -1,0 +1,15 @@
+[
+  {
+    "future_bill_id": 7,
+    "congress": 119,
+    "bill_type": "s",
+    "bill_number": "120",
+    "jurisdiction": "Federal",
+    "chamber": "Senate",
+    "source_system": "Approved review bundle import",
+    "active": true,
+    "match_confidence": "Medium",
+    "link_type": null,
+    "link_notes": "Approved from review bundle candidate discovery for future bill 7."
+  }
+]

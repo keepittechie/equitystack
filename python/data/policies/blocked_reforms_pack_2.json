@@ -1,0 +1,198 @@
+[
+  {
+    "title": "Emmett Till Antilynching Act",
+    "policy_type": "Law",
+    "summary": "Would have established a specific federal criminal civil-rights violation for lynching, reviving a reform Congress had failed to enact for more than a century.",
+    "year_enacted": 2020,
+    "date_enacted": "2020-02-26",
+    "era": "Contemporary Era",
+    "president": "Donald J. Trump",
+    "primary_party": "Democratic Party",
+    "house_party": "Democratic Party",
+    "senate_party": "Republican Party",
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "The House passed H.R. 35 in February 2020, but the bill stalled in the Senate, extending Congress's long record of delayed federal action against racial-terror violence.",
+    "status": "Blocked",
+    "impact_direction": "Blocked",
+    "impact_notes": "Important because even a narrowly framed anti-lynching measure still failed to become law at that stage, despite overwhelming historical evidence of federal inaction.",
+    "categories": [
+      "Criminal Justice",
+      "Civil Rights"
+    ],
+    "scores": {
+      "directness_score": 5,
+      "material_impact_score": 4,
+      "evidence_score": 5,
+      "durability_score": 4,
+      "equity_score": 0,
+      "harm_offset_score": 0,
+      "notes": "A major symbolic and legal reform that remained blocked despite the long history of failed anti-lynching legislation."
+    },
+    "sources": [
+      {
+        "source_title": "H.R.35 - Emmett Till Antilynching Act",
+        "source_url": "https://www.congress.gov/bill/116th-congress/house-bill/35",
+        "source_type": "Government",
+        "publisher": "Congress.gov",
+        "published_date": "2020-02-26",
+        "notes": "Official bill page showing House passage and Senate receipt."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Justice in Policing Act of 2020",
+    "policy_type": "Law",
+    "summary": "Would have imposed federal policing standards and expanded accountability measures on issues including use of force, chokeholds, no-knock warrants, data collection, and officer misconduct.",
+    "year_enacted": 2020,
+    "date_enacted": "2020-06-25",
+    "era": "Contemporary Era",
+    "president": "Donald J. Trump",
+    "primary_party": "Democratic Party",
+    "house_party": "Democratic Party",
+    "senate_party": "Republican Party",
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "The House passed H.R. 7120 in June 2020 after nationwide protests over police violence, but the Senate did not enact the measure, leaving major federal policing reforms unrealized.",
+    "status": "Blocked",
+    "impact_direction": "Blocked",
+    "impact_notes": "A major failed accountability package that prefigured the later George Floyd Justice in Policing Act and reflected how difficult it remained to pass federal policing reform.",
+    "categories": [
+      "Criminal Justice",
+      "Civil Rights",
+      "Constitutional Rights"
+    ],
+    "scores": {
+      "directness_score": 5,
+      "material_impact_score": 5,
+      "evidence_score": 5,
+      "durability_score": 4,
+      "equity_score": 0,
+      "harm_offset_score": 0,
+      "notes": "One of the highest-profile blocked policing reforms of the 2020 protest era."
+    },
+    "sources": [
+      {
+        "source_title": "H.R.7120 - George Floyd Justice in Policing Act of 2020",
+        "source_url": "https://www.congress.gov/bill/116th-congress/house-bill/7120/actions",
+        "source_type": "Government",
+        "publisher": "Congress.gov",
+        "published_date": "2020-06-25",
+        "notes": "Official action history showing House passage and subsequent Senate placement on the legislative calendar."
+      },
+      {
+        "source_title": "S.3912 - Justice in Policing Act of 2020",
+        "source_url": "https://www.congress.gov/bill/116th-congress/senate-bill/3912",
+        "source_type": "Government",
+        "publisher": "Congress.gov",
+        "published_date": "2020-06-08",
+        "notes": "Official Senate companion bill page summarizing the proposed reforms."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "CROWN Act of 2022",
+    "policy_type": "Law",
+    "summary": "Would have prohibited discrimination based on hair texture or hairstyles commonly associated with race across employment, housing, public accommodations, and federally assisted programs.",
+    "year_enacted": 2022,
+    "date_enacted": "2022-03-18",
+    "era": "Contemporary Era",
+    "president": "Joseph R. Biden Jr.",
+    "primary_party": "Democratic Party",
+    "house_party": "Democratic Party",
+    "senate_party": "Democratic Party",
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "The House passed the CROWN Act in March 2022, but the bill stalled in the Senate, leaving a visible gap in federal civil-rights protection against race-linked hair discrimination.",
+    "status": "Blocked",
+    "impact_direction": "Blocked",
+    "impact_notes": "Its failure mattered because it targeted a well-documented form of race discrimination that often falls on Black students, workers, and tenants.",
+    "categories": [
+      "Civil Rights",
+      "Labor",
+      "Education",
+      "Housing"
+    ],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 4,
+      "evidence_score": 4,
+      "durability_score": 4,
+      "equity_score": 0,
+      "harm_offset_score": 0,
+      "notes": "A blocked anti-discrimination reform aimed at a specific but widespread racialized practice."
+    },
+    "sources": [
+      {
+        "source_title": "H.R.2116 - CROWN Act of 2022",
+        "source_url": "https://www.congress.gov/bill/117th-congress/house-bill/2116",
+        "source_type": "Government",
+        "publisher": "Congress.gov",
+        "published_date": "2022-03-18",
+        "notes": "Official bill page showing House passage and Senate referral."
+      },
+      {
+        "source_title": "H.R.2116 - CROWN Act of 2022 Summary",
+        "source_url": "https://www.congress.gov/bill/117th-congress/house-bill/2116/summary/00",
+        "source_type": "Government",
+        "publisher": "Congress.gov",
+        "published_date": "2022-03-18",
+        "notes": "CRS summary describing the bill's anti-discrimination provisions."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Justice for Black Farmers Act of 2023",
+    "policy_type": "Law",
+    "summary": "Would have addressed USDA discrimination against Black farmers through debt relief, land-retention and land-grant support, civil-rights reforms, and equity-focused agricultural investment.",
+    "year_enacted": 2023,
+    "date_enacted": "2023-02-24",
+    "era": "Contemporary Era",
+    "president": "Joseph R. Biden Jr.",
+    "primary_party": "Democratic Party",
+    "house_party": "Republican Party",
+    "senate_party": "Democratic Party",
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "The bill directly confronted the documented history of federal discrimination against Black farmers, but it remained stuck in committee and did not produce the structural remedies it proposed.",
+    "status": "Blocked",
+    "impact_direction": "Blocked",
+    "impact_notes": "A major blocked reparative and anti-discrimination agriculture measure because it named the problem directly and proposed institutional remedies that Congress did not advance.",
+    "categories": [
+      "Business and Economics",
+      "Civil Rights",
+      "Education"
+    ],
+    "scores": {
+      "directness_score": 5,
+      "material_impact_score": 5,
+      "evidence_score": 5,
+      "durability_score": 4,
+      "equity_score": 0,
+      "harm_offset_score": 0,
+      "notes": "A high-value blocked reform aimed at one of the clearest long-run sites of federal racial discrimination."
+    },
+    "sources": [
+      {
+        "source_title": "H.R.1167 - Justice for Black Farmers Act of 2023",
+        "source_url": "https://www.congress.gov/bill/118th-congress/house-bill/1167",
+        "source_type": "Government",
+        "publisher": "Congress.gov",
+        "published_date": "2023-02-24",
+        "notes": "Official House bill page and CRS summary explaining the proposed remedies for discrimination against Black farmers."
+      },
+      {
+        "source_title": "S.96 - Justice for Black Farmers Act of 2023",
+        "source_url": "https://www.congress.gov/bill/118th-congress/senate-bill/96/history",
+        "source_type": "Government",
+        "publisher": "Congress.gov",
+        "published_date": "2023-01-26",
+        "notes": "Senate companion history showing the measure's referral and lack of further progress."
+      }
+    ],
+    "metrics": []
+  }
+]

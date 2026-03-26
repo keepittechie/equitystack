@@ -1,0 +1,181 @@
+[
+  {
+    "title": "Federal-Aid Highway Act of 1956",
+    "policy_type": "Law",
+    "summary": "Launched the modern interstate highway system and accelerated massive federally backed road construction through cities and metropolitan regions across the United States.",
+    "year_enacted": 1956,
+    "date_enacted": "1956-06-29",
+    "era": "Civil Rights Era",
+    "president": "Dwight D. Eisenhower",
+    "primary_party": "Republican Party",
+    "bipartisan": true,
+    "direct_black_impact": true,
+    "outcome_summary": "Expanded national mobility and suburban growth, but in many cities interstate routing destroyed or split Black neighborhoods, displaced residents and businesses, and reinforced unequal metropolitan development patterns.",
+    "status": "Active",
+    "impact_direction": "Negative",
+    "impact_notes": "One of the clearest federal infrastructure examples of racialized urban displacement through route selection and redevelopment logic.",
+    "categories": [
+      "Housing",
+      "Business and Economics",
+      "Civil Rights"
+    ],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 5,
+      "evidence_score": 5,
+      "durability_score": 5,
+      "equity_score": 1,
+      "harm_offset_score": 0,
+      "notes": "A landmark infrastructure law with major downstream consequences for Black neighborhoods, housing stability, and wealth."
+    },
+    "sources": [
+      {
+        "source_title": "National Interstate and Defense Highways Act (1956)",
+        "source_url": "https://www.archives.gov/milestone-documents/national-interstate-and-defense-highways-act",
+        "source_type": "Government",
+        "publisher": "National Archives",
+        "published_date": "1956-06-29",
+        "notes": "National Archives milestone document explaining the act, its enactment date, and its sweeping effects on community development and neighborhood destruction."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Uniform Relocation Assistance and Real Property Acquisition Policies Act of 1970",
+    "policy_type": "Law",
+    "summary": "Established federal standards for relocation payments and assistance for people displaced by federal and federally assisted projects, including displaced homeowners, tenants, businesses, and farms.",
+    "year_enacted": 1970,
+    "date_enacted": "1971-01-02",
+    "era": "Civil Rights Era",
+    "president": "Richard Nixon",
+    "primary_party": "Republican Party",
+    "bipartisan": true,
+    "direct_black_impact": true,
+    "outcome_summary": "Created a more equitable relocation framework in response to the harms of urban renewal, highway construction, and other public projects, but it did not undo the disproportionate displacement already borne by Black neighborhoods.",
+    "status": "Active",
+    "impact_direction": "Mixed",
+    "impact_notes": "Important because it recognized displacement harms and set a floor for compensation and assistance, while still operating inside a system that continued to clear and remake urban communities.",
+    "categories": [
+      "Housing",
+      "Civil Rights",
+      "Business and Economics"
+    ],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 4,
+      "evidence_score": 4,
+      "durability_score": 4,
+      "equity_score": 3,
+      "harm_offset_score": 2,
+      "notes": "A partial corrective response to federally backed displacement rather than a full remedy."
+    },
+    "sources": [
+      {
+        "source_title": "S.1 - Uniform Relocation Assistance and Real Property Acquisition Policies Act of 1970",
+        "source_url": "https://www.congress.gov/bill/91st-congress/senate-bill/1/titles",
+        "source_type": "Government",
+        "publisher": "Congress.gov",
+        "published_date": "1971-01-02",
+        "notes": "Official bill titles page describing the law's purpose of providing uniform and equitable treatment to people displaced by federal and federally assisted programs."
+      },
+      {
+        "source_title": "S.1 - Uniform Relocation Assistance and Real Property Acquisition Policies Act of 1970 Actions",
+        "source_url": "https://www.congress.gov/bill/91st-congress/senate-bill/1/actions",
+        "source_type": "Government",
+        "publisher": "Congress.gov",
+        "published_date": "1971-01-02",
+        "notes": "Official action history confirming enactment as Public Law 91-646."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Equal Employment Opportunity Act of 1972",
+    "policy_type": "Law",
+    "summary": "Strengthened Title VII enforcement by giving the EEOC litigation authority, expanding coverage to state and local governments and educational institutions, and extending protections in public employment.",
+    "year_enacted": 1972,
+    "date_enacted": "1972-03-24",
+    "era": "Civil Rights Era",
+    "president": "Richard Nixon",
+    "primary_party": "Republican Party",
+    "bipartisan": true,
+    "direct_black_impact": true,
+    "outcome_summary": "Made federal employment discrimination law more enforceable and widened its reach, materially strengthening the legal infrastructure used by Black workers to challenge exclusion, discriminatory hiring, and unequal promotion practices.",
+    "status": "Active",
+    "impact_direction": "Positive",
+    "impact_notes": "A major labor and civil-rights enforcement law because it transformed Title VII from a weaker promise into a more usable legal tool.",
+    "categories": [
+      "Labor",
+      "Civil Rights"
+    ],
+    "scores": {
+      "directness_score": 5,
+      "material_impact_score": 4,
+      "evidence_score": 5,
+      "durability_score": 5,
+      "equity_score": 5,
+      "harm_offset_score": 1,
+      "notes": "Foundational to modern federal employment discrimination enforcement."
+    },
+    "sources": [
+      {
+        "source_title": "Equal Employment Opportunity Act of 1972",
+        "source_url": "https://www.eeoc.gov/history/equal-employment-opportunity-act-1972",
+        "source_type": "Government",
+        "publisher": "U.S. Equal Employment Opportunity Commission",
+        "published_date": "1972-03-24",
+        "notes": "Official EEOC historical page reproducing the act and explaining the 1972 expansion of Title VII enforcement and coverage."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Housing and Community Development Act of 1974",
+    "policy_type": "Law",
+    "summary": "Created the Community Development Block Grant program and the Section 8 housing assistance framework while restructuring federal urban-development policy.",
+    "year_enacted": 1974,
+    "date_enacted": "1974-08-22",
+    "era": "Civil Rights Era",
+    "president": "Gerald Ford",
+    "primary_party": "Republican Party",
+    "bipartisan": true,
+    "direct_black_impact": true,
+    "outcome_summary": "Supplied durable federal tools for local housing and community development and created the modern voucher framework, but its flexible local administration also meant outcomes for Black communities varied sharply by city, politics, and enforcement.",
+    "status": "Active",
+    "impact_direction": "Mixed",
+    "impact_notes": "A major housing law because it combined meaningful anti-poverty and housing support tools with decentralized implementation that did not reliably overcome segregation or local exclusion.",
+    "categories": [
+      "Housing",
+      "Business and Economics",
+      "Civil Rights"
+    ],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 5,
+      "evidence_score": 4,
+      "durability_score": 5,
+      "equity_score": 3,
+      "harm_offset_score": 2,
+      "notes": "Created long-lived federal housing tools, but their equity effects depended heavily on local choices and enforcement."
+    },
+    "sources": [
+      {
+        "source_title": "S.3066 - Housing and Community Development Act of 1974",
+        "source_url": "https://www.congress.gov/bill/93rd-congress/senate-bill/3066",
+        "source_type": "Government",
+        "publisher": "Congress.gov",
+        "published_date": "1974-08-22",
+        "notes": "Official bill page and CRS summary for the law creating CDBG and related housing and development tools."
+      },
+      {
+        "source_title": "Community Development Block Grant Program",
+        "source_url": "https://www.hud.gov/hud-partners/community-cdbg",
+        "source_type": "Government",
+        "publisher": "U.S. Department of Housing and Urban Development",
+        "published_date": null,
+        "notes": "HUD overview linking the CDBG program directly to Title I of the Housing and Community Development Act of 1974."
+      }
+    ],
+    "metrics": []
+  }
+]

@@ -1,0 +1,211 @@
+[
+  {
+    "title": "Executive Order 8802",
+    "year_enacted": 1941,
+    "sources": [
+      {
+        "source_title": "Executive Order 8802: Prohibition of Discrimination in the Defense Industry",
+        "source_url": "https://www.archives.gov/milestone-documents/executive-order-8802",
+        "source_type": "Government",
+        "publisher": "National Archives",
+        "published_date": "2022-02-08",
+        "notes": "National Archives milestone document page explaining that Executive Order 8802 banned discriminatory employment practices by federal agencies and defense contractors and established the Fair Employment Practices Committee."
+      },
+      {
+        "source_title": "African Americans in World War II",
+        "source_url": "https://www.nationalww2museum.org/war/topics/african-americans-world-war-ii",
+        "source_type": "Other",
+        "publisher": "The National WWII Museum",
+        "published_date": "2025-02-15",
+        "notes": "Overview noting that Roosevelt issued Executive Order 8802 in response to pressure from the March on Washington Movement and that it banned discrimination in the defense industry."
+      },
+      {
+        "source_title": "Becoming the Arsenal of Democracy",
+        "source_url": "https://www.nationalww2museum.org/war/articles/becoming-arsenal-democracy",
+        "source_type": "Other",
+        "publisher": "The National WWII Museum",
+        "published_date": null,
+        "notes": "Historical overview explaining that Executive Order 8802 applied to federally contracted defense industries and created an enforcement mechanism through the Fair Employment Practices Committee."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Executive Order 9981",
+    "year_enacted": 1948,
+    "sources": [
+      {
+        "source_title": "Executive Order 9981: Desegregation of the Armed Forces",
+        "source_url": "https://www.archives.gov/milestone-documents/executive-order-9981",
+        "source_type": "Government",
+        "publisher": "National Archives",
+        "published_date": "2022-02-08",
+        "notes": "National Archives milestone document page describing the 1948 order abolishing segregation in the armed forces and directing integration."
+      },
+      {
+        "source_title": "Executive Order 9981",
+        "source_url": "https://www.trumanlibrary.gov/library/executive-orders/9981/executive-order-9981",
+        "source_type": "Government",
+        "publisher": "Harry S. Truman Presidential Library and Museum",
+        "published_date": null,
+        "notes": "Primary text of Executive Order 9981 stating that there shall be equality of treatment and opportunity in the armed services without regard to race, color, religion, or national origin."
+      },
+      {
+        "source_title": "Desegregation of the Armed Forces",
+        "source_url": "https://www.trumanlibrary.gov/library/online-collections/desegregation-of-armed-forces",
+        "source_type": "Archive",
+        "publisher": "Harry S. Truman Presidential Library and Museum",
+        "published_date": null,
+        "notes": "Archival collection on Truman's decision to desegregate the armed forces and the implementation context around the order."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "National Labor Relations Act",
+    "year_enacted": 1935,
+    "sources": [
+      {
+        "source_title": "National Labor Relations Act",
+        "source_url": "https://www.nlrb.gov/guidance/key-reference-materials/national-labor-relations-act",
+        "source_type": "Government",
+        "publisher": "National Labor Relations Board",
+        "published_date": null,
+        "notes": "NLRB overview explaining that the NLRA protects workers' right to organize and engage in collective bargaining."
+      },
+      {
+        "source_title": "Frequently Asked Questions - NLRB",
+        "source_url": "https://www.nlrb.gov/resources/faq/nlrb",
+        "source_type": "Government",
+        "publisher": "National Labor Relations Board",
+        "published_date": null,
+        "notes": "NLRB FAQ page stating that the NLRA grants employees the right to form or join unions and engage in protected concerted activity."
+      },
+      {
+        "source_title": "Basic Guide to the National Labor Relations Act",
+        "source_url": "https://www.nlrb.gov/sites/default/files/attachments/basic-page/node-3024/basicguide.pdf",
+        "source_type": "Government",
+        "publisher": "National Labor Relations Board",
+        "published_date": null,
+        "notes": "NLRB guide explaining the Act's protections and unlawful employer discrimination tied to union activity."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Fair Labor Standards Act",
+    "year_enacted": 1938,
+    "sources": [
+      {
+        "source_title": "Fair Labor Standards Act of 1938: Maximum Struggle for a Minimum Wage",
+        "source_url": "https://www.dol.gov/general/aboutdol/history/flsa1938",
+        "source_type": "Government",
+        "publisher": "U.S. Department of Labor",
+        "published_date": null,
+        "notes": "Department of Labor history page stating that the FLSA banned oppressive child labor and established a federal minimum wage and maximum workweek."
+      },
+      {
+        "source_title": "History of Changes to the Minimum Wage Law",
+        "source_url": "https://www.dol.gov/agencies/whd/minimum-wage/history",
+        "source_type": "Government",
+        "publisher": "U.S. Department of Labor",
+        "published_date": null,
+        "notes": "Department of Labor history page documenting the original wage floor and later changes under the FLSA."
+      },
+      {
+        "source_title": "History",
+        "source_url": "https://www.dol.gov/agencies/whd/about/history",
+        "source_type": "Government",
+        "publisher": "U.S. Department of Labor",
+        "published_date": null,
+        "notes": "Wage and Hour Division history page noting that the division was created with enactment of the FLSA in 1938."
+      }
+    ],
+    "metrics": [
+      {
+        "metric_name": "Initial federal minimum wage under the Fair Labor Standards Act",
+        "demographic_group": "Covered workers",
+        "before_value": 0,
+        "after_value": 0.25,
+        "unit": "USD per hour",
+        "geography": "United States",
+        "year_before": 1937,
+        "year_after": 1938,
+        "methodology_note": "Department of Labor history states that the original Fair Labor Standards Act established a federal minimum wage of 25 cents per hour."
+      },
+      {
+        "metric_name": "Initial maximum workweek under the Fair Labor Standards Act",
+        "demographic_group": "Covered workers",
+        "before_value": null,
+        "after_value": 44,
+        "unit": "hours per week",
+        "geography": "United States",
+        "year_before": null,
+        "year_after": 1938,
+        "methodology_note": "Department of Labor history states that the original Fair Labor Standards Act set a maximum workweek of 44 hours."
+      }
+    ]
+  },
+  {
+    "title": "Griggs v. Duke Power Company",
+    "year_enacted": 1971,
+    "sources": [
+      {
+        "source_title": "Griggs v. Duke Power Co.",
+        "source_url": "https://supreme.justia.com/cases/federal/us/401/424/",
+        "source_type": "Government",
+        "publisher": "Supreme Court / Justia",
+        "published_date": null,
+        "notes": "Opinion page for the 1971 decision holding that facially neutral employment practices that disproportionately exclude minority applicants and are not job related may violate Title VII."
+      },
+      {
+        "source_title": "Labor & Employment Supreme Court Cases",
+        "source_url": "https://supreme.justia.com/cases-by-topic/labor-employment/",
+        "source_type": "Other",
+        "publisher": "Justia",
+        "published_date": null,
+        "notes": "Justia topic page summarizing Griggs as a key employment discrimination case involving disparate impact."
+      },
+      {
+        "source_title": "Albemarle Paper Co. v. Moody",
+        "source_url": "https://supreme.justia.com/cases/federal/us/422/405/",
+        "source_type": "Government",
+        "publisher": "Supreme Court / Justia",
+        "published_date": null,
+        "notes": "Later Supreme Court opinion discussing Griggs and reinforcing the rule against discriminatory employment tests lacking demonstrable job relevance."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Civil Rights Act of 1991",
+    "year_enacted": 1991,
+    "sources": [
+      {
+        "source_title": "Civil Rights Act of 1991",
+        "source_url": "https://www.eeoc.gov/statutes/civil-rights-act-1991",
+        "source_type": "Government",
+        "publisher": "U.S. Equal Employment Opportunity Commission",
+        "published_date": null,
+        "notes": "EEOC statutory page for the Civil Rights Act of 1991, including expanded remedies such as compensatory and punitive damages in certain discrimination cases."
+      },
+      {
+        "source_title": "Civil Rights Act of 1991 (Original Text)",
+        "source_url": "https://www.eeoc.gov/civil-rights-act-1991-original-text",
+        "source_type": "Government",
+        "publisher": "U.S. Equal Employment Opportunity Commission",
+        "published_date": null,
+        "notes": "Original text page for the Civil Rights Act of 1991."
+      },
+      {
+        "source_title": "Enforcement Guidance: Compensatory and Punitive Damages Available under sec 102 of the CRA of 1991",
+        "source_url": "https://www.eeoc.gov/laws/guidance/enforcement-guidance-compensatory-and-punitive-damages-available-under-sec-102-cra",
+        "source_type": "Government",
+        "publisher": "U.S. Equal Employment Opportunity Commission",
+        "published_date": "1992-07-14",
+        "notes": "EEOC guidance describing the remedies made available under Section 102 of the Civil Rights Act of 1991."
+      }
+    ],
+    "metrics": []
+  }
+]

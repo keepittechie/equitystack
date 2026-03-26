@@ -1,0 +1,34 @@
+[
+  {
+    "title": "Fair Sentencing Act",
+    "policy_type": "Law",
+    "summary": "Reduced sentencing disparity between crack and powder cocaine offenses.",
+    "year_enacted": 2010,
+    "date_enacted": "2010-08-03",
+    "era": "Contemporary Era",
+    "president": "Barack Obama",
+    "primary_party": "Democratic Party",
+    "direct_black_impact": true,
+    "outcome_summary": "Reduced sentencing disparities but did not eliminate them entirely.",
+    "status": "Active",
+    "impact_direction": "Positive",
+    "impact_notes": "Partial correction of prior sentencing inequities.",
+    "categories": ["Criminal Justice"],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 4,
+      "evidence_score": 4,
+      "durability_score": 4,
+      "equity_score": 4,
+      "harm_offset_score": 2
+    },
+    "sources": [
+      {
+        "source_title": "Fair Sentencing Act",
+        "source_url": "https://www.congress.gov/bill/111th-congress/senate-bill/1789",
+        "source_type": "Government"
+      }
+    ],
+    "metrics": []
+  }
+]

@@ -1,0 +1,169 @@
+[
+  {
+    "title": "Home Owners' Loan Corporation (HOLC)",
+    "year_enacted": 1933,
+    "sources": [
+      {
+        "source_title": "Major Housing and Urban Development Legislation Since 1932",
+        "source_url": "https://www.hud.gov/sites/dfiles/GC/documents/LegislationChronology2024.pdf",
+        "source_type": "Government",
+        "publisher": "U.S. Department of Housing and Urban Development",
+        "published_date": "2024-01-01",
+        "notes": "HUD legislative chronology stating that the Home Owners Loan Act of 1933 created the Home Owners' Loan Corporation to refinance mortgages for homeowners facing foreclosure during the Depression."
+      },
+      {
+        "source_title": "HOLC “redlining” maps: The persistent structure of segregation and economic inequality",
+        "source_url": "https://ncrc.org/holc/",
+        "source_type": "Nonprofit",
+        "publisher": "National Community Reinvestment Coalition",
+        "published_date": "2018-03-20",
+        "notes": "NCRC overview of HOLC residential security maps and their long-term relationship to segregation and economic inequality."
+      },
+      {
+        "source_title": "HUD Housing Counselors Training: Module 3.1",
+        "source_url": "https://www.hudhousingcounselors.hud.gov/sites/default/files/study_pdfs/202504_Module%203.1%20PDF.pdf",
+        "source_type": "Government",
+        "publisher": "U.S. Department of Housing and Urban Development",
+        "published_date": "2025-04-01",
+        "notes": "HUD training material explaining that HOLC was created to prevent foreclosures and later developed residential security maps that graded neighborhoods for lending risk."
+      }
+    ],
+    "metrics": [
+      {
+        "metric_name": "Cities assessed through HOLC residential security maps",
+        "demographic_group": "U.S. urban neighborhoods",
+        "before_value": 0,
+        "after_value": 239,
+        "unit": "cities",
+        "geography": "United States",
+        "year_before": 1932,
+        "year_after": 1933,
+        "methodology_note": "HUD training material states that HOLC conducted its residential security mapping assessment in 239 cities. This is a reach metric showing the geographic scale of the mapping system associated with later redlining analysis."
+      }
+    ]
+  },
+  {
+    "title": "National Housing Act of 1934 (FHA Creation)",
+    "year_enacted": 1934,
+    "sources": [
+      {
+        "source_title": "Federal Housing Administration History",
+        "source_url": "https://www.hud.gov/aboutus/fhahistory",
+        "source_type": "Government",
+        "publisher": "U.S. Department of Housing and Urban Development",
+        "published_date": null,
+        "notes": "HUD history page stating that Congress created the FHA in 1934 as the housing market struggled during the Great Depression."
+      },
+      {
+        "source_title": "Major Housing and Urban Development Legislation Since 1932",
+        "source_url": "https://www.hud.gov/sites/dfiles/GC/documents/LegislationChronology2024.pdf",
+        "source_type": "Government",
+        "publisher": "U.S. Department of Housing and Urban Development",
+        "published_date": "2024-01-01",
+        "notes": "HUD legislative chronology describing the National Housing Act of 1934 as creating the FHA to insure long-term mortgage loans made by private lenders."
+      },
+      {
+        "source_title": "Annual Management Report Fiscal Year 2007",
+        "source_url": "https://www.hud.gov/sites/documents/doc_12563.pdf",
+        "source_type": "Government",
+        "publisher": "U.S. Department of Housing and Urban Development",
+        "published_date": "2007-01-01",
+        "notes": "HUD report noting that Congress created FHA in the National Housing Act to expand opportunities for homeownership."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Housing Act of 1949",
+    "year_enacted": 1949,
+    "sources": [
+      {
+        "source_title": "Major Housing and Urban Development Legislation Since 1932",
+        "source_url": "https://www.hud.gov/sites/dfiles/GC/documents/LegislationChronology2024.pdf",
+        "source_type": "Government",
+        "publisher": "U.S. Department of Housing and Urban Development",
+        "published_date": "2024-01-01",
+        "notes": "HUD legislative chronology explaining that the Housing Act of 1949 authorized urban redevelopment, slum clearance, and related housing activities."
+      },
+      {
+        "source_title": "50 Years of PD&R's Gentrification Research",
+        "source_url": "https://www.huduser.gov/archives/portal/pdredge/pdr-edge-pdrat50-090523.html",
+        "source_type": "Government",
+        "publisher": "HUD User",
+        "published_date": "2023-09-05",
+        "notes": "HUD User article explaining that urban renewal policy began with Title I of the Housing Act of 1949 and frequently displaced lower-income households, many headed by Black residents."
+      },
+      {
+        "source_title": "Is Your Public Housing Historic?",
+        "source_url": "https://www.hud.gov/sites/dfiles/PIH/documents/Section106_PublicHousing_Primer.pdf",
+        "source_type": "Government",
+        "publisher": "U.S. Department of Housing and Urban Development",
+        "published_date": "2020-12-01",
+        "notes": "HUD primer stating that the 1949 Housing Act restarted and reauthorized the federal public housing program and linked it to redevelopment and demolition of older neighborhoods."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Equal Credit Opportunity Act",
+    "year_enacted": 1974,
+    "sources": [
+      {
+        "source_title": "The Equal Credit Opportunity Act",
+        "source_url": "https://www.justice.gov/crt/equal-credit-opportunity-act-3",
+        "source_type": "Government",
+        "publisher": "U.S. Department of Justice",
+        "published_date": "2025-01-02",
+        "notes": "DOJ overview of ECOA stating that creditors may not discriminate on the basis of race, color, religion, national origin, sex, marital status, age, public assistance income, or exercise of rights under consumer protection law."
+      },
+      {
+        "source_title": "Fair Lending Enforcement",
+        "source_url": "https://www.justice.gov/crt/fair-lending-enforcement",
+        "source_type": "Government",
+        "publisher": "U.S. Department of Justice",
+        "published_date": "2025-02-11",
+        "notes": "DOJ fair lending enforcement page explaining that ECOA and the Fair Housing Act protect equal access to credit."
+      },
+      {
+        "source_title": "Fifty Years of Access to Lending Opportunity: Where Are We Now?",
+        "source_url": "https://www.justice.gov/archives/opa/blog/fifty-years-access-lending-opportunity-where-are-we-now",
+        "source_type": "Government",
+        "publisher": "U.S. Department of Justice",
+        "published_date": "2024-12-02",
+        "notes": "DOJ blog post marking the 51st year of ECOA and discussing its role in fair lending enforcement."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Home Mortgage Disclosure Act",
+    "year_enacted": 1975,
+    "sources": [
+      {
+        "source_title": "Home Mortgage Disclosure Act (HMDA) Data",
+        "source_url": "https://www.consumerfinance.gov/data-research/hmda/",
+        "source_type": "Government",
+        "publisher": "Consumer Financial Protection Bureau",
+        "published_date": "2024-12-13",
+        "notes": "CFPB overview stating that HMDA requires many financial institutions to maintain, report, and publicly disclose mortgage loan-level information to help reveal whether lenders are serving community housing needs and to illuminate potentially discriminatory patterns."
+      },
+      {
+        "source_title": "Home Mortgage Disclosure (Regulation C)",
+        "source_url": "https://www.consumerfinance.gov/rules-policy/regulations/1003/",
+        "source_type": "Government",
+        "publisher": "Consumer Financial Protection Bureau",
+        "published_date": "2026-01-07",
+        "notes": "Current CFPB Regulation C page for HMDA compliance and disclosure requirements."
+      },
+      {
+        "source_title": "Community Reinvestment Act of 1977",
+        "source_url": "https://www.federalreservehistory.org/essays/community-reinvestment-act",
+        "source_type": "Government",
+        "publisher": "Federal Reserve History",
+        "published_date": "2023-05-08",
+        "notes": "Federal Reserve History page noting that advocacy groups used data disclosed through HMDA to uncover continued redlining and support CRA-era analysis."
+      }
+    ],
+    "metrics": []
+  }
+]

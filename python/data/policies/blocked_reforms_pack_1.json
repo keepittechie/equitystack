@@ -1,0 +1,221 @@
+[
+  {
+    "title": "George White Anti-Lynching Bill (H.R. 6963)",
+    "policy_type": "Law",
+    "summary": "Representative George Henry White introduced the first federal anti-lynching bill to protect citizens against mob violence, but the measure never made it out of committee.",
+    "year_enacted": 1900,
+    "date_enacted": "1900-01-20",
+    "era": "Jim Crow and Disenfranchisement",
+    "president": "William McKinley",
+    "primary_party": "Republican Party",
+    "house_party": "Republican Party",
+    "senate_party": "Republican Party",
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "Its failure left Black communities exposed to racial terror at the dawn of Jim Crow and showed how little federal protection Congress was willing to provide even when lynching was openly used to terrorize Black citizens.",
+    "status": "Blocked",
+    "impact_direction": "Blocked",
+    "impact_notes": "Historically significant as the first federal anti-lynching effort, and significant precisely because Congress failed to act when mob violence against Black Americans was already entrenched.",
+    "categories": ["Criminal Justice", "Civil Rights"],
+    "scores": {
+      "directness_score": 5,
+      "material_impact_score": 4,
+      "evidence_score": 4,
+      "durability_score": 4,
+      "equity_score": 0,
+      "harm_offset_score": 0,
+      "notes": "A major missed opportunity for federal intervention against racial terror."
+    },
+    "sources": [
+      {
+        "source_title": "Anti-Lynching Petition",
+        "source_url": "https://history.house.gov/HouseRecord/Detail/15032448844",
+        "source_type": "Government",
+        "publisher": "U.S. House of Representatives, History, Art & Archives",
+        "published_date": "1900-02-21",
+        "notes": "Official House historical record describing George White's H.R. 6963, its introduction date, and the fact that it never left committee."
+      },
+      {
+        "source_title": "Toward a 'Temporary Farewell': Anti-Lynching Legislation",
+        "source_url": "https://history.house.gov/Exhibitions-and-Publications/BAIC/Historical-Essays/Fifteenth-Amendment/Temporary-Farewell/",
+        "source_type": "Government",
+        "publisher": "U.S. House of Representatives, History, Art & Archives",
+        "published_date": null,
+        "notes": "Official historical essay explaining White's introduction of the first federal anti-lynching bill in 1900."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Gavagan Anti-Lynching Bill (H.R. 1507)",
+    "policy_type": "Law",
+    "summary": "The House passed Representative Joseph Gavagan's anti-lynching bill in 1937, but Senate filibusters and failed cloture efforts prevented it from becoming law.",
+    "year_enacted": 1937,
+    "date_enacted": "1937-04-15",
+    "era": "Jim Crow and Disenfranchisement",
+    "president": "Franklin D. Roosevelt",
+    "primary_party": "Democratic Party",
+    "house_party": "Democratic Party",
+    "senate_party": "Democratic Party",
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "Its defeat showed that even after the House passed stronger anti-lynching legislation, the Senate remained willing to preserve white supremacist violence by blocking federal punishment.",
+    "status": "Blocked",
+    "impact_direction": "Blocked",
+    "impact_notes": "A major failed anti-lynching measure whose defeat underscored the power of southern obstruction against Black civil-rights protection.",
+    "categories": ["Criminal Justice", "Civil Rights"],
+    "scores": {
+      "directness_score": 5,
+      "material_impact_score": 5,
+      "evidence_score": 5,
+      "durability_score": 4,
+      "equity_score": 0,
+      "harm_offset_score": 0,
+      "notes": "One of the most important blocked anti-lynching efforts because it actually passed the House and still died under Senate obstruction."
+    },
+    "sources": [
+      {
+        "source_title": "Cloture Motions - 75th Congress",
+        "source_url": "https://www.senate.gov/legislative/cloture/75.htm",
+        "source_type": "Government",
+        "publisher": "United States Senate",
+        "published_date": null,
+        "notes": "Official Senate record showing failed cloture attempts on H.R. 1507 in 1937."
+      },
+      {
+        "source_title": "Arthur Wergs Mitchell",
+        "source_url": "https://history.house.gov/People/Detail/18340",
+        "source_type": "Government",
+        "publisher": "U.S. House of Representatives, History, Art & Archives",
+        "published_date": null,
+        "notes": "Official House history page describing the 1937 Gavagan anti-lynching bill, House passage, and Senate failure."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "John R. Lewis Voting Rights Advancement Act of 2021",
+    "policy_type": "Law",
+    "summary": "Would have restored and modernized key Voting Rights Act preclearance and anti-discrimination protections weakened by Shelby County v. Holder and subsequent voting-rights litigation.",
+    "year_enacted": 2021,
+    "date_enacted": "2021-08-17",
+    "era": "Contemporary Era",
+    "president": "Joseph R. Biden Jr.",
+    "primary_party": "Democratic Party",
+    "house_party": "Democratic Party",
+    "senate_party": "Democratic Party",
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "The House passed H.R. 4, and a Senate version followed, but the bill ultimately stalled under Senate obstruction, leaving major voting-rights protections unrestored during a period of aggressive state-level voting restrictions.",
+    "status": "Blocked",
+    "impact_direction": "Blocked",
+    "impact_notes": "A central blocked voting-rights reform because it was designed specifically to rebuild federal protections after major Supreme Court retrenchment.",
+    "categories": ["Voting Rights", "Civil Rights", "Constitutional Rights"],
+    "scores": {
+      "directness_score": 5,
+      "material_impact_score": 5,
+      "evidence_score": 5,
+      "durability_score": 4,
+      "equity_score": 0,
+      "harm_offset_score": 0,
+      "notes": "A high-stakes failed reform with direct implications for Black political participation and anti-discrimination enforcement."
+    },
+    "sources": [
+      {
+        "source_title": "H.R.4 - John R. Lewis Voting Rights Advancement Act of 2021",
+        "source_url": "https://www.congress.gov/bill/117th-congress/house-bill/4",
+        "source_type": "Government",
+        "publisher": "Congress.gov",
+        "published_date": "2021-08-17",
+        "notes": "Official bill page showing House introduction, House passage, and Senate receipt."
+      },
+      {
+        "source_title": "S.4 - John R. Lewis Voting Rights Advancement Act of 2021",
+        "source_url": "https://www.congress.gov/index.php/bill/117th-congress/senate-bill/4",
+        "source_type": "Government",
+        "publisher": "Congress.gov",
+        "published_date": "2021-10-05",
+        "notes": "Official Senate bill page showing the November 3, 2021 failed cloture motion to proceed."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Ending Qualified Immunity Act",
+    "policy_type": "Law",
+    "summary": "Would have eliminated the qualified immunity defense in civil rights actions, making it easier to hold state actors personally liable for constitutional violations.",
+    "year_enacted": 2021,
+    "date_enacted": "2021-03-01",
+    "era": "Contemporary Era",
+    "president": "Joseph R. Biden Jr.",
+    "primary_party": "Democratic Party",
+    "house_party": "Democratic Party",
+    "senate_party": "Democratic Party",
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "The bill was introduced in the wake of nationwide protests over police violence but failed to advance, leaving a major barrier to civil-rights accountability in place.",
+    "status": "Blocked",
+    "impact_direction": "Blocked",
+    "impact_notes": "Important not because it passed, but because its failure left intact one of the legal doctrines most criticized for impeding accountability in cases of police and state violence affecting Black communities.",
+    "categories": ["Criminal Justice", "Civil Rights", "Constitutional Rights"],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 4,
+      "evidence_score": 5,
+      "durability_score": 4,
+      "equity_score": 0,
+      "harm_offset_score": 0,
+      "notes": "A major failed accountability reform tied to the policing and civil-rights debate after 2020."
+    },
+    "sources": [
+      {
+        "source_title": "H.R.1470 - Ending Qualified Immunity Act",
+        "source_url": "https://www.congress.gov/bill/117th-congress/house-bill/1470",
+        "source_type": "Government",
+        "publisher": "Congress.gov",
+        "published_date": "2021-03-01",
+        "notes": "Official House bill page showing introduction and committee referral of the 117th Congress version."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Commission to Study and Develop Reparation Proposals for African Americans Act",
+    "policy_type": "Law",
+    "summary": "Would establish a federal commission to study slavery, subsequent racial discrimination, and the continuing effects of those systems, and to recommend remedies including reparative measures.",
+    "year_enacted": 2023,
+    "date_enacted": "2023-01-09",
+    "era": "Contemporary Era",
+    "president": "Joseph R. Biden Jr.",
+    "primary_party": "Democratic Party",
+    "house_party": "Republican Party",
+    "senate_party": "Democratic Party",
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "The bill kept reparations in the federal legislative conversation, but it remained stuck in committee and did not create the commission needed to generate formal federal findings and recommendations.",
+    "status": "Blocked",
+    "impact_direction": "Blocked",
+    "impact_notes": "A high-visibility blocked reform because it sought only a study commission, yet even that limited federal reckoning with slavery and its afterlives did not advance.",
+    "categories": ["Civil Rights", "Business and Economics", "Constitutional Rights"],
+    "scores": {
+      "directness_score": 5,
+      "material_impact_score": 4,
+      "evidence_score": 5,
+      "durability_score": 4,
+      "equity_score": 0,
+      "harm_offset_score": 0,
+      "notes": "A major blocked reparations measure with strong symbolic and agenda-setting significance."
+    },
+    "sources": [
+      {
+        "source_title": "H.R.40 - Commission to Study and Develop Reparation Proposals for African Americans Act",
+        "source_url": "https://www.congress.gov/bill/118th-congress/house-bill/40",
+        "source_type": "Government",
+        "publisher": "Congress.gov",
+        "published_date": "2023-01-09",
+        "notes": "Official bill page showing the 118th Congress version and its referral to the House Judiciary Committee."
+      }
+    ],
+    "metrics": []
+  }
+]

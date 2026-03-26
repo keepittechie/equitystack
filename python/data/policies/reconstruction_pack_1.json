@@ -1,0 +1,197 @@
+[
+  {
+    "title": "Civil Rights Cases (1883)",
+    "policy_type": "Court Case",
+    "summary": "The Supreme Court struck down the Civil Rights Act of 1875, ruling that Congress could not prohibit racial discrimination by private individuals or businesses.",
+    "year_enacted": 1883,
+    "date_enacted": "1883-10-15",
+    "era": "Jim Crow and Disenfranchisement",
+    "president": null,
+    "primary_party": null,
+    "house_party": null,
+    "senate_party": null,
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "This decision allowed widespread segregation in public accommodations and laid the legal groundwork for Jim Crow laws.",
+    "status": "Active",
+    "impact_direction": "Negative",
+    "impact_notes": "Undercut Reconstruction civil-rights protections and narrowed federal enforcement power.",
+    "categories": ["Civil Rights", "Constitutional Rights"],
+    "scores": {
+      "directness_score": 5,
+      "material_impact_score": 5,
+      "evidence_score": 4,
+      "durability_score": 5,
+      "equity_score": 1,
+      "harm_offset_score": 0,
+      "notes": "Major rollback of federal civil-rights protections."
+    },
+    "sources": [
+      {
+        "source_title": "The Civil Rights Cases",
+        "source_url": "https://supreme.justia.com/cases/federal/us/109/3/",
+        "source_type": "Government",
+        "publisher": "Supreme Court / Justia",
+        "published_date": null,
+        "notes": "Primary case text"
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Plessy v. Ferguson",
+    "policy_type": "Court Case",
+    "summary": "The Supreme Court upheld racial segregation under the separate but equal doctrine.",
+    "year_enacted": 1896,
+    "date_enacted": "1896-05-18",
+    "era": "Jim Crow and Disenfranchisement",
+    "president": null,
+    "primary_party": null,
+    "house_party": null,
+    "senate_party": null,
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "Legalized segregation across the United States for decades until overturned by Brown v. Board of Education.",
+    "status": "Active",
+    "impact_direction": "Negative",
+    "impact_notes": "One of the central legal pillars of Jim Crow segregation.",
+    "categories": ["Civil Rights", "Constitutional Rights"],
+    "scores": {
+      "directness_score": 5,
+      "material_impact_score": 5,
+      "evidence_score": 5,
+      "durability_score": 5,
+      "equity_score": 0,
+      "harm_offset_score": 0,
+      "notes": "Foundational segregation ruling."
+    },
+    "sources": [
+      {
+        "source_title": "Plessy v. Ferguson",
+        "source_url": "https://supreme.justia.com/cases/federal/us/163/537/",
+        "source_type": "Government",
+        "publisher": "Supreme Court / Justia",
+        "published_date": null,
+        "notes": "Primary case text"
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Guinn v. United States",
+    "policy_type": "Court Case",
+    "summary": "The Supreme Court struck down grandfather clauses that were used to block Black Americans from voting.",
+    "year_enacted": 1915,
+    "date_enacted": "1915-06-21",
+    "era": "Jim Crow and Disenfranchisement",
+    "president": null,
+    "primary_party": null,
+    "house_party": null,
+    "senate_party": null,
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "Temporarily expanded voting rights, though states later adopted new suppression tactics.",
+    "status": "Active",
+    "impact_direction": "Positive",
+    "impact_notes": "A meaningful voting-rights win, but states adapted quickly.",
+    "categories": ["Voting Rights"],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 3,
+      "evidence_score": 4,
+      "durability_score": 2,
+      "equity_score": 4,
+      "harm_offset_score": 0,
+      "notes": "Helpful ruling with limited long-term durability."
+    },
+    "sources": [
+      {
+        "source_title": "Guinn v. United States",
+        "source_url": "https://supreme.justia.com/cases/federal/us/238/347/",
+        "source_type": "Government",
+        "publisher": "Supreme Court / Justia",
+        "published_date": null,
+        "notes": "Primary case text"
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Smith v. Allwright",
+    "policy_type": "Court Case",
+    "summary": "The Supreme Court ruled that white-only primary elections were unconstitutional.",
+    "year_enacted": 1944,
+    "date_enacted": "1944-04-03",
+    "era": "Civil Rights Era",
+    "president": "Franklin D. Roosevelt",
+    "primary_party": null,
+    "house_party": null,
+    "senate_party": null,
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "Significantly increased Black voter participation in Southern states.",
+    "status": "Active",
+    "impact_direction": "Positive",
+    "impact_notes": "Major voting-rights breakthrough against white primaries.",
+    "categories": ["Voting Rights"],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 4,
+      "evidence_score": 4,
+      "durability_score": 4,
+      "equity_score": 4,
+      "harm_offset_score": 0,
+      "notes": "Strong pre-VRA voting-rights decision."
+    },
+    "sources": [
+      {
+        "source_title": "Smith v. Allwright",
+        "source_url": "https://supreme.justia.com/cases/federal/us/321/649/",
+        "source_type": "Government",
+        "publisher": "Supreme Court / Justia",
+        "published_date": null,
+        "notes": "Primary case text"
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Shelley v. Kraemer",
+    "policy_type": "Court Case",
+    "summary": "The Supreme Court ruled that racially restrictive housing covenants could not be enforced by courts.",
+    "year_enacted": 1948,
+    "date_enacted": "1948-05-03",
+    "era": "Civil Rights Era",
+    "president": "Harry S. Truman",
+    "primary_party": null,
+    "house_party": null,
+    "senate_party": null,
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "Undermined legal enforcement of housing segregation, though discriminatory housing practices continued.",
+    "status": "Active",
+    "impact_direction": "Positive",
+    "impact_notes": "Important housing-rights precedent with incomplete practical enforcement.",
+    "categories": ["Housing", "Civil Rights"],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 4,
+      "evidence_score": 4,
+      "durability_score": 3,
+      "equity_score": 4,
+      "harm_offset_score": 0,
+      "notes": "Important housing desegregation ruling."
+    },
+    "sources": [
+      {
+        "source_title": "Shelley v. Kraemer",
+        "source_url": "https://supreme.justia.com/cases/federal/us/334/1/",
+        "source_type": "Government",
+        "publisher": "Supreme Court / Justia",
+        "published_date": null,
+        "notes": "Primary case text"
+      }
+    ],
+    "metrics": []
+  }
+]

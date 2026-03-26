@@ -1,0 +1,255 @@
+[
+  {
+    "title": "Hospital Survey and Construction Act",
+    "policy_type": "Law",
+    "summary": "Authorized federal grants and loans for hospital construction and modernization through state plans, greatly expanding hospital infrastructure while permitting segregated implementation in many parts of the country.",
+    "year_enacted": 1946,
+    "date_enacted": "1946-08-13",
+    "era": "Civil Rights Era",
+    "president": "Harry S. Truman",
+    "primary_party": "Democratic Party",
+    "bipartisan": true,
+    "direct_black_impact": true,
+    "outcome_summary": "Expanded healthcare capacity nationwide but often reinforced segregated care and unequal access for Black patients until later civil rights enforcement and litigation challenged discriminatory administration.",
+    "status": "Partially Active",
+    "impact_direction": "Mixed",
+    "impact_notes": "A major public-health investment whose benefits were filtered through state and local systems that frequently upheld segregation.",
+    "categories": ["Healthcare", "Civil Rights"],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 4,
+      "evidence_score": 4,
+      "durability_score": 3,
+      "equity_score": 1,
+      "harm_offset_score": 1,
+      "notes": "Expanded physical access to care but left Black communities exposed to segregated and unequal hospital systems."
+    },
+    "sources": [
+      {
+        "source_title": "Hill-Burton Facilities Compliance",
+        "source_url": "https://www.hrsa.gov/get-health-care/affordable/hill-burton/compliance",
+        "source_type": "Government",
+        "publisher": "Health Resources and Services Administration",
+        "published_date": null,
+        "notes": "Federal program overview describing the 1946 law, its obligations, and its later compliance regime."
+      },
+      {
+        "source_title": "Green Bill to End Hospital Discrimination Under the Hill-Burton Act",
+        "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC2642116/",
+        "source_type": "Academic",
+        "publisher": "Journal of the National Medical Association",
+        "published_date": "1962-09-01",
+        "notes": "Contemporary discussion of how Hill-Burton funding intersected with hospital discrimination."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Food Stamp Act of 1964",
+    "policy_type": "Law",
+    "summary": "Made the federal Food Stamp Program permanent, using nutrition assistance as a nationwide anti-poverty tool for households with low income.",
+    "year_enacted": 1964,
+    "date_enacted": "1964-08-31",
+    "era": "Civil Rights Era",
+    "president": "Lyndon B. Johnson",
+    "primary_party": "Democratic Party",
+    "bipartisan": true,
+    "direct_black_impact": true,
+    "outcome_summary": "Expanded food assistance and became a major stabilizing support for low-income Black households, even though local administration and benefit adequacy remained uneven over time.",
+    "status": "Partially Active",
+    "impact_direction": "Positive",
+    "impact_notes": "A durable anti-hunger program with substantial downstream effects on poverty, nutrition, and household stability.",
+    "categories": ["Social Welfare", "Business and Economics"],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 4,
+      "evidence_score": 4,
+      "durability_score": 5,
+      "equity_score": 4,
+      "harm_offset_score": 1,
+      "notes": "Not race-specific, but highly consequential for communities facing concentrated poverty and food insecurity."
+    },
+    "sources": [
+      {
+        "source_title": "The Food Stamp Act of 1964",
+        "source_url": "https://www.congress.gov/bill/88th-congress/house-bill/10222/text/pl?overview=closed",
+        "source_type": "Government",
+        "publisher": "Congress.gov",
+        "published_date": "1964-08-31",
+        "notes": "Statutory text for the law that made the Food Stamp Program permanent."
+      },
+      {
+        "source_title": "The Many Reasons USDA is Celebrating 50 Years of SNAP",
+        "source_url": "https://www.usda.gov/about-usda/news/blog/many-reasons-usda-celebrating-50-years-snap",
+        "source_type": "Government",
+        "publisher": "U.S. Department of Agriculture",
+        "published_date": "2014-11-20",
+        "notes": "USDA overview of the program's anti-poverty role and its development from the 1964 law."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Social Security Amendments of 1965",
+    "policy_type": "Law",
+    "summary": "Created Medicare and Medicaid while expanding older-age and public assistance programs, making federal health coverage a permanent pillar of the welfare state.",
+    "year_enacted": 1965,
+    "date_enacted": "1965-07-30",
+    "era": "Civil Rights Era",
+    "president": "Lyndon B. Johnson",
+    "primary_party": "Democratic Party",
+    "bipartisan": true,
+    "direct_black_impact": true,
+    "outcome_summary": "Greatly expanded health insurance access and became central to reducing racial gaps in medical coverage and care, especially through Medicaid and later expansions tied to it.",
+    "status": "Active",
+    "impact_direction": "Positive",
+    "impact_notes": "One of the most consequential federal health-policy expansions for Black Americans in the twentieth century.",
+    "categories": ["Healthcare", "Social Welfare"],
+    "scores": {
+      "directness_score": 5,
+      "material_impact_score": 5,
+      "evidence_score": 5,
+      "durability_score": 5,
+      "equity_score": 5,
+      "harm_offset_score": 1,
+      "notes": "Created the programs that remain foundational to health coverage for older adults, disabled people, and low-income households."
+    },
+    "sources": [
+      {
+        "source_title": "Social Security Amendments of 1965",
+        "source_url": "https://www.congress.gov/bill/89th-congress/house-bill/6675/titles",
+        "source_type": "Government",
+        "publisher": "Congress.gov",
+        "published_date": "1965-07-30",
+        "notes": "Congressional record for the law that created Medicare and expanded medical assistance under Medicaid."
+      },
+      {
+        "source_title": "Loss of the Affordable Care Act Would Widen Racial Disparities in Health Coverage",
+        "source_url": "https://www.kff.org/medicaid/loss-of-the-affordable-care-act-would-widen-racial-disparities-in-health-coverage/",
+        "source_type": "Nonprofit",
+        "publisher": "KFF",
+        "published_date": "2020-08-26",
+        "notes": "Provides context on Medicaid's role in narrowing racial coverage gaps, which reflects the long legacy of the 1965 amendments."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Veterans' Readjustment Benefits Act of 1966",
+    "policy_type": "Law",
+    "summary": "Extended education, training, loan, and readjustment benefits to a new generation of veterans, including many who served during the Vietnam era.",
+    "year_enacted": 1966,
+    "date_enacted": "1966-03-03",
+    "era": "Civil Rights Era",
+    "president": "Lyndon B. Johnson",
+    "primary_party": "Democratic Party",
+    "bipartisan": true,
+    "direct_black_impact": true,
+    "outcome_summary": "Expanded veteran benefits, but Black veterans still faced discrimination in housing, education, and local administration that limited equal access to the wealth-building potential of those supports.",
+    "status": "Expired",
+    "impact_direction": "Mixed",
+    "impact_notes": "Important expansion of veteran benefits whose practical returns remained constrained by broader racial inequality.",
+    "categories": ["Military and Veterans", "Education", "Business and Economics"],
+    "scores": {
+      "directness_score": 3,
+      "material_impact_score": 3,
+      "evidence_score": 3,
+      "durability_score": 2,
+      "equity_score": 2,
+      "harm_offset_score": 1,
+      "notes": "Helpful in design, but implemented within markets and institutions that still sharply limited Black veterans' returns."
+    },
+    "sources": [
+      {
+        "source_title": "Veterans' Readjustment Benefits Act of 1966",
+        "source_url": "https://www.congress.gov/bill/89th-congress/senate-bill/9/titles",
+        "source_type": "Government",
+        "publisher": "Congress.gov",
+        "published_date": "1966-03-03",
+        "notes": "Congressional record for the law extending readjustment assistance to veterans."
+      },
+      {
+        "source_title": "Veterans' Readjustment Benefits Act of 1966 Actions",
+        "source_url": "https://www.congress.gov/bill/89th-congress/senate-bill/9/all-actions",
+        "source_type": "Government",
+        "publisher": "Congress.gov",
+        "published_date": "1966-03-03",
+        "notes": "Action history confirming enactment and legislative progression."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Patient Protection and Affordable Care Act",
+    "policy_type": "Law",
+    "summary": "Expanded Medicaid, created insurance marketplaces, prohibited many coverage denials, and widened subsidized access to health insurance.",
+    "year_enacted": 2010,
+    "date_enacted": "2010-03-23",
+    "era": "Contemporary Era",
+    "president": "Barack Obama",
+    "primary_party": "Democratic Party",
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "Reduced uninsured rates and narrowed several racial disparities in health coverage and access, with especially important effects for Black adults in Medicaid expansion states.",
+    "status": "Active",
+    "impact_direction": "Positive",
+    "impact_notes": "A major health-equity expansion whose effects have depended partly on state implementation choices.",
+    "categories": ["Healthcare", "Social Welfare", "Civil Rights"],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 5,
+      "evidence_score": 5,
+      "durability_score": 4,
+      "equity_score": 5,
+      "harm_offset_score": 2,
+      "notes": "One of the most important modern health reforms for reducing uninsurance and improving access among Black Americans."
+    },
+    "sources": [
+      {
+        "source_title": "Patient Protection and Affordable Care Act",
+        "source_url": "https://www.congress.gov/bill/111th-congress/house-bill/3590",
+        "source_type": "Government",
+        "publisher": "Congress.gov",
+        "published_date": "2010-03-23",
+        "notes": "Congressional record for the ACA and its enactment date."
+      },
+      {
+        "source_title": "The Affordable Care Act and African Americans",
+        "source_url": "https://aspe.hhs.gov/reports/affordable-care-act-african-americans-0",
+        "source_type": "Government",
+        "publisher": "U.S. Department of Health and Human Services",
+        "published_date": "2012-04-11",
+        "notes": "HHS overview of ACA provisions expected to improve coverage and healthcare access for African Americans."
+      },
+      {
+        "source_title": "Loss of the Affordable Care Act Would Widen Racial Disparities in Health Coverage",
+        "source_url": "https://www.kff.org/medicaid/loss-of-the-affordable-care-act-would-widen-racial-disparities-in-health-coverage/",
+        "source_type": "Nonprofit",
+        "publisher": "KFF",
+        "published_date": "2020-08-26",
+        "notes": "Synthesizes research showing ACA and Medicaid expansion effects on racial coverage disparities."
+      },
+      {
+        "source_title": "Health Insurance Coverage and Access to Care Among Black Americans: Recent Trends and Key Challenges",
+        "source_url": "https://aspe.hhs.gov/sites/default/files/documents/4fc0ddbcee8d583d57e399dad6201536/aspe-coverage-access-black-americans-ib.pdf",
+        "source_type": "Government",
+        "publisher": "U.S. Department of Health and Human Services",
+        "published_date": "2024-06-07",
+        "notes": "HHS issue brief stating that since implementation of the ACA coverage provisions, the uninsured rate among nonelderly Black Americans decreased by 10 percentage points."
+      }
+    ],
+    "metrics": [
+      {
+        "metric_name": "Change in uninsured rate among nonelderly Black Americans after ACA coverage provisions",
+        "demographic_group": "Black Americans",
+        "before_value": null,
+        "after_value": -10,
+        "unit": "percentage points",
+        "geography": "United States",
+        "year_before": 2010,
+        "year_after": 2024,
+        "methodology_note": "HHS reported in 2024 that since implementation of the Affordable Care Act coverage provisions, the uninsured rate among nonelderly Black Americans decreased by 10 percentage points."
+      }
+    ]
+  }
+]

@@ -1,0 +1,194 @@
+[
+  {
+    "title": "Civil Rights Act of 1991",
+    "policy_type": "Law",
+    "summary": "Strengthened civil rights protections in employment and allowed for jury trials and damages in discrimination cases.",
+    "year_enacted": 1991,
+    "date_enacted": "1991-11-21",
+    "era": "Contemporary Era",
+    "president": "George H. W. Bush",
+    "primary_party": "Republican Party",
+    "direct_black_impact": true,
+    "outcome_summary": "Expanded legal remedies for victims of workplace discrimination.",
+    "status": "Active",
+    "impact_direction": "Positive",
+    "impact_notes": "Reversed several Supreme Court decisions that had weakened discrimination protections.",
+    "categories": ["Civil Rights", "Labor"],
+    "scores": {
+      "directness_score": 5,
+      "material_impact_score": 4,
+      "evidence_score": 5,
+      "durability_score": 5,
+      "equity_score": 5,
+      "harm_offset_score": 1
+    },
+    "sources": [
+      {
+        "source_title": "Civil Rights Act of 1991",
+        "source_url": "https://www.congress.gov/bill/102nd-congress/house-bill/1",
+        "source_type": "Government"
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Motor Voter Act (National Voter Registration Act)",
+    "policy_type": "Law",
+    "summary": "Expanded voter registration through motor vehicle agencies and public assistance offices.",
+    "year_enacted": 1993,
+    "date_enacted": "1993-05-20",
+    "era": "Contemporary Era",
+    "president": "Bill Clinton",
+    "primary_party": "Democratic Party",
+    "direct_black_impact": true,
+    "outcome_summary": "Increased voter registration among historically underrepresented populations.",
+    "status": "Active",
+    "impact_direction": "Positive",
+    "impact_notes": "Expanded access to voter registration infrastructure.",
+    "categories": ["Voting Rights"],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 4,
+      "evidence_score": 4,
+      "durability_score": 5,
+      "equity_score": 4,
+      "harm_offset_score": 1
+    },
+    "sources": [
+      {
+        "source_title": "National Voter Registration Act",
+        "source_url": "https://www.congress.gov/bill/103rd-congress/house-bill/2",
+        "source_type": "Government"
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Personal Responsibility and Work Opportunity Reconciliation Act",
+    "policy_type": "Law",
+    "summary": "Overhauled welfare programs and imposed work requirements and time limits on benefits.",
+    "year_enacted": 1996,
+    "date_enacted": "1996-08-22",
+    "era": "Contemporary Era",
+    "president": "Bill Clinton",
+    "primary_party": "Democratic Party",
+    "direct_black_impact": true,
+    "outcome_summary": "Reduced welfare rolls but increased economic vulnerability for some populations.",
+    "status": "Active",
+    "impact_direction": "Mixed",
+    "impact_notes": "Major shift in social safety net structure.",
+    "categories": ["Business and Economics"],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 4,
+      "evidence_score": 4,
+      "durability_score": 5,
+      "equity_score": 2,
+      "harm_offset_score": 1
+    },
+    "sources": [
+      {
+        "source_title": "Welfare Reform Act",
+        "source_url": "https://www.congress.gov/bill/104th-congress/house-bill/3734",
+        "source_type": "Government"
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Prison Litigation Reform Act",
+    "policy_type": "Law",
+    "summary": "Restricted the ability of prisoners to file lawsuits regarding prison conditions.",
+    "year_enacted": 1996,
+    "date_enacted": "1996-04-26",
+    "era": "Contemporary Era",
+    "president": "Bill Clinton",
+    "primary_party": "Democratic Party",
+    "direct_black_impact": true,
+    "outcome_summary": "Limited legal recourse for incarcerated individuals.",
+    "status": "Active",
+    "impact_direction": "Negative",
+    "impact_notes": "Reduced oversight of prison conditions.",
+    "categories": ["Criminal Justice"],
+    "scores": {
+      "directness_score": 5,
+      "material_impact_score": 4,
+      "evidence_score": 4,
+      "durability_score": 5,
+      "equity_score": 1,
+      "harm_offset_score": 0
+    },
+    "sources": [
+      {
+        "source_title": "Prison Litigation Reform Act",
+        "source_url": "https://www.congress.gov/",
+        "source_type": "Government"
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "No Child Left Behind Act",
+    "policy_type": "Law",
+    "summary": "Expanded federal oversight of education and standardized testing requirements.",
+    "year_enacted": 2002,
+    "date_enacted": "2002-01-08",
+    "era": "Contemporary Era",
+    "president": "George W. Bush",
+    "primary_party": "Republican Party",
+    "direct_black_impact": true,
+    "outcome_summary": "Increased accountability but also widened disparities in underfunded schools.",
+    "status": "Active",
+    "impact_direction": "Mixed",
+    "impact_notes": "Major federal intervention in education policy.",
+    "categories": ["Education"],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 3,
+      "evidence_score": 4,
+      "durability_score": 4,
+      "equity_score": 2,
+      "harm_offset_score": 1
+    },
+    "sources": [
+      {
+        "source_title": "No Child Left Behind",
+        "source_url": "https://www.congress.gov/bill/107th-congress/house-bill/1",
+        "source_type": "Government"
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Every Student Succeeds Act",
+    "policy_type": "Law",
+    "summary": "Replaced No Child Left Behind and returned more control to states.",
+    "year_enacted": 2015,
+    "date_enacted": "2015-12-10",
+    "era": "Contemporary Era",
+    "president": "Barack Obama",
+    "primary_party": "Democratic Party",
+    "direct_black_impact": true,
+    "outcome_summary": "Reduced federal oversight but maintained accountability structures.",
+    "status": "Active",
+    "impact_direction": "Mixed",
+    "impact_notes": "Shifted control back to states.",
+    "categories": ["Education"],
+    "scores": {
+      "directness_score": 3,
+      "material_impact_score": 3,
+      "evidence_score": 4,
+      "durability_score": 4,
+      "equity_score": 3,
+      "harm_offset_score": 1
+    },
+    "sources": [
+      {
+        "source_title": "ESSA",
+        "source_url": "https://www.congress.gov/",
+        "source_type": "Government"
+      }
+    ],
+    "metrics": []
+  }
+]

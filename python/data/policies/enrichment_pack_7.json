@@ -1,0 +1,181 @@
+[
+  {
+    "title": "Violent Crime Control and Law Enforcement Act of 1994",
+    "year_enacted": 1994,
+    "sources": [
+      {
+        "source_title": "Provisions Implementing the Violent Crime Control and Law Enforcement Act of 1994",
+        "source_url": "https://www.archives.gov/federal-register/cfr/subject-title-28.html",
+        "source_type": "Government",
+        "publisher": "National Archives",
+        "published_date": "2025-05-01",
+        "notes": "National Archives CFR subject page listing implementing regulations for provisions of the Violent Crime Control and Law Enforcement Act of 1994."
+      },
+      {
+        "source_title": "Fact Sheet on Building Safer Communities",
+        "source_url": "https://clintonwhitehouse6.archives.gov/1998/05/1998-05-29-fact-sheet-on-building-safer-communities.html",
+        "source_type": "Archive",
+        "publisher": "Clinton White House Archive",
+        "published_date": "1998-05-29",
+        "notes": "Archived White House fact sheet describing major provisions of the 1994 Crime Bill, including policing, prisons, and prevention funding."
+      },
+      {
+        "source_title": "Fighting Crime",
+        "source_url": "https://clintonwhitehouse1.archives.gov/White_House/Publications/html/briefs/iii-4.html",
+        "source_type": "Archive",
+        "publisher": "Clinton White House Archive",
+        "published_date": null,
+        "notes": "Archived White House summary framing the 1994 law as a major federal anti-crime package and describing its policy scope."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Prison Litigation Reform Act",
+    "year_enacted": 1996,
+    "sources": [
+      {
+        "source_title": "Prison Litigation Reform Act Summary",
+        "source_url": "https://www.law.cornell.edu/wex/prison_litigation_reform_act",
+        "source_type": "Academic",
+        "publisher": "Cornell Law School Legal Information Institute",
+        "published_date": null,
+        "notes": "Legal summary explaining the Prison Litigation Reform Act's limits on prisoner lawsuits, exhaustion requirements, and filing restrictions."
+      },
+      {
+        "source_title": "Prison Litigation Reform Act: A Critical Review",
+        "source_url": "https://www.prisonpolicy.org/scans/sp/PLRA_critical_review.pdf",
+        "source_type": "Nonprofit",
+        "publisher": "Prison Policy Initiative",
+        "published_date": null,
+        "notes": "Review of the PLRA's practical impact on prison-condition litigation and barriers to court access."
+      },
+      {
+        "source_title": "42 U.S. Code § 1997e - Suits by prisoners",
+        "source_url": "https://www.law.cornell.edu/uscode/text/42/1997e",
+        "source_type": "Academic",
+        "publisher": "Cornell Law School Legal Information Institute",
+        "published_date": null,
+        "notes": "Statutory text page for the PLRA exhaustion requirement and related prisoner litigation provisions."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "First Step Act",
+    "year_enacted": 2018,
+    "sources": [
+      {
+        "source_title": "Department of Justice Report on Efforts to Fully Implement the Provisions and Intent of the First Step Act",
+        "source_url": "https://www.justice.gov/d9/2023-05/Sec.%2017%28a%29%20-%20DOJ%20Efforts%20to%20Efforts%20to%20Fully%20Implement%20the%20Provisions%20and%20Intent%20of%20the%20First%20S.pdf",
+        "source_type": "Government",
+        "publisher": "U.S. Department of Justice",
+        "published_date": "2023-05-01",
+        "notes": "DOJ implementation report describing the First Step Act as a bipartisan law to improve criminal justice outcomes and reduce the federal prison population while maintaining public safety."
+      },
+      {
+        "source_title": "Justice Department Announces New Rule Implementing the Federal Time Credits Program Established by the First Step Act",
+        "source_url": "https://www.justice.gov/archives/opa/pr/justice-department-announces-new-rule-implementing-federal-time-credits-program-established",
+        "source_type": "Government",
+        "publisher": "U.S. Department of Justice",
+        "published_date": "2022-01-13",
+        "notes": "DOJ press release explaining the earned time credit program created by the First Step Act."
+      },
+      {
+        "source_title": "Audit of the Federal Bureau of Prisons' Efforts to Place Inmates Close to Home",
+        "source_url": "https://oig.justice.gov/reports/audit-federal-bureau-prisons-efforts-place-inmates-close-home",
+        "source_type": "Government",
+        "publisher": "U.S. Department of Justice Office of the Inspector General",
+        "published_date": "2025-09-25",
+        "notes": "DOJ OIG audit discussing implementation of the First Step Act and its prison placement provisions."
+      }
+    ],
+    "metrics": [
+      {
+        "metric_name": "Earned time credits available under the First Step Act",
+        "demographic_group": "Eligible federal inmates",
+        "before_value": 0,
+        "after_value": 10,
+        "unit": "days per 30 days of programming",
+        "geography": "United States",
+        "year_before": 2018,
+        "year_after": 2022,
+        "methodology_note": "DOJ states that eligible inmates can earn 10 to 15 days of time credits for every 30 days of successful participation in qualifying programs under the First Step Act."
+      }
+    ]
+  },
+  {
+    "title": "Personal Responsibility and Work Opportunity Reconciliation Act",
+    "year_enacted": 1996,
+    "sources": [
+      {
+        "source_title": "Temporary Assistance for Needy Families (TANF): 26 Years of Progress",
+        "source_url": "https://acf.gov/ofa/policy-guidance/tanf-26-years-progress",
+        "source_type": "Government",
+        "publisher": "Administration for Children and Families",
+        "published_date": "2022-08-22",
+        "notes": "Federal overview of TANF, the cash assistance structure created by the 1996 welfare reform law."
+      },
+      {
+        "source_title": "Welfare Reform and the Safety Net",
+        "source_url": "https://www.cbpp.org/research/family-income-support/welfare-reform-and-the-safety-net",
+        "source_type": "Nonprofit",
+        "publisher": "Center on Budget and Policy Priorities",
+        "published_date": "2020-08-13",
+        "notes": "Policy analysis summarizing how welfare reform changed access to cash assistance and weakened parts of the safety net."
+      },
+      {
+        "source_title": "Personal Responsibility and Work Opportunity Reconciliation Act of 1996",
+        "source_url": "https://www.acf.hhs.gov/ofa/policy-guidance/personal-responsibility-and-work-opportunity-reconciliation-act-1996",
+        "source_type": "Government",
+        "publisher": "Administration for Children and Families",
+        "published_date": null,
+        "notes": "Federal reference page for the 1996 welfare reform law."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Affordable Care Act",
+    "year_enacted": 2010,
+    "sources": [
+      {
+        "source_title": "The Affordable Care Act and African Americans",
+        "source_url": "https://aspe.hhs.gov/reports/affordable-care-act-african-americans-0",
+        "source_type": "Government",
+        "publisher": "U.S. Department of Health and Human Services",
+        "published_date": "2012-04-11",
+        "notes": "HHS overview of ACA provisions expected to improve health coverage and access for African Americans."
+      },
+      {
+        "source_title": "Health Insurance Coverage and Access to Care Among Black Americans: Recent Trends and Key Challenges",
+        "source_url": "https://aspe.hhs.gov/sites/default/files/documents/4fc0ddbcee8d583d57e399dad6201536/aspe-coverage-access-black-americans-ib.pdf",
+        "source_type": "Government",
+        "publisher": "U.S. Department of Health and Human Services",
+        "published_date": "2024-06-07",
+        "notes": "HHS issue brief stating that since implementation of the ACA's coverage provisions, the uninsured rate among nonelderly Black Americans decreased by 10 percentage points."
+      },
+      {
+        "source_title": "The Affordable Care Act and Its Accomplishments",
+        "source_url": "https://aspe.hhs.gov/sites/default/files/documents/18cd655222dc3de64866b269143731ce/aca-briefing-book-aspe-03-2022.pdf",
+        "source_type": "Government",
+        "publisher": "U.S. Department of Health and Human Services",
+        "published_date": "2022-03-01",
+        "notes": "HHS briefing book stating that Medicaid expansions helped narrow racial disparities in health insurance coverage, especially for Black and Latino Americans."
+      }
+    ],
+    "metrics": [
+      {
+        "metric_name": "Change in uninsured rate among nonelderly Black Americans after ACA coverage provisions",
+        "demographic_group": "Black Americans",
+        "before_value": null,
+        "after_value": -10,
+        "unit": "percentage points",
+        "geography": "United States",
+        "year_before": 2010,
+        "year_after": 2024,
+        "methodology_note": "HHS reported in 2024 that since implementation of the Affordable Care Act coverage provisions, the uninsured rate among nonelderly Black Americans decreased by 10 percentage points."
+      }
+    ]
+  }
+]

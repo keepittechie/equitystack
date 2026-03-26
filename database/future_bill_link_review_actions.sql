@@ -1,0 +1,20 @@
+CREATE TABLE IF NOT EXISTS future_bill_link_review_actions (
+  id INT NOT NULL AUTO_INCREMENT,
+  future_bill_link_id INT NOT NULL,
+  prior_link_type ENUM('Direct', 'Related', 'Companion', 'Partial') DEFAULT NULL,
+  prior_tracked_bill_id INT DEFAULT NULL,
+  prior_future_bill_id INT DEFAULT NULL,
+  ai_final_decision VARCHAR(32) NOT NULL,
+  ai_match_label VARCHAR(32) NOT NULL,
+  ai_total_score INT NOT NULL,
+  ai_model VARCHAR(128) DEFAULT NULL,
+  source_review_report VARCHAR(512) DEFAULT NULL,
+  action_taken VARCHAR(64) NOT NULL,
+  action_reason TEXT DEFAULT NULL,
+  applied_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+  applied_by VARCHAR(128) DEFAULT NULL,
+  raw_review_json LONGTEXT DEFAULT NULL,
+  archived_link_json LONGTEXT DEFAULT NULL,
+  PRIMARY KEY (id),
+  KEY idx_future_bill_link_review_actions_link_id (future_bill_link_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

@@ -1,0 +1,80 @@
+[
+  {
+    "title": "Buchanan v. Warley",
+    "policy_type": "Court Case",
+    "summary": "The Supreme Court struck down a Louisville residential segregation ordinance that barred Black people from buying property on majority-white blocks and white people from buying property on majority-Black blocks.",
+    "year_enacted": 1917,
+    "date_enacted": "1917-11-05",
+    "era": "Jim Crow and Disenfranchisement",
+    "president": null,
+    "primary_party": null,
+    "house_party": null,
+    "senate_party": null,
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "Blocked one form of legally mandated residential segregation, though private covenants and other discriminatory housing practices continued.",
+    "status": "Active",
+    "impact_direction": "Positive",
+    "impact_notes": "Important early housing-rights decision that limited explicit racial zoning.",
+    "categories": ["Housing", "Civil Rights"],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 3,
+      "evidence_score": 5,
+      "durability_score": 3,
+      "equity_score": 4,
+      "harm_offset_score": 0,
+      "notes": "Meaningful legal check on racial zoning, but many segregation tools survived."
+    },
+    "sources": [
+      {
+        "source_title": "Buchanan v. Warley, 245 U.S. 60 (1917)",
+        "source_url": "https://www.govinfo.gov/app/details/USREPORTS-245/USREPORTS-245-60",
+        "source_type": "Government",
+        "publisher": "U.S. Government Publishing Office",
+        "published_date": null,
+        "notes": "United States Reports entry"
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Students for Fair Admissions v. Harvard and UNC",
+    "policy_type": "Court Case",
+    "summary": "The Supreme Court held that the race-conscious admissions programs challenged at Harvard and the University of North Carolina violated constitutional and statutory equal-protection rules, sharply restricting affirmative action in higher education.",
+    "year_enacted": 2023,
+    "date_enacted": "2023-06-29",
+    "era": "Contemporary Era",
+    "president": "Joseph R. Biden Jr.",
+    "primary_party": null,
+    "house_party": null,
+    "senate_party": null,
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "Narrowed one of the main remaining legal avenues universities had used to pursue racial diversity in admissions.",
+    "status": "Active",
+    "impact_direction": "Negative",
+    "impact_notes": "Major contemporary rollback of affirmative-action doctrine in higher education.",
+    "categories": ["Education", "Civil Rights"],
+    "scores": {
+      "directness_score": 5,
+      "material_impact_score": 4,
+      "evidence_score": 5,
+      "durability_score": 5,
+      "equity_score": 1,
+      "harm_offset_score": 0,
+      "notes": "High-impact modern ruling restricting race-conscious admissions."
+    },
+    "sources": [
+      {
+        "source_title": "Students for Fair Admissions, Inc. v. President and Fellows of Harvard College / UNC",
+        "source_url": "https://www.supremecourt.gov/opinions/22pdf/20-1199_hgdj.pdf",
+        "source_type": "Government",
+        "publisher": "Supreme Court of the United States",
+        "published_date": "2023-06-29",
+        "notes": "Majority opinion"
+      }
+    ],
+    "metrics": []
+  }
+]

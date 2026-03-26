@@ -1,0 +1,77 @@
+{
+  "generated_at": "2026-03-25T18:32:53.344095+00:00",
+  "input_file": "/home/josh/Documents/GitHub/equitystack/python/reports/equitystack_feedback_log.json",
+  "total_decisions": 4,
+  "approval_rate": 0.5,
+  "action_types": [
+    {
+      "name": "convert_to_partial",
+      "count": 2,
+      "approval_rate": 0.5,
+      "avg_score_approved": 0.55,
+      "avg_score_dismissed": 0.42,
+      "suggestion": "keep weight stable",
+      "suggested_adjustment": 0.0
+    },
+    {
+      "name": "import_candidate_seed",
+      "count": 2,
+      "approval_rate": 0.5,
+      "avg_score_approved": 0.83,
+      "avg_score_dismissed": 0.4,
+      "suggestion": "keep weight stable",
+      "suggested_adjustment": 0.0
+    }
+  ],
+  "link_types": [
+    {
+      "name": "Partial",
+      "count": 2,
+      "approval_rate": 0.5,
+      "avg_score_approved": 0.55,
+      "avg_score_dismissed": 0.42,
+      "suggestion": "keep weight stable",
+      "suggested_adjustment": 0.0
+    }
+  ],
+  "top_performing_action_types": [
+    {
+      "name": "convert_to_partial",
+      "count": 2,
+      "approval_rate": 0.5,
+      "avg_score_approved": 0.55,
+      "avg_score_dismissed": 0.42,
+      "suggestion": "keep weight stable",
+      "suggested_adjustment": 0.0
+    },
+    {
+      "name": "import_candidate_seed",
+      "count": 2,
+      "approval_rate": 0.5,
+      "avg_score_approved": 0.83,
+      "avg_score_dismissed": 0.4,
+      "suggestion": "keep weight stable",
+      "suggested_adjustment": 0.0
+    }
+  ],
+  "weakest_action_types": [
+    {
+      "name": "convert_to_partial",
+      "count": 2,
+      "approval_rate": 0.5,
+      "avg_score_approved": 0.55,
+      "avg_score_dismissed": 0.42,
+      "suggestion": "keep weight stable",
+      "suggested_adjustment": 0.0
+    },
+    {
+      "name": "import_candidate_seed",
+      "count": 2,
+      "approval_rate": 0.5,
+      "avg_score_approved": 0.83,
+      "avg_score_dismissed": 0.4,
+      "suggestion": "keep weight stable",
+      "suggested_adjustment": 0.0
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+    "sqltools.connections": [
+        {
+            "mysqlOptions": {
+                "authProtocol": "default",
+                "enableSsl": "Disabled"
+            },
+            "ssh": "Disabled",
+            "previewLimit": 50,
+            "server": "10.10.0.13",
+            "port": 3306,
+            "sshOptions": {
+                "port": 22,
+                "host": "10.10.0.13",
+                "username": "josh",
+                "password": "Lamar83jl"
+            },
+            "driver": "MariaDB",
+            "name": "btrack",
+            "database": "black_policy_tracker",
+            "username": "josh_db",
+            "password": "Lamar83jl"
+        }
+    ]
+}

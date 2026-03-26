@@ -1,0 +1,1657 @@
+{
+  "generated_at": "2026-03-25T07:53:52.990165+00:00",
+  "trigger_from_suggestions": "/home/josh/black-policy-site/python/reports/future_bill_link_partial_suggestions.json",
+  "trigger_from_review": "/home/josh/black-policy-site/python/reports/future_bill_link_ai_review.json",
+  "use_ollama": false,
+  "requested_model": null,
+  "resolved_model": null,
+  "top_k": 5,
+  "dry_run": false,
+  "summary": {
+    "future_bills_reviewed": 2,
+    "future_bills_with_candidates": 2,
+    "future_bills_without_candidates": 0,
+    "retrieval_rejected_count": 36,
+    "retrieval_passed_count": 7,
+    "rejected_by_domain": 14,
+    "rejected_by_bill_type": 14,
+    "rejected_by_anchor": 6,
+    "rejected_by_alignment": 2
+  },
+  "items": [
+    {
+      "future_bill_id": 3,
+      "future_bill_title": "Black Homeownership and Appraisal Fairness Act",
+      "target_area": "Housing",
+      "current_status": "remove_link",
+      "why_discovery_was_triggered": "Top-ranked alternate was blocked by cross-domain mismatch, mechanism-family mismatch, broad equity-only overlap, or weak evidence.",
+      "domain_warning": null,
+      "coverage_note": "fewer than three candidates survived retrieval",
+      "future_bill_signals": {
+        "domain": "housing",
+        "domain_warning": null,
+        "domain_keywords": [
+          "appraisal",
+          "fair housing",
+          "homeownership",
+          "housing assistance",
+          "lending",
+          "mortgage",
+          "rent"
+        ],
+        "problem_keywords": [
+          "appraisal",
+          "disparities",
+          "face",
+          "fairness",
+          "home buyer",
+          "homebuyer",
+          "homeownership",
+          "households",
+          "housing",
+          "mortgage",
+          "ownership",
+          "persistent",
+          "rent"
+        ],
+        "solution_keywords": [
+          "accountability",
+          "anti",
+          "anti-discrimination",
+          "appraisal",
+          "assistance",
+          "bias",
+          "borrowing",
+          "compliance",
+          "create",
+          "down",
+          "enforcement",
+          "expand",
+          "fair",
+          "lending",
+          "loan",
+          "mechanisms",
+          "mortgage",
+          "oversight",
+          "payment",
+          "regulation",
+          "review",
+          "standard",
+          "strengthen"
+        ],
+        "population_keywords": [
+          "borrowers",
+          "buyers",
+          "communities",
+          "homeowners",
+          "households",
+          "renters",
+          "residents",
+          "tenants"
+        ],
+        "mechanism_families": [
+          "housing_support",
+          "regulatory_enforcement"
+        ]
+      },
+      "retrieval_rejected_count": 21,
+      "retrieval_passed_count": 2,
+      "rejected_by_domain": 11,
+      "rejected_by_bill_type": 5,
+      "rejected_by_anchor": 5,
+      "rejected_by_alignment": 0,
+      "rejected_examples": [
+        {
+          "bill_number": "H.R. 7973",
+          "title": "To end preventable maternal mortality, severe maternal morbidity, and maternal health disparities in the United States, and for other purposes.",
+          "reason": "cross-domain mismatch (housing vs healthcare)",
+          "source": "tracked_bills"
+        },
+        {
+          "bill_number": "H.R. 14",
+          "title": "John R. Lewis Voting Rights Advancement Act of 2025",
+          "reason": "cross-domain mismatch (housing vs voting)",
+          "source": "tracked_bills"
+        },
+        {
+          "bill_number": "H.R. 3305",
+          "title": "Black Maternal Health Momnibus Act",
+          "reason": "cross-domain mismatch (housing vs healthcare)",
+          "source": "tracked_bills"
+        },
+        {
+          "bill_number": "H.R. 1041",
+          "title": "American Opportunity Accounts Act",
+          "reason": "cross-domain mismatch (housing vs healthcare)",
+          "source": "tracked_bills"
+        },
+        {
+          "bill_number": "H.R. 40",
+          "title": "Commission to Study and Develop Reparation Proposals for African Americans Act",
+          "reason": "missing required housing domain anchor",
+          "source": "tracked_bills"
+        }
+      ],
+      "accepted_examples": [
+        {
+          "bill_number": "H.R. 5975",
+          "title": "Appraisal Modernization Act",
+          "source": "tracked_bills"
+        },
+        {
+          "bill_number": "S. 2322",
+          "title": "Appraisal Modernization Act",
+          "source": "tracked_bills"
+        }
+      ],
+      "generated_queries": [
+        {
+          "query_text": "fair housing",
+          "rationale": "Domain recall query for the policy area.",
+          "search_type": "domain_query",
+          "domain": "housing",
+          "mechanism_family": [
+            "housing_support",
+            "regulatory_enforcement"
+          ],
+          "population_terms": [
+            "borrowers",
+            "buyers",
+            "communities",
+            "homeowners",
+            "households",
+            "renters"
+          ]
+        },
+        {
+          "query_text": "housing assistance",
+          "rationale": "Domain recall query for the policy area.",
+          "search_type": "domain_query",
+          "domain": "housing",
+          "mechanism_family": [
+            "housing_support",
+            "regulatory_enforcement"
+          ],
+          "population_terms": [
+            "borrowers",
+            "buyers",
+            "communities",
+            "homeowners",
+            "households",
+            "renters"
+          ]
+        },
+        {
+          "query_text": "appraisal accountability",
+          "rationale": "Domain + mechanism query.",
+          "search_type": "mechanism_query",
+          "domain": "housing",
+          "mechanism_family": [
+            "housing_support",
+            "regulatory_enforcement"
+          ],
+          "population_terms": [
+            "borrowers",
+            "buyers",
+            "communities",
+            "homeowners",
+            "households",
+            "renters"
+          ]
+        },
+        {
+          "query_text": "appraisal anti",
+          "rationale": "Domain + mechanism query.",
+          "search_type": "mechanism_query",
+          "domain": "housing",
+          "mechanism_family": [
+            "housing_support",
+            "regulatory_enforcement"
+          ],
+          "population_terms": [
+            "borrowers",
+            "buyers",
+            "communities",
+            "homeowners",
+            "households",
+            "renters"
+          ]
+        },
+        {
+          "query_text": "appraisal anti-discrimination",
+          "rationale": "Domain + mechanism query.",
+          "search_type": "mechanism_query",
+          "domain": "housing",
+          "mechanism_family": [
+            "housing_support",
+            "regulatory_enforcement"
+          ],
+          "population_terms": [
+            "borrowers",
+            "buyers",
+            "communities",
+            "homeowners",
+            "households",
+            "renters"
+          ]
+        },
+        {
+          "query_text": "appraisal appraisal",
+          "rationale": "Domain + mechanism query.",
+          "search_type": "mechanism_query",
+          "domain": "housing",
+          "mechanism_family": [
+            "housing_support",
+            "regulatory_enforcement"
+          ],
+          "population_terms": [
+            "borrowers",
+            "buyers",
+            "communities",
+            "homeowners",
+            "households",
+            "renters"
+          ]
+        },
+        {
+          "query_text": "appraisal assistance",
+          "rationale": "Domain + mechanism query.",
+          "search_type": "mechanism_query",
+          "domain": "housing",
+          "mechanism_family": [
+            "housing_support",
+            "regulatory_enforcement"
+          ],
+          "population_terms": [
+            "borrowers",
+            "buyers",
+            "communities",
+            "homeowners",
+            "households",
+            "renters"
+          ]
+        },
+        {
+          "query_text": "appraisal borrowers",
+          "rationale": "Domain + population query.",
+          "search_type": "population_query",
+          "domain": "housing",
+          "mechanism_family": [
+            "housing_support",
+            "regulatory_enforcement"
+          ],
+          "population_terms": [
+            "borrowers",
+            "buyers",
+            "communities",
+            "homeowners",
+            "households",
+            "renters"
+          ]
+        },
+        {
+          "query_text": "appraisal buyers",
+          "rationale": "Domain + population query.",
+          "search_type": "population_query",
+          "domain": "housing",
+          "mechanism_family": [
+            "housing_support",
+            "regulatory_enforcement"
+          ],
+          "population_terms": [
+            "borrowers",
+            "buyers",
+            "communities",
+            "homeowners",
+            "households",
+            "renters"
+          ]
+        },
+        {
+          "query_text": "appraisal communities",
+          "rationale": "Domain + population query.",
+          "search_type": "population_query",
+          "domain": "housing",
+          "mechanism_family": [
+            "housing_support",
+            "regulatory_enforcement"
+          ],
+          "population_terms": [
+            "borrowers",
+            "buyers",
+            "communities",
+            "homeowners",
+            "households",
+            "renters"
+          ]
+        },
+        {
+          "query_text": "appraisal homeowners",
+          "rationale": "Domain + population query.",
+          "search_type": "population_query",
+          "domain": "housing",
+          "mechanism_family": [
+            "housing_support",
+            "regulatory_enforcement"
+          ],
+          "population_terms": [
+            "borrowers",
+            "buyers",
+            "communities",
+            "homeowners",
+            "households",
+            "renters"
+          ]
+        },
+        {
+          "query_text": "appraisal fair housing",
+          "rationale": "Expanded domain phrase query.",
+          "search_type": "domain_query",
+          "domain": "housing",
+          "mechanism_family": [
+            "housing_support",
+            "regulatory_enforcement"
+          ],
+          "population_terms": [
+            "borrowers",
+            "buyers",
+            "communities",
+            "homeowners",
+            "households",
+            "renters"
+          ]
+        },
+        {
+          "query_text": "appraisal homeownership",
+          "rationale": "Expanded domain phrase query.",
+          "search_type": "domain_query",
+          "domain": "housing",
+          "mechanism_family": [
+            "housing_support",
+            "regulatory_enforcement"
+          ],
+          "population_terms": [
+            "borrowers",
+            "buyers",
+            "communities",
+            "homeowners",
+            "households",
+            "renters"
+          ]
+        },
+        {
+          "query_text": "fair housing homeownership",
+          "rationale": "Expanded domain phrase query.",
+          "search_type": "domain_query",
+          "domain": "housing",
+          "mechanism_family": [
+            "housing_support",
+            "regulatory_enforcement"
+          ],
+          "population_terms": [
+            "borrowers",
+            "buyers",
+            "communities",
+            "homeowners",
+            "households",
+            "renters"
+          ]
+        },
+        {
+          "query_text": "appraisal disparities",
+          "rationale": "Domain + problem query.",
+          "search_type": "problem_query",
+          "domain": "housing",
+          "mechanism_family": [
+            "housing_support",
+            "regulatory_enforcement"
+          ],
+          "population_terms": [
+            "borrowers",
+            "buyers",
+            "communities",
+            "homeowners",
+            "households",
+            "renters"
+          ]
+        },
+        {
+          "query_text": "appraisal face",
+          "rationale": "Domain + problem query.",
+          "search_type": "problem_query",
+          "domain": "housing",
+          "mechanism_family": [
+            "housing_support",
+            "regulatory_enforcement"
+          ],
+          "population_terms": [
+            "borrowers",
+            "buyers",
+            "communities",
+            "homeowners",
+            "households",
+            "renters"
+          ]
+        },
+        {
+          "query_text": "appraisal home buyer",
+          "rationale": "Domain + problem query.",
+          "search_type": "problem_query",
+          "domain": "housing",
+          "mechanism_family": [
+            "housing_support",
+            "regulatory_enforcement"
+          ],
+          "population_terms": [
+            "borrowers",
+            "buyers",
+            "communities",
+            "homeowners",
+            "households",
+            "renters"
+          ]
+        },
+        {
+          "query_text": "appraisal accountability borrowers",
+          "rationale": "Combined domain, mechanism, and population query.",
+          "search_type": "combined_query",
+          "domain": "housing",
+          "mechanism_family": [
+            "housing_support",
+            "regulatory_enforcement"
+          ],
+          "population_terms": [
+            "borrowers",
+            "buyers",
+            "communities",
+            "homeowners",
+            "households",
+            "renters"
+          ]
+        },
+        {
+          "query_text": "appraisal accountability buyers",
+          "rationale": "Combined domain, mechanism, and population query.",
+          "search_type": "combined_query",
+          "domain": "housing",
+          "mechanism_family": [
+            "housing_support",
+            "regulatory_enforcement"
+          ],
+          "population_terms": [
+            "borrowers",
+            "buyers",
+            "communities",
+            "homeowners",
+            "households",
+            "renters"
+          ]
+        },
+        {
+          "query_text": "appraisal accountability communities",
+          "rationale": "Combined domain, mechanism, and population query.",
+          "search_type": "combined_query",
+          "domain": "housing",
+          "mechanism_family": [
+            "housing_support",
+            "regulatory_enforcement"
+          ],
+          "population_terms": [
+            "borrowers",
+            "buyers",
+            "communities",
+            "homeowners",
+            "households",
+            "renters"
+          ]
+        },
+        {
+          "query_text": "appraisal anti borrowers",
+          "rationale": "Combined domain, mechanism, and population query.",
+          "search_type": "combined_query",
+          "domain": "housing",
+          "mechanism_family": [
+            "housing_support",
+            "regulatory_enforcement"
+          ],
+          "population_terms": [
+            "borrowers",
+            "buyers",
+            "communities",
+            "homeowners",
+            "households",
+            "renters"
+          ]
+        },
+        {
+          "query_text": "appraisal anti buyers",
+          "rationale": "Combined domain, mechanism, and population query.",
+          "search_type": "combined_query",
+          "domain": "housing",
+          "mechanism_family": [
+            "housing_support",
+            "regulatory_enforcement"
+          ],
+          "population_terms": [
+            "borrowers",
+            "buyers",
+            "communities",
+            "homeowners",
+            "households",
+            "renters"
+          ]
+        },
+        {
+          "query_text": "appraisal anti communities",
+          "rationale": "Combined domain, mechanism, and population query.",
+          "search_type": "combined_query",
+          "domain": "housing",
+          "mechanism_family": [
+            "housing_support",
+            "regulatory_enforcement"
+          ],
+          "population_terms": [
+            "borrowers",
+            "buyers",
+            "communities",
+            "homeowners",
+            "households",
+            "renters"
+          ]
+        },
+        {
+          "query_text": "appraisal anti-discrimination borrowers",
+          "rationale": "Combined domain, mechanism, and population query.",
+          "search_type": "combined_query",
+          "domain": "housing",
+          "mechanism_family": [
+            "housing_support",
+            "regulatory_enforcement"
+          ],
+          "population_terms": [
+            "borrowers",
+            "buyers",
+            "communities",
+            "homeowners",
+            "households",
+            "renters"
+          ]
+        },
+        {
+          "query_text": "appraisal anti-discrimination buyers",
+          "rationale": "Combined domain, mechanism, and population query.",
+          "search_type": "combined_query",
+          "domain": "housing",
+          "mechanism_family": [
+            "housing_support",
+            "regulatory_enforcement"
+          ],
+          "population_terms": [
+            "borrowers",
+            "buyers",
+            "communities",
+            "homeowners",
+            "households",
+            "renters"
+          ]
+        },
+        {
+          "query_text": "appraisal anti-discrimination communities",
+          "rationale": "Combined domain, mechanism, and population query.",
+          "search_type": "combined_query",
+          "domain": "housing",
+          "mechanism_family": [
+            "housing_support",
+            "regulatory_enforcement"
+          ],
+          "population_terms": [
+            "borrowers",
+            "buyers",
+            "communities",
+            "homeowners",
+            "households",
+            "renters"
+          ]
+        },
+        {
+          "query_text": "appraisal appraisal borrowers",
+          "rationale": "Combined domain, mechanism, and population query.",
+          "search_type": "combined_query",
+          "domain": "housing",
+          "mechanism_family": [
+            "housing_support",
+            "regulatory_enforcement"
+          ],
+          "population_terms": [
+            "borrowers",
+            "buyers",
+            "communities",
+            "homeowners",
+            "households",
+            "renters"
+          ]
+        },
+        {
+          "query_text": "appraisal appraisal buyers",
+          "rationale": "Combined domain, mechanism, and population query.",
+          "search_type": "combined_query",
+          "domain": "housing",
+          "mechanism_family": [
+            "housing_support",
+            "regulatory_enforcement"
+          ],
+          "population_terms": [
+            "borrowers",
+            "buyers",
+            "communities",
+            "homeowners",
+            "households",
+            "renters"
+          ]
+        },
+        {
+          "query_text": "appraisal appraisal communities",
+          "rationale": "Combined domain, mechanism, and population query.",
+          "search_type": "combined_query",
+          "domain": "housing",
+          "mechanism_family": [
+            "housing_support",
+            "regulatory_enforcement"
+          ],
+          "population_terms": [
+            "borrowers",
+            "buyers",
+            "communities",
+            "homeowners",
+            "households",
+            "renters"
+          ]
+        }
+      ],
+      "discovered_candidates": [
+        {
+          "bill_number": "H.R. 5975",
+          "chamber": "House",
+          "congress": 119,
+          "title": "Appraisal Modernization Act",
+          "official_summary": null,
+          "source": "tracked_bills",
+          "matched_query": "appraisal appraisal",
+          "matched_query_type": "mechanism_query",
+          "relevance_score": 7.75,
+          "selection_reasons": [
+            "domain overlap",
+            "problem overlap",
+            "matched query: mechanism_query"
+          ],
+          "extracted_signals": {
+            "domain": "housing",
+            "domain_signals": [
+              "appraisal"
+            ],
+            "mechanism_signals": [],
+            "population_signals": []
+          },
+          "problem_alignment": 1,
+          "solution_alignment": 1,
+          "population_alignment": 0,
+          "mechanism_specificity": 1,
+          "evidence_strength": 1,
+          "import_priority": "reject",
+          "why_this_candidate": "Only weak policy-alignment signals are present. Could support a partial legislative anchor after import. Already exists in tracked_bills and may have been overlooked.",
+          "why_not_direct_anchor_yet": "Solution alignment is not strong enough for Direct. Mechanism specificity is too weak for Direct. Evidence is too thin for a confident Direct recommendation. Candidate appears to cover only part of the future bill's mechanism and does not include the direct-benefit component. Candidate title is weak and there is no official summary.",
+          "recommended_next_step": "reject_candidate",
+          "llm_import_decision": null,
+          "llm_reasoning_short": null
+        },
+        {
+          "bill_number": "S. 2322",
+          "chamber": "Senate",
+          "congress": 119,
+          "title": "Appraisal Modernization Act",
+          "official_summary": null,
+          "source": "tracked_bills",
+          "matched_query": "appraisal appraisal",
+          "matched_query_type": "mechanism_query",
+          "relevance_score": 7.75,
+          "selection_reasons": [
+            "domain overlap",
+            "problem overlap",
+            "matched query: mechanism_query"
+          ],
+          "extracted_signals": {
+            "domain": "housing",
+            "domain_signals": [
+              "appraisal"
+            ],
+            "mechanism_signals": [],
+            "population_signals": []
+          },
+          "problem_alignment": 1,
+          "solution_alignment": 1,
+          "population_alignment": 0,
+          "mechanism_specificity": 1,
+          "evidence_strength": 1,
+          "import_priority": "reject",
+          "why_this_candidate": "Only weak policy-alignment signals are present. Could support a partial legislative anchor after import. Already exists in tracked_bills and may have been overlooked.",
+          "why_not_direct_anchor_yet": "Solution alignment is not strong enough for Direct. Mechanism specificity is too weak for Direct. Evidence is too thin for a confident Direct recommendation. Candidate appears to cover only part of the future bill's mechanism and does not include the direct-benefit component. Candidate title is weak and there is no official summary.",
+          "recommended_next_step": "reject_candidate",
+          "llm_import_decision": null,
+          "llm_reasoning_short": null
+        }
+      ]
+    },
+    {
+      "future_bill_id": 2,
+      "future_bill_title": "HBCU Capital and Research Equity Act",
+      "target_area": "Education",
+      "current_status": "review_manually",
+      "why_discovery_was_triggered": "Top-ranked alternate was blocked by cross-domain mismatch, mechanism-family mismatch, broad equity-only overlap, or weak evidence.",
+      "domain_warning": null,
+      "coverage_note": null,
+      "future_bill_signals": {
+        "domain": "education",
+        "domain_warning": null,
+        "domain_keywords": [
+          "campus infrastructure",
+          "college funding",
+          "endowment",
+          "hbcu",
+          "hbcus",
+          "higher education",
+          "institutional aid",
+          "university grants"
+        ],
+        "problem_keywords": [
+          "capital",
+          "compared",
+          "face",
+          "facilities",
+          "funding",
+          "gaps",
+          "grants",
+          "hbcu",
+          "hbcus",
+          "improvement",
+          "infrastructure",
+          "innovation",
+          "investment",
+          "many",
+          "peer",
+          "remain",
+          "research",
+          "underfunded"
+        ],
+        "solution_keywords": [
+          "appropriation",
+          "business",
+          "campus",
+          "capital",
+          "college",
+          "commerce",
+          "create",
+          "education",
+          "endowment",
+          "enterprise",
+          "entrepreneur",
+          "facilities",
+          "funding",
+          "grant",
+          "grants",
+          "hbcus",
+          "higher education",
+          "improvement",
+          "infrastructure",
+          "innovation",
+          "institution",
+          "institutional aid",
+          "institutions",
+          "investment",
+          "long",
+          "matching",
+          "pathways",
+          "procurement",
+          "research",
+          "student",
+          "students",
+          "support",
+          "term",
+          "university"
+        ],
+        "population_keywords": [
+          "colleges",
+          "hbcu",
+          "hbcus",
+          "institutions",
+          "minority-serving institution",
+          "minority-serving institutions",
+          "universities"
+        ],
+        "mechanism_families": [
+          "institutional_funding",
+          "procurement_support"
+        ]
+      },
+      "retrieval_rejected_count": 15,
+      "retrieval_passed_count": 5,
+      "rejected_by_domain": 3,
+      "rejected_by_bill_type": 9,
+      "rejected_by_anchor": 1,
+      "rejected_by_alignment": 2,
+      "rejected_examples": [
+        {
+          "bill_number": "H.R. 3281",
+          "title": "To prohibit the reduction, elimination, or suspension of funding for land-grant colleges and universities.",
+          "reason": "no problem/solution alignment",
+          "source": "tracked_bills"
+        },
+        {
+          "bill_number": "H.R. 2664",
+          "title": "To amend the Higher Education Act of 1965 to provide for additional uses of funds for grants to strengthen historically Black colleges and universities, and for other purposes.",
+          "reason": "no problem/solution alignment",
+          "source": "tracked_bills"
+        },
+        {
+          "bill_number": "S. 2068",
+          "title": "Minority Business Development Act of 2021",
+          "reason": "cross-domain mismatch (education vs economic)",
+          "source": "tracked_bills"
+        },
+        {
+          "bill_number": "S.J.Res. 121",
+          "title": "A joint resolution proposing an amendment to the Constitution of the United States to abolish the electoral college and to provide for the direct election of the President and Vice President of the United States.",
+          "reason": "resolution/commemorative/naming bill filtered",
+          "source": "congress_api"
+        },
+        {
+          "bill_number": "H.Res. 16",
+          "title": "Congratulating the University of Georgia Bulldogs football team for winning the 2023 National Collegiate Athletic Association College Football National Championship.",
+          "reason": "resolution/commemorative/naming bill filtered",
+          "source": "congress_api"
+        }
+      ],
+      "accepted_examples": [
+        {
+          "bill_number": "H.R. 2486",
+          "title": "FUTURE Act",
+          "source": "tracked_bills"
+        },
+        {
+          "bill_number": "S. 16",
+          "title": "Protecting Life on College Campus Act of 2023",
+          "source": "congress_api"
+        },
+        {
+          "bill_number": "S. 207",
+          "title": "Protecting Life on College Campus Act of 2025",
+          "source": "congress_api"
+        },
+        {
+          "bill_number": "H.R. 231",
+          "title": "Terminate TikTok on Campus Act of 2023",
+          "source": "congress_api"
+        },
+        {
+          "bill_number": "H.R. 7660",
+          "title": "HBCU Empowerment and Reform Act",
+          "source": "tracked_bills"
+        }
+      ],
+      "generated_queries": [
+        {
+          "query_text": "campus infrastructure",
+          "rationale": "Domain recall query for the policy area.",
+          "search_type": "domain_query",
+          "domain": "education",
+          "mechanism_family": [
+            "institutional_funding",
+            "procurement_support"
+          ],
+          "population_terms": [
+            "colleges",
+            "hbcu",
+            "hbcus",
+            "institutions",
+            "minority-serving institution",
+            "minority-serving institutions"
+          ]
+        },
+        {
+          "query_text": "college funding",
+          "rationale": "Domain recall query for the policy area.",
+          "search_type": "domain_query",
+          "domain": "education",
+          "mechanism_family": [
+            "institutional_funding",
+            "procurement_support"
+          ],
+          "population_terms": [
+            "colleges",
+            "hbcu",
+            "hbcus",
+            "institutions",
+            "minority-serving institution",
+            "minority-serving institutions"
+          ]
+        },
+        {
+          "query_text": "campus infrastructure appropriation",
+          "rationale": "Domain + mechanism query.",
+          "search_type": "mechanism_query",
+          "domain": "education",
+          "mechanism_family": [
+            "institutional_funding",
+            "procurement_support"
+          ],
+          "population_terms": [
+            "colleges",
+            "hbcu",
+            "hbcus",
+            "institutions",
+            "minority-serving institution",
+            "minority-serving institutions"
+          ]
+        },
+        {
+          "query_text": "campus infrastructure business",
+          "rationale": "Domain + mechanism query.",
+          "search_type": "mechanism_query",
+          "domain": "education",
+          "mechanism_family": [
+            "institutional_funding",
+            "procurement_support"
+          ],
+          "population_terms": [
+            "colleges",
+            "hbcu",
+            "hbcus",
+            "institutions",
+            "minority-serving institution",
+            "minority-serving institutions"
+          ]
+        },
+        {
+          "query_text": "campus infrastructure campus",
+          "rationale": "Domain + mechanism query.",
+          "search_type": "mechanism_query",
+          "domain": "education",
+          "mechanism_family": [
+            "institutional_funding",
+            "procurement_support"
+          ],
+          "population_terms": [
+            "colleges",
+            "hbcu",
+            "hbcus",
+            "institutions",
+            "minority-serving institution",
+            "minority-serving institutions"
+          ]
+        },
+        {
+          "query_text": "campus infrastructure capital",
+          "rationale": "Domain + mechanism query.",
+          "search_type": "mechanism_query",
+          "domain": "education",
+          "mechanism_family": [
+            "institutional_funding",
+            "procurement_support"
+          ],
+          "population_terms": [
+            "colleges",
+            "hbcu",
+            "hbcus",
+            "institutions",
+            "minority-serving institution",
+            "minority-serving institutions"
+          ]
+        },
+        {
+          "query_text": "campus infrastructure college",
+          "rationale": "Domain + mechanism query.",
+          "search_type": "mechanism_query",
+          "domain": "education",
+          "mechanism_family": [
+            "institutional_funding",
+            "procurement_support"
+          ],
+          "population_terms": [
+            "colleges",
+            "hbcu",
+            "hbcus",
+            "institutions",
+            "minority-serving institution",
+            "minority-serving institutions"
+          ]
+        },
+        {
+          "query_text": "campus infrastructure colleges",
+          "rationale": "Domain + population query.",
+          "search_type": "population_query",
+          "domain": "education",
+          "mechanism_family": [
+            "institutional_funding",
+            "procurement_support"
+          ],
+          "population_terms": [
+            "colleges",
+            "hbcu",
+            "hbcus",
+            "institutions",
+            "minority-serving institution",
+            "minority-serving institutions"
+          ]
+        },
+        {
+          "query_text": "campus infrastructure hbcu",
+          "rationale": "Domain + population query.",
+          "search_type": "population_query",
+          "domain": "education",
+          "mechanism_family": [
+            "institutional_funding",
+            "procurement_support"
+          ],
+          "population_terms": [
+            "colleges",
+            "hbcu",
+            "hbcus",
+            "institutions",
+            "minority-serving institution",
+            "minority-serving institutions"
+          ]
+        },
+        {
+          "query_text": "campus infrastructure hbcus",
+          "rationale": "Domain + population query.",
+          "search_type": "population_query",
+          "domain": "education",
+          "mechanism_family": [
+            "institutional_funding",
+            "procurement_support"
+          ],
+          "population_terms": [
+            "colleges",
+            "hbcu",
+            "hbcus",
+            "institutions",
+            "minority-serving institution",
+            "minority-serving institutions"
+          ]
+        },
+        {
+          "query_text": "campus infrastructure institutions",
+          "rationale": "Domain + population query.",
+          "search_type": "population_query",
+          "domain": "education",
+          "mechanism_family": [
+            "institutional_funding",
+            "procurement_support"
+          ],
+          "population_terms": [
+            "colleges",
+            "hbcu",
+            "hbcus",
+            "institutions",
+            "minority-serving institution",
+            "minority-serving institutions"
+          ]
+        },
+        {
+          "query_text": "campus infrastructure college funding",
+          "rationale": "Expanded domain phrase query.",
+          "search_type": "domain_query",
+          "domain": "education",
+          "mechanism_family": [
+            "institutional_funding",
+            "procurement_support"
+          ],
+          "population_terms": [
+            "colleges",
+            "hbcu",
+            "hbcus",
+            "institutions",
+            "minority-serving institution",
+            "minority-serving institutions"
+          ]
+        },
+        {
+          "query_text": "campus infrastructure endowment",
+          "rationale": "Expanded domain phrase query.",
+          "search_type": "domain_query",
+          "domain": "education",
+          "mechanism_family": [
+            "institutional_funding",
+            "procurement_support"
+          ],
+          "population_terms": [
+            "colleges",
+            "hbcu",
+            "hbcus",
+            "institutions",
+            "minority-serving institution",
+            "minority-serving institutions"
+          ]
+        },
+        {
+          "query_text": "college funding endowment",
+          "rationale": "Expanded domain phrase query.",
+          "search_type": "domain_query",
+          "domain": "education",
+          "mechanism_family": [
+            "institutional_funding",
+            "procurement_support"
+          ],
+          "population_terms": [
+            "colleges",
+            "hbcu",
+            "hbcus",
+            "institutions",
+            "minority-serving institution",
+            "minority-serving institutions"
+          ]
+        },
+        {
+          "query_text": "campus infrastructure compared",
+          "rationale": "Domain + problem query.",
+          "search_type": "problem_query",
+          "domain": "education",
+          "mechanism_family": [
+            "institutional_funding",
+            "procurement_support"
+          ],
+          "population_terms": [
+            "colleges",
+            "hbcu",
+            "hbcus",
+            "institutions",
+            "minority-serving institution",
+            "minority-serving institutions"
+          ]
+        },
+        {
+          "query_text": "campus infrastructure face",
+          "rationale": "Domain + problem query.",
+          "search_type": "problem_query",
+          "domain": "education",
+          "mechanism_family": [
+            "institutional_funding",
+            "procurement_support"
+          ],
+          "population_terms": [
+            "colleges",
+            "hbcu",
+            "hbcus",
+            "institutions",
+            "minority-serving institution",
+            "minority-serving institutions"
+          ]
+        },
+        {
+          "query_text": "campus infrastructure facilities",
+          "rationale": "Domain + problem query.",
+          "search_type": "problem_query",
+          "domain": "education",
+          "mechanism_family": [
+            "institutional_funding",
+            "procurement_support"
+          ],
+          "population_terms": [
+            "colleges",
+            "hbcu",
+            "hbcus",
+            "institutions",
+            "minority-serving institution",
+            "minority-serving institutions"
+          ]
+        },
+        {
+          "query_text": "campus infrastructure appropriation colleges",
+          "rationale": "Combined domain, mechanism, and population query.",
+          "search_type": "combined_query",
+          "domain": "education",
+          "mechanism_family": [
+            "institutional_funding",
+            "procurement_support"
+          ],
+          "population_terms": [
+            "colleges",
+            "hbcu",
+            "hbcus",
+            "institutions",
+            "minority-serving institution",
+            "minority-serving institutions"
+          ]
+        },
+        {
+          "query_text": "campus infrastructure appropriation hbcu",
+          "rationale": "Combined domain, mechanism, and population query.",
+          "search_type": "combined_query",
+          "domain": "education",
+          "mechanism_family": [
+            "institutional_funding",
+            "procurement_support"
+          ],
+          "population_terms": [
+            "colleges",
+            "hbcu",
+            "hbcus",
+            "institutions",
+            "minority-serving institution",
+            "minority-serving institutions"
+          ]
+        },
+        {
+          "query_text": "campus infrastructure appropriation hbcus",
+          "rationale": "Combined domain, mechanism, and population query.",
+          "search_type": "combined_query",
+          "domain": "education",
+          "mechanism_family": [
+            "institutional_funding",
+            "procurement_support"
+          ],
+          "population_terms": [
+            "colleges",
+            "hbcu",
+            "hbcus",
+            "institutions",
+            "minority-serving institution",
+            "minority-serving institutions"
+          ]
+        },
+        {
+          "query_text": "campus infrastructure business colleges",
+          "rationale": "Combined domain, mechanism, and population query.",
+          "search_type": "combined_query",
+          "domain": "education",
+          "mechanism_family": [
+            "institutional_funding",
+            "procurement_support"
+          ],
+          "population_terms": [
+            "colleges",
+            "hbcu",
+            "hbcus",
+            "institutions",
+            "minority-serving institution",
+            "minority-serving institutions"
+          ]
+        },
+        {
+          "query_text": "campus infrastructure business hbcu",
+          "rationale": "Combined domain, mechanism, and population query.",
+          "search_type": "combined_query",
+          "domain": "education",
+          "mechanism_family": [
+            "institutional_funding",
+            "procurement_support"
+          ],
+          "population_terms": [
+            "colleges",
+            "hbcu",
+            "hbcus",
+            "institutions",
+            "minority-serving institution",
+            "minority-serving institutions"
+          ]
+        },
+        {
+          "query_text": "campus infrastructure business hbcus",
+          "rationale": "Combined domain, mechanism, and population query.",
+          "search_type": "combined_query",
+          "domain": "education",
+          "mechanism_family": [
+            "institutional_funding",
+            "procurement_support"
+          ],
+          "population_terms": [
+            "colleges",
+            "hbcu",
+            "hbcus",
+            "institutions",
+            "minority-serving institution",
+            "minority-serving institutions"
+          ]
+        },
+        {
+          "query_text": "campus infrastructure campus colleges",
+          "rationale": "Combined domain, mechanism, and population query.",
+          "search_type": "combined_query",
+          "domain": "education",
+          "mechanism_family": [
+            "institutional_funding",
+            "procurement_support"
+          ],
+          "population_terms": [
+            "colleges",
+            "hbcu",
+            "hbcus",
+            "institutions",
+            "minority-serving institution",
+            "minority-serving institutions"
+          ]
+        },
+        {
+          "query_text": "campus infrastructure campus hbcu",
+          "rationale": "Combined domain, mechanism, and population query.",
+          "search_type": "combined_query",
+          "domain": "education",
+          "mechanism_family": [
+            "institutional_funding",
+            "procurement_support"
+          ],
+          "population_terms": [
+            "colleges",
+            "hbcu",
+            "hbcus",
+            "institutions",
+            "minority-serving institution",
+            "minority-serving institutions"
+          ]
+        },
+        {
+          "query_text": "campus infrastructure campus hbcus",
+          "rationale": "Combined domain, mechanism, and population query.",
+          "search_type": "combined_query",
+          "domain": "education",
+          "mechanism_family": [
+            "institutional_funding",
+            "procurement_support"
+          ],
+          "population_terms": [
+            "colleges",
+            "hbcu",
+            "hbcus",
+            "institutions",
+            "minority-serving institution",
+            "minority-serving institutions"
+          ]
+        },
+        {
+          "query_text": "campus infrastructure capital colleges",
+          "rationale": "Combined domain, mechanism, and population query.",
+          "search_type": "combined_query",
+          "domain": "education",
+          "mechanism_family": [
+            "institutional_funding",
+            "procurement_support"
+          ],
+          "population_terms": [
+            "colleges",
+            "hbcu",
+            "hbcus",
+            "institutions",
+            "minority-serving institution",
+            "minority-serving institutions"
+          ]
+        },
+        {
+          "query_text": "campus infrastructure capital hbcu",
+          "rationale": "Combined domain, mechanism, and population query.",
+          "search_type": "combined_query",
+          "domain": "education",
+          "mechanism_family": [
+            "institutional_funding",
+            "procurement_support"
+          ],
+          "population_terms": [
+            "colleges",
+            "hbcu",
+            "hbcus",
+            "institutions",
+            "minority-serving institution",
+            "minority-serving institutions"
+          ]
+        },
+        {
+          "query_text": "campus infrastructure capital hbcus",
+          "rationale": "Combined domain, mechanism, and population query.",
+          "search_type": "combined_query",
+          "domain": "education",
+          "mechanism_family": [
+            "institutional_funding",
+            "procurement_support"
+          ],
+          "population_terms": [
+            "colleges",
+            "hbcu",
+            "hbcus",
+            "institutions",
+            "minority-serving institution",
+            "minority-serving institutions"
+          ]
+        }
+      ],
+      "discovered_candidates": [
+        {
+          "bill_number": "H.R. 2486",
+          "chamber": "House",
+          "congress": 116,
+          "title": "FUTURE Act",
+          "official_summary": "Fostering Undergraduate Talent by Unlocking Resources for Education Act or the FUTURE Act This bill extends through FY2021 and revises mandatory funding&nbsp;programs for historically black colleges and universities and other minority-serving institutions, including by allocating a portion of the funding for grants to predominantly black institutions for programs in (1) science, technology, engineering, or mathematics; (2) health education; (3) internationalization or globalization; (4) teacher preparation; or (5) improving educational outcomes of African-American males.",
+          "source": "tracked_bills",
+          "matched_query": "campus infrastructure colleges",
+          "matched_query_type": "population_query",
+          "relevance_score": 13.583,
+          "selection_reasons": [
+            "domain overlap",
+            "mechanism overlap",
+            "population overlap",
+            "problem overlap",
+            "matched query: population_query"
+          ],
+          "extracted_signals": {
+            "domain": "education",
+            "domain_signals": [
+              "college",
+              "minority-serving institution",
+              "minority-serving institutions"
+            ],
+            "mechanism_signals": [
+              "college",
+              "endowment",
+              "funding",
+              "infrastructure",
+              "institution",
+              "institutions",
+              "research",
+              "university"
+            ],
+            "population_signals": [
+              "campuses",
+              "colleges",
+              "hbcu",
+              "hbcus",
+              "institutions",
+              "minority-serving institution",
+              "minority-serving institutions",
+              "students",
+              "universities"
+            ]
+          },
+          "problem_alignment": 1,
+          "solution_alignment": 0,
+          "population_alignment": 0,
+          "mechanism_specificity": 0,
+          "evidence_strength": 1,
+          "import_priority": "reject",
+          "why_this_candidate": "Only weak policy-alignment signals are present. Already exists in tracked_bills and may have been overlooked.",
+          "why_not_direct_anchor_yet": "Solution alignment is not strong enough for Direct. Mechanism specificity is too weak for Direct. Evidence is too thin for a confident Direct recommendation. Cross-domain mismatch blocks Partial and Direct suggestions without unusually strong explicit overlap.",
+          "recommended_next_step": "reject_candidate",
+          "llm_import_decision": null,
+          "llm_reasoning_short": null
+        },
+        {
+          "bill_number": "S. 16",
+          "chamber": "Senate",
+          "congress": 118,
+          "title": "Protecting Life on College Campus Act of 2023",
+          "official_summary": "Protecting Life on College Campus Act of 2023 This bill prohibits the award of federal funds to an institution of higher education (IHE) that hosts or is affiliated with a school-based service site that provides abortion drugs or abortions to its students or to employees of the IHE or the site. An IHE that hosts or is affiliated with a site must, in order to remain eligible for federal funds, annually certify that the site does not provide abortion drugs or abortions to students or employees.",
+          "source": "congress_api",
+          "matched_query": "college funding",
+          "matched_query_type": "domain_query",
+          "relevance_score": 11.75,
+          "selection_reasons": [
+            "domain overlap",
+            "problem overlap",
+            "matched query: domain_query"
+          ],
+          "extracted_signals": {
+            "domain": "education",
+            "domain_signals": [
+              "campus",
+              "college",
+              "higher education"
+            ],
+            "mechanism_signals": [],
+            "population_signals": [
+              "campuses",
+              "colleges",
+              "students",
+              "universities"
+            ]
+          },
+          "problem_alignment": 1,
+          "solution_alignment": 0,
+          "population_alignment": 0,
+          "mechanism_specificity": 0,
+          "evidence_strength": 1,
+          "import_priority": "reject",
+          "why_this_candidate": "Only weak policy-alignment signals are present.",
+          "why_not_direct_anchor_yet": "Solution alignment is not strong enough for Direct. Mechanism specificity is too weak for Direct. Evidence is too thin for a confident Direct recommendation. Cross-domain mismatch blocks Partial and Direct suggestions without unusually strong explicit overlap. Candidate appears to cover only part of the future bill's mechanism and does not include the direct-benefit component. Education partial override not applied because the candidate does not clearly support HBCUs, MSIs, or higher-ed institutions.",
+          "recommended_next_step": "reject_candidate",
+          "llm_import_decision": null,
+          "llm_reasoning_short": null
+        },
+        {
+          "bill_number": "S. 207",
+          "chamber": "Senate",
+          "congress": 119,
+          "title": "Protecting Life on College Campus Act of 2025",
+          "official_summary": "Protecting Life on College Campus Act of 2025 This bill prohibits the award of federal funds to an institution of higher education (IHE) that hosts or is affiliated with a school-based service site that provides abortion drugs or abortions to its students or to employees of the IHE or the site. An IHE that hosts or is affiliated with a site must, in order to remain eligible for federal funds, annually certify that the site does not provide abortion drugs or abortions to students or employees.",
+          "source": "congress_api",
+          "matched_query": "college funding",
+          "matched_query_type": "domain_query",
+          "relevance_score": 11.75,
+          "selection_reasons": [
+            "domain overlap",
+            "problem overlap",
+            "matched query: domain_query"
+          ],
+          "extracted_signals": {
+            "domain": "education",
+            "domain_signals": [
+              "campus",
+              "college",
+              "higher education"
+            ],
+            "mechanism_signals": [],
+            "population_signals": [
+              "campuses",
+              "colleges",
+              "students",
+              "universities"
+            ]
+          },
+          "problem_alignment": 1,
+          "solution_alignment": 0,
+          "population_alignment": 0,
+          "mechanism_specificity": 0,
+          "evidence_strength": 1,
+          "import_priority": "reject",
+          "why_this_candidate": "Only weak policy-alignment signals are present.",
+          "why_not_direct_anchor_yet": "Solution alignment is not strong enough for Direct. Mechanism specificity is too weak for Direct. Evidence is too thin for a confident Direct recommendation. Cross-domain mismatch blocks Partial and Direct suggestions without unusually strong explicit overlap. Candidate appears to cover only part of the future bill's mechanism and does not include the direct-benefit component. Education partial override not applied because the candidate does not clearly support HBCUs, MSIs, or higher-ed institutions.",
+          "recommended_next_step": "reject_candidate",
+          "llm_import_decision": null,
+          "llm_reasoning_short": null
+        },
+        {
+          "bill_number": "H.R. 231",
+          "chamber": "House",
+          "congress": 118,
+          "title": "Terminate TikTok on Campus Act of 2023",
+          "official_summary": "Terminate TikTok on Campus Act of 2023 This bill prohibits an institution of higher education (IHE) from receiving federal funds unless the IHE takes certain actions to ban the use of the social media video application TikTok. Specifically, the IHE must develop and implement standards and guidelines (1) prohibiting the use of TikTok on electronic devices owned or issued by the IHE, and (2) requiring the removal of TikTok from these devices. The bill includes an exception for research that (1) is conducted, supervised, or authorized by an IHE's faculty; and (2) pertains to national security, law enforcement, telecommunications, or cybersecurity.",
+          "source": "congress_api",
+          "matched_query": "campus infrastructure",
+          "matched_query_type": "domain_query",
+          "relevance_score": 9.75,
+          "selection_reasons": [
+            "domain overlap",
+            "problem overlap",
+            "matched query: domain_query"
+          ],
+          "extracted_signals": {
+            "domain": "education",
+            "domain_signals": [
+              "campus",
+              "higher education"
+            ],
+            "mechanism_signals": [
+              "accountability",
+              "anti-discrimination",
+              "compliance",
+              "enforcement",
+              "oversight",
+              "standard"
+            ],
+            "population_signals": []
+          },
+          "problem_alignment": 1,
+          "solution_alignment": 0,
+          "population_alignment": 0,
+          "mechanism_specificity": 0,
+          "evidence_strength": 1,
+          "import_priority": "reject",
+          "why_this_candidate": "Only weak policy-alignment signals are present.",
+          "why_not_direct_anchor_yet": "Solution alignment is not strong enough for Direct. Mechanism specificity is too weak for Direct. Evidence is too thin for a confident Direct recommendation. Cross-domain mismatch blocks Partial and Direct suggestions without unusually strong explicit overlap. Candidate reads like a study or commission rather than a direct-benefit mechanism. Candidate appears to cover only part of the future bill's mechanism and does not include the direct-benefit component. Mechanism-family mismatch blocks Partial and Direct suggestions unless there is unusually strong secondary evidence. Education partial override not applied because the candidate does not clearly support HBCUs, MSIs, or higher-ed institutions.",
+          "recommended_next_step": "reject_candidate",
+          "llm_import_decision": null,
+          "llm_reasoning_short": null
+        },
+        {
+          "bill_number": "H.R. 7660",
+          "chamber": "House",
+          "congress": 119,
+          "title": "HBCU Empowerment and Reform Act",
+          "official_summary": null,
+          "source": "tracked_bills",
+          "matched_query": "campus infrastructure hbcu",
+          "matched_query_type": "population_query",
+          "relevance_score": 4.583,
+          "selection_reasons": [
+            "domain overlap",
+            "population overlap",
+            "problem overlap",
+            "matched query: population_query"
+          ],
+          "extracted_signals": {
+            "domain": "education",
+            "domain_signals": [
+              "hbcu"
+            ],
+            "mechanism_signals": [],
+            "population_signals": [
+              "colleges",
+              "hbcu",
+              "hbcus",
+              "institutions",
+              "minority-serving institution",
+              "minority-serving institutions",
+              "universities"
+            ]
+          },
+          "problem_alignment": 1,
+          "solution_alignment": 0,
+          "population_alignment": 2,
+          "mechanism_specificity": 0,
+          "evidence_strength": 0,
+          "import_priority": "reject",
+          "why_this_candidate": "Targets a similar beneficiary population. Already exists in tracked_bills and may have been overlooked.",
+          "why_not_direct_anchor_yet": "Solution alignment is not strong enough for Direct. Mechanism specificity is too weak for Direct. Evidence is too thin for a confident Direct recommendation. Cross-domain mismatch blocks Partial and Direct suggestions without unusually strong explicit overlap. Candidate appears to cover only part of the future bill's mechanism and does not include the direct-benefit component. Candidate title is weak and there is no official summary. Education partial override not applied because the candidate does not clearly support HBCUs, MSIs, or higher-ed institutions.",
+          "recommended_next_step": "reject_candidate",
+          "llm_import_decision": null,
+          "llm_reasoning_short": null
+        }
+      ]
+    }
+  ]
+}

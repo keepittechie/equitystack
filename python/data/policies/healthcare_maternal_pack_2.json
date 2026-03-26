@@ -1,0 +1,166 @@
+[
+  {
+    "title": "Emergency Medical Treatment and Active Labor Act",
+    "policy_type": "Law",
+    "summary": "Required Medicare-participating hospitals with emergency departments to provide screening and stabilizing treatment for emergency medical conditions, including active labor, regardless of ability to pay.",
+    "year_enacted": 1986,
+    "date_enacted": "1986-04-07",
+    "era": "Post Civil Rights Era",
+    "president": "Ronald Reagan",
+    "primary_party": "Republican Party",
+    "bipartisan": true,
+    "direct_black_impact": true,
+    "outcome_summary": "Strengthened the right to emergency care and reduced the formal ability of hospitals to refuse urgent patients, which has been especially consequential for low-income Black patients and pregnant Black women navigating unequal healthcare systems.",
+    "status": "Active",
+    "impact_direction": "Positive",
+    "impact_notes": "Not designed specifically for Black Americans, but important because emergency-room access and labor-and-delivery protections matter most where discriminatory access barriers and underinsurance are concentrated.",
+    "categories": ["Healthcare", "Civil Rights"],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 4,
+      "evidence_score": 4,
+      "durability_score": 5,
+      "equity_score": 4,
+      "harm_offset_score": 1,
+      "notes": "A durable floor of emergency-care access with particular importance for racialized access disparities."
+    },
+    "sources": [
+      {
+        "source_title": "Emergency Medical Treatment & Labor Act (EMTALA)",
+        "source_url": "https://www.cms.gov/medicare/regulations-guidance/legislation/emergency-medical-treatment-labor-act",
+        "source_type": "Government",
+        "publisher": "Centers for Medicare & Medicaid Services",
+        "published_date": null,
+        "notes": "CMS overview of EMTALA and the obligations it imposes on Medicare-participating hospitals."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Healthy Start Initiative",
+    "policy_type": "Program",
+    "summary": "Created a federal maternal and infant health initiative focused on communities with exceptionally high infant mortality and poor maternal health outcomes.",
+    "year_enacted": 1991,
+    "date_enacted": "1991-01-01",
+    "era": "Contemporary Era",
+    "president": "George H. W. Bush",
+    "primary_party": "Republican Party",
+    "bipartisan": true,
+    "direct_black_impact": true,
+    "outcome_summary": "Targeted maternal and infant health resources toward high-risk communities, which has mattered disproportionately for Black mothers and infants because of persistent racial gaps in mortality, prenatal care, and postpartum support.",
+    "status": "Active",
+    "impact_direction": "Positive",
+    "impact_notes": "Important for addressing racialized maternal and infant health disparities through place-based community investment rather than only clinical reimbursement.",
+    "categories": ["Healthcare", "Social Welfare"],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 4,
+      "evidence_score": 4,
+      "durability_score": 4,
+      "equity_score": 5,
+      "harm_offset_score": 1,
+      "notes": "A targeted federal maternal-health program aimed at communities where Black maternal and infant mortality burdens have been especially high."
+    },
+    "sources": [
+      {
+        "source_title": "Healthy Start",
+        "source_url": "https://mchb.hrsa.gov/programs-impact/programs/healthy-start",
+        "source_type": "Government",
+        "publisher": "Health Resources and Services Administration",
+        "published_date": null,
+        "notes": "Official HRSA overview describing Healthy Start's maternal and infant health mission and community targeting."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Children's Health Insurance Program Reauthorization Act of 2009",
+    "policy_type": "Law",
+    "summary": "Reauthorized and expanded CHIP, increasing federal support for child coverage, outreach, enrollment, and optional coverage of low-income pregnant women.",
+    "year_enacted": 2009,
+    "date_enacted": "2009-02-04",
+    "era": "Contemporary Era",
+    "president": "Barack Obama",
+    "primary_party": "Democratic Party",
+    "bipartisan": true,
+    "direct_black_impact": true,
+    "outcome_summary": "Expanded public health-insurance coverage for children and some pregnant women, which helped narrow coverage gaps affecting Black families and improved access to preventive, dental, and maternal-related care.",
+    "status": "Active",
+    "impact_direction": "Positive",
+    "impact_notes": "Meaningful because Black children are more likely to benefit from public insurance expansions when market-based coverage is unequal or unstable.",
+    "categories": ["Healthcare", "Social Welfare"],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 4,
+      "evidence_score": 4,
+      "durability_score": 4,
+      "equity_score": 4,
+      "harm_offset_score": 1,
+      "notes": "A strong child-health and family-coverage expansion with racial-equity significance."
+    },
+    "sources": [
+      {
+        "source_title": "H.R.2 - Children's Health Insurance Program Reauthorization Act of 2009",
+        "source_url": "https://www.congress.gov/bill/111th-congress/house-bill/2",
+        "source_type": "Government",
+        "publisher": "Congress.gov",
+        "published_date": "2009-02-04",
+        "notes": "Official bill page showing enactment of CHIP reauthorization."
+      },
+      {
+        "source_title": "H.R.2 - Children's Health Insurance Program Reauthorization Act of 2009 Summary",
+        "source_url": "https://www.congress.gov/bill/111th-congress/house-bill/2/summary/00",
+        "source_type": "Government",
+        "publisher": "Congress.gov",
+        "published_date": "2009-02-04",
+        "notes": "CRS summary describing CHIP reauthorization, outreach, pregnant women coverage, and child health improvements."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Maternal, Infant, and Early Childhood Home Visiting Program",
+    "policy_type": "Program",
+    "summary": "Established a federal evidence-based home visiting program for pregnant women and families with young children in communities facing greater barriers and health risks.",
+    "year_enacted": 2010,
+    "date_enacted": "2010-03-23",
+    "era": "Contemporary Era",
+    "president": "Barack Obama",
+    "primary_party": "Democratic Party",
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "Expanded maternal and early-childhood support services that can improve pregnancy outcomes, family stability, and child development in higher-risk communities, including communities facing entrenched racial disparities in maternal and infant health.",
+    "status": "Active",
+    "impact_direction": "Positive",
+    "impact_notes": "An important maternal-health and early-childhood intervention because it addresses support before and after birth, not only acute care financing.",
+    "categories": ["Healthcare", "Social Welfare"],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 4,
+      "evidence_score": 5,
+      "durability_score": 4,
+      "equity_score": 4,
+      "harm_offset_score": 1,
+      "notes": "Evidence-based maternal and early-childhood support with strong relevance to racial disparities in maternal and infant outcomes."
+    },
+    "sources": [
+      {
+        "source_title": "Maternal, Infant, and Early Childhood Home Visiting (MIECHV) Program",
+        "source_url": "https://mchb.hrsa.gov/programs-impact/maternal-infant-early-childhood-home-visiting-miechv-program",
+        "source_type": "Government",
+        "publisher": "Health Resources and Services Administration",
+        "published_date": null,
+        "notes": "Official HRSA overview of the MIECHV program, its target populations, and its intended outcomes."
+      },
+      {
+        "source_title": "MIECHV Program Awards",
+        "source_url": "https://mchb.hrsa.gov/programs-impact/programs/home-visiting/maternal-infant-early-childhood-home-visiting-miechv-program/fy25-awards",
+        "source_type": "Government",
+        "publisher": "Health Resources and Services Administration",
+        "published_date": null,
+        "notes": "Demonstrates the continuing national scale and reach of the home-visiting program."
+      }
+    ],
+    "metrics": []
+  }
+]

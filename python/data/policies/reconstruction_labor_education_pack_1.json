@@ -1,0 +1,258 @@
+[
+  {
+    "title": "Enforcement Act of 1870",
+    "policy_type": "Law",
+    "summary": "Protected voting rights of Black Americans and enforced the 15th Amendment.",
+    "year_enacted": 1870,
+    "date_enacted": "1870-05-31",
+    "era": "Civil War and Reconstruction",
+    "president": "Ulysses S. Grant",
+    "primary_party": "Republican Party",
+    "direct_black_impact": true,
+    "outcome_summary": "Enabled federal prosecution of voter suppression and intimidation.",
+    "status": "Active",
+    "impact_direction": "Positive",
+    "impact_notes": "Key enforcement mechanism during Reconstruction.",
+    "categories": ["Voting Rights", "Civil Rights"],
+    "scores": {
+      "directness_score": 5,
+      "material_impact_score": 4,
+      "evidence_score": 5,
+      "durability_score": 2,
+      "equity_score": 5,
+      "harm_offset_score": 0
+    },
+    "sources": [
+      {
+        "source_title": "Enforcement Act of 1870",
+        "source_url": "https://www.govinfo.gov/content/pkg/STATUTE-16/pdf/STATUTE-16-Pg140.pdf",
+        "source_type": "Government"
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Enforcement Act of 1871 (Second Enforcement Act)",
+    "policy_type": "Law",
+    "summary": "Expanded federal oversight of elections and enforcement powers against voter suppression.",
+    "year_enacted": 1871,
+    "date_enacted": "1871-02-28",
+    "era": "Civil War and Reconstruction",
+    "president": "Ulysses S. Grant",
+    "primary_party": "Republican Party",
+    "direct_black_impact": true,
+    "outcome_summary": "Allowed federal supervision of elections in areas with suppression.",
+    "status": "Active",
+    "impact_direction": "Positive",
+    "impact_notes": "Strengthened federal election oversight.",
+    "categories": ["Voting Rights"],
+    "scores": {
+      "directness_score": 5,
+      "material_impact_score": 4,
+      "evidence_score": 5,
+      "durability_score": 2,
+      "equity_score": 5,
+      "harm_offset_score": 0
+    },
+    "sources": [
+      {
+        "source_title": "Enforcement Act of 1871",
+        "source_url": "https://www.govinfo.gov/",
+        "source_type": "Government"
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Ku Klux Klan Act of 1871",
+    "policy_type": "Law",
+    "summary": "Authorized federal intervention against white supremacist violence and suspended habeas corpus in certain areas.",
+    "year_enacted": 1871,
+    "date_enacted": "1871-04-20",
+    "era": "Civil War and Reconstruction",
+    "president": "Ulysses S. Grant",
+    "primary_party": "Republican Party",
+    "direct_black_impact": true,
+    "outcome_summary": "Suppressed KKK activity temporarily through federal enforcement.",
+    "status": "Active",
+    "impact_direction": "Positive",
+    "impact_notes": "One of the strongest federal civil rights enforcement laws ever passed.",
+    "categories": ["Civil Rights", "Criminal Justice"],
+    "scores": {
+      "directness_score": 5,
+      "material_impact_score": 5,
+      "evidence_score": 5,
+      "durability_score": 3,
+      "equity_score": 5,
+      "harm_offset_score": 0
+    },
+    "sources": [
+      {
+        "source_title": "Ku Klux Klan Act",
+        "source_url": "https://www.govinfo.gov/",
+        "source_type": "Government"
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "National Labor Relations Act",
+    "policy_type": "Law",
+    "summary": "Established workers’ rights to unionize and bargain collectively.",
+    "year_enacted": 1935,
+    "date_enacted": "1935-07-05",
+    "era": "Jim Crow and Disenfranchisement",
+    "president": "Franklin D. Roosevelt",
+    "primary_party": "Democratic Party",
+    "direct_black_impact": true,
+    "outcome_summary": "Expanded labor protections, though many Black workers were excluded initially.",
+    "status": "Active",
+    "impact_direction": "Mixed",
+    "impact_notes": "Important labor law with racial exclusions in practice.",
+    "categories": ["Labor", "Business and Economics"],
+    "scores": {
+      "directness_score": 3,
+      "material_impact_score": 4,
+      "evidence_score": 4,
+      "durability_score": 5,
+      "equity_score": 2,
+      "harm_offset_score": 1
+    },
+    "sources": [
+      {
+        "source_title": "NLRA",
+        "source_url": "https://www.nlrb.gov/",
+        "source_type": "Government"
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Fair Labor Standards Act",
+    "policy_type": "Law",
+    "summary": "Established minimum wage, overtime pay, and child labor protections.",
+    "year_enacted": 1938,
+    "date_enacted": "1938-06-25",
+    "era": "Jim Crow and Disenfranchisement",
+    "president": "Franklin D. Roosevelt",
+    "primary_party": "Democratic Party",
+    "direct_black_impact": true,
+    "outcome_summary": "Improved labor standards but excluded many Black workers in agriculture and domestic work.",
+    "status": "Active",
+    "impact_direction": "Mixed",
+    "impact_notes": "Foundational labor law with exclusionary impact.",
+    "categories": ["Labor", "Business and Economics"],
+    "scores": {
+      "directness_score": 3,
+      "material_impact_score": 4,
+      "evidence_score": 5,
+      "durability_score": 5,
+      "equity_score": 2,
+      "harm_offset_score": 1
+    },
+    "sources": [
+      {
+        "source_title": "FLSA",
+        "source_url": "https://www.dol.gov/",
+        "source_type": "Government"
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "G.I. Bill (Servicemen's Readjustment Act)",
+    "policy_type": "Law",
+    "summary": "Provided education and housing benefits to returning veterans.",
+    "year_enacted": 1944,
+    "date_enacted": "1944-06-22",
+    "era": "Civil Rights Era",
+    "president": "Franklin D. Roosevelt",
+    "primary_party": "Democratic Party",
+    "direct_black_impact": true,
+    "outcome_summary": "Expanded wealth-building opportunities but was implemented in discriminatory ways.",
+    "status": "Active",
+    "impact_direction": "Mixed",
+    "impact_notes": "Major wealth-building program with unequal access.",
+    "categories": ["Education", "Housing", "Business and Economics"],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 5,
+      "evidence_score": 5,
+      "durability_score": 5,
+      "equity_score": 1,
+      "harm_offset_score": 1
+    },
+    "sources": [
+      {
+        "source_title": "GI Bill",
+        "source_url": "https://www.va.gov/",
+        "source_type": "Government"
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Higher Education Act",
+    "policy_type": "Law",
+    "summary": "Expanded federal funding for colleges and financial aid programs.",
+    "year_enacted": 1965,
+    "date_enacted": "1965-11-08",
+    "era": "Civil Rights Era",
+    "president": "Lyndon B. Johnson",
+    "primary_party": "Democratic Party",
+    "direct_black_impact": true,
+    "outcome_summary": "Expanded access to higher education for Black students.",
+    "status": "Active",
+    "impact_direction": "Positive",
+    "impact_notes": "Major expansion of education access.",
+    "categories": ["Education"],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 4,
+      "evidence_score": 5,
+      "durability_score": 5,
+      "equity_score": 4,
+      "harm_offset_score": 1
+    },
+    "sources": [
+      {
+        "source_title": "Higher Education Act",
+        "source_url": "https://www.congress.gov/",
+        "source_type": "Government"
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Violent Crime Control and Law Enforcement Act",
+    "policy_type": "Law",
+    "summary": "Expanded policing, prisons, and sentencing laws across the United States.",
+    "year_enacted": 1994,
+    "date_enacted": "1994-09-13",
+    "era": "Post Civil Rights Era",
+    "president": "Bill Clinton",
+    "primary_party": "Democratic Party",
+    "direct_black_impact": true,
+    "outcome_summary": "Contributed to mass incarceration trends.",
+    "status": "Active",
+    "impact_direction": "Negative",
+    "impact_notes": "Major expansion of incarceration policy.",
+    "categories": ["Criminal Justice"],
+    "scores": {
+      "directness_score": 5,
+      "material_impact_score": 5,
+      "evidence_score": 5,
+      "durability_score": 5,
+      "equity_score": 0,
+      "harm_offset_score": 0
+    },
+    "sources": [
+      {
+        "source_title": "1994 Crime Bill",
+        "source_url": "https://www.congress.gov/",
+        "source_type": "Government"
+      }
+    ],
+    "metrics": []
+  }
+]

@@ -1,0 +1,359 @@
+import Link from "next/link";
+import { PromiseStatusBadge } from "@/app/components/policy-badges";
+import { fetchInternalJson } from "@/lib/api";
+import { PUBLIC_REVALIDATE_SECONDS, withRevalidate } from "@/lib/cache";
+import { buildPageMetadata } from "@/lib/metadata";
+
+export const metadata = buildPageMetadata({
+  title: "All Promise Records",
+  description:
+    "Browse all Promise Tracker records with filters for president, status, topic, and search terms.",
+  path: "/promises/all",
+});
+
+async function getPromises(searchParams) {
+  const params = new URLSearchParams();
+
+  if (searchParams.q) params.set("q", searchParams.q);
+  if (searchParams.president) params.set("president", searchParams.president);
+  if (searchParams.status) params.set("status", searchParams.status);
+  if (searchParams.topic) params.set("topic", searchParams.topic);
+  if (searchParams.page) params.set("page", searchParams.page);
+  if (searchParams.sort) params.set("sort", searchParams.sort);
+
+  const query = params.toString();
+  return fetchInternalJson(`/api/promises${query ? `?${query}` : ""}`, {
+    ...withRevalidate(PUBLIC_REVALIDATE_SECONDS),
+    errorMessage: "Failed to fetch promises",
+  });
+}
+
+function FilterField({ label, children }) {
+  return (
+    <div>
+      <label className="block text-sm font-medium mb-1 text-[var(--ink-soft)]">{label}</label>
+      {children}
+    </div>
+  );
+}
+
+function MetaPill({ children }) {
+  return (
+    <span className="inline-flex items-center rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-3 py-1 text-xs text-[var(--ink-soft)]">
+      {children}
+    </span>
+  );
+}
+
+function buildPageHref(searchParams, page) {
+  const params = new URLSearchParams();
+
+  Object.entries(searchParams).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== "") {
+      params.set(key, String(value));
+    }
+  });
+
+  params.set("page", String(page));
+  return `/promises/all?${params.toString()}`;
+}
+
+function buildResetHref(searchParams, keyToRemove) {
+  const params = new URLSearchParams();
+
+  Object.entries(searchParams).forEach(([key, value]) => {
+    if (
+      key !== keyToRemove &&
+      key !== "page" &&
+      value !== undefined &&
+      value !== null &&
+      value !== ""
+    ) {
+      params.set(key, String(value));
+    }
+  });
+
+  const query = params.toString();
+  return query ? `/promises/all?${query}` : "/promises/all";
+}
+
+function getActiveFilters(searchParams) {
+  const filters = [];
+
+  if (searchParams.q) filters.push({ key: "q", label: `Search: ${searchParams.q}` });
+  if (searchParams.president) {
+    filters.push({ key: "president", label: `President: ${searchParams.president}` });
+  }
+  if (searchParams.status) {
+    filters.push({ key: "status", label: `Status: ${searchParams.status}` });
+  }
+  if (searchParams.topic) {
+    filters.push({ key: "topic", label: `Topic: ${searchParams.topic}` });
+  }
+
+  return filters;
+}
+
+function formatDate(dateString) {
+  if (!dateString) return null;
+
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) return dateString;
+
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
+
+export default async function AllPromisesPage({ searchParams }) {
+  const resolvedSearchParams = (await searchParams) || {};
+  const data = await getPromises(resolvedSearchParams);
+  const promises = data.items || [];
+  const filters = data.filters || { presidents: [], topics: [], statuses: [] };
+  const pagination = data.pagination || {
+    page: 1,
+    total_pages: 1,
+    has_prev: false,
+    has_next: false,
+  };
+  const activeFilters = getActiveFilters(resolvedSearchParams);
+
+  return (
+    <main className="max-w-7xl mx-auto p-6">
+      <section className="hero-panel p-8 md:p-10 mb-6">
+        <div className="section-intro">
+          <p className="eyebrow mb-4">Promise Tracker</p>
+          <h1 className="text-4xl md:text-5xl font-bold">All Promise Records</h1>
+          <p className="text-base md:text-lg text-[var(--ink-soft)] mt-4 leading-8 max-w-3xl">
+            Browse all tracked promise records, filter by president or status, and move from the
+            broader record list into full detail pages for actions, outcomes, and source context.
+          </p>
+          <div className="mt-5 flex flex-wrap gap-2">
+            <MetaPill>{data.pagination?.total || 0} tracked promises</MetaPill>
+            <MetaPill>Distinct source counts across promise, action, and outcome records</MetaPill>
+          </div>
+        </div>
+      </section>
+
+      <section className="mb-6 flex flex-wrap gap-3">
+        <Link
+          href="/promises"
+          className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
+        >
+          View Presidents
+        </Link>
+      </section>
+
+      <section className="card-surface rounded-[1.6rem] p-5 mb-8">
+        <div className="mb-4">
+          <h2 className="text-xl font-semibold">Search and Filter</h2>
+          <p className="text-sm text-[var(--ink-soft)] mt-1">
+            Filter by president, status, or topic, or search across titles, summaries, and promise text.
+          </p>
+        </div>
+
+        <form method="GET" className="grid gap-4 md:grid-cols-4">
+          <div className="md:col-span-4">
+            <label className="block text-sm font-medium mb-1 text-[var(--ink-soft)]">
+              Search
+            </label>
+            <input
+              type="text"
+              name="q"
+              defaultValue={resolvedSearchParams.q || ""}
+              className="w-full border rounded-xl px-3 py-2"
+              placeholder="Search by promise title, summary, topic, or impacted group"
+            />
+          </div>
+
+          <FilterField label="President">
+            <select
+              name="president"
+              defaultValue={resolvedSearchParams.president || ""}
+              className="w-full border rounded-xl px-3 py-2 bg-white/80"
+            >
+              <option value="">All</option>
+              {filters.presidents.map((name) => (
+                <option key={name} value={name}>
+                  {name}
+                </option>
+              ))}
+            </select>
+          </FilterField>
+
+          <FilterField label="Status">
+            <select
+              name="status"
+              defaultValue={resolvedSearchParams.status || ""}
+              className="w-full border rounded-xl px-3 py-2 bg-white/80"
+            >
+              <option value="">All</option>
+              {filters.statuses.map((label) => (
+                <option key={label} value={label}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </FilterField>
+
+          <FilterField label="Topic">
+            <select
+              name="topic"
+              defaultValue={resolvedSearchParams.topic || ""}
+              className="w-full border rounded-xl px-3 py-2 bg-white/80"
+            >
+              <option value="">All</option>
+              {filters.topics.map((label) => (
+                <option key={label} value={label}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </FilterField>
+
+          <FilterField label="Sort">
+            <select
+              name="sort"
+              defaultValue={resolvedSearchParams.sort || "promise_date_desc"}
+              className="w-full border rounded-xl px-3 py-2 bg-white/80"
+            >
+              <option value="promise_date_desc">Newest Promise Date</option>
+              <option value="promise_date_asc">Oldest Promise Date</option>
+              <option value="title_asc">Title A-Z</option>
+              <option value="title_desc">Title Z-A</option>
+              <option value="status_asc">Status</option>
+            </select>
+          </FilterField>
+
+          <div className="md:col-span-4 flex flex-wrap gap-3">
+            <button
+              type="submit"
+              className="rounded-full bg-[var(--accent)] text-white px-5 py-2 text-sm font-medium"
+            >
+              Apply Filters
+            </button>
+            <Link
+              href="/promises/all"
+              className="rounded-full border border-[rgba(120,53,15,0.18)] px-5 py-2 text-sm font-medium"
+            >
+              Reset
+            </Link>
+          </div>
+        </form>
+      </section>
+
+      {activeFilters.length > 0 && (
+        <section className="mb-6 flex flex-wrap gap-2">
+          {activeFilters.map((filter) => (
+            <Link
+              key={filter.key}
+              href={buildResetHref(resolvedSearchParams, filter.key)}
+              className="inline-flex items-center rounded-full border border-[rgba(120,53,15,0.12)] px-3 py-2 text-sm bg-white/75 hover:bg-white"
+            >
+              {filter.label} ×
+            </Link>
+          ))}
+        </section>
+      )}
+
+      <section className="mb-4 flex items-center justify-between gap-4 flex-wrap">
+        <div>
+          <h2 className="text-2xl font-semibold">Tracked Promises</h2>
+          <p className="text-sm text-[var(--ink-soft)] mt-1">
+            {data.pagination?.total || 0} Promise Tracker records
+          </p>
+        </div>
+      </section>
+
+      {promises.length === 0 ? (
+        <section className="card-surface rounded-[1.6rem] p-8 text-center">
+          <h3 className="text-xl font-semibold">No promises matched these filters.</h3>
+          <p className="text-[var(--ink-soft)] mt-3">
+            Try removing a filter or broadening the search terms.
+          </p>
+        </section>
+      ) : (
+        <section className="grid gap-4 md:grid-cols-2">
+          {promises.map((promise) => (
+            <Link
+              key={promise.id}
+              href={`/promises/${promise.slug}`}
+              className="panel-link block rounded-[1.45rem] p-5"
+            >
+              <div className="flex items-start justify-between gap-4 flex-wrap">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">
+                    {promise.president}
+                  </p>
+                  <h3 className="text-xl font-semibold mt-2">{promise.title}</h3>
+                </div>
+                <PromiseStatusBadge status={promise.status} />
+              </div>
+
+              <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
+                {promise.summary || "No summary added yet."}
+              </p>
+
+              <div className="flex flex-wrap gap-2 mt-4">
+                <MetaPill>{promise.topic || "No topic"}</MetaPill>
+                <MetaPill>{promise.promise_type}</MetaPill>
+                <MetaPill>{promise.campaign_or_official}</MetaPill>
+                <MetaPill>
+                  {promise.action_count} action{promise.action_count === 1 ? "" : "s"}
+                </MetaPill>
+                <MetaPill>
+                  {promise.source_count} distinct source{promise.source_count === 1 ? "" : "s"}
+                </MetaPill>
+                {(promise.related_policy_count || promise.related_explainer_count) ? (
+                  <MetaPill>
+                    {promise.related_policy_count || 0} policy / {promise.related_explainer_count || 0} explainer links
+                  </MetaPill>
+                ) : null}
+              </div>
+
+              <div className="flex flex-wrap gap-4 mt-2 text-xs text-[var(--ink-soft)]">
+                {promise.promise_date ? <span>Promise date: {formatDate(promise.promise_date)}</span> : null}
+                {promise.latest_action_date ? (
+                  <span>Latest action: {formatDate(promise.latest_action_date)}</span>
+                ) : null}
+                {promise.is_demo ? <span>Demo seed data</span> : null}
+              </div>
+            </Link>
+          ))}
+        </section>
+      )}
+
+      {pagination.total_pages > 1 && (
+        <section className="mt-8 flex items-center justify-between gap-4">
+          {pagination.has_prev ? (
+            <Link
+              href={buildPageHref(resolvedSearchParams, pagination.page - 1)}
+              className="rounded-full border border-[rgba(120,53,15,0.18)] px-4 py-2 text-sm font-medium"
+            >
+              Previous
+            </Link>
+          ) : (
+            <span />
+          )}
+
+          <span className="text-sm text-[var(--ink-soft)]">
+            Page {pagination.page} of {pagination.total_pages}
+          </span>
+
+          {pagination.has_next ? (
+            <Link
+              href={buildPageHref(resolvedSearchParams, pagination.page + 1)}
+              className="rounded-full border border-[rgba(120,53,15,0.18)] px-4 py-2 text-sm font-medium"
+            >
+              Next
+            </Link>
+          ) : (
+            <span />
+          )}
+        </section>
+      )}
+    </main>
+  );
+}

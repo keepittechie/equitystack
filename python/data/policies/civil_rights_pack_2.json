@@ -1,0 +1,197 @@
+[
+  {
+    "title": "Missouri ex rel. Gaines v. Canada",
+    "policy_type": "Court Case",
+    "summary": "The Supreme Court ruled that states providing a law school for white students had to provide a genuinely equal legal education for Black students within the state.",
+    "year_enacted": 1938,
+    "date_enacted": "1938-12-12",
+    "era": "Jim Crow and Disenfranchisement",
+    "president": "Franklin D. Roosevelt",
+    "primary_party": null,
+    "house_party": null,
+    "senate_party": null,
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "A major pre-Brown education case that chipped away at segregated higher education.",
+    "status": "Active",
+    "impact_direction": "Positive",
+    "impact_notes": "Important legal step toward dismantling educational segregation.",
+    "categories": ["Education", "Civil Rights"],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 4,
+      "evidence_score": 4,
+      "durability_score": 4,
+      "equity_score": 4,
+      "harm_offset_score": 0,
+      "notes": "Important precursor to Brown."
+    },
+    "sources": [
+      {
+        "source_title": "Missouri ex rel. Gaines v. Canada",
+        "source_url": "https://supreme.justia.com/cases/federal/us/305/337/",
+        "source_type": "Government",
+        "publisher": "Supreme Court / Justia",
+        "published_date": null,
+        "notes": "Primary case text"
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Browder v. Gayle",
+    "policy_type": "Court Case",
+    "summary": "A federal court ruled that racial segregation on public buses in Alabama was unconstitutional.",
+    "year_enacted": 1956,
+    "date_enacted": "1956-06-05",
+    "era": "Civil Rights Era",
+    "president": "Dwight D. Eisenhower",
+    "primary_party": null,
+    "house_party": null,
+    "senate_party": null,
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "Ended bus segregation in Montgomery and validated the constitutional claims behind the bus boycott.",
+    "status": "Active",
+    "impact_direction": "Positive",
+    "impact_notes": "A key legal victory tied directly to the civil rights movement.",
+    "categories": ["Civil Rights", "Constitutional Rights"],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 4,
+      "evidence_score": 4,
+      "durability_score": 4,
+      "equity_score": 4,
+      "harm_offset_score": 0,
+      "notes": "Major movement-era desegregation ruling."
+    },
+    "sources": [
+      {
+        "source_title": "Browder v. Gayle",
+        "source_url": "https://law.justia.com/cases/federal/district-courts/FSupp/142/707/2186315/",
+        "source_type": "Government",
+        "publisher": "Justia",
+        "published_date": null,
+        "notes": "Primary case text"
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Loving v. Virginia",
+    "policy_type": "Court Case",
+    "summary": "The Supreme Court ruled that laws banning interracial marriage were unconstitutional.",
+    "year_enacted": 1967,
+    "date_enacted": "1967-06-12",
+    "era": "Civil Rights Era",
+    "president": "Lyndon B. Johnson",
+    "primary_party": null,
+    "house_party": null,
+    "senate_party": null,
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "Invalidated anti-miscegenation laws nationwide and reinforced equal protection in family life and marriage.",
+    "status": "Active",
+    "impact_direction": "Positive",
+    "impact_notes": "A landmark civil-rights and constitutional-rights case.",
+    "categories": ["Civil Rights", "Constitutional Rights"],
+    "scores": {
+      "directness_score": 5,
+      "material_impact_score": 4,
+      "evidence_score": 5,
+      "durability_score": 5,
+      "equity_score": 5,
+      "harm_offset_score": 0,
+      "notes": "Major constitutional equality ruling."
+    },
+    "sources": [
+      {
+        "source_title": "Loving v. Virginia",
+        "source_url": "https://supreme.justia.com/cases/federal/us/388/1/",
+        "source_type": "Government",
+        "publisher": "Supreme Court / Justia",
+        "published_date": null,
+        "notes": "Primary case text"
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Dyer Anti-Lynching Bill",
+    "policy_type": "Law",
+    "summary": "A federal anti-lynching bill passed the House but was blocked in the Senate after fierce opposition.",
+    "year_enacted": 1922,
+    "date_enacted": null,
+    "era": "Jim Crow and Disenfranchisement",
+    "president": "Warren G. Harding",
+    "primary_party": "Republican Party",
+    "house_party": "Republican Party",
+    "senate_party": "Republican Party",
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "Its failure showed the federal government’s unwillingness to fully confront racial terror despite widespread lynching.",
+    "status": "Blocked",
+    "impact_direction": "Blocked",
+    "impact_notes": "A major missed opportunity for federal protection against racial violence.",
+    "categories": ["Criminal Justice", "Civil Rights"],
+    "scores": {
+      "directness_score": 5,
+      "material_impact_score": 4,
+      "evidence_score": 4,
+      "durability_score": 4,
+      "equity_score": 1,
+      "harm_offset_score": 0,
+      "notes": "Important failed anti-lynching effort."
+    },
+    "sources": [
+      {
+        "source_title": "Dyer Anti-Lynching Bill",
+        "source_url": "https://history.house.gov/Historical-Highlights/1901-1950/The-Dyer-Anti-Lynching-Bill/",
+        "source_type": "Government",
+        "publisher": "U.S. House of Representatives",
+        "published_date": null,
+        "notes": "Historical overview of the bill"
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Costigan-Wagner Anti-Lynching Bill",
+    "policy_type": "Law",
+    "summary": "A later federal anti-lynching bill was introduced but failed to become law after strong Senate resistance.",
+    "year_enacted": 1934,
+    "date_enacted": null,
+    "era": "Jim Crow and Disenfranchisement",
+    "president": "Franklin D. Roosevelt",
+    "primary_party": "Democratic Party",
+    "house_party": "Democratic Party",
+    "senate_party": "Democratic Party",
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "Its failure reinforced the federal government’s long refusal to adequately punish racial mob violence.",
+    "status": "Blocked",
+    "impact_direction": "Blocked",
+    "impact_notes": "Another major failed anti-lynching effort.",
+    "categories": ["Criminal Justice", "Civil Rights"],
+    "scores": {
+      "directness_score": 5,
+      "material_impact_score": 4,
+      "evidence_score": 4,
+      "durability_score": 4,
+      "equity_score": 1,
+      "harm_offset_score": 0,
+      "notes": "Important failed anti-lynching legislation."
+    },
+    "sources": [
+      {
+        "source_title": "Costigan-Wagner Bill",
+        "source_url": "https://www.senate.gov/artandhistory/history/minute/Costigan-Wagner_Anti-Lynching_Bill.htm",
+        "source_type": "Government",
+        "publisher": "United States Senate",
+        "published_date": null,
+        "notes": "Historical summary"
+      }
+    ],
+    "metrics": []
+  }
+]

@@ -1,0 +1,188 @@
+[
+  {
+    "title": "Veterans' Health Care Eligibility Reform Act of 1996",
+    "policy_type": "Law",
+    "summary": "Overhauled eligibility rules for the VA health system, broadened access to medical services, and expanded attention to women veterans, mental health, and counseling.",
+    "year_enacted": 1996,
+    "date_enacted": "1996-10-09",
+    "era": "Contemporary Era",
+    "president": "Bill Clinton",
+    "primary_party": "Democratic Party",
+    "bipartisan": true,
+    "direct_black_impact": true,
+    "outcome_summary": "Expanded the modern VA healthcare framework and made services more accessible to veterans who had previously fallen outside narrower eligibility rules, including Black veterans who have long faced both military and civilian healthcare inequities.",
+    "status": "Active",
+    "impact_direction": "Positive",
+    "impact_notes": "Important because veteran healthcare access is itself an equity issue where civilian labor, housing, and insurance disparities already shape outcomes for Black veterans.",
+    "categories": [
+      "Military and Veterans",
+      "Healthcare"
+    ],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 4,
+      "evidence_score": 4,
+      "durability_score": 5,
+      "equity_score": 4,
+      "harm_offset_score": 1,
+      "notes": "A durable expansion of veteran healthcare access with clear relevance to Black veteran wellbeing."
+    },
+    "sources": [
+      {
+        "source_title": "H.R.3118 - Veterans' Health Care Eligibility Reform Act of 1996",
+        "source_url": "https://www.congress.gov/bill/104th-congress/house-bill/3118",
+        "source_type": "Government",
+        "publisher": "Congress.gov",
+        "published_date": "1996-10-09",
+        "notes": "Official bill page and CRS summary for the law restructuring VA healthcare eligibility."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Post-9/11 GI Bill",
+    "policy_type": "Program",
+    "summary": "Created a major modern package of education and housing-related benefits for veterans who served after September 10, 2001, covering tuition, housing, books, and training support.",
+    "year_enacted": 2008,
+    "date_enacted": "2008-06-30",
+    "era": "Contemporary Era",
+    "president": "George W. Bush",
+    "primary_party": "Republican Party",
+    "bipartisan": true,
+    "direct_black_impact": true,
+    "outcome_summary": "Expanded educational and wealth-building opportunities for a new generation of veterans, including many Black veterans, though differences in school quality, debt, labor markets, and family wealth still shaped how fully those benefits translated into long-run gains.",
+    "status": "Active",
+    "impact_direction": "Positive",
+    "impact_notes": "A significant veteran-benefits expansion with particular relevance because Black service members are overrepresented in many military cohorts and often rely heavily on educational benefit access after service.",
+    "categories": [
+      "Military and Veterans",
+      "Education",
+      "Business and Economics"
+    ],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 5,
+      "evidence_score": 4,
+      "durability_score": 5,
+      "equity_score": 4,
+      "harm_offset_score": 1,
+      "notes": "A major modern education-benefits program with real wealth-building implications for veterans."
+    },
+    "sources": [
+      {
+        "source_title": "Post-9/11 GI Bill (Chapter 33)",
+        "source_url": "https://www.va.gov/education/about-gi-bill-benefits/post-9-11/",
+        "source_type": "Government",
+        "publisher": "U.S. Department of Veterans Affairs",
+        "published_date": null,
+        "notes": "Official VA overview of the program's eligibility, tuition, housing, and training benefits."
+      },
+      {
+        "source_title": "Harry W. Colmery Veterans Educational Assistance Act of 2017 (P.L. 115-48)",
+        "source_url": "https://www.congress.gov/crs-product/R45205",
+        "source_type": "Government",
+        "publisher": "Congressional Research Service",
+        "published_date": "2018-07-31",
+        "notes": "CRS report noting that the Post-9/11 GI Bill was originally established by Title V of the Supplemental Appropriations Act, 2008."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Harry W. Colmery Veterans Educational Assistance Act of 2017",
+    "policy_type": "Law",
+    "summary": "Updated and expanded GI Bill benefits, including changes affecting housing, school closures, reserve eligibility, and the elimination of benefit expiration for many Post-9/11 GI Bill users.",
+    "year_enacted": 2017,
+    "date_enacted": "2017-08-16",
+    "era": "Contemporary Era",
+    "president": "Donald J. Trump",
+    "primary_party": "Republican Party",
+    "bipartisan": true,
+    "direct_black_impact": true,
+    "outcome_summary": "Improved the long-run usability of GI Bill benefits and reduced time-limit barriers that could otherwise weaken the value of those benefits for veterans balancing work, caregiving, and uneven post-service transitions.",
+    "status": "Active",
+    "impact_direction": "Positive",
+    "impact_notes": "Important because benefit-expiration and administrative design choices often hit veterans with fewer financial buffers hardest, which can include Black veterans facing broader structural inequality.",
+    "categories": [
+      "Military and Veterans",
+      "Education",
+      "Business and Economics"
+    ],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 4,
+      "evidence_score": 4,
+      "durability_score": 5,
+      "equity_score": 4,
+      "harm_offset_score": 1,
+      "notes": "A meaningful improvement to the modern GI Bill framework, especially around access over time."
+    },
+    "sources": [
+      {
+        "source_title": "H.R.3218 - Harry W. Colmery Veterans Educational Assistance Act of 2017",
+        "source_url": "https://www.congress.gov/bill/115th-congress/house-bill/3218/all-actions",
+        "source_type": "Government",
+        "publisher": "Congress.gov",
+        "published_date": "2017-08-16",
+        "notes": "Official action history confirming enactment of the Forever GI Bill."
+      },
+      {
+        "source_title": "Harry W. Colmery Veterans Educational Assistance Act of 2017 (P.L. 115-48)",
+        "source_url": "https://www.congress.gov/crs-product/R45205",
+        "source_type": "Government",
+        "publisher": "Congressional Research Service",
+        "published_date": "2018-07-31",
+        "notes": "CRS explanation of how the Colmery Act amended the Post-9/11 GI Bill and related education benefits."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Honoring our PACT Act of 2022",
+    "policy_type": "Law",
+    "summary": "Expanded eligibility for VA healthcare and disability benefits related to toxic exposures, including burn pits, Agent Orange-related conditions, and other service-connected harms.",
+    "year_enacted": 2022,
+    "date_enacted": "2022-08-10",
+    "era": "Contemporary Era",
+    "president": "Joseph R. Biden Jr.",
+    "primary_party": "Democratic Party",
+    "bipartisan": true,
+    "direct_black_impact": true,
+    "outcome_summary": "Broadened access to treatment and compensation for veterans with service-connected toxic exposure conditions, which matters for Black veterans as part of a larger struggle over equal recognition, care, and support after service.",
+    "status": "Active",
+    "impact_direction": "Positive",
+    "impact_notes": "A large veteran-health expansion that addresses long-contested eligibility gaps in care and benefits.",
+    "categories": [
+      "Military and Veterans",
+      "Healthcare"
+    ],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 5,
+      "evidence_score": 4,
+      "durability_score": 5,
+      "equity_score": 4,
+      "harm_offset_score": 1,
+      "notes": "A major modern veteran-health reform with significant implications for access to care and disability recognition."
+    },
+    "sources": [
+      {
+        "source_title": "S.3373 - Honoring our PACT Act of 2022",
+        "source_url": "https://www.congress.gov/bill/117th-congress/senate-bill/3373/actions",
+        "source_type": "Government",
+        "publisher": "Congress.gov",
+        "published_date": "2022-08-10",
+        "notes": "Official action history confirming enactment of the PACT Act."
+      },
+      {
+        "source_title": "The PACT Act and your VA benefits",
+        "source_url": "https://www.va.gov/resources/the-pact-act-and-your-va-benefits/",
+        "source_type": "Government",
+        "publisher": "U.S. Department of Veterans Affairs",
+        "published_date": null,
+        "notes": "Official VA implementation page describing the expanded toxic exposure care and benefits framework."
+      }
+    ],
+    "metrics": []
+  }
+]

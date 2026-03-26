@@ -1,0 +1,194 @@
+[
+  {
+    "title": "Home Owners' Loan Corporation (HOLC)",
+    "policy_type": "Program",
+    "summary": "Created to refinance home mortgages during the Great Depression and produced residential security maps that contributed to redlining practices.",
+    "year_enacted": 1933,
+    "date_enacted": "1933-06-13",
+    "era": "Jim Crow and Disenfranchisement",
+    "president": "Franklin D. Roosevelt",
+    "primary_party": "Democratic Party",
+    "direct_black_impact": true,
+    "outcome_summary": "Helped stabilize housing markets but institutionalized discriminatory lending patterns.",
+    "status": "Expired",
+    "impact_direction": "Negative",
+    "impact_notes": "HOLC maps influenced decades of redlining and disinvestment in Black neighborhoods.",
+    "categories": ["Housing", "Business and Economics"],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 5,
+      "evidence_score": 5,
+      "durability_score": 5,
+      "equity_score": 0,
+      "harm_offset_score": 0
+    },
+    "sources": [
+      {
+        "source_title": "HOLC Overview",
+        "source_url": "https://www.federalreservehistory.org/essays/home-owners-loan-corporation",
+        "source_type": "Government"
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "National Housing Act of 1934 (FHA Creation)",
+    "policy_type": "Law",
+    "summary": "Established the Federal Housing Administration to insure mortgages and expand homeownership.",
+    "year_enacted": 1934,
+    "date_enacted": "1934-06-27",
+    "era": "Jim Crow and Disenfranchisement",
+    "president": "Franklin D. Roosevelt",
+    "primary_party": "Democratic Party",
+    "direct_black_impact": true,
+    "outcome_summary": "Expanded homeownership but excluded Black Americans through discriminatory underwriting practices.",
+    "status": "Active",
+    "impact_direction": "Negative",
+    "impact_notes": "Key driver of the racial wealth gap through housing access.",
+    "categories": ["Housing", "Business and Economics"],
+    "scores": {
+      "directness_score": 5,
+      "material_impact_score": 5,
+      "evidence_score": 5,
+      "durability_score": 5,
+      "equity_score": 0,
+      "harm_offset_score": 0
+    },
+    "sources": [
+      {
+        "source_title": "National Housing Act",
+        "source_url": "https://www.govinfo.gov/",
+        "source_type": "Government"
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Housing Act of 1949",
+    "policy_type": "Law",
+    "summary": "Funded urban redevelopment and public housing expansion.",
+    "year_enacted": 1949,
+    "date_enacted": "1949-07-15",
+    "era": "Civil Rights Era",
+    "president": "Harry S. Truman",
+    "primary_party": "Democratic Party",
+    "direct_black_impact": true,
+    "outcome_summary": "Expanded public housing but displaced many Black communities through urban renewal.",
+    "status": "Active",
+    "impact_direction": "Mixed",
+    "impact_notes": "Urban renewal often destroyed Black neighborhoods.",
+    "categories": ["Housing"],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 5,
+      "evidence_score": 5,
+      "durability_score": 5,
+      "equity_score": 2,
+      "harm_offset_score": 1
+    },
+    "sources": [
+      {
+        "source_title": "Housing Act of 1949",
+        "source_url": "https://www.congress.gov/",
+        "source_type": "Government"
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Equal Credit Opportunity Act",
+    "policy_type": "Law",
+    "summary": "Prohibited discrimination in credit transactions based on race, sex, and other factors.",
+    "year_enacted": 1974,
+    "date_enacted": "1974-10-28",
+    "era": "Contemporary Era",
+    "president": "Gerald Ford",
+    "primary_party": "Republican Party",
+    "direct_black_impact": true,
+    "outcome_summary": "Improved access to credit for historically marginalized groups.",
+    "status": "Active",
+    "impact_direction": "Positive",
+    "impact_notes": "Major step toward fair lending practices.",
+    "categories": ["Business and Economics", "Civil Rights"],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 4,
+      "evidence_score": 5,
+      "durability_score": 5,
+      "equity_score": 4,
+      "harm_offset_score": 2
+    },
+    "sources": [
+      {
+        "source_title": "Equal Credit Opportunity Act",
+        "source_url": "https://www.consumerfinance.gov/",
+        "source_type": "Government"
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Home Mortgage Disclosure Act",
+    "policy_type": "Law",
+    "summary": "Required lenders to disclose mortgage data to identify discriminatory practices.",
+    "year_enacted": 1975,
+    "date_enacted": "1975-12-31",
+    "era": "Contemporary Era",
+    "president": "Gerald Ford",
+    "primary_party": "Republican Party",
+    "direct_black_impact": true,
+    "outcome_summary": "Enabled tracking of redlining and discriminatory lending.",
+    "status": "Active",
+    "impact_direction": "Positive",
+    "impact_notes": "Key transparency law for housing discrimination.",
+    "categories": ["Housing", "Business and Economics"],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 4,
+      "evidence_score": 5,
+      "durability_score": 5,
+      "equity_score": 4,
+      "harm_offset_score": 2
+    },
+    "sources": [
+      {
+        "source_title": "HMDA",
+        "source_url": "https://www.ffiec.gov/hmda/",
+        "source_type": "Government"
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Dodd-Frank Wall Street Reform and Consumer Protection Act",
+    "policy_type": "Law",
+    "summary": "Implemented financial regulations and created the Consumer Financial Protection Bureau.",
+    "year_enacted": 2010,
+    "date_enacted": "2010-07-21",
+    "era": "Contemporary Era",
+    "president": "Barack Obama",
+    "primary_party": "Democratic Party",
+    "direct_black_impact": true,
+    "outcome_summary": "Increased consumer protections in financial markets.",
+    "status": "Active",
+    "impact_direction": "Positive",
+    "impact_notes": "Improved oversight of discriminatory lending practices.",
+    "categories": ["Business and Economics"],
+    "scores": {
+      "directness_score": 3,
+      "material_impact_score": 4,
+      "evidence_score": 5,
+      "durability_score": 4,
+      "equity_score": 4,
+      "harm_offset_score": 2
+    },
+    "sources": [
+      {
+        "source_title": "Dodd-Frank Act",
+        "source_url": "https://www.congress.gov/bill/111th-congress/house-bill/4173",
+        "source_type": "Government"
+      }
+    ],
+    "metrics": []
+  }
+]

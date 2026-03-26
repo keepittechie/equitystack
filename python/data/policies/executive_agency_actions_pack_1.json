@@ -1,0 +1,260 @@
+[
+  {
+    "title": "Executive Order 10925",
+    "policy_type": "Executive Order",
+    "summary": "Established the President's Committee on Equal Employment Opportunity and used the phrase 'affirmative action' in the federal contracting context to require proactive nondiscrimination efforts by government contractors.",
+    "year_enacted": 1961,
+    "date_enacted": "1961-03-06",
+    "era": "Civil Rights Era",
+    "president": "John F. Kennedy",
+    "primary_party": "Democratic Party",
+    "house_party": null,
+    "senate_party": null,
+    "bipartisan": false,
+    "direct_black_impact": false,
+    "outcome_summary": "Expanded federal equal-employment oversight and helped establish the administrative architecture that later evolved into stronger contract-compliance enforcement.",
+    "status": "Expired",
+    "impact_direction": "Positive",
+    "impact_notes": "Important as an administrative precursor to later civil-rights enforcement through contracting, especially because it required proactive measures rather than only formal neutrality.",
+    "categories": ["Civil Rights", "Labor", "Business and Economics"],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 4,
+      "evidence_score": 5,
+      "durability_score": 3,
+      "equity_score": 4,
+      "harm_offset_score": 1,
+      "notes": "A major executive foundation for later affirmative-action and contract-compliance systems."
+    },
+    "sources": [
+      {
+        "source_title": "Executive Order 10925",
+        "source_url": "https://www.eeoc.gov/history/executive-order-10925",
+        "source_type": "Government",
+        "publisher": "U.S. Equal Employment Opportunity Commission",
+        "published_date": "1961-03-06",
+        "notes": "Historical EEOC page with text of the order establishing the President's Committee on Equal Employment Opportunity."
+      },
+      {
+        "source_title": "Executive Orders Disposition Tables: 1961 Kennedy",
+        "source_url": "https://www.archives.gov/federal-register/executive-orders/1961-kennedy.html",
+        "source_type": "Government",
+        "publisher": "National Archives",
+        "published_date": null,
+        "notes": "National Archives disposition table confirming the signature date and later supersession by Executive Order 11246."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Executive Order 11063",
+    "policy_type": "Executive Order",
+    "summary": "Directed executive departments and agencies to prevent discrimination in federally assisted housing and created a federal administrative framework for equal opportunity in housing before the Fair Housing Act of 1968.",
+    "year_enacted": 1962,
+    "date_enacted": "1962-11-20",
+    "era": "Civil Rights Era",
+    "president": "John F. Kennedy",
+    "primary_party": "Democratic Party",
+    "house_party": null,
+    "senate_party": null,
+    "bipartisan": false,
+    "direct_black_impact": false,
+    "outcome_summary": "Expanded federal responsibility for confronting discrimination in federally assisted housing, though coverage and enforcement remained incomplete and depended heavily on executive follow-through.",
+    "status": "Active",
+    "impact_direction": "Positive",
+    "impact_notes": "A significant administrative precursor to later fair-housing law, especially because it acknowledged the federal government's duty not to subsidize segregated housing systems.",
+    "categories": ["Housing", "Civil Rights"],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 4,
+      "evidence_score": 5,
+      "durability_score": 4,
+      "equity_score": 4,
+      "harm_offset_score": 1,
+      "notes": "Important fair-housing executive action with meaningful but partial reach."
+    },
+    "sources": [
+      {
+        "source_title": "Executive Order 11063--Equal opportunity in housing",
+        "source_url": "https://www.archives.gov/federal-register/codification/executive-order/11063.html",
+        "source_type": "Government",
+        "publisher": "National Archives",
+        "published_date": "1962-11-20",
+        "notes": "Official codified text of the order and its implementation structure."
+      },
+      {
+        "source_title": "Executive Order 12259",
+        "source_url": "https://www.archives.gov/federal-register/codification/executive-order/12259.html",
+        "source_type": "Government",
+        "publisher": "National Archives",
+        "published_date": "1980-12-31",
+        "notes": "Shows later amendments and transfer of housing-related fair-opportunity functions to HUD."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Executive Order 11246",
+    "policy_type": "Executive Order",
+    "summary": "Required federal contractors and subcontractors to refrain from employment discrimination and authorized the Secretary of Labor to administer and enforce equal employment opportunity obligations in federal contracting.",
+    "year_enacted": 1965,
+    "date_enacted": "1965-09-24",
+    "era": "Civil Rights Era",
+    "president": "Lyndon B. Johnson",
+    "primary_party": "Democratic Party",
+    "house_party": null,
+    "senate_party": null,
+    "bipartisan": false,
+    "direct_black_impact": false,
+    "outcome_summary": "Became one of the central administrative tools for equal-employment enforcement in federal contracting and helped institutionalize affirmative-action style compliance in the workplace.",
+    "status": "Expired",
+    "impact_direction": "Positive",
+    "impact_notes": "One of the most consequential executive civil-rights actions because it tied nondiscrimination and affirmative compliance to the federal government's contracting power for decades before its later revocation.",
+    "categories": ["Civil Rights", "Labor", "Business and Economics"],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 5,
+      "evidence_score": 5,
+      "durability_score": 5,
+      "equity_score": 5,
+      "harm_offset_score": 1,
+      "notes": "A durable and highly consequential administrative civil-rights framework."
+    },
+    "sources": [
+      {
+        "source_title": "Executive Order 11246--Equal employment opportunity",
+        "source_url": "https://www.archives.gov/federal-register/codification/executive-order/11246.html",
+        "source_type": "Government",
+        "publisher": "National Archives",
+        "published_date": "1965-09-24",
+        "notes": "Official codified order text, including contract-compliance structure and supersession of earlier equal-employment orders."
+      },
+      {
+        "source_title": "Executive Order 11246",
+        "source_url": "https://www.dol.gov/agencies/ofccp/executive-order-11246",
+        "source_type": "Government",
+        "publisher": "U.S. Department of Labor",
+        "published_date": null,
+        "notes": "Department of Labor page describing the order's long-running federal contractor obligations and historical role."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Executive Order 12067",
+    "policy_type": "Executive Order",
+    "summary": "Assigned the Equal Employment Opportunity Commission a coordinating leadership role over federal equal-employment programs and enforcement across agencies.",
+    "year_enacted": 1978,
+    "date_enacted": "1978-06-30",
+    "era": "Post Civil Rights Era",
+    "president": "Jimmy Carter",
+    "primary_party": "Democratic Party",
+    "house_party": null,
+    "senate_party": null,
+    "bipartisan": false,
+    "direct_black_impact": false,
+    "outcome_summary": "Strengthened coordination of federal equal-employment enforcement at a time when anti-discrimination implementation was spread across multiple agencies and systems.",
+    "status": "Active",
+    "impact_direction": "Positive",
+    "impact_notes": "More administrative than symbolic, but important for making federal equal-employment enforcement more coherent and durable.",
+    "categories": ["Civil Rights", "Labor"],
+    "scores": {
+      "directness_score": 3,
+      "material_impact_score": 3,
+      "evidence_score": 4,
+      "durability_score": 4,
+      "equity_score": 4,
+      "harm_offset_score": 1,
+      "notes": "An administrative coordination reform that improved civil-rights enforcement infrastructure."
+    },
+    "sources": [
+      {
+        "source_title": "Executive Order 12067--Providing for coordination of Federal Equal Employment Opportunity programs",
+        "source_url": "https://www.archives.gov/federal-register/codification/executive-order/12067.html",
+        "source_type": "Government",
+        "publisher": "National Archives",
+        "published_date": "1978-06-30",
+        "notes": "Official codified order assigning the EEOC a federal coordination role."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "HUD Affirmatively Furthering Fair Housing Final Rule",
+    "policy_type": "Agency Action",
+    "summary": "HUD issued a final rule to give jurisdictions receiving HUD funds clearer planning obligations, data tools, and procedures for meeting the Fair Housing Act's requirement to affirmatively further fair housing.",
+    "year_enacted": 2015,
+    "date_enacted": "2015-07-08",
+    "era": "Contemporary Era",
+    "president": "Barack Obama",
+    "primary_party": "Democratic Party",
+    "house_party": null,
+    "senate_party": null,
+    "bipartisan": false,
+    "direct_black_impact": false,
+    "outcome_summary": "The rule attempted to make fair-housing planning more concrete and data-driven for localities and public housing agencies, especially in ways relevant to segregation, exclusion, and unequal access affecting Black communities.",
+    "status": "Expired",
+    "impact_direction": "Positive",
+    "impact_notes": "An important modern administrative effort to operationalize fair-housing obligations, though its implementation and durability were later contested and interrupted.",
+    "categories": ["Housing", "Civil Rights"],
+    "scores": {
+      "directness_score": 3,
+      "material_impact_score": 4,
+      "evidence_score": 4,
+      "durability_score": 1,
+      "equity_score": 5,
+      "harm_offset_score": 1,
+      "notes": "Substantively important but institutionally fragile because it depended on administrative continuity."
+    },
+    "sources": [
+      {
+        "source_title": "HUD Announces Final Rule on Affirmatively Furthering Fair Housing",
+        "source_url": "https://archives.hud.gov/news/2015/pr15-084.cfm",
+        "source_type": "Government",
+        "publisher": "HUD Archives",
+        "published_date": "2015-07-08",
+        "notes": "Official HUD announcement describing the final rule, its fair-housing planning tools, and intended implementation."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "HUD Termination of the 2015 AFFH Rule",
+    "policy_type": "Agency Action",
+    "summary": "HUD terminated the 2015 Affirmatively Furthering Fair Housing regulation, ending the structured Assessment of Fair Housing framework that had required localities and housing agencies to use data and planning tools tied to segregation and opportunity gaps.",
+    "year_enacted": 2020,
+    "date_enacted": "2020-07-23",
+    "era": "Contemporary Era",
+    "president": "Donald J. Trump",
+    "primary_party": "Republican Party",
+    "house_party": null,
+    "senate_party": null,
+    "bipartisan": false,
+    "direct_black_impact": false,
+    "outcome_summary": "The action dismantled a major federal administrative framework aimed at forcing clearer fair-housing planning and accountability, weakening one modern mechanism for addressing segregation and unequal housing opportunity.",
+    "status": "Expired",
+    "impact_direction": "Negative",
+    "impact_notes": "A significant rollback because it removed a concrete federal planning and accountability structure tied to fair-housing enforcement.",
+    "categories": ["Housing", "Civil Rights"],
+    "scores": {
+      "directness_score": 3,
+      "material_impact_score": 4,
+      "evidence_score": 4,
+      "durability_score": 1,
+      "equity_score": 1,
+      "harm_offset_score": 0,
+      "notes": "A modern administrative rollback with immediate implications for fair-housing enforcement structure."
+    },
+    "sources": [
+      {
+        "source_title": "Secretary Carson Terminates 2015 AFFH Rule",
+        "source_url": "https://archives.hud.gov/news/2020/pr20-109.cfm",
+        "source_type": "Government",
+        "publisher": "HUD Archives",
+        "published_date": "2020-07-23",
+        "notes": "Official HUD announcement describing the department's termination of the 2015 AFFH framework."
+      }
+    ],
+    "metrics": []
+  }
+]

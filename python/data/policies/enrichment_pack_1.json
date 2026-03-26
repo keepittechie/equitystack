@@ -1,0 +1,169 @@
+[
+  {
+    "title": "Voting Rights Act of 1965",
+    "year_enacted": 1965,
+    "sources": [
+      {
+        "source_title": "Chapter 3: Voting Rights in Mississippi Delta",
+        "source_url": "https://www.usccr.gov/files/pubs/msdelta/ch3.htm",
+        "source_type": "Government",
+        "publisher": "U.S. Commission on Civil Rights",
+        "published_date": null,
+        "notes": "Government civil rights history summarizing Black voter registration in Mississippi before and after the Voting Rights Act."
+      },
+      {
+        "source_title": "Section 4 of the Voting Rights Act",
+        "source_url": "https://www.justice.gov/crt/section-4-voting-rights-act",
+        "source_type": "Government",
+        "publisher": "U.S. Department of Justice",
+        "published_date": null,
+        "notes": "DOJ overview of the coverage formula and targeted remedies used to address racial discrimination in voting."
+      },
+      {
+        "source_title": "The Voting Rights Act, Explained",
+        "source_url": "https://www.brennancenter.org/our-work/research-reports/voting-rights-act-explained",
+        "source_type": "Nonprofit",
+        "publisher": "Brennan Center for Justice",
+        "published_date": null,
+        "notes": "Research explainer on the structure and significance of the Voting Rights Act and subsequent weakening by the courts."
+      }
+    ],
+    "metrics": [
+      {
+        "metric_name": "Black voter registration in Mississippi under the Voting Rights Act era",
+        "demographic_group": "Black Americans",
+        "before_value": 6.7,
+        "after_value": 72.2,
+        "unit": "percent",
+        "geography": "Mississippi",
+        "year_before": 1964,
+        "year_after": 2006,
+        "methodology_note": "Uses Mississippi Black voter registration before the Voting Rights Act and a later preclearance-era benchmark cited in government and court materials to illustrate the scale of long-run change."
+      }
+    ]
+  },
+  {
+    "title": "Shelby County v. Holder",
+    "year_enacted": 2013,
+    "sources": [
+      {
+        "source_title": "Effects of Shelby County v. Holder on the Voting Rights Act",
+        "source_url": "https://www.brennancenter.org/our-work/research-reports/effects-shelby-county-v-holder-voting-rights-act",
+        "source_type": "Nonprofit",
+        "publisher": "Brennan Center for Justice",
+        "published_date": null,
+        "notes": "Research summary explaining how the ruling weakened preclearance and opened the door to restrictive voting laws."
+      },
+      {
+        "source_title": "Shelby County v. Holder",
+        "source_url": "https://www.brennancenter.org/our-work/court-cases/shelby-county-v-holder",
+        "source_type": "Nonprofit",
+        "publisher": "Brennan Center for Justice",
+        "published_date": null,
+        "notes": "Case overview summarizing the decision and the role of the Voting Rights Act provision that was struck down."
+      },
+      {
+        "source_title": "Shelby County v. Holder Supreme Court Opinion",
+        "source_url": "https://supreme.justia.com/cases/federal/us/570/12-96/case.pdf",
+        "source_type": "Government",
+        "publisher": "Supreme Court / Justia",
+        "published_date": null,
+        "notes": "Opinion text for the 2013 decision invalidating the Section 4 coverage formula used for preclearance."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Fair Housing Act of 1968",
+    "year_enacted": 1968,
+    "sources": [
+      {
+        "source_title": "The Fair Housing Act",
+        "source_url": "https://www.justice.gov/crt/fair-housing-act-1",
+        "source_type": "Government",
+        "publisher": "U.S. Department of Justice",
+        "published_date": null,
+        "notes": "DOJ overview of the Fair Housing Act, including race discrimination in sales, rentals, lending, and enforcement."
+      },
+      {
+        "source_title": "1968 and the Beginnings of Federal Enforcement of Fair Housing",
+        "source_url": "https://www.justice.gov/crt/1968-and-beginnings-federal-enforcement-fair-housing1",
+        "source_type": "Government",
+        "publisher": "U.S. Department of Justice",
+        "published_date": null,
+        "notes": "Historical DOJ account of early federal enforcement activity after enactment of the Fair Housing Act."
+      },
+      {
+        "source_title": "Housing and Civil Enforcement Section",
+        "source_url": "https://www.justice.gov/crt/housing-and-civil-enforcement-section",
+        "source_type": "Government",
+        "publisher": "U.S. Department of Justice",
+        "published_date": null,
+        "notes": "Current DOJ enforcement page covering the Fair Housing Act and related anti-discrimination authority."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Brown v. Board of Education",
+    "year_enacted": 1954,
+    "sources": [
+      {
+        "source_title": "Brown v. Board of Education (1954)",
+        "source_url": "https://www.archives.gov/milestone-documents/brown-v-board-of-education",
+        "source_type": "Government",
+        "publisher": "National Archives",
+        "published_date": null,
+        "notes": "National Archives milestone document page for the Brown decision and its constitutional significance."
+      },
+      {
+        "source_title": "Brown v. Board of Education Lesson Page",
+        "source_url": "https://www.archives.gov/education/lessons/brown-v-board",
+        "source_type": "Archive",
+        "publisher": "National Archives",
+        "published_date": null,
+        "notes": "Educational context page summarizing the ruling and its legal effect on school segregation."
+      },
+      {
+        "source_title": "Timeline of Events Leading to Brown v. Board of Education",
+        "source_url": "https://www.archives.gov/education/lessons/brown-v-board/timeline.html",
+        "source_type": "Archive",
+        "publisher": "National Archives",
+        "published_date": null,
+        "notes": "Archival teaching resource placing Brown within the longer sequence of segregation and legal challenge."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Civil Rights Act of 1964",
+    "year_enacted": 1964,
+    "sources": [
+      {
+        "source_title": "Civil Rights Act (1964)",
+        "source_url": "https://www.archives.gov/milestone-documents/civil-rights-act",
+        "source_type": "Government",
+        "publisher": "National Archives",
+        "published_date": null,
+        "notes": "National Archives milestone document page describing the law's major anti-discrimination provisions."
+      },
+      {
+        "source_title": "Title VI of the Civil Rights Act of 1964",
+        "source_url": "https://www.justice.gov/crt/fcs/TitleVI",
+        "source_type": "Government",
+        "publisher": "U.S. Department of Justice",
+        "published_date": null,
+        "notes": "DOJ overview of Title VI and the prohibition on race discrimination in federally funded programs."
+      },
+      {
+        "source_title": "Civil Rights Act of 1964 Document Highlights",
+        "source_url": "https://www.archives.gov/dc/highlights/civil-rights-act",
+        "source_type": "Archive",
+        "publisher": "National Archives",
+        "published_date": null,
+        "notes": "National Archives highlights page summarizing the law's scope across public accommodations, employment, and federally funded programs."
+      }
+    ],
+    "metrics": []
+  }
+]

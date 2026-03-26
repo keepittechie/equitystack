@@ -1,0 +1,299 @@
+[
+  {
+    "title": "Williams v. Mississippi",
+    "policy_type": "Court Case",
+    "summary": "The Supreme Court upheld Mississippi's poll tax, literacy test, and related voter qualification scheme because the law did not explicitly name race on its face, even though it was designed and administered to disfranchise Black voters.",
+    "year_enacted": 1898,
+    "date_enacted": "1898-04-25",
+    "era": "Jim Crow and Disenfranchisement",
+    "president": null,
+    "primary_party": null,
+    "house_party": null,
+    "senate_party": null,
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "The ruling legitimized facially race-neutral voter suppression tools that were central to Jim Crow disfranchisement across the South.",
+    "status": "Active",
+    "impact_direction": "Negative",
+    "impact_notes": "A foundational anti-voting-rights precedent because it gave constitutional cover to state schemes designed to strip Black citizens of the franchise.",
+    "categories": ["Voting Rights", "Constitutional Rights", "Civil Rights"],
+    "scores": {
+      "directness_score": 5,
+      "material_impact_score": 5,
+      "evidence_score": 5,
+      "durability_score": 5,
+      "equity_score": 0,
+      "harm_offset_score": 0,
+      "notes": "One of the key Supreme Court decisions entrenching Jim Crow disfranchisement."
+    },
+    "sources": [
+      {
+        "source_title": "Williams v. Mississippi, 170 U.S. 213 (1898)",
+        "source_url": "https://supreme.justia.com/cases/federal/us/170/213/",
+        "source_type": "Archive",
+        "publisher": "Justia U.S. Supreme Court Center",
+        "published_date": "1898-04-25",
+        "notes": "Decision text describing the Court's approval of Mississippi's voting qualification regime."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Giles v. Harris",
+    "policy_type": "Court Case",
+    "summary": "The Supreme Court refused to grant meaningful relief to Black plaintiffs challenging Alabama's disfranchising constitution, effectively declining to use federal judicial power to restore their voting rights.",
+    "year_enacted": 1903,
+    "date_enacted": "1903-02-23",
+    "era": "Jim Crow and Disenfranchisement",
+    "president": null,
+    "primary_party": null,
+    "house_party": null,
+    "senate_party": null,
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "The ruling signaled that federal courts would not reliably intervene against systematic Black disfranchisement in the Jim Crow South.",
+    "status": "Active",
+    "impact_direction": "Negative",
+    "impact_notes": "Deepened the practical collapse of Reconstruction voting protections by leaving a major disfranchising regime in place.",
+    "categories": ["Voting Rights", "Constitutional Rights", "Civil Rights"],
+    "scores": {
+      "directness_score": 5,
+      "material_impact_score": 5,
+      "evidence_score": 5,
+      "durability_score": 5,
+      "equity_score": 0,
+      "harm_offset_score": 0,
+      "notes": "A major judicial retreat from federal protection of Black suffrage."
+    },
+    "sources": [
+      {
+        "source_title": "Giles v. Harris, 189 U.S. 475 (1903)",
+        "source_url": "https://supreme.justia.com/cases/federal/us/189/475/",
+        "source_type": "Archive",
+        "publisher": "Justia U.S. Supreme Court Center",
+        "published_date": "1903-02-23",
+        "notes": "Decision text showing the Court's refusal to meaningfully remedy Alabama disfranchisement."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Nixon v. Herndon",
+    "policy_type": "Court Case",
+    "summary": "The Supreme Court struck down a Texas statute that explicitly barred Black citizens from voting in Democratic primary elections.",
+    "year_enacted": 1927,
+    "date_enacted": "1927-03-07",
+    "era": "Jim Crow and Disenfranchisement",
+    "president": null,
+    "primary_party": null,
+    "house_party": null,
+    "senate_party": null,
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "The ruling was an important but incomplete victory against white primaries, because states and party actors quickly adapted with new exclusion mechanisms.",
+    "status": "Active",
+    "impact_direction": "Positive",
+    "impact_notes": "A meaningful legal win against explicit racial disfranchisement, but one that did not end the white primary system on its own.",
+    "categories": ["Voting Rights", "Civil Rights", "Constitutional Rights"],
+    "scores": {
+      "directness_score": 5,
+      "material_impact_score": 4,
+      "evidence_score": 5,
+      "durability_score": 2,
+      "equity_score": 4,
+      "harm_offset_score": 0,
+      "notes": "An important anti-Jim Crow voting-rights decision with limited durability."
+    },
+    "sources": [
+      {
+        "source_title": "Nixon v. Herndon, 273 U.S. 536 (1927)",
+        "source_url": "https://supreme.justia.com/cases/federal/us/273/536/",
+        "source_type": "Archive",
+        "publisher": "Justia U.S. Supreme Court Center",
+        "published_date": "1927-03-07",
+        "notes": "Decision text holding Texas's explicit white-primary statute unconstitutional."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Grovey v. Townsend",
+    "policy_type": "Court Case",
+    "summary": "The Supreme Court upheld the exclusion of Black voters from a Texas Democratic primary by treating the party's action as private rather than state action.",
+    "year_enacted": 1935,
+    "date_enacted": "1935-04-01",
+    "era": "Jim Crow and Disenfranchisement",
+    "president": null,
+    "primary_party": null,
+    "house_party": null,
+    "senate_party": null,
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "The decision preserved a central disfranchisement mechanism in the South until the Court reversed course in Smith v. Allwright in 1944.",
+    "status": "Expired",
+    "impact_direction": "Negative",
+    "impact_notes": "A harmful Jim Crow precedent because it allowed white primaries to persist through formal distinctions between party and state action.",
+    "categories": ["Voting Rights", "Civil Rights", "Constitutional Rights"],
+    "scores": {
+      "directness_score": 5,
+      "material_impact_score": 4,
+      "evidence_score": 5,
+      "durability_score": 2,
+      "equity_score": 0,
+      "harm_offset_score": 0,
+      "notes": "A major setback in the fight against white primaries, later overturned."
+    },
+    "sources": [
+      {
+        "source_title": "Grovey v. Townsend, 295 U.S. 45 (1935)",
+        "source_url": "https://supreme.justia.com/cases/federal/us/295/45/",
+        "source_type": "Archive",
+        "publisher": "Justia U.S. Supreme Court Center",
+        "published_date": "1935-04-01",
+        "notes": "Decision text upholding exclusion from a Texas Democratic primary."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Social Security Act of 1935",
+    "policy_type": "Law",
+    "summary": "Created federal old-age insurance, unemployment insurance, and public assistance programs, but initially excluded many occupations in which Black workers were concentrated, including large portions of agricultural and domestic labor.",
+    "year_enacted": 1935,
+    "date_enacted": "1935-08-14",
+    "era": "Jim Crow and Disenfranchisement",
+    "president": "Franklin D. Roosevelt",
+    "primary_party": "Democratic Party",
+    "house_party": "Democratic Party",
+    "senate_party": "Democratic Party",
+    "bipartisan": false,
+    "direct_black_impact": false,
+    "outcome_summary": "The Act became a pillar of the modern welfare state, but its original exclusions limited Black workers' access to social insurance and reinforced racial inequality in economic security.",
+    "status": "Active",
+    "impact_direction": "Mixed",
+    "impact_notes": "Historically transformative overall, but structured in ways that disproportionately excluded Black workers at the time of enactment.",
+    "categories": ["Social Welfare", "Labor", "Business and Economics"],
+    "scores": {
+      "directness_score": 2,
+      "material_impact_score": 5,
+      "evidence_score": 5,
+      "durability_score": 5,
+      "equity_score": 1,
+      "harm_offset_score": 1,
+      "notes": "A foundational federal welfare law whose racially unequal occupational exclusions had major downstream effects."
+    },
+    "sources": [
+      {
+        "source_title": "Anniversary of the Social Security Act of 1935",
+        "source_url": "https://www.govinfo.gov/features/anniversary-ssa",
+        "source_type": "Government",
+        "publisher": "GovInfo",
+        "published_date": null,
+        "notes": "Official overview confirming the Act's signature date and core program structure."
+      },
+      {
+        "source_title": "The 1935 Law",
+        "source_url": "https://www.ssa.gov/history/aja1043.html",
+        "source_type": "Government",
+        "publisher": "Social Security Administration",
+        "published_date": null,
+        "notes": "SSA history page explaining the original design of old-age insurance, unemployment insurance, and related provisions."
+      },
+      {
+        "source_title": "The Social Security Act of 1935",
+        "source_url": "https://www.ssa.gov/history/aja964.html",
+        "source_type": "Government",
+        "publisher": "Social Security Administration",
+        "published_date": null,
+        "notes": "SSA history page describing the law's original coverage structure and early occupational limits."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "United States Housing Act of 1937",
+    "policy_type": "Law",
+    "summary": "Created the United States Housing Authority and provided federal support for low-income housing and slum clearance, but administration through local authorities often reproduced segregation and unequal access.",
+    "year_enacted": 1937,
+    "date_enacted": "1937-09-01",
+    "era": "Jim Crow and Disenfranchisement",
+    "president": "Franklin D. Roosevelt",
+    "primary_party": "Democratic Party",
+    "house_party": "Democratic Party",
+    "senate_party": "Democratic Party",
+    "bipartisan": false,
+    "direct_black_impact": false,
+    "outcome_summary": "The law expanded the federal role in housing, but public-housing development and slum-clearance policy were frequently implemented within segregated local systems that limited equitable benefit for Black communities.",
+    "status": "Active",
+    "impact_direction": "Mixed",
+    "impact_notes": "A major housing intervention that could provide relief, yet often reinforced segregation and unequal administration at the local level.",
+    "categories": ["Housing", "Social Welfare", "Business and Economics"],
+    "scores": {
+      "directness_score": 2,
+      "material_impact_score": 4,
+      "evidence_score": 4,
+      "durability_score": 5,
+      "equity_score": 2,
+      "harm_offset_score": 1,
+      "notes": "Important federal housing legislation whose practical effects for Black communities were constrained by segregated administration."
+    },
+    "sources": [
+      {
+        "source_title": "United States Housing Act of 1937",
+        "source_url": "https://www.govinfo.gov/app/details/COMPS-10348",
+        "source_type": "Government",
+        "publisher": "GovInfo",
+        "published_date": "1937-09-01",
+        "notes": "Statute compilation for the Wagner-Steagall Act creating the United States Housing Authority."
+      },
+      {
+        "source_title": "Summary of Major Legislation, 1933-1940",
+        "source_url": "https://www.govinfo.gov/content/pkg/SERIALSET-10565_00_00-002-0049-0000/pdf/SERIALSET-10565_00_00-002-0049-0000.pdf",
+        "source_type": "Government",
+        "publisher": "GovInfo",
+        "published_date": null,
+        "notes": "Historical congressional compilation identifying the Act and the federal housing authority it created."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Lane v. Wilson",
+    "policy_type": "Court Case",
+    "summary": "The Supreme Court struck down Oklahoma's replacement voter registration scheme because it preserved advantages for voters previously protected by a grandfather clause while imposing restrictive, short registration windows on Black citizens excluded under Jim Crow.",
+    "year_enacted": 1939,
+    "date_enacted": "1939-02-27",
+    "era": "Jim Crow and Disenfranchisement",
+    "president": null,
+    "primary_party": null,
+    "house_party": null,
+    "senate_party": null,
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "The ruling invalidated one adaptation of disfranchisement after Guinn v. United States, though Southern states continued searching for other suppression techniques.",
+    "status": "Active",
+    "impact_direction": "Positive",
+    "impact_notes": "An important voting-rights decision because it recognized that replacement schemes could preserve racial disfranchisement even after an earlier grandfather clause was struck down.",
+    "categories": ["Voting Rights", "Civil Rights", "Constitutional Rights"],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 3,
+      "evidence_score": 5,
+      "durability_score": 3,
+      "equity_score": 4,
+      "harm_offset_score": 0,
+      "notes": "A useful anti-disfranchisement ruling, though states continued to evolve suppression tools."
+    },
+    "sources": [
+      {
+        "source_title": "Lane v. Wilson, 307 U.S. 268 (1939)",
+        "source_url": "https://supreme.justia.com/cases/federal/us/307/268/",
+        "source_type": "Archive",
+        "publisher": "Justia U.S. Supreme Court Center",
+        "published_date": "1939-02-27",
+        "notes": "Decision text describing Oklahoma's replacement registration scheme after Guinn."
+      }
+    ],
+    "metrics": []
+  }
+]

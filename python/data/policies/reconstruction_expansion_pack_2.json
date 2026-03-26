@@ -1,0 +1,284 @@
+[
+  {
+    "title": "Freedmen's Bureau",
+    "policy_type": "Program",
+    "summary": "Established the Bureau of Refugees, Freedmen, and Abandoned Lands in the War Department to provide relief, labor oversight, schooling support, legal assistance, and family reunification support for formerly enslaved people and war refugees.",
+    "year_enacted": 1865,
+    "date_enacted": "1865-03-03",
+    "era": "Civil War and Reconstruction",
+    "president": "Abraham Lincoln",
+    "primary_party": "Republican Party",
+    "house_party": "Republican Party",
+    "senate_party": "Republican Party",
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "The Bureau became one of the federal government's most direct Reconstruction interventions, supporting schools, labor supervision, legal claims, and basic relief, but it was underfunded, politically contested, and largely withdrawn by the late 1860s.",
+    "status": "Expired",
+    "impact_direction": "Positive",
+    "impact_notes": "Directly aimed at helping formerly enslaved people transition from slavery to freedom, even though its reach and durability were sharply limited by white resistance and federal retreat.",
+    "categories": ["Civil Rights", "Education", "Social Welfare"],
+    "scores": {
+      "directness_score": 5,
+      "material_impact_score": 4,
+      "evidence_score": 5,
+      "durability_score": 2,
+      "equity_score": 5,
+      "harm_offset_score": 0,
+      "notes": "One of the clearest federal Reconstruction efforts on behalf of freedpeople, but its institutional life was short and its implementation uneven."
+    },
+    "sources": [
+      {
+        "source_title": "The Freedmen's Bureau",
+        "source_url": "https://www.archives.gov/research/african-americans/freedmens-bureau",
+        "source_type": "Government",
+        "publisher": "National Archives",
+        "published_date": null,
+        "notes": "Official overview explaining the Bureau's creation on March 3, 1865 and its major functions."
+      },
+      {
+        "source_title": "Records of the Bureau of Refugees, Freedmen, and Abandoned Lands",
+        "source_url": "https://www.archives.gov/research/guide-fed-records/groups/105.html",
+        "source_type": "Government",
+        "publisher": "National Archives",
+        "published_date": null,
+        "notes": "Federal records guide describing Bureau operations, including schools, labor contracts, legal complaints, and claims."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Civil Rights Act of 1866",
+    "policy_type": "Law",
+    "summary": "Declared all persons born in the United States, except most Native Americans at the time, to be citizens and guaranteed equal rights to make contracts, sue, give evidence, and buy, lease, sell, and hold property.",
+    "year_enacted": 1866,
+    "date_enacted": "1866-04-09",
+    "era": "Civil War and Reconstruction",
+    "president": "Andrew Johnson",
+    "primary_party": "Republican Party",
+    "house_party": "Republican Party",
+    "senate_party": "Republican Party",
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "Passed over President Andrew Johnson's veto, it became Congress's first major civil-rights law and helped establish national citizenship and baseline civil equality for formerly enslaved people.",
+    "status": "Active",
+    "impact_direction": "Positive",
+    "impact_notes": "A foundational Reconstruction civil-rights statute that directly targeted the Black Codes and remains significant through later codification and constitutional development.",
+    "categories": ["Civil Rights", "Constitutional Rights"],
+    "scores": {
+      "directness_score": 5,
+      "material_impact_score": 5,
+      "evidence_score": 5,
+      "durability_score": 4,
+      "equity_score": 5,
+      "harm_offset_score": 0,
+      "notes": "A cornerstone Reconstruction law with enduring legal significance, even though later courts narrowed some of its early promise."
+    },
+    "sources": [
+      {
+        "source_title": "The Civil Rights Bill of 1866",
+        "source_url": "https://history.house.gov/HistoricalHighlight/Detail/35384",
+        "source_type": "Government",
+        "publisher": "U.S. House of Representatives, History, Art & Archives",
+        "published_date": null,
+        "notes": "Official House history page describing the April 9, 1866 veto override and the law's core protections."
+      },
+      {
+        "source_title": "Constitutional Amendments and Major Civil Rights Acts of Congress",
+        "source_url": "https://history.house.gov/Exhibitions-and-Publications/BAIC/Historical-Data/Constitutional-Amendments-and-Legislation/",
+        "source_type": "Government",
+        "publisher": "U.S. House of Representatives, History, Art & Archives",
+        "published_date": null,
+        "notes": "Official congressional historical data page summarizing the Act's main provisions and statute citation."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "First Reconstruction Act",
+    "policy_type": "Law",
+    "summary": "Divided most former Confederate states into military districts and required new constitutions, ratification of the Fourteenth Amendment, and Black male suffrage as conditions for readmission to the Union.",
+    "year_enacted": 1867,
+    "date_enacted": "1867-03-02",
+    "era": "Civil War and Reconstruction",
+    "president": "Andrew Johnson",
+    "primary_party": "Republican Party",
+    "house_party": "Republican Party",
+    "senate_party": "Republican Party",
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "The Act reset federal Reconstruction on more expansive civil-rights terms, tying Southern readmission to constitutional change and Black political participation.",
+    "status": "Expired",
+    "impact_direction": "Positive",
+    "impact_notes": "One of the central legal engines of Radical Reconstruction, though its protections depended on sustained federal enforcement that later collapsed.",
+    "categories": ["Voting Rights", "Civil Rights", "Constitutional Rights"],
+    "scores": {
+      "directness_score": 5,
+      "material_impact_score": 5,
+      "evidence_score": 5,
+      "durability_score": 2,
+      "equity_score": 5,
+      "harm_offset_score": 0,
+      "notes": "Transformative in immediate effect, but structurally vulnerable to later political retreat and judicial narrowing."
+    },
+    "sources": [
+      {
+        "source_title": "Constitutional Amendments and Major Civil Rights Acts of Congress",
+        "source_url": "https://history.house.gov/Exhibitions-and-Publications/BAIC/Historical-Data/Constitutional-Amendments-and-Legislation/",
+        "source_type": "Government",
+        "publisher": "U.S. House of Representatives, History, Art & Archives",
+        "published_date": null,
+        "notes": "Official historical data page describing the First Reconstruction Act and its conditions for readmission."
+      },
+      {
+        "source_title": "Power Struggle Over a New America",
+        "source_url": "https://history.house.gov/Exhibitions-and-Publications/Johnson-Impeachment/Power-Struggle-Over-a-New-America/",
+        "source_type": "Government",
+        "publisher": "U.S. House of Representatives, History, Art & Archives",
+        "published_date": null,
+        "notes": "Official House historical exhibit describing Andrew Johnson's resistance to Reconstruction legislation and congressional overrides."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Slaughter-House Cases",
+    "policy_type": "Court Case",
+    "summary": "The Supreme Court narrowly interpreted the Privileges or Immunities Clause of the Fourteenth Amendment, sharply limiting its usefulness as a federal protection against state-level rights violations.",
+    "year_enacted": 1873,
+    "date_enacted": "1873-04-14",
+    "era": "Civil War and Reconstruction",
+    "president": null,
+    "primary_party": null,
+    "house_party": null,
+    "senate_party": null,
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "Although not a case brought by Black plaintiffs, the ruling weakened Reconstruction constitutional enforcement and narrowed one of the main pathways for protecting Black citizenship rights against hostile state action.",
+    "status": "Active",
+    "impact_direction": "Negative",
+    "impact_notes": "The decision did not abolish the Fourteenth Amendment, but it drastically reduced one of its most expansive clauses and contributed to later retrenchment in Black civil-rights protection.",
+    "categories": ["Constitutional Rights", "Civil Rights"],
+    "scores": {
+      "directness_score": 3,
+      "material_impact_score": 4,
+      "evidence_score": 5,
+      "durability_score": 5,
+      "equity_score": 1,
+      "harm_offset_score": 0,
+      "notes": "A major doctrinal narrowing of Reconstruction constitutional power with long-lasting negative consequences."
+    },
+    "sources": [
+      {
+        "source_title": "Slaughterhouse Cases, 83 U.S. 36 (1872)",
+        "source_url": "https://supreme.justia.com/cases/federal/us/83/36/",
+        "source_type": "Government",
+        "publisher": "Justia U.S. Supreme Court Center",
+        "published_date": null,
+        "notes": "Case text and decision date, including the Court's holding on the Privileges or Immunities Clause."
+      },
+      {
+        "source_title": "Timeline of Events Leading to the Brown v. Board of Education Decision of 1954",
+        "source_url": "https://www.archives.gov/education/lessons/brown-v-board/timeline.html",
+        "source_type": "Government",
+        "publisher": "National Archives",
+        "published_date": null,
+        "notes": "National Archives educational timeline explaining how the Slaughter-House Cases weakened the power of the Fourteenth Amendment."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Civil Rights Act of 1875",
+    "policy_type": "Law",
+    "summary": "Barred discrimination in public accommodations and public conveyances and prohibited exclusion from jury service on the basis of race.",
+    "year_enacted": 1875,
+    "date_enacted": "1875-03-01",
+    "era": "Civil War and Reconstruction",
+    "president": "Ulysses S. Grant",
+    "primary_party": "Republican Party",
+    "house_party": "Republican Party",
+    "senate_party": "Republican Party",
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "It represented the high-water mark of Reconstruction public-accommodations policy, but key protections were later nullified by the Supreme Court in the Civil Rights Cases of 1883.",
+    "status": "Expired",
+    "impact_direction": "Positive",
+    "impact_notes": "A major civil-rights advance on paper, but weakened at passage and later stripped of much of its force by hostile judicial interpretation.",
+    "categories": ["Civil Rights", "Constitutional Rights"],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 4,
+      "evidence_score": 5,
+      "durability_score": 1,
+      "equity_score": 4,
+      "harm_offset_score": 0,
+      "notes": "Historically important and clearly pro-equality, but its practical durability was very poor."
+    },
+    "sources": [
+      {
+        "source_title": "Constitutional Amendments and Major Civil Rights Acts of Congress",
+        "source_url": "https://history.house.gov/Exhibitions-and-Publications/BAIC/Historical-Data/Constitutional-Amendments-and-Legislation/",
+        "source_type": "Government",
+        "publisher": "U.S. House of Representatives, History, Art & Archives",
+        "published_date": null,
+        "notes": "Official historical data page summarizing the Act's core protections and statute citation."
+      },
+      {
+        "source_title": "In Pursuit of Practical Freedom",
+        "source_url": "https://history.house.gov/Exhibitions-and-Publications/BAIC/Historical-Essays/Fifteenth-Amendment/Civil-Rights-Act-of-1875/",
+        "source_type": "Government",
+        "publisher": "U.S. House of Representatives, History, Art & Archives",
+        "published_date": null,
+        "notes": "Official essay describing the final compromises in the Act and Grant's March 1, 1875 signature."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "United States v. Cruikshank",
+    "policy_type": "Court Case",
+    "summary": "The Supreme Court overturned federal convictions tied to the Colfax Massacre and sharply limited federal power to protect Black citizens from private racial violence and state-level rights violations.",
+    "year_enacted": 1876,
+    "date_enacted": "1876-03-27",
+    "era": "Civil War and Reconstruction",
+    "president": null,
+    "primary_party": null,
+    "house_party": null,
+    "senate_party": null,
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "The ruling weakened Reconstruction enforcement by making it much harder for the federal government to prosecute racial terror and protect Black voting and civil rights when states failed or refused to act.",
+    "status": "Active",
+    "impact_direction": "Negative",
+    "impact_notes": "One of the most damaging Reconstruction decisions because it narrowed federal civil-rights enforcement after one of the era's deadliest massacres of Black citizens.",
+    "categories": ["Voting Rights", "Criminal Justice", "Constitutional Rights", "Civil Rights"],
+    "scores": {
+      "directness_score": 5,
+      "material_impact_score": 5,
+      "evidence_score": 5,
+      "durability_score": 5,
+      "equity_score": 0,
+      "harm_offset_score": 0,
+      "notes": "A major doctrinal retreat that emboldened white terror and undercut federal protection of Black citizenship rights."
+    },
+    "sources": [
+      {
+        "source_title": "United States v. Cruikshank, 92 U.S. 542 (1876)",
+        "source_url": "https://supreme.justia.com/cases/federal/us/92/542/",
+        "source_type": "Government",
+        "publisher": "Justia U.S. Supreme Court Center",
+        "published_date": null,
+        "notes": "Case text documenting the Court's narrowing of federal enforcement power."
+      },
+      {
+        "source_title": "Colfax Riot",
+        "source_url": "https://www.archives.gov/fort-worth/highlights/columbus-nash",
+        "source_type": "Government",
+        "publisher": "National Archives",
+        "published_date": null,
+        "notes": "National Archives overview connecting the Colfax Massacre to the Cruikshank ruling and its effect on Fourteenth Amendment enforcement."
+      }
+    ],
+    "metrics": []
+  }
+]

@@ -1,0 +1,223 @@
+[
+  {
+    "title": "Community Reinvestment Act of 1977",
+    "policy_type": "Law",
+    "summary": "The law directed federal banking regulators to encourage insured depository institutions to help meet the credit needs of the communities they serve, including low- and moderate-income neighborhoods, consistent with safe and sound operations.",
+    "year_enacted": 1977,
+    "date_enacted": "1977-10-12",
+    "era": "Post Civil Rights Era",
+    "president": null,
+    "primary_party": null,
+    "house_party": null,
+    "senate_party": null,
+    "bipartisan": true,
+    "direct_black_impact": true,
+    "outcome_summary": "The law became one of the major federal tools used to challenge redlining and press for fairer access to credit in communities that included many Black neighborhoods.",
+    "status": "Active",
+    "impact_direction": "Positive",
+    "impact_notes": "Closely tied to anti-redlining and equitable access to credit, though enforcement strength has varied over time.",
+    "categories": [
+      "Housing",
+      "Business and Economics",
+      "Civil Rights"
+    ],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 4,
+      "evidence_score": 5,
+      "durability_score": 4,
+      "equity_score": 4,
+      "harm_offset_score": 0,
+      "notes": "Important anti-redlining and credit-access framework."
+    },
+    "sources": [
+      {
+        "source_title": "Community Reinvestment Act of 1977",
+        "source_url": "https://www.govinfo.gov/app/details/COMPS-258/",
+        "source_type": "Government",
+        "publisher": "GovInfo",
+        "published_date": "1977-10-12",
+        "notes": "Primary statute compilation"
+      },
+      {
+        "source_title": "Community Reinvestment Act (CRA) overview",
+        "source_url": "https://www.federalreserve.gov/consumerscommunities/cra_about.htm",
+        "source_type": "Government",
+        "publisher": "Federal Reserve",
+        "published_date": null,
+        "notes": "Agency overview of CRA purpose and scope"
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Civil Rights Restoration Act of 1987",
+    "policy_type": "Law",
+    "summary": "The law restored broad institution-wide coverage for Title VI, Title IX, Section 504, and the Age Discrimination Act after narrower Supreme Court interpretations had limited their reach.",
+    "year_enacted": 1988,
+    "date_enacted": "1988-03-22",
+    "era": "Post Civil Rights Era",
+    "president": "Ronald Reagan",
+    "primary_party": null,
+    "house_party": null,
+    "senate_party": null,
+    "bipartisan": true,
+    "direct_black_impact": true,
+    "outcome_summary": "By restoring broad Title VI coverage, the law reinforced federal civil-rights enforcement in federally funded institutions that could affect Black students, employees, and service recipients.",
+    "status": "Active",
+    "impact_direction": "Positive",
+    "impact_notes": "Important statutory restoration of civil-rights coverage after restrictive court interpretation.",
+    "categories": [
+      "Civil Rights",
+      "Education",
+      "Healthcare"
+    ],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 4,
+      "evidence_score": 5,
+      "durability_score": 4,
+      "equity_score": 4,
+      "harm_offset_score": 0,
+      "notes": "Broadened the reach of anti-discrimination protections tied to federal funding."
+    },
+    "sources": [
+      {
+        "source_title": "Civil Rights Restoration Act of 1987, Public Law 100-259",
+        "source_url": "https://www.govinfo.gov/app/details/STATUTE-102/STATUTE-102-Pg28",
+        "source_type": "Government",
+        "publisher": "GovInfo / Statutes at Large",
+        "published_date": "1988-03-22",
+        "notes": "Primary statute text"
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "McCleskey v. Kemp",
+    "policy_type": "Court Case",
+    "summary": "The Supreme Court rejected an equal-protection and Eighth Amendment challenge to Georgia's death penalty despite statistical evidence of racial disparities, requiring proof of intentional discrimination in the individual case.",
+    "year_enacted": 1987,
+    "date_enacted": "1987-04-22",
+    "era": "Post Civil Rights Era",
+    "president": "Ronald Reagan",
+    "primary_party": null,
+    "house_party": null,
+    "senate_party": null,
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "The ruling made it substantially harder to use systemic statistical evidence to challenge racial disparities in criminal punishment.",
+    "status": "Active",
+    "impact_direction": "Negative",
+    "impact_notes": "Widely regarded as a major barrier to race-disparity challenges in criminal justice.",
+    "categories": [
+      "Criminal Justice",
+      "Civil Rights",
+      "Constitutional Rights"
+    ],
+    "scores": {
+      "directness_score": 5,
+      "material_impact_score": 4,
+      "evidence_score": 5,
+      "durability_score": 5,
+      "equity_score": 0,
+      "harm_offset_score": 0,
+      "notes": "A major anti-equity precedent in criminal justice."
+    },
+    "sources": [
+      {
+        "source_title": "McCleskey v. Kemp, 481 U.S. 279 (1987)",
+        "source_url": "https://supreme.justia.com/cases/federal/us/481/279/",
+        "source_type": "Archive",
+        "publisher": "Justia",
+        "published_date": "1987-04-22",
+        "notes": "Primary decision text mirror"
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Fair Housing Amendments Act of 1988",
+    "policy_type": "Law",
+    "summary": "The law expanded the Fair Housing Act's protected classes and strengthened federal enforcement mechanisms and remedies for housing discrimination.",
+    "year_enacted": 1988,
+    "date_enacted": "1988-09-13",
+    "era": "Post Civil Rights Era",
+    "president": "Ronald Reagan",
+    "primary_party": null,
+    "house_party": null,
+    "senate_party": null,
+    "bipartisan": true,
+    "direct_black_impact": true,
+    "outcome_summary": "The law strengthened federal enforcement of fair-housing protections in a policy area where Black Americans had long faced entrenched discrimination.",
+    "status": "Active",
+    "impact_direction": "Positive",
+    "impact_notes": "A significant strengthening of fair-housing enforcement after the 1968 act.",
+    "categories": [
+      "Housing",
+      "Civil Rights"
+    ],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 4,
+      "evidence_score": 5,
+      "durability_score": 4,
+      "equity_score": 4,
+      "harm_offset_score": 0,
+      "notes": "Expanded enforcement tools for housing discrimination claims."
+    },
+    "sources": [
+      {
+        "source_title": "Fair Housing Amendments Act of 1988, Public Law 100-430",
+        "source_url": "https://www.govinfo.gov/app/details/STATUTE-102/STATUTE-102-Pg1619",
+        "source_type": "Government",
+        "publisher": "GovInfo / Statutes at Large",
+        "published_date": "1988-09-13",
+        "notes": "Primary statute text"
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Texas Department of Housing and Community Affairs v. Inclusive Communities Project, Inc.",
+    "policy_type": "Court Case",
+    "summary": "The Supreme Court held that disparate-impact claims are cognizable under the Fair Housing Act, preserving an important tool for challenging facially neutral housing policies with discriminatory effects.",
+    "year_enacted": 2015,
+    "date_enacted": "2015-06-25",
+    "era": "Contemporary Era",
+    "president": "Barack Obama",
+    "primary_party": null,
+    "house_party": null,
+    "senate_party": null,
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "The ruling preserved a key legal avenue for challenging housing practices that reinforce segregation or disadvantage Black communities without explicit racial language.",
+    "status": "Active",
+    "impact_direction": "Positive",
+    "impact_notes": "Important modern fair-housing precedent protecting disparate-impact claims.",
+    "categories": [
+      "Housing",
+      "Civil Rights"
+    ],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 4,
+      "evidence_score": 5,
+      "durability_score": 4,
+      "equity_score": 5,
+      "harm_offset_score": 0,
+      "notes": "Preserved disparate-impact enforcement under the Fair Housing Act."
+    },
+    "sources": [
+      {
+        "source_title": "Texas Department of Housing and Community Affairs v. Inclusive Communities Project, Inc., 576 U.S. 519 (2015)",
+        "source_url": "https://supreme.justia.com/cases/federal/us/576/519/",
+        "source_type": "Archive",
+        "publisher": "Justia",
+        "published_date": "2015-06-25",
+        "notes": "Primary decision text mirror"
+      }
+    ],
+    "metrics": []
+  }
+]

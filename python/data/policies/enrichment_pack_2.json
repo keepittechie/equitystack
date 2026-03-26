@@ -1,0 +1,162 @@
+[
+  {
+    "title": "G.I. Bill (Servicemen's Readjustment Act)",
+    "year_enacted": 1944,
+    "sources": [
+      {
+        "source_title": "Servicemen's Readjustment Act (1944)",
+        "source_url": "https://www.archives.gov/milestone-documents/servicemens-readjustment-act",
+        "source_type": "Government",
+        "publisher": "National Archives",
+        "published_date": "2022-05-03",
+        "notes": "National Archives milestone document page for the G.I. Bill. Also notes that Black veterans often faced discrimination in accessing mortgages and housing opportunities."
+      },
+      {
+        "source_title": "The 80th Anniversary of the G.I. Bill",
+        "source_url": "https://unwritten-record.blogs.archives.gov/2024/06/20/the-80th-anniversary-of-the-g-i-bill/",
+        "source_type": "Archive",
+        "publisher": "National Archives",
+        "published_date": "2024-06-20",
+        "notes": "Archival overview of the G.I. Bill's purpose and its role in helping veterans transition to civilian life."
+      },
+      {
+        "source_title": "The G.I. Bill, World War II, and the Education of Black Americans",
+        "source_url": "https://www.nber.org/digest/dec02/gi-bill-world-war-ii-and-education-black-americans",
+        "source_type": "Academic",
+        "publisher": "National Bureau of Economic Research",
+        "published_date": null,
+        "notes": "Research summary explaining that while Black veterans were eligible for educational benefits, segregation and limited capacity at Black colleges constrained access, especially in the South."
+      }
+    ],
+    "metrics": [
+      {
+        "metric_name": "Veterans who used G.I. Bill education or training benefits by 1956",
+        "demographic_group": "Veterans",
+        "before_value": 0,
+        "after_value": 7800000,
+        "unit": "people",
+        "geography": "United States",
+        "year_before": 1944,
+        "year_after": 1956,
+        "methodology_note": "National Archives historical summary states that by 1956 the G.I. Bill had helped 7.8 million veterans pursue education or training. This is a broad reach metric, not a race-specific equity metric."
+      }
+    ]
+  },
+  {
+    "title": "Community Reinvestment Act of 1977",
+    "year_enacted": 1977,
+    "sources": [
+      {
+        "source_title": "Community Reinvestment Act of 1977",
+        "source_url": "https://www.federalreservehistory.org/essays/community-reinvestment-act",
+        "source_type": "Government",
+        "publisher": "Federal Reserve History",
+        "published_date": null,
+        "notes": "Federal Reserve history of the CRA describing its response to redlining, disinvestment, and inequities in access to credit."
+      },
+      {
+        "source_title": "Consumers and Communities",
+        "source_url": "https://www.federalreservehistory.org/essays/consumers-and-communities",
+        "source_type": "Government",
+        "publisher": "Federal Reserve History",
+        "published_date": "2023-10-12",
+        "notes": "Context page linking the CRA to the Federal Reserve's role in community lending, access to credit, and low- and moderate-income communities."
+      },
+      {
+        "source_title": "The Federal Reserve's Community Development Function",
+        "source_url": "https://www.federalreservehistory.org/essays/community-development",
+        "source_type": "Government",
+        "publisher": "Federal Reserve History",
+        "published_date": "2023-05-08",
+        "notes": "Explains how the CRA shaped the Federal Reserve's later community development responsibilities and compliance role."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Anti-Drug Abuse Act of 1986",
+    "year_enacted": 1986,
+    "sources": [
+      {
+        "source_title": "Crime Prevention and the African-American Community",
+        "source_url": "https://www.usccr.gov/files/historical/1991/91-006.pdf",
+        "source_type": "Government",
+        "publisher": "U.S. Commission on Civil Rights",
+        "published_date": "1991-01-01",
+        "notes": "USCCR report discussing the crack versus powder cocaine sentencing disparity created by the 1986 law and its disproportionate impact on Black communities."
+      },
+      {
+        "source_title": "The Crisis of the Young African American Male in the Inner Cities",
+        "source_url": "https://www.usccr.gov/files/historical/1999/99-016.pdf",
+        "source_type": "Government",
+        "publisher": "U.S. Commission on Civil Rights",
+        "published_date": "1999-01-01",
+        "notes": "USCCR report describing how drug policies and sentencing practices deepened racial disparities in incarceration and community outcomes."
+      },
+      {
+        "source_title": "Attorney General Memorandum for All Federal Prosecutors Concerning the Application of the Statutory Mandatory Minimum Sentencing Laws for Crack Cocaine Offenses Amended by the Fair Sentencing Act of 2010",
+        "source_url": "https://www.justice.gov/oip/ag_memo_application_statutory_mandatory_sentencing_laws_amended_fair_sentencing_act_2010",
+        "source_type": "Government",
+        "publisher": "U.S. Department of Justice",
+        "published_date": null,
+        "notes": "DOJ memorandum summarizing the old crack cocaine mandatory minimum thresholds that originated under the 1986 law and were later reduced by the Fair Sentencing Act."
+      }
+    ],
+    "metrics": [
+      {
+        "metric_name": "Crack-to-powder cocaine mandatory minimum sentencing ratio",
+        "demographic_group": "Federal defendants",
+        "before_value": null,
+        "after_value": 100,
+        "unit": "ratio",
+        "geography": "United States",
+        "year_before": null,
+        "year_after": 1986,
+        "methodology_note": "Represents the 100-to-1 disparity embedded in federal sentencing policy for crack versus powder cocaine offenses under the Anti-Drug Abuse Act of 1986."
+      }
+    ]
+  },
+  {
+    "title": "Fair Sentencing Act of 2010",
+    "year_enacted": 2010,
+    "sources": [
+      {
+        "source_title": "Attorney General Memorandum for All Federal Prosecutors Concerning the Application of the Statutory Mandatory Minimum Sentencing Laws for Crack Cocaine Offenses Amended by the Fair Sentencing Act of 2010",
+        "source_url": "https://www.justice.gov/oip/ag_memo_application_statutory_mandatory_sentencing_laws_amended_fair_sentencing_act_2010",
+        "source_type": "Government",
+        "publisher": "U.S. Department of Justice",
+        "published_date": null,
+        "notes": "DOJ explanation of how the Fair Sentencing Act changed the crack cocaine threshold quantities tied to federal mandatory minimums."
+      },
+      {
+        "source_title": "Fair Sentencing Act of 2010",
+        "source_url": "https://www.justice.gov/sites/default/files/oip/legacy/2014/07/23/fair-sentencing-act-memo.pdf",
+        "source_type": "Government",
+        "publisher": "U.S. Department of Justice",
+        "published_date": "2010-08-03",
+        "notes": "DOJ memorandum stating the revised crack cocaine thresholds for five- and ten-year mandatory minimum penalties."
+      },
+      {
+        "source_title": "Justice Department Set to Expand Clemency Criteria, Will Prepare Wave of Additional Clefts",
+        "source_url": "https://www.justice.gov/archives/opa/pr/attorney-general-holder-justice-department-set-expand-clemency-criteria-will-prepare-wave",
+        "source_type": "Government",
+        "publisher": "U.S. Department of Justice",
+        "published_date": "2014-04-21",
+        "notes": "DOJ statement describing the Fair Sentencing Act as reducing the disparity between crack and powder cocaine offenses."
+      }
+    ],
+    "metrics": [
+      {
+        "metric_name": "Crack-to-powder cocaine mandatory minimum sentencing ratio after the Fair Sentencing Act",
+        "demographic_group": "Federal defendants",
+        "before_value": 100,
+        "after_value": 18,
+        "unit": "ratio",
+        "geography": "United States",
+        "year_before": 1986,
+        "year_after": 2010,
+        "methodology_note": "Measures the reduction in the statutory crack-to-powder sentencing disparity from 100-to-1 to 18-to-1 under the Fair Sentencing Act of 2010."
+      }
+    ]
+  }
+]

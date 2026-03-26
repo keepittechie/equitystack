@@ -1,0 +1,197 @@
+[
+  {
+    "title": "Anti-Drug Abuse Act of 1986",
+    "policy_type": "Law",
+    "summary": "Federal anti-drug law that established harsh mandatory minimum sentences, including the 100-to-1 crack versus powder cocaine sentencing disparity.",
+    "year_enacted": 1986,
+    "date_enacted": "1986-10-27",
+    "era": "Contemporary Era",
+    "president": "Ronald Reagan",
+    "primary_party": "Republican Party",
+    "house_party": "Democratic Party",
+    "senate_party": "Republican Party",
+    "bipartisan": true,
+    "direct_black_impact": true,
+    "outcome_summary": "Contributed to major racial disparities in federal sentencing and incarceration, especially affecting Black communities.",
+    "status": "Active",
+    "impact_direction": "Negative",
+    "impact_notes": "A major driver of sentencing disparities tied to the War on Drugs.",
+    "categories": ["Criminal Justice", "Civil Rights"],
+    "scores": {
+      "directness_score": 5,
+      "material_impact_score": 5,
+      "evidence_score": 5,
+      "durability_score": 5,
+      "equity_score": 0,
+      "harm_offset_score": 0,
+      "notes": "Major harmful criminal justice policy with long-lasting effects."
+    },
+    "sources": [
+      {
+        "source_title": "Anti-Drug Abuse Act of 1986",
+        "source_url": "https://www.congress.gov/bill/99th-congress/house-bill/5484",
+        "source_type": "Government",
+        "publisher": "Congress.gov",
+        "published_date": null,
+        "notes": "Legislative record"
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Anti-Drug Abuse Act of 1988",
+    "policy_type": "Law",
+    "summary": "Expanded the federal drug war framework, created the Office of National Drug Control Policy, and intensified criminal penalties tied to drug enforcement.",
+    "year_enacted": 1988,
+    "date_enacted": "1988-11-18",
+    "era": "Contemporary Era",
+    "president": "Ronald Reagan",
+    "primary_party": "Republican Party",
+    "house_party": "Democratic Party",
+    "senate_party": "Democratic Party",
+    "bipartisan": true,
+    "direct_black_impact": true,
+    "outcome_summary": "Deepened punitive drug enforcement and reinforced policies that disproportionately affected Black communities.",
+    "status": "Active",
+    "impact_direction": "Negative",
+    "impact_notes": "Extended the punitive direction of 1980s federal drug policy.",
+    "categories": ["Criminal Justice", "Civil Rights"],
+    "scores": {
+      "directness_score": 5,
+      "material_impact_score": 4,
+      "evidence_score": 4,
+      "durability_score": 4,
+      "equity_score": 0,
+      "harm_offset_score": 0,
+      "notes": "Expanded punitive drug-war infrastructure."
+    },
+    "sources": [
+      {
+        "source_title": "Anti-Drug Abuse Act of 1988",
+        "source_url": "https://www.congress.gov/bill/100th-congress/house-bill/5210",
+        "source_type": "Government",
+        "publisher": "Congress.gov",
+        "published_date": null,
+        "notes": "Legislative record"
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Violent Crime Control and Law Enforcement Act of 1994",
+    "policy_type": "Law",
+    "summary": "Large federal crime law that expanded policing, prisons, and sentencing measures while also including provisions like the Violence Against Women Act.",
+    "year_enacted": 1994,
+    "date_enacted": "1994-09-13",
+    "era": "Contemporary Era",
+    "president": "Bill Clinton",
+    "primary_party": "Democratic Party",
+    "house_party": "Democratic Party",
+    "senate_party": "Democratic Party",
+    "bipartisan": true,
+    "direct_black_impact": true,
+    "outcome_summary": "Contributed to a tougher federal crime environment that many critics argue worsened mass incarceration and disproportionately harmed Black communities.",
+    "status": "Active",
+    "impact_direction": "Mixed",
+    "impact_notes": "Included both harmful punitive expansion and some provisions viewed as beneficial, making it best classified as mixed.",
+    "categories": ["Criminal Justice", "Civil Rights"],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 5,
+      "evidence_score": 4,
+      "durability_score": 4,
+      "equity_score": 1,
+      "harm_offset_score": 0,
+      "notes": "Large mixed-impact law with major long-term criminal justice effects."
+    },
+    "sources": [
+      {
+        "source_title": "Violent Crime Control and Law Enforcement Act of 1994",
+        "source_url": "https://www.congress.gov/bill/103rd-congress/house-bill/3355",
+        "source_type": "Government",
+        "publisher": "Congress.gov",
+        "published_date": null,
+        "notes": "Legislative record"
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Fair Sentencing Act of 2010",
+    "policy_type": "Law",
+    "summary": "Reduced the federal sentencing disparity between crack and powder cocaine offenses.",
+    "year_enacted": 2010,
+    "date_enacted": "2010-08-03",
+    "era": "Contemporary Era",
+    "president": "Barack Obama",
+    "primary_party": "Democratic Party",
+    "house_party": "Democratic Party",
+    "senate_party": "Democratic Party",
+    "bipartisan": true,
+    "direct_black_impact": true,
+    "outcome_summary": "Reduced one of the most notorious federal sentencing disparities affecting Black defendants, though it did not eliminate it entirely.",
+    "status": "Active",
+    "impact_direction": "Positive",
+    "impact_notes": "Important sentencing reform with incomplete but meaningful corrective effect.",
+    "categories": ["Criminal Justice", "Civil Rights"],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 4,
+      "evidence_score": 4,
+      "durability_score": 4,
+      "equity_score": 4,
+      "harm_offset_score": 0,
+      "notes": "Important reform of crack sentencing disparities."
+    },
+    "sources": [
+      {
+        "source_title": "Fair Sentencing Act of 2010",
+        "source_url": "https://www.congress.gov/bill/111th-congress/senate-bill/1789",
+        "source_type": "Government",
+        "publisher": "Congress.gov",
+        "published_date": null,
+        "notes": "Legislative record"
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "First Step Act",
+    "policy_type": "Law",
+    "summary": "Federal criminal justice reform law that reduced some sentencing disparities and expanded earned-time credits and reentry support.",
+    "year_enacted": 2018,
+    "date_enacted": "2018-12-21",
+    "era": "Contemporary Era",
+    "president": "Donald J. Trump",
+    "primary_party": "Republican Party",
+    "house_party": "Republican Party",
+    "senate_party": "Republican Party",
+    "bipartisan": true,
+    "direct_black_impact": true,
+    "outcome_summary": "Provided meaningful but partial federal sentencing and prison reform, with particular importance for communities harmed by prior drug sentencing rules.",
+    "status": "Active",
+    "impact_direction": "Positive",
+    "impact_notes": "A meaningful reform law, though limited relative to the scale of the broader system.",
+    "categories": ["Criminal Justice", "Civil Rights"],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 3,
+      "evidence_score": 4,
+      "durability_score": 3,
+      "equity_score": 4,
+      "harm_offset_score": 0,
+      "notes": "Useful but partial criminal justice reform."
+    },
+    "sources": [
+      {
+        "source_title": "First Step Act",
+        "source_url": "https://www.congress.gov/bill/115th-congress/senate-bill/756",
+        "source_type": "Government",
+        "publisher": "Congress.gov",
+        "published_date": null,
+        "notes": "Legislative record"
+      }
+    ],
+    "metrics": []
+  }
+]

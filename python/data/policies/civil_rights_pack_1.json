@@ -1,0 +1,168 @@
+[
+  {
+    "title": "Executive Order 8802",
+    "policy_type": "Executive Order",
+    "summary": "Prohibited racial discrimination in the defense industry and established the Fair Employment Practices Committee.",
+    "year_enacted": 1941,
+    "date_enacted": "1941-06-25",
+    "era": "Civil Rights Era",
+    "president": "Franklin D. Roosevelt",
+    "direct_black_impact": true,
+    "bipartisan": false,
+    "outcome_summary": "Marked the first federal action to promote equal employment opportunities for Black Americans in wartime industries.",
+    "impact_direction": "Positive",
+    "categories": ["Labor", "Civil Rights"],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 4,
+      "evidence_score": 4,
+      "durability_score": 3,
+      "equity_score": 4,
+      "harm_offset_score": 0
+    },
+    "sources": [
+      {
+        "source_title": "Executive Order 8802",
+        "source_url": "https://www.archives.gov/milestone-documents/executive-order-8802",
+        "source_type": "Government",
+        "publisher": "National Archives"
+      }
+    ]
+  },
+  {
+    "title": "Executive Order 9981",
+    "policy_type": "Executive Order",
+    "summary": "Ended racial segregation in the United States Armed Forces.",
+    "year_enacted": 1948,
+    "date_enacted": "1948-07-26",
+    "era": "Civil Rights Era",
+    "president": "Harry S. Truman",
+    "direct_black_impact": true,
+    "impact_direction": "Positive",
+    "categories": ["Military and Veterans", "Civil Rights"],
+    "scores": {
+      "directness_score": 5,
+      "material_impact_score": 4,
+      "evidence_score": 4,
+      "durability_score": 4,
+      "equity_score": 5,
+      "harm_offset_score": 0
+    },
+    "sources": [
+      {
+        "source_title": "Executive Order 9981",
+        "source_url": "https://www.archives.gov/milestone-documents/executive-order-9981",
+        "source_type": "Government",
+        "publisher": "National Archives"
+      }
+    ]
+  },
+  {
+    "title": "Brown v. Board of Education",
+    "policy_type": "Court Case",
+    "summary": "The Supreme Court ruled that racial segregation in public schools is unconstitutional.",
+    "year_enacted": 1954,
+    "date_enacted": "1954-05-17",
+    "era": "Civil Rights Era",
+    "direct_black_impact": true,
+    "impact_direction": "Positive",
+    "categories": ["Education", "Civil Rights"],
+    "scores": {
+      "directness_score": 5,
+      "material_impact_score": 5,
+      "evidence_score": 5,
+      "durability_score": 5,
+      "equity_score": 5,
+      "harm_offset_score": 0
+    },
+    "sources": [
+      {
+        "source_title": "Brown v. Board of Education",
+        "source_url": "https://supreme.justia.com/cases/federal/us/347/483/",
+        "source_type": "Government",
+        "publisher": "Supreme Court"
+      }
+    ]
+  },
+  {
+    "title": "Civil Rights Act of 1957",
+    "policy_type": "Law",
+    "summary": "The first civil rights legislation since Reconstruction, aimed at protecting voting rights.",
+    "year_enacted": 1957,
+    "date_enacted": "1957-09-09",
+    "era": "Civil Rights Era",
+    "direct_black_impact": true,
+    "impact_direction": "Positive",
+    "categories": ["Voting Rights", "Civil Rights"],
+    "scores": {
+      "directness_score": 3,
+      "material_impact_score": 3,
+      "evidence_score": 4,
+      "durability_score": 3,
+      "equity_score": 3,
+      "harm_offset_score": 0
+    },
+    "sources": [
+      {
+        "source_title": "Civil Rights Act of 1957",
+        "source_url": "https://www.congress.gov/bill/85th-congress/senate-bill/83",
+        "source_type": "Government",
+        "publisher": "Congress.gov"
+      }
+    ]
+  },
+  {
+    "title": "Civil Rights Act of 1960",
+    "policy_type": "Law",
+    "summary": "Strengthened federal inspection of local voter registration and introduced penalties for obstructing voting.",
+    "year_enacted": 1960,
+    "date_enacted": "1960-05-06",
+    "era": "Civil Rights Era",
+    "direct_black_impact": true,
+    "impact_direction": "Positive",
+    "categories": ["Voting Rights", "Civil Rights"],
+    "scores": {
+      "directness_score": 3,
+      "material_impact_score": 3,
+      "evidence_score": 4,
+      "durability_score": 3,
+      "equity_score": 3,
+      "harm_offset_score": 0
+    },
+    "sources": [
+      {
+        "source_title": "Civil Rights Act of 1960",
+        "source_url": "https://www.congress.gov/bill/86th-congress/house-bill/8601",
+        "source_type": "Government",
+        "publisher": "Congress.gov"
+      }
+    ]
+  },
+  {
+    "title": "24th Amendment",
+    "policy_type": "Amendment",
+    "summary": "Prohibited poll taxes in federal elections.",
+    "year_enacted": 1964,
+    "date_enacted": "1964-01-23",
+    "era": "Civil Rights Era",
+    "direct_black_impact": true,
+    "impact_direction": "Positive",
+    "categories": ["Voting Rights", "Constitutional Rights"],
+    "scores": {
+      "directness_score": 5,
+      "material_impact_score": 4,
+      "evidence_score": 5,
+      "durability_score": 5,
+      "equity_score": 5,
+      "harm_offset_score": 0
+    },
+    "sources": [
+      {
+        "source_title": "24th Amendment",
+        "source_url": "https://www.archives.gov/founding-docs/amendments-11-27",
+        "source_type": "Government",
+        "publisher": "National Archives"
+      }
+    ]
+  }
+]

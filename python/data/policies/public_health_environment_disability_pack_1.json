@@ -1,0 +1,199 @@
+[
+  {
+    "title": "Lead-Based Paint Poisoning Prevention Act",
+    "policy_type": "Law",
+    "summary": "Created a federal framework for the detection, treatment, and elimination of lead-based paint poisoning, especially in federally assisted housing and among children facing elevated exposure risk.",
+    "year_enacted": 1971,
+    "date_enacted": "1971-01-13",
+    "era": "Civil Rights Era",
+    "president": "Richard Nixon",
+    "primary_party": "Republican Party",
+    "bipartisan": true,
+    "direct_black_impact": true,
+    "outcome_summary": "Established the first major federal lead-poisoning law, addressing a public-health hazard concentrated in older and underinvested housing stock where Black children and families have long faced disproportionate exposure.",
+    "status": "Active",
+    "impact_direction": "Positive",
+    "impact_notes": "Important because toxic housing conditions are part of the public-health and housing inequality story, not just an environmental regulation issue.",
+    "categories": ["Healthcare", "Housing", "Civil Rights"],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 4,
+      "evidence_score": 4,
+      "durability_score": 4,
+      "equity_score": 4,
+      "harm_offset_score": 1,
+      "notes": "A foundational lead-poisoning intervention with strong relevance to racialized housing and child-health disparities."
+    },
+    "sources": [
+      {
+        "source_title": "H.R.19172 - Lead-Based Paint Poisoning Prevention Act",
+        "source_url": "https://www.congress.gov/bill/91st-congress/house-bill/19172",
+        "source_type": "Government",
+        "publisher": "Congress.gov",
+        "published_date": "1971-01-13",
+        "notes": "Official bill page and action history confirming enactment as Public Law 91-695."
+      },
+      {
+        "source_title": "About Lead in Paint",
+        "source_url": "https://www.cdc.gov/lead-prevention/prevention/paint.html",
+        "source_type": "Government",
+        "publisher": "Centers for Disease Control and Prevention",
+        "published_date": "2025-03-26",
+        "notes": "CDC overview showing the continuing scale of lead-paint hazards in older housing and the disproportionate exposure risk for children."
+      }
+    ],
+    "metrics": [
+      {
+        "metric_name": "Housing units with lead-based paint hazards",
+        "demographic_group": "United States households",
+        "before_value": null,
+        "after_value": 29000000,
+        "unit": "housing units",
+        "geography": "United States",
+        "year_before": null,
+        "year_after": 2025,
+        "methodology_note": "CDC stated in March 2025 that approximately 29 million housing units still have lead-based paint hazards."
+      },
+      {
+        "metric_name": "Housing units with lead-based paint hazards that are home to young children",
+        "demographic_group": "Households with young children",
+        "before_value": null,
+        "after_value": 2600000,
+        "unit": "housing units",
+        "geography": "United States",
+        "year_before": null,
+        "year_after": 2025,
+        "methodology_note": "CDC stated in March 2025 that about 2.6 million housing units with lead-based paint hazards are home to young children."
+      }
+    ]
+  },
+  {
+    "title": "Americans with Disabilities Act of 1990",
+    "policy_type": "Law",
+    "summary": "Prohibited disability discrimination across employment, public services, public accommodations, telecommunications, and other major areas of civic and economic life.",
+    "year_enacted": 1990,
+    "date_enacted": "1990-07-26",
+    "era": "Contemporary Era",
+    "president": "George H. W. Bush",
+    "primary_party": "Democratic Party",
+    "bipartisan": true,
+    "direct_black_impact": true,
+    "outcome_summary": "Created the central federal civil-rights framework for disability access and anti-discrimination, with important implications for Black disabled Americans who face overlapping barriers in employment, transportation, schooling, housing, and public services.",
+    "status": "Active",
+    "impact_direction": "Positive",
+    "impact_notes": "Important not only as disability law, but as an equity law affecting Black Americans living at the intersection of racial and disability discrimination.",
+    "categories": ["Civil Rights", "Labor", "Healthcare", "Constitutional Rights"],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 5,
+      "evidence_score": 5,
+      "durability_score": 5,
+      "equity_score": 5,
+      "harm_offset_score": 1,
+      "notes": "A landmark civil-rights law with broad consequences for access, participation, and anti-discrimination enforcement."
+    },
+    "sources": [
+      {
+        "source_title": "H.R.2273 - Americans with Disabilities Act of 1990",
+        "source_url": "https://www.congress.gov/bill/101st-congress/house-bill/2273/all-info",
+        "source_type": "Government",
+        "publisher": "Congress.gov",
+        "published_date": "1990-05-22",
+        "notes": "Congress.gov bill record and CRS summary describing the ADA's core prohibitions and protections."
+      },
+      {
+        "source_title": "Help - Americans with Disabilities Act",
+        "source_url": "https://www.ada.gov/help/",
+        "source_type": "Government",
+        "publisher": "ADA.gov / U.S. Department of Justice",
+        "published_date": null,
+        "notes": "DOJ ADA portal describing the law's scope and the opportunities it is meant to guarantee."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Executive Order 12898",
+    "policy_type": "Executive Order",
+    "summary": "Directed federal agencies to identify and address disproportionately high and adverse human health or environmental effects of their actions on minority and low-income populations and established an interagency environmental justice framework.",
+    "year_enacted": 1994,
+    "date_enacted": "1994-02-11",
+    "era": "Contemporary Era",
+    "president": "Bill Clinton",
+    "primary_party": "Democratic Party",
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "Placed environmental justice into federal administrative practice and linked environmental decision-making to civil-rights obligations, though implementation has remained uneven and heavily dependent on agency follow-through.",
+    "status": "Active",
+    "impact_direction": "Positive",
+    "impact_notes": "A foundational environmental-justice action because it formally recognized that minority communities, including Black communities, bear disproportionate environmental and health harms.",
+    "categories": ["Healthcare", "Civil Rights", "Business and Economics"],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 4,
+      "evidence_score": 5,
+      "durability_score": 4,
+      "equity_score": 5,
+      "harm_offset_score": 1,
+      "notes": "A major federal recognition of environmental racism and public-health inequity, though not self-executing."
+    },
+    "sources": [
+      {
+        "source_title": "Summary of Executive Order 12898 - Federal Actions to Address Environmental Justice in Minority Populations and Low-Income Populations",
+        "source_url": "https://19january2021snapshot.epa.gov/laws-regulations/summary-executive-order-12898-federal-actions-address-environmental-justice",
+        "source_type": "Government",
+        "publisher": "U.S. Environmental Protection Agency",
+        "published_date": "1994-02-11",
+        "notes": "EPA summary of the executive order's purpose, directives, and interagency framework."
+      },
+      {
+        "source_title": "Title VI and Environmental Justice",
+        "source_url": "https://19january2021snapshot.epa.gov/environmentaljustice/title-vi-and-environmental-justice",
+        "source_type": "Government",
+        "publisher": "U.S. Environmental Protection Agency",
+        "published_date": null,
+        "notes": "EPA explanation of how environmental justice intersects with Title VI's race-discrimination rules in federally funded programs."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Olmstead v. L. C.",
+    "policy_type": "Court Case",
+    "summary": "The Supreme Court held that unjustified institutional segregation of people with disabilities can violate Title II of the ADA and that states must provide services in the most integrated appropriate setting when reasonably possible.",
+    "year_enacted": 1999,
+    "date_enacted": "1999-06-22",
+    "era": "Contemporary Era",
+    "president": "Bill Clinton",
+    "primary_party": null,
+    "house_party": null,
+    "senate_party": null,
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "Became the leading integration mandate in disability civil-rights law, expanding the legal basis for community-based services over unnecessary institutionalization, with important implications for Black disabled Americans disproportionately exposed to segregated or under-resourced public systems.",
+    "status": "Active",
+    "impact_direction": "Positive",
+    "impact_notes": "Important because disability segregation and institutionalization are also racial-equity issues when access to community care and public services is unequal.",
+    "categories": ["Civil Rights", "Healthcare", "Constitutional Rights"],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 4,
+      "evidence_score": 5,
+      "durability_score": 5,
+      "equity_score": 5,
+      "harm_offset_score": 1,
+      "notes": "A landmark disability-integration ruling with broad significance for equitable access to public systems and community living."
+    },
+    "sources": [
+      {
+        "source_title": "Olmstead v. L. C.",
+        "source_url": "https://supreme.justia.com/cases/federal/us/527/581/",
+        "source_type": "Government",
+        "publisher": "U.S. Supreme Court / Justia",
+        "published_date": "1999-06-22",
+        "notes": "Primary case text and syllabus for the landmark ADA integration decision."
+      }
+    ],
+    "metrics": []
+  }
+]

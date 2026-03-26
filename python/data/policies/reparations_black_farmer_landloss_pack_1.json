@@ -1,0 +1,229 @@
+[
+  {
+    "title": "Commission to Study Reparation Proposals for African Americans Act",
+    "policy_type": "Law",
+    "summary": "Would have established a federal commission to examine slavery, post-emancipation discrimination, and the continuing effects of those systems, and to recommend remedies including apology and compensation.",
+    "year_enacted": 1989,
+    "date_enacted": "1989-11-20",
+    "era": "Contemporary Era",
+    "president": "George H. W. Bush",
+    "primary_party": "Democratic Party",
+    "house_party": "Democratic Party",
+    "senate_party": "Democratic Party",
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "John Conyers's original 1989 bill put federal reparations study on the congressional agenda but failed to become law, beginning a long cycle of repeated introduction without enactment.",
+    "status": "Blocked",
+    "impact_direction": "Blocked",
+    "impact_notes": "A major blocked reform because it marked the modern legislative starting point for federal reparations proposals and still could not clear Congress.",
+    "categories": ["Civil Rights", "Business and Economics", "Constitutional Rights"],
+    "scores": {
+      "directness_score": 5,
+      "material_impact_score": 4,
+      "evidence_score": 5,
+      "durability_score": 4,
+      "equity_score": 0,
+      "harm_offset_score": 0,
+      "notes": "A foundational blocked reparations proposal whose failure shaped decades of subsequent congressional debate."
+    },
+    "sources": [
+      {
+        "source_title": "H.R.3745 - Commission to Study Reparation Proposals for African Americans Act",
+        "source_url": "https://www.congress.gov/bill/101st-congress/house-bill/3745",
+        "source_type": "Government",
+        "publisher": "Congress.gov",
+        "published_date": "1989-11-20",
+        "notes": "Official bill page and CRS summary for John Conyers's original 1989 reparations-study bill."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Pigford v. Glickman",
+    "policy_type": "Court Case",
+    "summary": "Black farmers sued the U.S. Department of Agriculture over decades of racial discrimination in farm credit and benefit programs and the government's failure to process civil-rights complaints fairly.",
+    "year_enacted": 1999,
+    "date_enacted": "1999-04-14",
+    "era": "Contemporary Era",
+    "president": "Bill Clinton",
+    "primary_party": null,
+    "house_party": null,
+    "senate_party": null,
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "The consent decree produced compensation and some debt relief for thousands of Black farmers, but it also highlighted how much land, credit access, and economic opportunity had already been lost through USDA discrimination.",
+    "status": "Partially Active",
+    "impact_direction": "Mixed",
+    "impact_notes": "Historically important because it formally validated long-standing USDA discrimination while offering only partial redress relative to the scale of the harm.",
+    "categories": ["Business and Economics", "Civil Rights"],
+    "scores": {
+      "directness_score": 5,
+      "material_impact_score": 4,
+      "evidence_score": 5,
+      "durability_score": 3,
+      "equity_score": 3,
+      "harm_offset_score": 2,
+      "notes": "A major civil-rights and economic-justice case for Black farmers, but one that did not fully repair accumulated land loss and lending exclusion."
+    },
+    "sources": [
+      {
+        "source_title": "Department of Justice and USDA Announce Historic Settlement in Lawsuit by Black Farmers Claiming Discrimination by USDA",
+        "source_url": "https://www.justice.gov/archives/opa/pr/department-justice-and-usda-announce-historic-settlement-lawsuit-black-farmers-claiming",
+        "source_type": "Government",
+        "publisher": "U.S. Department of Justice",
+        "published_date": "2010-02-18",
+        "notes": "DOJ announcement explaining the Pigford litigation history and the follow-on settlement process for excluded claimants."
+      },
+      {
+        "source_title": "African American Farmers Settlement (Pigford II)",
+        "source_url": "https://www.fsa.usda.gov/Internet/FSA_File/pigford.pdf",
+        "source_type": "Government",
+        "publisher": "U.S. Department of Agriculture, Farm Service Agency",
+        "published_date": null,
+        "notes": "USDA settlement document summarizing eligibility and claims procedures for the Pigford II process."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Black Farmer Fairness Act of 2001",
+    "policy_type": "Law",
+    "summary": "Would have protected Pigford settlement recipients from tax liability and the loss of means-tested federal benefits triggered by settlement payments arising from USDA discrimination claims.",
+    "year_enacted": 2001,
+    "date_enacted": "2001-05-15",
+    "era": "Contemporary Era",
+    "president": "George W. Bush",
+    "primary_party": "Republican Party",
+    "house_party": "Republican Party",
+    "senate_party": "Democratic Party",
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "The bill recognized that even compensation for discrimination could create new penalties for Black farmers, but it remained stuck in committee and did not provide the intended relief.",
+    "status": "Blocked",
+    "impact_direction": "Blocked",
+    "impact_notes": "Important because it showed how partial remedies could still leave Black farmers exposed to secondary losses and administrative unfairness.",
+    "categories": ["Business and Economics", "Civil Rights"],
+    "scores": {
+      "directness_score": 5,
+      "material_impact_score": 4,
+      "evidence_score": 4,
+      "durability_score": 4,
+      "equity_score": 0,
+      "harm_offset_score": 0,
+      "notes": "A targeted blocked remedy tied directly to the aftereffects of USDA discrimination litigation."
+    },
+    "sources": [
+      {
+        "source_title": "H.R.1856 - Black Farmer Fairness Act of 2001",
+        "source_url": "https://www.congress.gov/bill/107th-congress/house-bill/1856",
+        "source_type": "Government",
+        "publisher": "Congress.gov",
+        "published_date": "2001-05-15",
+        "notes": "Official bill page and CRS summary explaining the proposal to exempt Pigford-related payments from taxation and benefit calculations."
+      },
+      {
+        "source_title": "Introduction of the Black Farmers Fairness Act of 2001",
+        "source_url": "https://www.congress.gov/congressional-record/volume-147/issue-66/extensions-of-remarks-section/article/E806-3",
+        "source_type": "Government",
+        "publisher": "Congressional Record / Congress.gov",
+        "published_date": "2001-05-15",
+        "notes": "Congressional Record statement introducing the bill and explaining its rationale."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "American Rescue Plan Act of 2021 Section 1005 Debt Relief for Socially Disadvantaged Farmers",
+    "policy_type": "Law",
+    "summary": "Appropriated funding for USDA to pay certain outstanding direct and guaranteed farm loan balances for socially disadvantaged farmers and ranchers as a response to the cumulative effects of discriminatory lending and program administration.",
+    "year_enacted": 2021,
+    "date_enacted": "2021-03-11",
+    "era": "Contemporary Era",
+    "president": "Joseph R. Biden Jr.",
+    "primary_party": "Democratic Party",
+    "house_party": "Democratic Party",
+    "senate_party": "Democratic Party",
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "Section 1005 marked a direct federal attempt to address longstanding USDA discrimination in farm lending, but injunctions and political backlash prevented it from operating as originally designed and it was later replaced by a different discrimination-assistance model.",
+    "status": "Partially Active",
+    "impact_direction": "Mixed",
+    "impact_notes": "Important because it moved beyond study and litigation toward direct debt relief, but its implementation was substantially blocked before the original remedy could be delivered.",
+    "categories": ["Business and Economics", "Civil Rights"],
+    "scores": {
+      "directness_score": 5,
+      "material_impact_score": 5,
+      "evidence_score": 5,
+      "durability_score": 2,
+      "equity_score": 3,
+      "harm_offset_score": 2,
+      "notes": "A major reparative agricultural intervention whose design was strong but whose intended effect was weakened by litigation and replacement."
+    },
+    "sources": [
+      {
+        "source_title": "In Historic Move, USDA to Begin Loan Payments to Socially Disadvantaged Borrowers under American Rescue Plan Act Section 1005",
+        "source_url": "https://www.fsa.usda.gov/news-events/news/05-24-2021/historic-move-usda-begin-loan-payments-socially-disadvantaged-0",
+        "source_type": "Government",
+        "publisher": "U.S. Department of Agriculture, Farm Service Agency",
+        "published_date": "2021-05-24",
+        "notes": "Official USDA announcement describing Section 1005, its intended debt-relief mechanism, and its connection to long-standing discrimination."
+      },
+      {
+        "source_title": "USDA Seeking Public Comment on a New Provision to Provide Assistance to Agricultural Producers Who Have Experienced Discrimination",
+        "source_url": "https://www.usda.gov/about-usda/news/press-releases/2022/10/13/usda-seeking-public-comment-new-provision-provide-assistance-agricultural-producers-who-have",
+        "source_type": "Government",
+        "publisher": "U.S. Department of Agriculture",
+        "published_date": "2022-10-13",
+        "notes": "USDA explanation of the later Inflation Reduction Act discrimination-assistance provision that replaced the original Section 1005 approach."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Heirs' Property Relending Program",
+    "policy_type": "Program",
+    "summary": "Created a USDA lending framework to help producers and landowners resolve heirs' property title problems that often prevent access to federal agricultural programs and make Black-owned family land vulnerable to partition sales and loss.",
+    "year_enacted": 2021,
+    "date_enacted": "2021-07-29",
+    "era": "Contemporary Era",
+    "president": "Joseph R. Biden Jr.",
+    "primary_party": "Democratic Party",
+    "house_party": "Democratic Party",
+    "senate_party": "Democratic Party",
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "The program gave heirs and landowners a new federal route to address title fragmentation and succession barriers that have contributed significantly to Black land loss, although as a loan program it remains a partial rather than comprehensive remedy.",
+    "status": "Active",
+    "impact_direction": "Positive",
+    "impact_notes": "A meaningful land-retention tool because heirs' property has been one of the central legal mechanisms through which Black agricultural land has been lost across generations.",
+    "categories": ["Business and Economics", "Civil Rights"],
+    "scores": {
+      "directness_score": 5,
+      "material_impact_score": 4,
+      "evidence_score": 4,
+      "durability_score": 4,
+      "equity_score": 4,
+      "harm_offset_score": 2,
+      "notes": "A targeted program addressing one of the most important institutional pathways of Black land loss."
+    },
+    "sources": [
+      {
+        "source_title": "Vilsack Unveils New Heirs Property Relending Program",
+        "source_url": "https://www.usda.gov/about-usda/news/radio/daily-newsline/2021-07-29/vilsack-unveils-new-heirs-property-relending-program",
+        "source_type": "Government",
+        "publisher": "U.S. Department of Agriculture",
+        "published_date": "2021-07-29",
+        "notes": "USDA announcement introducing the heirs' property relending program and explaining its purpose."
+      },
+      {
+        "source_title": "USDA Announces First Three Lenders for Heirs' Property Relending Program",
+        "source_url": "https://www.usda.gov/about-usda/news/press-releases/2022/08/18/usda-announces-first-three-lenders-heirs-property-relending-program",
+        "source_type": "Government",
+        "publisher": "U.S. Department of Agriculture",
+        "published_date": "2022-08-18",
+        "notes": "USDA press release explaining how the program helps resolve succession and title issues that block access to USDA programs and can trigger land loss."
+      }
+    ],
+    "metrics": []
+  }
+]

@@ -1,0 +1,130 @@
+[
+  {
+    "title": "Jones v. Alfred H. Mayer Co.",
+    "policy_type": "Court Case",
+    "summary": "The Supreme Court held that Congress could prohibit private racial discrimination in the sale or rental of property under 42 U.S.C. \u00a7 1982 and the Thirteenth Amendment.",
+    "year_enacted": 1968,
+    "date_enacted": "1968-06-17",
+    "era": "Civil Rights Era",
+    "president": "Lyndon B. Johnson",
+    "primary_party": null,
+    "house_party": null,
+    "senate_party": null,
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "The ruling strengthened federal power against private housing discrimination beyond state action cases alone.",
+    "status": "Active",
+    "impact_direction": "Positive",
+    "impact_notes": "An important housing-rights decision expanding protection against private racial discrimination.",
+    "categories": [
+      "Housing",
+      "Civil Rights",
+      "Constitutional Rights"
+    ],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 4,
+      "evidence_score": 5,
+      "durability_score": 4,
+      "equity_score": 5,
+      "harm_offset_score": 0,
+      "notes": "Important reinforcement of federal anti-discrimination power in housing."
+    },
+    "sources": [
+      {
+        "source_title": "Jones v. Alfred H. Mayer Co., 392 U.S. 409 (1968)",
+        "source_url": "https://supreme.justia.com/cases/federal/us/392/409/",
+        "source_type": "Archive",
+        "publisher": "Justia",
+        "published_date": "1968-06-17",
+        "notes": "Primary decision text mirror"
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Alexander v. Holmes County Board of Education",
+    "policy_type": "Court Case",
+    "summary": "The Supreme Court ordered Southern school districts to end delays and transition immediately from dual school systems to unitary systems.",
+    "year_enacted": 1969,
+    "date_enacted": "1969-10-29",
+    "era": "Post Civil Rights Era",
+    "president": "Richard Nixon",
+    "primary_party": null,
+    "house_party": null,
+    "senate_party": null,
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "The ruling accelerated school desegregation after years of slow-walking and resistance across the South.",
+    "status": "Active",
+    "impact_direction": "Positive",
+    "impact_notes": "Forced more immediate implementation of desegregation in K-12 education.",
+    "categories": [
+      "Education",
+      "Civil Rights"
+    ],
+    "scores": {
+      "directness_score": 5,
+      "material_impact_score": 4,
+      "evidence_score": 4,
+      "durability_score": 4,
+      "equity_score": 5,
+      "harm_offset_score": 0,
+      "notes": "Important desegregation ruling aimed at ending deliberate delay."
+    },
+    "sources": [
+      {
+        "source_title": "Alexander v. Holmes County Board of Education, 396 U.S. 19 (1969)",
+        "source_url": "https://supreme.justia.com/cases/federal/us/396/19/",
+        "source_type": "Archive",
+        "publisher": "Justia",
+        "published_date": "1969-10-29",
+        "notes": "Primary decision text mirror"
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Swann v. Charlotte-Mecklenburg Board of Education",
+    "policy_type": "Court Case",
+    "summary": "The Supreme Court approved broad equitable remedies, including busing and redrawn attendance zones, to dismantle de jure school segregation.",
+    "year_enacted": 1971,
+    "date_enacted": "1971-04-20",
+    "era": "Post Civil Rights Era",
+    "president": "Richard Nixon",
+    "primary_party": null,
+    "house_party": null,
+    "senate_party": null,
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "The ruling gave federal courts stronger tools to implement desegregation in public schools where anti-Black segregation had been maintained by law and policy.",
+    "status": "Active",
+    "impact_direction": "Positive",
+    "impact_notes": "A major pro-desegregation decision in K-12 education.",
+    "categories": [
+      "Education",
+      "Civil Rights",
+      "Constitutional Rights"
+    ],
+    "scores": {
+      "directness_score": 5,
+      "material_impact_score": 4,
+      "evidence_score": 5,
+      "durability_score": 4,
+      "equity_score": 5,
+      "harm_offset_score": 0,
+      "notes": "Strong remedy case for school desegregation."
+    },
+    "sources": [
+      {
+        "source_title": "Swann v. Charlotte-Mecklenburg Board of Education, 402 U.S. 1 (1971)",
+        "source_url": "https://www.govinfo.gov/content/pkg/USREPORTS-402/pdf/USREPORTS-402-1.pdf",
+        "source_type": "Government",
+        "publisher": "GovInfo / United States Reports",
+        "published_date": "1971-04-20",
+        "notes": "Primary decision text PDF"
+      }
+    ],
+    "metrics": []
+  }
+]

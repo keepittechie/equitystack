@@ -1,0 +1,214 @@
+[
+  {
+    "title": "Griggs v. Duke Power Company",
+    "policy_type": "Court Case",
+    "summary": "The Supreme Court held that Title VII prohibits employment practices that are facially neutral but have a discriminatory impact unless the employer can show business necessity.",
+    "year_enacted": 1971,
+    "date_enacted": "1971-03-08",
+    "era": "Post Civil Rights Era",
+    "president": "Richard Nixon",
+    "primary_party": null,
+    "house_party": null,
+    "senate_party": null,
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "The decision became a foundational precedent against employment screening rules that disproportionately excluded Black workers without sufficient justification.",
+    "status": "Active",
+    "impact_direction": "Positive",
+    "impact_notes": "Key disparate-impact precedent in employment discrimination law.",
+    "categories": [
+      "Labor",
+      "Civil Rights"
+    ],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 4,
+      "evidence_score": 5,
+      "durability_score": 4,
+      "equity_score": 5,
+      "harm_offset_score": 0,
+      "notes": "Landmark employment discrimination case under Title VII."
+    },
+    "sources": [
+      {
+        "source_title": "Griggs v. Duke Power Company, 401 U.S. 424 (1971)",
+        "source_url": "https://www.oyez.org/cases/1970/124",
+        "source_type": "Archive",
+        "publisher": "Oyez",
+        "published_date": "1971-03-08",
+        "notes": "Primary decision summary and case record"
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Milliken v. Bradley",
+    "policy_type": "Court Case",
+    "summary": "The Supreme Court limited interdistrict desegregation remedies by ruling that suburban districts could not be included in a metropolitan desegregation plan absent proof that they had contributed to the constitutional violation.",
+    "year_enacted": 1974,
+    "date_enacted": "1974-07-25",
+    "era": "Post Civil Rights Era",
+    "president": "Richard Nixon",
+    "primary_party": null,
+    "house_party": null,
+    "senate_party": null,
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "The decision sharply constrained metropolitan school desegregation efforts and is widely associated with limiting remedies for racially isolated urban schools.",
+    "status": "Active",
+    "impact_direction": "Negative",
+    "impact_notes": "Commonly viewed as a major limitation on school desegregation remedies.",
+    "categories": [
+      "Education",
+      "Civil Rights"
+    ],
+    "scores": {
+      "directness_score": 5,
+      "material_impact_score": 4,
+      "evidence_score": 5,
+      "durability_score": 5,
+      "equity_score": 1,
+      "harm_offset_score": 0,
+      "notes": "A major setback for broad school desegregation efforts."
+    },
+    "sources": [
+      {
+        "source_title": "Milliken v. Bradley, 418 U.S. 717 (1974)",
+        "source_url": "https://www.govinfo.gov/app/details/USREPORTS-418/USREPORTS-418-717",
+        "source_type": "Government",
+        "publisher": "GovInfo / United States Reports",
+        "published_date": "1974-07-25",
+        "notes": "Primary decision text"
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Regents of the University of California v. Bakke",
+    "policy_type": "Court Case",
+    "summary": "The Supreme Court struck down a rigid admissions quota while also allowing race to be considered as one factor among many in higher education admissions.",
+    "year_enacted": 1978,
+    "date_enacted": "1978-06-28",
+    "era": "Post Civil Rights Era",
+    "president": null,
+    "primary_party": null,
+    "house_party": null,
+    "senate_party": null,
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "The decision both limited explicit quota systems and preserved a narrower path for race-conscious admissions, making its effect on Black educational access mixed.",
+    "status": "Partially Active",
+    "impact_direction": "Mixed",
+    "impact_notes": "Historically influential but internally mixed in effect and later narrowed by subsequent case law.",
+    "categories": [
+      "Education",
+      "Civil Rights",
+      "Constitutional Rights"
+    ],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 3,
+      "evidence_score": 5,
+      "durability_score": 3,
+      "equity_score": 3,
+      "harm_offset_score": 0,
+      "notes": "Mixed-impact affirmative-action precedent."
+    },
+    "sources": [
+      {
+        "source_title": "Regents of the University of California v. Bakke, 438 U.S. 265 (1978)",
+        "source_url": "https://supreme.justia.com/cases/federal/us/438/265/",
+        "source_type": "Archive",
+        "publisher": "Justia",
+        "published_date": "1978-06-28",
+        "notes": "Primary decision text mirror"
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Grutter v. Bollinger",
+    "policy_type": "Court Case",
+    "summary": "The Supreme Court upheld the University of Michigan Law School's limited use of race as one factor in a holistic admissions process.",
+    "year_enacted": 2003,
+    "date_enacted": "2003-06-23",
+    "era": "Post Civil Rights Era",
+    "president": "George W. Bush",
+    "primary_party": null,
+    "house_party": null,
+    "senate_party": null,
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "The decision preserved a path for race-conscious admissions policies that many institutions viewed as important to Black representation in higher education, though later case law severely limited it.",
+    "status": "Partially Active",
+    "impact_direction": "Positive",
+    "impact_notes": "Historically important pro-affirmative-action decision, though later narrowed.",
+    "categories": [
+      "Education",
+      "Civil Rights"
+    ],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 4,
+      "evidence_score": 5,
+      "durability_score": 2,
+      "equity_score": 4,
+      "harm_offset_score": 0,
+      "notes": "Important but no longer fully intact precedent."
+    },
+    "sources": [
+      {
+        "source_title": "Grutter v. Bollinger, 539 U.S. 306 (2003)",
+        "source_url": "https://supreme.justia.com/cases/federal/us/539/306/",
+        "source_type": "Archive",
+        "publisher": "Justia",
+        "published_date": "2003-06-23",
+        "notes": "Primary decision text mirror"
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Parents Involved in Community Schools v. Seattle School District No. 1",
+    "policy_type": "Court Case",
+    "summary": "The Supreme Court struck down certain voluntary K-12 student assignment plans that used individual racial classifications to promote school integration.",
+    "year_enacted": 2007,
+    "date_enacted": "2007-06-28",
+    "era": "Post Civil Rights Era",
+    "president": "George W. Bush",
+    "primary_party": null,
+    "house_party": null,
+    "senate_party": null,
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "The ruling limited one set of tools school districts could use to pursue racial integration in public education.",
+    "status": "Active",
+    "impact_direction": "Negative",
+    "impact_notes": "Generally viewed as constraining voluntary integration efforts in K-12 schools.",
+    "categories": [
+      "Education",
+      "Civil Rights",
+      "Constitutional Rights"
+    ],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 3,
+      "evidence_score": 5,
+      "durability_score": 4,
+      "equity_score": 1,
+      "harm_offset_score": 0,
+      "notes": "Important limit on voluntary race-conscious K-12 integration policies."
+    },
+    "sources": [
+      {
+        "source_title": "Parents Involved in Community Schools v. Seattle School District No. 1, 551 U.S. 701 (2007)",
+        "source_url": "https://supreme.justia.com/cases/federal/us/551/701/",
+        "source_type": "Archive",
+        "publisher": "Justia",
+        "published_date": "2007-06-28",
+        "notes": "Primary decision text mirror"
+      }
+    ],
+    "metrics": []
+  }
+]

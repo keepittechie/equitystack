@@ -1,0 +1,101 @@
+{
+  "generated_at": "2026-03-25T07:53:53.046919+00:00",
+  "started_at": "2026-03-25T07:49:37.807341+00:00",
+  "status": "failed",
+  "requested_model": "qwen3:latest",
+  "apply_safe_removals": false,
+  "skip_discovery": false,
+  "only_future_bill_ids": [],
+  "bundle_path": "/home/josh/black-policy-site/python/reports/equitystack_review_bundle.json",
+  "reports": {
+    "ai_review": "/home/josh/black-policy-site/python/reports/future_bill_link_ai_review.json",
+    "manual_queue": "/home/josh/black-policy-site/python/reports/future_bill_link_manual_review_queue.json",
+    "suggestions": "/home/josh/black-policy-site/python/reports/future_bill_link_partial_suggestions.json",
+    "discovery": "/home/josh/black-policy-site/python/reports/future_bill_candidate_discovery.json"
+  },
+  "steps": [
+    {
+      "name": "refresh_database",
+      "command": [
+        "/home/josh/black-policy-site/python/venv/bin/python3",
+        "update_database.py"
+      ],
+      "started_at": "2026-03-25T07:50:06.960711+00:00",
+      "duration_seconds": 29.153,
+      "returncode": 0,
+      "status": "ok"
+    },
+    {
+      "name": "review_future_bill_audit",
+      "command": [
+        "/home/josh/black-policy-site/python/venv/bin/python3",
+        "scripts/review_future_bill_audit_with_ollama.py",
+        "--model",
+        "qwen3:latest",
+        "--csv"
+      ],
+      "started_at": "2026-03-25T07:52:41.906927+00:00",
+      "duration_seconds": 154.946,
+      "returncode": 0,
+      "status": "ok"
+    },
+    {
+      "name": "safe_remove_review",
+      "command": [
+        "/home/josh/black-policy-site/python/venv/bin/python3",
+        "scripts/apply_future_bill_ai_review.py",
+        "--input",
+        "/home/josh/black-policy-site/python/reports/future_bill_link_ai_review.json",
+        "--csv"
+      ],
+      "started_at": "2026-03-25T07:52:41.946326+00:00",
+      "duration_seconds": 0.039,
+      "returncode": 0,
+      "status": "ok"
+    },
+    {
+      "name": "suggest_partial_links",
+      "command": [
+        "/home/josh/black-policy-site/python/venv/bin/python3",
+        "scripts/suggest_partial_future_bill_links.py",
+        "--input-review-report",
+        "/home/josh/black-policy-site/python/reports/future_bill_link_ai_review.json",
+        "--input-manual-queue",
+        "/home/josh/black-policy-site/python/reports/future_bill_link_manual_review_queue.json",
+        "--top-k",
+        "5",
+        "--csv"
+      ],
+      "started_at": "2026-03-25T07:52:42.139519+00:00",
+      "duration_seconds": 0.193,
+      "returncode": 0,
+      "status": "ok"
+    },
+    {
+      "name": "discover_missing_tracked_bills",
+      "command": [
+        "/home/josh/black-policy-site/python/venv/bin/python3",
+        "scripts/find_candidate_tracked_bills.py",
+        "--trigger-from-suggestions",
+        "/home/josh/black-policy-site/python/reports/future_bill_link_partial_suggestions.json",
+        "--trigger-from-review",
+        "/home/josh/black-policy-site/python/reports/future_bill_link_ai_review.json",
+        "--top-k",
+        "5",
+        "--csv"
+      ],
+      "started_at": "2026-03-25T07:53:53.009095+00:00",
+      "duration_seconds": 70.869,
+      "returncode": 0,
+      "status": "ok"
+    }
+  ],
+  "failure": {
+    "command": [
+      "/home/josh/black-policy-site/python/venv/bin/python3",
+      "scripts/build_review_bundle.py",
+      "--csv"
+    ],
+    "returncode": 1
+  }
+}

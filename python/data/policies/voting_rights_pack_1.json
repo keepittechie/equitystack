@@ -1,0 +1,158 @@
+[
+  {
+    "title": "South Carolina v. Katzenbach",
+    "policy_type": "Court Case",
+    "summary": "The Supreme Court upheld core provisions of the Voting Rights Act of 1965 as a valid exercise of Congress's enforcement power under the Fifteenth Amendment.",
+    "year_enacted": 1966,
+    "date_enacted": "1966-03-07",
+    "era": "Civil Rights Era",
+    "president": "Lyndon B. Johnson",
+    "primary_party": null,
+    "house_party": null,
+    "senate_party": null,
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "The ruling protected the federal government's ability to block discriminatory voting rules in jurisdictions with entrenched anti-Black voter suppression.",
+    "status": "Active",
+    "impact_direction": "Positive",
+    "impact_notes": "A foundational Supreme Court decision supporting federal voting-rights enforcement.",
+    "categories": ["Voting Rights", "Civil Rights", "Constitutional Rights"],
+    "scores": {
+      "directness_score": 5,
+      "material_impact_score": 5,
+      "evidence_score": 5,
+      "durability_score": 4,
+      "equity_score": 5,
+      "harm_offset_score": 0,
+      "notes": "Strongly reinforced the legal foundation of the Voting Rights Act."
+    },
+    "sources": [
+      {
+        "source_title": "South Carolina v. Katzenbach, 383 U.S. 301 (1966)",
+        "source_url": "https://www.govinfo.gov/app/details/USREPORTS-383/USREPORTS-383-301",
+        "source_type": "Government",
+        "publisher": "GovInfo / United States Reports",
+        "published_date": "1966-03-07",
+        "notes": "Primary decision text"
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Allen v. State Board of Elections",
+    "policy_type": "Court Case",
+    "summary": "The Supreme Court interpreted Section 5 of the Voting Rights Act broadly, allowing private suits and requiring federal review of a wider range of voting changes in covered jurisdictions.",
+    "year_enacted": 1969,
+    "date_enacted": "1969-03-03",
+    "era": "Post Civil Rights Era",
+    "president": "Richard Nixon",
+    "primary_party": null,
+    "house_party": null,
+    "senate_party": null,
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "The decision expanded federal oversight of election law changes that could be used to dilute or suppress Black voting power.",
+    "status": "Active",
+    "impact_direction": "Positive",
+    "impact_notes": "A major early case broadening the practical reach of the Voting Rights Act.",
+    "categories": ["Voting Rights", "Civil Rights", "Constitutional Rights"],
+    "scores": {
+      "directness_score": 5,
+      "material_impact_score": 4,
+      "evidence_score": 5,
+      "durability_score": 4,
+      "equity_score": 5,
+      "harm_offset_score": 0,
+      "notes": "Expanded the scope of Section 5 review and private enforcement."
+    },
+    "sources": [
+      {
+        "source_title": "Allen v. State Board of Elections, 393 U.S. 544 (1969)",
+        "source_url": "https://www.govinfo.gov/app/details/USREPORTS-393/USREPORTS-393-544",
+        "source_type": "Government",
+        "publisher": "GovInfo / United States Reports",
+        "published_date": "1969-03-03",
+        "notes": "Primary decision text"
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Shelby County v. Holder",
+    "policy_type": "Court Case",
+    "summary": "The Supreme Court invalidated the coverage formula used for federal preclearance under the Voting Rights Act.",
+    "year_enacted": 2013,
+    "date_enacted": "2013-06-25",
+    "era": "Contemporary Era",
+    "president": "Barack Obama",
+    "primary_party": null,
+    "house_party": null,
+    "senate_party": null,
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "Weakened federal oversight of voting changes in jurisdictions with histories of racial discrimination.",
+    "status": "Active",
+    "impact_direction": "Negative",
+    "impact_notes": "Widely viewed as a major rollback of voting-rights enforcement.",
+    "categories": ["Voting Rights", "Civil Rights", "Constitutional Rights"],
+    "scores": {
+      "directness_score": 5,
+      "material_impact_score": 4,
+      "evidence_score": 5,
+      "durability_score": 4,
+      "equity_score": 0,
+      "harm_offset_score": 0,
+      "notes": "Major voting-rights rollback."
+    },
+    "sources": [
+      {
+        "source_title": "Shelby County v. Holder",
+        "source_url": "https://supreme.justia.com/cases/federal/us/570/529/",
+        "source_type": "Government",
+        "publisher": "Supreme Court / Justia",
+        "published_date": null,
+        "notes": "Primary case text"
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Brnovich v. Democratic National Committee",
+    "policy_type": "Court Case",
+    "summary": "The Supreme Court upheld Arizona voting restrictions and adopted a narrower interpretation of Section 2 of the Voting Rights Act.",
+    "year_enacted": 2021,
+    "date_enacted": "2021-07-01",
+    "era": "Contemporary Era",
+    "president": "Joseph R. Biden Jr.",
+    "primary_party": null,
+    "house_party": null,
+    "senate_party": null,
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "Made it harder to challenge voting rules under the Voting Rights Act and was widely seen as another setback for minority voting-rights protections.",
+    "status": "Active",
+    "impact_direction": "Negative",
+    "impact_notes": "A modern voting-rights rollback that narrowed practical Section 2 protections.",
+    "categories": ["Voting Rights", "Civil Rights", "Constitutional Rights"],
+    "scores": {
+      "directness_score": 5,
+      "material_impact_score": 4,
+      "evidence_score": 5,
+      "durability_score": 4,
+      "equity_score": 0,
+      "harm_offset_score": 0,
+      "notes": "Important modern voting-rights setback."
+    },
+    "sources": [
+      {
+        "source_title": "Brnovich v. Democratic National Committee",
+        "source_url": "https://supreme.justia.com/cases/federal/us/594/19-1257/",
+        "source_type": "Government",
+        "publisher": "Supreme Court / Justia",
+        "published_date": null,
+        "notes": "Primary case text"
+      }
+    ],
+    "metrics": []
+  }
+]

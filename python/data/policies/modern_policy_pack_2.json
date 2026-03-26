@@ -1,0 +1,158 @@
+[
+  {
+    "title": "Freedom to Vote Act",
+    "policy_type": "Law",
+    "summary": "A proposed federal voting-rights and election-administration bill designed to expand ballot access, limit partisan gerrymandering, and strengthen election protections.",
+    "year_enacted": 2021,
+    "date_enacted": null,
+    "era": "Contemporary Era",
+    "president": "Joseph R. Biden Jr.",
+    "primary_party": "Democratic Party",
+    "house_party": "Democratic Party",
+    "senate_party": "Democratic Party",
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "The bill failed to become law, leaving many proposed federal voting protections unrealized.",
+    "status": "Blocked",
+    "impact_direction": "Blocked",
+    "impact_notes": "A major modern voting-rights proposal that stalled.",
+    "categories": ["Voting Rights", "Civil Rights"],
+    "scores": {
+      "directness_score": 5,
+      "material_impact_score": 4,
+      "evidence_score": 4,
+      "durability_score": 0,
+      "equity_score": 5,
+      "harm_offset_score": 0,
+      "notes": "High-impact proposed reform that failed."
+    },
+    "sources": [
+      {
+        "source_title": "Freedom to Vote Act",
+        "source_url": "https://www.congress.gov/bill/117th-congress/senate-bill/2747",
+        "source_type": "Government",
+        "publisher": "Congress.gov",
+        "published_date": null,
+        "notes": "Legislative record"
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "George Floyd Justice in Policing Act",
+    "policy_type": "Law",
+    "summary": "A proposed federal policing reform bill focused on accountability, use-of-force standards, qualified immunity changes, and misconduct tracking.",
+    "year_enacted": 2021,
+    "date_enacted": null,
+    "era": "Contemporary Era",
+    "president": "Joseph R. Biden Jr.",
+    "primary_party": "Democratic Party",
+    "house_party": "Democratic Party",
+    "senate_party": "Democratic Party",
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "The bill did not pass, leaving major federal policing reforms unresolved.",
+    "status": "Blocked",
+    "impact_direction": "Blocked",
+    "impact_notes": "High-profile policing reform effort that stalled.",
+    "categories": ["Criminal Justice", "Civil Rights"],
+    "scores": {
+      "directness_score": 5,
+      "material_impact_score": 4,
+      "evidence_score": 4,
+      "durability_score": 0,
+      "equity_score": 5,
+      "harm_offset_score": 0,
+      "notes": "Major policing reform proposal that failed."
+    },
+    "sources": [
+      {
+        "source_title": "George Floyd Justice in Policing Act",
+        "source_url": "https://www.congress.gov/bill/117th-congress/house-bill/1280",
+        "source_type": "Government",
+        "publisher": "Congress.gov",
+        "published_date": null,
+        "notes": "Legislative record"
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "FUTURE Act",
+    "policy_type": "Law",
+    "summary": "Permanently funded mandatory federal support for HBCUs and other minority-serving institutions.",
+    "year_enacted": 2019,
+    "date_enacted": "2019-12-19",
+    "era": "Contemporary Era",
+    "president": "Donald J. Trump",
+    "primary_party": "Republican Party",
+    "house_party": "Democratic Party",
+    "senate_party": "Republican Party",
+    "bipartisan": true,
+    "direct_black_impact": true,
+    "outcome_summary": "Secured long-term federal funding support for HBCUs and other minority-serving institutions.",
+    "status": "Active",
+    "impact_direction": "Positive",
+    "impact_notes": "A significant HBCU funding measure with broad practical importance.",
+    "categories": ["HBCUs", "Education"],
+    "scores": {
+      "directness_score": 5,
+      "material_impact_score": 4,
+      "evidence_score": 4,
+      "durability_score": 4,
+      "equity_score": 5,
+      "harm_offset_score": 0,
+      "notes": "Important modern HBCU funding law."
+    },
+    "sources": [
+      {
+        "source_title": "FUTURE Act",
+        "source_url": "https://www.congress.gov/bill/116th-congress/house-bill/2486",
+        "source_type": "Government",
+        "publisher": "Congress.gov",
+        "published_date": null,
+        "notes": "Legislative record"
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "American Rescue Plan",
+    "policy_type": "Law",
+    "summary": "Pandemic relief law that included direct payments, an expanded Child Tax Credit, and broad anti-poverty support.",
+    "year_enacted": 2021,
+    "date_enacted": "2021-03-11",
+    "era": "Contemporary Era",
+    "president": "Joseph R. Biden Jr.",
+    "primary_party": "Democratic Party",
+    "house_party": "Democratic Party",
+    "senate_party": "Democratic Party",
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "Delivered major short-term anti-poverty relief and support that disproportionately benefited lower-income households, including many Black families.",
+    "status": "Expired",
+    "impact_direction": "Positive",
+    "impact_notes": "Important relief law with strong short-term material effects, though not permanent.",
+    "categories": ["Social Welfare", "Business and Economics"],
+    "scores": {
+      "directness_score": 3,
+      "material_impact_score": 5,
+      "evidence_score": 4,
+      "durability_score": 1,
+      "equity_score": 4,
+      "harm_offset_score": 0,
+      "notes": "Major short-term relief measure with meaningful equity impact."
+    },
+    "sources": [
+      {
+        "source_title": "American Rescue Plan Act of 2021",
+        "source_url": "https://www.congress.gov/bill/117th-congress/house-bill/1319",
+        "source_type": "Government",
+        "publisher": "Congress.gov",
+        "published_date": null,
+        "notes": "Legislative record"
+      }
+    ],
+    "metrics": []
+  }
+]

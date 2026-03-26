@@ -1,0 +1,8 @@
+future_bill_id,future_bill_title,target_area,current_status,bill_number,title,source,matched_query,relevance_score,problem_alignment,solution_alignment,population_alignment,mechanism_specificity,evidence_strength,import_priority,recommended_next_step
+3,Black Homeownership and Appraisal Fairness Act,Housing,remove_link,H.R. 5975,Appraisal Modernization Act,tracked_bills,appraisal appraisal,7.75,1,1,0,1,1,reject,reject_candidate
+3,Black Homeownership and Appraisal Fairness Act,Housing,remove_link,S. 2322,Appraisal Modernization Act,tracked_bills,appraisal appraisal,7.75,1,1,0,1,1,reject,reject_candidate
+2,HBCU Capital and Research Equity Act,Education,review_manually,H.R. 2486,FUTURE Act,tracked_bills,campus infrastructure colleges,13.583,1,0,0,0,1,reject,reject_candidate
+2,HBCU Capital and Research Equity Act,Education,review_manually,S. 16,Protecting Life on College Campus Act of 2023,congress_api,college funding,11.75,1,0,0,0,1,reject,reject_candidate
+2,HBCU Capital and Research Equity Act,Education,review_manually,S. 207,Protecting Life on College Campus Act of 2025,congress_api,college funding,11.75,1,0,0,0,1,reject,reject_candidate
+2,HBCU Capital and Research Equity Act,Education,review_manually,H.R. 231,Terminate TikTok on Campus Act of 2023,congress_api,campus infrastructure,9.75,1,0,0,0,1,reject,reject_candidate
+2,HBCU Capital and Research Equity Act,Education,review_manually,H.R. 7660,HBCU Empowerment and Reform Act,tracked_bills,campus infrastructure hbcu,4.583,1,0,2,0,0,reject,reject_candidate
