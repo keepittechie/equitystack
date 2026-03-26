@@ -157,6 +157,21 @@ export default async function BlackImpactScorePage() {
 
   return (
     <main className="max-w-7xl mx-auto p-6 space-y-8">
+      <div className="flex flex-wrap gap-3">
+        <Link
+          href="/promises"
+          className="inline-flex items-center rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
+        >
+          Explore Promise Tracker data
+        </Link>
+        <Link
+          href="/reports"
+          className="inline-flex items-center rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
+        >
+          Back to Reports
+        </Link>
+      </div>
+
       <section className="hero-panel p-8 md:p-10">
         <p className="eyebrow mb-4">Promise Tracker Report</p>
         <h1 className="text-4xl md:text-5xl font-bold">Black Impact Score</h1>
@@ -172,11 +187,29 @@ export default async function BlackImpactScorePage() {
       </section>
 
       <section className="card-surface rounded-[1.6rem] p-5">
+        <div className="flex items-start justify-between gap-4 flex-wrap">
+          <div className="max-w-3xl">
+            <h2 className="text-lg font-semibold mb-2">Built From Promise Tracker</h2>
+            <p className="text-sm text-[var(--ink-soft)] leading-7">
+              This report is not a separate product surface. It summarizes the same Promise Tracker records,
+              actions, and outcomes in a president-level score view.
+            </p>
+          </div>
+          <Link
+            href="/promises"
+            className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
+          >
+            Open Promise Tracker
+          </Link>
+        </div>
+      </section>
+
+      <section className="card-surface rounded-[1.6rem] p-5">
         <details>
           <summary className="cursor-pointer text-lg font-semibold">Methodology</summary>
           <div className="mt-4 space-y-4">
             <p className="text-sm text-[var(--ink-soft)] leading-7">
-              The Black Impact Score uses Promise Tracker's relevance curation and a transparent weighting model.
+              The Black Impact Score uses Promise Tracker&apos;s relevance curation and a transparent weighting model.
               It is designed as a presidential accountability measure tied to Black-community outcomes, not a generic promise-keeping score.
             </p>
 
@@ -270,7 +303,7 @@ export default async function BlackImpactScorePage() {
                     href={`/promises/president/${president.president_slug}`}
                     className="rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
                   >
-                    View Promise Tracker
+                    See Promise Tracker data
                   </Link>
                 </div>
               </div>

@@ -95,6 +95,30 @@ export default async function PromisesPage({ searchParams }) {
         >
           {showAll ? "Show Prioritized View" : "Show All Promises"}
         </Link>
+        <Link
+          href="/reports/black-impact-score"
+          className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
+        >
+          View Black Impact Score
+        </Link>
+      </section>
+
+      <section className="card-surface rounded-[1.6rem] p-5 mb-8">
+        <div className="flex items-start justify-between gap-4 flex-wrap">
+          <div className="max-w-3xl">
+            <h2 className="text-lg font-semibold mb-2">Promise Tracker Reports</h2>
+            <p className="text-sm text-[var(--ink-soft)] leading-7">
+              Black Impact Score turns the tracked promise record into a president-level accountability view.
+              Use it after browsing promises to compare how administrations scored overall.
+            </p>
+          </div>
+          <Link
+            href="/reports/black-impact-score"
+            className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
+          >
+            See Black Impact Score
+          </Link>
+        </div>
       </section>
 
       {presidents.length === 0 ? (

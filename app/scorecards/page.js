@@ -131,6 +131,21 @@ export default async function ScorecardsPage({ searchParams }) {
         </div>
       </section>
 
+      <SectionCard title="Connected Sections">
+        <p>
+          Scorecards work best alongside the live reform-bill layer. Use Future Bills to inspect the proposals,
+          linked legislation, and action history that feed these accountability snapshots.
+        </p>
+        <div className="flex flex-wrap gap-3 text-sm">
+          <Link href="/future-bills" className="accent-link">
+            Open Future Bills
+          </Link>
+          <Link href="/promises" className="accent-link">
+            Open Promise Tracker
+          </Link>
+        </div>
+      </SectionCard>
+
       {overview.top_legislators?.length ? (
         <SectionCard title="Current Coverage Preview">
           <p>

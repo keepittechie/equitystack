@@ -100,6 +100,12 @@ export default async function PromisePresidentPage({ params, searchParams }) {
         >
           {showAll ? "Show Prioritized View" : "Show All Promises"}
         </Link>
+        <Link
+          href="/reports/black-impact-score"
+          className="inline-flex items-center rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
+        >
+          View Black Impact Score
+        </Link>
       </div>
 
       <section className="hero-panel p-8 md:p-10 mb-6">
@@ -131,6 +137,24 @@ export default async function PromisePresidentPage({ params, searchParams }) {
         <MiniStat label="Partial" value={showAll ? president.partial_count : president.visible_partial_count} />
         <MiniStat label="Failed" value={showAll ? president.failed_count : president.visible_failed_count} />
         <MiniStat label="Blocked" value={showAll ? president.blocked_count : president.visible_blocked_count} />
+      </section>
+
+      <section className="card-surface rounded-[1.6rem] p-5 mb-8">
+        <div className="flex items-start justify-between gap-4 flex-wrap">
+          <div className="max-w-3xl">
+            <h2 className="text-lg font-semibold mb-2">See the Score View</h2>
+            <p className="text-sm text-[var(--ink-soft)] leading-7">
+              Black Impact Score uses these Promise Tracker records as a president-level accountability layer.
+              Open it to compare this presidency against the broader Promise Tracker dataset.
+            </p>
+          </div>
+          <Link
+            href="/reports/black-impact-score"
+            className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
+          >
+            Explore Black Impact Score
+          </Link>
+        </div>
       </section>
 
       <div className="space-y-8">

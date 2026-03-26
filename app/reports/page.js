@@ -146,6 +146,34 @@ export default async function ReportsPage() {
             Open Black Impact Score
           </Link>
         </div>
+        <div className="mt-4 flex flex-wrap gap-3 text-sm">
+          <Link href="/promises" className="accent-link">
+            Explore Promise Tracker data
+          </Link>
+        </div>
+      </section>
+
+      <section className="card-surface rounded-[1.6rem] p-5 mb-8">
+        <div className="flex items-start justify-between gap-4 flex-wrap">
+          <div className="max-w-3xl">
+            <h2 className="text-lg font-semibold mb-2">Adjacent Analysis Views</h2>
+            <p className="text-sm text-[var(--ink-soft)] leading-7">
+              Use reports for the quantitative overview, then move into the core record and comparison views
+              when you want to inspect the underlying material more directly.
+            </p>
+          </div>
+        </div>
+        <div className="mt-4 flex flex-wrap gap-3 text-sm">
+          <Link href="/policies" className="accent-link">
+            Browse policies
+          </Link>
+          <Link href="/timeline" className="accent-link">
+            Open timeline
+          </Link>
+          <Link href="/compare" className="accent-link">
+            Compare party views
+          </Link>
+        </div>
       </section>
 
       <ReportsDashboard

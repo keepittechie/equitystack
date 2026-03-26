@@ -7,16 +7,13 @@ import { usePathname } from "next/navigation";
 const NAV_LINKS = [
   { href: "/", label: "Home" },
   { href: "/start", label: "Start Here" },
-  { href: "/policies", label: "Policies" },
-  { href: "/timeline", label: "Timeline" },
   { href: "/explainers", label: "Explainers" },
-  { href: "/future-bills", label: "Future Bills" },
-  { href: "/scorecards", label: "Scorecards" },
+  { href: "/policies", label: "Policies" },
   { href: "/reports", label: "Reports" },
   { href: "/promises", label: "Promise Tracker" },
-  { href: "/activity", label: "Activity" },
-  { href: "/compare", label: "Compare" },
-  { href: "/methodology", label: "Methodology" },
+  { href: "/future-bills", label: "Future Bills" },
+  { href: "/scorecards", label: "Scorecards" },
+  { href: "/timeline", label: "Timeline" },
 ];
 
 function navClasses(pathname, href) {

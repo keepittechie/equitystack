@@ -313,6 +313,26 @@ export default function FutureBillsClient({ bills, focusId }) {
         <StatCard title="Bills With Timelines" value={historyCount} />
       </section>
 
+      <section className="card-surface rounded-[1.6rem] p-5">
+        <div className="flex items-start justify-between gap-4 flex-wrap">
+          <div className="max-w-3xl">
+            <h2 className="text-lg font-semibold mb-2">Accountability Connections</h2>
+            <p className="text-sm text-[var(--ink-soft)] leading-7">
+              Future Bills tracks the proposal layer. Use Scorecards to see which legislators are attached to
+              those bills, and Promise Tracker to connect presidential commitments to the broader accountability record.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-3 text-sm">
+            <Link href="/scorecards" className="accent-link">
+              Open Scorecards
+            </Link>
+            <Link href="/promises" className="accent-link">
+              Open Promise Tracker
+            </Link>
+          </div>
+        </div>
+      </section>
+
       <section className="card-surface rounded-[1.6rem] p-5 md:p-6 space-y-5">
         <div className="section-intro">
           <h2 className="text-2xl font-semibold">Browse Future Bills</h2>
