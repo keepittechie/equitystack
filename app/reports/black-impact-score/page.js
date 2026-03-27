@@ -3,12 +3,52 @@ import { ImpactBadge } from "@/app/components/policy-badges";
 import { fetchInternalJson } from "@/lib/api";
 import { REPORT_REVALIDATE_SECONDS, withRevalidate } from "@/lib/cache";
 import { getBlackImpactScoreMethodology } from "@/lib/black-impact-score/methodology.js";
+import { fetchPromiseTimelineRelationshipMap } from "@/lib/services/promiseService";
 import CopyShareLinkButton from "./CopyShareLinkButton";
 
 const REPORT_PATH = "/reports/black-impact-score";
 const DEFAULT_TITLE = "Black Impact Score Report";
 const DEFAULT_DESCRIPTION =
   "A data-driven report on presidential impact based on documented real-world outcomes affecting Black Americans.";
+
+function normalizeSearchParamEntries(value) {
+  const items = Array.isArray(value) ? value : value ? [value] : [];
+
+  return items
+    .flatMap((item) => String(item).split(","))
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function getViewFlags(searchParams = {}) {
+  return new Set(normalizeSearchParamEntries(searchParams.view));
+}
+
+function appendViewFlags(params, viewFlags) {
+  for (const viewFlag of [...viewFlags].sort()) {
+    params.append("view", viewFlag);
+  }
+}
+
+function buildReportHref({ viewFlags = [], mode, president, model }) {
+  const params = new URLSearchParams();
+  appendViewFlags(params, new Set(viewFlags));
+
+  if (mode === "debate") {
+    params.set("mode", "debate");
+  }
+
+  if (typeof president === "string" && president.trim()) {
+    params.set("president", president.trim());
+  }
+
+  if (model && model !== "outcome") {
+    params.set("model", model);
+  }
+
+  const query = params.toString();
+  return query ? `${REPORT_PATH}?${query}` : REPORT_PATH;
+}
 
 function formatPresidentSlug(slug) {
   if (!slug) {
@@ -24,10 +64,7 @@ function formatPresidentSlug(slug) {
 
 function buildMetadataUrl(searchParams = {}) {
   const params = new URLSearchParams();
-
-  if (searchParams.view === "public") {
-    params.set("view", "public");
-  }
+  appendViewFlags(params, new Set(searchParams.viewFlags || []));
 
   if (searchParams.mode === "debate") {
     params.set("mode", "debate");
@@ -35,6 +72,10 @@ function buildMetadataUrl(searchParams = {}) {
 
   if (typeof searchParams.president === "string" && searchParams.president.trim()) {
     params.set("president", searchParams.president.trim());
+  }
+
+  if (searchParams.model && searchParams.model !== "outcome") {
+    params.set("model", searchParams.model);
   }
 
   const query = params.toString();
@@ -43,10 +84,7 @@ function buildMetadataUrl(searchParams = {}) {
 
 function buildOgImageUrl(searchParams = {}) {
   const params = new URLSearchParams();
-
-  if (searchParams.view === "public") {
-    params.set("view", "public");
-  }
+  appendViewFlags(params, new Set(searchParams.viewFlags || []));
 
   if (searchParams.mode === "debate") {
     params.set("mode", "debate");
@@ -54,6 +92,10 @@ function buildOgImageUrl(searchParams = {}) {
 
   if (typeof searchParams.president === "string" && searchParams.president.trim()) {
     params.set("president", searchParams.president.trim());
+  }
+
+  if (searchParams.model && searchParams.model !== "outcome") {
+    params.set("model", searchParams.model);
   }
 
   const query = params.toString();
@@ -64,11 +106,17 @@ function buildOgImageUrl(searchParams = {}) {
 
 export async function generateMetadata({ searchParams }) {
   const resolvedSearchParams = (await searchParams) || {};
-  const isPublicView = resolvedSearchParams.view === "public";
+  const viewFlags = getViewFlags(resolvedSearchParams);
+  const isPublicView = viewFlags.has("public");
+  const isTimelineView = viewFlags.has("timeline");
   const isDebateMode = resolvedSearchParams.mode === "debate";
   const presidentSlug =
     typeof resolvedSearchParams.president === "string" ? resolvedSearchParams.president.trim() : "";
   const presidentName = formatPresidentSlug(presidentSlug);
+  const requestedModel =
+    resolvedSearchParams.model === "legacy" || resolvedSearchParams.model === "compare"
+      ? resolvedSearchParams.model
+      : "outcome";
 
   let title = DEFAULT_TITLE;
   let description = DEFAULT_DESCRIPTION;
@@ -87,6 +135,15 @@ export async function generateMetadata({ searchParams }) {
       "A shareable data-driven report on presidential impact based on documented real-world outcomes affecting Black Americans.";
   }
 
+  if (isTimelineView) {
+    title = presidentName
+      ? `${presidentName} Black Impact Score Timeline`
+      : "Black Impact Score Timeline";
+    description = presidentName
+      ? `A chronological view of Promise Tracker records and documented Black Impact Score context for ${presidentName}.`
+      : "A chronological view of Promise Tracker records and documented Black Impact Score context across presidents.";
+  }
+
   if (isDebateMode) {
     title = presidentName
       ? `${presidentName} Black Impact Score Debate View`
@@ -97,14 +154,16 @@ export async function generateMetadata({ searchParams }) {
   }
 
   const url = buildMetadataUrl({
-    view: isPublicView ? "public" : null,
+    viewFlags,
     mode: isDebateMode ? "debate" : null,
     president: presidentSlug || null,
+    model: requestedModel,
   });
   const imageUrl = buildOgImageUrl({
-    view: isPublicView ? "public" : null,
+    viewFlags,
     mode: isDebateMode ? "debate" : null,
     president: presidentSlug || null,
+    model: requestedModel,
   });
 
   return {
@@ -172,11 +231,28 @@ function getEffectiveScoringModel({ metadata, usingLegacyModel }) {
   return usingLegacyModel ? "legacy" : "outcome-based";
 }
 
-function getModelStatusLabel({ metadata, usingLegacyModel }) {
+function normalizeOutcomeMetadata(metadata) {
+  return {
+    total_promises: Number(metadata?.total_promises || 0),
+    total_outcomes: Number(metadata?.total_outcomes || 0),
+    total_loaded_promises: Number(metadata?.total_loaded_promises || 0),
+    total_loaded_outcomes: Number(metadata?.total_loaded_outcomes || 0),
+    scoring_model:
+      typeof metadata?.scoring_model === "string" && metadata.scoring_model.trim()
+        ? metadata.scoring_model.trim()
+        : "outcome-based-v1",
+  };
+}
+
+function getModelStatusLabel({ metadata, usingLegacyModel, isLegacyFallbackActive }) {
   const scoringModel = getEffectiveScoringModel({ metadata, usingLegacyModel });
 
-  if (usingLegacyModel) {
+  if (isLegacyFallbackActive) {
     return "Legacy fallback active";
+  }
+
+  if (usingLegacyModel) {
+    return "Legacy model";
   }
 
   if (scoringModel.toLowerCase().includes("outcome")) {
@@ -186,11 +262,15 @@ function getModelStatusLabel({ metadata, usingLegacyModel }) {
   return "Scoring model active";
 }
 
-function getScoreContextText({ metadata, usingLegacyModel }) {
+function getScoreContextText({ metadata, usingLegacyModel, isLegacyFallbackActive }) {
   const scoringModel = getEffectiveScoringModel({ metadata, usingLegacyModel });
 
+  if (isLegacyFallbackActive) {
+    return `Legacy promise-based fallback scoring is currently shown for this president (${scoringModel}).`;
+  }
+
   if (usingLegacyModel) {
-    return `Legacy promise-based scoring is currently shown for this president (${scoringModel}).`;
+    return `The ${scoringModel} methodology is currently shown for this president.`;
   }
 
   return `The ${scoringModel} methodology is currently shown for this president.`;
@@ -225,6 +305,18 @@ function formatSignedScore(value) {
   if (!Number.isFinite(numeric)) return String(value);
   const fixed = numeric.toFixed(2);
   return numeric > 0 ? `+${fixed}` : fixed;
+}
+
+function formatTimelineDate(value) {
+  if (!value) return "Date not available";
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return String(value);
+
+  return new Intl.DateTimeFormat("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  }).format(parsed);
 }
 
 function getTopAndBottomPresidents(presidents = []) {
@@ -625,7 +717,7 @@ function TopSummarySection({ presidents }) {
   );
 }
 
-function MethodologySection({ methodology, metadata, usingLegacyModel }) {
+function MethodologySection({ methodology, metadata, usingLegacyModel, isLegacyFallbackActive }) {
   const effectiveScoringModel = getEffectiveScoringModel({ metadata, usingLegacyModel });
   const usingOutcomeModel = isOutcomeScoringModel({ metadata, usingLegacyModel });
 
@@ -637,7 +729,9 @@ function MethodologySection({ methodology, metadata, usingLegacyModel }) {
           <p className="text-sm text-[var(--ink-soft)] leading-7">
             {usingOutcomeModel
               ? "Scores are based on documented real-world outcomes, not just promises or enacted laws. Each outcome is classified as positive, negative, mixed, or blocked, then weighted by evidence strength and available source support before president totals are aggregated."
-              : "Scores are currently using the legacy promise-based model. Records are summarized from editorial relevance, impact direction, and current promise status while the outcome-based model is unavailable."}
+              : isLegacyFallbackActive
+                ? "Scores are currently using the legacy promise-based fallback model. Records are summarized from editorial relevance, impact direction, and current promise status while the outcome-based model is unavailable."
+                : "Scores are currently using the legacy promise-based model. Records are summarized from editorial relevance, impact direction, and current promise status."}
           </p>
         </div>
         <a
@@ -677,7 +771,11 @@ function MethodologySection({ methodology, metadata, usingLegacyModel }) {
             <ScoreCard
               label="Scoring Model"
               value={effectiveScoringModel}
-              subtitle="Legacy promise-based scoring is currently active"
+              subtitle={
+                isLegacyFallbackActive
+                  ? "Legacy promise-based fallback scoring is currently active"
+                  : "Legacy promise-based scoring is currently active"
+              }
             />
             <ScoreCard
               label="Relevance Weights"
@@ -755,6 +853,156 @@ function VerificationSection() {
   );
 }
 
+function ViewToggleSection({ standardHref, timelineHref, isTimelineView }) {
+  return (
+    <section className="card-surface rounded-[1.6rem] p-5">
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div className="max-w-3xl">
+          <h2 className="text-lg font-semibold mb-2">View Mode</h2>
+          <p className="text-sm text-[var(--ink-soft)] leading-7">
+            Switch between the president summary report and the chronological timeline view without changing the underlying scoring model.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Link
+            href={standardHref}
+            className={`rounded-full border px-4 py-2 text-sm font-medium ${
+              !isTimelineView
+                ? "border-[rgba(120,53,15,0.2)] bg-[rgba(120,53,15,0.08)] text-[var(--ink)]"
+                : "border-[rgba(120,53,15,0.12)] bg-white/80 text-[var(--ink-soft)] hover:text-[var(--accent)]"
+            }`}
+          >
+            Report View
+          </Link>
+          <Link
+            href={timelineHref}
+            className={`rounded-full border px-4 py-2 text-sm font-medium ${
+              isTimelineView
+                ? "border-[rgba(120,53,15,0.2)] bg-[rgba(120,53,15,0.08)] text-[var(--ink)]"
+                : "border-[rgba(120,53,15,0.12)] bg-white/80 text-[var(--ink-soft)] hover:text-[var(--accent)]"
+            }`}
+          >
+            Timeline View
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function TimelineModeSection({ entries, isPublicView, effectiveScoringModel }) {
+  return (
+    <section className="card-surface rounded-[1.6rem] p-5">
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div className="max-w-3xl">
+          <h2 className="text-lg font-semibold mb-2">Timeline Mode</h2>
+          <p className="text-sm text-[var(--ink-soft)] leading-7">
+            This chronological view reuses the current report&apos;s scoring results and adds simple relationship cues where Promise Tracker records are directly connected.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <MetaPill>{entries.length} entries</MetaPill>
+          <MetaPill>{effectiveScoringModel}</MetaPill>
+        </div>
+      </div>
+
+      {entries.length === 0 ? (
+        <div className="card-muted rounded-[1.25rem] p-5 mt-5">
+          <p className="text-sm text-[var(--ink-soft)]">
+            No timeline entries are available for the current filters.
+          </p>
+        </div>
+      ) : (
+        <div className="mt-5 max-h-[70vh] overflow-y-auto pr-1">
+          <div className="space-y-4">
+            {entries.map((entry, index) => {
+              const previousEntry = index > 0 ? entries[index - 1] : null;
+              const showPresidentDivider =
+                !previousEntry || previousEntry.president_slug !== entry.president_slug;
+
+              return (
+                <article
+                  key={entry.slug || entry.id || `${entry.title}-${index}`}
+                  className={`relative rounded-[1.35rem] border bg-white/90 p-5 md:p-6 ${
+                    entry.impact_direction === "Mixed"
+                      ? "border-[rgba(180,83,9,0.14)] bg-[linear-gradient(180deg,rgba(255,251,235,0.9),rgba(255,255,255,0.98))]"
+                      : "border-[rgba(120,53,15,0.1)]"
+                  }`}
+                >
+                  {showPresidentDivider ? (
+                    <div className="mb-4 flex items-center gap-3 flex-wrap">
+                      <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">
+                        {entry.president || "President not available"}
+                      </p>
+                      {entry.president_party ? <MetaPill>{entry.president_party}</MetaPill> : null}
+                    </div>
+                  ) : null}
+
+                  <div className="grid gap-4 md:grid-cols-[160px,minmax(0,1fr)] md:gap-6">
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">
+                        {formatTimelineDate(entry.promise_date)}
+                      </p>
+                      <p className="text-sm text-[var(--ink-soft)] mt-2">
+                        President score: {formatNormalizedScore(entry.normalized_president_score ?? 0)}
+                      </p>
+                      {entry.impact_direction ? (
+                        <div className="mt-3">
+                          <ImpactBadge impact={entry.impact_direction} />
+                        </div>
+                      ) : null}
+                    </div>
+
+                    <div>
+                      <div className="flex items-start justify-between gap-3 flex-wrap">
+                        <div className="max-w-3xl">
+                          <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">
+                            {entry.topic || "Promise Tracker record"}
+                          </p>
+                          {entry.slug && !isPublicView ? (
+                            <Link href={`/promises/${entry.slug}`} className="accent-link text-xl font-semibold mt-2 inline-block">
+                              {entry.title}
+                            </Link>
+                          ) : (
+                            <h3 className="text-xl font-semibold mt-2">{entry.title}</h3>
+                          )}
+                        </div>
+                        <MetaPill>{formatSignedScore(entry.total_score)}</MetaPill>
+                      </div>
+
+                      <p className="text-sm text-[var(--ink-soft)] mt-4 leading-7">
+                        {entry.explanation_summary || "No explanation is available for this record yet."}
+                      </p>
+
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        {entry.status ? <MetaPill>{entry.status}</MetaPill> : null}
+                        {entry.outcome_count ? <MetaPill>{entry.outcome_count} outcomes</MetaPill> : null}
+                      </div>
+
+                      {entry.lead?.promise ? (
+                        <div className="mt-5 rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-[rgba(255,252,247,0.92)] px-4 py-3 text-sm text-[var(--ink-soft)]">
+                          <span className="font-medium text-[var(--ink)]">Leads to → </span>
+                          {entry.lead.promise.slug && !isPublicView ? (
+                            <Link href={`/promises/${entry.lead.promise.slug}`} className="accent-link">
+                              {entry.lead.promise.title}
+                            </Link>
+                          ) : (
+                            <span className="text-[var(--ink)]">{entry.lead.promise.title}</span>
+                          )}
+                        </div>
+                      ) : null}
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}
+
 function normalizeOutcomePresident(president) {
   return {
     president: president.president,
@@ -794,9 +1042,118 @@ function normalizeLegacyPresident(president) {
   };
 }
 
+function normalizeOutcomeRecord(record) {
+  return {
+    id: record.id,
+    slug: record.slug || null,
+    title: record.title || "Untitled promise",
+    topic: record.topic || null,
+    status: record.status || null,
+    president: record.president || null,
+    president_slug: record.president_slug || null,
+    president_party: record.president_party || null,
+    promise_date: record.promise_date || null,
+    total_score: Number(record.total_score || 0),
+    outcome_count: Number(record.outcome_count || 0),
+    explanation_summary: record.explanation_summary || null,
+    scored_outcomes: record.scored_outcomes || [],
+    impact_direction: getPrimaryImpactDirection(record),
+  };
+}
+
+function normalizeLegacyRecord(record) {
+  return {
+    id: record.id,
+    slug: record.slug || null,
+    title: record.title || "Untitled promise",
+    topic: record.topic || null,
+    status: record.status || null,
+    president: record.president || null,
+    president_slug: record.president_slug || null,
+    president_party: record.president_party || null,
+    promise_date: record.promise_date || null,
+    total_score: Number(record.raw_score || 0),
+    outcome_count: 0,
+    explanation_summary: record.summary || null,
+    scored_outcomes: [],
+    impact_direction:
+      record.scoring_impact_direction === "Blocked/Unrealized" ||
+      record.impact_direction_for_curation === "Blocked/Unrealized"
+        ? "Blocked"
+        : record.scoring_impact_direction ||
+          record.impact_direction_for_curation ||
+          null,
+  };
+}
+
+function compareTimelineEntries(left, right) {
+  const leftDate = left?.promise_date ? new Date(left.promise_date).getTime() : Number.NaN;
+  const rightDate = right?.promise_date ? new Date(right.promise_date).getTime() : Number.NaN;
+
+  if (!Number.isNaN(leftDate) && !Number.isNaN(rightDate) && leftDate !== rightDate) {
+    return leftDate - rightDate;
+  }
+
+  if (!Number.isNaN(leftDate) && Number.isNaN(rightDate)) {
+    return -1;
+  }
+
+  if (Number.isNaN(leftDate) && !Number.isNaN(rightDate)) {
+    return 1;
+  }
+
+  return String(left?.title || "").localeCompare(String(right?.title || ""));
+}
+
+function pickTimelineLead(record, relationshipMap, visiblePromiseIds) {
+  const relationships = relationshipMap.get(record.id) || [];
+  const visibleRelationships = relationships.filter((item) =>
+    visiblePromiseIds.has(item.promise.id)
+  );
+
+  if (!visibleRelationships.length) {
+    return null;
+  }
+
+  const preferredRelationship =
+    visibleRelationships.find((item) => item.relationship_type === "followed_by") ||
+    visibleRelationships.find((item) => item.relationship_type === "builds_on") ||
+    null;
+
+  if (!preferredRelationship) {
+    return null;
+  }
+
+  return {
+    relationship_type: preferredRelationship.relationship_type,
+    promise: preferredRelationship.promise,
+  };
+}
+
+function buildTimelineEntries({ records, presidents, relationshipMap }) {
+  const presidentScores = new Map(
+    presidents.map((president) => [president.president_slug, president.normalized_score])
+  );
+  const visiblePromiseIds = new Set(
+    records
+      .map((record) => Number(record.id))
+      .filter((value) => Number.isInteger(value) && value > 0)
+  );
+
+  return [...records]
+    .sort(compareTimelineEntries)
+    .map((record) => ({
+      ...record,
+      normalized_president_score: presidentScores.get(record.president_slug) ?? null,
+      lead: pickTimelineLead(record, relationshipMap, visiblePromiseIds),
+    }));
+}
+
 export default async function BlackImpactScorePage({ searchParams }) {
   const resolvedSearchParams = (await searchParams) || {};
-  const isPublicView = resolvedSearchParams.view === "public";
+  const viewFlags = getViewFlags(resolvedSearchParams);
+  const isPublicView = viewFlags.has("public");
+  const isTimelineView = viewFlags.has("timeline");
   const isDebateMode = resolvedSearchParams.mode === "debate";
   const requestedPresidentSlug =
     typeof resolvedSearchParams.president === "string" ? resolvedSearchParams.president : null;
@@ -805,13 +1162,13 @@ export default async function BlackImpactScorePage({ searchParams }) {
       ? resolvedSearchParams.model
       : "outcome";
   const data = await getBlackImpactScores(requestedModel);
-  const isLegacyFallback = data.notice === "Outcome-based scoring is temporarily unavailable";
   const comparisonMode = data.model === "compare";
   const publicOutcomeMethodology = getBlackImpactScoreMethodology();
 
   let methodology = null;
   let presidents = [];
   let metadata = null;
+  let records = [];
   let usingLegacyModel = false;
 
   if (comparisonMode) {
@@ -819,52 +1176,91 @@ export default async function BlackImpactScorePage({ searchParams }) {
       usingLegacyModel = true;
       methodology = data.legacy?.methodology || null;
       presidents = (data.legacy?.items || []).map(normalizeLegacyPresident);
+      records = (data.legacy?.records || []).map(normalizeLegacyRecord);
     } else {
       methodology = data.outcome?.methodology || null;
       presidents = (data.outcome?.items || []).map(normalizeOutcomePresident);
-      metadata = data.outcome?.metadata || null;
+      metadata = normalizeOutcomeMetadata(data.outcome?.metadata);
+      records = (data.outcome?.records || []).map(normalizeOutcomeRecord);
     }
   } else if (data.model === "legacy") {
     usingLegacyModel = true;
     methodology = data.methodology || null;
     presidents = (data.items || []).map(normalizeLegacyPresident);
+    records = (data.records || []).map(normalizeLegacyRecord);
   } else {
     methodology = data.methodology || publicOutcomeMethodology;
     presidents = (data.items || []).map(normalizeOutcomePresident);
-    metadata = data.metadata || null;
+    metadata = normalizeOutcomeMetadata(data.metadata);
+    records = (data.records || []).map(normalizeOutcomeRecord);
   }
 
   if (requestedPresidentSlug) {
     presidents = presidents.filter((president) => president.president_slug === requestedPresidentSlug);
+    records = records.filter((record) => record.president_slug === requestedPresidentSlug);
   }
 
   const effectiveScoringModel = getEffectiveScoringModel({ metadata, usingLegacyModel });
   const usingOutcomeModel = isOutcomeScoringModel({ metadata, usingLegacyModel });
+  const isLegacyFallbackActive = usingLegacyModel && requestedModel !== "legacy";
+  const timelineRelationshipMap =
+    isTimelineView && records.length
+      ? await fetchPromiseTimelineRelationshipMap(records.map((record) => record.id))
+      : new Map();
+  const timelineEntries = isTimelineView
+    ? buildTimelineEntries({
+        records,
+        presidents,
+        relationshipMap: timelineRelationshipMap,
+      })
+    : [];
   const methodologyBadgeLabel =
-    usingLegacyModel || effectiveScoringModel === "legacy"
+    isLegacyFallbackActive
       ? "Methodology: Legacy (Fallback)"
       : `Methodology: ${effectiveScoringModel}`;
   const methodologyBadgeDescription =
-    usingLegacyModel || effectiveScoringModel === "legacy"
+    isLegacyFallbackActive
       ? "Scores are temporarily using the legacy promise-based fallback model."
+      : usingLegacyModel || effectiveScoringModel === "legacy"
+        ? "Scores are currently using the legacy promise-based model."
       : `Scores are based on documented real-world outcomes using ${effectiveScoringModel}.`;
   const evidenceBadgeDescription =
-    usingLegacyModel || effectiveScoringModel === "legacy"
+    isLegacyFallbackActive
       ? "Legacy fallback is active while outcome-based evidence weighting is unavailable."
+      : usingLegacyModel || effectiveScoringModel === "legacy"
+        ? "Legacy scoring uses Promise Tracker relevance and impact curation."
       : "Scores incorporate evidence strength and source-backed outcomes.";
-  const shareQuery = new URLSearchParams();
-  shareQuery.set("view", "public");
-  if (isDebateMode) {
-    shareQuery.set("mode", "debate");
-  }
-  if (requestedModel !== "outcome") {
-    shareQuery.set("model", requestedModel);
-  }
-  if (requestedPresidentSlug) {
-    shareQuery.set("president", requestedPresidentSlug);
-  }
-  const shareUrl = `/reports/black-impact-score?${shareQuery.toString()}`;
-  const modelStatusLabel = getModelStatusLabel({ metadata, usingLegacyModel });
+  const shareViewFlags = new Set(viewFlags);
+  shareViewFlags.add("public");
+  const shareUrl = buildReportHref({
+    viewFlags: shareViewFlags,
+    mode: isDebateMode ? "debate" : null,
+    president: requestedPresidentSlug,
+    model: requestedModel,
+  });
+  const modelStatusLabel = getModelStatusLabel({
+    metadata,
+    usingLegacyModel,
+    isLegacyFallbackActive,
+  });
+  const standardReportHref = buildReportHref({
+    viewFlags: [...viewFlags].filter((flag) => flag !== "timeline"),
+    mode: isDebateMode ? "debate" : null,
+    president: requestedPresidentSlug,
+    model: requestedModel,
+  });
+  const timelineReportHref = buildReportHref({
+    viewFlags: new Set([...viewFlags].filter((flag) => flag !== "timeline").concat("timeline")),
+    mode: isDebateMode ? "debate" : null,
+    president: requestedPresidentSlug,
+    model: requestedModel,
+  });
+  const compareHref = buildReportHref({
+    viewFlags,
+    mode: isDebateMode ? "debate" : null,
+    president: requestedPresidentSlug,
+    model: "compare",
+  });
 
   return (
     <main className={`max-w-7xl mx-auto ${isPublicView ? "px-6 py-10 space-y-10" : "p-6 space-y-8"}`}>
@@ -883,7 +1279,7 @@ export default async function BlackImpactScorePage({ searchParams }) {
             Back to Reports
           </Link>
           <Link
-            href="/reports/black-impact-score?model=compare"
+            href={compareHref}
             className="inline-flex items-center rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
           >
             Compare with previous model
@@ -918,7 +1314,13 @@ export default async function BlackImpactScorePage({ searchParams }) {
         </div>
       </section>
 
-      {isLegacyFallback ? (
+      <ViewToggleSection
+        standardHref={standardReportHref}
+        timelineHref={timelineReportHref}
+        isTimelineView={isTimelineView}
+      />
+
+      {isLegacyFallbackActive ? (
         <section className="card-surface rounded-[1.6rem] p-5 border border-[rgba(120,53,15,0.12)]">
           <h2 className="text-lg font-semibold">Outcome-Based Scoring Is Temporarily Unavailable</h2>
           <p className="text-sm text-[var(--ink-soft)] leading-7 mt-2">
@@ -933,6 +1335,7 @@ export default async function BlackImpactScorePage({ searchParams }) {
         methodology={methodology}
         metadata={metadata}
         usingLegacyModel={usingLegacyModel}
+        isLegacyFallbackActive={isLegacyFallbackActive}
       />
 
       {usingOutcomeModel ? (
@@ -1010,13 +1413,19 @@ export default async function BlackImpactScorePage({ searchParams }) {
         </details>
       </section>
 
-      {presidents.length === 0 ? (
+      {presidents.length === 0 && !isTimelineView ? (
         <section className="card-surface rounded-[1.6rem] p-8 text-center">
           <h2 className="text-xl font-semibold">No Black Impact Score data is available yet.</h2>
           <p className="text-[var(--ink-soft)] mt-3">
             President-level score summaries will appear here once Promise Tracker score data is available.
           </p>
         </section>
+      ) : isTimelineView ? (
+        <TimelineModeSection
+          entries={timelineEntries}
+          isPublicView={isPublicView}
+          effectiveScoringModel={effectiveScoringModel}
+        />
       ) : (
         <div className="space-y-8">
           {presidents.map((president) => (
@@ -1078,7 +1487,11 @@ export default async function BlackImpactScorePage({ searchParams }) {
                 <div className="card-muted rounded-[1.25rem] p-4">
                   <h3 className="text-lg font-semibold">Score Context</h3>
                   <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
-                    {getScoreContextText({ metadata, usingLegacyModel })}
+                    {getScoreContextText({
+                      metadata,
+                      usingLegacyModel,
+                      isLegacyFallbackActive,
+                    })}
                   </p>
                   {effectiveScoringModel ? (
                     <div className="mt-3 flex flex-wrap gap-2">
