@@ -6,6 +6,7 @@ import {
   PromiseStatusBadge,
   ImpactBadge,
 } from "@/app/components/policy-badges";
+import SourceDisclosure from "@/app/components/SourceDisclosure";
 import { fetchInternalJson } from "@/lib/api";
 import { PUBLIC_REVALIDATE_SECONDS, withRevalidate } from "@/lib/cache";
 import { buildPageMetadata } from "@/lib/metadata";
@@ -118,6 +119,162 @@ function getMixedImpactSummary(promise) {
   };
 }
 
+function formatRelationshipLabel(relationshipType, direction) {
+  if (direction === "incoming") {
+    if (relationshipType === "builds_on") {
+      return "Built on by this record";
+    }
+
+    if (relationshipType === "followed_by") {
+      return "Earlier related record";
+    }
+
+    if (relationshipType === "limited_by") {
+      return "Limits this record";
+    }
+  }
+
+  if (relationshipType === "builds_on") {
+    return "Builds on this context";
+  }
+
+  if (relationshipType === "followed_by") {
+    return "Followed by";
+  }
+
+  if (relationshipType === "limited_by") {
+    return "Limited by later record";
+  }
+
+  return relationshipType;
+}
+
+function getRelationshipPriority(relationshipType, direction) {
+  if (direction === "incoming") {
+    if (relationshipType === "builds_on") return 0;
+    if (relationshipType === "followed_by") return 1;
+    return 2;
+  }
+
+  if (relationshipType === "followed_by") return 0;
+  if (relationshipType === "builds_on") return 1;
+  return 2;
+}
+
+function toDateValue(value) {
+  if (!value) return Number.NaN;
+
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? Number.NaN : date.getTime();
+}
+
+function selectContextNavRecord(items = [], direction) {
+  const candidates = items.filter(
+    (item) =>
+      item.relationship_type === "builds_on" ||
+      item.relationship_type === "followed_by"
+  );
+
+  if (!candidates.length) {
+    return null;
+  }
+
+  const sorted = [...candidates].sort((a, b) => {
+    const aDate = toDateValue(a.promise.promise_date);
+    const bDate = toDateValue(b.promise.promise_date);
+
+    if (!Number.isNaN(aDate) && !Number.isNaN(bDate) && aDate !== bDate) {
+      return direction === "incoming" ? bDate - aDate : aDate - bDate;
+    }
+
+    const priorityDiff =
+      getRelationshipPriority(a.relationship_type, direction) -
+      getRelationshipPriority(b.relationship_type, direction);
+    if (priorityDiff !== 0) {
+      return priorityDiff;
+    }
+
+    return a.promise.title.localeCompare(b.promise.title);
+  });
+
+  return sorted[0];
+}
+
+function ContextNavCard({ href, label, title, align = "left" }) {
+  const alignmentClass = align === "right" ? "md:text-right md:items-end" : "md:items-start";
+
+  return (
+    <Link
+      href={href}
+      className={`panel-link flex min-h-[96px] flex-col justify-between rounded-[1.2rem] p-4 ${alignmentClass}`}
+      aria-label={`${label} record: ${title}`}
+    >
+      <p className="text-xs uppercase tracking-[0.14em] text-[var(--ink-soft)]">
+        {label === "Previous" ? "\u2190 Previous" : "Next \u2192"}
+      </p>
+      <p className="mt-3 text-sm font-medium leading-6 text-[var(--ink)]">{title}</p>
+    </Link>
+  );
+}
+
+function ContextNav({ previousRecord, nextRecord }) {
+  if (!previousRecord && !nextRecord) {
+    return null;
+  }
+
+  return (
+    <nav
+      aria-label="Context navigation"
+      className="mb-6 grid gap-3 md:grid-cols-2"
+    >
+      {previousRecord ? (
+        <ContextNavCard
+          href={`/promises/${previousRecord.promise.slug}`}
+          label="Previous"
+          title={previousRecord.promise.title}
+        />
+      ) : (
+        <div className="hidden md:block" aria-hidden="true" />
+      )}
+
+      {nextRecord ? (
+        <ContextNavCard
+          href={`/promises/${nextRecord.promise.slug}`}
+          label="Next"
+          title={nextRecord.promise.title}
+          align="right"
+        />
+      ) : (
+        <div className="hidden md:block" aria-hidden="true" />
+      )}
+    </nav>
+  );
+}
+
+function RelationshipList({ items = [], direction }) {
+  if (!items.length) {
+    return null;
+  }
+
+  return (
+    <ul className="space-y-3">
+      {items.map((item) => (
+        <li key={`${item.relationship_type}-${item.promise.id}`}>
+          <Link
+            href={`/promises/${item.promise.slug}`}
+            className="panel-link block rounded-[1.15rem] p-4"
+          >
+            <p className="font-medium leading-6">{item.promise.title}</p>
+            <p className="mt-2 text-xs uppercase tracking-[0.14em] text-[var(--ink-soft)]">
+              {formatRelationshipLabel(item.relationship_type, direction)}
+            </p>
+          </Link>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export default async function PromiseDetailPage({ params }) {
   const { slug } = await params;
   const promise = await getPromise(slug);
@@ -128,6 +285,14 @@ export default async function PromiseDetailPage({ params }) {
 
   const mixedImpactSummary =
     promise.impact_direction_for_curation === "Mixed" ? getMixedImpactSummary(promise) : null;
+  const hasHistoricalContext =
+    (promise.related_from_promises?.length || 0) > 0 ||
+    (promise.related_to_promises?.length || 0) > 0;
+  const previousRecord = selectContextNavRecord(
+    promise.related_from_promises,
+    "incoming"
+  );
+  const nextRecord = selectContextNavRecord(promise.related_to_promises, "outgoing");
 
   return (
     <main className="max-w-7xl mx-auto p-6">
@@ -173,6 +338,8 @@ export default async function PromiseDetailPage({ params }) {
           </div>
         </div>
       </section>
+
+      <ContextNav previousRecord={previousRecord} nextRecord={nextRecord} />
 
       {mixedImpactSummary ? (
         <section className="card-surface rounded-[1.6rem] p-5 mb-6 border-[rgba(180,83,9,0.12)] bg-[linear-gradient(180deg,rgba(255,251,235,0.9),rgba(255,255,255,0.98))]">
@@ -273,29 +440,10 @@ export default async function PromiseDetailPage({ params }) {
                       ) : null}
                     </div>
 
-                    {action.sources?.length ? (
-                      <div className="mt-4 space-y-2">
-                        <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">
-                          Sources
-                        </p>
-                        {action.sources.map((source) => (
-                          <div key={source.id} className="border rounded-xl p-3 bg-[rgba(255,252,247,0.8)]">
-                            <p className="font-medium text-sm">{source.source_title}</p>
-                            <p className="text-xs text-[var(--ink-soft)] mt-1">
-                              {source.publisher || "Unknown publisher"} • {source.source_type}
-                            </p>
-                            <a
-                              href={source.source_url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-xs accent-link mt-2 inline-block"
-                            >
-                              Open source
-                            </a>
-                          </div>
-                        ))}
-                      </div>
-                    ) : null}
+                    <SourceDisclosure
+                      label="Action Sources"
+                      sources={action.action_sources}
+                    />
                   </div>
                 ))
               ) : (
@@ -343,29 +491,10 @@ export default async function PromiseDetailPage({ params }) {
                       <strong>Evidence strength:</strong> {outcome.evidence_strength}
                     </p>
 
-                    {outcome.sources?.length ? (
-                      <div className="mt-4 space-y-2">
-                        <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">
-                          Sources
-                        </p>
-                        {outcome.sources.map((source) => (
-                          <div key={source.id} className="border rounded-xl p-3 bg-[rgba(255,252,247,0.8)]">
-                            <p className="font-medium text-sm">{source.source_title}</p>
-                            <p className="text-xs text-[var(--ink-soft)] mt-1">
-                              {source.publisher || "Unknown publisher"} • {source.source_type}
-                            </p>
-                            <a
-                              href={source.source_url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-xs accent-link mt-2 inline-block"
-                            >
-                              Open source
-                            </a>
-                          </div>
-                        ))}
-                      </div>
-                    ) : null}
+                    <SourceDisclosure
+                      label="Outcome Sources"
+                      sources={outcome.outcome_sources}
+                    />
                   </div>
                 ))
               ) : (
@@ -374,39 +503,6 @@ export default async function PromiseDetailPage({ params }) {
             </div>
           </section>
 
-          <section className="card-surface rounded-[1.6rem] p-5">
-            <h2 className="text-xl font-semibold mb-3">Promise Sources</h2>
-            {promise.promise_sources?.length ? (
-              <div className="space-y-3">
-                {promise.promise_sources.map((source) => (
-                  <div key={source.id} className="card-muted rounded-[1.25rem] p-4">
-                    <div className="flex items-center justify-between gap-3 flex-wrap">
-                      <div>
-                        <p className="font-semibold">{source.source_title}</p>
-                        <p className="text-sm text-[var(--ink-soft)] mt-1">
-                          {source.publisher || "Unknown publisher"} • {source.source_type}
-                          {source.published_date ? ` • ${formatDate(source.published_date)}` : ""}
-                        </p>
-                      </div>
-                    </div>
-                    {source.notes ? (
-                      <p className="mt-3 text-sm text-[var(--ink-soft)]">{source.notes}</p>
-                    ) : null}
-                    <a
-                      href={source.source_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm accent-link mt-3 inline-block"
-                    >
-                      Open source
-                    </a>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-[var(--ink-soft)]">No promise-level sources are linked to this record yet.</p>
-            )}
-          </section>
         </div>
 
         <aside className="space-y-6">
@@ -430,17 +526,46 @@ export default async function PromiseDetailPage({ params }) {
               <MiniStat label="Actions" value={promise.actions?.length || 0} />
               <MiniStat label="Outcomes" value={promise.outcomes?.length || 0} />
               <MiniStat
-                label="Distinct Sources"
-                value={promise.source_summary?.total_sources || 0}
-                subtitle="Deduplicated across promise, action, and outcome links."
+                label="Source Links"
+                value={
+                  (promise.source_summary?.action_sources || 0) +
+                  (promise.source_summary?.outcome_sources || 0)
+                }
+                subtitle="Visible links attached to action and outcome records."
               />
             </div>
             <div className="mt-4 text-xs text-[var(--ink-soft)] space-y-1">
-              <p>Promise links: {promise.source_summary?.promise_sources || 0}</p>
-              <p>Action links: {promise.source_summary?.action_sources || 0}</p>
-              <p>Outcome links: {promise.source_summary?.outcome_sources || 0}</p>
+              <p>Action source links: {promise.source_summary?.action_sources || 0}</p>
+              <p>Outcome source links: {promise.source_summary?.outcome_sources || 0}</p>
             </div>
           </section>
+
+          {hasHistoricalContext ? (
+            <section className="card-surface rounded-[1.6rem] p-5">
+              <h2 className="text-lg font-semibold mb-3">Historical Context</h2>
+              <p className="text-sm text-[var(--ink-soft)] leading-7">
+                These links show how this record connects to other federal posture records in the tracker.
+              </p>
+
+              {promise.related_from_promises?.length ? (
+                <div className="mt-4">
+                  <h3 className="text-xs uppercase tracking-[0.16em] text-[var(--accent)] mb-3">
+                    Builds on / Comes from
+                  </h3>
+                  <RelationshipList items={promise.related_from_promises} direction="incoming" />
+                </div>
+              ) : null}
+
+              {promise.related_to_promises?.length ? (
+                <div className="mt-4">
+                  <h3 className="text-xs uppercase tracking-[0.16em] text-[var(--accent)] mb-3">
+                    Leads to / Followed by
+                  </h3>
+                  <RelationshipList items={promise.related_to_promises} direction="outgoing" />
+                </div>
+              ) : null}
+            </section>
+          ) : null}
 
           <section className="card-surface rounded-[1.6rem] p-5">
             <h2 className="text-lg font-semibold mb-3">Related Policies</h2>
