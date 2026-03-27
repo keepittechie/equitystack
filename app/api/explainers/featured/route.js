@@ -16,7 +16,7 @@ export async function GET() {
       FROM explainers
       WHERE published = 1
       ORDER BY created_at DESC, title ASC
-      LIMIT 3
+      LIMIT 4
     `);
 
     return NextResponse.json(rows);

@@ -449,6 +449,13 @@ export default async function HomePage() {
               Scorecards surface which legislators are attached to the tracked reform layer.
             </p>
           </div>
+          <div className="panel-link rounded-[1.4rem] p-5">
+            <h3 className="text-lg font-semibold">6. Follow the Sources</h3>
+            <p className="text-sm text-[var(--ink-soft)] mt-2">
+              Linked source trails let you inspect the documents behind each interpretation,
+              timeline entry, and accountability claim.
+            </p>
+          </div>
         </div>
       </section>
 
