@@ -169,7 +169,8 @@ function buildOgImageUrl(searchParams = {}) {
 export async function generateMetadata({ searchParams }) {
   const resolvedSearchParams = (await searchParams) || {};
   const viewFlags = getViewFlags(resolvedSearchParams);
-  const isPublicView = viewFlags.has("public");
+  const isPublicShareView = viewFlags.has("public-share");
+  const isPublicView = viewFlags.has("public") || isPublicShareView;
   const isTimelineView = viewFlags.has("timeline");
   const isTopicCompareView = viewFlags.has("topic-compare");
   const isPresidentCompareView = viewFlags.has("president-compare");
@@ -205,6 +206,15 @@ export async function generateMetadata({ searchParams }) {
     title = "Black Impact Score Public Report";
     description =
       "A shareable data-driven report on presidential impact based on documented real-world outcomes affecting Black Americans.";
+  }
+
+  if (isPublicShareView) {
+    title = presidentName
+      ? `${presidentName} Black Impact Score Share View`
+      : "Black Impact Score Share View";
+    description = presidentName
+      ? `A public share view of ${presidentName}'s Black Impact Score with visible drivers and verification context.`
+      : "A public share view of the Black Impact Score with visible drivers and verification context.";
   }
 
   if (isTimelineView) {
@@ -248,6 +258,17 @@ export async function generateMetadata({ searchParams }) {
     description = presidentName
       ? `A debate-oriented view of ${presidentName}'s strongest Black Impact Score drivers using documented outcomes and source-backed records.`
       : "A debate-oriented view of the Black Impact Score highlighting the strongest documented score drivers and source-backed records.";
+  }
+
+  if (isPublicShareView) {
+    title = presidentName
+      ? `${presidentName} Black Impact Score Share View`
+      : topicParam
+        ? `Black Impact Score Share View · ${formatTopicParam(topicParam)}`
+        : "Black Impact Score Share View";
+    description = isDebateMode
+      ? "A public share view of the Black Impact Score with visible drivers, verification context, and debate-ready evidence trails."
+      : "A public share view of the Black Impact Score with visible drivers and verification context.";
   }
 
   const url = buildMetadataUrl({
@@ -1048,6 +1069,43 @@ function ShareHeader({ shareUrl }) {
   );
 }
 
+function SourceAwareShareHeader({
+  shareUrl,
+  selectedTopic,
+  effectiveScoringModel,
+  isLegacyFallbackActive,
+  usingLegacyModel,
+}) {
+  const modeLabel = isLegacyFallbackActive
+    ? "Legacy fallback"
+    : usingLegacyModel
+      ? "Legacy"
+      : "Outcome-based";
+
+  return (
+    <section className="card-surface rounded-[1.6rem] p-6">
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div className="max-w-3xl">
+          <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Source-Aware Share View</p>
+          <h2 className="text-2xl font-semibold mt-2">Black Impact Score</h2>
+          <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
+            This shared view highlights the visible score context, strongest available drivers, and the quickest path to verification.
+          </p>
+        </div>
+        <CopyShareLinkButton path={shareUrl} />
+      </div>
+      <div className="mt-4 flex flex-wrap gap-2">
+        {selectedTopic ? <MetaPill>Topic: {selectedTopic.label}</MetaPill> : null}
+        <MetaPill>{effectiveScoringModel}</MetaPill>
+        <MetaPill>{modeLabel}</MetaPill>
+      </div>
+      <div className="mt-4 rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 px-4 py-3 text-sm text-[var(--ink-soft)] break-all">
+        {shareUrl}
+      </div>
+    </section>
+  );
+}
+
 function DebateModeHeader() {
   return (
     <section className="card-surface rounded-[1.6rem] p-6">
@@ -1078,6 +1136,124 @@ function VerificationSection() {
         <li>Review supporting sources.</li>
         <li>Compare the record against the methodology section.</li>
       </ul>
+    </section>
+  );
+}
+
+function ShareVerificationSection() {
+  return (
+    <section className="card-surface rounded-[1.6rem] p-5">
+      <h2 className="text-lg font-semibold">How to verify this view</h2>
+      <ul className="mt-3 space-y-2 text-sm text-[var(--ink-soft)] leading-7">
+        <li>Review the linked Promise Tracker record.</li>
+        <li>Check the documented outcomes attached to that record.</li>
+        <li>Review the supporting sources on the record page.</li>
+        <li>Compare the record against the methodology section.</li>
+      </ul>
+    </section>
+  );
+}
+
+function collectShareEvidenceItems({
+  presidents,
+  selectedPresidentA,
+  selectedPresidentB,
+  isPresidentCompareView,
+}) {
+  if (isPresidentCompareView) {
+    return [
+      {
+        key: "president-a-positive",
+        label: selectedPresidentA ? `${selectedPresidentA.president} strongest positive driver` : "President A strongest positive driver",
+        promise: selectedPresidentA?.top_positive_promises?.[0] || null,
+      },
+      {
+        key: "president-a-negative",
+        label: selectedPresidentA ? `${selectedPresidentA.president} strongest negative driver` : "President A strongest negative driver",
+        promise: selectedPresidentA?.top_negative_promises?.[0] || null,
+      },
+      {
+        key: "president-b-positive",
+        label: selectedPresidentB ? `${selectedPresidentB.president} strongest positive driver` : "President B strongest positive driver",
+        promise: selectedPresidentB?.top_positive_promises?.[0] || null,
+      },
+      {
+        key: "president-b-negative",
+        label: selectedPresidentB ? `${selectedPresidentB.president} strongest negative driver` : "President B strongest negative driver",
+        promise: selectedPresidentB?.top_negative_promises?.[0] || null,
+      },
+    ].filter((item) => item.promise);
+  }
+
+  const strongestPositive = presidents
+    .flatMap((president) => president.top_positive_promises?.[0] || [])
+    .filter(Boolean)
+    .sort((left, right) => Number(right.total_score || 0) - Number(left.total_score || 0))[0] || null;
+  const strongestNegative = presidents
+    .flatMap((president) => president.top_negative_promises?.[0] || [])
+    .filter(Boolean)
+    .sort((left, right) => Number(left.total_score || 0) - Number(right.total_score || 0))[0] || null;
+
+  return [
+    {
+      key: "strongest-positive",
+      label: "Strongest positive driver",
+      promise: strongestPositive,
+    },
+    {
+      key: "strongest-negative",
+      label: "Strongest negative driver",
+      promise: strongestNegative,
+    },
+  ].filter((item) => item.promise);
+}
+
+function SourceAwareEvidenceTrail({ items, isPublicView }) {
+  return (
+    <section className="card-surface rounded-[1.6rem] p-5">
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div className="max-w-3xl">
+          <h2 className="text-lg font-semibold mb-2">Top Evidence Trail</h2>
+          <p className="text-sm text-[var(--ink-soft)] leading-7">
+            These are the strongest visible records in the current shared view and provide the fastest path to verification.
+          </p>
+        </div>
+        {items.length ? <MetaPill>{items.length} visible drivers</MetaPill> : null}
+      </div>
+
+      {items.length === 0 ? (
+        <div className="card-muted rounded-[1.25rem] p-5 mt-5">
+          <p className="text-sm text-[var(--ink-soft)]">
+            No visible drivers are available for the current shared report state.
+          </p>
+        </div>
+      ) : (
+        <div className="grid gap-4 xl:grid-cols-2 mt-5">
+          {items.map((item) => (
+            <div key={item.key} className="card-muted rounded-[1.25rem] p-4">
+              <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">{item.label}</p>
+              <div className="mt-3 rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 p-4">
+                <EvidencePanelContent promise={item.promise} linkToPromises={true} />
+                {!getPromiseEvidenceSourceCount(item.promise) ? (
+                  <p className="text-sm text-[var(--ink-soft)] mt-4 leading-7">
+                    Source titles are not listed in this share view. Review the Promise Tracker record for the full supporting-source trail.
+                  </p>
+                ) : null}
+                {item.promise?.slug && isPublicView ? (
+                  <div className="mt-4">
+                    <Link
+                      href={`/promises/${item.promise.slug}`}
+                      className="rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
+                    >
+                      Open Promise Tracker record
+                    </Link>
+                  </div>
+                ) : null}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </section>
   );
 }
@@ -2023,7 +2199,8 @@ function buildTimelineEntries({ records, presidents, relationshipMap }) {
 export default async function BlackImpactScorePage({ searchParams }) {
   const resolvedSearchParams = (await searchParams) || {};
   const viewFlags = getViewFlags(resolvedSearchParams);
-  const isPublicView = viewFlags.has("public");
+  const isPublicShareView = viewFlags.has("public-share");
+  const isPublicView = viewFlags.has("public") || isPublicShareView;
   const isTimelineView = viewFlags.has("timeline");
   const isTopicCompareView = viewFlags.has("topic-compare");
   const isPresidentCompareView = viewFlags.has("president-compare");
@@ -2141,8 +2318,8 @@ export default async function BlackImpactScorePage({ searchParams }) {
       : usingLegacyModel || effectiveScoringModel === "legacy"
         ? "Legacy scoring uses Promise Tracker relevance and impact curation."
       : "Scores incorporate evidence strength and source-backed outcomes.";
-  const shareViewFlags = new Set(viewFlags);
-  shareViewFlags.add("public");
+  const shareViewFlags = new Set([...viewFlags].filter((flag) => flag !== "public" && flag !== "public-share"));
+  shareViewFlags.add("public-share");
   const shareUrl = buildReportHref({
     viewFlags: shareViewFlags,
     mode: isDebateMode ? "debate" : null,
@@ -2239,6 +2416,12 @@ export default async function BlackImpactScorePage({ searchParams }) {
       model: requestedModel,
       topic: selectedTopic?.value || requestedTopicParam,
     });
+  const shareEvidenceItems = collectShareEvidenceItems({
+    presidents,
+    selectedPresidentA,
+    selectedPresidentB,
+    isPresidentCompareView,
+  });
 
   return (
     <main className={`max-w-7xl mx-auto ${isPublicView ? "px-6 py-10 space-y-10" : "p-6 space-y-8"}`}>
@@ -2265,7 +2448,17 @@ export default async function BlackImpactScorePage({ searchParams }) {
         </div>
       ) : null}
 
-      {isPublicView ? <ShareHeader shareUrl={shareUrl} /> : null}
+      {isPublicShareView ? (
+        <SourceAwareShareHeader
+          shareUrl={shareUrl}
+          selectedTopic={selectedTopic}
+          effectiveScoringModel={effectiveScoringModel}
+          isLegacyFallbackActive={isLegacyFallbackActive}
+          usingLegacyModel={usingLegacyModel}
+        />
+      ) : isPublicView ? (
+        <ShareHeader shareUrl={shareUrl} />
+      ) : null}
 
       {isDebateMode ? <DebateModeHeader /> : null}
 
@@ -2292,6 +2485,10 @@ export default async function BlackImpactScorePage({ searchParams }) {
           />
         </div>
       </section>
+
+      {isPublicShareView ? (
+        <SourceAwareEvidenceTrail items={shareEvidenceItems} isPublicView={isPublicView} />
+      ) : null}
 
       <MultiViewToggleSection
         reportHref={standardReportHref}
@@ -2343,6 +2540,8 @@ export default async function BlackImpactScorePage({ searchParams }) {
       ) : null}
 
       {isDebateMode ? <VerificationSection /> : null}
+
+      {isPublicShareView ? <ShareVerificationSection /> : null}
 
       {!isPublicView ? (
         <section className="card-surface rounded-[1.6rem] p-5">
