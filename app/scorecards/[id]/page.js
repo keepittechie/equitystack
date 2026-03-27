@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import { buildPageMetadata } from "@/lib/metadata";
 import { getLegislatorDetail } from "@/lib/services/scorecardService";
 
+export const dynamic = "force-dynamic";
+
 async function loadLegislator(id) {
   return getLegislatorDetail(id);
 }

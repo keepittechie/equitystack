@@ -2,6 +2,8 @@ import Link from "next/link";
 import { buildPageMetadata } from "@/lib/metadata";
 import { getLegislatorDirectory, getScorecardOverview } from "@/lib/services/scorecardService";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = buildPageMetadata({
   title: "Legislator Scorecards",
   description:
