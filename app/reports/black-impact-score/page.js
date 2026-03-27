@@ -2,15 +2,104 @@ import Link from "next/link";
 import { ImpactBadge } from "@/app/components/policy-badges";
 import { fetchInternalJson } from "@/lib/api";
 import { REPORT_REVALIDATE_SECONDS, withRevalidate } from "@/lib/cache";
-import { buildPageMetadata } from "@/lib/metadata";
 import { getBlackImpactScoreMethodology } from "@/lib/black-impact-score/methodology.js";
+import CopyShareLinkButton from "./CopyShareLinkButton";
 
-export const metadata = buildPageMetadata({
-  title: "Black Impact Score",
-  description:
-    "A Promise Tracker report summarizing presidential accountability for documented outcomes tied to Black-community impacts.",
-  path: "/reports/black-impact-score",
-});
+const REPORT_PATH = "/reports/black-impact-score";
+const DEFAULT_TITLE = "Black Impact Score Report";
+const DEFAULT_DESCRIPTION =
+  "A data-driven report on presidential impact based on documented real-world outcomes affecting Black Americans.";
+
+function formatPresidentSlug(slug) {
+  if (!slug) {
+    return null;
+  }
+
+  return String(slug)
+    .split("-")
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+function buildMetadataUrl(searchParams = {}) {
+  const params = new URLSearchParams();
+
+  if (searchParams.view === "public") {
+    params.set("view", "public");
+  }
+
+  if (searchParams.mode === "debate") {
+    params.set("mode", "debate");
+  }
+
+  if (typeof searchParams.president === "string" && searchParams.president.trim()) {
+    params.set("president", searchParams.president.trim());
+  }
+
+  const query = params.toString();
+  return query ? `${REPORT_PATH}?${query}` : REPORT_PATH;
+}
+
+export async function generateMetadata({ searchParams }) {
+  const resolvedSearchParams = (await searchParams) || {};
+  const isPublicView = resolvedSearchParams.view === "public";
+  const isDebateMode = resolvedSearchParams.mode === "debate";
+  const presidentSlug =
+    typeof resolvedSearchParams.president === "string" ? resolvedSearchParams.president.trim() : "";
+  const presidentName = formatPresidentSlug(presidentSlug);
+
+  let title = DEFAULT_TITLE;
+  let description = DEFAULT_DESCRIPTION;
+
+  if (presidentName && isPublicView) {
+    title = `${presidentName} Black Impact Score Report`;
+    description =
+      `A data-driven view of ${presidentName}'s documented outcome-based Black Impact Score and the records that shape it.`;
+  } else if (presidentName) {
+    title = `${presidentName} Black Impact Score`;
+    description =
+      `A data-driven view of ${presidentName}'s documented outcome-based Black Impact Score and supporting report context.`;
+  } else if (isPublicView) {
+    title = "Black Impact Score Public Report";
+    description =
+      "A shareable data-driven report on presidential impact based on documented real-world outcomes affecting Black Americans.";
+  }
+
+  if (isDebateMode) {
+    title = presidentName
+      ? `${presidentName} Black Impact Score Debate View`
+      : "Black Impact Score Debate View";
+    description = presidentName
+      ? `A debate-oriented view of ${presidentName}'s strongest Black Impact Score drivers using documented outcomes and source-backed records.`
+      : "A debate-oriented view of the Black Impact Score highlighting the strongest documented score drivers and source-backed records.";
+  }
+
+  const url = buildMetadataUrl({
+    view: isPublicView ? "public" : null,
+    mode: isDebateMode ? "debate" : null,
+    president: presidentSlug || null,
+  });
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: REPORT_PATH,
+    },
+    openGraph: {
+      title,
+      description,
+      url,
+      type: "article",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+    },
+  };
+}
 
 async function getBlackImpactScores(model) {
   const query = model && model !== "outcome" ? `?model=${model}` : "";
@@ -484,12 +573,7 @@ function ShareHeader({ shareUrl }) {
             A data-driven analysis of presidential impact based on real-world outcomes affecting Black Americans.
           </p>
         </div>
-        <a
-          href={shareUrl}
-          className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
-        >
-          Copy Link
-        </a>
+        <CopyShareLinkButton path={shareUrl} />
       </div>
       <div className="mt-4 rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 px-4 py-3 text-sm text-[var(--ink-soft)] break-all">
         {shareUrl}
