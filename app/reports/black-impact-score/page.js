@@ -196,6 +196,10 @@ function getScoreContextText({ metadata, usingLegacyModel }) {
   return `The ${scoringModel} methodology is currently shown for this president.`;
 }
 
+function isOutcomeScoringModel({ metadata, usingLegacyModel }) {
+  return !usingLegacyModel && getEffectiveScoringModel({ metadata, usingLegacyModel }).toLowerCase().includes("outcome");
+}
+
 function ScoreCard({ label, value, subtitle }) {
   return (
     <div className="card-muted rounded-[1.15rem] px-4 py-4">
@@ -221,6 +225,22 @@ function formatSignedScore(value) {
   if (!Number.isFinite(numeric)) return String(value);
   const fixed = numeric.toFixed(2);
   return numeric > 0 ? `+${fixed}` : fixed;
+}
+
+function getTopAndBottomPresidents(presidents = []) {
+  const sorted = [...presidents].sort((left, right) => {
+    const scoreDiff = Number(right.normalized_score || 0) - Number(left.normalized_score || 0);
+    if (scoreDiff !== 0) {
+      return scoreDiff;
+    }
+
+    return String(left.president || "").localeCompare(String(right.president || ""));
+  });
+
+  return {
+    top: sorted.slice(0, 3),
+    bottom: [...sorted].reverse().slice(0, 3),
+  };
 }
 
 function formatImpactDisplayLabel(label) {
@@ -551,16 +571,73 @@ function PresidentInsightPanel({ president }) {
   );
 }
 
-function MethodologySection({ methodology }) {
+function TopSummarySection({ presidents }) {
+  const summary = getTopAndBottomPresidents(presidents);
+
+  return (
+    <section className="card-surface rounded-[1.6rem] p-5">
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div className="max-w-3xl">
+          <h2 className="text-lg font-semibold mb-2">Top Summary</h2>
+          <p className="text-sm text-[var(--ink-soft)] leading-7">
+            A quick view of the highest and lowest normalized scores in the current report.
+          </p>
+        </div>
+        <MetaPill>{presidents.length} presidents included</MetaPill>
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-2 mt-5">
+        <section className="card-muted rounded-[1.25rem] p-4">
+          <h3 className="text-lg font-semibold">Highest Impact</h3>
+          <div className="mt-3 space-y-3">
+            {summary.top.map((president) => (
+              <div
+                key={`top-${president.president_slug}`}
+                className="rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 p-4"
+              >
+                <div className="flex items-start justify-between gap-3 flex-wrap">
+                  <p className="text-base font-semibold">{president.president}</p>
+                  <MetaPill>{formatNormalizedScore(president.normalized_score)}</MetaPill>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="card-muted rounded-[1.25rem] p-4">
+          <h3 className="text-lg font-semibold">Lowest Impact</h3>
+          <div className="mt-3 space-y-3">
+            {summary.bottom.map((president) => (
+              <div
+                key={`bottom-${president.president_slug}`}
+                className="rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 p-4"
+              >
+                <div className="flex items-start justify-between gap-3 flex-wrap">
+                  <p className="text-base font-semibold">{president.president}</p>
+                  <MetaPill>{formatNormalizedScore(president.normalized_score)}</MetaPill>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
+    </section>
+  );
+}
+
+function MethodologySection({ methodology, metadata, usingLegacyModel }) {
+  const effectiveScoringModel = getEffectiveScoringModel({ metadata, usingLegacyModel });
+  const usingOutcomeModel = isOutcomeScoringModel({ metadata, usingLegacyModel });
+
   return (
     <section className="card-surface rounded-[1.6rem] p-5">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="max-w-3xl">
           <h2 className="text-lg font-semibold mb-2">How This Score Is Calculated</h2>
           <p className="text-sm text-[var(--ink-soft)] leading-7">
-            Scores are based on documented real-world outcomes, not just promises or enacted laws.
-            Each outcome is classified as positive, negative, mixed, or blocked, then weighted by
-            evidence strength and available source support before president totals are aggregated.
+            {usingOutcomeModel
+              ? "Scores are based on documented real-world outcomes, not just promises or enacted laws. Each outcome is classified as positive, negative, mixed, or blocked, then weighted by evidence strength and available source support before president totals are aggregated."
+              : "Scores are currently using the legacy promise-based model. Records are summarized from editorial relevance, impact direction, and current promise status while the outcome-based model is unavailable."}
           </p>
         </div>
         <a
@@ -572,26 +649,53 @@ function MethodologySection({ methodology }) {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4 mt-5">
-        <ScoreCard
-          label="Outcome Types"
-          value="4"
-          subtitle="Positive, Negative, Mixed, and Blocked"
-        />
-        <ScoreCard
-          label="Evidence Weighting"
-          value="Active"
-          subtitle="Stronger evidence carries more weight"
-        />
-        <ScoreCard
-          label="Source Support"
-          value="Included"
-          subtitle="Outcome records incorporate source counts"
-        />
-        <ScoreCard
-          label="Aggregation"
-          value="By President"
-          subtitle="President scores roll up from outcome-linked records"
-        />
+        {usingOutcomeModel ? (
+          <>
+            <ScoreCard
+              label="Outcome Types"
+              value="4"
+              subtitle="Positive, Negative, Mixed, and Blocked"
+            />
+            <ScoreCard
+              label="Evidence Weighting"
+              value="Active"
+              subtitle="Stronger evidence carries more weight"
+            />
+            <ScoreCard
+              label="Source Support"
+              value="Included"
+              subtitle="Outcome records incorporate source counts"
+            />
+            <ScoreCard
+              label="Aggregation"
+              value="By President"
+              subtitle={`President scores roll up from ${effectiveScoringModel}`}
+            />
+          </>
+        ) : (
+          <>
+            <ScoreCard
+              label="Scoring Model"
+              value={effectiveScoringModel}
+              subtitle="Legacy promise-based scoring is currently active"
+            />
+            <ScoreCard
+              label="Relevance Weights"
+              value={Object.keys(methodology?.relevance_weights || {}).length || "Active"}
+              subtitle="Legacy scores incorporate editorial relevance"
+            />
+            <ScoreCard
+              label="Impact Direction"
+              value="Included"
+              subtitle="Legacy scores incorporate curated impact direction"
+            />
+            <ScoreCard
+              label="Aggregation"
+              value="By President"
+              subtitle="President scores roll up from legacy promise records"
+            />
+          </>
+        )}
       </div>
     </section>
   );
@@ -713,7 +817,7 @@ export default async function BlackImpactScorePage({ searchParams }) {
   if (comparisonMode) {
     if (data.outcome?.error) {
       usingLegacyModel = true;
-      methodology = publicOutcomeMethodology;
+      methodology = data.legacy?.methodology || null;
       presidents = (data.legacy?.items || []).map(normalizeLegacyPresident);
     } else {
       methodology = data.outcome?.methodology || null;
@@ -722,7 +826,7 @@ export default async function BlackImpactScorePage({ searchParams }) {
     }
   } else if (data.model === "legacy") {
     usingLegacyModel = true;
-    methodology = isLegacyFallback ? publicOutcomeMethodology : data.methodology || null;
+    methodology = data.methodology || null;
     presidents = (data.items || []).map(normalizeLegacyPresident);
   } else {
     methodology = data.methodology || publicOutcomeMethodology;
@@ -734,16 +838,18 @@ export default async function BlackImpactScorePage({ searchParams }) {
     presidents = presidents.filter((president) => president.president_slug === requestedPresidentSlug);
   }
 
+  const effectiveScoringModel = getEffectiveScoringModel({ metadata, usingLegacyModel });
+  const usingOutcomeModel = isOutcomeScoringModel({ metadata, usingLegacyModel });
   const methodologyBadgeLabel =
-    usingLegacyModel || metadata?.scoring_model === "legacy"
+    usingLegacyModel || effectiveScoringModel === "legacy"
       ? "Methodology: Legacy (Fallback)"
-      : "Methodology: Outcome-Based";
+      : `Methodology: ${effectiveScoringModel}`;
   const methodologyBadgeDescription =
-    usingLegacyModel || metadata?.scoring_model === "legacy"
+    usingLegacyModel || effectiveScoringModel === "legacy"
       ? "Scores are temporarily using the legacy promise-based fallback model."
-      : "Scores are based on documented real-world outcomes, not promises.";
+      : `Scores are based on documented real-world outcomes using ${effectiveScoringModel}.`;
   const evidenceBadgeDescription =
-    usingLegacyModel || metadata?.scoring_model === "legacy"
+    usingLegacyModel || effectiveScoringModel === "legacy"
       ? "Legacy fallback is active while outcome-based evidence weighting is unavailable."
       : "Scores incorporate evidence strength and source-backed outcomes.";
   const shareQuery = new URLSearchParams();
@@ -759,7 +865,6 @@ export default async function BlackImpactScorePage({ searchParams }) {
   }
   const shareUrl = `/reports/black-impact-score?${shareQuery.toString()}`;
   const modelStatusLabel = getModelStatusLabel({ metadata, usingLegacyModel });
-  const effectiveScoringModel = getEffectiveScoringModel({ metadata, usingLegacyModel });
 
   return (
     <main className={`max-w-7xl mx-auto ${isPublicView ? "px-6 py-10 space-y-10" : "p-6 space-y-8"}`}>
@@ -822,9 +927,15 @@ export default async function BlackImpactScorePage({ searchParams }) {
         </section>
       ) : null}
 
-      <MethodologySection methodology={methodology} />
+      {presidents.length ? <TopSummarySection presidents={presidents} /> : null}
 
-      {!usingLegacyModel ? (
+      <MethodologySection
+        methodology={methodology}
+        metadata={metadata}
+        usingLegacyModel={usingLegacyModel}
+      />
+
+      {usingOutcomeModel ? (
         <SystemLevelInsight presidents={presidents} metadata={metadata} />
       ) : null}
 
@@ -835,9 +946,9 @@ export default async function BlackImpactScorePage({ searchParams }) {
           <div className="flex items-start justify-between gap-4 flex-wrap">
             <div className="max-w-3xl">
               <h2 className="text-lg font-semibold mb-2">Built From Promise Tracker</h2>
-              <p className="text-sm text-[var(--ink-soft)] leading-7">
-                This report summarizes Promise Tracker records into a president-level accountability view.
-                It remains tied to the underlying promise, action, and outcome records rather than operating as a separate product surface.
+          <p className="text-sm text-[var(--ink-soft)] leading-7">
+            This report summarizes Promise Tracker records into a president-level accountability view.
+            It remains tied to the underlying promise, action, and outcome records rather than operating as a separate product surface.
               </p>
             </div>
             <Link
