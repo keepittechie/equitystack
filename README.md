@@ -1,5 +1,7 @@
 # EquityStack
 
+[https://equitystack.org](https://equitystack.org)
+
 This repository has two active parts:
 
 - the Node.js / Next.js website at the repo root

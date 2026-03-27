@@ -422,6 +422,21 @@ function formatTimelineDate(value) {
   }).format(parsed);
 }
 
+function getPromiseEvidenceSourceCount(promise) {
+  const explicitCount = Number(promise?.source_count || 0);
+  if (Number.isFinite(explicitCount) && explicitCount > 0) {
+    return explicitCount;
+  }
+
+  const scoredOutcomes = Array.isArray(promise?.scored_outcomes) ? promise.scored_outcomes : [];
+  const derivedCount = scoredOutcomes.reduce(
+    (count, outcome) => count + Number(outcome?.factors?.source_count || 0),
+    0
+  );
+
+  return derivedCount > 0 ? derivedCount : null;
+}
+
 function getTopAndBottomPresidents(presidents = []) {
   const sorted = [...presidents].sort((left, right) => {
     const scoreDiff = Number(right.normalized_score || 0) - Number(left.normalized_score || 0);
@@ -564,6 +579,14 @@ function PromiseDriverList({ title, items, emptyMessage, linkToPromises = true }
                 <div className="mt-3 flex flex-wrap gap-2">
                   <MetaPill>{promise.outcome_count || 0} outcomes</MetaPill>
                 </div>
+
+                <div className="mt-4">
+                  <EvidencePanelTrigger
+                    promise={promise}
+                    label="View Evidence"
+                    linkToPromises={true}
+                  />
+                </div>
               </div>
             );
           })}
@@ -596,9 +619,112 @@ function StrongestDriverCard({ title, promise, linkToPromises = true }) {
           <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
             {promise.explanation_summary || "No explanation is available for this record yet."}
           </p>
+          <div className="mt-4">
+            <EvidencePanelTrigger
+              promise={promise}
+              label="View Evidence"
+              linkToPromises={true}
+            />
+          </div>
         </div>
       )}
     </section>
+  );
+}
+
+function EvidencePanelContent({ promise, linkToPromises = true }) {
+  const impactDirection = getPrimaryImpactDirection(promise) || promise?.impact_direction || null;
+  const sourceCount = getPromiseEvidenceSourceCount(promise);
+
+  if (!promise) {
+    return (
+      <p className="text-sm text-[var(--ink-soft)]">
+        No driver is available for this evidence panel.
+      </p>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">
+          {promise.topic || "Promise Tracker record"}
+        </p>
+        {promise.slug && linkToPromises ? (
+          <Link href={`/promises/${promise.slug}`} className="accent-link text-base font-semibold mt-2 inline-block">
+            {promise.title}
+          </Link>
+        ) : (
+          <p className="text-base font-semibold mt-2">{promise.title}</p>
+        )}
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        {promise.president ? <MetaPill>{promise.president}</MetaPill> : null}
+        {impactDirection ? <ImpactBadge impact={impactDirection} /> : null}
+        {promise.total_score != null ? <MetaPill>{formatSignedScore(promise.total_score)}</MetaPill> : null}
+        {promise.outcome_count ? <MetaPill>{promise.outcome_count} outcomes</MetaPill> : null}
+        {sourceCount ? <MetaPill>{sourceCount} source references</MetaPill> : null}
+      </div>
+
+      <p className="text-sm text-[var(--ink-soft)] leading-7">
+        {promise.explanation_summary || "No explanation summary is available for this record."}
+      </p>
+
+      {sourceCount ? (
+        <p className="text-sm text-[var(--ink-soft)] leading-7">
+          Source support is available for this record. Review the Promise Tracker page for the underlying sources and linked outcomes.
+        </p>
+      ) : (
+        <p className="text-sm text-[var(--ink-soft)] leading-7">
+          Inline source detail is not available in this panel. Review the Promise Tracker page for the underlying record and sources.
+        </p>
+      )}
+    </div>
+  );
+}
+
+function EvidencePanelTrigger({ promise, label = "View Evidence", linkToPromises = true }) {
+  return (
+    <details className="rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-[rgba(255,252,247,0.92)]">
+      <summary className="cursor-pointer list-none px-4 py-3 text-sm font-medium text-[var(--ink)]">
+        {label}
+      </summary>
+      <div className="border-t border-[rgba(120,53,15,0.08)] px-4 py-4">
+        <EvidencePanelContent promise={promise} linkToPromises={linkToPromises} />
+      </div>
+    </details>
+  );
+}
+
+function EvidencePanelGroup({
+  title,
+  items,
+  linkToPromises = true,
+  emptyMessage = "No evidence records are available for this section.",
+}) {
+  const visibleItems = (items || []).filter(Boolean);
+
+  return (
+    <details className="card-muted rounded-[1.25rem] p-4">
+      <summary className="cursor-pointer list-none text-sm font-semibold text-[var(--ink)]">
+        {title}
+      </summary>
+      <div className="mt-4 space-y-4">
+        {visibleItems.length ? (
+          visibleItems.map((item) => (
+            <div
+              key={item.slug || item.id || item.title}
+              className="rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 p-4"
+            >
+              <EvidencePanelContent promise={item} linkToPromises={linkToPromises} />
+            </div>
+          ))
+        ) : (
+          <p className="text-sm text-[var(--ink-soft)]">{emptyMessage}</p>
+        )}
+      </div>
+    </details>
   );
 }
 
@@ -1437,6 +1563,17 @@ function TopicComparisonSection({
                 {president.outcome_count != null ? <MetaPill>{president.outcome_count} outcomes</MetaPill> : null}
               </div>
             </div>
+            <div className="mt-4">
+              <EvidencePanelGroup
+                title="Evidence Panel"
+                items={[
+                  president.top_positive_promises?.[0] || null,
+                  president.top_negative_promises?.[0] || null,
+                ]}
+                linkToPromises={true}
+                emptyMessage="No driver evidence is available for this president in the current topic."
+              />
+            </div>
           </section>
         ))}
       </div>
@@ -1600,6 +1737,15 @@ function PresidentComparisonSection({
             <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Top Negative Driver</p>
             <p className="text-base font-semibold mt-2">{topNegative?.title || "Unavailable"}</p>
           </div>
+        </div>
+
+        <div className="mt-4">
+          <EvidencePanelGroup
+            title="Evidence Panel"
+            items={[topPositive, topNegative]}
+            linkToPromises={true}
+            emptyMessage="No driver evidence is available for this president in the current comparison."
+          />
         </div>
       </section>
     );
@@ -2384,6 +2530,16 @@ export default async function BlackImpactScorePage({ searchParams }) {
               </div>
 
               <PresidentInsightPanel president={president} />
+
+              <EvidencePanelGroup
+                title="Evidence Panel"
+                items={[
+                  president.top_positive_promises?.[0] || null,
+                  president.top_negative_promises?.[0] || null,
+                ]}
+                linkToPromises={true}
+                emptyMessage="No driver evidence is available for this president."
+              />
 
               {isDebateMode ? (
                 <div className="grid gap-4 xl:grid-cols-2 mt-6">
