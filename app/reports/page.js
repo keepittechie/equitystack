@@ -71,6 +71,16 @@ function FlagshipReportCard({ eyebrow, title, description, href, linkLabel }) {
   );
 }
 
+function CuratedModeCard({ title, description, href }) {
+  return (
+    <Link href={href} className="card-muted rounded-[1.25rem] p-4 block">
+      <h3 className="text-base font-semibold">{title}</h3>
+      <p className="text-sm text-[var(--ink-soft)] mt-2 leading-6">{description}</p>
+      <span className="accent-link text-sm inline-block mt-4">Open view</span>
+    </Link>
+  );
+}
+
 export default async function ReportsPage() {
   const [
     overallSummary,
@@ -174,6 +184,90 @@ export default async function ReportsPage() {
             linkLabel="Open Civil Rights Timeline"
           />
         </div>
+      </section>
+
+      <section className="card-surface rounded-[1.6rem] p-5 mb-8">
+        <div className="max-w-3xl mb-5">
+          <h2 className="text-lg font-semibold mb-2">Black Impact Score Entry Points</h2>
+          <p className="text-sm text-[var(--ink-soft)] leading-7">
+            These curated entry points highlight the main ways to use the Black Impact Score system
+            without exposing the full query-state surface.
+          </p>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <CuratedModeCard
+            title="Standard Report"
+            description="Start with the outcome-based president summary view for the clearest accountability overview."
+            href="/reports/black-impact-score"
+          />
+          <CuratedModeCard
+            title="Timeline View"
+            description="Follow scored records in chronological order to see how presidential actions unfold over time."
+            href="/reports/black-impact-score?view=timeline"
+          />
+          <CuratedModeCard
+            title="Causal Timeline"
+            description="Open the timeline view and scan the explicit record-to-record historical relationships already tracked."
+            href="/reports/black-impact-score?view=timeline"
+          />
+          <CuratedModeCard
+            title="Topic Comparison"
+            description="Compare presidents inside a single policy domain using the topic comparison view."
+            href="/reports/black-impact-score?view=topic-compare"
+          />
+          <CuratedModeCard
+            title="President Comparison"
+            description="Use the two-president comparison workflow to compare two administrations within one selected topic."
+            href="/reports/black-impact-score?view=president-compare"
+          />
+          <CuratedModeCard
+            title="Public Share View"
+            description="Open a public-safe share-ready view with evidence context and verification guidance."
+            href="/reports/black-impact-score?view=public-share"
+          />
+          <CuratedModeCard
+            title="Debate View"
+            description="Highlight the strongest visible drivers and verification cues in a factual debate-oriented layout."
+            href="/reports/black-impact-score?mode=debate"
+          />
+        </div>
+      </section>
+
+      <section className="grid gap-6 xl:grid-cols-[1.1fr,0.9fr] mb-8">
+        <section className="card-surface rounded-[1.6rem] p-5">
+          <h2 className="text-lg font-semibold mb-3">Recommended Starting Points</h2>
+          <div className="space-y-3 text-sm">
+            <Link href="/reports/black-impact-score" className="block rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 px-4 py-3 hover:border-[rgba(120,53,15,0.18)]">
+              <span className="font-medium text-[var(--ink)]">Start with the standard outcome-based report</span>
+              <span className="block text-[var(--ink-soft)] mt-1">Use the default report to understand the overall president-level scoring context first.</span>
+            </Link>
+            <Link href="/reports/black-impact-score?view=timeline" className="block rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 px-4 py-3 hover:border-[rgba(120,53,15,0.18)]">
+              <span className="font-medium text-[var(--ink)]">Explore policy change over time</span>
+              <span className="block text-[var(--ink-soft)] mt-1">Open the timeline to follow how scored records unfold and connect across administrations.</span>
+            </Link>
+            <Link href="/reports/black-impact-score?view=topic-compare" className="block rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 px-4 py-3 hover:border-[rgba(120,53,15,0.18)]">
+              <span className="font-medium text-[var(--ink)]">Compare presidents within a topic</span>
+              <span className="block text-[var(--ink-soft)] mt-1">Move into topic comparison when you want a narrower policy-domain lens.</span>
+            </Link>
+            <Link href="/reports/black-impact-score?view=public-share" className="block rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 px-4 py-3 hover:border-[rgba(120,53,15,0.18)]">
+              <span className="font-medium text-[var(--ink)]">Open a public share-ready report</span>
+              <span className="block text-[var(--ink-soft)] mt-1">Use the source-aware public share view when you need a clean external-facing entry point.</span>
+            </Link>
+          </div>
+        </section>
+
+        <section className="card-surface rounded-[1.6rem] p-5">
+          <h2 className="text-lg font-semibold mb-3">What This System Supports</h2>
+          <ul className="text-sm text-[var(--ink-soft)] space-y-2 leading-7">
+            <li>Outcome-based scoring with legacy and compare-mode support.</li>
+            <li>Evidence-backed drivers and inline transparency panels.</li>
+            <li>Timeline and causal timeline views for historical context.</li>
+            <li>Topic comparison and president-vs-president comparison.</li>
+            <li>Public-share views, debate views, and stable permalinks.</li>
+            <li>Saved snapshots and browser print/save-PDF workflow.</li>
+          </ul>
+        </section>
       </section>
 
       <section className="card-surface rounded-[1.6rem] p-5 mb-8">
