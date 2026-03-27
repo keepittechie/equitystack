@@ -191,6 +191,170 @@ function PromiseDriverList({ title, items, emptyMessage }) {
   );
 }
 
+function getPrimaryImpactArea(president) {
+  const topTopic = (president.score_by_topic || [])[0];
+
+  if (!topTopic?.topic) {
+    return null;
+  }
+
+  return {
+    topic: topTopic.topic,
+    raw_score_total: topTopic.raw_score_total,
+  };
+}
+
+function getImbalanceSignal(president) {
+  const counts = president.counts_by_direction || {};
+  const positive = Number(counts.Positive || 0);
+  const negative = Number(counts.Negative || 0);
+  const mixed = Number(counts.Mixed || 0);
+  const blocked = Number(counts.Blocked || 0);
+
+  if (negative >= 2 && negative > positive * 1.5) {
+    return "Negative outcomes outweigh positive outcomes in this score profile.";
+  }
+
+  if (mixed + blocked >= 2 && mixed + blocked >= positive + negative) {
+    return "Mixed and blocked outcomes make up a large share of this score profile.";
+  }
+
+  return null;
+}
+
+function getPresidentInsightLines(president) {
+  const insights = [];
+  const primaryImpactArea = getPrimaryImpactArea(president);
+  const topPositive = president.top_positive_promises?.[0] || null;
+  const topNegative = president.top_negative_promises?.[0] || null;
+
+  if (primaryImpactArea) {
+    insights.push(`Most of this president's score is concentrated in ${primaryImpactArea.topic}.`);
+  }
+
+  if (topNegative?.topic) {
+    insights.push(`Negative impact is driven most visibly by ${topNegative.topic}.`);
+  } else if (topPositive?.topic) {
+    insights.push(`Positive impact is concentrated most clearly in ${topPositive.topic}.`);
+  }
+
+  if (topPositive?.topic && topNegative?.topic && topPositive.topic !== topNegative.topic) {
+    insights.push("Positive and negative contributions are concentrated in different policy areas.");
+  }
+
+  return insights.slice(0, 3);
+}
+
+function SystemLevelInsight({ presidents, metadata }) {
+  const totals = {
+    Positive: 0,
+    Negative: 0,
+    Mixed: 0,
+    Blocked: 0,
+  };
+  const topicTotals = new Map();
+
+  for (const president of presidents) {
+    for (const [label, count] of Object.entries(president.counts_by_direction || {})) {
+      totals[label] = (totals[label] || 0) + Number(count || 0);
+    }
+
+    for (const item of president.score_by_topic || []) {
+      const current = topicTotals.get(item.topic) || 0;
+      topicTotals.set(item.topic, current + Math.abs(Number(item.raw_score_total || 0)));
+    }
+  }
+
+  const dominantTopic = [...topicTotals.entries()]
+    .sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]))[0] || null;
+
+  return (
+    <section className="card-surface rounded-[1.6rem] p-5">
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div className="max-w-3xl">
+          <h2 className="text-lg font-semibold mb-2">System-Level Insight</h2>
+          <p className="text-sm text-[var(--ink-soft)] leading-7">
+            These summary signals describe the current score corpus as a whole. They help identify
+            the dominant impact mix and the main topic area shaping the report.
+          </p>
+        </div>
+        {metadata?.scoring_model ? <MetaPill>{metadata.scoring_model}</MetaPill> : null}
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-3 mt-5">
+        <ScoreCard
+          label="Total Outcomes"
+          value={metadata?.total_outcomes ?? 0}
+          subtitle="Documented outcomes included in the live model"
+        />
+        <ScoreCard
+          label="Impact Distribution"
+          value={`${totals.Positive}/${totals.Negative}/${totals.Mixed}/${totals.Blocked}`}
+          subtitle="Positive, Negative, Mixed, and Blocked counts"
+        />
+        <ScoreCard
+          label="Dominant Topic"
+          value={dominantTopic?.[0] || "Unavailable"}
+          subtitle="Largest absolute contribution across all presidents"
+        />
+      </div>
+    </section>
+  );
+}
+
+function PresidentInsightPanel({ president }) {
+  const primaryImpactArea = getPrimaryImpactArea(president);
+  const imbalanceSignal = getImbalanceSignal(president);
+  const insightLines = getPresidentInsightLines(president);
+
+  return (
+    <section className="card-muted rounded-[1.25rem] p-4">
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <h3 className="text-lg font-semibold">Key Insight</h3>
+          <p className="text-sm text-[var(--ink-soft)] mt-2 leading-7">
+            Derived from topic contribution, directional mix, and the strongest positive and negative drivers.
+          </p>
+        </div>
+        {imbalanceSignal ? <MetaPill>Context Signal</MetaPill> : null}
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-3 mt-5">
+        <div className="rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 p-4">
+          <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Primary Impact Area</p>
+          <p className="text-base font-semibold mt-2">{primaryImpactArea?.topic || "Unavailable"}</p>
+          <p className="text-sm text-[var(--ink-soft)] mt-2">
+            {primaryImpactArea
+              ? `Largest absolute topic contribution: ${formatSignedScore(primaryImpactArea.raw_score_total)}`
+              : "No topic contribution data is available for this president."}
+          </p>
+        </div>
+
+        <div className="rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 p-4 lg:col-span-2">
+          <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Insight Summary</p>
+          {insightLines.length ? (
+            <ul className="mt-3 space-y-2 text-sm text-[var(--ink-soft)] leading-7">
+              {insightLines.map((line) => (
+                <li key={line}>{line}</li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm text-[var(--ink-soft)] mt-3">
+              Not enough structured detail is available to generate a fuller topic insight for this president yet.
+            </p>
+          )}
+
+          {imbalanceSignal ? (
+            <p className="text-sm text-[var(--ink-soft)] mt-4 leading-7">
+              <strong className="text-[var(--ink)]">Context signal:</strong> {imbalanceSignal}
+            </p>
+          ) : null}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function MethodologySection({ methodology }) {
   return (
     <section className="card-surface rounded-[1.6rem] p-5">
@@ -360,6 +524,10 @@ export default async function BlackImpactScorePage({ searchParams }) {
 
       <MethodologySection methodology={methodology} />
 
+      {!usingLegacyModel ? (
+        <SystemLevelInsight presidents={presidents} metadata={metadata} />
+      ) : null}
+
       <section className="card-surface rounded-[1.6rem] p-5">
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div className="max-w-3xl">
@@ -504,6 +672,8 @@ export default async function BlackImpactScorePage({ searchParams }) {
                   ) : null}
                 </div>
               </div>
+
+              <PresidentInsightPanel president={president} />
 
               <div className="grid gap-4 xl:grid-cols-2 mt-6">
                 <PromiseDriverList
