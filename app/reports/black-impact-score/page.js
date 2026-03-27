@@ -3,7 +3,9 @@ import { ImpactBadge } from "@/app/components/policy-badges";
 import { fetchInternalJson } from "@/lib/api";
 import { REPORT_REVALIDATE_SECONDS, withRevalidate } from "@/lib/cache";
 import { getBlackImpactScoreMethodology } from "@/lib/black-impact-score/methodology.js";
+import { aggregatePresidentFromOutcomes } from "@/lib/black-impact-score/presidentAggregation.js";
 import { fetchPromiseTimelineRelationshipMap } from "@/lib/services/promiseService";
+import { aggregatePromiseScoresByPresident } from "@/lib/promise-tracker-scoring";
 import CopyShareLinkButton from "./CopyShareLinkButton";
 
 const REPORT_PATH = "/reports/black-impact-score";
@@ -30,7 +32,7 @@ function appendViewFlags(params, viewFlags) {
   }
 }
 
-function buildReportHref({ viewFlags = [], mode, president, model }) {
+function buildReportHref({ viewFlags = [], mode, president, model, topic }) {
   const params = new URLSearchParams();
   appendViewFlags(params, new Set(viewFlags));
 
@@ -46,8 +48,28 @@ function buildReportHref({ viewFlags = [], mode, president, model }) {
     params.set("model", model);
   }
 
+  if (typeof topic === "string" && topic.trim()) {
+    params.set("topic", topic.trim());
+  }
+
   const query = params.toString();
   return query ? `${REPORT_PATH}?${query}` : REPORT_PATH;
+}
+
+function normalizeTopicSlug(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .replace(/-{2,}/g, "-");
+}
+
+function formatTopicParam(value) {
+  return String(value || "")
+    .split("-")
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
 }
 
 function formatPresidentSlug(slug) {
@@ -78,6 +100,10 @@ function buildMetadataUrl(searchParams = {}) {
     params.set("model", searchParams.model);
   }
 
+  if (typeof searchParams.topic === "string" && searchParams.topic.trim()) {
+    params.set("topic", searchParams.topic.trim());
+  }
+
   const query = params.toString();
   return query ? `${REPORT_PATH}?${query}` : REPORT_PATH;
 }
@@ -98,6 +124,10 @@ function buildOgImageUrl(searchParams = {}) {
     params.set("model", searchParams.model);
   }
 
+  if (typeof searchParams.topic === "string" && searchParams.topic.trim()) {
+    params.set("topic", searchParams.topic.trim());
+  }
+
   const query = params.toString();
   return query
     ? `${REPORT_PATH}/opengraph-image?${query}`
@@ -112,6 +142,8 @@ export async function generateMetadata({ searchParams }) {
   const isDebateMode = resolvedSearchParams.mode === "debate";
   const presidentSlug =
     typeof resolvedSearchParams.president === "string" ? resolvedSearchParams.president.trim() : "";
+  const topicParam =
+    typeof resolvedSearchParams.topic === "string" ? resolvedSearchParams.topic.trim() : "";
   const presidentName = formatPresidentSlug(presidentSlug);
   const requestedModel =
     resolvedSearchParams.model === "legacy" || resolvedSearchParams.model === "compare"
@@ -144,6 +176,12 @@ export async function generateMetadata({ searchParams }) {
       : "A chronological view of Promise Tracker records and documented Black Impact Score context across presidents.";
   }
 
+  if (topicParam) {
+    const topicLabel = formatTopicParam(topicParam);
+    title = `${title} · ${topicLabel}`;
+    description = `${description} Filtered to ${topicLabel}.`;
+  }
+
   if (isDebateMode) {
     title = presidentName
       ? `${presidentName} Black Impact Score Debate View`
@@ -158,12 +196,14 @@ export async function generateMetadata({ searchParams }) {
     mode: isDebateMode ? "debate" : null,
     president: presidentSlug || null,
     model: requestedModel,
+    topic: topicParam || null,
   });
   const imageUrl = buildOgImageUrl({
     viewFlags,
     mode: isDebateMode ? "debate" : null,
     president: presidentSlug || null,
     model: requestedModel,
+    topic: topicParam || null,
   });
 
   return {
@@ -853,6 +893,58 @@ function VerificationSection() {
   );
 }
 
+function TopicFilterSection({
+  topicOptions,
+  selectedTopic,
+  allTopicsHref,
+  buildTopicHref,
+  isPublicView,
+}) {
+  if (!topicOptions.length) {
+    return null;
+  }
+
+  return (
+    <section className="card-surface rounded-[1.6rem] p-5">
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div className="max-w-3xl">
+          <h2 className="text-lg font-semibold mb-2">Topic Filter</h2>
+          <p className="text-sm text-[var(--ink-soft)] leading-7">
+            Limit the current report view to one policy topic using the records already loaded for this page.
+          </p>
+        </div>
+        {selectedTopic ? <MetaPill>Filtered Topic: {selectedTopic.label}</MetaPill> : null}
+      </div>
+
+      <div className={`mt-4 flex flex-wrap gap-2 ${isPublicView ? "" : ""}`}>
+        <Link
+          href={allTopicsHref}
+          className={`rounded-full border px-4 py-2 text-sm font-medium ${
+            !selectedTopic
+              ? "border-[rgba(120,53,15,0.2)] bg-[rgba(120,53,15,0.08)] text-[var(--ink)]"
+              : "border-[rgba(120,53,15,0.12)] bg-white/80 text-[var(--ink-soft)] hover:text-[var(--accent)]"
+          }`}
+        >
+          All topics
+        </Link>
+        {topicOptions.map((topic) => (
+          <Link
+            key={topic.value}
+            href={buildTopicHref(topic.value)}
+            className={`rounded-full border px-4 py-2 text-sm font-medium ${
+              selectedTopic?.value === topic.value
+                ? "border-[rgba(120,53,15,0.2)] bg-[rgba(120,53,15,0.08)] text-[var(--ink)]"
+                : "border-[rgba(120,53,15,0.12)] bg-white/80 text-[var(--ink-soft)] hover:text-[var(--accent)]"
+            }`}
+          >
+            {topic.label}
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function ViewToggleSection({ standardHref, timelineHref, isTimelineView }) {
   return (
     <section className="card-surface rounded-[1.6rem] p-5">
@@ -951,7 +1043,7 @@ function TimelineConnector({ relationshipType, crossesPresident }) {
   );
 }
 
-function TimelineModeSection({ entries, isPublicView, effectiveScoringModel }) {
+function TimelineModeSection({ entries, isPublicView, effectiveScoringModel, selectedTopic }) {
   return (
     <section className="card-surface rounded-[1.6rem] p-5">
       <div className="flex items-start justify-between gap-4 flex-wrap">
@@ -970,7 +1062,9 @@ function TimelineModeSection({ entries, isPublicView, effectiveScoringModel }) {
       {entries.length === 0 ? (
         <div className="card-muted rounded-[1.25rem] p-5 mt-5">
           <p className="text-sm text-[var(--ink-soft)]">
-            No timeline entries are available for the current filters.
+            {selectedTopic
+              ? `No scored timeline records matched ${selectedTopic.label} in the current view.`
+              : "No timeline entries are available for the current filters."}
           </p>
         </div>
       ) : (
@@ -1143,6 +1237,42 @@ function normalizeOutcomeRecord(record) {
   };
 }
 
+function normalizeTopicOption(topic) {
+  const label = String(topic || "").trim();
+
+  return {
+    label,
+    value: normalizeTopicSlug(label),
+  };
+}
+
+function getAvailableTopicOptions(records = []) {
+  return [...new Set(
+    records
+      .map((record) => String(record?.topic || "").trim())
+      .filter(Boolean)
+  )]
+    .sort((left, right) => left.localeCompare(right))
+    .map(normalizeTopicOption);
+}
+
+function resolveSelectedTopic(topicOptions = [], rawTopicParam) {
+  if (!rawTopicParam) {
+    return null;
+  }
+
+  const normalizedParam = normalizeTopicSlug(rawTopicParam);
+
+  return (
+    topicOptions.find((option) => option.label === rawTopicParam) ||
+    topicOptions.find((option) => option.value === normalizedParam) ||
+    {
+      label: rawTopicParam,
+      value: normalizedParam || rawTopicParam,
+    }
+  );
+}
+
 function normalizeLegacyRecord(record) {
   return {
     id: record.id,
@@ -1282,6 +1412,8 @@ export default async function BlackImpactScorePage({ searchParams }) {
   const isDebateMode = resolvedSearchParams.mode === "debate";
   const requestedPresidentSlug =
     typeof resolvedSearchParams.president === "string" ? resolvedSearchParams.president : null;
+  const requestedTopicParam =
+    typeof resolvedSearchParams.topic === "string" ? resolvedSearchParams.topic.trim() : null;
   const requestedModel =
     resolvedSearchParams.model === "legacy" || resolvedSearchParams.model === "compare"
       ? resolvedSearchParams.model
@@ -1294,35 +1426,61 @@ export default async function BlackImpactScorePage({ searchParams }) {
   let presidents = [];
   let metadata = null;
   let records = [];
+  let baseRecords = [];
+  let baseOutcomeMetadata = null;
   let usingLegacyModel = false;
 
   if (comparisonMode) {
     if (data.outcome?.error) {
       usingLegacyModel = true;
       methodology = data.legacy?.methodology || null;
-      presidents = (data.legacy?.items || []).map(normalizeLegacyPresident);
-      records = (data.legacy?.records || []).map(normalizeLegacyRecord);
+      baseRecords = data.legacy?.records || [];
     } else {
       methodology = data.outcome?.methodology || null;
-      presidents = (data.outcome?.items || []).map(normalizeOutcomePresident);
-      metadata = normalizeOutcomeMetadata(data.outcome?.metadata);
-      records = (data.outcome?.records || []).map(normalizeOutcomeRecord);
+      baseOutcomeMetadata = normalizeOutcomeMetadata(data.outcome?.metadata);
+      baseRecords = data.outcome?.records || [];
     }
   } else if (data.model === "legacy") {
     usingLegacyModel = true;
     methodology = data.methodology || null;
-    presidents = (data.items || []).map(normalizeLegacyPresident);
-    records = (data.records || []).map(normalizeLegacyRecord);
+    baseRecords = data.records || [];
   } else {
     methodology = data.methodology || publicOutcomeMethodology;
-    presidents = (data.items || []).map(normalizeOutcomePresident);
-    metadata = normalizeOutcomeMetadata(data.metadata);
-    records = (data.records || []).map(normalizeOutcomeRecord);
+    baseOutcomeMetadata = normalizeOutcomeMetadata(data.metadata);
+    baseRecords = data.records || [];
+  }
+
+  if (requestedPresidentSlug) {
+    baseRecords = baseRecords.filter((record) => record.president_slug === requestedPresidentSlug);
+  }
+
+  const topicOptions = getAvailableTopicOptions(baseRecords);
+  const selectedTopic = resolveSelectedTopic(topicOptions, requestedTopicParam);
+
+  if (selectedTopic) {
+    baseRecords = baseRecords.filter(
+      (record) => normalizeTopicSlug(record.topic) === selectedTopic.value
+    );
+  }
+
+  if (usingLegacyModel) {
+    presidents = aggregatePromiseScoresByPresident(baseRecords).map(normalizeLegacyPresident);
+    records = baseRecords.map(normalizeLegacyRecord);
+  } else {
+    presidents = aggregatePresidentFromOutcomes(baseRecords).map(normalizeOutcomePresident);
+    records = baseRecords.map(normalizeOutcomeRecord);
+    metadata = {
+      ...(baseOutcomeMetadata || normalizeOutcomeMetadata(null)),
+      total_promises: baseRecords.length,
+      total_outcomes: baseRecords.reduce(
+        (count, record) => count + Number(record.outcome_count || 0),
+        0
+      ),
+    };
   }
 
   if (requestedPresidentSlug) {
     presidents = presidents.filter((president) => president.president_slug === requestedPresidentSlug);
-    records = records.filter((record) => record.president_slug === requestedPresidentSlug);
   }
 
   const effectiveScoringModel = getEffectiveScoringModel({ metadata, usingLegacyModel });
@@ -1362,6 +1520,7 @@ export default async function BlackImpactScorePage({ searchParams }) {
     mode: isDebateMode ? "debate" : null,
     president: requestedPresidentSlug,
     model: requestedModel,
+    topic: selectedTopic?.value || requestedTopicParam,
   });
   const modelStatusLabel = getModelStatusLabel({
     metadata,
@@ -1373,19 +1532,36 @@ export default async function BlackImpactScorePage({ searchParams }) {
     mode: isDebateMode ? "debate" : null,
     president: requestedPresidentSlug,
     model: requestedModel,
+    topic: selectedTopic?.value || requestedTopicParam,
   });
   const timelineReportHref = buildReportHref({
     viewFlags: new Set([...viewFlags].filter((flag) => flag !== "timeline").concat("timeline")),
     mode: isDebateMode ? "debate" : null,
     president: requestedPresidentSlug,
     model: requestedModel,
+    topic: selectedTopic?.value || requestedTopicParam,
   });
   const compareHref = buildReportHref({
     viewFlags,
     mode: isDebateMode ? "debate" : null,
     president: requestedPresidentSlug,
     model: "compare",
+    topic: selectedTopic?.value || requestedTopicParam,
   });
+  const allTopicsHref = buildReportHref({
+    viewFlags,
+    mode: isDebateMode ? "debate" : null,
+    president: requestedPresidentSlug,
+    model: requestedModel,
+  });
+  const buildTopicHref = (topicValue) =>
+    buildReportHref({
+      viewFlags,
+      mode: isDebateMode ? "debate" : null,
+      president: requestedPresidentSlug,
+      model: requestedModel,
+      topic: topicValue,
+    });
 
   return (
     <main className={`max-w-7xl mx-auto ${isPublicView ? "px-6 py-10 space-y-10" : "p-6 space-y-8"}`}>
@@ -1428,6 +1604,7 @@ export default async function BlackImpactScorePage({ searchParams }) {
           <MetaPill>{modelStatusLabel}</MetaPill>
           {metadata?.total_outcomes ? <MetaPill>{metadata.total_outcomes} outcomes scored</MetaPill> : null}
           <MetaPill>{effectiveScoringModel}</MetaPill>
+          {selectedTopic ? <MetaPill>Filtered Topic: {selectedTopic.label}</MetaPill> : null}
           <TrustBadge
             label={methodologyBadgeLabel}
             description={methodologyBadgeDescription}
@@ -1443,6 +1620,14 @@ export default async function BlackImpactScorePage({ searchParams }) {
         standardHref={standardReportHref}
         timelineHref={timelineReportHref}
         isTimelineView={isTimelineView}
+      />
+
+      <TopicFilterSection
+        topicOptions={topicOptions}
+        selectedTopic={selectedTopic}
+        allTopicsHref={allTopicsHref}
+        buildTopicHref={buildTopicHref}
+        isPublicView={isPublicView}
       />
 
       {isLegacyFallbackActive ? (
@@ -1540,9 +1725,15 @@ export default async function BlackImpactScorePage({ searchParams }) {
 
       {presidents.length === 0 && !isTimelineView ? (
         <section className="card-surface rounded-[1.6rem] p-8 text-center">
-          <h2 className="text-xl font-semibold">No Black Impact Score data is available yet.</h2>
+          <h2 className="text-xl font-semibold">
+            {selectedTopic
+              ? `No scored records matched ${selectedTopic.label}.`
+              : "No Black Impact Score data is available yet."}
+          </h2>
           <p className="text-[var(--ink-soft)] mt-3">
-            President-level score summaries will appear here once Promise Tracker score data is available.
+            {selectedTopic
+              ? "No scored records matched the selected topic in the current report view."
+              : "President-level score summaries will appear here once Promise Tracker score data is available."}
           </p>
         </section>
       ) : isTimelineView ? (
@@ -1550,6 +1741,7 @@ export default async function BlackImpactScorePage({ searchParams }) {
           entries={timelineEntries}
           isPublicView={isPublicView}
           effectiveScoringModel={effectiveScoringModel}
+          selectedTopic={selectedTopic}
         />
       ) : (
         <div className="space-y-8">
