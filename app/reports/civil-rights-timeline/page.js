@@ -25,6 +25,21 @@ const TIMELINE_LEGEND_STATUSES = [
 
 const TIMELINE_LEGEND_IMPACTS = ["Positive", "Mixed", "Negative", "Blocked/Unrealized"];
 
+const ERA_HELPER_COPY = {
+  reconstruction:
+    "This section shows early federal attempts to protect Black citizenship, voting, and equal treatment after emancipation.",
+  "reconstruction-retreat":
+    "This section shows how federal protection narrowed, weakened, or was abandoned after early Reconstruction gains, helping explain the path from postwar promise to long-term retrenchment.",
+  "pre-civil-rights-bridge":
+    "This section highlights the smaller but important federal steps that reopened civil-rights enforcement before the major breakthroughs of the 1960s.",
+  "civil-rights-era":
+    "This section tracks the major period of renewed federal enforcement, legislation, and executive action against segregation and exclusion.",
+  "post-civil-rights-continuity":
+    "This section shows how federal civil-rights commitments continued after the peak legislative era through housing, credit, and institutional enforcement.",
+  "modern-continuity":
+    "This section extends the timeline into modern debates over voting rights, policing, courts, and federal accountability.",
+};
+
 function MetaPill({ children }) {
   return (
     <span className="inline-flex items-center rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-3 py-1 text-xs text-[var(--ink-soft)]">
@@ -162,9 +177,10 @@ export default async function CivilRightsTimelinePage() {
         <p className="eyebrow mb-4">Promise Tracker Report</p>
         <h1 className="text-4xl md:text-5xl font-bold">Civil Rights Timeline</h1>
         <p className="text-base md:text-lg text-[var(--ink-soft)] mt-4 max-w-3xl leading-8">
-          This curated timeline traces key federal civil-rights commitments, actions, and outcomes
-          affecting Black communities across U.S. history. It is designed as a guided historical view
-          built from Promise Tracker records, not a replacement for the full tracker.
+          This curated timeline traces how federal civil-rights policy moved through protection,
+          retreat, rebuilding, and modern continuity for Black communities across U.S. history.
+          It is designed as a guided historical view built from Promise Tracker records, not a
+          replacement for the full tracker.
         </p>
         <div className="mt-5 flex flex-wrap gap-2">
           <MetaPill>{totalEntries} timeline records</MetaPill>
@@ -223,6 +239,11 @@ export default async function CivilRightsTimelinePage() {
                   <p className="eyebrow mb-3">{era.label}</p>
                   <h2 className="text-2xl font-semibold">{era.label}</h2>
                   <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">{era.description}</p>
+                  {ERA_HELPER_COPY[era.id] ? (
+                    <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
+                      {ERA_HELPER_COPY[era.id]}
+                    </p>
+                  ) : null}
                 </div>
                 <MetaPill>{era.items.length} records</MetaPill>
               </div>
