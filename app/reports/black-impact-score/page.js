@@ -431,6 +431,75 @@ function formatSignedScore(value) {
   return numeric > 0 ? `+${fixed}` : fixed;
 }
 
+function getCoverageSignal({ promiseCount, outcomeCount, usingLegacyModel, isLegacyFallbackActive }) {
+  const normalizedPromiseCount = Number(promiseCount || 0);
+  const normalizedOutcomeCount = Number(outcomeCount || 0);
+
+  if (normalizedOutcomeCount >= 24 || normalizedPromiseCount >= 18) {
+    return {
+      label: "Higher coverage",
+      description: "This view reflects a broader set of currently tracked records.",
+    };
+  }
+
+  if (normalizedOutcomeCount >= 10 || normalizedPromiseCount >= 8) {
+    return {
+      label: "Moderate coverage",
+      description: "This view reflects a meaningful but still partial set of currently tracked records.",
+    };
+  }
+
+  if (isLegacyFallbackActive) {
+    return {
+      label: "Limited coverage",
+      description: "Legacy fallback is active, so this view uses a narrower currently available record set.",
+    };
+  }
+
+  if (usingLegacyModel) {
+    return {
+      label: "Limited coverage",
+      description: "This view is based on the currently tracked legacy record set.",
+    };
+  }
+
+  return {
+    label: "Limited coverage",
+    description: "This view reflects a smaller set of currently tracked records.",
+  };
+}
+
+function CredibilityNote({ promiseCount, outcomeCount, effectiveScoringModel, usingLegacyModel, isLegacyFallbackActive }) {
+  const coverageSignal = getCoverageSignal({
+    promiseCount,
+    outcomeCount,
+    usingLegacyModel,
+    isLegacyFallbackActive,
+  });
+
+  return (
+    <section className="card-muted rounded-[1.25rem] p-4">
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div className="max-w-3xl">
+          <h3 className="text-lg font-semibold">Data Credibility</h3>
+          <p className="text-sm text-[var(--ink-soft)] mt-2 leading-7">
+            This score reflects currently tracked records in EquityStack. Coverage may expand as additional records and sources are added.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <MetaPill>{coverageSignal.label}</MetaPill>
+          <MetaPill>Based on {promiseCount} records</MetaPill>
+          {outcomeCount != null ? <MetaPill>Based on {outcomeCount} outcomes</MetaPill> : null}
+          <MetaPill>{effectiveScoringModel}</MetaPill>
+        </div>
+      </div>
+      <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
+        {coverageSignal.description}
+      </p>
+    </section>
+  );
+}
+
 function formatTimelineDate(value) {
   if (!value) return "Date not available";
   const parsed = new Date(value);
@@ -909,6 +978,42 @@ function PresidentInsightPanel({ president }) {
           ) : null}
         </div>
       </div>
+    </section>
+  );
+}
+
+function PresidentCredibilityPanel({
+  president,
+  effectiveScoringModel,
+  usingLegacyModel,
+  isLegacyFallbackActive,
+}) {
+  const coverageSignal = getCoverageSignal({
+    promiseCount: president.promise_count,
+    outcomeCount: president.outcome_count,
+    usingLegacyModel,
+    isLegacyFallbackActive,
+  });
+
+  return (
+    <section className="card-muted rounded-[1.25rem] p-4">
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div className="max-w-3xl">
+          <h3 className="text-lg font-semibold">Coverage Context</h3>
+          <p className="text-sm text-[var(--ink-soft)] mt-2 leading-7">
+            This score reflects the currently visible records for this president in EquityStack.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <MetaPill>{coverageSignal.label}</MetaPill>
+          <MetaPill>Based on {president.promise_count} records</MetaPill>
+          {president.outcome_count != null ? <MetaPill>Based on {president.outcome_count} outcomes</MetaPill> : null}
+          <MetaPill>{effectiveScoringModel}</MetaPill>
+        </div>
+      </div>
+      <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
+        {coverageSignal.description}
+      </p>
     </section>
   );
 }
@@ -2526,6 +2631,14 @@ export default async function BlackImpactScorePage({ searchParams }) {
         </section>
       ) : null}
 
+      <CredibilityNote
+        promiseCount={records.length}
+        outcomeCount={usingLegacyModel ? null : metadata?.total_outcomes ?? 0}
+        effectiveScoringModel={effectiveScoringModel}
+        usingLegacyModel={usingLegacyModel}
+        isLegacyFallbackActive={isLegacyFallbackActive}
+      />
+
       {presidents.length && !isTopicCompareView && !isPresidentCompareView ? <TopSummarySection presidents={presidents} /> : null}
 
       <MethodologySection
@@ -2729,6 +2842,13 @@ export default async function BlackImpactScorePage({ searchParams }) {
               </div>
 
               <PresidentInsightPanel president={president} />
+
+              <PresidentCredibilityPanel
+                president={president}
+                effectiveScoringModel={effectiveScoringModel}
+                usingLegacyModel={usingLegacyModel}
+                isLegacyFallbackActive={isLegacyFallbackActive}
+              />
 
               <EvidencePanelGroup
                 title="Evidence Panel"
