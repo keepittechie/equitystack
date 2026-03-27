@@ -29,6 +29,49 @@ function MetaPill({ children }) {
   );
 }
 
+function TrustBadge({ label, description }) {
+  return (
+    <span
+      title={description}
+      className="inline-flex items-center rounded-full border border-[rgba(120,53,15,0.18)] bg-[rgba(255,252,247,0.92)] px-3 py-1 text-xs font-medium text-[var(--ink)]"
+    >
+      {label}
+    </span>
+  );
+}
+
+function getEffectiveScoringModel({ metadata, usingLegacyModel }) {
+  if (typeof metadata?.scoring_model === "string" && metadata.scoring_model.trim()) {
+    return metadata.scoring_model.trim();
+  }
+
+  return usingLegacyModel ? "legacy" : "outcome-based";
+}
+
+function getModelStatusLabel({ metadata, usingLegacyModel }) {
+  const scoringModel = getEffectiveScoringModel({ metadata, usingLegacyModel });
+
+  if (usingLegacyModel) {
+    return "Legacy fallback active";
+  }
+
+  if (scoringModel.toLowerCase().includes("outcome")) {
+    return "Outcome-based model";
+  }
+
+  return "Scoring model active";
+}
+
+function getScoreContextText({ metadata, usingLegacyModel }) {
+  const scoringModel = getEffectiveScoringModel({ metadata, usingLegacyModel });
+
+  if (usingLegacyModel) {
+    return `Legacy promise-based scoring is currently shown for this president (${scoringModel}).`;
+  }
+
+  return `The ${scoringModel} methodology is currently shown for this president.`;
+}
+
 function ScoreCard({ label, value, subtitle }) {
   return (
     <div className="card-muted rounded-[1.15rem] px-4 py-4">
@@ -132,7 +175,7 @@ function TopicBreakdown({ items }) {
   );
 }
 
-function PromiseDriverList({ title, items, emptyMessage }) {
+function PromiseDriverList({ title, items, emptyMessage, linkToPromises = true }) {
   return (
     <section className="card-muted rounded-[1.25rem] p-4">
       <div className="flex items-center justify-between gap-3 flex-wrap mb-3">
@@ -161,7 +204,7 @@ function PromiseDriverList({ title, items, emptyMessage }) {
                     <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">
                       {promise.topic || "No topic"}
                     </p>
-                    {promise.slug ? (
+                    {promise.slug && linkToPromises ? (
                       <Link href={`/promises/${promise.slug}`} className="accent-link text-base font-semibold mt-2 inline-block">
                         {promise.title}
                       </Link>
@@ -185,6 +228,35 @@ function PromiseDriverList({ title, items, emptyMessage }) {
               </div>
             );
           })}
+        </div>
+      )}
+    </section>
+  );
+}
+
+function StrongestDriverCard({ title, promise, linkToPromises = true }) {
+  return (
+    <section className="card-muted rounded-[1.25rem] p-4">
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <h3 className="text-lg font-semibold">{title}</h3>
+        {promise ? <MetaPill>{formatSignedScore(promise.total_score)}</MetaPill> : null}
+      </div>
+
+      {!promise ? (
+        <p className="text-sm text-[var(--ink-soft)] mt-3">No driver is currently available for this category.</p>
+      ) : (
+        <div className="mt-3 rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 p-4">
+          <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">{promise.topic || "No topic"}</p>
+          {promise.slug && linkToPromises ? (
+            <Link href={`/promises/${promise.slug}`} className="accent-link text-base font-semibold mt-2 inline-block">
+              {promise.title}
+            </Link>
+          ) : (
+            <p className="text-base font-semibold mt-2">{promise.title}</p>
+          )}
+          <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
+            {promise.explanation_summary || "No explanation is available for this record yet."}
+          </p>
         </div>
       )}
     </section>
@@ -401,6 +473,65 @@ function MethodologySection({ methodology }) {
   );
 }
 
+function ShareHeader({ shareUrl }) {
+  return (
+    <section className="card-surface rounded-[1.6rem] p-6">
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div className="max-w-3xl">
+          <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Share This Report</p>
+          <h2 className="text-2xl font-semibold mt-2">Black Impact Score Report</h2>
+          <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
+            A data-driven analysis of presidential impact based on real-world outcomes affecting Black Americans.
+          </p>
+        </div>
+        <a
+          href={shareUrl}
+          className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
+        >
+          Copy Link
+        </a>
+      </div>
+      <div className="mt-4 rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 px-4 py-3 text-sm text-[var(--ink-soft)] break-all">
+        {shareUrl}
+      </div>
+    </section>
+  );
+}
+
+function DebateModeHeader() {
+  return (
+    <section className="card-surface rounded-[1.6rem] p-6">
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div className="max-w-3xl">
+          <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Debate Mode</p>
+          <h2 className="text-2xl font-semibold mt-2">Debate Mode</h2>
+          <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
+            This view highlights the strongest score drivers and links back to the underlying Promise Tracker records.
+          </p>
+        </div>
+        <TrustBadge
+          label="Receipts Enabled"
+          description="This view emphasizes the strongest score drivers and the records used to verify them."
+        />
+      </div>
+    </section>
+  );
+}
+
+function VerificationSection() {
+  return (
+    <section className="card-surface rounded-[1.6rem] p-5">
+      <h2 className="text-lg font-semibold">How to Verify</h2>
+      <ul className="mt-3 space-y-2 text-sm text-[var(--ink-soft)] leading-7">
+        <li>Review the linked Promise Tracker record.</li>
+        <li>Check documented outcomes tied to that promise.</li>
+        <li>Review supporting sources.</li>
+        <li>Compare the record against the methodology section.</li>
+      </ul>
+    </section>
+  );
+}
+
 function normalizeOutcomePresident(president) {
   return {
     president: president.president,
@@ -442,6 +573,10 @@ function normalizeLegacyPresident(president) {
 
 export default async function BlackImpactScorePage({ searchParams }) {
   const resolvedSearchParams = (await searchParams) || {};
+  const isPublicView = resolvedSearchParams.view === "public";
+  const isDebateMode = resolvedSearchParams.mode === "debate";
+  const requestedPresidentSlug =
+    typeof resolvedSearchParams.president === "string" ? resolvedSearchParams.president : null;
   const requestedModel =
     resolvedSearchParams.model === "legacy" || resolvedSearchParams.model === "compare"
       ? resolvedSearchParams.model
@@ -476,28 +611,65 @@ export default async function BlackImpactScorePage({ searchParams }) {
     metadata = data.metadata || null;
   }
 
+  if (requestedPresidentSlug) {
+    presidents = presidents.filter((president) => president.president_slug === requestedPresidentSlug);
+  }
+
+  const methodologyBadgeLabel =
+    usingLegacyModel || metadata?.scoring_model === "legacy"
+      ? "Methodology: Legacy (Fallback)"
+      : "Methodology: Outcome-Based";
+  const methodologyBadgeDescription =
+    usingLegacyModel || metadata?.scoring_model === "legacy"
+      ? "Scores are temporarily using the legacy promise-based fallback model."
+      : "Scores are based on documented real-world outcomes, not promises.";
+  const evidenceBadgeDescription =
+    usingLegacyModel || metadata?.scoring_model === "legacy"
+      ? "Legacy fallback is active while outcome-based evidence weighting is unavailable."
+      : "Scores incorporate evidence strength and source-backed outcomes.";
+  const shareQuery = new URLSearchParams();
+  shareQuery.set("view", "public");
+  if (isDebateMode) {
+    shareQuery.set("mode", "debate");
+  }
+  if (requestedModel !== "outcome") {
+    shareQuery.set("model", requestedModel);
+  }
+  if (requestedPresidentSlug) {
+    shareQuery.set("president", requestedPresidentSlug);
+  }
+  const shareUrl = `/reports/black-impact-score?${shareQuery.toString()}`;
+  const modelStatusLabel = getModelStatusLabel({ metadata, usingLegacyModel });
+  const effectiveScoringModel = getEffectiveScoringModel({ metadata, usingLegacyModel });
+
   return (
-    <main className="max-w-7xl mx-auto p-6 space-y-8">
-      <div className="flex flex-wrap gap-3">
-        <Link
-          href="/promises"
-          className="inline-flex items-center rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
-        >
-          Explore Promise Tracker data
-        </Link>
-        <Link
-          href="/reports"
-          className="inline-flex items-center rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
-        >
-          Back to Reports
-        </Link>
-        <Link
-          href="/reports/black-impact-score?model=compare"
-          className="inline-flex items-center rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
-        >
-          Compare with previous model
-        </Link>
-      </div>
+    <main className={`max-w-7xl mx-auto ${isPublicView ? "px-6 py-10 space-y-10" : "p-6 space-y-8"}`}>
+      {!isPublicView ? (
+        <div className="flex flex-wrap gap-3">
+          <Link
+            href="/promises"
+            className="inline-flex items-center rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
+          >
+            Explore Promise Tracker data
+          </Link>
+          <Link
+            href="/reports"
+            className="inline-flex items-center rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
+          >
+            Back to Reports
+          </Link>
+          <Link
+            href="/reports/black-impact-score?model=compare"
+            className="inline-flex items-center rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
+          >
+            Compare with previous model
+          </Link>
+        </div>
+      ) : null}
+
+      {isPublicView ? <ShareHeader shareUrl={shareUrl} /> : null}
+
+      {isDebateMode ? <DebateModeHeader /> : null}
 
       <section className="hero-panel p-8 md:p-10">
         <p className="eyebrow mb-4">Promise Tracker Report</p>
@@ -508,8 +680,17 @@ export default async function BlackImpactScorePage({ searchParams }) {
         </p>
         <div className="mt-5 flex flex-wrap gap-2">
           <MetaPill>{presidents.length} presidents scored</MetaPill>
-          <MetaPill>{usingLegacyModel ? "Legacy fallback active" : "Outcome-based model"}</MetaPill>
+          <MetaPill>{modelStatusLabel}</MetaPill>
           {metadata?.total_outcomes ? <MetaPill>{metadata.total_outcomes} outcomes scored</MetaPill> : null}
+          <MetaPill>{effectiveScoringModel}</MetaPill>
+          <TrustBadge
+            label={methodologyBadgeLabel}
+            description={methodologyBadgeDescription}
+          />
+          <TrustBadge
+            label="Evidence-Based Scoring"
+            description={evidenceBadgeDescription}
+          />
         </div>
       </section>
 
@@ -528,23 +709,27 @@ export default async function BlackImpactScorePage({ searchParams }) {
         <SystemLevelInsight presidents={presidents} metadata={metadata} />
       ) : null}
 
-      <section className="card-surface rounded-[1.6rem] p-5">
-        <div className="flex items-start justify-between gap-4 flex-wrap">
-          <div className="max-w-3xl">
-            <h2 className="text-lg font-semibold mb-2">Built From Promise Tracker</h2>
-            <p className="text-sm text-[var(--ink-soft)] leading-7">
-              This report summarizes Promise Tracker records into a president-level accountability view.
-              It remains tied to the underlying promise, action, and outcome records rather than operating as a separate product surface.
-            </p>
+      {isDebateMode ? <VerificationSection /> : null}
+
+      {!isPublicView ? (
+        <section className="card-surface rounded-[1.6rem] p-5">
+          <div className="flex items-start justify-between gap-4 flex-wrap">
+            <div className="max-w-3xl">
+              <h2 className="text-lg font-semibold mb-2">Built From Promise Tracker</h2>
+              <p className="text-sm text-[var(--ink-soft)] leading-7">
+                This report summarizes Promise Tracker records into a president-level accountability view.
+                It remains tied to the underlying promise, action, and outcome records rather than operating as a separate product surface.
+              </p>
+            </div>
+            <Link
+              href="/promises"
+              className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
+            >
+              Open Promise Tracker
+            </Link>
           </div>
-          <Link
-            href="/promises"
-            className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
-          >
-            Open Promise Tracker
-          </Link>
-        </div>
-      </section>
+        </section>
+      ) : null}
 
       <section id="methodology" className="card-surface rounded-[1.6rem] p-5">
         <details>
@@ -616,12 +801,14 @@ export default async function BlackImpactScorePage({ searchParams }) {
                 </div>
                 <div className="flex flex-wrap gap-2 items-center">
                   {president.president_party ? <MetaPill>{president.president_party}</MetaPill> : null}
-                  <Link
-                    href={`/promises/president/${president.president_slug}`}
-                    className="rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
-                  >
-                    See Promise Tracker data
-                  </Link>
+                  {!isPublicView ? (
+                    <Link
+                      href={`/promises/president/${president.president_slug}`}
+                      className="rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
+                    >
+                      See Promise Tracker data
+                    </Link>
+                  ) : null}
                 </div>
               </div>
 
@@ -661,13 +848,11 @@ export default async function BlackImpactScorePage({ searchParams }) {
                 <div className="card-muted rounded-[1.25rem] p-4">
                   <h3 className="text-lg font-semibold">Score Context</h3>
                   <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
-                    {usingLegacyModel
-                      ? "Legacy promise-based scoring is currently shown for this president."
-                      : "Outcome-based scoring is currently shown for this president."}
+                    {getScoreContextText({ metadata, usingLegacyModel })}
                   </p>
-                  {metadata?.scoring_model ? (
+                  {effectiveScoringModel ? (
                     <div className="mt-3 flex flex-wrap gap-2">
-                      <MetaPill>{metadata.scoring_model}</MetaPill>
+                      <MetaPill>{effectiveScoringModel}</MetaPill>
                     </div>
                   ) : null}
                 </div>
@@ -675,16 +860,33 @@ export default async function BlackImpactScorePage({ searchParams }) {
 
               <PresidentInsightPanel president={president} />
 
+              {isDebateMode ? (
+                <div className="grid gap-4 xl:grid-cols-2 mt-6">
+                  <StrongestDriverCard
+                    title="Strongest Positive Driver"
+                    promise={president.top_positive_promises?.[0] || null}
+                    linkToPromises={!isPublicView}
+                  />
+                  <StrongestDriverCard
+                    title="Strongest Negative Driver"
+                    promise={president.top_negative_promises?.[0] || null}
+                    linkToPromises={!isPublicView}
+                  />
+                </div>
+              ) : null}
+
               <div className="grid gap-4 xl:grid-cols-2 mt-6">
                 <PromiseDriverList
                   title="Key Positive Drivers"
                   items={president.top_positive_promises || []}
                   emptyMessage="No positive score drivers are currently highlighted for this president."
+                  linkToPromises={!isPublicView}
                 />
                 <PromiseDriverList
                   title="Key Negative Drivers"
                   items={president.top_negative_promises || []}
                   emptyMessage="No negative score drivers are currently highlighted for this president."
+                  linkToPromises={!isPublicView}
                 />
               </div>
             </section>
