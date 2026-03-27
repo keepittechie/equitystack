@@ -119,6 +119,33 @@ export default function StartPage() {
           </Link>
         ))}
       </section>
+
+      <section className="card-surface rounded-[1.6rem] p-6">
+        <h2 className="text-2xl font-semibold mb-3">Where to go next</h2>
+        <p className="text-sm text-[var(--ink-soft)] leading-7 max-w-3xl">
+          After the guided explainers, move into the tracked record layer first, then use the report system for summary, comparison, and timeline views.
+        </p>
+        <div className="grid gap-4 md:grid-cols-3 mt-5">
+          <Link href="/promises" className="panel-link block rounded-[1.25rem] p-5">
+            <h3 className="text-lg font-semibold">Promise Tracker</h3>
+            <p className="text-sm text-[var(--ink-soft)] mt-2 leading-7">
+              Review promises, actions, outcomes, and source-backed detail at the record level.
+            </p>
+          </Link>
+          <Link href="/reports/black-impact-score" className="panel-link block rounded-[1.25rem] p-5">
+            <h3 className="text-lg font-semibold">Black Impact Score</h3>
+            <p className="text-sm text-[var(--ink-soft)] mt-2 leading-7">
+              Move from individual records to a president-level accountability summary built from the tracker.
+            </p>
+          </Link>
+          <Link href="/reports/civil-rights-timeline" className="panel-link block rounded-[1.25rem] p-5">
+            <h3 className="text-lg font-semibold">Timeline</h3>
+            <p className="text-sm text-[var(--ink-soft)] mt-2 leading-7">
+              Follow the broader civil-rights arc when you want historical continuity beyond a single report state.
+            </p>
+          </Link>
+        </div>
+      </section>
     </main>
   );
 }

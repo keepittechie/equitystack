@@ -1163,7 +1163,7 @@ function ShareHeader({ shareUrl }) {
           <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Share Report</p>
           <h2 className="text-2xl font-semibold mt-2">Black Impact Score Report</h2>
           <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
-            A data-driven analysis of presidential impact based on real-world outcomes affecting Black Americans.
+            Share the current report state with the visible scoring context, filters, and verification path intact.
           </p>
         </div>
         <CopyShareLinkButton
@@ -1179,14 +1179,14 @@ function ShareHeader({ shareUrl }) {
   );
 }
 
-function PermalinkSection({ permalinkUrl, isPublicView }) {
+function PermalinkSection({ permalinkUrl }) {
   return (
     <section className="card-surface rounded-[1.6rem] p-5 print:hidden">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="max-w-3xl">
           <h2 className="text-lg font-semibold mb-2">Permalink</h2>
           <p className="text-sm text-[var(--ink-soft)] leading-7">
-            This stable link preserves the current report state, including active filters, view mode, and comparison context.
+            Use this direct link when you need to reopen the exact report state later, including filters, view mode, and comparison context.
           </p>
         </div>
         <CopyShareLinkButton
@@ -1195,7 +1195,7 @@ function PermalinkSection({ permalinkUrl, isPublicView }) {
           copiedLabel="Permalink Copied"
         />
       </div>
-      <div className={`mt-4 rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 px-4 py-3 text-sm text-[var(--ink-soft)] break-all ${isPublicView ? "" : ""}`}>
+      <div className="mt-4 rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 px-4 py-3 text-sm text-[var(--ink-soft)] break-all">
         {permalinkUrl}
       </div>
     </section>
@@ -1268,9 +1268,9 @@ function SnapshotSection({ snapshotLabel, isPublicShareView, permalinkUrl }) {
     <section className="card-muted rounded-[1.25rem] p-5">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="max-w-3xl">
-          <h2 className="text-lg font-semibold mb-2">Saved View Snapshot</h2>
+          <h2 className="text-lg font-semibold mb-2">Snapshot</h2>
           <p className="text-sm text-[var(--ink-soft)] leading-7">
-            A concise summary of the current report state that is ready to reuse and share.
+            A compact label for the current report state so it is easier to save, reuse, or share.
           </p>
         </div>
         <CopyShareLinkButton
@@ -1361,7 +1361,7 @@ function SourceAwareShareHeader({
           <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Share Report</p>
           <h2 className="text-2xl font-semibold mt-2">Black Impact Score</h2>
           <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
-            This shared view highlights the visible score context, strongest available drivers, and the quickest path to verification.
+            This shared view keeps the visible score context, strongest available drivers, and the quickest path to verification in one place.
           </p>
         </div>
         <CopyShareLinkButton
@@ -1413,7 +1413,7 @@ function AdvancedReportToolsSection({
       <details>
         <summary className="cursor-pointer list-none text-lg font-semibold">Advanced Tools</summary>
         <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7 max-w-3xl">
-          Use these secondary controls for debate workflows, deeper comparison, saved views, and print or PDF output.
+          These secondary controls support deeper comparison, debate workflows, saved views, and print or PDF output after you have the main report state set.
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
           <Link
@@ -2794,7 +2794,7 @@ export default async function BlackImpactScorePage({ searchParams }) {
             href="/promises"
             className="inline-flex items-center rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
           >
-            Explore Promise Tracker data
+            Open Promise Tracker
           </Link>
           <Link
             href="/reports"
@@ -2825,6 +2825,9 @@ export default async function BlackImpactScorePage({ searchParams }) {
         <p className="text-base md:text-lg text-[var(--ink-soft)] mt-4 max-w-3xl leading-8">
           This report measures presidential accountability through documented outcomes tied to Black-community impacts.
           It emphasizes what happened in practice, not just what was promised or enacted.
+        </p>
+        <p className="text-sm text-[var(--ink-soft)] mt-3 max-w-3xl leading-7">
+          Start with the standard report, then move into timeline or topic comparison when you want a narrower historical or policy-domain view.
         </p>
         <div className="mt-5 flex flex-wrap gap-2">
           <MetaPill>{presidents.length} presidents scored</MetaPill>
@@ -2871,7 +2874,7 @@ export default async function BlackImpactScorePage({ searchParams }) {
         presidentCompareHref={presidentCompareHref}
         compareHref={compareHref}
       >
-        <PermalinkSection permalinkUrl={permalinkUrl} isPublicView={isPublicView} />
+        <PermalinkSection permalinkUrl={permalinkUrl} />
 
         <SnapshotSection
           snapshotLabel={snapshotLabel}

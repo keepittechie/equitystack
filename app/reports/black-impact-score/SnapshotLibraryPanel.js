@@ -148,7 +148,7 @@ export default function SnapshotLibraryPanel({ currentSnapshot }) {
     }
 
     setSnapshots(nextItems);
-    setStatusMessage("Snapshot saved.");
+    setStatusMessage("Current view saved.");
   }
 
   function handleDeleteSnapshot(permalinkUrl) {
@@ -175,7 +175,7 @@ export default function SnapshotLibraryPanel({ currentSnapshot }) {
         <div className="max-w-3xl">
           <h2 className="text-lg font-semibold mb-2">Saved Snapshots</h2>
           <p className="text-sm text-[var(--ink-soft)] leading-7">
-            Save the current report state in this browser and reuse it later with the same permalink and visible mode context.
+            Save the current report state in this browser and reopen it later with the same link and visible mode context.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -184,14 +184,14 @@ export default function SnapshotLibraryPanel({ currentSnapshot }) {
             onClick={handleSaveSnapshot}
             className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
           >
-            Save Snapshot
+            Save Current View
           </button>
           <button
             type="button"
             onClick={handlePrint}
             className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
           >
-            Print / Save PDF
+            Print or Save PDF
           </button>
         </div>
       </div>
@@ -212,7 +212,7 @@ export default function SnapshotLibraryPanel({ currentSnapshot }) {
         </p>
       ) : snapshots.length === 0 ? (
         <p className="text-sm text-[var(--ink-soft)] mt-4">
-          No saved snapshots yet. Save the current report state to keep a reusable local snapshot.
+          No saved snapshots yet. Save the current view to keep a reusable local record in this browser.
         </p>
       ) : (
         <div className="space-y-3 mt-4">

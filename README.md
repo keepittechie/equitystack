@@ -2,6 +2,15 @@
 
 [https://equitystack.org](https://equitystack.org)
 
+EquityStack is a public-facing research and accountability platform focused on how laws, court cases, executive actions, and tracked political promises affect Black communities in the United States.
+
+The product is organized around a clear public flow:
+
+1. `Start Here` for guided background and framing
+2. `Promise Tracker` for record-level promises, actions, outcomes, and sources
+3. `Black Impact Score` for president-level accountability summaries built from those records
+4. `Timeline` and `Compare` views for historical continuity and side-by-side analysis
+
 This repository has two active parts:
 
 - the Node.js / Next.js website at the repo root
@@ -20,7 +29,13 @@ Key directories:
 - [`public/`](/home/josh/Documents/GitHub/equitystack/public) for website assets
 - [`database/`](/home/josh/Documents/GitHub/equitystack/database) for schema and SQL helpers
 
-Recent website additions include the public Promise Tracker at `/promises`, the Black Impact Score preview at `/promises/score-preview`, and the public report at `/reports/black-impact-score`.
+Core public routes:
+
+- [`/start`](/home/josh/Documents/GitHub/equitystack/app/start/page.js) for onboarding and guided explainers
+- [`/promises`](/home/josh/Documents/GitHub/equitystack/app/promises/page.js) for the Promise Tracker
+- [`/reports`](/home/josh/Documents/GitHub/equitystack/app/reports/page.js) for curated report entry points
+- [`/reports/black-impact-score`](/home/josh/Documents/GitHub/equitystack/app/reports/black-impact-score/page.js) for the Black Impact Score system
+- [`/reports/civil-rights-timeline`](/home/josh/Documents/GitHub/equitystack/app/reports/civil-rights-timeline/page.js) for the curated civil-rights timeline
 
 The current database source of truth is:
 
@@ -31,7 +46,30 @@ Active Promise Tracker reference docs now live in:
 - [`database/promise_tracker_import_batch_2_sources.md`](/home/josh/Documents/GitHub/equitystack/database/promise_tracker_import_batch_2_sources.md) for manual source reconciliation on the approved import batch
 - [`docs/promise-tracker-v1.md`](/home/josh/Documents/GitHub/equitystack/docs/promise-tracker-v1.md) for the feature summary
 
-Old one-off Promise Tracker staging files and superseded standalone SQL helper files were removed during cleanup once the full database dump was refreshed.
+## Black Impact Score in Plain Language
+
+Black Impact Score is the site’s accountability layer. It takes Promise Tracker records and summarizes them into president-level score views using documented outcomes rather than campaign rhetoric alone.
+
+Primary report modes:
+
+- Standard Report
+- Timeline
+- Topic Comparison
+- Share Report
+
+Advanced tools remain available on the same route, but they are intentionally secondary:
+
+- Debate mode
+- President comparison
+- Saved snapshots
+- Permalinks
+- Print / Save PDF
+
+For more detail, see:
+
+- [`docs/reports.md`](/home/josh/Documents/GitHub/equitystack/docs/reports.md)
+- [`docs/architecture.md`](/home/josh/Documents/GitHub/equitystack/docs/architecture.md)
+- [`docs/sharing.md`](/home/josh/Documents/GitHub/equitystack/docs/sharing.md)
 
 Run the website locally with:
 
@@ -52,6 +90,17 @@ npm run lint
 The app expects local environment variables in `.env.local`, including database connection settings and the admin basic-auth credentials used by [`proxy.js`](/home/josh/Documents/GitHub/equitystack/proxy.js).
 
 Deployment is handled by [`deploy.sh`](/home/josh/Documents/GitHub/equitystack/deploy.sh).
+
+## Sharing and Reuse
+
+The public report system supports a few lightweight sharing paths:
+
+- `Share Report` is the main public-facing share action
+- normalized permalinks preserve exact report state under the hood
+- saved snapshots keep reusable report states in the current browser
+- browser print provides the current print / save-PDF export path
+
+These features all reuse the same report-state system. They do not change scoring or store report state in the database.
 
 ## Python Data Pipeline
 

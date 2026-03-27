@@ -108,7 +108,7 @@ export default async function ReportsPage() {
     <main className="max-w-7xl mx-auto p-6">
       <section className="hero-panel p-8 md:p-10 mb-6">
         <div className="section-intro">
-          <p className="eyebrow mb-4">Quantitative View</p>
+          <p className="eyebrow mb-4">Reports Hub</p>
           <h1 className="text-4xl md:text-5xl font-bold">Reports</h1>
           <p className="text-base md:text-lg text-[var(--ink-soft)] mt-4 max-w-3xl leading-8">
             Start with the featured accountability reports, then move into broader analytics
@@ -116,39 +116,6 @@ export default async function ReportsPage() {
             descriptive, not causal, and should be interpreted within historical context.
           </p>
         </div>
-      </section>
-
-      <section className="card-muted rounded-[1.6rem] p-5 mb-6">
-        <h2 className="text-lg font-semibold mb-2">How to Read This Dashboard</h2>
-        <p className="text-sm text-[var(--ink-soft)] mb-2">
-          This dashboard analyzes public policies based on their documented impact on Black communities,
-          using a structured scoring system. Each policy is evaluated across factors such as directness,
-          material impact, evidence strength, durability, and equity.
-        </p>
-        <p className="text-sm text-[var(--ink-soft)]">
-          These results represent structured analysis based on historical data and research.
-          They should be interpreted as part of a broader context rather than a single definitive conclusion.
-        </p>
-      </section>
-
-      <section className="card-surface rounded-[1.6rem] p-5 mb-8">
-        <h2 className="text-lg font-semibold mb-3">Metrics Explained</h2>
-        <ul className="text-sm text-[var(--ink-soft)] space-y-2">
-          <li>
-            <strong>Policy Impact Score:</strong> Composite score based on directness, material impact,
-            evidence, durability, and equity.
-          </li>
-          <li>
-            <strong>Net Weighted Impact:</strong> Total impact score adjusted by whether outcomes were
-            positive, negative, or mixed.
-          </li>
-          <li>
-            <strong>Direct Impact:</strong> Policies explicitly targeting or directly affecting Black communities.
-          </li>
-          <li>
-            <strong>Indirect Impact:</strong> Policies affecting broader systems with measurable downstream effects.
-          </li>
-        </ul>
       </section>
 
       <section className="card-surface rounded-[1.6rem] p-5 mb-8">
@@ -289,6 +256,38 @@ export default async function ReportsPage() {
             Compare party views
           </Link>
         </div>
+      </section>
+
+      <section className="card-muted rounded-[1.6rem] p-5 mb-6">
+        <h2 className="text-lg font-semibold mb-2">How to Read the Analytics Layer</h2>
+        <p className="text-sm text-[var(--ink-soft)] mb-2">
+          These summaries analyze public policies using a structured scoring system across directness,
+          material impact, evidence strength, durability, and equity.
+        </p>
+        <p className="text-sm text-[var(--ink-soft)]">
+          Use them as supporting context after the featured report paths, not as a replacement for the
+          Promise Tracker or Black Impact Score views.
+        </p>
+      </section>
+
+      <section className="card-surface rounded-[1.6rem] p-5 mb-8">
+        <h2 className="text-lg font-semibold mb-3">Metrics Explained</h2>
+        <ul className="text-sm text-[var(--ink-soft)] space-y-2">
+          <li>
+            <strong>Policy Impact Score:</strong> Composite score based on directness, material impact,
+            evidence, durability, and equity.
+          </li>
+          <li>
+            <strong>Net Weighted Impact:</strong> Total impact score adjusted by whether outcomes were
+            positive, negative, or mixed.
+          </li>
+          <li>
+            <strong>Direct Impact:</strong> Policies explicitly targeting or directly affecting Black communities.
+          </li>
+          <li>
+            <strong>Indirect Impact:</strong> Policies affecting broader systems with measurable downstream effects.
+          </li>
+        </ul>
       </section>
 
       <section className="card-surface rounded-[1.6rem] p-5 mb-8">
