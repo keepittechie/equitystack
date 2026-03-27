@@ -7,6 +7,7 @@ import { aggregatePresidentFromOutcomes } from "@/lib/black-impact-score/preside
 import { fetchPromiseTimelineRelationshipMap } from "@/lib/services/promiseService";
 import { aggregatePromiseScoresByPresident } from "@/lib/promise-tracker-scoring";
 import CopyShareLinkButton from "./CopyShareLinkButton";
+import SnapshotLibraryPanel from "./SnapshotLibraryPanel";
 
 const REPORT_PATH = "/reports/black-impact-score";
 const DEFAULT_TITLE = "Black Impact Score Report";
@@ -1156,7 +1157,7 @@ function MethodologySection({ methodology, metadata, usingLegacyModel, isLegacyF
 
 function ShareHeader({ shareUrl }) {
   return (
-    <section className="card-surface rounded-[1.6rem] p-6">
+    <section className="card-surface rounded-[1.6rem] p-6 print:hidden">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="max-w-3xl">
           <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Share This Report</p>
@@ -1176,7 +1177,7 @@ function ShareHeader({ shareUrl }) {
 
 function PermalinkSection({ permalinkUrl, isPublicView }) {
   return (
-    <section className="card-surface rounded-[1.6rem] p-5">
+    <section className="card-surface rounded-[1.6rem] p-5 print:hidden">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="max-w-3xl">
           <h2 className="text-lg font-semibold mb-2">Permalink</h2>
@@ -1260,7 +1261,7 @@ function getSnapshotLabel({
 
 function SnapshotSection({ snapshotLabel, isPublicShareView, permalinkUrl }) {
   return (
-    <section className="card-surface rounded-[1.6rem] p-5">
+    <section className="card-surface rounded-[1.6rem] p-5 print:hidden">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="max-w-3xl">
           <h2 className="text-lg font-semibold mb-2">Snapshot</h2>
@@ -1282,6 +1283,60 @@ function SnapshotSection({ snapshotLabel, isPublicShareView, permalinkUrl }) {
   );
 }
 
+function getSnapshotModeSummary({
+  effectiveScoringModel,
+  selectedTopic,
+  isTimelineView,
+  isTopicCompareView,
+  isPresidentCompareView,
+  isDebateMode,
+  isPublicView,
+  isPublicShareView,
+  selectedPresident,
+  selectedPresidentA,
+  selectedPresidentB,
+}) {
+  const parts = [];
+
+  if (isPresidentCompareView) {
+    parts.push("President comparison");
+  } else if (isTopicCompareView) {
+    parts.push("Topic comparison");
+  } else if (isTimelineView) {
+    parts.push("Timeline view");
+  } else {
+    parts.push("Report view");
+  }
+
+  parts.push(`Scoring model: ${effectiveScoringModel}`);
+
+  if (selectedTopic?.label) {
+    parts.push(`Topic: ${selectedTopic.label}`);
+  }
+
+  if (selectedPresident) {
+    parts.push(`President: ${selectedPresident}`);
+  }
+
+  if (selectedPresidentA || selectedPresidentB) {
+    parts.push(
+      `Compared presidents: ${selectedPresidentA || "Unselected"} and ${selectedPresidentB || "Unselected"}`
+    );
+  }
+
+  if (isDebateMode) {
+    parts.push("Debate mode active");
+  }
+
+  if (isPublicShareView) {
+    parts.push("Public-share state");
+  } else if (isPublicView) {
+    parts.push("Public state");
+  }
+
+  return parts.join(" · ");
+}
+
 function SourceAwareShareHeader({
   shareUrl,
   selectedTopic,
@@ -1296,7 +1351,7 @@ function SourceAwareShareHeader({
       : "Outcome-based";
 
   return (
-    <section className="card-surface rounded-[1.6rem] p-6">
+    <section className="card-surface rounded-[1.6rem] p-6 print:hidden">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="max-w-3xl">
           <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Source-Aware Share View</p>
@@ -1483,7 +1538,7 @@ function TopicFilterSection({
   }
 
   return (
-    <section className="card-surface rounded-[1.6rem] p-5">
+    <section className="card-surface rounded-[1.6rem] p-5 print:hidden">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="max-w-3xl">
           <h2 className="text-lg font-semibold mb-2">Topic Filter</h2>
@@ -1570,7 +1625,7 @@ function MultiViewToggleSection({
   isPresidentCompareView,
 }) {
   return (
-    <section className="card-surface rounded-[1.6rem] p-5">
+    <section className="card-surface rounded-[1.6rem] p-5 print:hidden">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="max-w-3xl">
           <h2 className="text-lg font-semibold mb-2">View Mode</h2>
@@ -1981,7 +2036,7 @@ function PresidentCompareSelectorSection({
   }
 
   return (
-    <section className="card-surface rounded-[1.6rem] p-5">
+    <section className="card-surface rounded-[1.6rem] p-5 print:hidden">
       <div className="grid gap-5 lg:grid-cols-2">
         <div>
           <h2 className="text-lg font-semibold mb-2">Select President A</h2>
@@ -2658,11 +2713,24 @@ export default async function BlackImpactScorePage({ searchParams }) {
     requestedModel,
     isLegacyFallbackActive,
   });
+  const snapshotModeSummary = getSnapshotModeSummary({
+    effectiveScoringModel,
+    selectedTopic,
+    isTimelineView,
+    isTopicCompareView,
+    isPresidentCompareView,
+    isDebateMode,
+    isPublicView,
+    isPublicShareView,
+    selectedPresident: requestedPresidentSlug ? formatPresidentSlug(requestedPresidentSlug) : null,
+    selectedPresidentA: selectedPresidentA?.president || null,
+    selectedPresidentB: selectedPresidentB?.president || null,
+  });
 
   return (
     <main className={`max-w-7xl mx-auto ${isPublicView ? "px-6 py-10 space-y-10" : "p-6 space-y-8"}`}>
       {!isPublicView ? (
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-wrap gap-3 print:hidden">
           <Link
             href="/promises"
             className="inline-flex items-center rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
@@ -2728,6 +2796,14 @@ export default async function BlackImpactScorePage({ searchParams }) {
         snapshotLabel={snapshotLabel}
         isPublicShareView={isPublicShareView}
         permalinkUrl={permalinkUrl}
+      />
+
+      <SnapshotLibraryPanel
+        currentSnapshot={{
+          label: snapshotLabel,
+          permalinkUrl,
+          modeSummary: snapshotModeSummary,
+        }}
       />
 
       {isPublicShareView ? (
