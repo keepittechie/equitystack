@@ -7,7 +7,7 @@ import { buildPageMetadata } from "@/lib/metadata";
 export const metadata = buildPageMetadata({
   title: "Reports",
   description:
-    "View EquityStack reports on policy impact across parties, eras, categories, and direct Black impact.",
+    "Explore EquityStack's featured accountability reports first, then move into broader analytics and supporting tools.",
   path: "/reports",
 });
 
@@ -109,11 +109,11 @@ export default async function ReportsPage() {
       <section className="hero-panel p-8 md:p-10 mb-6">
         <div className="section-intro">
           <p className="eyebrow mb-4">Quantitative View</p>
-          <h1 className="text-4xl md:text-5xl font-bold">Reports Dashboard</h1>
+          <h1 className="text-4xl md:text-5xl font-bold">Reports</h1>
           <p className="text-base md:text-lg text-[var(--ink-soft)] mt-4 max-w-3xl leading-8">
-            This dashboard summarizes policy impacts across time, political control,
-            categories, and direct Black impact. These charts are descriptive, not causal,
-            and should be interpreted within historical context.
+            Start with the featured accountability reports, then move into broader analytics
+            and supporting tools when you want more quantitative context. These charts are
+            descriptive, not causal, and should be interpreted within historical context.
           </p>
         </div>
       </section>
@@ -153,11 +153,10 @@ export default async function ReportsPage() {
 
       <section className="card-surface rounded-[1.6rem] p-5 mb-8">
         <div className="max-w-3xl mb-5">
-          <h2 className="text-lg font-semibold mb-2">Flagship Accountability Views</h2>
+          <h2 className="text-lg font-semibold mb-2">Featured Accountability Reports</h2>
           <p className="text-sm text-[var(--ink-soft)] leading-7">
-            These three connected views are the clearest way to understand the project:
-            track presidential commitments, compare their Black-community impact, and place
-            them inside the longer civil-rights story.
+            These are the core public-facing report paths for understanding presidential commitments,
+            documented outcomes, and the longer civil-rights arc.
           </p>
         </div>
 
@@ -188,10 +187,10 @@ export default async function ReportsPage() {
 
       <section className="card-surface rounded-[1.6rem] p-5 mb-8">
         <div className="max-w-3xl mb-5">
-          <h2 className="text-lg font-semibold mb-2">Black Impact Score Entry Points</h2>
+          <h2 className="text-lg font-semibold mb-2">Black Impact Score Modes</h2>
           <p className="text-sm text-[var(--ink-soft)] leading-7">
             These curated entry points highlight the main ways to use the Black Impact Score system
-            without exposing the full query-state surface.
+            without exposing every advanced report mode at once.
           </p>
         </div>
 
@@ -217,19 +216,9 @@ export default async function ReportsPage() {
             href="/reports/black-impact-score?view=topic-compare"
           />
           <CuratedModeCard
-            title="President Comparison"
-            description="Use the two-president comparison workflow to compare two administrations within one selected topic."
-            href="/reports/black-impact-score?view=president-compare"
-          />
-          <CuratedModeCard
-            title="Public Share View"
-            description="Open a public-safe share-ready view with evidence context and verification guidance."
+            title="Share Report"
+            description="Open a public-safe share-ready report with evidence context and verification guidance."
             href="/reports/black-impact-score?view=public-share"
-          />
-          <CuratedModeCard
-            title="Debate View"
-            description="Highlight the strongest visible drivers and verification cues in a factual debate-oriented layout."
-            href="/reports/black-impact-score?mode=debate"
           />
         </div>
       </section>
@@ -264,7 +253,7 @@ export default async function ReportsPage() {
             <li>Evidence-backed drivers and inline transparency panels.</li>
             <li>Timeline and causal timeline views for historical context.</li>
             <li>Topic comparison and president-vs-president comparison.</li>
-            <li>Public-share views, debate views, and stable permalinks.</li>
+            <li>Share-ready public views, debate-ready receipts, and stable permalinks.</li>
             <li>Saved snapshots and browser print/save-PDF workflow.</li>
           </ul>
         </section>
@@ -273,23 +262,43 @@ export default async function ReportsPage() {
       <section className="card-surface rounded-[1.6rem] p-5 mb-8">
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div className="max-w-3xl">
-            <h2 className="text-lg font-semibold mb-2">Adjacent Analysis Views</h2>
+            <h2 className="text-lg font-semibold mb-2">Additional Analytics and Supporting Tools</h2>
             <p className="text-sm text-[var(--ink-soft)] leading-7">
-              Use reports for the quantitative overview, then move into the core record and comparison views
-              when you want to inspect the underlying material more directly.
+              Use these after the featured reports when you want broader dataset exploration,
+              supporting policy context, or secondary quantitative views.
             </p>
           </div>
         </div>
         <div className="mt-4 flex flex-wrap gap-3 text-sm">
+          <Link href="/reports/civil-rights-timeline" className="accent-link">
+            Civil Rights Timeline
+          </Link>
+          <Link href="/reports/black-impact-score?mode=debate" className="accent-link">
+            Debate-ready score view
+          </Link>
+          <Link href="/reports/black-impact-score?view=president-compare" className="accent-link">
+            President comparison
+          </Link>
           <Link href="/policies" className="accent-link">
             Browse policies
           </Link>
           <Link href="/timeline" className="accent-link">
-            Open timeline
+            Open database timeline
           </Link>
           <Link href="/compare" className="accent-link">
             Compare party views
           </Link>
+        </div>
+      </section>
+
+      <section className="card-surface rounded-[1.6rem] p-5 mb-8">
+        <div className="max-w-3xl">
+          <h2 className="text-lg font-semibold mb-2">Analytics Dashboard</h2>
+          <p className="text-sm text-[var(--ink-soft)] leading-7">
+            These quantitative summaries provide broader context across parties, eras, categories,
+            direct Black impact, top policies, and rollback patterns. They support the featured
+            accountability reports rather than replacing them.
+          </p>
         </div>
       </section>
 

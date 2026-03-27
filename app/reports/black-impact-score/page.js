@@ -1160,13 +1160,17 @@ function ShareHeader({ shareUrl }) {
     <section className="card-surface rounded-[1.6rem] p-6 print:hidden">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="max-w-3xl">
-          <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Share This Report</p>
+          <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Share Report</p>
           <h2 className="text-2xl font-semibold mt-2">Black Impact Score Report</h2>
           <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
             A data-driven analysis of presidential impact based on real-world outcomes affecting Black Americans.
           </p>
         </div>
-        <CopyShareLinkButton path={shareUrl} />
+        <CopyShareLinkButton
+          path={shareUrl}
+          defaultLabel="Copy Share Link"
+          copiedLabel="Share Link Copied"
+        />
       </div>
       <div className="mt-4 rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 px-4 py-3 text-sm text-[var(--ink-soft)] break-all">
         {shareUrl}
@@ -1261,10 +1265,10 @@ function getSnapshotLabel({
 
 function SnapshotSection({ snapshotLabel, isPublicShareView, permalinkUrl }) {
   return (
-    <section className="card-surface rounded-[1.6rem] p-5 print:hidden">
+    <section className="card-muted rounded-[1.25rem] p-5">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="max-w-3xl">
-          <h2 className="text-lg font-semibold mb-2">Snapshot</h2>
+          <h2 className="text-lg font-semibold mb-2">Saved View Snapshot</h2>
           <p className="text-sm text-[var(--ink-soft)] leading-7">
             A concise summary of the current report state that is ready to reuse and share.
           </p>
@@ -1354,13 +1358,17 @@ function SourceAwareShareHeader({
     <section className="card-surface rounded-[1.6rem] p-6 print:hidden">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="max-w-3xl">
-          <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Source-Aware Share View</p>
+          <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Share Report</p>
           <h2 className="text-2xl font-semibold mt-2">Black Impact Score</h2>
           <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
             This shared view highlights the visible score context, strongest available drivers, and the quickest path to verification.
           </p>
         </div>
-        <CopyShareLinkButton path={shareUrl} />
+        <CopyShareLinkButton
+          path={shareUrl}
+          defaultLabel="Copy Share Link"
+          copiedLabel="Share Link Copied"
+        />
       </div>
       <div className="mt-4 flex flex-wrap gap-2">
         {selectedTopic ? <MetaPill>Topic: {selectedTopic.label}</MetaPill> : null}
@@ -1390,6 +1398,47 @@ function DebateModeHeader() {
           description="This view emphasizes the strongest score drivers and the records used to verify them."
         />
       </div>
+    </section>
+  );
+}
+
+function AdvancedReportToolsSection({
+  debateHref,
+  presidentCompareHref,
+  compareHref,
+  children,
+}) {
+  return (
+    <section className="card-surface rounded-[1.6rem] p-5 print:hidden">
+      <details>
+        <summary className="cursor-pointer list-none text-lg font-semibold">Advanced Tools</summary>
+        <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7 max-w-3xl">
+          Use these secondary controls for debate workflows, deeper comparison, saved views, and print or PDF output.
+        </p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <Link
+            href={presidentCompareHref}
+            className="rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
+          >
+            President Comparison
+          </Link>
+          <Link
+            href={debateHref}
+            className="rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
+          >
+            Debate View
+          </Link>
+          <Link
+            href={compareHref}
+            className="rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
+          >
+            Compare with Previous Model
+          </Link>
+        </div>
+        <div className="mt-5 space-y-4">
+          {children}
+        </div>
+      </details>
     </section>
   );
 }
@@ -1619,10 +1668,11 @@ function MultiViewToggleSection({
   reportHref,
   timelineHref,
   topicCompareHref,
-  presidentCompareHref,
+  publicShareHref,
   isTimelineView,
   isTopicCompareView,
   isPresidentCompareView,
+  isPublicShareView,
 }) {
   return (
     <section className="card-surface rounded-[1.6rem] p-5 print:hidden">
@@ -1630,19 +1680,19 @@ function MultiViewToggleSection({
         <div className="max-w-3xl">
           <h2 className="text-lg font-semibold mb-2">View Mode</h2>
           <p className="text-sm text-[var(--ink-soft)] leading-7">
-            Switch between the report, the chronological timeline, and the topic comparison view without changing the underlying scoring model.
+            Switch between the primary report modes without changing the underlying scoring model.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Link
             href={reportHref}
             className={`rounded-full border px-4 py-2 text-sm font-medium ${
-              !isTimelineView && !isTopicCompareView
+              !isTimelineView && !isTopicCompareView && !isPresidentCompareView && !isPublicShareView
                 ? "border-[rgba(120,53,15,0.2)] bg-[rgba(120,53,15,0.08)] text-[var(--ink)]"
                 : "border-[rgba(120,53,15,0.12)] bg-white/80 text-[var(--ink-soft)] hover:text-[var(--accent)]"
             }`}
           >
-            Report View
+            Standard Report
           </Link>
           <Link
             href={timelineHref}
@@ -1665,14 +1715,14 @@ function MultiViewToggleSection({
             Topic Comparison
           </Link>
           <Link
-            href={presidentCompareHref}
+            href={publicShareHref}
             className={`rounded-full border px-4 py-2 text-sm font-medium ${
-              isPresidentCompareView
+              isPublicShareView
                 ? "border-[rgba(120,53,15,0.2)] bg-[rgba(120,53,15,0.08)] text-[var(--ink)]"
                 : "border-[rgba(120,53,15,0.12)] bg-white/80 text-[var(--ink-soft)] hover:text-[var(--accent)]"
             }`}
           >
-            President Comparison
+            Share Report
           </Link>
         </div>
       </div>
@@ -2664,6 +2714,15 @@ export default async function BlackImpactScorePage({ searchParams }) {
     model: "compare",
     topic: selectedTopic?.value || requestedTopicParam,
   });
+  const debateHref = buildReportHref({
+    viewFlags,
+    mode: "debate",
+    president: requestedPresidentSlug,
+    presidentA: requestedPresidentASlug,
+    presidentB: requestedPresidentBSlug,
+    model: requestedModel,
+    topic: selectedTopic?.value || requestedTopicParam,
+  });
   const allTopicsHref = buildReportHref({
     viewFlags,
     mode: isDebateMode ? "debate" : null,
@@ -2743,12 +2802,6 @@ export default async function BlackImpactScorePage({ searchParams }) {
           >
             Back to Reports
           </Link>
-          <Link
-            href={compareHref}
-            className="inline-flex items-center rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
-          >
-            Compare with previous model
-          </Link>
         </div>
       ) : null}
 
@@ -2790,22 +2843,6 @@ export default async function BlackImpactScorePage({ searchParams }) {
         </div>
       </section>
 
-      <PermalinkSection permalinkUrl={permalinkUrl} isPublicView={isPublicView} />
-
-      <SnapshotSection
-        snapshotLabel={snapshotLabel}
-        isPublicShareView={isPublicShareView}
-        permalinkUrl={permalinkUrl}
-      />
-
-      <SnapshotLibraryPanel
-        currentSnapshot={{
-          label: snapshotLabel,
-          permalinkUrl,
-          modeSummary: snapshotModeSummary,
-        }}
-      />
-
       {isPublicShareView ? (
         <SourceAwareEvidenceTrail items={shareEvidenceItems} isPublicView={isPublicView} />
       ) : null}
@@ -2814,10 +2851,11 @@ export default async function BlackImpactScorePage({ searchParams }) {
         reportHref={standardReportHref}
         timelineHref={timelineReportHref}
         topicCompareHref={topicCompareHref}
-        presidentCompareHref={presidentCompareHref}
+        publicShareHref={shareUrl}
         isTimelineView={isTimelineView}
         isTopicCompareView={isTopicCompareView}
         isPresidentCompareView={isPresidentCompareView}
+        isPublicShareView={isPublicShareView}
       />
 
       <TopicFilterSection
@@ -2827,6 +2865,28 @@ export default async function BlackImpactScorePage({ searchParams }) {
         buildTopicHref={buildTopicHref}
         isPublicView={isPublicView}
       />
+
+      <AdvancedReportToolsSection
+        debateHref={debateHref}
+        presidentCompareHref={presidentCompareHref}
+        compareHref={compareHref}
+      >
+        <PermalinkSection permalinkUrl={permalinkUrl} isPublicView={isPublicView} />
+
+        <SnapshotSection
+          snapshotLabel={snapshotLabel}
+          isPublicShareView={isPublicShareView}
+          permalinkUrl={permalinkUrl}
+        />
+
+        <SnapshotLibraryPanel
+          currentSnapshot={{
+            label: snapshotLabel,
+            permalinkUrl,
+            modeSummary: snapshotModeSummary,
+          }}
+        />
+      </AdvancedReportToolsSection>
 
       {isPresidentCompareView && selectedTopic ? (
         <PresidentCompareSelectorSection

@@ -3,12 +3,18 @@ import { fetchInternalJson } from "@/lib/api";
 import { PUBLIC_REVALIDATE_SECONDS, withRevalidate } from "@/lib/cache";
 import { buildPageMetadata } from "@/lib/metadata";
 
-export const metadata = buildPageMetadata({
-  title: "Black Impact Score Preview",
-  description:
-    "Internal comparison view for the legacy Promise Tracker score model and the newer outcome-based Black Impact Score model.",
-  path: "/promises/score-preview",
-});
+export const metadata = {
+  ...buildPageMetadata({
+    title: "Black Impact Score Preview",
+    description:
+      "Internal comparison view for the legacy Promise Tracker score model and the newer outcome-based Black Impact Score model.",
+    path: "/promises/score-preview",
+  }),
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 async function getPromiseScorePreview() {
   return fetchInternalJson("/api/promises/scores?model=compare", {
