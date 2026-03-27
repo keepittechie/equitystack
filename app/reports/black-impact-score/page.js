@@ -1,18 +1,21 @@
 import Link from "next/link";
-import { PromiseImpactDirectionBadge } from "@/app/components/policy-badges";
+import { ImpactBadge } from "@/app/components/policy-badges";
 import { fetchInternalJson } from "@/lib/api";
 import { REPORT_REVALIDATE_SECONDS, withRevalidate } from "@/lib/cache";
 import { buildPageMetadata } from "@/lib/metadata";
+import { getBlackImpactScoreMethodology } from "@/lib/black-impact-score/methodology.js";
 
 export const metadata = buildPageMetadata({
   title: "Black Impact Score",
   description:
-    "A Promise Tracker report summarizing presidential accountability for promises and outcomes tied to Black-community impacts.",
+    "A Promise Tracker report summarizing presidential accountability for documented outcomes tied to Black-community impacts.",
   path: "/reports/black-impact-score",
 });
 
-async function getBlackImpactScores() {
-  return fetchInternalJson("/api/promises/scores", {
+async function getBlackImpactScores(model) {
+  const query = model && model !== "outcome" ? `?model=${model}` : "";
+
+  return fetchInternalJson(`/api/promises/scores${query}`, {
     ...withRevalidate(REPORT_REVALIDATE_SECONDS),
     errorMessage: "Failed to fetch Black Impact Score data",
   });
@@ -43,7 +46,7 @@ function formatRawScore(value) {
 
 function formatNormalizedScore(value) {
   const numeric = Number(value ?? 0);
-  return Number.isFinite(numeric) ? numeric.toFixed(4) : String(value);
+  return Number.isFinite(numeric) ? numeric.toFixed(2) : String(value);
 }
 
 function formatSignedScore(value) {
@@ -55,6 +58,19 @@ function formatSignedScore(value) {
 
 function formatImpactDisplayLabel(label) {
   return label === "Mixed" ? "Mixed Impact" : label;
+}
+
+function getPrimaryImpactDirection(promise) {
+  const directions = (promise.scored_outcomes || [])
+    .map((item) => item.impact_direction)
+    .filter(Boolean);
+
+  if (directions.includes("Mixed")) return "Mixed";
+  if (directions.includes("Blocked")) return "Blocked";
+  if (directions.includes("Negative")) return "Negative";
+  if (directions.includes("Positive")) return "Positive";
+
+  return null;
 }
 
 function CountBarGroup({ title, counts }) {
@@ -105,7 +121,7 @@ function TopicBreakdown({ items }) {
         <div className="mt-3 flex flex-wrap gap-2">
           {items.map((item) => (
             <MetaPill key={item.topic}>
-              {item.topic}: {formatSignedScore(item.raw_score)}
+              {item.topic}: {formatSignedScore(item.raw_score_total)}
             </MetaPill>
           ))}
         </div>
@@ -128,51 +144,173 @@ function PromiseDriverList({ title, items, emptyMessage }) {
         <p className="text-sm text-[var(--ink-soft)]">{emptyMessage}</p>
       ) : (
         <div className="space-y-3">
-          {items.slice(0, 3).map((promise) => (
-            <div
-              key={promise.slug}
-              className={`rounded-[1rem] border bg-white/85 p-4 ${
-                promise.impact_direction_for_curation === "Mixed"
-                  ? "border-[rgba(180,83,9,0.14)] bg-[linear-gradient(180deg,rgba(255,251,235,0.86),rgba(255,255,255,0.98))]"
-                  : "border-[rgba(120,53,15,0.1)]"
-              }`}
-            >
-              <div className="flex items-start justify-between gap-3 flex-wrap">
-                <div>
-                  <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">
-                    {promise.topic || "No topic"}
-                  </p>
-                  <Link href={`/promises/${promise.slug}`} className="accent-link text-base font-semibold mt-2 inline-block">
-                    {promise.title}
-                  </Link>
+          {items.slice(0, 3).map((promise) => {
+            const impactDirection = getPrimaryImpactDirection(promise);
+
+            return (
+              <div
+                key={promise.slug || promise.id || promise.title}
+                className={`rounded-[1rem] border bg-white/85 p-4 ${
+                  impactDirection === "Mixed"
+                    ? "border-[rgba(180,83,9,0.14)] bg-[linear-gradient(180deg,rgba(255,251,235,0.86),rgba(255,255,255,0.98))]"
+                    : "border-[rgba(120,53,15,0.1)]"
+                }`}
+              >
+                <div className="flex items-start justify-between gap-3 flex-wrap">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">
+                      {promise.topic || "No topic"}
+                    </p>
+                    {promise.slug ? (
+                      <Link href={`/promises/${promise.slug}`} className="accent-link text-base font-semibold mt-2 inline-block">
+                        {promise.title}
+                      </Link>
+                    ) : (
+                      <p className="text-base font-semibold mt-2">{promise.title}</p>
+                    )}
+                  </div>
+                  <div className="flex flex-wrap items-center justify-end gap-2">
+                    {impactDirection ? <ImpactBadge impact={impactDirection} /> : null}
+                    <MetaPill>{formatSignedScore(promise.total_score)}</MetaPill>
+                  </div>
                 </div>
-                <div className="flex flex-wrap items-center justify-end gap-2">
-                  <PromiseImpactDirectionBadge impact={promise.impact_direction_for_curation} />
-                  <MetaPill>{formatSignedScore(promise.raw_score)}</MetaPill>
+
+                <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
+                  {promise.explanation_summary || "No explanation is available for this record yet."}
+                </p>
+
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <MetaPill>{promise.outcome_count || 0} outcomes</MetaPill>
                 </div>
               </div>
-
-              <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
-                {promise.summary || "No summary added yet."}
-              </p>
-
-              {promise.impact_direction_for_curation === "Mixed" ? (
-                <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
-                  Mixed impact: documented gains with important limits or exclusions.
-                </p>
-              ) : null}
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </section>
   );
 }
 
-export default async function BlackImpactScorePage() {
-  const data = await getBlackImpactScores();
-  const methodology = data.methodology || null;
-  const presidents = data.items || [];
+function MethodologySection({ methodology }) {
+  return (
+    <section className="card-surface rounded-[1.6rem] p-5">
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div className="max-w-3xl">
+          <h2 className="text-lg font-semibold mb-2">How This Score Is Calculated</h2>
+          <p className="text-sm text-[var(--ink-soft)] leading-7">
+            Scores are based on documented real-world outcomes, not just promises or enacted laws.
+            Each outcome is classified as positive, negative, mixed, or blocked, then weighted by
+            evidence strength and available source support before president totals are aggregated.
+          </p>
+        </div>
+        <a
+          href="#methodology"
+          className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
+        >
+          View Methodology
+        </a>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4 mt-5">
+        <ScoreCard
+          label="Outcome Types"
+          value="4"
+          subtitle="Positive, Negative, Mixed, and Blocked"
+        />
+        <ScoreCard
+          label="Evidence Weighting"
+          value="Active"
+          subtitle="Stronger evidence carries more weight"
+        />
+        <ScoreCard
+          label="Source Support"
+          value="Included"
+          subtitle="Outcome records incorporate source counts"
+        />
+        <ScoreCard
+          label="Aggregation"
+          value="By President"
+          subtitle="President scores roll up from outcome-linked records"
+        />
+      </div>
+    </section>
+  );
+}
+
+function normalizeOutcomePresident(president) {
+  return {
+    president: president.president,
+    president_slug: president.president_slug,
+    president_party: president.president_party,
+    raw_score: president.raw_score_total,
+    normalized_score: president.normalized_score_total,
+    promise_count: president.promise_count,
+    outcome_count: president.outcome_count,
+    explanation: president.explanation_summary,
+    counts_by_direction: president.breakdowns?.by_direction || {},
+    counts_by_confidence: president.breakdowns?.by_confidence || {},
+    score_by_topic: president.breakdowns?.by_topic || [],
+    top_positive_promises: president.top_positive_promises || [],
+    top_negative_promises: president.top_negative_promises || [],
+  };
+}
+
+function normalizeLegacyPresident(president) {
+  return {
+    president: president.president,
+    president_slug: president.president_slug,
+    president_party: president.president_party,
+    raw_score: president.raw_score,
+    normalized_score: president.normalized_score,
+    promise_count: president.promise_count,
+    outcome_count: null,
+    explanation: president.score_explanation,
+    counts_by_direction: president.counts_by_impact_direction || {},
+    counts_by_confidence: president.counts_by_relevance || {},
+    score_by_topic: (president.score_by_topic || []).map((item) => ({
+      topic: item.topic,
+      raw_score_total: item.raw_score,
+    })),
+    top_positive_promises: president.top_positive_promises || [],
+    top_negative_promises: president.top_negative_promises || [],
+  };
+}
+
+export default async function BlackImpactScorePage({ searchParams }) {
+  const resolvedSearchParams = (await searchParams) || {};
+  const requestedModel =
+    resolvedSearchParams.model === "legacy" || resolvedSearchParams.model === "compare"
+      ? resolvedSearchParams.model
+      : "outcome";
+  const data = await getBlackImpactScores(requestedModel);
+  const isLegacyFallback = data.notice === "Outcome-based scoring is temporarily unavailable";
+  const comparisonMode = data.model === "compare";
+  const publicOutcomeMethodology = getBlackImpactScoreMethodology();
+
+  let methodology = null;
+  let presidents = [];
+  let metadata = null;
+  let usingLegacyModel = false;
+
+  if (comparisonMode) {
+    if (data.outcome?.error) {
+      usingLegacyModel = true;
+      methodology = publicOutcomeMethodology;
+      presidents = (data.legacy?.items || []).map(normalizeLegacyPresident);
+    } else {
+      methodology = data.outcome?.methodology || null;
+      presidents = (data.outcome?.items || []).map(normalizeOutcomePresident);
+      metadata = data.outcome?.metadata || null;
+    }
+  } else if (data.model === "legacy") {
+    usingLegacyModel = true;
+    methodology = isLegacyFallback ? publicOutcomeMethodology : data.methodology || null;
+    presidents = (data.items || []).map(normalizeLegacyPresident);
+  } else {
+    methodology = data.methodology || publicOutcomeMethodology;
+    presidents = (data.items || []).map(normalizeOutcomePresident);
+    metadata = data.metadata || null;
+  }
 
   return (
     <main className="max-w-7xl mx-auto p-6 space-y-8">
@@ -189,29 +327,46 @@ export default async function BlackImpactScorePage() {
         >
           Back to Reports
         </Link>
+        <Link
+          href="/reports/black-impact-score?model=compare"
+          className="inline-flex items-center rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
+        >
+          Compare with previous model
+        </Link>
       </div>
 
       <section className="hero-panel p-8 md:p-10">
         <p className="eyebrow mb-4">Promise Tracker Report</p>
         <h1 className="text-4xl md:text-5xl font-bold">Black Impact Score</h1>
         <p className="text-base md:text-lg text-[var(--ink-soft)] mt-4 max-w-3xl leading-8">
-          This report measures presidential accountability for tracked promises tied to Black-community outcomes.
-          It weighs what was promised, what happened, and whether the result helped, harmed, or failed Black communities.
+          This report measures presidential accountability through documented outcomes tied to Black-community impacts.
+          It emphasizes what happened in practice, not just what was promised or enacted.
         </p>
         <div className="mt-5 flex flex-wrap gap-2">
           <MetaPill>{presidents.length} presidents scored</MetaPill>
-          <MetaPill>Built from Promise Tracker relevance, impact, and status</MetaPill>
-          <MetaPill>Raw and normalized views</MetaPill>
+          <MetaPill>{usingLegacyModel ? "Legacy fallback active" : "Outcome-based model"}</MetaPill>
+          {metadata?.total_outcomes ? <MetaPill>{metadata.total_outcomes} outcomes scored</MetaPill> : null}
         </div>
       </section>
+
+      {isLegacyFallback ? (
+        <section className="card-surface rounded-[1.6rem] p-5 border border-[rgba(120,53,15,0.12)]">
+          <h2 className="text-lg font-semibold">Outcome-Based Scoring Is Temporarily Unavailable</h2>
+          <p className="text-sm text-[var(--ink-soft)] leading-7 mt-2">
+            This page has temporarily fallen back to the previous legacy model so score access remains available.
+          </p>
+        </section>
+      ) : null}
+
+      <MethodologySection methodology={methodology} />
 
       <section className="card-surface rounded-[1.6rem] p-5">
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div className="max-w-3xl">
             <h2 className="text-lg font-semibold mb-2">Built From Promise Tracker</h2>
             <p className="text-sm text-[var(--ink-soft)] leading-7">
-              This report is not a separate product surface. It summarizes the same Promise Tracker records,
-              actions, and outcomes in a president-level score view.
+              This report summarizes Promise Tracker records into a president-level accountability view.
+              It remains tied to the underlying promise, action, and outcome records rather than operating as a separate product surface.
             </p>
           </div>
           <Link
@@ -223,66 +378,41 @@ export default async function BlackImpactScorePage() {
         </div>
       </section>
 
-      <section className="card-surface rounded-[1.6rem] p-5">
+      <section id="methodology" className="card-surface rounded-[1.6rem] p-5">
         <details>
-          <summary className="cursor-pointer text-lg font-semibold">Methodology</summary>
+          <summary className="cursor-pointer text-lg font-semibold">View Methodology</summary>
           <div className="mt-4 space-y-4">
-            <p className="text-sm text-[var(--ink-soft)] leading-7">
-              The Black Impact Score uses Promise Tracker&apos;s relevance curation and a transparent weighting model.
-              It is designed as a presidential accountability measure tied to Black-community outcomes, not a generic promise-keeping score.
-            </p>
-
-            <div className="card-muted rounded-[1.25rem] p-4">
-              <h2 className="text-base font-semibold">How to read the score</h2>
-              <ul className="mt-3 space-y-2 text-sm text-[var(--ink-soft)]">
-                <li>Helpful promises delivered raise the score.</li>
-                <li>Helpful promises that were blocked or failed lower the score.</li>
-                <li>Harmful promises delivered lower the score.</li>
-                <li>Harmful promises that were blocked or failed are treated as neutral, not positive.</li>
-              </ul>
-            </div>
-
             {methodology ? (
               <>
-                <div className="grid gap-4 md:grid-cols-2">
+                {methodology.summary ? (
+                  <p className="text-sm text-[var(--ink-soft)] leading-7">{methodology.summary}</p>
+                ) : null}
+
+                {methodology.outcome_scoring?.evidence_multipliers ? (
                   <div className="card-muted rounded-[1.25rem] p-4">
-                    <h2 className="text-base font-semibold">Relevance Weights</h2>
+                    <h2 className="text-base font-semibold">Evidence Weighting</h2>
                     <div className="mt-3 flex flex-wrap gap-2">
-                      {Object.entries(methodology.relevance_weights || {}).map(([label, value]) => (
+                      {Object.entries(methodology.outcome_scoring.evidence_multipliers).map(([label, value]) => (
                         <MetaPill key={label}>
                           {label} = {value}
                         </MetaPill>
                       ))}
                     </div>
                   </div>
+                ) : null}
 
+                {methodology.confidence?.levels ? (
                   <div className="card-muted rounded-[1.25rem] p-4">
-                    <h2 className="text-base font-semibold">Status Grouping</h2>
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      {Object.entries(methodology.status_grouping || {}).map(([label, value]) => (
-                        <MetaPill key={label}>
-                          {label} → {value}
-                        </MetaPill>
+                    <h2 className="text-base font-semibold">Confidence Levels</h2>
+                    <div className="mt-3 space-y-2 text-sm text-[var(--ink-soft)]">
+                      {Object.entries(methodology.confidence.levels).map(([label, value]) => (
+                        <p key={label}>
+                          <strong className="text-[var(--ink)] capitalize">{label}:</strong> {value}
+                        </p>
                       ))}
                     </div>
                   </div>
-                </div>
-
-                <div className="grid gap-4 lg:grid-cols-3">
-                  {Object.entries(methodology.outcome_multipliers || {}).map(([direction, values]) => (
-                    <div key={direction} className="card-muted rounded-[1.25rem] p-4">
-                      <h2 className="text-base font-semibold">{direction} Multipliers</h2>
-                      <div className="mt-3 space-y-2 text-sm text-[var(--ink-soft)]">
-                        {Object.entries(values || {}).map(([status, value]) => (
-                          <div key={status} className="flex items-center justify-between gap-3">
-                            <span>{status}</span>
-                            <span className="font-medium text-[var(--ink)]">{value}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                ) : null}
 
                 <ul className="text-sm text-[var(--ink-soft)] space-y-2">
                   {(methodology.notes || []).map((note) => (
@@ -313,7 +443,7 @@ export default async function BlackImpactScorePage() {
                   <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">President Summary</p>
                   <h2 className="text-3xl font-semibold mt-2">{president.president}</h2>
                   <p className="text-sm text-[var(--ink-soft)] mt-2 leading-7 max-w-3xl">
-                    {president.score_explanation}
+                    {president.explanation}
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-2 items-center">
@@ -327,7 +457,7 @@ export default async function BlackImpactScorePage() {
                 </div>
               </div>
 
-              <div className="grid gap-4 md:grid-cols-3 mt-6">
+              <div className="grid gap-4 md:grid-cols-4 mt-6">
                 <ScoreCard
                   label="Normalized Score"
                   value={formatNormalizedScore(president.normalized_score)}
@@ -336,29 +466,46 @@ export default async function BlackImpactScorePage() {
                 <ScoreCard
                   label="Raw Score"
                   value={formatRawScore(president.raw_score)}
-                  subtitle="Weighted total across tracked promises"
+                  subtitle="Underlying total across scored records"
                 />
                 <ScoreCard
-                  label="Tracked Promises"
+                  label="Promise Records"
                   value={president.promise_count}
                   subtitle="Promise Tracker records included in this score"
                 />
-              </div>
-
-              <div className="grid gap-4 lg:grid-cols-2 mt-6">
-                <CountBarGroup title="Breakdown by Status" counts={president.counts_by_status} />
-                <CountBarGroup
-                  title="Breakdown by Impact Direction"
-                  counts={president.counts_by_impact_direction}
+                <ScoreCard
+                  label="Outcomes"
+                  value={president.outcome_count ?? "\u2014"}
+                  subtitle="Documented outcomes used in the score model"
                 />
               </div>
 
               <div className="grid gap-4 lg:grid-cols-2 mt-6">
-                <CountBarGroup title="Breakdown by Relevance" counts={president.counts_by_relevance} />
-                <TopicBreakdown items={president.score_by_topic || []} />
+                <CountBarGroup title="Breakdown by Impact Direction" counts={president.counts_by_direction} />
+                <CountBarGroup
+                  title={usingLegacyModel ? "Breakdown by Relevance" : "Breakdown by Confidence"}
+                  counts={president.counts_by_confidence}
+                />
               </div>
 
-              <div className="grid gap-4 xl:grid-cols-3 mt-6">
+              <div className="grid gap-4 lg:grid-cols-2 mt-6">
+                <TopicBreakdown items={president.score_by_topic || []} />
+                <div className="card-muted rounded-[1.25rem] p-4">
+                  <h3 className="text-lg font-semibold">Score Context</h3>
+                  <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
+                    {usingLegacyModel
+                      ? "Legacy promise-based scoring is currently shown for this president."
+                      : "Outcome-based scoring is currently shown for this president."}
+                  </p>
+                  {metadata?.scoring_model ? (
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <MetaPill>{metadata.scoring_model}</MetaPill>
+                    </div>
+                  ) : null}
+                </div>
+              </div>
+
+              <div className="grid gap-4 xl:grid-cols-2 mt-6">
                 <PromiseDriverList
                   title="Key Positive Drivers"
                   items={president.top_positive_promises || []}
@@ -368,11 +515,6 @@ export default async function BlackImpactScorePage() {
                   title="Key Negative Drivers"
                   items={president.top_negative_promises || []}
                   emptyMessage="No negative score drivers are currently highlighted for this president."
-                />
-                <PromiseDriverList
-                  title="Key Blocked Drivers"
-                  items={president.top_blocked_promises || []}
-                  emptyMessage="No blocked or unrealized drivers are currently highlighted for this president."
                 />
               </div>
             </section>
