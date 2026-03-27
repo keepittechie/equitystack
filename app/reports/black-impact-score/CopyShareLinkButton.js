@@ -2,7 +2,11 @@
 
 import { useEffect, useRef, useState } from "react";
 
-export default function CopyShareLinkButton({ path }) {
+export default function CopyShareLinkButton({
+  path,
+  defaultLabel = "Copy Link",
+  copiedLabel = "Copied",
+}) {
   const [copied, setCopied] = useState(false);
   const timeoutRef = useRef(null);
 
@@ -42,7 +46,7 @@ export default function CopyShareLinkButton({ path }) {
       className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
       aria-live="polite"
     >
-      {copied ? "Copied" : "Copy Link"}
+      {copied ? copiedLabel : defaultLabel}
     </button>
   );
 }

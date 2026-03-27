@@ -44,6 +44,14 @@ function buildReportHref({
   const params = new URLSearchParams();
   appendViewFlags(params, new Set(viewFlags));
 
+  if (model && model !== "outcome") {
+    params.set("model", model);
+  }
+
+  if (typeof topic === "string" && topic.trim()) {
+    params.set("topic", topic.trim());
+  }
+
   if (mode === "debate") {
     params.set("mode", "debate");
   }
@@ -58,14 +66,6 @@ function buildReportHref({
 
   if (typeof presidentB === "string" && presidentB.trim()) {
     params.set("president_b", presidentB.trim());
-  }
-
-  if (model && model !== "outcome") {
-    params.set("model", model);
-  }
-
-  if (typeof topic === "string" && topic.trim()) {
-    params.set("topic", topic.trim());
   }
 
   const query = params.toString();
@@ -104,6 +104,14 @@ function buildMetadataUrl(searchParams = {}) {
   const params = new URLSearchParams();
   appendViewFlags(params, new Set(searchParams.viewFlags || []));
 
+  if (searchParams.model && searchParams.model !== "outcome") {
+    params.set("model", searchParams.model);
+  }
+
+  if (typeof searchParams.topic === "string" && searchParams.topic.trim()) {
+    params.set("topic", searchParams.topic.trim());
+  }
+
   if (searchParams.mode === "debate") {
     params.set("mode", "debate");
   }
@@ -118,14 +126,6 @@ function buildMetadataUrl(searchParams = {}) {
 
   if (typeof searchParams.presidentB === "string" && searchParams.presidentB.trim()) {
     params.set("president_b", searchParams.presidentB.trim());
-  }
-
-  if (searchParams.model && searchParams.model !== "outcome") {
-    params.set("model", searchParams.model);
-  }
-
-  if (typeof searchParams.topic === "string" && searchParams.topic.trim()) {
-    params.set("topic", searchParams.topic.trim());
   }
 
   const query = params.toString();
@@ -136,6 +136,14 @@ function buildOgImageUrl(searchParams = {}) {
   const params = new URLSearchParams();
   appendViewFlags(params, new Set(searchParams.viewFlags || []));
 
+  if (searchParams.model && searchParams.model !== "outcome") {
+    params.set("model", searchParams.model);
+  }
+
+  if (typeof searchParams.topic === "string" && searchParams.topic.trim()) {
+    params.set("topic", searchParams.topic.trim());
+  }
+
   if (searchParams.mode === "debate") {
     params.set("mode", "debate");
   }
@@ -150,14 +158,6 @@ function buildOgImageUrl(searchParams = {}) {
 
   if (typeof searchParams.presidentB === "string" && searchParams.presidentB.trim()) {
     params.set("president_b", searchParams.presidentB.trim());
-  }
-
-  if (searchParams.model && searchParams.model !== "outcome") {
-    params.set("model", searchParams.model);
-  }
-
-  if (typeof searchParams.topic === "string" && searchParams.topic.trim()) {
-    params.set("topic", searchParams.topic.trim());
   }
 
   const query = params.toString();
@@ -1169,6 +1169,29 @@ function ShareHeader({ shareUrl }) {
       </div>
       <div className="mt-4 rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 px-4 py-3 text-sm text-[var(--ink-soft)] break-all">
         {shareUrl}
+      </div>
+    </section>
+  );
+}
+
+function PermalinkSection({ permalinkUrl, isPublicView }) {
+  return (
+    <section className="card-surface rounded-[1.6rem] p-5">
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div className="max-w-3xl">
+          <h2 className="text-lg font-semibold mb-2">Permalink</h2>
+          <p className="text-sm text-[var(--ink-soft)] leading-7">
+            This stable link preserves the current report state, including active filters, view mode, and comparison context.
+          </p>
+        </div>
+        <CopyShareLinkButton
+          path={permalinkUrl}
+          defaultLabel="Copy Permalink"
+          copiedLabel="Permalink Copied"
+        />
+      </div>
+      <div className={`mt-4 rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 px-4 py-3 text-sm text-[var(--ink-soft)] break-all ${isPublicView ? "" : ""}`}>
+        {permalinkUrl}
       </div>
     </section>
   );
@@ -2434,6 +2457,15 @@ export default async function BlackImpactScorePage({ searchParams }) {
     model: requestedModel,
     topic: selectedTopic?.value || requestedTopicParam,
   });
+  const permalinkUrl = buildReportHref({
+    viewFlags,
+    mode: isDebateMode ? "debate" : null,
+    president: requestedPresidentSlug,
+    presidentA: requestedPresidentASlug,
+    presidentB: requestedPresidentBSlug,
+    model: requestedModel,
+    topic: selectedTopic?.value || requestedTopicParam,
+  });
   const modelStatusLabel = getModelStatusLabel({
     metadata,
     usingLegacyModel,
@@ -2590,6 +2622,8 @@ export default async function BlackImpactScorePage({ searchParams }) {
           />
         </div>
       </section>
+
+      <PermalinkSection permalinkUrl={permalinkUrl} isPublicView={isPublicView} />
 
       {isPublicShareView ? (
         <SourceAwareEvidenceTrail items={shareEvidenceItems} isPublicView={isPublicView} />
