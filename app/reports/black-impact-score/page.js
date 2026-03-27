@@ -32,7 +32,15 @@ function appendViewFlags(params, viewFlags) {
   }
 }
 
-function buildReportHref({ viewFlags = [], mode, president, model, topic }) {
+function buildReportHref({
+  viewFlags = [],
+  mode,
+  president,
+  presidentA,
+  presidentB,
+  model,
+  topic,
+}) {
   const params = new URLSearchParams();
   appendViewFlags(params, new Set(viewFlags));
 
@@ -42,6 +50,14 @@ function buildReportHref({ viewFlags = [], mode, president, model, topic }) {
 
   if (typeof president === "string" && president.trim()) {
     params.set("president", president.trim());
+  }
+
+  if (typeof presidentA === "string" && presidentA.trim()) {
+    params.set("president_a", presidentA.trim());
+  }
+
+  if (typeof presidentB === "string" && presidentB.trim()) {
+    params.set("president_b", presidentB.trim());
   }
 
   if (model && model !== "outcome") {
@@ -96,6 +112,14 @@ function buildMetadataUrl(searchParams = {}) {
     params.set("president", searchParams.president.trim());
   }
 
+  if (typeof searchParams.presidentA === "string" && searchParams.presidentA.trim()) {
+    params.set("president_a", searchParams.presidentA.trim());
+  }
+
+  if (typeof searchParams.presidentB === "string" && searchParams.presidentB.trim()) {
+    params.set("president_b", searchParams.presidentB.trim());
+  }
+
   if (searchParams.model && searchParams.model !== "outcome") {
     params.set("model", searchParams.model);
   }
@@ -120,6 +144,14 @@ function buildOgImageUrl(searchParams = {}) {
     params.set("president", searchParams.president.trim());
   }
 
+  if (typeof searchParams.presidentA === "string" && searchParams.presidentA.trim()) {
+    params.set("president_a", searchParams.presidentA.trim());
+  }
+
+  if (typeof searchParams.presidentB === "string" && searchParams.presidentB.trim()) {
+    params.set("president_b", searchParams.presidentB.trim());
+  }
+
   if (searchParams.model && searchParams.model !== "outcome") {
     params.set("model", searchParams.model);
   }
@@ -140,12 +172,19 @@ export async function generateMetadata({ searchParams }) {
   const isPublicView = viewFlags.has("public");
   const isTimelineView = viewFlags.has("timeline");
   const isTopicCompareView = viewFlags.has("topic-compare");
+  const isPresidentCompareView = viewFlags.has("president-compare");
   const isDebateMode = resolvedSearchParams.mode === "debate";
   const presidentSlug =
     typeof resolvedSearchParams.president === "string" ? resolvedSearchParams.president.trim() : "";
+  const presidentASlug =
+    typeof resolvedSearchParams.president_a === "string" ? resolvedSearchParams.president_a.trim() : "";
+  const presidentBSlug =
+    typeof resolvedSearchParams.president_b === "string" ? resolvedSearchParams.president_b.trim() : "";
   const topicParam =
     typeof resolvedSearchParams.topic === "string" ? resolvedSearchParams.topic.trim() : "";
   const presidentName = formatPresidentSlug(presidentSlug);
+  const presidentAName = formatPresidentSlug(presidentASlug);
+  const presidentBName = formatPresidentSlug(presidentBSlug);
   const requestedModel =
     resolvedSearchParams.model === "legacy" || resolvedSearchParams.model === "compare"
       ? resolvedSearchParams.model
@@ -186,6 +225,16 @@ export async function generateMetadata({ searchParams }) {
       : "A topic-specific comparison view for Black Impact Score records.";
   }
 
+  if (isPresidentCompareView) {
+    title = topicParam
+      ? `President Comparison · ${formatTopicParam(topicParam)}`
+      : "President Comparison";
+    description =
+      presidentAName && presidentBName && topicParam
+        ? `A side-by-side comparison of ${presidentAName} and ${presidentBName} within ${formatTopicParam(topicParam)} using existing Black Impact Score records.`
+        : "A side-by-side comparison of two presidents within a selected Black Impact Score topic.";
+  }
+
   if (topicParam) {
     const topicLabel = formatTopicParam(topicParam);
     title = `${title} · ${topicLabel}`;
@@ -205,6 +254,8 @@ export async function generateMetadata({ searchParams }) {
     viewFlags,
     mode: isDebateMode ? "debate" : null,
     president: presidentSlug || null,
+    presidentA: presidentASlug || null,
+    presidentB: presidentBSlug || null,
     model: requestedModel,
     topic: topicParam || null,
   });
@@ -212,6 +263,8 @@ export async function generateMetadata({ searchParams }) {
     viewFlags,
     mode: isDebateMode ? "debate" : null,
     president: presidentSlug || null,
+    presidentA: presidentASlug || null,
+    presidentB: presidentBSlug || null,
     model: requestedModel,
     topic: topicParam || null,
   });
@@ -996,8 +1049,10 @@ function MultiViewToggleSection({
   reportHref,
   timelineHref,
   topicCompareHref,
+  presidentCompareHref,
   isTimelineView,
   isTopicCompareView,
+  isPresidentCompareView,
 }) {
   return (
     <section className="card-surface rounded-[1.6rem] p-5">
@@ -1038,6 +1093,16 @@ function MultiViewToggleSection({
             }`}
           >
             Topic Comparison
+          </Link>
+          <Link
+            href={presidentCompareHref}
+            className={`rounded-full border px-4 py-2 text-sm font-medium ${
+              isPresidentCompareView
+                ? "border-[rgba(120,53,15,0.2)] bg-[rgba(120,53,15,0.08)] text-[var(--ink)]"
+                : "border-[rgba(120,53,15,0.12)] bg-white/80 text-[var(--ink-soft)] hover:text-[var(--accent)]"
+            }`}
+          >
+            President Comparison
           </Link>
         </div>
       </div>
@@ -1379,6 +1444,201 @@ function TopicComparisonSection({
   );
 }
 
+function PresidentCompareSelectorSection({
+  options,
+  selectedPresidentASlug,
+  selectedPresidentBSlug,
+  buildPresidentCompareHref,
+}) {
+  if (!options.length) {
+    return null;
+  }
+
+  return (
+    <section className="card-surface rounded-[1.6rem] p-5">
+      <div className="grid gap-5 lg:grid-cols-2">
+        <div>
+          <h2 className="text-lg font-semibold mb-2">Select President A</h2>
+          <div className="flex flex-wrap gap-2">
+            {options.map((option) => (
+              <Link
+                key={`a-${option.slug}`}
+                href={buildPresidentCompareHref(option.slug, selectedPresidentBSlug)}
+                className={`rounded-full border px-4 py-2 text-sm font-medium ${
+                  selectedPresidentASlug === option.slug
+                    ? "border-[rgba(120,53,15,0.2)] bg-[rgba(120,53,15,0.08)] text-[var(--ink)]"
+                    : "border-[rgba(120,53,15,0.12)] bg-white/80 text-[var(--ink-soft)] hover:text-[var(--accent)]"
+                }`}
+              >
+                {option.name}
+              </Link>
+            ))}
+          </div>
+        </div>
+        <div>
+          <h2 className="text-lg font-semibold mb-2">Select President B</h2>
+          <div className="flex flex-wrap gap-2">
+            {options.map((option) => (
+              <Link
+                key={`b-${option.slug}`}
+                href={buildPresidentCompareHref(selectedPresidentASlug, option.slug)}
+                className={`rounded-full border px-4 py-2 text-sm font-medium ${
+                  selectedPresidentBSlug === option.slug
+                    ? "border-[rgba(120,53,15,0.2)] bg-[rgba(120,53,15,0.08)] text-[var(--ink)]"
+                    : "border-[rgba(120,53,15,0.12)] bg-white/80 text-[var(--ink-soft)] hover:text-[var(--accent)]"
+                }`}
+              >
+                {option.name}
+              </Link>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function PresidentComparisonSection({
+  presidents,
+  selectedTopic,
+  effectiveScoringModel,
+  usingLegacyModel,
+  isLegacyFallbackActive,
+  selectedPresidentA,
+  selectedPresidentB,
+  selectedPresidentASlug,
+  selectedPresidentBSlug,
+}) {
+  if (!selectedTopic) {
+    return (
+      <section className="card-surface rounded-[1.6rem] p-6">
+        <h2 className="text-lg font-semibold">President Comparison</h2>
+        <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
+          Select a topic before comparing two presidents.
+        </p>
+      </section>
+    );
+  }
+
+  if (!selectedPresidentASlug || !selectedPresidentBSlug) {
+    return (
+      <section className="card-surface rounded-[1.6rem] p-6">
+        <h2 className="text-lg font-semibold">President Comparison</h2>
+        <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
+          Select two presidents to compare within {selectedTopic.label}.
+        </p>
+      </section>
+    );
+  }
+
+  if (selectedPresidentASlug === selectedPresidentBSlug) {
+    return (
+      <section className="card-surface rounded-[1.6rem] p-6">
+        <h2 className="text-lg font-semibold">President Comparison</h2>
+        <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
+          President comparison requires two different presidents.
+        </p>
+      </section>
+    );
+  }
+
+  if (!selectedPresidentA || !selectedPresidentB) {
+    return (
+      <section className="card-surface rounded-[1.6rem] p-6">
+        <h2 className="text-lg font-semibold">President Comparison</h2>
+        <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
+          One or both selected presidents do not have scored records in {selectedTopic.label} for the current model and filters.
+        </p>
+      </section>
+    );
+  }
+
+  const modeLabel = isLegacyFallbackActive
+    ? "Legacy fallback"
+    : usingLegacyModel
+      ? "Legacy"
+      : "Outcome-based";
+  const normalizedDelta = Number(selectedPresidentA.normalized_score || 0) - Number(selectedPresidentB.normalized_score || 0);
+  const rawDelta = Number(selectedPresidentA.raw_score || 0) - Number(selectedPresidentB.raw_score || 0);
+  const primaryImpactAreaA = getPrimaryImpactArea(selectedPresidentA);
+  const primaryImpactAreaB = getPrimaryImpactArea(selectedPresidentB);
+
+  function PresidentCompareCard({ president, primaryImpactArea }) {
+    const topPositive = president.top_positive_promises?.[0] || null;
+    const topNegative = president.top_negative_promises?.[0] || null;
+
+    return (
+      <section className="card-muted rounded-[1.25rem] p-5">
+        <div className="flex items-start justify-between gap-4 flex-wrap">
+          <div className="max-w-3xl">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h3 className="text-xl font-semibold">{president.president}</h3>
+              {president.president_party ? <MetaPill>{president.president_party}</MetaPill> : null}
+            </div>
+            <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
+              {president.explanation || "No explanation is available for this president in the current topic."}
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <MetaPill>Normalized {formatNormalizedScore(president.normalized_score)}</MetaPill>
+            <MetaPill>Raw {formatRawScore(president.raw_score)}</MetaPill>
+            <MetaPill>{president.promise_count} promises</MetaPill>
+            {president.outcome_count != null ? <MetaPill>{president.outcome_count} outcomes</MetaPill> : null}
+          </div>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-3 mt-5">
+          <div className="rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 p-4">
+            <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Primary Impact Area</p>
+            <p className="text-base font-semibold mt-2">{primaryImpactArea?.topic || "Unavailable"}</p>
+          </div>
+          <div className="rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 p-4">
+            <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Top Positive Driver</p>
+            <p className="text-base font-semibold mt-2">{topPositive?.title || "Unavailable"}</p>
+          </div>
+          <div className="rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 p-4">
+            <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Top Negative Driver</p>
+            <p className="text-base font-semibold mt-2">{topNegative?.title || "Unavailable"}</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="card-surface rounded-[1.6rem] p-5">
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div className="max-w-3xl">
+          <h2 className="text-lg font-semibold mb-2">President Comparison</h2>
+          <p className="text-sm text-[var(--ink-soft)] leading-7">
+            This view compares two presidents within the selected topic using the same scored records already loaded for this report.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <MetaPill>{selectedTopic.label}</MetaPill>
+          <MetaPill>{selectedPresidentA.president}</MetaPill>
+          <MetaPill>{selectedPresidentB.president}</MetaPill>
+          <MetaPill>{effectiveScoringModel}</MetaPill>
+          <MetaPill>{modeLabel}</MetaPill>
+        </div>
+      </div>
+
+      <div className="card-muted rounded-[1.25rem] p-4 mt-5">
+        <h3 className="text-lg font-semibold">Delta Summary</h3>
+        <div className="flex flex-wrap gap-2 mt-3">
+          <MetaPill>Normalized delta {formatSignedScore(normalizedDelta)}</MetaPill>
+          <MetaPill>Raw delta {formatSignedScore(rawDelta)}</MetaPill>
+        </div>
+      </div>
+
+      <div className="grid gap-4 xl:grid-cols-2 mt-5">
+        <PresidentCompareCard president={selectedPresidentA} primaryImpactArea={primaryImpactAreaA} />
+        <PresidentCompareCard president={selectedPresidentB} primaryImpactArea={primaryImpactAreaB} />
+      </div>
+    </section>
+  );
+}
+
 function normalizeOutcomePresident(president) {
   return {
     president: president.president,
@@ -1471,6 +1731,16 @@ function resolveSelectedTopic(topicOptions = [], rawTopicParam) {
       value: normalizedParam || rawTopicParam,
     }
   );
+}
+
+function getPresidentCompareOptions(presidents = []) {
+  return [...presidents]
+    .sort((left, right) => String(left.president || "").localeCompare(String(right.president || "")))
+    .map((president) => ({
+      slug: president.president_slug,
+      name: president.president,
+      party: president.president_party || null,
+    }));
 }
 
 function normalizeLegacyRecord(record) {
@@ -1610,9 +1880,14 @@ export default async function BlackImpactScorePage({ searchParams }) {
   const isPublicView = viewFlags.has("public");
   const isTimelineView = viewFlags.has("timeline");
   const isTopicCompareView = viewFlags.has("topic-compare");
+  const isPresidentCompareView = viewFlags.has("president-compare");
   const isDebateMode = resolvedSearchParams.mode === "debate";
   const requestedPresidentSlug =
     typeof resolvedSearchParams.president === "string" ? resolvedSearchParams.president : null;
+  const requestedPresidentASlug =
+    typeof resolvedSearchParams.president_a === "string" ? resolvedSearchParams.president_a : null;
+  const requestedPresidentBSlug =
+    typeof resolvedSearchParams.president_b === "string" ? resolvedSearchParams.president_b : null;
   const requestedTopicParam =
     typeof resolvedSearchParams.topic === "string" ? resolvedSearchParams.topic.trim() : null;
   const requestedModel =
@@ -1651,7 +1926,7 @@ export default async function BlackImpactScorePage({ searchParams }) {
     baseRecords = data.records || [];
   }
 
-  if (requestedPresidentSlug) {
+  if (requestedPresidentSlug && !isPresidentCompareView) {
     baseRecords = baseRecords.filter((record) => record.president_slug === requestedPresidentSlug);
   }
 
@@ -1680,9 +1955,15 @@ export default async function BlackImpactScorePage({ searchParams }) {
     };
   }
 
-  if (requestedPresidentSlug) {
+  if (requestedPresidentSlug && !isPresidentCompareView) {
     presidents = presidents.filter((president) => president.president_slug === requestedPresidentSlug);
   }
+
+  const presidentCompareOptions = getPresidentCompareOptions(presidents);
+  const selectedPresidentA =
+    presidents.find((president) => president.president_slug === requestedPresidentASlug) || null;
+  const selectedPresidentB =
+    presidents.find((president) => president.president_slug === requestedPresidentBSlug) || null;
 
   const effectiveScoringModel = getEffectiveScoringModel({ metadata, usingLegacyModel });
   const usingOutcomeModel = isOutcomeScoringModel({ metadata, usingLegacyModel });
@@ -1720,6 +2001,8 @@ export default async function BlackImpactScorePage({ searchParams }) {
     viewFlags: shareViewFlags,
     mode: isDebateMode ? "debate" : null,
     president: requestedPresidentSlug,
+    presidentA: requestedPresidentASlug,
+    presidentB: requestedPresidentBSlug,
     model: requestedModel,
     topic: selectedTopic?.value || requestedTopicParam,
   });
@@ -1732,6 +2015,8 @@ export default async function BlackImpactScorePage({ searchParams }) {
     viewFlags: [...viewFlags].filter((flag) => flag !== "timeline" && flag !== "topic-compare"),
     mode: isDebateMode ? "debate" : null,
     president: requestedPresidentSlug,
+    presidentA: requestedPresidentASlug,
+    presidentB: requestedPresidentBSlug,
     model: requestedModel,
     topic: selectedTopic?.value || requestedTopicParam,
   });
@@ -1741,6 +2026,8 @@ export default async function BlackImpactScorePage({ searchParams }) {
     ),
     mode: isDebateMode ? "debate" : null,
     president: requestedPresidentSlug,
+    presidentA: requestedPresidentASlug,
+    presidentB: requestedPresidentBSlug,
     model: requestedModel,
     topic: selectedTopic?.value || requestedTopicParam,
   });
@@ -1750,6 +2037,21 @@ export default async function BlackImpactScorePage({ searchParams }) {
     ),
     mode: isDebateMode ? "debate" : null,
     president: requestedPresidentSlug,
+    presidentA: requestedPresidentASlug,
+    presidentB: requestedPresidentBSlug,
+    model: requestedModel,
+    topic: selectedTopic?.value || requestedTopicParam,
+  });
+  const presidentCompareHref = buildReportHref({
+    viewFlags: new Set(
+      [...viewFlags]
+        .filter((flag) => flag !== "timeline" && flag !== "topic-compare" && flag !== "president-compare")
+        .concat("president-compare")
+    ),
+    mode: isDebateMode ? "debate" : null,
+    president: requestedPresidentSlug,
+    presidentA: requestedPresidentASlug,
+    presidentB: requestedPresidentBSlug,
     model: requestedModel,
     topic: selectedTopic?.value || requestedTopicParam,
   });
@@ -1757,6 +2059,8 @@ export default async function BlackImpactScorePage({ searchParams }) {
     viewFlags,
     mode: isDebateMode ? "debate" : null,
     president: requestedPresidentSlug,
+    presidentA: requestedPresidentASlug,
+    presidentB: requestedPresidentBSlug,
     model: "compare",
     topic: selectedTopic?.value || requestedTopicParam,
   });
@@ -1771,8 +2075,23 @@ export default async function BlackImpactScorePage({ searchParams }) {
       viewFlags,
       mode: isDebateMode ? "debate" : null,
       president: requestedPresidentSlug,
+      presidentA: requestedPresidentASlug,
+      presidentB: requestedPresidentBSlug,
       model: requestedModel,
       topic: topicValue,
+    });
+  const buildPresidentCompareHref = (presidentASlug, presidentBSlug) =>
+    buildReportHref({
+      viewFlags: new Set(
+        [...viewFlags]
+          .filter((flag) => flag !== "timeline" && flag !== "topic-compare" && flag !== "president-compare")
+          .concat("president-compare")
+      ),
+      mode: isDebateMode ? "debate" : null,
+      presidentA: presidentASlug,
+      presidentB: presidentBSlug,
+      model: requestedModel,
+      topic: selectedTopic?.value || requestedTopicParam,
     });
 
   return (
@@ -1832,8 +2151,10 @@ export default async function BlackImpactScorePage({ searchParams }) {
         reportHref={standardReportHref}
         timelineHref={timelineReportHref}
         topicCompareHref={topicCompareHref}
+        presidentCompareHref={presidentCompareHref}
         isTimelineView={isTimelineView}
         isTopicCompareView={isTopicCompareView}
+        isPresidentCompareView={isPresidentCompareView}
       />
 
       <TopicFilterSection
@@ -1844,6 +2165,15 @@ export default async function BlackImpactScorePage({ searchParams }) {
         isPublicView={isPublicView}
       />
 
+      {isPresidentCompareView && selectedTopic ? (
+        <PresidentCompareSelectorSection
+          options={presidentCompareOptions}
+          selectedPresidentASlug={requestedPresidentASlug}
+          selectedPresidentBSlug={requestedPresidentBSlug}
+          buildPresidentCompareHref={buildPresidentCompareHref}
+        />
+      ) : null}
+
       {isLegacyFallbackActive ? (
         <section className="card-surface rounded-[1.6rem] p-5 border border-[rgba(120,53,15,0.12)]">
           <h2 className="text-lg font-semibold">Outcome-Based Scoring Is Temporarily Unavailable</h2>
@@ -1853,7 +2183,7 @@ export default async function BlackImpactScorePage({ searchParams }) {
         </section>
       ) : null}
 
-      {presidents.length && !isTopicCompareView ? <TopSummarySection presidents={presidents} /> : null}
+      {presidents.length && !isTopicCompareView && !isPresidentCompareView ? <TopSummarySection presidents={presidents} /> : null}
 
       <MethodologySection
         methodology={methodology}
@@ -1862,7 +2192,7 @@ export default async function BlackImpactScorePage({ searchParams }) {
         isLegacyFallbackActive={isLegacyFallbackActive}
       />
 
-      {usingOutcomeModel && !isTopicCompareView ? (
+      {usingOutcomeModel && !isTopicCompareView && !isPresidentCompareView ? (
         <SystemLevelInsight presidents={presidents} metadata={metadata} />
       ) : null}
 
@@ -1937,7 +2267,7 @@ export default async function BlackImpactScorePage({ searchParams }) {
         </details>
       </section>
 
-      {presidents.length === 0 && !isTimelineView && !isTopicCompareView ? (
+      {presidents.length === 0 && !isTimelineView && !isTopicCompareView && !isPresidentCompareView ? (
         <section className="card-surface rounded-[1.6rem] p-8 text-center">
           <h2 className="text-xl font-semibold">
             {selectedTopic
@@ -1965,6 +2295,18 @@ export default async function BlackImpactScorePage({ searchParams }) {
           usingLegacyModel={usingLegacyModel}
           isLegacyFallbackActive={isLegacyFallbackActive}
           requestedPresidentSlug={requestedPresidentSlug}
+        />
+      ) : isPresidentCompareView ? (
+        <PresidentComparisonSection
+          presidents={presidents}
+          selectedTopic={selectedTopic}
+          effectiveScoringModel={effectiveScoringModel}
+          usingLegacyModel={usingLegacyModel}
+          isLegacyFallbackActive={isLegacyFallbackActive}
+          selectedPresidentA={selectedPresidentA}
+          selectedPresidentB={selectedPresidentB}
+          selectedPresidentASlug={requestedPresidentASlug}
+          selectedPresidentBSlug={requestedPresidentBSlug}
         />
       ) : (
         <div className="space-y-8">
