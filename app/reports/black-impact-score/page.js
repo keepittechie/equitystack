@@ -1197,6 +1197,91 @@ function PermalinkSection({ permalinkUrl, isPublicView }) {
   );
 }
 
+function getSnapshotLabel({
+  selectedTopic,
+  selectedPresident,
+  selectedPresidentA,
+  selectedPresidentB,
+  isTimelineView,
+  isTopicCompareView,
+  isPresidentCompareView,
+  isDebateMode,
+  isPublicView,
+  isPublicShareView,
+  requestedModel,
+  isLegacyFallbackActive,
+}) {
+  const parts = [];
+
+  if (isPresidentCompareView) {
+    if (selectedPresidentA && selectedPresidentB) {
+      parts.push(`${selectedPresidentA} vs ${selectedPresidentB}`);
+    } else {
+      parts.push("President Compare");
+    }
+  } else if (selectedPresident) {
+    parts.push(selectedPresident);
+  }
+
+  if (selectedTopic?.label) {
+    parts.push(selectedTopic.label);
+  }
+
+  if (isTimelineView) {
+    parts.push("Timeline");
+  } else if (isTopicCompareView || isPresidentCompareView) {
+    parts.push("Compare");
+  } else if (!selectedTopic?.label && !selectedPresident) {
+    parts.push("Report");
+  }
+
+  if (requestedModel === "compare") {
+    parts.push("Compare Model");
+  } else if (isLegacyFallbackActive) {
+    parts.push("Legacy Fallback");
+  } else if (requestedModel === "legacy") {
+    parts.push("Legacy");
+  } else {
+    parts.push("Outcome");
+  }
+
+  if (isDebateMode) {
+    parts.push("Debate");
+  }
+
+  if (isPublicShareView) {
+    parts.push("Public Share");
+  } else if (isPublicView) {
+    parts.push("Public");
+  }
+
+  return parts.join(" · ");
+}
+
+function SnapshotSection({ snapshotLabel, isPublicShareView, permalinkUrl }) {
+  return (
+    <section className="card-surface rounded-[1.6rem] p-5">
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div className="max-w-3xl">
+          <h2 className="text-lg font-semibold mb-2">Snapshot</h2>
+          <p className="text-sm text-[var(--ink-soft)] leading-7">
+            A concise summary of the current report state that is ready to reuse and share.
+          </p>
+        </div>
+        <CopyShareLinkButton
+          path={permalinkUrl}
+          defaultLabel="Copy Permalink"
+          copiedLabel="Permalink Copied"
+        />
+      </div>
+      <div className="mt-4 flex flex-wrap gap-2">
+        <MetaPill>{snapshotLabel}</MetaPill>
+        <MetaPill>{isPublicShareView ? "Share-ready" : "Permalink-ready"}</MetaPill>
+      </div>
+    </section>
+  );
+}
+
 function SourceAwareShareHeader({
   shareUrl,
   selectedTopic,
@@ -2559,6 +2644,20 @@ export default async function BlackImpactScorePage({ searchParams }) {
     selectedPresidentB,
     isPresidentCompareView,
   });
+  const snapshotLabel = getSnapshotLabel({
+    selectedTopic,
+    selectedPresident: requestedPresidentSlug ? formatPresidentSlug(requestedPresidentSlug) : null,
+    selectedPresidentA: selectedPresidentA?.president || null,
+    selectedPresidentB: selectedPresidentB?.president || null,
+    isTimelineView,
+    isTopicCompareView,
+    isPresidentCompareView,
+    isDebateMode,
+    isPublicView,
+    isPublicShareView,
+    requestedModel,
+    isLegacyFallbackActive,
+  });
 
   return (
     <main className={`max-w-7xl mx-auto ${isPublicView ? "px-6 py-10 space-y-10" : "p-6 space-y-8"}`}>
@@ -2624,6 +2723,12 @@ export default async function BlackImpactScorePage({ searchParams }) {
       </section>
 
       <PermalinkSection permalinkUrl={permalinkUrl} isPublicView={isPublicView} />
+
+      <SnapshotSection
+        snapshotLabel={snapshotLabel}
+        isPublicShareView={isPublicShareView}
+        permalinkUrl={permalinkUrl}
+      />
 
       {isPublicShareView ? (
         <SourceAwareEvidenceTrail items={shareEvidenceItems} isPublicView={isPublicView} />
