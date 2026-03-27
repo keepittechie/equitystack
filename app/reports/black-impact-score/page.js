@@ -139,6 +139,7 @@ export async function generateMetadata({ searchParams }) {
   const viewFlags = getViewFlags(resolvedSearchParams);
   const isPublicView = viewFlags.has("public");
   const isTimelineView = viewFlags.has("timeline");
+  const isTopicCompareView = viewFlags.has("topic-compare");
   const isDebateMode = resolvedSearchParams.mode === "debate";
   const presidentSlug =
     typeof resolvedSearchParams.president === "string" ? resolvedSearchParams.president.trim() : "";
@@ -174,6 +175,15 @@ export async function generateMetadata({ searchParams }) {
     description = presidentName
       ? `A chronological view of Promise Tracker records and documented Black Impact Score context for ${presidentName}.`
       : "A chronological view of Promise Tracker records and documented Black Impact Score context across presidents.";
+  }
+
+  if (isTopicCompareView) {
+    title = topicParam
+      ? `Black Impact Score Topic Comparison · ${formatTopicParam(topicParam)}`
+      : "Black Impact Score Topic Comparison";
+    description = topicParam
+      ? `A topic-specific comparison of presidents using existing Black Impact Score records filtered to ${formatTopicParam(topicParam)}.`
+      : "A topic-specific comparison view for Black Impact Score records.";
   }
 
   if (topicParam) {
@@ -982,6 +992,59 @@ function ViewToggleSection({ standardHref, timelineHref, isTimelineView }) {
   );
 }
 
+function MultiViewToggleSection({
+  reportHref,
+  timelineHref,
+  topicCompareHref,
+  isTimelineView,
+  isTopicCompareView,
+}) {
+  return (
+    <section className="card-surface rounded-[1.6rem] p-5">
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div className="max-w-3xl">
+          <h2 className="text-lg font-semibold mb-2">View Mode</h2>
+          <p className="text-sm text-[var(--ink-soft)] leading-7">
+            Switch between the report, the chronological timeline, and the topic comparison view without changing the underlying scoring model.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Link
+            href={reportHref}
+            className={`rounded-full border px-4 py-2 text-sm font-medium ${
+              !isTimelineView && !isTopicCompareView
+                ? "border-[rgba(120,53,15,0.2)] bg-[rgba(120,53,15,0.08)] text-[var(--ink)]"
+                : "border-[rgba(120,53,15,0.12)] bg-white/80 text-[var(--ink-soft)] hover:text-[var(--accent)]"
+            }`}
+          >
+            Report View
+          </Link>
+          <Link
+            href={timelineHref}
+            className={`rounded-full border px-4 py-2 text-sm font-medium ${
+              isTimelineView
+                ? "border-[rgba(120,53,15,0.2)] bg-[rgba(120,53,15,0.08)] text-[var(--ink)]"
+                : "border-[rgba(120,53,15,0.12)] bg-white/80 text-[var(--ink-soft)] hover:text-[var(--accent)]"
+            }`}
+          >
+            Timeline View
+          </Link>
+          <Link
+            href={topicCompareHref}
+            className={`rounded-full border px-4 py-2 text-sm font-medium ${
+              isTopicCompareView
+                ? "border-[rgba(120,53,15,0.2)] bg-[rgba(120,53,15,0.08)] text-[var(--ink)]"
+                : "border-[rgba(120,53,15,0.12)] bg-white/80 text-[var(--ink-soft)] hover:text-[var(--accent)]"
+            }`}
+          >
+            Topic Comparison
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function getTimelineRelationshipLabel(relationshipType) {
   if (relationshipType === "followed_by") {
     return "Followed by";
@@ -1175,6 +1238,143 @@ function TimelineModeSection({ entries, isPublicView, effectiveScoringModel, sel
         </div>
         </div>
       )}
+    </section>
+  );
+}
+
+function TopicComparisonSection({
+  presidents,
+  selectedTopic,
+  effectiveScoringModel,
+  usingLegacyModel,
+  isLegacyFallbackActive,
+  requestedPresidentSlug,
+}) {
+  if (!selectedTopic) {
+    return (
+      <section className="card-surface rounded-[1.6rem] p-6">
+        <h2 className="text-lg font-semibold">Topic Comparison</h2>
+        <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
+          Select a topic to compare presidents within a single policy domain.
+        </p>
+      </section>
+    );
+  }
+
+  if (requestedPresidentSlug) {
+    return (
+      <section className="card-surface rounded-[1.6rem] p-6">
+        <h2 className="text-lg font-semibold">Topic Comparison</h2>
+        <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
+          Topic comparison is reduced in single-president view. Clear the president filter to compare presidents within {selectedTopic.label}.
+        </p>
+      </section>
+    );
+  }
+
+  if (!presidents.length) {
+    return (
+      <section className="card-surface rounded-[1.6rem] p-6">
+        <h2 className="text-lg font-semibold">Topic Comparison</h2>
+        <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
+          No scored records matched {selectedTopic.label} in the current comparison view.
+        </p>
+      </section>
+    );
+  }
+
+  const rankedPresidents = [...presidents].sort((left, right) => {
+    const normalizedDiff = Number(right.normalized_score || 0) - Number(left.normalized_score || 0);
+    if (normalizedDiff !== 0) {
+      return normalizedDiff;
+    }
+
+    const rawDiff = Number(right.raw_score || 0) - Number(left.raw_score || 0);
+    if (rawDiff !== 0) {
+      return rawDiff;
+    }
+
+    return String(left.president || "").localeCompare(String(right.president || ""));
+  });
+
+  const strongestPositive = rankedPresidents[0] || null;
+  const strongestNegative = [...rankedPresidents].reverse()[0] || null;
+  const modeLabel = isLegacyFallbackActive
+    ? "Legacy fallback"
+    : usingLegacyModel
+      ? "Legacy"
+      : "Outcome-based";
+
+  return (
+    <section className="card-surface rounded-[1.6rem] p-5">
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div className="max-w-3xl">
+          <h2 className="text-lg font-semibold mb-2">Topic Comparison</h2>
+          <p className="text-sm text-[var(--ink-soft)] leading-7">
+            This view compares presidents within the currently selected topic using the same scored records shown elsewhere in the report.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <MetaPill>{selectedTopic.label}</MetaPill>
+          <MetaPill>{rankedPresidents.length} presidents</MetaPill>
+          <MetaPill>{effectiveScoringModel}</MetaPill>
+          <MetaPill>{modeLabel}</MetaPill>
+        </div>
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-2 mt-5">
+        <div className="card-muted rounded-[1.25rem] p-4">
+          <h3 className="text-lg font-semibold">Strongest Positive President</h3>
+          {strongestPositive ? (
+            <div className="mt-3">
+              <p className="text-base font-semibold">{strongestPositive.president}</p>
+              <p className="text-sm text-[var(--ink-soft)] mt-2">
+                Normalized score: {formatNormalizedScore(strongestPositive.normalized_score)}
+              </p>
+            </div>
+          ) : (
+            <p className="text-sm text-[var(--ink-soft)] mt-3">No comparison data is available.</p>
+          )}
+        </div>
+
+        <div className="card-muted rounded-[1.25rem] p-4">
+          <h3 className="text-lg font-semibold">Strongest Negative President</h3>
+          {strongestNegative ? (
+            <div className="mt-3">
+              <p className="text-base font-semibold">{strongestNegative.president}</p>
+              <p className="text-sm text-[var(--ink-soft)] mt-2">
+                Normalized score: {formatNormalizedScore(strongestNegative.normalized_score)}
+              </p>
+            </div>
+          ) : (
+            <p className="text-sm text-[var(--ink-soft)] mt-3">No comparison data is available.</p>
+          )}
+        </div>
+      </div>
+
+      <div className="space-y-4 mt-5">
+        {rankedPresidents.map((president) => (
+          <section key={president.president_slug} className="card-muted rounded-[1.25rem] p-4">
+            <div className="flex items-start justify-between gap-4 flex-wrap">
+              <div className="max-w-3xl">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h3 className="text-lg font-semibold">{president.president}</h3>
+                  {president.president_party ? <MetaPill>{president.president_party}</MetaPill> : null}
+                </div>
+                <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
+                  {president.explanation || "No explanation is available for this president in the current topic."}
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <MetaPill>Normalized {formatNormalizedScore(president.normalized_score)}</MetaPill>
+                <MetaPill>Raw {formatRawScore(president.raw_score)}</MetaPill>
+                <MetaPill>{president.promise_count} promises</MetaPill>
+                {president.outcome_count != null ? <MetaPill>{president.outcome_count} outcomes</MetaPill> : null}
+              </div>
+            </div>
+          </section>
+        ))}
+      </div>
     </section>
   );
 }
@@ -1409,6 +1609,7 @@ export default async function BlackImpactScorePage({ searchParams }) {
   const viewFlags = getViewFlags(resolvedSearchParams);
   const isPublicView = viewFlags.has("public");
   const isTimelineView = viewFlags.has("timeline");
+  const isTopicCompareView = viewFlags.has("topic-compare");
   const isDebateMode = resolvedSearchParams.mode === "debate";
   const requestedPresidentSlug =
     typeof resolvedSearchParams.president === "string" ? resolvedSearchParams.president : null;
@@ -1528,14 +1729,25 @@ export default async function BlackImpactScorePage({ searchParams }) {
     isLegacyFallbackActive,
   });
   const standardReportHref = buildReportHref({
-    viewFlags: [...viewFlags].filter((flag) => flag !== "timeline"),
+    viewFlags: [...viewFlags].filter((flag) => flag !== "timeline" && flag !== "topic-compare"),
     mode: isDebateMode ? "debate" : null,
     president: requestedPresidentSlug,
     model: requestedModel,
     topic: selectedTopic?.value || requestedTopicParam,
   });
   const timelineReportHref = buildReportHref({
-    viewFlags: new Set([...viewFlags].filter((flag) => flag !== "timeline").concat("timeline")),
+    viewFlags: new Set(
+      [...viewFlags].filter((flag) => flag !== "timeline" && flag !== "topic-compare").concat("timeline")
+    ),
+    mode: isDebateMode ? "debate" : null,
+    president: requestedPresidentSlug,
+    model: requestedModel,
+    topic: selectedTopic?.value || requestedTopicParam,
+  });
+  const topicCompareHref = buildReportHref({
+    viewFlags: new Set(
+      [...viewFlags].filter((flag) => flag !== "timeline" && flag !== "topic-compare").concat("topic-compare")
+    ),
     mode: isDebateMode ? "debate" : null,
     president: requestedPresidentSlug,
     model: requestedModel,
@@ -1616,10 +1828,12 @@ export default async function BlackImpactScorePage({ searchParams }) {
         </div>
       </section>
 
-      <ViewToggleSection
-        standardHref={standardReportHref}
+      <MultiViewToggleSection
+        reportHref={standardReportHref}
         timelineHref={timelineReportHref}
+        topicCompareHref={topicCompareHref}
         isTimelineView={isTimelineView}
+        isTopicCompareView={isTopicCompareView}
       />
 
       <TopicFilterSection
@@ -1639,7 +1853,7 @@ export default async function BlackImpactScorePage({ searchParams }) {
         </section>
       ) : null}
 
-      {presidents.length ? <TopSummarySection presidents={presidents} /> : null}
+      {presidents.length && !isTopicCompareView ? <TopSummarySection presidents={presidents} /> : null}
 
       <MethodologySection
         methodology={methodology}
@@ -1648,7 +1862,7 @@ export default async function BlackImpactScorePage({ searchParams }) {
         isLegacyFallbackActive={isLegacyFallbackActive}
       />
 
-      {usingOutcomeModel ? (
+      {usingOutcomeModel && !isTopicCompareView ? (
         <SystemLevelInsight presidents={presidents} metadata={metadata} />
       ) : null}
 
@@ -1723,7 +1937,7 @@ export default async function BlackImpactScorePage({ searchParams }) {
         </details>
       </section>
 
-      {presidents.length === 0 && !isTimelineView ? (
+      {presidents.length === 0 && !isTimelineView && !isTopicCompareView ? (
         <section className="card-surface rounded-[1.6rem] p-8 text-center">
           <h2 className="text-xl font-semibold">
             {selectedTopic
@@ -1742,6 +1956,15 @@ export default async function BlackImpactScorePage({ searchParams }) {
           isPublicView={isPublicView}
           effectiveScoringModel={effectiveScoringModel}
           selectedTopic={selectedTopic}
+        />
+      ) : isTopicCompareView ? (
+        <TopicComparisonSection
+          presidents={presidents}
+          selectedTopic={selectedTopic}
+          effectiveScoringModel={effectiveScoringModel}
+          usingLegacyModel={usingLegacyModel}
+          isLegacyFallbackActive={isLegacyFallbackActive}
+          requestedPresidentSlug={requestedPresidentSlug}
         />
       ) : (
         <div className="space-y-8">
