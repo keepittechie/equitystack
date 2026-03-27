@@ -1028,7 +1028,8 @@ function TopSummarySection({ presidents }) {
         <div className="max-w-3xl">
           <h2 className="text-lg font-semibold mb-2">Top Summary</h2>
           <p className="text-sm text-[var(--ink-soft)] leading-7">
-            A quick view of the highest and lowest normalized scores in the current report.
+            A quick view of the highest and lowest net scores based on currently tracked records.
+            Scores reflect available data and may change as additional records are added.
           </p>
         </div>
         <MetaPill>{presidents.length} presidents included</MetaPill>
