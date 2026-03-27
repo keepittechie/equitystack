@@ -135,20 +135,31 @@ export default async function ReportsPage() {
           <div className="max-w-3xl">
             <h2 className="text-lg font-semibold mb-2">Promise Tracker Reports</h2>
             <p className="text-sm text-[var(--ink-soft)] leading-7">
-              Review the Black Impact Score, a Promise Tracker report that summarizes how tracked presidential
-              promises and outcomes affected Black communities.
+              Review Promise Tracker reports that connect presidential commitments to actions, outcomes, and
+              historical accountability across Black-community impacts.
             </p>
           </div>
-          <Link
-            href="/reports/black-impact-score"
-            className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
-          >
-            Open Black Impact Score
-          </Link>
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href="/reports/black-impact-score"
+              className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
+            >
+              Open Black Impact Score
+            </Link>
+            <Link
+              href="/reports/civil-rights-timeline"
+              className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
+            >
+              Open Civil Rights Timeline
+            </Link>
+          </div>
         </div>
         <div className="mt-4 flex flex-wrap gap-3 text-sm">
           <Link href="/promises" className="accent-link">
             Explore Promise Tracker data
+          </Link>
+          <Link href="/reports/civil-rights-timeline" className="accent-link">
+            Follow the civil-rights arc
           </Link>
         </div>
       </section>
