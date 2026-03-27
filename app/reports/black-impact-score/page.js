@@ -41,6 +41,27 @@ function buildMetadataUrl(searchParams = {}) {
   return query ? `${REPORT_PATH}?${query}` : REPORT_PATH;
 }
 
+function buildOgImageUrl(searchParams = {}) {
+  const params = new URLSearchParams();
+
+  if (searchParams.view === "public") {
+    params.set("view", "public");
+  }
+
+  if (searchParams.mode === "debate") {
+    params.set("mode", "debate");
+  }
+
+  if (typeof searchParams.president === "string" && searchParams.president.trim()) {
+    params.set("president", searchParams.president.trim());
+  }
+
+  const query = params.toString();
+  return query
+    ? `${REPORT_PATH}/opengraph-image?${query}`
+    : `${REPORT_PATH}/opengraph-image`;
+}
+
 export async function generateMetadata({ searchParams }) {
   const resolvedSearchParams = (await searchParams) || {};
   const isPublicView = resolvedSearchParams.view === "public";
@@ -80,6 +101,11 @@ export async function generateMetadata({ searchParams }) {
     mode: isDebateMode ? "debate" : null,
     president: presidentSlug || null,
   });
+  const imageUrl = buildOgImageUrl({
+    view: isPublicView ? "public" : null,
+    mode: isDebateMode ? "debate" : null,
+    president: presidentSlug || null,
+  });
 
   return {
     title,
@@ -92,11 +118,20 @@ export async function generateMetadata({ searchParams }) {
       description,
       url,
       type: "article",
+      images: [
+        {
+          url: imageUrl,
+          width: 1200,
+          height: 630,
+          alt: title,
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
+      images: [imageUrl],
     },
   };
 }
