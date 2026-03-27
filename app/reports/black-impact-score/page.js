@@ -890,6 +890,67 @@ function ViewToggleSection({ standardHref, timelineHref, isTimelineView }) {
   );
 }
 
+function getTimelineRelationshipLabel(relationshipType) {
+  if (relationshipType === "followed_by") {
+    return "Followed by";
+  }
+
+  if (relationshipType === "builds_on") {
+    return "Builds toward";
+  }
+
+  if (relationshipType === "limited_by") {
+    return "Later limited by";
+  }
+
+  return "Related record";
+}
+
+function getTimelineRelationshipPriority(relationshipType) {
+  if (relationshipType === "followed_by") return 0;
+  if (relationshipType === "builds_on") return 1;
+  if (relationshipType === "limited_by") return 2;
+  return 3;
+}
+
+function CausalTimelineSummary({ entries }) {
+  const connectedCount = entries.filter((entry) => entry.causal_link).length;
+
+  return (
+    <section className="card-muted rounded-[1.25rem] p-4">
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div className="max-w-3xl">
+          <h3 className="text-lg font-semibold mb-2">Causal Timeline</h3>
+          <p className="text-sm text-[var(--ink-soft)] leading-7">
+            This view shows how scored records unfold over time and where the tracker has explicit historical relationships between them.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <MetaPill>{entries.length} entries</MetaPill>
+          {connectedCount ? <MetaPill>{connectedCount} linked transitions</MetaPill> : null}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function TimelineConnector({ relationshipType, crossesPresident }) {
+  return (
+    <div className="flex items-center gap-3 px-3 py-1 text-sm text-[var(--ink-soft)]">
+      <div className="h-px flex-1 bg-[rgba(120,53,15,0.12)]" />
+      <span className="rounded-full border border-[rgba(120,53,15,0.14)] bg-[rgba(255,252,247,0.92)] px-3 py-1 text-xs font-medium text-[var(--ink)]">
+        {getTimelineRelationshipLabel(relationshipType)}
+      </span>
+      {crossesPresident ? (
+        <span className="text-xs uppercase tracking-[0.14em] text-[var(--accent)]">
+          Crosses administrations
+        </span>
+      ) : null}
+      <div className="h-px flex-1 bg-[rgba(120,53,15,0.12)]" />
+    </div>
+  );
+}
+
 function TimelineModeSection({ entries, isPublicView, effectiveScoringModel }) {
   return (
     <section className="card-surface rounded-[1.6rem] p-5">
@@ -913,7 +974,10 @@ function TimelineModeSection({ entries, isPublicView, effectiveScoringModel }) {
           </p>
         </div>
       ) : (
-        <div className="mt-5 max-h-[70vh] overflow-y-auto pr-1">
+        <div className="mt-5 space-y-5">
+          <CausalTimelineSummary entries={entries} />
+
+          <div className="max-h-[70vh] overflow-y-auto pr-1">
           <div className="space-y-4">
             {entries.map((entry, index) => {
               const previousEntry = index > 0 ? entries[index - 1] : null;
@@ -921,82 +985,100 @@ function TimelineModeSection({ entries, isPublicView, effectiveScoringModel }) {
                 !previousEntry || previousEntry.president_slug !== entry.president_slug;
 
               return (
-                <article
-                  key={entry.slug || entry.id || `${entry.title}-${index}`}
-                  className={`relative rounded-[1.35rem] border bg-white/90 p-5 md:p-6 ${
-                    entry.impact_direction === "Mixed"
-                      ? "border-[rgba(180,83,9,0.14)] bg-[linear-gradient(180deg,rgba(255,251,235,0.9),rgba(255,255,255,0.98))]"
-                      : "border-[rgba(120,53,15,0.1)]"
-                  }`}
-                >
-                  {showPresidentDivider ? (
-                    <div className="mb-4 flex items-center gap-3 flex-wrap">
-                      <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">
-                        {entry.president || "President not available"}
-                      </p>
-                      {entry.president_party ? <MetaPill>{entry.president_party}</MetaPill> : null}
+                <div key={entry.slug || entry.id || `${entry.title}-${index}`}>
+                  <article
+                    className={`relative rounded-[1.35rem] border bg-white/90 p-5 md:p-6 ${
+                      entry.impact_direction === "Mixed"
+                        ? "border-[rgba(180,83,9,0.14)] bg-[linear-gradient(180deg,rgba(255,251,235,0.9),rgba(255,255,255,0.98))]"
+                        : "border-[rgba(120,53,15,0.1)]"
+                    }`}
+                  >
+                    {showPresidentDivider ? (
+                      <div className="mb-4 flex items-center gap-3 flex-wrap">
+                        <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">
+                          {entry.president || "President not available"}
+                        </p>
+                        {entry.president_party ? <MetaPill>{entry.president_party}</MetaPill> : null}
+                      </div>
+                    ) : null}
+
+                    <div className="grid gap-4 md:grid-cols-[160px,minmax(0,1fr)] md:gap-6">
+                      <div>
+                        <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">
+                          {formatTimelineDate(entry.promise_date)}
+                        </p>
+                        <p className="text-sm text-[var(--ink-soft)] mt-2">
+                          President score: {formatNormalizedScore(entry.normalized_president_score ?? 0)}
+                        </p>
+                        <p className="text-xs text-[var(--ink-soft)] mt-2">
+                          Model: {effectiveScoringModel}
+                        </p>
+                        {entry.impact_direction ? (
+                          <div className="mt-3">
+                            <ImpactBadge impact={entry.impact_direction} />
+                          </div>
+                        ) : null}
+                      </div>
+
+                      <div>
+                        <div className="flex items-start justify-between gap-3 flex-wrap">
+                          <div className="max-w-3xl">
+                            <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">
+                              {entry.topic || "Promise Tracker record"}
+                            </p>
+                            {entry.slug && !isPublicView ? (
+                              <Link href={`/promises/${entry.slug}`} className="accent-link text-xl font-semibold mt-2 inline-block">
+                                {entry.title}
+                              </Link>
+                            ) : (
+                              <h3 className="text-xl font-semibold mt-2">{entry.title}</h3>
+                            )}
+                          </div>
+                          <MetaPill>{formatSignedScore(entry.total_score)}</MetaPill>
+                        </div>
+
+                        <p className="text-sm text-[var(--ink-soft)] mt-4 leading-7">
+                          {entry.explanation_summary || "No explanation is available for this record yet."}
+                        </p>
+
+                        <div className="mt-4 flex flex-wrap gap-2">
+                          {entry.status ? <MetaPill>{entry.status}</MetaPill> : null}
+                          {entry.outcome_count ? <MetaPill>{entry.outcome_count} outcomes</MetaPill> : null}
+                          {entry.causal_link ? (
+                            <MetaPill>
+                              {getTimelineRelationshipLabel(entry.causal_link.relationship_type)}
+                            </MetaPill>
+                          ) : null}
+                        </div>
+
+                        {entry.causal_link?.promise ? (
+                          <div className="mt-5 rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-[rgba(255,252,247,0.92)] px-4 py-3 text-sm text-[var(--ink-soft)]">
+                            <span className="font-medium text-[var(--ink)]">
+                              {getTimelineRelationshipLabel(entry.causal_link.relationship_type)}:{" "}
+                            </span>
+                            {entry.causal_link.promise.slug && !isPublicView ? (
+                              <Link href={`/promises/${entry.causal_link.promise.slug}`} className="accent-link">
+                                {entry.causal_link.promise.title}
+                              </Link>
+                            ) : (
+                              <span className="text-[var(--ink)]">{entry.causal_link.promise.title}</span>
+                            )}
+                          </div>
+                        ) : null}
+                      </div>
                     </div>
+                  </article>
+                  {entry.connector_to_next ? (
+                    <TimelineConnector
+                      relationshipType={entry.connector_to_next.relationship_type}
+                      crossesPresident={entry.connector_to_next.crosses_president}
+                    />
                   ) : null}
-
-                  <div className="grid gap-4 md:grid-cols-[160px,minmax(0,1fr)] md:gap-6">
-                    <div>
-                      <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">
-                        {formatTimelineDate(entry.promise_date)}
-                      </p>
-                      <p className="text-sm text-[var(--ink-soft)] mt-2">
-                        President score: {formatNormalizedScore(entry.normalized_president_score ?? 0)}
-                      </p>
-                      {entry.impact_direction ? (
-                        <div className="mt-3">
-                          <ImpactBadge impact={entry.impact_direction} />
-                        </div>
-                      ) : null}
-                    </div>
-
-                    <div>
-                      <div className="flex items-start justify-between gap-3 flex-wrap">
-                        <div className="max-w-3xl">
-                          <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">
-                            {entry.topic || "Promise Tracker record"}
-                          </p>
-                          {entry.slug && !isPublicView ? (
-                            <Link href={`/promises/${entry.slug}`} className="accent-link text-xl font-semibold mt-2 inline-block">
-                              {entry.title}
-                            </Link>
-                          ) : (
-                            <h3 className="text-xl font-semibold mt-2">{entry.title}</h3>
-                          )}
-                        </div>
-                        <MetaPill>{formatSignedScore(entry.total_score)}</MetaPill>
-                      </div>
-
-                      <p className="text-sm text-[var(--ink-soft)] mt-4 leading-7">
-                        {entry.explanation_summary || "No explanation is available for this record yet."}
-                      </p>
-
-                      <div className="mt-4 flex flex-wrap gap-2">
-                        {entry.status ? <MetaPill>{entry.status}</MetaPill> : null}
-                        {entry.outcome_count ? <MetaPill>{entry.outcome_count} outcomes</MetaPill> : null}
-                      </div>
-
-                      {entry.lead?.promise ? (
-                        <div className="mt-5 rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-[rgba(255,252,247,0.92)] px-4 py-3 text-sm text-[var(--ink-soft)]">
-                          <span className="font-medium text-[var(--ink)]">Leads to → </span>
-                          {entry.lead.promise.slug && !isPublicView ? (
-                            <Link href={`/promises/${entry.lead.promise.slug}`} className="accent-link">
-                              {entry.lead.promise.title}
-                            </Link>
-                          ) : (
-                            <span className="text-[var(--ink)]">{entry.lead.promise.title}</span>
-                          )}
-                        </div>
-                      ) : null}
-                    </div>
-                  </div>
-                </article>
+                </div>
               );
             })}
           </div>
+        </div>
         </div>
       )}
     </section>
@@ -1118,6 +1200,7 @@ function pickTimelineLead(record, relationshipMap, visiblePromiseIds) {
   const preferredRelationship =
     visibleRelationships.find((item) => item.relationship_type === "followed_by") ||
     visibleRelationships.find((item) => item.relationship_type === "builds_on") ||
+    visibleRelationships.find((item) => item.relationship_type === "limited_by") ||
     null;
 
   if (!preferredRelationship) {
@@ -1134,19 +1217,61 @@ function buildTimelineEntries({ records, presidents, relationshipMap }) {
   const presidentScores = new Map(
     presidents.map((president) => [president.president_slug, president.normalized_score])
   );
+  const sortedRecords = [...records].sort(compareTimelineEntries);
   const visiblePromiseIds = new Set(
-    records
+    sortedRecords
       .map((record) => Number(record.id))
       .filter((value) => Number.isInteger(value) && value > 0)
   );
+  const visibleRecordIndex = new Map(
+    sortedRecords.map((record, index) => [Number(record.id), index])
+  );
 
-  return [...records]
-    .sort(compareTimelineEntries)
-    .map((record) => ({
+  const entries = sortedRecords.map((record) => {
+    const relationships = relationshipMap.get(record.id) || [];
+    const visibleRelationships = relationships
+      .filter((item) => visiblePromiseIds.has(item.promise.id))
+      .sort((left, right) => {
+        const priorityDiff =
+          getTimelineRelationshipPriority(left.relationship_type) -
+          getTimelineRelationshipPriority(right.relationship_type);
+
+        if (priorityDiff !== 0) {
+          return priorityDiff;
+        }
+
+        return (
+          (visibleRecordIndex.get(left.promise.id) ?? Number.POSITIVE_INFINITY) -
+          (visibleRecordIndex.get(right.promise.id) ?? Number.POSITIVE_INFINITY)
+        );
+      });
+
+    const causalLink = visibleRelationships[0] || pickTimelineLead(record, relationshipMap, visiblePromiseIds);
+
+    return {
       ...record,
       normalized_president_score: presidentScores.get(record.president_slug) ?? null,
-      lead: pickTimelineLead(record, relationshipMap, visiblePromiseIds),
-    }));
+      causal_link: causalLink || null,
+      connector_to_next: null,
+    };
+  });
+
+  for (let index = 0; index < entries.length - 1; index += 1) {
+    const currentEntry = entries[index];
+    const nextEntry = entries[index + 1];
+    const causalLink = currentEntry.causal_link;
+
+    if (!causalLink?.promise || causalLink.promise.id !== nextEntry.id) {
+      continue;
+    }
+
+    currentEntry.connector_to_next = {
+      relationship_type: causalLink.relationship_type,
+      crosses_president: currentEntry.president_slug !== nextEntry.president_slug,
+    };
+  }
+
+  return entries;
 }
 
 export default async function BlackImpactScorePage({ searchParams }) {
