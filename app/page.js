@@ -59,6 +59,17 @@ function SectionCard({ title, href, linkLabel, children }) {
   );
 }
 
+function FlagshipViewCard({ eyebrow, title, description, href, linkLabel }) {
+  return (
+    <Link href={href} className="panel-link block rounded-[1.4rem] p-5">
+      <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">{eyebrow}</p>
+      <h3 className="text-lg font-semibold mt-3">{title}</h3>
+      <p className="text-sm text-[var(--ink-soft)] mt-2 leading-6">{description}</p>
+      <span className="accent-link text-sm inline-block mt-4">{linkLabel}</span>
+    </Link>
+  );
+}
+
 function categoryClasses(category) {
   switch (category) {
     case "Politics":
@@ -146,6 +157,12 @@ export default async function HomePage() {
                 Start With the Guide
               </Link>
               <Link
+                href="/promises"
+                className="px-5 py-3 rounded-full border border-[var(--line-strong)] bg-white/75 font-medium hover:bg-white"
+              >
+                Open Promise Tracker
+              </Link>
+              <Link
                 href="/policies"
                 className="px-5 py-3 rounded-full border border-[var(--line-strong)] bg-white/75 font-medium hover:bg-white"
               >
@@ -169,8 +186,8 @@ export default async function HomePage() {
                 Use This Site
               </p>
               <p className="text-sm text-[var(--ink-soft)] leading-6 mt-3">
-                Start with an explainer or the guided path, then move into the linked policy
-                records, future bills, and scorecards.
+                Start with the flagship accountability views, then move into the linked
+                policy records, explainers, and current legislative tracking.
               </p>
             </div>
           </div>
@@ -183,6 +200,42 @@ export default async function HomePage() {
         <CompactStat label="Negative" value={negativePolicies} />
         <CompactStat label="Blocked" value={blockedPolicies} />
         <CompactStat label="Historical Eras" value={eraCount} />
+      </section>
+
+      <section className="card-surface rounded-[1.6rem] p-6">
+        <div className="flex items-start justify-between gap-4 mb-5 flex-wrap">
+          <div className="max-w-3xl">
+            <h2 className="text-2xl font-semibold">Flagship Accountability Views</h2>
+            <p className="text-sm text-[var(--ink-soft)] mt-2">
+              Start with the three public-facing views that connect presidential commitments,
+              documented outcomes, and the longer civil-rights arc into one accountability story.
+            </p>
+          </div>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-3">
+          <FlagshipViewCard
+            eyebrow="Intent"
+            title="Promise Tracker"
+            description="Follow what presidents said they would do, what actions followed, and what was delivered, blocked, or left unfinished."
+            href="/promises"
+            linkLabel="Open Promise Tracker"
+          />
+          <FlagshipViewCard
+            eyebrow="Outcomes"
+            title="Black Impact Score"
+            description="Compare how presidential records affected Black communities using a transparent accountability framework built from Promise Tracker data."
+            href="/reports/black-impact-score"
+            linkLabel="Open Black Impact Score"
+          />
+          <FlagshipViewCard
+            eyebrow="Continuity"
+            title="Civil Rights Timeline"
+            description="Trace key federal civil-rights action across time, from Reconstruction to the present, through a curated historical sequence."
+            href="/reports/civil-rights-timeline"
+            linkLabel="Open Civil Rights Timeline"
+          />
+        </div>
       </section>
 
       <section className="card-surface rounded-[1.6rem] p-6">

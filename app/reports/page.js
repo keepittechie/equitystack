@@ -60,6 +60,17 @@ async function getFutureBills() {
   return fetchJson("/api/future-bills", "Failed to fetch future bills");
 }
 
+function FlagshipReportCard({ eyebrow, title, description, href, linkLabel }) {
+  return (
+    <Link href={href} className="panel-link block rounded-[1.4rem] p-5">
+      <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">{eyebrow}</p>
+      <h3 className="text-lg font-semibold mt-3">{title}</h3>
+      <p className="text-sm text-[var(--ink-soft)] mt-2 leading-6">{description}</p>
+      <span className="accent-link text-sm inline-block mt-4">{linkLabel}</span>
+    </Link>
+  );
+}
+
 export default async function ReportsPage() {
   const [
     overallSummary,
@@ -131,36 +142,37 @@ export default async function ReportsPage() {
       </section>
 
       <section className="card-surface rounded-[1.6rem] p-5 mb-8">
-        <div className="flex items-start justify-between gap-4 flex-wrap">
-          <div className="max-w-3xl">
-            <h2 className="text-lg font-semibold mb-2">Promise Tracker Reports</h2>
-            <p className="text-sm text-[var(--ink-soft)] leading-7">
-              Review Promise Tracker reports that connect presidential commitments to actions, outcomes, and
-              historical accountability across Black-community impacts.
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-3">
-            <Link
-              href="/reports/black-impact-score"
-              className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
-            >
-              Open Black Impact Score
-            </Link>
-            <Link
-              href="/reports/civil-rights-timeline"
-              className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
-            >
-              Open Civil Rights Timeline
-            </Link>
-          </div>
+        <div className="max-w-3xl mb-5">
+          <h2 className="text-lg font-semibold mb-2">Flagship Accountability Views</h2>
+          <p className="text-sm text-[var(--ink-soft)] leading-7">
+            These three connected views are the clearest way to understand the project:
+            track presidential commitments, compare their Black-community impact, and place
+            them inside the longer civil-rights story.
+          </p>
         </div>
-        <div className="mt-4 flex flex-wrap gap-3 text-sm">
-          <Link href="/promises" className="accent-link">
-            Explore Promise Tracker data
-          </Link>
-          <Link href="/reports/civil-rights-timeline" className="accent-link">
-            Follow the civil-rights arc
-          </Link>
+
+        <div className="grid gap-4 md:grid-cols-3">
+          <FlagshipReportCard
+            eyebrow="Intent"
+            title="Promise Tracker"
+            description="Review what presidents promised, what actions followed, and what outcomes were delivered, blocked, or left unfinished."
+            href="/promises"
+            linkLabel="Open Promise Tracker"
+          />
+          <FlagshipReportCard
+            eyebrow="Outcomes"
+            title="Black Impact Score"
+            description="Compare how presidential records affected Black communities through a transparent accountability summary built from Promise Tracker data."
+            href="/reports/black-impact-score"
+            linkLabel="Open Black Impact Score"
+          />
+          <FlagshipReportCard
+            eyebrow="Continuity"
+            title="Civil Rights Timeline"
+            description="Follow the curated civil-rights arc across time to see how major federal action, continuity, and erosion connect."
+            href="/reports/civil-rights-timeline"
+            linkLabel="Open Civil Rights Timeline"
+          />
         </div>
       </section>
 
