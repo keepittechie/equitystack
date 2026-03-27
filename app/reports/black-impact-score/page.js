@@ -1581,7 +1581,6 @@ function TopicFilterSection({
   selectedTopic,
   allTopicsHref,
   buildTopicHref,
-  isPublicView,
 }) {
   if (!topicOptions.length) {
     return null;
@@ -1589,41 +1588,48 @@ function TopicFilterSection({
 
   return (
     <section className="card-surface rounded-[1.6rem] p-5 print:hidden">
-      <div className="flex items-start justify-between gap-4 flex-wrap">
-        <div className="max-w-3xl">
-          <h2 className="text-lg font-semibold mb-2">Topic Filter</h2>
-          <p className="text-sm text-[var(--ink-soft)] leading-7">
-            Limit the current report view to one policy topic using the records already loaded for this page.
-          </p>
-        </div>
-        {selectedTopic ? <MetaPill>Filtered Topic: {selectedTopic.label}</MetaPill> : null}
-      </div>
+      <details>
+        <summary className="cursor-pointer list-none">
+          <div className="flex items-start justify-between gap-4 flex-wrap">
+            <div className="max-w-3xl">
+              <h2 className="text-lg font-semibold mb-2">Topic Filter</h2>
+              <p className="text-sm text-[var(--ink-soft)] leading-7">
+                Limit the current report view to one policy topic using the records already loaded for this page.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2 items-center">
+              <MetaPill>{selectedTopic ? `Selected: ${selectedTopic.label}` : "All topics"}</MetaPill>
+              <MetaPill>{topicOptions.length} topics</MetaPill>
+            </div>
+          </div>
+        </summary>
 
-      <div className={`mt-4 flex flex-wrap gap-2 ${isPublicView ? "" : ""}`}>
-        <Link
-          href={allTopicsHref}
-          className={`rounded-full border px-4 py-2 text-sm font-medium ${
-            !selectedTopic
-              ? "border-[rgba(120,53,15,0.2)] bg-[rgba(120,53,15,0.08)] text-[var(--ink)]"
-              : "border-[rgba(120,53,15,0.12)] bg-white/80 text-[var(--ink-soft)] hover:text-[var(--accent)]"
-          }`}
-        >
-          All topics
-        </Link>
-        {topicOptions.map((topic) => (
+        <div className="mt-4 flex flex-wrap gap-2">
           <Link
-            key={topic.value}
-            href={buildTopicHref(topic.value)}
+            href={allTopicsHref}
             className={`rounded-full border px-4 py-2 text-sm font-medium ${
-              selectedTopic?.value === topic.value
+              !selectedTopic
                 ? "border-[rgba(120,53,15,0.2)] bg-[rgba(120,53,15,0.08)] text-[var(--ink)]"
                 : "border-[rgba(120,53,15,0.12)] bg-white/80 text-[var(--ink-soft)] hover:text-[var(--accent)]"
             }`}
           >
-            {topic.label}
+            All topics
           </Link>
-        ))}
-      </div>
+          {topicOptions.map((topic) => (
+            <Link
+              key={topic.value}
+              href={buildTopicHref(topic.value)}
+              className={`rounded-full border px-4 py-2 text-sm font-medium ${
+                selectedTopic?.value === topic.value
+                  ? "border-[rgba(120,53,15,0.2)] bg-[rgba(120,53,15,0.08)] text-[var(--ink)]"
+                  : "border-[rgba(120,53,15,0.12)] bg-white/80 text-[var(--ink-soft)] hover:text-[var(--accent)]"
+              }`}
+            >
+              {topic.label}
+            </Link>
+          ))}
+        </div>
+      </details>
     </section>
   );
 }
@@ -2867,7 +2873,6 @@ export default async function BlackImpactScorePage({ searchParams }) {
         selectedTopic={selectedTopic}
         allTopicsHref={allTopicsHref}
         buildTopicHref={buildTopicHref}
-        isPublicView={isPublicView}
       />
 
       <AdvancedReportToolsSection
