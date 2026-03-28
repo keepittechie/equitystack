@@ -6,7 +6,9 @@ import {
   PromiseStatusBadge,
   ImpactBadge,
 } from "@/app/components/policy-badges";
+import HelpfulFeedback from "@/app/components/feedback/HelpfulFeedback";
 import SourceDisclosure from "@/app/components/SourceDisclosure";
+import TrackedLink from "@/app/components/telemetry/TrackedLink";
 import { fetchInternalJson } from "@/lib/api";
 import { PUBLIC_REVALIDATE_SECONDS, withRevalidate } from "@/lib/cache";
 import { buildPageMetadata } from "@/lib/metadata";
@@ -359,12 +361,16 @@ export default async function PromiseDetailPage({ params }) {
               {promise.is_demo ? <MetaPill>Demo seed data</MetaPill> : null}
             </div>
           </div>
-          <Link
+          <TrackedLink
             href={buildPromiseCardHref(promise)}
+            eventType="share_card_click"
+            routeKind="detail"
+            entityType="promise"
+            entityKey={promise.slug}
             className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
           >
             Share Card
-          </Link>
+          </TrackedLink>
         </div>
       </section>
 
@@ -666,6 +672,13 @@ export default async function PromiseDetailPage({ params }) {
           </section>
         </aside>
       </div>
+
+      <HelpfulFeedback
+        pagePath={`/promises/${promise.slug}`}
+        routeKind="detail"
+        entityType="promise"
+        entityKey={promise.slug}
+      />
     </main>
   );
 }

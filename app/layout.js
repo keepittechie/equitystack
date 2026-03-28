@@ -1,5 +1,7 @@
 import "./globals.css";
+import { Suspense } from "react";
 import MainLayout from "@/app/components/layout/MainLayout";
+import PageViewTracker from "@/app/components/telemetry/PageViewTracker";
 
 export const metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://equitystack.org"),
@@ -33,6 +35,9 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className="antialiased">
+        <Suspense fallback={null}>
+          <PageViewTracker />
+        </Suspense>
         <MainLayout>
           {children}
         </MainLayout>

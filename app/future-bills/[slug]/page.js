@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import HelpfulFeedback from "@/app/components/feedback/HelpfulFeedback";
+import TrackedLink from "@/app/components/telemetry/TrackedLink";
 import CopyShareLinkButton from "@/app/reports/black-impact-score/CopyShareLinkButton";
 import {
   FutureBillDetailSections,
@@ -70,12 +72,16 @@ export default async function FutureBillDetailPage({ params }) {
         >
           Back to Future Bills
         </Link>
-        <Link
+        <TrackedLink
           href={bill.cardPath}
+          eventType="share_card_click"
+          routeKind="detail"
+          entityType="future-bill"
+          entityKey={bill.slug}
           className="inline-flex items-center rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
         >
           Open Shareable Card
-        </Link>
+        </TrackedLink>
       </div>
 
       <section className="hero-panel p-8 md:p-10">
@@ -100,16 +106,25 @@ export default async function FutureBillDetailPage({ params }) {
           </div>
 
           <div className="flex flex-wrap gap-2">
-            <Link
+            <TrackedLink
               href={bill.cardPath}
+              eventType="share_card_click"
+              routeKind="detail"
+              entityType="future-bill"
+              entityKey={bill.slug}
               className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
             >
               Share Card
-            </Link>
+            </TrackedLink>
             <CopyShareLinkButton
               path={bill.detailPath}
               defaultLabel="Copy Page Link"
               copiedLabel="Copied!"
+              trackPayload={{
+                route_kind: "detail",
+                entity_type: "future-bill",
+                entity_key: bill.slug,
+              }}
             />
           </div>
         </div>
@@ -141,6 +156,13 @@ export default async function FutureBillDetailPage({ params }) {
       <section className="card-surface rounded-[1.7rem] p-7 md:p-8">
         <FutureBillDetailSections bill={bill} detailMode sources={bill.sources} />
       </section>
+
+      <HelpfulFeedback
+        pagePath={bill.detailPath}
+        routeKind="detail"
+        entityType="future-bill"
+        entityKey={bill.slug}
+      />
     </main>
   );
 }

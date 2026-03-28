@@ -2,6 +2,7 @@ import Link from "next/link";
 import { PromiseRelevanceBadge, PromiseStatusBadge } from "@/app/components/policy-badges";
 import { fetchInternalJson } from "@/lib/api";
 import { PUBLIC_REVALIDATE_SECONDS, withRevalidate } from "@/lib/cache";
+import TrackedLink from "@/app/components/telemetry/TrackedLink";
 import { buildPageMetadata } from "@/lib/metadata";
 import { buildPromiseCardHref } from "@/lib/shareable-card-links";
 
@@ -330,19 +331,32 @@ export default async function AllPromisesPage({ searchParams }) {
                   <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">
                     {promise.president}
                   </p>
-                  <Link href={`/promises/${promise.slug}`} className="text-xl font-semibold mt-2 inline-block accent-link">
+                  <TrackedLink
+                    href={`/promises/${promise.slug}`}
+                    eventType="detail_page_click"
+                    pagePath="/promises/all"
+                    routeKind="page"
+                    entityType="promise"
+                    entityKey={promise.slug}
+                    className="text-xl font-semibold mt-2 inline-block accent-link"
+                  >
                     {promise.title}
-                  </Link>
+                  </TrackedLink>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   <PromiseRelevanceBadge relevance={promise.relevance} />
                   <PromiseStatusBadge status={promise.status} />
-                  <Link
+                  <TrackedLink
                     href={buildPromiseCardHref(promise)}
+                    eventType="share_card_click"
+                    pagePath="/promises/all"
+                    routeKind="page"
+                    entityType="promise"
+                    entityKey={promise.slug}
                     className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-3 py-1 text-xs font-medium"
                   >
                     Share Card
-                  </Link>
+                  </TrackedLink>
                 </div>
               </div>
 

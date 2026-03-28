@@ -7,6 +7,7 @@ import {
 } from "@/app/components/policy-badges";
 import { fetchInternalJson } from "@/lib/api";
 import { PUBLIC_REVALIDATE_SECONDS, withRevalidate } from "@/lib/cache";
+import TrackedLink from "@/app/components/telemetry/TrackedLink";
 import { buildPageMetadata } from "@/lib/metadata";
 import { buildPromiseCardHref } from "@/lib/shareable-card-links";
 
@@ -217,22 +218,32 @@ export default async function PromisePresidentPage({ params, searchParams }) {
                         <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">
                           {promise.topic || "No topic"}
                         </p>
-                        <Link
+                        <TrackedLink
                           href={`/promises/${promise.slug}`}
+                          eventType="detail_page_click"
+                          pagePath={`/promises/president/${slug}`}
+                          routeKind="page"
+                          entityType="promise"
+                          entityKey={promise.slug}
                           className="text-xl font-semibold mt-2 inline-block accent-link"
                         >
                           {promise.title}
-                        </Link>
+                        </TrackedLink>
                       </div>
                       <div className="flex flex-wrap gap-2">
                         <PromiseRelevanceBadge relevance={promise.relevance} />
                         <PromiseImpactDirectionBadge impact={promise.impact_direction_for_curation} />
-                        <Link
+                        <TrackedLink
                           href={buildPromiseCardHref(promise)}
+                          eventType="share_card_click"
+                          pagePath={`/promises/president/${slug}`}
+                          routeKind="page"
+                          entityType="promise"
+                          entityKey={promise.slug}
                           className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-3 py-1 text-xs font-medium"
                         >
                           Share Card
-                        </Link>
+                        </TrackedLink>
                       </div>
                     </div>
 

@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { sendPublicSignal } from "@/lib/public-signals-client";
 
 export default function CopyShareLinkButton({
   path,
   defaultLabel = "Copy Link",
   copiedLabel = "Copied",
+  trackPayload = null,
 }) {
   const [copied, setCopied] = useState(false);
   const timeoutRef = useRef(null);
@@ -26,6 +28,15 @@ export default function CopyShareLinkButton({
     try {
       await navigator.clipboard.writeText(url);
       setCopied(true);
+
+      if (trackPayload) {
+        sendPublicSignal({
+          event_type: "copy_link_click",
+          page_path: window.location.pathname + window.location.search,
+          ...trackPayload,
+          target_path: path,
+        });
+      }
 
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);

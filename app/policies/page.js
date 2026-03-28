@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { EvidenceBadge, ImpactBadge } from "@/app/components/policy-badges";
+import TrackedLink from "@/app/components/telemetry/TrackedLink";
 import { formatPartyLabel } from "@/app/components/policy-formatters";
 import { fetchInternalJson } from "@/lib/api";
 import { PUBLIC_REVALIDATE_SECONDS, withRevalidate } from "@/lib/cache";
@@ -482,9 +483,17 @@ export default async function PoliciesPage({ searchParams }) {
           <article key={policy.id} className="panel-link rounded-[1.5rem] p-5">
             <div className="flex items-start justify-between gap-4 flex-wrap">
               <div className="max-w-3xl">
-                <Link href={`/policies/${policy.id}`} className="text-xl font-semibold accent-link">
+                <TrackedLink
+                  href={`/policies/${policy.id}`}
+                  eventType="detail_page_click"
+                  pagePath="/policies"
+                  routeKind="page"
+                  entityType="policy"
+                  entityKey={String(policy.id)}
+                  className="text-xl font-semibold accent-link"
+                >
                   {policy.title}
-                </Link>
+                </TrackedLink>
                 <p className="text-sm text-[var(--ink-soft)] mt-1">
                   {policy.year_enacted} {" • "} {policy.policy_type} {" • "} {formatPartyLabel(policy)}
                 </p>
@@ -501,12 +510,17 @@ export default async function PoliciesPage({ searchParams }) {
               <div className="flex flex-wrap gap-2 items-start justify-end">
                 <ImpactBadge impact={policy.impact_direction} />
                 <EvidenceBadge summary={policy.evidence_summary} />
-                <Link
+                <TrackedLink
                   href={buildPolicyCardHref(policy)}
+                  eventType="share_card_click"
+                  pagePath="/policies"
+                  routeKind="page"
+                  entityType="policy"
+                  entityKey={String(policy.id)}
                   className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-3 py-1 text-xs font-medium"
                 >
                   Share Card
-                </Link>
+                </TrackedLink>
               </div>
             </div>
 

@@ -1,4 +1,6 @@
 import Link from "next/link";
+import HelpfulFeedback from "@/app/components/feedback/HelpfulFeedback";
+import TrackedLink from "@/app/components/telemetry/TrackedLink";
 import { ImpactBadge } from "@/app/components/policy-badges";
 import { fetchInternalJson } from "@/lib/api";
 import { REPORT_REVALIDATE_SECONDS, withRevalidate } from "@/lib/cache";
@@ -1353,6 +1355,12 @@ function ShareHeader({ shareUrl }) {
           path={shareUrl}
           defaultLabel="Copy Share Link"
           copiedLabel="Share Link Copied"
+          trackPayload={{
+            route_kind: "report",
+            entity_type: "impact-score",
+            entity_key: "black-impact-score",
+            interaction: "share-report",
+          }}
         />
       </div>
       <div className="mt-4 rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 px-4 py-3 text-sm text-[var(--ink-soft)] break-all">
@@ -1376,6 +1384,12 @@ function PermalinkSection({ permalinkUrl }) {
           path={permalinkUrl}
           defaultLabel="Copy Permalink"
           copiedLabel="Permalink Copied"
+          trackPayload={{
+            route_kind: "report",
+            entity_type: "impact-score",
+            entity_key: "black-impact-score",
+            interaction: "permalink",
+          }}
         />
       </div>
       <div className="mt-4 rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 px-4 py-3 text-sm text-[var(--ink-soft)] break-all">
@@ -1460,6 +1474,12 @@ function SnapshotSection({ snapshotLabel, isPublicShareView, permalinkUrl }) {
           path={permalinkUrl}
           defaultLabel="Copy Permalink"
           copiedLabel="Permalink Copied"
+          trackPayload={{
+            route_kind: "report",
+            entity_type: "impact-score",
+            entity_key: "black-impact-score",
+            interaction: "snapshot-permalink",
+          }}
         />
       </div>
       <div className="mt-4 flex flex-wrap gap-2">
@@ -1551,6 +1571,12 @@ function SourceAwareShareHeader({
           path={shareUrl}
           defaultLabel="Copy Share Link"
           copiedLabel="Share Link Copied"
+          trackPayload={{
+            route_kind: "report",
+            entity_type: "impact-score",
+            entity_key: "black-impact-score",
+            interaction: "share-report",
+          }}
         />
       </div>
       <div className="mt-4 flex flex-wrap gap-2">
@@ -1601,36 +1627,66 @@ function AdvancedReportToolsSection({
           These secondary controls support deeper comparison, debate workflows, saved views, and print or PDF output after you have the main report state set.
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
-          <Link
+          <TrackedLink
             href={topicCompareHref}
+            eventType="report_view_change"
+            pagePath={REPORT_PATH}
+            routeKind="report"
+            entityType="impact-score"
+            entityKey="black-impact-score"
+            metadata={{ target_view: "topic-compare" }}
             className="rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
           >
             Topic Comparison
-          </Link>
-          <Link
+          </TrackedLink>
+          <TrackedLink
             href={presidentCompareHref}
+            eventType="report_view_change"
+            pagePath={REPORT_PATH}
+            routeKind="report"
+            entityType="impact-score"
+            entityKey="black-impact-score"
+            metadata={{ target_view: "president-compare" }}
             className="rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
           >
             President Comparison
-          </Link>
-          <Link
+          </TrackedLink>
+          <TrackedLink
             href={debateHref}
+            eventType="report_view_change"
+            pagePath={REPORT_PATH}
+            routeKind="report"
+            entityType="impact-score"
+            entityKey="black-impact-score"
+            metadata={{ target_view: "debate" }}
             className="rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
           >
             Debate View
-          </Link>
-          <Link
+          </TrackedLink>
+          <TrackedLink
             href={compareHref}
+            eventType="report_view_change"
+            pagePath={REPORT_PATH}
+            routeKind="report"
+            entityType="impact-score"
+            entityKey="black-impact-score"
+            metadata={{ target_view: "experimental" }}
             className="rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
           >
             Experimental Views
-          </Link>
-          <Link
+          </TrackedLink>
+          <TrackedLink
             href={shareReportHref}
+            eventType="report_view_change"
+            pagePath={REPORT_PATH}
+            routeKind="report"
+            entityType="impact-score"
+            entityKey="black-impact-score"
+            metadata={{ target_view: "public-share" }}
             className="rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
           >
             Share Report
-          </Link>
+          </TrackedLink>
         </div>
         <div className="mt-5 space-y-4">
           {children}
@@ -1841,8 +1897,14 @@ function ViewToggleSection({ standardHref, timelineHref, isTimelineView }) {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Link
+          <TrackedLink
             href={standardHref}
+            eventType="report_view_change"
+            pagePath={REPORT_PATH}
+            routeKind="report"
+            entityType="impact-score"
+            entityKey="black-impact-score"
+            metadata={{ target_view: "report" }}
             className={`rounded-full border px-4 py-2 text-sm font-medium ${
               !isTimelineView
                 ? "border-[rgba(120,53,15,0.2)] bg-[rgba(120,53,15,0.08)] text-[var(--ink)]"
@@ -1850,9 +1912,15 @@ function ViewToggleSection({ standardHref, timelineHref, isTimelineView }) {
             }`}
           >
             Report View
-          </Link>
-          <Link
+          </TrackedLink>
+          <TrackedLink
             href={timelineHref}
+            eventType="report_view_change"
+            pagePath={REPORT_PATH}
+            routeKind="report"
+            entityType="impact-score"
+            entityKey="black-impact-score"
+            metadata={{ target_view: "timeline" }}
             className={`rounded-full border px-4 py-2 text-sm font-medium ${
               isTimelineView
                 ? "border-[rgba(120,53,15,0.2)] bg-[rgba(120,53,15,0.08)] text-[var(--ink)]"
@@ -1860,7 +1928,7 @@ function ViewToggleSection({ standardHref, timelineHref, isTimelineView }) {
             }`}
           >
             Timeline View
-          </Link>
+          </TrackedLink>
         </div>
       </div>
     </section>
@@ -3369,6 +3437,14 @@ export default async function BlackImpactScorePage({ searchParams }) {
           ))}
         </div>
       )}
+
+      <HelpfulFeedback
+        pagePath={permalinkUrl}
+        routeKind="report"
+        entityType="impact-score"
+        entityKey="black-impact-score"
+        title="Was this report helpful?"
+      />
     </main>
   );
 }

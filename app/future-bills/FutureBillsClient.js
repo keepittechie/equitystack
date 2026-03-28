@@ -1,10 +1,11 @@
 "use client";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   buildFutureBillCardHref,
   buildFutureBillDetailHref,
 } from "@/lib/shareable-card-links";
+import { sendPublicSignal } from "@/lib/public-signals-client";
 import {
   FutureBillDetailSections,
   formatDate,
@@ -47,6 +48,7 @@ export default function FutureBillsClient({ bills, focusId }) {
   const [statusFilter, setStatusFilter] = useState("All");
   const [trackingFilter, setTrackingFilter] = useState("All");
   const [sortBy, setSortBy] = useState("recent_update");
+  const didTrackFilterRef = useRef(false);
 
   const totalBills = bills.length;
   const criticalCount = bills.filter((bill) => bill.priority_level === "Critical").length;
@@ -68,6 +70,27 @@ export default function FutureBillsClient({ bills, focusId }) {
       block: "start",
     });
   }, [focusId]);
+
+  useEffect(() => {
+    if (!didTrackFilterRef.current) {
+      didTrackFilterRef.current = true;
+      return;
+    }
+
+    sendPublicSignal({
+      event_type: "filter_change",
+      page_path: "/future-bills",
+      route_kind: "page",
+      entity_type: "future-bill",
+      metadata: {
+        query: query.trim() || null,
+        priority: priorityFilter,
+        status: statusFilter,
+        tracking: trackingFilter,
+        sort: sortBy,
+      },
+    });
+  }, [priorityFilter, query, sortBy, statusFilter, trackingFilter]);
 
   const filteredBills = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
@@ -302,6 +325,16 @@ export default function FutureBillsClient({ bills, focusId }) {
               <Link
                 key={`recent-${bill.id}`}
                 href={buildFutureBillDetailHref(bill)}
+                onClick={() =>
+                  sendPublicSignal({
+                    event_type: "detail_page_click",
+                    page_path: "/future-bills",
+                    route_kind: "page",
+                    entity_type: "future-bill",
+                    entity_key: String(bill.id),
+                    target_path: buildFutureBillDetailHref(bill),
+                  })
+                }
                 className="panel-link block rounded-[1.5rem] p-5"
               >
                 <div className="flex items-start justify-between gap-3 flex-wrap">
@@ -357,6 +390,16 @@ export default function FutureBillsClient({ bills, focusId }) {
                   <div className="max-w-3xl">
                     <Link
                       href={buildFutureBillDetailHref(bill)}
+                      onClick={() =>
+                        sendPublicSignal({
+                          event_type: "detail_page_click",
+                          page_path: "/future-bills",
+                          route_kind: "page",
+                          entity_type: "future-bill",
+                          entity_key: String(bill.id),
+                          target_path: buildFutureBillDetailHref(bill),
+                        })
+                      }
                       className="text-2xl font-semibold accent-link"
                     >
                       {bill.title}
@@ -407,12 +450,32 @@ export default function FutureBillsClient({ bills, focusId }) {
                     </span>
                     <Link
                       href={buildFutureBillCardHref(bill)}
+                      onClick={() =>
+                        sendPublicSignal({
+                          event_type: "share_card_click",
+                          page_path: "/future-bills",
+                          route_kind: "page",
+                          entity_type: "future-bill",
+                          entity_key: String(bill.id),
+                          target_path: buildFutureBillCardHref(bill),
+                        })
+                      }
                       className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
                     >
                       Share Card
                     </Link>
                     <Link
                       href={buildFutureBillDetailHref(bill)}
+                      onClick={() =>
+                        sendPublicSignal({
+                          event_type: "detail_page_click",
+                          page_path: "/future-bills",
+                          route_kind: "page",
+                          entity_type: "future-bill",
+                          entity_key: String(bill.id),
+                          target_path: buildFutureBillDetailHref(bill),
+                        })
+                      }
                       className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
                     >
                       Open Detail Page
