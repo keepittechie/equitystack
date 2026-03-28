@@ -16,8 +16,11 @@ const NAV_LINKS = [
 ];
 
 const ADMIN_NAV_LINKS = [
-  { href: "/admin", label: "Admin Hub" },
-  { href: "/admin/review", label: "Policy Review" },
+  { href: "/admin", label: "Dashboard" },
+  { href: "/admin/current-admin-review", label: "Current Admin Review" },
+  { href: "/admin/pre-commit", label: "Pre-Commit Status" },
+  { href: "/admin/import-history", label: "Import History" },
+  { href: "/admin/logs", label: "Logs / Decisions" },
   { href: "/admin/promises/current-administration", label: "Staging Intake" },
   { href: "/admin/logout", label: "Logout", external: true },
 ];

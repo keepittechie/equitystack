@@ -538,6 +538,11 @@ Import dry-run report: $( [ -f "$import_dry_run_path" ] && echo "present" || ech
 Import apply report: $( [ -f "$import_apply_path" ] && echo "present" || echo "missing" )
 Validation report: $( [ -f "$validation_path" ] && echo "present" || echo "missing" )
 
+Key files:
+  Review: ${review_path#$PROJECT_DIR/}
+  Queue: ${queue_path#$PROJECT_DIR/}
+  Pre-commit: ${precommit_path#$PROJECT_DIR/}
+
 Next step: $next_step
 Recommended command:
   $next_command
@@ -738,7 +743,6 @@ Decision file: $decision_file
 Manual review queue: ${queue_path#$PROJECT_DIR/}
 
 Next recommended step:
-  ./bin/equitystack current-admin workflow review --input ${resolved_review#$PROJECT_DIR/} --output /tmp/${resolved_batch}.decision-template.json
   ./bin/equitystack current-admin pre-commit --input ${queue_path#$PROJECT_DIR/}
   ./bin/equitystack current-admin status --batch-name $resolved_batch
 EOF

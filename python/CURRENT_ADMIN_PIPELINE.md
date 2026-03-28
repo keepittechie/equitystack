@@ -2,6 +2,8 @@
 
 Use this only for curated Promise Tracker updates for the current administration.
 
+If you want the simple daily runbook, read `CURRENT_ADMIN_DAILY.md`.
+
 This Python workflow is the canonical current-admin review pipeline.
 
 - use it to generate review artifacts

@@ -2,7 +2,9 @@
 
 This directory stores durable JSON outputs for the current-administration Promise Tracker workflow.
 
-Primary operator instructions live in `python/CURRENT_ADMIN_PIPELINE.md`.
+Daily operator instructions live in `python/CURRENT_ADMIN_DAILY.md`.
+
+Full system reference lives in `python/CURRENT_ADMIN_PIPELINE.md`.
 
 Expected report types:
 - `discovery_report.json`

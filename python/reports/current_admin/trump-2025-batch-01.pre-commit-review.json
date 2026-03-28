@@ -1,22 +1,49 @@
 {
   "batch_name": "trump-2025-batch-01",
-  "generated_at": "2026-03-28T20:16:20.949001+00:00",
+  "generated_at": "2026-03-28T21:17:37.099083+00:00",
   "source_queue_file": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.manual-review-queue.json",
+  "source_review_file": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.ai-review.json",
+  "source_decision_template": null,
   "source_decision_log": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/review_decisions/trump-2025-batch-01.20260328T193423Z.decision-log.json",
+  "decision_template_source_review_file": null,
+  "decision_log_source_review_file": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.ai-review.json",
+  "reviewed_item_count": 10,
   "decision_log_resolution": "auto",
+  "artifact_linkage": {
+    "queue_to_review": "ok",
+    "decision_template_to_review": "missing",
+    "decision_log_to_review": "ok"
+  },
   "total_item_count": 10,
   "selected_for_import_count": 0,
   "decision_covered_count": 0,
   "decision_missing_count": 0,
+  "invalid_operator_action_count": 0,
   "unresolved_manual_review_count": 0,
   "material_conflict_count": 0,
   "source_gap_count": 0,
   "high_attention_count": 0,
   "readiness_status": "blocked",
+  "readiness_label": "Blocked",
+  "readiness_explanation": "You cannot proceed. Fix the issues below.",
+  "readiness_details": {
+    "label": "Blocked",
+    "meaning": "Something is incomplete, mismatched, or missing for at least one import candidate.",
+    "operator_guidance": "Fix the listed blockers, then rerun pre-commit review."
+  },
   "readiness_formula": {
-    "ready": "No blocking issues were found for approved queue items.",
-    "ready_with_warnings": "Approved items are importable, but warning signals still merit operator review before import.",
-    "blocked": "At least one approved item is missing decision coverage or still has a non-import-ready operator action."
+    "ready": "Safe to proceed to import.",
+    "ready_with_warnings": "You can proceed, but review warnings first.",
+    "blocked": "You cannot proceed. Fix the issues below."
+  },
+  "summary": {
+    "total_items": 10,
+    "approved_items": 0,
+    "manual_review_items": 0,
+    "missing_decisions": 0,
+    "invalid_actions": 0,
+    "high_attention_items": 0,
+    "low_confidence_items": 0
   },
   "warning_counts": {
     "material_conflict_present": 0,
@@ -27,9 +54,103 @@
     "decision_mismatch": 0
   },
   "blocking_issues": [
-    "No queue items are currently approved for import."
+    {
+      "type": "no_approved_queue_items",
+      "severity": "blocking",
+      "message": "No queue items are currently approved for import.",
+      "why": "Import only uses approved queue items. If nothing is approved, there is nothing to import.",
+      "fix": "Approve the intended queue items or keep them pending, then rerun pre-commit review."
+    }
   ],
-  "recommended_next_step": "Resolve the blocking issues, then rerun pre-commit review.",
+  "linkage_warnings": [],
+  "low_confidence_items": [],
+  "diff_preview": {
+    "new_records": [],
+    "updated_records": [],
+    "skipped_items": [
+      {
+        "slug": "trump-2025-election-integrity-proof-citizenship-paper-ballots",
+        "title": "Require proof of citizenship and paper-ballot election safeguards",
+        "operator_action": "approve_with_changes",
+        "decision_alignment": "match",
+        "preview": "skip from import",
+        "reason": "approved with changes"
+      },
+      {
+        "slug": "trump-2025-end-federal-dei-equity-programs",
+        "title": "End federal DEI and equity-based government programs",
+        "operator_action": null,
+        "decision_alignment": null,
+        "preview": "skip from import",
+        "reason": "pending"
+      },
+      {
+        "slug": "trump-2025-strengthen-local-law-enforcement",
+        "title": "Increase federal support for state and local law enforcement",
+        "operator_action": null,
+        "decision_alignment": null,
+        "preview": "skip from import",
+        "reason": "pending"
+      },
+      {
+        "slug": "trump-2025-clear-street-encampments-expand-civil-commitment",
+        "title": "Clear street encampments and expand treatment-oriented street-order responses",
+        "operator_action": null,
+        "decision_alignment": null,
+        "preview": "skip from import",
+        "reason": "pending"
+      },
+      {
+        "slug": "trump-2025-domestic-production-of-critical-medicines",
+        "title": "Expand domestic production of critical medicines",
+        "operator_action": null,
+        "decision_alignment": null,
+        "preview": "skip from import",
+        "reason": "pending"
+      },
+      {
+        "slug": "trump-2025-expand-educational-freedom-for-families",
+        "title": "Expand educational freedom and school-choice options for families",
+        "operator_action": null,
+        "decision_alignment": null,
+        "preview": "skip from import",
+        "reason": "pending"
+      },
+      {
+        "slug": "trump-2025-reform-higher-education-accreditation",
+        "title": "Reform higher-education accreditation around student outcomes",
+        "operator_action": null,
+        "decision_alignment": null,
+        "preview": "skip from import",
+        "reason": "pending"
+      },
+      {
+        "slug": "trump-2025-promote-hbcu-excellence-and-innovation",
+        "title": "Promote excellence and innovation at HBCUs",
+        "operator_action": null,
+        "decision_alignment": null,
+        "preview": "skip from import",
+        "reason": "pending"
+      },
+      {
+        "slug": "trump-2025-reinstate-school-discipline-policies",
+        "title": "Reinstate school discipline policies without equity-based disparate-impact framing",
+        "operator_action": null,
+        "decision_alignment": null,
+        "preview": "skip from import",
+        "reason": "pending"
+      },
+      {
+        "slug": "trump-2025-high-paying-skilled-trade-jobs",
+        "title": "Prepare Americans for high-paying skilled trade jobs",
+        "operator_action": null,
+        "decision_alignment": null,
+        "preview": "skip from import",
+        "reason": "pending"
+      }
+    ]
+  },
+  "recommended_next_step": "Approve the intended queue items or keep them pending, then rerun pre-commit review.",
   "items": [
     {
       "slug": "trump-2025-election-integrity-proof-citizenship-paper-ballots",
@@ -38,6 +159,7 @@
       "operator_status": "pending",
       "approved": false,
       "operator_action": "approve_with_changes",
+      "operator_action_valid": true,
       "decision_alignment": "match",
       "review_priority": "medium",
       "review_priority_score": 3,
@@ -47,6 +169,7 @@
       "evidence_gap_count": 1,
       "confidence_level": "Medium",
       "confidence_score": 0.7,
+      "record_action_suggestion": "new_record",
       "import_readiness": "not_selected",
       "blocking_issues": [],
       "warning_signals": [
@@ -61,6 +184,7 @@
       "operator_status": "pending",
       "approved": false,
       "operator_action": null,
+      "operator_action_valid": null,
       "decision_alignment": null,
       "review_priority": "low",
       "review_priority_score": 0,
@@ -70,6 +194,7 @@
       "evidence_gap_count": 0,
       "confidence_level": "Medium",
       "confidence_score": 0.7,
+      "record_action_suggestion": "new_record",
       "import_readiness": "not_selected",
       "blocking_issues": [],
       "warning_signals": []
@@ -81,6 +206,7 @@
       "operator_status": "pending",
       "approved": false,
       "operator_action": null,
+      "operator_action_valid": null,
       "decision_alignment": null,
       "review_priority": "medium",
       "review_priority_score": 3,
@@ -90,6 +216,7 @@
       "evidence_gap_count": 1,
       "confidence_level": "Medium",
       "confidence_score": 0.7,
+      "record_action_suggestion": "new_record",
       "import_readiness": "not_selected",
       "blocking_issues": [],
       "warning_signals": [
@@ -104,6 +231,7 @@
       "operator_status": "pending",
       "approved": false,
       "operator_action": null,
+      "operator_action_valid": null,
       "decision_alignment": null,
       "review_priority": "medium",
       "review_priority_score": 3,
@@ -113,6 +241,7 @@
       "evidence_gap_count": 1,
       "confidence_level": "Medium",
       "confidence_score": 0.7,
+      "record_action_suggestion": "new_record",
       "import_readiness": "not_selected",
       "blocking_issues": [],
       "warning_signals": [
@@ -127,6 +256,7 @@
       "operator_status": "pending",
       "approved": false,
       "operator_action": null,
+      "operator_action_valid": null,
       "decision_alignment": null,
       "review_priority": "low",
       "review_priority_score": 0,
@@ -136,6 +266,7 @@
       "evidence_gap_count": 0,
       "confidence_level": "Medium",
       "confidence_score": 0.7,
+      "record_action_suggestion": "new_record",
       "import_readiness": "not_selected",
       "blocking_issues": [],
       "warning_signals": []
@@ -147,6 +278,7 @@
       "operator_status": "pending",
       "approved": false,
       "operator_action": null,
+      "operator_action_valid": null,
       "decision_alignment": null,
       "review_priority": "medium",
       "review_priority_score": 3,
@@ -156,6 +288,7 @@
       "evidence_gap_count": 1,
       "confidence_level": "Medium",
       "confidence_score": 0.7,
+      "record_action_suggestion": "new_record",
       "import_readiness": "not_selected",
       "blocking_issues": [],
       "warning_signals": [
@@ -170,6 +303,7 @@
       "operator_status": "pending",
       "approved": false,
       "operator_action": null,
+      "operator_action_valid": null,
       "decision_alignment": null,
       "review_priority": "medium",
       "review_priority_score": 3,
@@ -179,6 +313,7 @@
       "evidence_gap_count": 1,
       "confidence_level": "Medium",
       "confidence_score": 0.7,
+      "record_action_suggestion": "new_record",
       "import_readiness": "not_selected",
       "blocking_issues": [],
       "warning_signals": [
@@ -193,6 +328,7 @@
       "operator_status": "pending",
       "approved": false,
       "operator_action": null,
+      "operator_action_valid": null,
       "decision_alignment": null,
       "review_priority": "low",
       "review_priority_score": 0,
@@ -202,6 +338,7 @@
       "evidence_gap_count": 0,
       "confidence_level": "Medium",
       "confidence_score": 0.7,
+      "record_action_suggestion": "new_record",
       "import_readiness": "not_selected",
       "blocking_issues": [],
       "warning_signals": []
@@ -213,6 +350,7 @@
       "operator_status": "pending",
       "approved": false,
       "operator_action": null,
+      "operator_action_valid": null,
       "decision_alignment": null,
       "review_priority": "low",
       "review_priority_score": 0,
@@ -222,6 +360,7 @@
       "evidence_gap_count": 0,
       "confidence_level": "Medium",
       "confidence_score": 0.7,
+      "record_action_suggestion": "new_record",
       "import_readiness": "not_selected",
       "blocking_issues": [],
       "warning_signals": []
@@ -233,6 +372,7 @@
       "operator_status": "pending",
       "approved": false,
       "operator_action": null,
+      "operator_action_valid": null,
       "decision_alignment": null,
       "review_priority": "low",
       "review_priority_score": 0,
@@ -242,6 +382,7 @@
       "evidence_gap_count": 0,
       "confidence_level": "Medium",
       "confidence_score": 0.7,
+      "record_action_suggestion": "new_record",
       "import_readiness": "not_selected",
       "blocking_issues": [],
       "warning_signals": []

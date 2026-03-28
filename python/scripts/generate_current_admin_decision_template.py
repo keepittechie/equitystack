@@ -154,6 +154,28 @@ def build_selection_filters(args: argparse.Namespace) -> dict[str, Any]:
 
 def build_template_item(item: dict[str, Any], index: int) -> dict[str, Any]:
     suggestion = item.get("suggestions") or {}
+    attention_bits: list[str] = []
+    suggested_checks: list[str] = []
+
+    review_priority = item.get("review_priority")
+    review_priority_score = item.get("review_priority_score")
+    if review_priority:
+        attention_bits.append(f"priority={review_priority} ({review_priority_score})")
+    if item.get("suggested_batch"):
+        attention_bits.append(f"batch={item.get('suggested_batch')}")
+    if item.get("has_material_conflict"):
+        attention_bits.append("material conflict")
+        suggested_checks.append("Compare the conflicting suggestions before choosing operator_action.")
+    if item.get("deep_review_recommended"):
+        attention_bits.append("deep review recommended")
+        suggested_checks.append("Consider deep review if the record still feels ambiguous.")
+    if item.get("operator_attention_needed"):
+        attention_bits.append("attention needed")
+    if suggestion.get("source_warnings") or suggestion.get("missing_source_warnings"):
+        suggested_checks.append("Check the sources and make sure the evidence still supports the record.")
+    if suggestion.get("evidence_needed_to_reduce_risk"):
+        suggested_checks.append("Look at the evidence gaps before moving this item toward import.")
+
     return {
         "index": index,
         "slug": item.get("slug"),
@@ -167,6 +189,8 @@ def build_template_item(item: dict[str, Any], index: int) -> dict[str, Any]:
         "deep_review_recommended": item.get("deep_review_recommended"),
         "manual_review_severity": item.get("manual_review_severity"),
         "ai_record_action_suggestion": suggestion.get("record_action_suggestion"),
+        "attention_summary": "; ".join(attention_bits) or "standard review item",
+        "suggested_checks": suggested_checks,
         "operator_action": "",
         "operator_notes": "",
         "final_decision_summary": "",
@@ -234,11 +258,14 @@ def build_summary_lines(template_payload: dict[str, Any], output_path: Path) -> 
 
     return [
         "Decision Template Summary",
+        f"Source artifact: {template_payload.get('source_artifact_file')}",
+        f"Source review: {template_payload.get('source_review_file') or 'n/a'}",
         f"Output: {output_path}",
         f"Selected items: {len(items)}",
         f"High priority: {counts['high']}",
         f"Medium priority: {counts['medium']}",
         f"Low priority: {counts['low']}",
+        "Next: fill operator_action values, then run workflow finalize with this file.",
     ]
 
 
@@ -278,9 +305,12 @@ def main() -> None:
     print_json(
         {
             "output_path": str(output_path),
+            "source_artifact_file": template_payload["source_artifact_file"],
+            "source_review_file": template_payload.get("source_review_file"),
             "item_count": template_payload["item_count"],
             "selection_filters": template_payload["selection_filters"],
             "session_focus": template_payload.get("session_focus"),
+            "next_step": "Fill operator_action values, then run workflow finalize with this file.",
         }
     )
 

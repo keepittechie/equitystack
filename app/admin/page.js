@@ -1,67 +1,71 @@
 import Link from "next/link";
-import AdminPolicyForm from "./AdminPolicyForm";
-import { fetchInternalJson } from "@/lib/api";
 import {
   getCurrentAdministrationDecisionMetrics,
-  getCurrentAdministrationReviewOverview,
+  getCurrentAdministrationOperatorWorkspace,
   getCurrentAdministrationWorkflowGuide,
 } from "@/lib/services/currentAdministrationReviewInsightsService";
 
-async function getLookups() {
-  return fetchInternalJson("/api/admin/lookups", {
-    errorMessage: "Failed to fetch admin lookups",
-  });
-}
-
 export default async function AdminPage() {
-  const [lookups, workflowGuide, reviewOverview, decisionMetrics] = await Promise.all([
-    getLookups(),
+  const [workspace, workflowGuide, decisionMetrics] = await Promise.all([
+    getCurrentAdministrationOperatorWorkspace(),
     getCurrentAdministrationWorkflowGuide(),
-    getCurrentAdministrationReviewOverview(),
     getCurrentAdministrationDecisionMetrics(),
   ]);
+  const batch = workspace.batch;
+  const counts = workspace.counts;
+  const latestPrecommit = workspace.latest_pre_commit_review;
 
   return (
     <main className="max-w-6xl mx-auto p-6 space-y-8">
       <section className="space-y-4">
-        <p className="text-sm text-gray-600">Admin review hub</p>
-        <h1 className="text-3xl font-bold">Admin</h1>
+        <p className="text-sm text-gray-600">Admin dashboard</p>
+        <h1 className="text-3xl font-bold">Current-admin workflow overview</h1>
         <p className="text-gray-700 max-w-3xl">
-          Use this page as the admin hub for review visibility and workflow guidance.
-          Canonical current-admin review generation, decision logging, and pre-commit
-          import checks still live in the Python pipeline under <code>python/</code>.
-          This page does not generate reviews or trigger imports.
+          This dashboard is a visual layer on top of the canonical Python
+          current-admin workflow. It shows the current batch, the next recommended
+          CLI step, and the latest read-only readiness state. It does not generate
+          AI reviews or replace the Python import path.
         </p>
       </section>
 
-      <section className="grid gap-4 lg:grid-cols-3">
+      <section className="grid gap-4 lg:grid-cols-4">
         <div className="border rounded-2xl p-5 bg-white shadow-sm">
-          <p className="text-sm text-gray-600">Latest review</p>
+          <p className="text-sm text-gray-600">Current batch</p>
           <p className="text-2xl font-semibold mt-2">
-            {reviewOverview.review_overview.reviewed_count}
+            {batch?.batch_name || "Unavailable"}
           </p>
           <p className="text-sm text-gray-700 mt-2">
-            Items in the latest current-admin review artifact.
+            Stage: {batch?.stage || "review"}
           </p>
         </div>
 
         <div className="border rounded-2xl p-5 bg-white shadow-sm">
-          <p className="text-sm text-gray-600">Decision sessions</p>
+          <p className="text-sm text-gray-600">Total items</p>
           <p className="text-2xl font-semibold mt-2">
-            {decisionMetrics.total_decision_log_sessions}
+            {counts.total_items}
           </p>
           <p className="text-sm text-gray-700 mt-2">
-            Logged operator decision sessions currently available.
+            Reviewed items in the current batch workspace.
+          </p>
+        </div>
+
+        <div className="border rounded-2xl p-5 bg-white shadow-sm">
+          <p className="text-sm text-gray-600">Approved / pending</p>
+          <p className="text-2xl font-semibold mt-2">
+            {counts.approved} / {counts.pending}
+          </p>
+          <p className="text-sm text-gray-700 mt-2">
+            Items with explicit approval decisions vs items still waiting on the operator.
           </p>
         </div>
 
         <div className="border rounded-2xl p-5 bg-white shadow-sm">
           <p className="text-sm text-gray-600">Pre-commit readiness</p>
           <p className="text-2xl font-semibold mt-2">
-            {workflowGuide.latest_pre_commit_review?.readiness_status || "missing"}
+            {latestPrecommit?.readiness_status || "missing"}
           </p>
           <p className="text-sm text-gray-700 mt-2">
-            Latest import-readiness status from the Python pre-commit artifact.
+            Last updated: {batch?.last_updated || "Unavailable"}
           </p>
         </div>
       </section>
@@ -73,16 +77,14 @@ export default async function AdminPage() {
             <h2 className="text-xl font-semibold mt-1">Canonical next step</h2>
           </div>
 
-          <div className="rounded-xl border p-4 bg-gray-50">
-            <p className="text-sm text-gray-600">Next step</p>
-            <p className="font-semibold mt-1">{workflowGuide.workflow_handoff.next_step_label}</p>
-            <p className="text-sm text-gray-600 mt-2">
-              Pipeline status key: <span className="font-medium">{workflowGuide.workflow_handoff.next_step}</span>
-            </p>
-          </div>
+            <div className="rounded-xl border p-4 bg-gray-50">
+              <p className="text-sm text-gray-600">Next step</p>
+              <p className="font-semibold mt-1">{workflowGuide.workflow_handoff.next_step_label}</p>
+              <p className="text-sm text-gray-600 mt-2">{latestPrecommit?.recommended_next_step || "Follow the recommended CLI command below."}</p>
+            </div>
 
-          <div className="space-y-2">
-            <p className="text-sm font-semibold">Recommended CLI commands</p>
+            <div className="space-y-2">
+              <p className="text-sm font-semibold">Recommended CLI commands</p>
             {workflowGuide.workflow_handoff.next_commands.map((command) => (
               <pre
                 key={command}
@@ -95,12 +97,13 @@ export default async function AdminPage() {
 
           <div className="grid gap-3 md:grid-cols-2">
             <div className="rounded-xl border p-4">
-              <p className="text-sm text-gray-600">Latest review artifact</p>
-              <p className="font-semibold mt-1">
-                {workflowGuide.latest_review?.batch_name || "Unavailable"}
+              <p className="text-sm text-gray-600">Current batch files</p>
+              <p className="font-semibold mt-1">{batch?.batch_name || "Unavailable"}</p>
+              <p className="text-sm text-gray-700 mt-2 break-all">
+                Review: {batch?.paths?.review || "No review artifact found."}
               </p>
               <p className="text-sm text-gray-700 mt-2 break-all">
-                {workflowGuide.latest_review?.file_path || "No review artifact found."}
+                Queue: {batch?.paths?.queue || "No queue artifact found."}
               </p>
             </div>
 
@@ -122,8 +125,17 @@ export default async function AdminPage() {
           </div>
 
           <div className="flex flex-wrap gap-3">
-            <Link href="/admin/review" className="border rounded-lg px-4 py-2">
-              Policy Review Queue
+            <Link href="/admin/current-admin-review" className="border rounded-lg px-4 py-2">
+              Current Admin Review
+            </Link>
+            <Link href="/admin/pre-commit" className="border rounded-lg px-4 py-2">
+              Pre-Commit Status
+            </Link>
+            <Link href="/admin/import-history" className="border rounded-lg px-4 py-2">
+              Import History
+            </Link>
+            <Link href="/admin/logs" className="border rounded-lg px-4 py-2">
+              Decision Logs
             </Link>
             <Link
               href="/admin/promises/current-administration"
@@ -165,14 +177,6 @@ export default async function AdminPage() {
             </div>
           </div>
         </div>
-      </section>
-
-      <section className="border rounded-2xl p-5 bg-white shadow-sm">
-        <h2 className="text-xl font-semibold mb-4">Add Policy Record</h2>
-        <p className="text-gray-700 mb-6">
-          This editor remains separate from the current-admin Python review pipeline.
-        </p>
-        <AdminPolicyForm lookups={lookups} />
       </section>
     </main>
   );
