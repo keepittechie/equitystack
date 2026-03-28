@@ -1,0 +1,103 @@
+{
+  "generated_at": "2026-03-28T20:17:34.866Z",
+  "source_log_files": [
+    "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/review_decisions/trump-2025-batch-01.20260328T193423Z.decision-log.json"
+  ],
+  "source_review_files": [
+    "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.ai-review.json"
+  ],
+  "total_sessions": 1,
+  "total_logged_items": 1,
+  "alignment_analytics": {
+    "total_match_count": 1,
+    "total_mismatch_count": 0,
+    "alignment_rate": 1,
+    "mismatches_by_operator_action": {},
+    "mismatches_by_ai_record_action_suggestion": {},
+    "mismatches_by_suggested_batch": {},
+    "mismatches_by_review_priority": {},
+    "average_confidence_for_matches": 0.55,
+    "average_confidence_for_mismatches": null,
+    "high_confidence_mismatches": 0,
+    "low_confidence_matches": 0,
+    "confidence_buckets": {
+      "high": {
+        "total": 0,
+        "mismatch_count": 0
+      },
+      "medium": {
+        "total": 1,
+        "mismatch_count": 0
+      },
+      "low": {
+        "total": 0,
+        "mismatch_count": 0
+      }
+    },
+    "mismatch_rate_with_material_conflicts": {
+      "total": 0,
+      "mismatch_count": 0,
+      "rate": null
+    },
+    "mismatch_rate_for_deep_review_recommended": {
+      "total": 1,
+      "mismatch_count": 0,
+      "rate": 0
+    },
+    "mismatch_rate_for_deep_review_ran": {
+      "total": 0,
+      "mismatch_count": 0,
+      "rate": null
+    }
+  },
+  "refinement_summary": {
+    "formulas": {
+      "review_risk_score": {
+        "scale": "0-10",
+        "advisory_only": true,
+        "high_meaning": "Higher review risk means the item is more ambiguous, conflict-heavy, or source-thin.",
+        "low_meaning": "Lower review risk means the item appears more stable and straightforward for review.",
+        "inputs": [
+          "review_priority_score capped at 6",
+          "has_material_conflict (+2)",
+          "deep_review_recommended (+1)",
+          "low confidence (+1)",
+          "source warnings or evidence gaps (+1)"
+        ]
+      },
+      "operator_friction_score": {
+        "scale": "0-10",
+        "advisory_only": true,
+        "high_meaning": "Higher operator friction means more manual effort, hesitation, or disagreement is likely.",
+        "low_meaning": "Lower operator friction means the item should take less operator effort to move through review.",
+        "inputs": [
+          "review_priority high (+2) / medium (+1)",
+          "suggested_batch manual_review_focus (+2)",
+          "operator_attention_needed (+1)",
+          "has_material_conflict (+2)",
+          "deep_review_recommended without deep review (+1)",
+          "source warnings (+1)",
+          "decision mismatch (+2 when available)",
+          "operator_action in manual_review_required, needs_more_sources, defer, reject, escalate (+1 when available)"
+        ]
+      }
+    },
+    "average_review_risk_score": 5,
+    "average_operator_friction_score": 3,
+    "review_risk_level_counts": {
+      "medium": 1
+    },
+    "operator_friction_level_counts": {
+      "low": 1
+    },
+    "suggested_batch_profiles": [
+      {
+        "suggested_batch": "deep_review_candidates",
+        "item_count": 1,
+        "average_review_risk_score": 5,
+        "average_operator_friction_score": 3
+      }
+    ]
+  },
+  "key_findings": []
+}

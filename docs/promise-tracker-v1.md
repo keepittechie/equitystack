@@ -130,7 +130,7 @@ Key fields:
 ## Service Layer Summary
 
 Primary file:
-- [`lib/services/promiseService.js`](/home/josh/Documents/GitHub/equitystack/lib/services/promiseService.js)
+- [`lib/services/promiseService.js`](../lib/services/promiseService.js)
 
 Current service responsibilities:
 - define Promise Tracker status ordering via `PROMISE_STATUSES`
@@ -187,8 +187,8 @@ The count is distinct by `source_id`, so a source linked at more than one level 
 ## Deployment and Migration Notes
 
 ### Current Database Snapshot
-- [`database/equitystack.sql`](/home/josh/Documents/GitHub/equitystack/database/equitystack.sql)
-- [`database/promise_tracker_current_admin_phase1.sql`](/home/josh/Documents/GitHub/equitystack/database/promise_tracker_current_admin_phase1.sql)
+- [`database/equitystack.sql`](../database/equitystack.sql)
+- [`database/promise_tracker_current_admin_phase1.sql`](../database/promise_tracker_current_admin_phase1.sql)
 
 Current repo convention:
 - the full database dump is the schema source of truth
@@ -207,22 +207,19 @@ Current-administration monitoring is intentionally separate from historical/manu
 
 ### Phase 2.5 AI-Assisted Triage
 
-The internal current-administration review flow now supports an AI review assistant using Ollama `qwen3.5:latest`.
+The canonical current-administration AI review flow now lives in the Python artifact pipeline.
 
-AI review is advisory only:
-- it can suggest whether a staged item looks trackable, noisy, or unclear
-- it can suggest likely classification fields
-- it can suggest a cleaned-up title and summary
-- it can suggest whether the item looks more like a new record or an update candidate
+Use the Python workflow for:
+- normalized batch review
+- deep review
+- worklists and session manifests
+- decision templates
+- decision logging
+- pre-commit review
+- feedback summaries
 
-AI review cannot:
-- approve a staged item
-- reject a staged item permanently
-- promote a staged item
-- create outcomes
-- change scoring
-
-Human review remains the approval boundary.
+The app-side staging UI may still show historical staged-item AI notes, but it is no longer the
+canonical AI review-generation path.
 
 ### Phase 2 Review and Promotion
 
@@ -282,25 +279,26 @@ Public report views may reference `scoring-ready` as a transparency filter, but 
 When a current-administration dataset has already passed normalization and editorial validation, it can be imported without going through raw staging ingestion.
 
 Use:
-- [`python/scripts/import_curated_current_admin_batch.py`](/home/josh/Documents/GitHub/equitystack/python/scripts/import_curated_current_admin_batch.py)
+- [`python/scripts/import_curated_current_admin_batch.py`](../python/scripts/import_curated_current_admin_batch.py)
 
 Batch modules live under:
-- [`python/data/current_admin_batches`](/home/josh/Documents/GitHub/equitystack/python/data/current_admin_batches)
+- [`python/data/current_admin_batches`](../python/data/current_admin_batches)
 
 Reports are written to:
-- [`python/reports/current_admin`](/home/josh/Documents/GitHub/equitystack/python/reports/current_admin)
+- [`python/reports/current_admin`](../python/reports/current_admin)
 
 Suggested sequence:
 - raw staging intake for noisy current White House feeds
 - manual review and promotion for individual staged items
 - editorial enrichment for outcomes and sources
+- Python curated-batch review as the canonical AI-assisted review path
 - curated batch import for already reviewed multi-record editorial batches
 
 The first live curated batch imported the 2025 Trump term starter set and is recorded in:
-- [`python/reports/current_admin/trump-2025-batch-01.import-apply.json`](/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.import-apply.json)
+- [`python/reports/current_admin/trump-2025-batch-01.import-apply.json`](../python/reports/current_admin/trump-2025-batch-01.import-apply.json)
 
 ### Remaining Promise Tracker Reference File
-- [`database/promise_tracker_import_batch_2_sources.md`](/home/josh/Documents/GitHub/equitystack/database/promise_tracker_import_batch_2_sources.md)
+- [`database/promise_tracker_import_batch_2_sources.md`](../database/promise_tracker_import_batch_2_sources.md)
 
 What it is for:
 - manual source reconciliation for the approved Promise Tracker import batch

@@ -54,35 +54,6 @@ export default function CurrentAdministrationReviewPanel({
     router.push(`?${params.toString()}`);
   }
 
-  async function generateAiReview() {
-    setMessage("");
-    startTransition(async () => {
-      try {
-        const response = await fetch(
-          `/api/admin/current-administration-staging/${item.id}/ai-review`,
-          {
-            method: "POST",
-          }
-        );
-
-        const payload = await response.json();
-        if (!response.ok) {
-          throw new Error(payload.error || "Failed to generate AI review");
-        }
-
-        const status = payload.review?.generation_status || "completed";
-        setMessage(
-          status === "completed"
-            ? "AI review refreshed."
-            : "AI review assistant was unavailable. Human review can continue."
-        );
-        router.refresh();
-      } catch (error) {
-        setMessage(error.message);
-      }
-    });
-  }
-
   async function mutateReviewStatus(status) {
     setMessage("");
     startTransition(async () => {
@@ -155,24 +126,23 @@ export default function CurrentAdministrationReviewPanel({
       <section className="border rounded-2xl p-5 bg-white shadow-sm">
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <div>
-            <h2 className="text-lg font-semibold">AI Review Assistant</h2>
+            <h2 className="text-lg font-semibold">Staging AI Review</h2>
             <p className="text-sm text-gray-700 mt-1">
-              Advisory only. Human approval is still required before promotion.
+              Historical staging-only AI notes can still be viewed here, but the canonical
+              current-admin AI review now runs through the Python artifact pipeline.
             </p>
           </div>
-          <button
-            type="button"
-            onClick={generateAiReview}
-            disabled={isPending}
-            className="rounded-full border px-4 py-2 text-sm font-medium disabled:opacity-60"
-          >
-            {aiReview ? "Refresh AI Review" : "Generate AI Review"}
-          </button>
+        </div>
+
+        <div className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950 mt-4">
+          This staging AI generator is deprecated.
+          Use the Python current-admin workflow to generate canonical review artifacts, decision logs,
+          and feedback summaries. This admin page remains a manual staging review and promotion surface.
         </div>
 
         {!aiReview ? (
           <p className="text-sm text-gray-600 mt-4">
-            No AI review has been generated for this staged item yet.
+            No legacy staging AI review is stored for this staged item.
           </p>
         ) : (
           <div className="space-y-4 mt-4">

@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import {
-  generateAiReviewForStagedItem,
   getAiReviewForStagedItem,
 } from "@/lib/services/currentAdministrationAiReviewService";
 
@@ -23,8 +22,15 @@ export async function GET(request, context) {
 export async function POST(request, context) {
   try {
     const { id } = await context.params;
-    const review = await generateAiReviewForStagedItem(id);
-    return NextResponse.json({ review });
+    const existingReview = await getAiReviewForStagedItem(id);
+    return NextResponse.json(
+      {
+        error:
+          "The staged-item AI review generator is deprecated. Use the canonical Python current-admin review pipeline to generate review artifacts, then use the dashboard as a read-only/admin surface.",
+        review: existingReview,
+      },
+      { status: 410 }
+    );
   } catch (error) {
     const message = error?.message || "Failed to generate AI review";
     const status = /not found/i.test(message) ? 404 : 500;

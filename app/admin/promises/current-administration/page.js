@@ -118,7 +118,9 @@ export default async function CurrentAdministrationReviewPage({ searchParams }) 
           <p className="text-gray-700 mt-3 max-w-3xl">
             Review White House intake candidates, mark them approved or rejected,
             and manually promote approved items into curated Promise Tracker
-            records. Staged items here remain internal until promotion.
+            records. Staged items here remain internal until promotion. Canonical
+            current-admin AI review and analytics now come from the Python artifact
+            pipeline, not from this staging UI.
           </p>
         </div>
 

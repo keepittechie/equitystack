@@ -15,13 +15,23 @@ const NAV_LINKS = [
   { href: "/reports/civil-rights-timeline", label: "Civil Rights Timeline" },
 ];
 
+const ADMIN_NAV_LINKS = [
+  { href: "/admin", label: "Admin Hub" },
+  { href: "/admin/review", label: "Policy Review" },
+  { href: "/admin/promises/current-administration", label: "Staging Intake" },
+  { href: "/admin/logout", label: "Logout", external: true },
+];
+
+function isActiveNavItem(pathname, href) {
+  return href === "/"
+    ? pathname === "/"
+    : href === "/reports"
+      ? pathname === href
+      : pathname === href || pathname.startsWith(`${href}/`);
+}
+
 function navClasses(pathname, href) {
-  const isActive =
-    href === "/"
-      ? pathname === "/"
-      : href === "/reports"
-        ? pathname === href
-        : pathname === href || pathname.startsWith(`${href}/`);
+  const isActive = isActiveNavItem(pathname, href);
 
   return isActive
     ? "rounded-full bg-[rgba(138,59,18,0.1)] px-4 py-2 text-[var(--accent)] font-semibold"
@@ -30,13 +40,31 @@ function navClasses(pathname, href) {
 
 export default function MainLayout({ children }) {
   const pathname = usePathname();
+  const isAdminPath = pathname?.startsWith("/admin");
+  const navLinks = isAdminPath ? ADMIN_NAV_LINKS : NAV_LINKS;
+
+  function renderNavItem(item, className) {
+    if (item.external) {
+      return (
+        <a key={item.href} href={item.href} className={className}>
+          {item.label}
+        </a>
+      );
+    }
+
+    return (
+      <Link key={item.href} href={item.href} className={className}>
+        {item.label}
+      </Link>
+    );
+  }
 
   return (
     <div className="page-shell min-h-screen text-gray-900 flex flex-col">
       <header className="sticky top-0 z-50 border-b soft-rule bg-[rgba(252,248,241,0.9)] backdrop-blur">
         <div className="max-w-7xl mx-auto px-6 py-3 flex justify-between items-center gap-6">
             <div className="flex flex-col items-start justify-center min-w-[180px]">
-              <span className="eyebrow mb-2">EquityStack</span>
+              <span className="eyebrow mb-2">{isAdminPath ? "EquityStack Admin" : "EquityStack"}</span>
               <Link href="/" className="block leading-none">
                 <Image
                   src="/logo-v2.png"
@@ -48,41 +76,32 @@ export default function MainLayout({ children }) {
                 />
               </Link>
               <span className="text-[10px] tracking-[0.2em] text-[var(--ink-soft)] mt-1 pl-1 uppercase">
-                Policy • History • Impact
+                {isAdminPath ? "Admin • Review • Workflow" : "Policy • History • Impact"}
               </span>
             </div>
             <nav
-              aria-label="Primary"
+              aria-label={isAdminPath ? "Admin" : "Primary"}
               className="hidden md:flex flex-wrap gap-1 text-[12px] font-medium items-center"
             >
-              {NAV_LINKS.map((item) => (
-                <Link key={item.href} href={item.href} className={navClasses(pathname, item.href)}>
-                  {item.label}
-                </Link>
+              {navLinks.map((item) => (
+                renderNavItem(item, navClasses(pathname, item.href))
               ))}
             </nav>
           </div>
 
         <div className="border-t soft-rule md:hidden">
-          <nav aria-label="Mobile" className="max-w-7xl mx-auto px-4 py-2">
+          <nav aria-label={isAdminPath ? "Admin mobile" : "Mobile"} className="max-w-7xl mx-auto px-4 py-2">
             <div className="flex gap-2 overflow-x-auto">
-              {NAV_LINKS.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`whitespace-nowrap rounded-full border px-3 py-2 text-sm ${
-                    item.href === "/"
-                      ? pathname === item.href
-                      : item.href === "/reports"
-                        ? pathname === item.href
-                        : pathname === item.href || pathname.startsWith(`${item.href}/`)
+              {navLinks.map((item) =>
+                renderNavItem(
+                  item,
+                  `whitespace-nowrap rounded-full border px-3 py-2 text-sm ${
+                    isActiveNavItem(pathname, item.href)
                       ? "bg-[var(--accent)] text-white border-[var(--accent)]"
                       : "bg-white/70 text-[var(--ink-soft)] border-[rgba(120,53,15,0.12)]"
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              ))}
+                  }`
+                )
+              )}
             </div>
           </nav>
         </div>

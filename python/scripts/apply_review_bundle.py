@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+import csv
 import json
 from datetime import UTC, datetime
 from pathlib import Path
@@ -58,6 +59,35 @@ def default_feedback_log_path() -> Path:
     return reports_dir() / "equitystack_feedback_log.json"
 
 
+def derive_csv_path(csv_arg: str | None, output_path: Path) -> Path | None:
+    if csv_arg is None:
+        return None
+    if csv_arg == "":
+        return output_path.with_suffix(".csv")
+    return Path(csv_arg).resolve()
+
+
+def write_csv_rows(path: Path, rows: list[dict[str, Any]]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    if not rows:
+        path.write_text("")
+        return
+
+    fieldnames: list[str] = []
+    seen: set[str] = set()
+    for row in rows:
+        for key in row.keys():
+            if key not in seen:
+                seen.add(key)
+                fieldnames.append(key)
+
+    with path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=fieldnames)
+        writer.writeheader()
+        for row in rows:
+            writer.writerow(row)
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Safely apply only approved operator_actions from an EquityStack review bundle.")
     parser.add_argument("--input", type=Path, default=default_input_path(), help="Path to reports/equitystack_review_bundle.json")
@@ -65,6 +95,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--yes", action="store_true", help="Required confirmation bypass for --apply mode")
     parser.add_argument("--only-future-bill-id", type=int, action="append", help="Limit to one or more future_bill_id values")
     parser.add_argument("--output", type=Path, default=default_output_path(), help="Path to write reports/equitystack_apply_report.json")
+    parser.add_argument("--csv", nargs="?", const="", help="Write a CSV summary. Pass a path or omit a value to derive one.")
     return parser.parse_args()
 
 
@@ -491,10 +522,30 @@ def dry_run_result(action: dict[str, Any]) -> dict[str, Any]:
     )
 
 
+def csv_row(category: str, item: dict[str, Any]) -> dict[str, Any]:
+    change = item.get("change_summary") or {}
+    return {
+        "category": category,
+        "action_id": item.get("action_id"),
+        "action_type": item.get("action_type"),
+        "future_bill_id": item.get("future_bill_id"),
+        "future_bill_link_id": item.get("future_bill_link_id") or change.get("future_bill_link_id"),
+        "tracked_bill_id": change.get("tracked_bill_id"),
+        "result": item.get("result"),
+        "message": item.get("message"),
+        "reason": item.get("reason"),
+        "error": item.get("error"),
+        "new_link_type": item.get("new_link_type") or change.get("new_link_type"),
+        "old_link_type": change.get("old_link_type"),
+        "timestamp": item.get("timestamp"),
+    }
+
+
 def main() -> None:
     args = parse_args()
     input_path = args.input.resolve()
     output_path = args.output.resolve()
+    csv_path = derive_csv_path(args.csv, output_path)
     dry_run = not args.apply
 
     if args.apply and not args.yes:
@@ -634,6 +685,14 @@ def main() -> None:
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(json.dumps(report, indent=2, default=str))
 
+    if csv_path:
+        rows = (
+            [csv_row("applied", item) for item in applied_actions]
+            + [csv_row("skipped", item) for item in skipped_actions]
+            + [csv_row("error", item) for item in errors]
+        )
+        write_csv_rows(csv_path, rows)
+
     if not dry_run and applied_actions:
         applied_ids = {str(item.get("action_id")) for item in applied_actions if item.get("action_id")}
         append_feedback_entries([feedback_entry(action, "approved") for action in approved_actions if str(action.get("action_id")) in applied_ids])
@@ -642,6 +701,8 @@ def main() -> None:
     print(f"Total skipped: {len(skipped_actions)}")
     print(f"Total errors: {len(errors)}")
     print(f"Wrote apply report to {output_path}")
+    if csv_path:
+        print(f"Wrote CSV summary to {csv_path}")
 
     if errors and not dry_run:
         raise SystemExit(1)

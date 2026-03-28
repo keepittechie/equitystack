@@ -1,6 +1,6 @@
 {
   "batch_name": "trump-2025-batch-01",
-  "source_path": "data/current_admin_batches/trump_2025_batch_01.json",
+  "source_path": "/home/josh/Documents/GitHub/equitystack/python/data/current_admin_batches/trump_2025_batch_01.json",
   "normalized_output_path": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.normalized.json",
   "record_count": 10,
   "issue_count": 0,

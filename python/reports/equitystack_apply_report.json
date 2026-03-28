@@ -1,39 +1,20 @@
 {
-  "generated_at": "2026-03-25T07:49:22.025662+00:00",
+  "generated_at": "2026-03-28T17:01:56.072249+00:00",
   "mode": "apply",
-  "input_bundle": "/home/josh/black-policy-site/python/reports/equitystack_review_bundle.json",
-  "affected_future_bill_ids": [
-    7
-  ],
+  "input_bundle": "/home/josh/Documents/GitHub/equitystack/python/reports/equitystack_review_bundle.json",
+  "affected_future_bill_ids": [],
   "affected_future_bill_link_ids": [],
   "created_links": [],
   "updated_links": [],
   "deleted_links": [],
-  "applied_actions": [
-    {
-      "action_id": "import_candidate_seed:7:S. 120",
-      "action_type": "import_candidate_seed",
-      "future_bill_id": 7,
-      "result": "applied",
-      "timestamp": "2026-03-25T07:49:22.025435+00:00",
-      "message": "Approved seed row written for later import"
-    }
-  ],
+  "applied_actions": [],
   "skipped_actions": [
     {
-      "action_id": "import_candidate_seed:7:H.R. 68",
-      "action_type": "import_candidate_seed",
+      "action_id": "create_partial_link:7:21",
+      "action_type": "create_partial_link",
       "future_bill_id": 7,
       "result": "skipped",
-      "timestamp": "2026-03-25T07:49:22.025407+00:00",
-      "reason": "Action is not both approved=true and status=pending"
-    },
-    {
-      "action_id": "import_candidate_seed:7:S. 32",
-      "action_type": "import_candidate_seed",
-      "future_bill_id": 7,
-      "result": "skipped",
-      "timestamp": "2026-03-25T07:49:22.025426+00:00",
+      "timestamp": "2026-03-28T17:01:56.072236+00:00",
       "reason": "Action is not both approved=true and status=pending"
     }
   ],

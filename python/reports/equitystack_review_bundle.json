@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-03-25T22:15:25.606624+00:00",
-  "pipeline_run_id": "20260325T221525Z",
+  "generated_at": "2026-03-28T17:01:56.129306+00:00",
+  "pipeline_run_id": "20260328T170156Z",
   "environment": {
     "python_dir": "/home/josh/Documents/GitHub/equitystack/python",
     "reports_dir": "/home/josh/Documents/GitHub/equitystack/python/reports"
@@ -14,8 +14,8 @@
     "feedback_analysis": "/home/josh/Documents/GitHub/equitystack/python/reports/equitystack_feedback_analysis.json"
   },
   "normalization_summary": {
-    "rows_seen": 32,
-    "rows_grouped": 18,
+    "rows_seen": 30,
+    "rows_grouped": 16,
     "rows_skipped_missing_future_bill_id": 14,
     "rows_skipped_other_errors": 0
   },
@@ -136,18 +136,18 @@
   "summary": {
     "future_bills_reviewed": 3,
     "future_bills_in_bundle": 3,
-    "total_actions": 2,
+    "total_actions": 1,
     "safe_auto_removals_available": 0,
     "manual_review_items": 0,
     "partial_candidates": 1,
     "discovery_candidates": 0,
     "items_requiring_operator_action": 1,
-    "total_applied_actions": 1,
+    "total_applied_actions": 0,
     "total_actionable_operator_actions": 1,
     "total_skipped": 0,
     "total_stale": 20,
     "total_stale_suggestions": 20,
-    "total_already_applied": 1,
+    "total_already_applied": 0,
     "total_suppressed_weak_candidates": 7,
     "feedback_adjustments_applied": {
       "action_type": {
@@ -2284,17 +2284,7 @@
         "companion": []
       },
       "ai_review": [],
-      "safe_apply": [
-        {
-          "action_id": "import_candidate_seed:7:S. 120",
-          "action_type": "import_candidate_seed",
-          "future_bill_id": 7,
-          "result": "applied",
-          "timestamp": "2026-03-25T07:49:22.025435+00:00",
-          "message": "Approved seed row written for later import",
-          "review_state": "actionable"
-        }
-      ],
+      "safe_apply": [],
       "manual_review_queue": [],
       "partial_suggestions": [
         {
@@ -2447,64 +2437,11 @@
               "existing_link_penalty": -0.05
             }
           }
-        },
-        {
-          "action_id": "import_candidate_seed:7:S. 120",
-          "action_type": "import_candidate_seed",
-          "target_type": null,
-          "target_id": null,
-          "payload": {},
-          "status": "applied",
-          "approved": true,
-          "approved_by": null,
-          "approved_at": null,
-          "applied_at": "2026-03-25T07:49:22.025435+00:00",
-          "apply_result": "applied",
-          "source": "equitystack_apply_report",
-          "rationale": "Approved seed row written for later import",
-          "review_state": "already_applied",
-          "future_bill_id": 7,
-          "future_bill_link_id": null,
-          "current_tracked_bill_id": null,
-          "candidate_tracked_bill_id": null,
-          "candidate_bill_number": null,
-          "candidate_title": null,
-          "proposed_link_type": null,
-          "raw_data": {
-            "action_id": "import_candidate_seed:7:S. 120",
-            "action_type": "import_candidate_seed",
-            "future_bill_id": 7,
-            "result": "applied",
-            "timestamp": "2026-03-25T07:49:22.025435+00:00",
-            "message": "Approved seed row written for later import",
-            "review_state": "actionable"
-          },
-          "action_score": 0.525,
-          "action_priority": "Low",
-          "score_breakdown": {
-            "match_confidence": 0.5,
-            "link_type_score": 0.5,
-            "action_type_score": 0.75,
-            "recency_score": 0.5,
-            "existing_link_penalty": 0.0,
-            "penalty": -0.0,
-            "feedback_adjustments": {
-              "action_type_adjustment": 0.0,
-              "link_type_adjustment": 0.0
-            },
-            "weights": {
-              "match_confidence": 0.35,
-              "link_type_score": 0.3,
-              "action_type_score": 0.2,
-              "recency_score": 0.1,
-              "existing_link_penalty": -0.05
-            }
-          }
         }
       ],
       "actionable_operator_actions_count": 1,
       "stale_suggestions_count": 1,
-      "already_applied_count": 1,
+      "already_applied_count": 0,
       "suppressed_weak_candidates_count": 0
     }
   ],

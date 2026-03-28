@@ -1,7 +1,7 @@
 # Historical Coverage Backlog
 
 This file is a working backlog for expanding EquityStack's historical corpus.
-It is based on the current JSON packs under [`python/data/policies`](/home/josh/Documents/GitHub/equitystack/python/data/policies), plus the database schema and app behavior already in the repo.
+It is based on the current JSON packs under [`data/policies`](data/policies), plus the database schema and app behavior already in the repo.
 
 It is not a claim that the database is wrong. It is a planning document for what is most likely still missing or underrepresented.
 

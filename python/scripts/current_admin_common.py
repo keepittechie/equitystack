@@ -8,8 +8,6 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-import pymysql
-
 
 DEFAULT_CURRENT_ADMIN_REPORTS_DIRNAME = "current_admin"
 VALID_PROMISE_STATUSES = {"In Progress", "Partial", "Delivered", "Blocked", "Failed"}
@@ -61,6 +59,8 @@ def get_db_env_values() -> dict[str, str]:
 
 
 def get_db_connection():
+    import pymysql
+
     env_values = get_db_env_values()
     return pymysql.connect(
         host=env_values.get("DB_HOST", "127.0.0.1"),

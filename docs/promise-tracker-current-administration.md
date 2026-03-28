@@ -78,11 +78,20 @@ The ingestion script:
 - does not affect scoring
 
 Script path:
-- [`python/scripts/ingest_current_administration.py`](/home/josh/Documents/GitHub/equitystack/python/scripts/ingest_current_administration.py)
+- [`python/scripts/ingest_current_administration.py`](../python/scripts/ingest_current_administration.py)
 
 ## Review Workflow
 
 Phase 2 adds an internal review workflow under `/admin/promises/current-administration`.
+
+That admin surface is now a manual staging review and promotion UI, not the canonical
+current-admin AI review pipeline.
+
+Canonical current-admin review generation now lives in the Python artifact workflow under:
+- `python/scripts/normalize_current_admin_batch.py`
+- `python/scripts/review_current_admin_batch_with_ollama.py`
+- `python/scripts/apply_current_admin_ai_review.py`
+- `python/reports/current_admin/`
 
 Operators can:
 - list staged items by status
@@ -115,26 +124,28 @@ Curated batch import is for cases where the dataset has already passed:
 - duplicate and relationship checks
 
 Primary Python scripts:
-- [`python/scripts/discover_current_admin_updates.py`](/home/josh/Documents/GitHub/equitystack/python/scripts/discover_current_admin_updates.py)
-- [`python/scripts/export_current_admin_discovery_candidates.py`](/home/josh/Documents/GitHub/equitystack/python/scripts/export_current_admin_discovery_candidates.py)
-- [`python/scripts/normalize_current_admin_batch.py`](/home/josh/Documents/GitHub/equitystack/python/scripts/normalize_current_admin_batch.py)
-- [`python/scripts/review_current_admin_batch_with_ollama.py`](/home/josh/Documents/GitHub/equitystack/python/scripts/review_current_admin_batch_with_ollama.py)
-- [`python/scripts/apply_current_admin_ai_review.py`](/home/josh/Documents/GitHub/equitystack/python/scripts/apply_current_admin_ai_review.py)
-- [`python/scripts/import_curated_current_admin_batch.py`](/home/josh/Documents/GitHub/equitystack/python/scripts/import_curated_current_admin_batch.py)
-- [`python/scripts/validate_current_admin_import.py`](/home/josh/Documents/GitHub/equitystack/python/scripts/validate_current_admin_import.py)
+- [`python/scripts/discover_current_admin_updates.py`](../python/scripts/discover_current_admin_updates.py)
+- [`python/scripts/export_current_admin_discovery_candidates.py`](../python/scripts/export_current_admin_discovery_candidates.py)
+- [`python/scripts/normalize_current_admin_batch.py`](../python/scripts/normalize_current_admin_batch.py)
+- [`python/scripts/review_current_admin_batch_with_ollama.py`](../python/scripts/review_current_admin_batch_with_ollama.py)
+- [`python/scripts/apply_current_admin_ai_review.py`](../python/scripts/apply_current_admin_ai_review.py)
+- [`python/scripts/import_curated_current_admin_batch.py`](../python/scripts/import_curated_current_admin_batch.py)
+- [`python/scripts/validate_current_admin_import.py`](../python/scripts/validate_current_admin_import.py)
 
 Current batch file:
-- [`python/data/current_admin_batches/trump_2025_batch_01.json`](/home/josh/Documents/GitHub/equitystack/python/data/current_admin_batches/trump_2025_batch_01.json)
+- [`python/data/current_admin_batches/trump_2025_batch_01.json`](../python/data/current_admin_batches/trump_2025_batch_01.json)
 
 Audit report directory:
-- [`python/reports/current_admin`](/home/josh/Documents/GitHub/equitystack/python/reports/current_admin)
+- [`python/reports/current_admin`](../python/reports/current_admin)
 
 Recommended workflow:
 - optionally run discovery to identify stale records, missing actions, and possible new promise candidates
 - review `python/reports/current_admin/discovery_report.json`
 - export selected discovery suggestions into a draft batch file
 - edit that draft into a curated batch JSON or enrichment batch
-- run a dry run first
+- run the canonical Python wrapper flow
+- fill explicit operator actions in the generated decision template
+- run the read-only pre-commit review before import
 - inspect the generated ingest report for duplicates, conflicts, and validation results
 - rerun with `--apply` only after the dry run is clean
 - keep the apply report in the audit directory
@@ -142,15 +153,17 @@ Recommended workflow:
 Example commands:
 
 ```bash
-python3 scripts/discover_current_admin_updates.py --president-slug donald-j-trump-2025 --dry-run
-python3 scripts/export_current_admin_discovery_candidates.py --candidate-id update_candidates:2 --output-name trump_2025_refresh_draft
-python3 scripts/normalize_current_admin_batch.py --input data/current_admin_batches/trump_2025_batch_01.json
-python3 scripts/review_current_admin_batch_with_ollama.py --input reports/current_admin/trump-2025-batch-01.normalized.json
-python3 scripts/apply_current_admin_ai_review.py --batch reports/current_admin/trump-2025-batch-01.normalized.json --review reports/current_admin/trump-2025-batch-01.ai-review.json
-python3 scripts/import_curated_current_admin_batch.py --input reports/current_admin/trump-2025-batch-01.manual-review-queue.json
-python3 scripts/import_curated_current_admin_batch.py --input reports/current_admin/trump-2025-batch-01.manual-review-queue.json --apply --yes
-python3 scripts/validate_current_admin_import.py --input reports/current_admin/trump-2025-batch-01.manual-review-queue.json
+cd python
+./bin/equitystack current-admin workflow start --input data/current_admin_batches/trump_2025_batch_01.json
+./bin/equitystack current-admin workflow review --input reports/current_admin/trump-2025-batch-01.ai-review.json --output /tmp/trump-2025-batch-01.decision-template.json
+./bin/equitystack current-admin workflow finalize --review reports/current_admin/trump-2025-batch-01.ai-review.json --decision-file /tmp/trump-2025-batch-01.decision-template.json --log-decisions
+./bin/equitystack current-admin pre-commit --input reports/current_admin/trump-2025-batch-01.manual-review-queue.json
+./bin/equitystack current-admin import --input reports/current_admin/trump-2025-batch-01.manual-review-queue.json
+./bin/equitystack current-admin import --input reports/current_admin/trump-2025-batch-01.manual-review-queue.json --apply --yes
+./bin/equitystack current-admin validate --input reports/current_admin/trump-2025-batch-01.manual-review-queue.json
 ```
+
+Raw Python entrypoints still exist under `python/scripts/` for debugging, but the wrapper is the recommended operator interface.
 
 The import script remains non-destructive:
 - promise matching prefers existing slug or title-plus-president matches
@@ -182,40 +195,31 @@ Production apply result:
 - 16 sources reused
 
 Audit file:
-- [`python/reports/current_admin/trump-2025-batch-01.import-apply.json`](/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.import-apply.json)
+- [`python/reports/current_admin/trump-2025-batch-01.import-apply.json`](../python/reports/current_admin/trump-2025-batch-01.import-apply.json)
 
-### AI Review Assistant
+### Staging AI Review Status
 
-The review page now supports an internal AI review assistant powered by Ollama `qwen3.5:latest`.
+Historical staged-item AI review rows may still be visible in the admin UI, but the live
+staging AI generator is deprecated.
 
-The AI layer is advisory only and stored separately from human review status.
+The canonical AI review path for current-administration records is the Python artifact pipeline.
+That keeps:
+- review generation
+- deep review
+- worklists
+- decision logging
+- feedback summaries
 
-It can suggest:
-- whether a staged item looks like a presidency-level action worth tracking
-- likely classification fields
-- a cleaned-up editorial title and summary
-- whether the item looks more like a new record or an update candidate
-- caution notes and editorial flags
+in one canonical process instead of splitting them between the app and Python.
 
-It cannot:
-- approve a staged item
-- reject a staged item permanently
-- promote a staged item
-- create public Promise Tracker records
-- create outcomes
-- affect Black Impact Score
+### Failure-Safe Admin Behavior
 
-Human approval is still required before promotion.
+The admin staging page remains safe even without AI generation:
 
-### Failure-Safe AI Behavior
-
-AI review is optional and fail-safe.
-
-If Ollama is unavailable:
 - review pages still load
 - manual review actions still work
 - promotion still requires explicit human approval
-- the AI section shows the assistant as unavailable instead of blocking the workflow
+- the canonical Python pipeline remains the source of review artifacts and analytics
 
 ## Promotion Boundary
 
