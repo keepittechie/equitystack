@@ -160,13 +160,13 @@ export default async function HomePage() {
                 href="/reports"
                 className="px-5 py-3 rounded-full border border-[var(--line-strong)] bg-white/75 font-medium hover:bg-white"
               >
-                Open Reports
+                Browse Reports
               </Link>
               <Link
                 href="/future-bills"
                 className="px-5 py-3 rounded-full border border-[var(--line-strong)] bg-white/75 font-medium hover:bg-white"
               >
-                Track Current Bills
+                Browse Future Bills
               </Link>
             </div>
             <div className="card-muted rounded-[1.25rem] p-4">
@@ -174,8 +174,8 @@ export default async function HomePage() {
                 Use This Site
               </p>
               <p className="text-sm text-[var(--ink-soft)] leading-6 mt-3">
-                Start with the Impact Score, then branch into reports, current bills,
-                and the linked record pages when you want more detail.
+                Start with the Impact Score, then move into reports, future bills,
+                and linked record pages when you want more detail.
               </p>
             </div>
           </div>
@@ -247,7 +247,7 @@ export default async function HomePage() {
           <div>
             <h2 className="text-2xl font-semibold">How To Use EquityStack</h2>
             <p className="text-sm text-[var(--ink-soft)] mt-1">
-              The fastest way to understand the project is to move from narrative to evidence to current accountability.
+              The fastest way to understand the site is to move from narrative to evidence to current accountability.
             </p>
           </div>
           <Link href="/start" className="text-sm accent-link">

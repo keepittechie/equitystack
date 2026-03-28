@@ -478,7 +478,7 @@ export default function FutureBillsClient({ bills, focusId }) {
                       }
                       className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
                     >
-                      Open Detail Page
+                      Open Future Bill
                     </Link>
                   </div>
                 </div>

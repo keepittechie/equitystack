@@ -332,13 +332,13 @@ export default async function PromiseDetailPage({ params }) {
           href={`/promises/president/${promise.president_slug}`}
           className="inline-flex items-center rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
         >
-          Back to {promise.president}
+          Back to {promise.president} Promise Tracker
         </Link>
         <Link
           href="/promises/all"
           className="inline-flex items-center rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
         >
-          Browse All Promise Records
+          Browse All Promises
         </Link>
       </div>
 

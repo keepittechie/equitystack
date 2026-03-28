@@ -1146,7 +1146,7 @@ function MethodologySection({ methodology, metadata, usingLegacyModel, isLegacyF
     <section className="card-surface rounded-[1.6rem] p-5">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="max-w-3xl">
-          <h2 className="text-lg font-semibold mb-2">How This Score Is Calculated</h2>
+          <h2 className="text-lg font-semibold mb-2">Scoring Details</h2>
           <p className="text-sm text-[var(--ink-soft)] leading-7">
             {usingOutcomeModel
               ? "Scores are based on documented real-world outcomes, not just promises or enacted laws. Each outcome is classified as positive, negative, mixed, or blocked, then weighted by evidence strength and available source support before president totals are aggregated."
@@ -1159,7 +1159,7 @@ function MethodologySection({ methodology, metadata, usingLegacyModel, isLegacyF
           href="#methodology"
           className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
         >
-          View Methodology
+          Open Full Methodology
         </a>
       </div>
 
@@ -1226,22 +1226,52 @@ function ScoringTransparencySection({ usingLegacyModel, isLegacyFallbackActive }
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="max-w-3xl">
           <h2 className="text-lg font-semibold mb-2">How this was scored</h2>
+          <p className="text-sm text-[var(--ink-soft)] leading-7">
+            This report starts with tracked actions, checks what actually happened, reviews the sources,
+            and then rolls those outcomes into a president-level score.
+          </p>
         </div>
         <MetaPill>{usingLegacyModel ? "Legacy framing" : "Outcome-based framing"}</MetaPill>
       </div>
 
-      <ul className="mt-5 space-y-3 text-sm text-[var(--ink-soft)] leading-7">
-        <li>This score is based on real outcomes, not just promises or announcements.</li>
-        <li>Each record is reviewed for what actually happened, who it affected, and whether the result helped or harmed Black communities.</li>
-        <li>For example, a delivered action with documented gains can push a score up, while a harmful outcome pushes it down.</li>
-        <li>Positive means helped, Negative means harmed, Mixed means both, and Blocked means an attempt did not fully take effect.</li>
-        <li>Only reviewed, evidence-backed public records are included here. Admin, staging, and draft material are excluded.</li>
-        {isLegacyFallbackActive ? (
-          <li>Legacy fallback is temporarily active for this view, but the scoring rules themselves have not been changed on this page.</li>
-        ) : (
-          <li>The scoring logic itself has not changed here. This section only explains the results in plainer language.</li>
-        )}
-      </ul>
+      <div className="grid gap-4 md:grid-cols-2 mt-5">
+        <div className="card-muted rounded-[1.2rem] p-4">
+          <h3 className="text-base font-semibold">1. Actions are tracked</h3>
+          <p className="text-sm text-[var(--ink-soft)] mt-2 leading-7">
+            Each score starts with public Promise Tracker records that connect a promise to actions,
+            outcomes, and supporting sources.
+          </p>
+        </div>
+        <div className="card-muted rounded-[1.2rem] p-4">
+          <h3 className="text-base font-semibold">2. Outcomes are classified</h3>
+          <p className="text-sm text-[var(--ink-soft)] mt-2 leading-7">
+            Reviewers classify what happened as Positive, Negative, Mixed, or Blocked based on the
+            real effect on Black communities.
+          </p>
+        </div>
+        <div className="card-muted rounded-[1.2rem] p-4">
+          <h3 className="text-base font-semibold">3. Sources are checked</h3>
+          <p className="text-sm text-[var(--ink-soft)] mt-2 leading-7">
+            Source support matters. Stronger public evidence gives an outcome more weight than a
+            weaker or thinly documented record.
+          </p>
+        </div>
+        <div className="card-muted rounded-[1.2rem] p-4">
+          <h3 className="text-base font-semibold">4. Scores are rolled up</h3>
+          <p className="text-sm text-[var(--ink-soft)] mt-2 leading-7">
+            Weighted outcomes are combined into a president-level score, so the final number reflects
+            documented results, not campaign language alone.
+          </p>
+        </div>
+      </div>
+
+      <p className="text-sm text-[var(--ink-soft)] mt-4 leading-7">
+        Positive means helped, Negative means harmed, Mixed means both, and Blocked means the effort
+        did not fully take effect. Only reviewed public records are included here.
+        {isLegacyFallbackActive
+          ? " This view is temporarily using the legacy fallback model, but the explanation above still describes the intended scoring flow."
+          : ""}
+      </p>
     </section>
   );
 }
@@ -1622,9 +1652,12 @@ function AdvancedReportToolsSection({
   return (
     <section className="card-surface rounded-[1.6rem] p-5 print:hidden">
       <details>
-        <summary className="cursor-pointer list-none text-lg font-semibold">Advanced Tools</summary>
+        <summary className="cursor-pointer list-none text-lg font-semibold">
+          Advanced Tools and Sharing
+        </summary>
         <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7 max-w-3xl">
-          These secondary controls support deeper comparison, debate workflows, saved views, and print or PDF output after you have the main report state set.
+          Open this section for timeline controls, topic or comparison filters, share links, saved
+          states, and print or PDF tools after you have read the main report.
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
           <TrackedLink
@@ -1891,9 +1924,9 @@ function ViewToggleSection({ standardHref, timelineHref, isTimelineView }) {
     <section className="card-surface rounded-[1.6rem] p-5">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="max-w-3xl">
-          <h2 className="text-lg font-semibold mb-2">View Mode</h2>
+          <h2 className="text-lg font-semibold mb-2">Choose a View</h2>
           <p className="text-sm text-[var(--ink-soft)] leading-7">
-            Switch between the president summary report and the chronological timeline view without changing the underlying scoring model.
+            Start with the standard report, then switch to the timeline when you want chronological context without changing the underlying scoring model.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -1911,7 +1944,7 @@ function ViewToggleSection({ standardHref, timelineHref, isTimelineView }) {
                 : "border-[rgba(120,53,15,0.12)] bg-white/80 text-[var(--ink-soft)] hover:text-[var(--accent)]"
             }`}
           >
-            Report View
+            Standard Report
           </TrackedLink>
           <TrackedLink
             href={timelineHref}
@@ -1927,9 +1960,36 @@ function ViewToggleSection({ standardHref, timelineHref, isTimelineView }) {
                 : "border-[rgba(120,53,15,0.12)] bg-white/80 text-[var(--ink-soft)] hover:text-[var(--accent)]"
             }`}
           >
-            Timeline View
+            Timeline
           </TrackedLink>
         </div>
+      </div>
+    </section>
+  );
+}
+
+function TimelineShortcutSection({ timelineHref }) {
+  return (
+    <section className="card-surface rounded-[1.6rem] p-5 print:hidden">
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div className="max-w-3xl">
+          <h2 className="text-lg font-semibold mb-2">Need the timeline?</h2>
+          <p className="text-sm text-[var(--ink-soft)] leading-7">
+            Open the timeline when you want the same report in chronological order.
+          </p>
+        </div>
+        <TrackedLink
+          href={timelineHref}
+          eventType="report_view_change"
+          pagePath={REPORT_PATH}
+          routeKind="report"
+          entityType="impact-score"
+          entityKey="black-impact-score"
+          metadata={{ target_view: "timeline" }}
+          className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
+        >
+          Open Timeline
+        </TrackedLink>
       </div>
     </section>
   );
@@ -3073,7 +3133,7 @@ export default async function BlackImpactScorePage({ searchParams }) {
           It emphasizes what happened in practice, not just what was promised or enacted.
         </p>
         <p className="text-sm text-[var(--ink-soft)] mt-3 max-w-3xl leading-7">
-          Start with the standard report, then move into timeline or topic comparison when you want a narrower historical or policy-domain view.
+          Start with the score below. Open the timeline or advanced tools only when you want more context.
         </p>
         <div className="mt-5 flex flex-wrap gap-2">
           <MetaPill>{presidents.length} presidents scored</MetaPill>
@@ -3096,62 +3156,6 @@ export default async function BlackImpactScorePage({ searchParams }) {
         <SourceAwareEvidenceTrail items={shareEvidenceItems} isPublicView={isPublicView} />
       ) : null}
 
-      <ViewToggleSection
-        standardHref={standardReportHref}
-        timelineHref={timelineReportHref}
-        isTimelineView={isTimelineView}
-      />
-
-      <TopicFilterSection
-        topicOptions={topicOptions}
-        selectedTopic={selectedTopic}
-        allTopicsHref={allTopicsHref}
-        buildTopicHref={buildTopicHref}
-      />
-
-      <ScoringReadyFilterSection
-        filterHref={scoringReadyFilterHref}
-        clearHref={scoringReadyClearHref}
-        isActive={isScoringReadyFilterActive}
-        availableCount={scoringReadyAvailableCount}
-        totalCount={records.length}
-        usingLegacyModel={usingLegacyModel}
-        isLegacyFallbackActive={isLegacyFallbackActive}
-      />
-
-      <AdvancedReportToolsSection
-        debateHref={debateHref}
-        presidentCompareHref={presidentCompareHref}
-        topicCompareHref={topicCompareHref}
-        shareReportHref={shareUrl}
-        compareHref={compareHref}
-      >
-        <PermalinkSection permalinkUrl={permalinkUrl} />
-
-        <SnapshotSection
-          snapshotLabel={snapshotLabel}
-          isPublicShareView={isPublicShareView}
-          permalinkUrl={permalinkUrl}
-        />
-
-        <SnapshotLibraryPanel
-          currentSnapshot={{
-            label: snapshotLabel,
-            permalinkUrl,
-            modeSummary: snapshotModeSummary,
-          }}
-        />
-      </AdvancedReportToolsSection>
-
-      {isPresidentCompareView && selectedTopic ? (
-        <PresidentCompareSelectorSection
-          options={presidentCompareOptions}
-          selectedPresidentASlug={requestedPresidentASlug}
-          selectedPresidentBSlug={requestedPresidentBSlug}
-          buildPresidentCompareHref={buildPresidentCompareHref}
-        />
-      ) : null}
-
       {isLegacyFallbackActive ? (
         <section className="card-surface rounded-[1.6rem] p-5 border border-[rgba(120,53,15,0.12)]">
           <h2 className="text-lg font-semibold">Outcome-Based Scoring Is Temporarily Unavailable</h2>
@@ -3160,6 +3164,17 @@ export default async function BlackImpactScorePage({ searchParams }) {
           </p>
         </section>
       ) : null}
+
+      {presidents.length && !isTopicCompareView && !isPresidentCompareView ? <TopSummarySection presidents={presidents} /> : null}
+
+      {!isPublicView && !isTimelineView && !isTopicCompareView && !isPresidentCompareView ? (
+        <TimelineShortcutSection timelineHref={timelineReportHref} />
+      ) : null}
+
+      <ScoringTransparencySection
+        usingLegacyModel={usingLegacyModel}
+        isLegacyFallbackActive={isLegacyFallbackActive}
+      />
 
       <CredibilityNote
         promiseCount={records.length}
@@ -3178,19 +3193,68 @@ export default async function BlackImpactScorePage({ searchParams }) {
         usingLegacyModel={usingLegacyModel}
       />
 
-      {presidents.length && !isTopicCompareView && !isPresidentCompareView ? <TopSummarySection presidents={presidents} /> : null}
-
-      <ScoringTransparencySection
-        usingLegacyModel={usingLegacyModel}
-        isLegacyFallbackActive={isLegacyFallbackActive}
-      />
-
       <MethodologySection
         methodology={methodology}
         metadata={metadata}
         usingLegacyModel={usingLegacyModel}
         isLegacyFallbackActive={isLegacyFallbackActive}
       />
+
+      <AdvancedReportToolsSection
+        debateHref={debateHref}
+        presidentCompareHref={presidentCompareHref}
+        topicCompareHref={topicCompareHref}
+        shareReportHref={shareUrl}
+        compareHref={compareHref}
+      >
+        <ViewToggleSection
+          standardHref={standardReportHref}
+          timelineHref={timelineReportHref}
+          isTimelineView={isTimelineView}
+        />
+
+        <TopicFilterSection
+          topicOptions={topicOptions}
+          selectedTopic={selectedTopic}
+          allTopicsHref={allTopicsHref}
+          buildTopicHref={buildTopicHref}
+        />
+
+        <ScoringReadyFilterSection
+          filterHref={scoringReadyFilterHref}
+          clearHref={scoringReadyClearHref}
+          isActive={isScoringReadyFilterActive}
+          availableCount={scoringReadyAvailableCount}
+          totalCount={records.length}
+          usingLegacyModel={usingLegacyModel}
+          isLegacyFallbackActive={isLegacyFallbackActive}
+        />
+
+        {isPresidentCompareView && selectedTopic ? (
+          <PresidentCompareSelectorSection
+            options={presidentCompareOptions}
+            selectedPresidentASlug={requestedPresidentASlug}
+            selectedPresidentBSlug={requestedPresidentBSlug}
+            buildPresidentCompareHref={buildPresidentCompareHref}
+          />
+        ) : null}
+
+        <PermalinkSection permalinkUrl={permalinkUrl} />
+
+        <SnapshotSection
+          snapshotLabel={snapshotLabel}
+          isPublicShareView={isPublicShareView}
+          permalinkUrl={permalinkUrl}
+        />
+
+        <SnapshotLibraryPanel
+          currentSnapshot={{
+            label: snapshotLabel,
+            permalinkUrl,
+            modeSummary: snapshotModeSummary,
+          }}
+        />
+      </AdvancedReportToolsSection>
 
       {usingOutcomeModel && !isTopicCompareView && !isPresidentCompareView ? (
         <SystemLevelInsight presidents={presidents} metadata={metadata} />

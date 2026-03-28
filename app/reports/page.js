@@ -154,7 +154,7 @@ export default async function ReportsPage() {
 
       <section className="card-surface rounded-[1.6rem] p-5 mb-8">
         <div className="max-w-3xl mb-5">
-          <h2 className="text-lg font-semibold mb-2">Black Impact Score Modes</h2>
+          <h2 className="text-lg font-semibold mb-2">Start With Black Impact Score</h2>
           <p className="text-sm text-[var(--ink-soft)] leading-7">
             Keep the first pass simple. Start with the standard report, then open the timeline when you want chronological context.
           </p>
@@ -176,7 +176,7 @@ export default async function ReportsPage() {
 
       <section className="grid gap-6 xl:grid-cols-[1.1fr,0.9fr] mb-8">
         <section className="card-surface rounded-[1.6rem] p-5">
-          <h2 className="text-lg font-semibold mb-3">Recommended Starting Points</h2>
+          <h2 className="text-lg font-semibold mb-3">Recommended Next Steps</h2>
           <div className="space-y-3 text-sm">
             <Link href="/reports/black-impact-score" className="block rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 px-4 py-3 hover:border-[rgba(120,53,15,0.18)]">
               <span className="font-medium text-[var(--ink)]">Start with the standard outcome-based report</span>
@@ -194,7 +194,10 @@ export default async function ReportsPage() {
         </section>
 
         <section className="card-surface rounded-[1.6rem] p-5">
-          <h2 className="text-lg font-semibold mb-3">What This System Supports</h2>
+          <h2 className="text-lg font-semibold mb-3">Also Available in Black Impact Score</h2>
+          <p className="text-sm text-[var(--ink-soft)] mb-3 leading-7">
+            These deeper tools are still available when you need them, but they work best after the standard report.
+          </p>
           <ul className="text-sm text-[var(--ink-soft)] space-y-2 leading-7">
             <li>Outcome-based scoring with legacy and compare-mode support.</li>
             <li>Evidence-backed drivers and inline transparency panels.</li>
@@ -209,7 +212,7 @@ export default async function ReportsPage() {
       <section className="card-surface rounded-[1.6rem] p-5 mb-8">
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div className="max-w-3xl">
-            <h2 className="text-lg font-semibold mb-2">Additional Analytics and Supporting Tools</h2>
+            <h2 className="text-lg font-semibold mb-2">More Reports and Tools</h2>
             <p className="text-sm text-[var(--ink-soft)] leading-7">
               Use these after the featured reports when you want broader dataset exploration,
               supporting policy context, or secondary quantitative views.

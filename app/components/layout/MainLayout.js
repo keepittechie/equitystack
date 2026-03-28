@@ -11,7 +11,7 @@ const NAV_LINKS = [
   { href: "/reports", label: "Reports" },
   { href: "/future-bills", label: "Future Bills" },
   { href: "/promises", label: "Promise Tracker" },
-  { href: "/reports/civil-rights-timeline", label: "Timeline" },
+  { href: "/reports/civil-rights-timeline", label: "Civil Rights Timeline" },
 ];
 
 function navClasses(pathname, href) {
@@ -139,7 +139,7 @@ export default function MainLayout({ children }) {
                   Activity
                 </Link>
                 <Link href="/policies" className="text-[var(--ink-soft)] hover:text-[var(--accent)]">
-                  Policy Database
+                  Policies
                 </Link>
               </div>
             </div>

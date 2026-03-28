@@ -127,7 +127,7 @@ export default function CardPage({ card, backHref, backLabel }) {
             <div className="max-w-2xl">
               <h2 className="text-2xl font-semibold">Share This Card</h2>
               <p className="text-sm text-[var(--ink-soft)] mt-2 leading-7">
-                This page is meant to stand alone. The URL is stable and readable out of context.
+                This page is meant to stand on its own. The link is stable and readable out of context.
               </p>
             </div>
             <CardShareActions path={card.sharePath} title={card.title} />

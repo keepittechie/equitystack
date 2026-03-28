@@ -80,7 +80,7 @@ export default async function FutureBillDetailPage({ params }) {
           entityKey={bill.slug}
           className="inline-flex items-center rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
         >
-          Open Shareable Card
+          Open Card Page
         </TrackedLink>
       </div>
 
@@ -149,7 +149,7 @@ export default async function FutureBillDetailPage({ params }) {
         <SummaryCard
           title="Verification"
           value={String(bill.sources?.length || 0)}
-          subtitle="Public source links aggregated from linked bills and tracked actions."
+          subtitle="Public source links pulled from linked bills and tracked actions."
         />
       </section>
 
