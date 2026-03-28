@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { PromiseStatusBadge } from "@/app/components/policy-badges";
 import { fetchInternalJson } from "@/lib/api";
 import { buildExplainerJsonLd, serializeJsonLd } from "@/lib/structured-data";
+import { buildExplainerCardHref } from "@/lib/shareable-card-links";
 
 async function getExplainer(slug) {
   return fetchInternalJson(`/api/explainers/${slug}`, {
@@ -193,12 +194,20 @@ export default async function ExplainerDetailPage({ params }) {
       </div>
 
       <section className="hero-panel p-8 md:p-10 space-y-6">
-        <div>
-          <p className="eyebrow mb-4">{explainer.category || "Explainer"}</p>
-          <h1 className="text-4xl font-bold">{explainer.title}</h1>
-          {explainer.summary && (
-            <p className="text-lg text-[var(--ink-soft)] leading-8 mt-4">{explainer.summary}</p>
-          )}
+        <div className="flex items-start justify-between gap-4 flex-wrap">
+          <div>
+            <p className="eyebrow mb-4">{explainer.category || "Explainer"}</p>
+            <h1 className="text-4xl font-bold">{explainer.title}</h1>
+            {explainer.summary && (
+              <p className="text-lg text-[var(--ink-soft)] leading-8 mt-4">{explainer.summary}</p>
+            )}
+          </div>
+          <Link
+            href={buildExplainerCardHref(explainer)}
+            className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
+          >
+            Share Card
+          </Link>
         </div>
 
         <div className="grid gap-3 sm:grid-cols-3">

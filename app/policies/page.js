@@ -4,6 +4,7 @@ import { formatPartyLabel } from "@/app/components/policy-formatters";
 import { fetchInternalJson } from "@/lib/api";
 import { PUBLIC_REVALIDATE_SECONDS, withRevalidate } from "@/lib/cache";
 import { buildPageMetadata } from "@/lib/metadata";
+import { buildPolicyCardHref } from "@/lib/shareable-card-links";
 
 const QUICK_FILTERS = [
   {
@@ -478,14 +479,12 @@ export default async function PoliciesPage({ searchParams }) {
         )}
 
         {policies.map((policy) => (
-          <Link
-            key={policy.id}
-            href={`/policies/${policy.id}`}
-            className="panel-link block rounded-[1.5rem] p-5"
-          >
+          <article key={policy.id} className="panel-link rounded-[1.5rem] p-5">
             <div className="flex items-start justify-between gap-4 flex-wrap">
               <div className="max-w-3xl">
-                <h2 className="text-xl font-semibold">{policy.title}</h2>
+                <Link href={`/policies/${policy.id}`} className="text-xl font-semibold accent-link">
+                  {policy.title}
+                </Link>
                 <p className="text-sm text-[var(--ink-soft)] mt-1">
                   {policy.year_enacted} {" • "} {policy.policy_type} {" • "} {formatPartyLabel(policy)}
                 </p>
@@ -499,9 +498,15 @@ export default async function PoliciesPage({ searchParams }) {
                 ) : null}
               </div>
 
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2 items-start justify-end">
                 <ImpactBadge impact={policy.impact_direction} />
                 <EvidenceBadge summary={policy.evidence_summary} />
+                <Link
+                  href={buildPolicyCardHref(policy)}
+                  className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-3 py-1 text-xs font-medium"
+                >
+                  Share Card
+                </Link>
               </div>
             </div>
 
@@ -533,7 +538,7 @@ export default async function PoliciesPage({ searchParams }) {
                 </span>
               ) : null}
             </div>
-          </Link>
+          </article>
         ))}
       </div>
 

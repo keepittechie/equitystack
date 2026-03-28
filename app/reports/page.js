@@ -156,12 +156,11 @@ export default async function ReportsPage() {
         <div className="max-w-3xl mb-5">
           <h2 className="text-lg font-semibold mb-2">Black Impact Score Modes</h2>
           <p className="text-sm text-[var(--ink-soft)] leading-7">
-            These curated entry points highlight the main ways to use the Black Impact Score system
-            without exposing every advanced report mode at once.
+            Keep the first pass simple. Start with the standard report, then open the timeline when you want chronological context.
           </p>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2">
           <CuratedModeCard
             title="Standard Report"
             description="Start with the outcome-based president summary view for the clearest accountability overview."
@@ -171,21 +170,6 @@ export default async function ReportsPage() {
             title="Timeline View"
             description="Follow scored records in chronological order to see how presidential actions unfold over time."
             href="/reports/black-impact-score?view=timeline"
-          />
-          <CuratedModeCard
-            title="Causal Timeline"
-            description="Open the timeline view and scan the explicit record-to-record historical relationships already tracked."
-            href="/reports/black-impact-score?view=timeline"
-          />
-          <CuratedModeCard
-            title="Topic Comparison"
-            description="Compare presidents inside a single policy domain using the topic comparison view."
-            href="/reports/black-impact-score?view=topic-compare"
-          />
-          <CuratedModeCard
-            title="Share Report"
-            description="Open a public-safe share-ready report with evidence context and verification guidance."
-            href="/reports/black-impact-score?view=public-share"
           />
         </div>
       </section>
@@ -202,13 +186,9 @@ export default async function ReportsPage() {
               <span className="font-medium text-[var(--ink)]">Explore policy change over time</span>
               <span className="block text-[var(--ink-soft)] mt-1">Open the timeline to follow how scored records unfold and connect across administrations.</span>
             </Link>
-            <Link href="/reports/black-impact-score?view=topic-compare" className="block rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 px-4 py-3 hover:border-[rgba(120,53,15,0.18)]">
-              <span className="font-medium text-[var(--ink)]">Compare presidents within a topic</span>
-              <span className="block text-[var(--ink-soft)] mt-1">Move into topic comparison when you want a narrower policy-domain lens.</span>
-            </Link>
-            <Link href="/reports/black-impact-score?view=public-share" className="block rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 px-4 py-3 hover:border-[rgba(120,53,15,0.18)]">
-              <span className="font-medium text-[var(--ink)]">Open a public share-ready report</span>
-              <span className="block text-[var(--ink-soft)] mt-1">Use the source-aware public share view when you need a clean external-facing entry point.</span>
+            <Link href="/future-bills" className="block rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 px-4 py-3 hover:border-[rgba(120,53,15,0.18)]">
+              <span className="font-medium text-[var(--ink)]">Track current reform proposals</span>
+              <span className="block text-[var(--ink-soft)] mt-1">Use Future Bills after the report when you want to connect the historical score context to current legislation.</span>
             </Link>
           </div>
         </section>

@@ -11,6 +11,7 @@ import { fetchInternalJson } from "@/lib/api";
 import { PUBLIC_REVALIDATE_SECONDS, withRevalidate } from "@/lib/cache";
 import { buildPageMetadata } from "@/lib/metadata";
 import { buildPromiseJsonLd, serializeJsonLd } from "@/lib/structured-data";
+import { buildPromiseCardHref } from "@/lib/shareable-card-links";
 
 async function getPromise(slug) {
   return fetchInternalJson(`/api/promises/${slug}`, {
@@ -356,6 +357,12 @@ export default async function PromiseDetailPage({ params }) {
               {promise.is_demo ? <MetaPill>Demo seed data</MetaPill> : null}
             </div>
           </div>
+          <Link
+            href={buildPromiseCardHref(promise)}
+            className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
+          >
+            Share Card
+          </Link>
         </div>
       </section>
 

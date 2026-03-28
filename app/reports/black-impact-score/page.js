@@ -1224,61 +1224,22 @@ function ScoringTransparencySection({ usingLegacyModel, isLegacyFallbackActive }
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="max-w-3xl">
           <h2 className="text-lg font-semibold mb-2">How this was scored</h2>
-          <p className="text-sm text-[var(--ink-soft)] leading-7">
-            Black Impact Score is a public summary built from curated Promise Tracker records. It uses manually reviewed outcomes and linked sources, not unreviewed staging data or internal drafts.
-          </p>
         </div>
         <MetaPill>{usingLegacyModel ? "Legacy framing" : "Outcome-based framing"}</MetaPill>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4 mt-5">
-        <div className="card-muted rounded-[1.25rem] p-4">
-          <h3 className="text-base font-semibold">Positive</h3>
-          <p className="text-sm text-[var(--ink-soft)] mt-2 leading-7">
-            Outcomes documented as beneficial in practice.
-          </p>
-        </div>
-        <div className="card-muted rounded-[1.25rem] p-4">
-          <h3 className="text-base font-semibold">Negative</h3>
-          <p className="text-sm text-[var(--ink-soft)] mt-2 leading-7">
-            Outcomes documented as harmful in practice.
-          </p>
-        </div>
-        <div className="card-muted rounded-[1.25rem] p-4">
-          <h3 className="text-base font-semibold">Mixed</h3>
-          <p className="text-sm text-[var(--ink-soft)] mt-2 leading-7">
-            Outcomes with both gains and meaningful limits or exclusions.
-          </p>
-        </div>
-        <div className="card-muted rounded-[1.25rem] p-4">
-          <h3 className="text-base font-semibold">Blocked</h3>
-          <p className="text-sm text-[var(--ink-soft)] mt-2 leading-7">
-            Documented attempts that did not fully take effect.
-          </p>
-        </div>
-      </div>
-
-      <div className="grid gap-4 xl:grid-cols-2 mt-5">
-        <div className="card-muted rounded-[1.25rem] p-4">
-          <h3 className="text-base font-semibold">What counts</h3>
-          <ul className="mt-3 space-y-2 text-sm text-[var(--ink-soft)] leading-7">
-            <li>Curated Promise Tracker records.</li>
-            <li>Documented outcomes attached to those records.</li>
-            <li>Evidence strength and linked source support.</li>
-          </ul>
-        </div>
-        <div className="card-muted rounded-[1.25rem] p-4">
-          <h3 className="text-base font-semibold">What does not count</h3>
-          <ul className="mt-3 space-y-2 text-sm text-[var(--ink-soft)] leading-7">
-            <li>Unreviewed staging items or admin-only notes.</li>
-            <li>AI review assistance or internal promotion drafts.</li>
-            <li>Outcomes that have not been curated into the public record yet.</li>
-            {isLegacyFallbackActive ? (
-              <li>Outcome-based weighting is temporarily unavailable in legacy fallback mode.</li>
-            ) : null}
-          </ul>
-        </div>
-      </div>
+      <ul className="mt-5 space-y-3 text-sm text-[var(--ink-soft)] leading-7">
+        <li>This score is based on real outcomes, not just promises or announcements.</li>
+        <li>Each record is reviewed for what actually happened, who it affected, and whether the result helped or harmed Black communities.</li>
+        <li>For example, a delivered action with documented gains can push a score up, while a harmful outcome pushes it down.</li>
+        <li>Positive means helped, Negative means harmed, Mixed means both, and Blocked means an attempt did not fully take effect.</li>
+        <li>Only reviewed, evidence-backed public records are included here. Admin, staging, and draft material are excluded.</li>
+        {isLegacyFallbackActive ? (
+          <li>Legacy fallback is temporarily active for this view, but the scoring rules themselves have not been changed on this page.</li>
+        ) : (
+          <li>The scoring logic itself has not changed here. This section only explains the results in plainer language.</li>
+        )}
+      </ul>
     </section>
   );
 }
@@ -1627,6 +1588,8 @@ function DebateModeHeader() {
 function AdvancedReportToolsSection({
   debateHref,
   presidentCompareHref,
+  topicCompareHref,
+  shareReportHref,
   compareHref,
   children,
 }) {
@@ -1638,6 +1601,12 @@ function AdvancedReportToolsSection({
           These secondary controls support deeper comparison, debate workflows, saved views, and print or PDF output after you have the main report state set.
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
+          <Link
+            href={topicCompareHref}
+            className="rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
+          >
+            Topic Comparison
+          </Link>
           <Link
             href={presidentCompareHref}
             className="rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
@@ -1654,7 +1623,13 @@ function AdvancedReportToolsSection({
             href={compareHref}
             className="rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
           >
-            Compare with Previous Model
+            Experimental Views
+          </Link>
+          <Link
+            href={shareReportHref}
+            className="rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
+          >
+            Share Report
           </Link>
         </div>
         <div className="mt-5 space-y-4">
@@ -1885,72 +1860,6 @@ function ViewToggleSection({ standardHref, timelineHref, isTimelineView }) {
             }`}
           >
             Timeline View
-          </Link>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function MultiViewToggleSection({
-  reportHref,
-  timelineHref,
-  topicCompareHref,
-  publicShareHref,
-  isTimelineView,
-  isTopicCompareView,
-  isPresidentCompareView,
-  isPublicShareView,
-}) {
-  return (
-    <section className="card-surface rounded-[1.6rem] p-5 print:hidden">
-      <div className="flex items-start justify-between gap-4 flex-wrap">
-        <div className="max-w-3xl">
-          <h2 className="text-lg font-semibold mb-2">View Mode</h2>
-          <p className="text-sm text-[var(--ink-soft)] leading-7">
-            Switch between the primary report modes without changing the underlying scoring model.
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <Link
-            href={reportHref}
-            className={`rounded-full border px-4 py-2 text-sm font-medium ${
-              !isTimelineView && !isTopicCompareView && !isPresidentCompareView && !isPublicShareView
-                ? "border-[rgba(120,53,15,0.2)] bg-[rgba(120,53,15,0.08)] text-[var(--ink)]"
-                : "border-[rgba(120,53,15,0.12)] bg-white/80 text-[var(--ink-soft)] hover:text-[var(--accent)]"
-            }`}
-          >
-            Standard Report
-          </Link>
-          <Link
-            href={timelineHref}
-            className={`rounded-full border px-4 py-2 text-sm font-medium ${
-              isTimelineView
-                ? "border-[rgba(120,53,15,0.2)] bg-[rgba(120,53,15,0.08)] text-[var(--ink)]"
-                : "border-[rgba(120,53,15,0.12)] bg-white/80 text-[var(--ink-soft)] hover:text-[var(--accent)]"
-            }`}
-          >
-            Timeline View
-          </Link>
-          <Link
-            href={topicCompareHref}
-            className={`rounded-full border px-4 py-2 text-sm font-medium ${
-              isTopicCompareView
-                ? "border-[rgba(120,53,15,0.2)] bg-[rgba(120,53,15,0.08)] text-[var(--ink)]"
-                : "border-[rgba(120,53,15,0.12)] bg-white/80 text-[var(--ink-soft)] hover:text-[var(--accent)]"
-            }`}
-          >
-            Topic Comparison
-          </Link>
-          <Link
-            href={publicShareHref}
-            className={`rounded-full border px-4 py-2 text-sm font-medium ${
-              isPublicShareView
-                ? "border-[rgba(120,53,15,0.2)] bg-[rgba(120,53,15,0.08)] text-[var(--ink)]"
-                : "border-[rgba(120,53,15,0.12)] bg-white/80 text-[var(--ink-soft)] hover:text-[var(--accent)]"
-            }`}
-          >
-            Share Report
           </Link>
         </div>
       </div>
@@ -3119,15 +3028,10 @@ export default async function BlackImpactScorePage({ searchParams }) {
         <SourceAwareEvidenceTrail items={shareEvidenceItems} isPublicView={isPublicView} />
       ) : null}
 
-      <MultiViewToggleSection
-        reportHref={standardReportHref}
+      <ViewToggleSection
+        standardHref={standardReportHref}
         timelineHref={timelineReportHref}
-        topicCompareHref={topicCompareHref}
-        publicShareHref={shareUrl}
         isTimelineView={isTimelineView}
-        isTopicCompareView={isTopicCompareView}
-        isPresidentCompareView={isPresidentCompareView}
-        isPublicShareView={isPublicShareView}
       />
 
       <TopicFilterSection
@@ -3150,6 +3054,8 @@ export default async function BlackImpactScorePage({ searchParams }) {
       <AdvancedReportToolsSection
         debateHref={debateHref}
         presidentCompareHref={presidentCompareHref}
+        topicCompareHref={topicCompareHref}
+        shareReportHref={shareUrl}
         compareHref={compareHref}
       >
         <PermalinkSection permalinkUrl={permalinkUrl} />

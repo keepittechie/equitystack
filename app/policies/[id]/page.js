@@ -12,6 +12,7 @@ import { computePolicyImpactScore } from "@/lib/analytics/impactAggregator";
 import { buildPageMetadata } from "@/lib/metadata";
 import { buildPolicyJsonLd, serializeJsonLd } from "@/lib/structured-data";
 import { notFound } from "next/navigation";
+import { buildPolicyCardHref } from "@/lib/shareable-card-links";
 
 async function getPolicy(id) {
   return fetchInternalJson(`/api/policies/${id}`, {
@@ -178,6 +179,12 @@ export default async function PolicyDetailPage({ params }) {
               <CompletenessBadge summary={policy.completeness_summary} />
             </div>
           </div>
+          <Link
+            href={buildPolicyCardHref(policy)}
+            className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
+          >
+            Share Card
+          </Link>
         </div>
       </section>
 

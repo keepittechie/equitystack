@@ -151,28 +151,16 @@ export default async function HomePage() {
           <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_220px] items-start">
             <div className="flex flex-wrap gap-3">
               <Link
-                href="/start"
+                href="/reports/black-impact-score"
                 className="px-5 py-3 rounded-full bg-[var(--accent)] text-white font-medium shadow-[0_14px_26px_rgba(138,59,18,0.18)] hover:translate-y-[-1px]"
               >
-                Start With the Guide
+                Start With the Impact Score
               </Link>
               <Link
-                href="/promises"
+                href="/reports"
                 className="px-5 py-3 rounded-full border border-[var(--line-strong)] bg-white/75 font-medium hover:bg-white"
               >
-                Open Promise Tracker
-              </Link>
-              <Link
-                href="/policies"
-                className="px-5 py-3 rounded-full border border-[var(--line-strong)] bg-white/75 font-medium hover:bg-white"
-              >
-                Browse Policies
-              </Link>
-              <Link
-                href="/explainers"
-                className="px-5 py-3 rounded-full border border-[var(--line-strong)] bg-white/75 font-medium hover:bg-white"
-              >
-                Read Explainers
+                Open Reports
               </Link>
               <Link
                 href="/future-bills"
@@ -186,8 +174,8 @@ export default async function HomePage() {
                 Use This Site
               </p>
               <p className="text-sm text-[var(--ink-soft)] leading-6 mt-3">
-                Start with the flagship accountability views, then move into the linked
-                policy records, explainers, and current legislative tracking.
+                Start with the Impact Score, then branch into reports, current bills,
+                and the linked record pages when you want more detail.
               </p>
             </div>
           </div>
@@ -207,8 +195,7 @@ export default async function HomePage() {
           <div className="max-w-3xl">
             <h2 className="text-2xl font-semibold">Flagship Accountability Views</h2>
             <p className="text-sm text-[var(--ink-soft)] mt-2">
-              Start with the three public-facing views that connect presidential commitments,
-              documented outcomes, and the longer civil-rights arc into one accountability story.
+              Start with the Impact Score first, then open the surrounding report and record layers as needed.
             </p>
           </div>
         </div>
@@ -236,6 +223,23 @@ export default async function HomePage() {
             linkLabel="Open Civil Rights Timeline"
           />
         </div>
+      </section>
+
+      <section className="grid gap-4 md:grid-cols-2">
+        <FlagshipViewCard
+          eyebrow="Reports Hub"
+          title="Browse Reports"
+          description="Reach the main report entry points in one click, including the Impact Score and the civil-rights timeline."
+          href="/reports"
+          linkLabel="Open Reports"
+        />
+        <FlagshipViewCard
+          eyebrow="Current Tracking"
+          title="Follow Future Bills"
+          description="Open the current-bills layer directly to see proposed reforms, linked legislation, sponsors, and updates."
+          href="/future-bills"
+          linkLabel="Open Future Bills"
+        />
       </section>
 
       <section className="card-surface rounded-[1.6rem] p-6">

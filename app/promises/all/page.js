@@ -3,6 +3,7 @@ import { PromiseRelevanceBadge, PromiseStatusBadge } from "@/app/components/poli
 import { fetchInternalJson } from "@/lib/api";
 import { PUBLIC_REVALIDATE_SECONDS, withRevalidate } from "@/lib/cache";
 import { buildPageMetadata } from "@/lib/metadata";
+import { buildPromiseCardHref } from "@/lib/shareable-card-links";
 
 export const metadata = buildPageMetadata({
   title: "All Promise Records",
@@ -323,21 +324,25 @@ export default async function AllPromisesPage({ searchParams }) {
       ) : (
         <section className="grid gap-4 md:grid-cols-2">
           {promises.map((promise) => (
-            <Link
-              key={promise.id}
-              href={`/promises/${promise.slug}`}
-              className="panel-link block rounded-[1.45rem] p-5"
-            >
+            <article key={promise.id} className="panel-link rounded-[1.45rem] p-5">
               <div className="flex items-start justify-between gap-4 flex-wrap">
                 <div>
                   <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">
                     {promise.president}
                   </p>
-                  <h3 className="text-xl font-semibold mt-2">{promise.title}</h3>
+                  <Link href={`/promises/${promise.slug}`} className="text-xl font-semibold mt-2 inline-block accent-link">
+                    {promise.title}
+                  </Link>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   <PromiseRelevanceBadge relevance={promise.relevance} />
                   <PromiseStatusBadge status={promise.status} />
+                  <Link
+                    href={buildPromiseCardHref(promise)}
+                    className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-3 py-1 text-xs font-medium"
+                  >
+                    Share Card
+                  </Link>
                 </div>
               </div>
 
@@ -372,7 +377,7 @@ export default async function AllPromisesPage({ searchParams }) {
                   <span>Overlapping record under review</span>
                 ) : null}
               </div>
-            </Link>
+            </article>
           ))}
         </section>
       )}

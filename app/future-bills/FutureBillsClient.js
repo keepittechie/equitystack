@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { buildFutureBillCardHref } from "@/lib/shareable-card-links";
 
 function priorityClasses(priority) {
   switch (priority) {
@@ -532,6 +533,12 @@ export default function FutureBillsClient({ bills, focusId }) {
                     >
                       {bill.status}
                     </span>
+                    <Link
+                      href={buildFutureBillCardHref(bill)}
+                      className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
+                    >
+                      Share Card
+                    </Link>
                   </div>
                 </div>
 

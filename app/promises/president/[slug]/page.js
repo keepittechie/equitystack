@@ -8,6 +8,7 @@ import {
 import { fetchInternalJson } from "@/lib/api";
 import { PUBLIC_REVALIDATE_SECONDS, withRevalidate } from "@/lib/cache";
 import { buildPageMetadata } from "@/lib/metadata";
+import { buildPromiseCardHref } from "@/lib/shareable-card-links";
 
 async function getPromisePresident(slug, showAll) {
   const params = new URLSearchParams();
@@ -210,21 +211,28 @@ export default async function PromisePresidentPage({ params, searchParams }) {
             ) : (
               <div className="grid gap-4 md:grid-cols-2">
                 {section.items.map((promise) => (
-                  <Link
-                    key={promise.id}
-                    href={`/promises/${promise.slug}`}
-                    className={promiseCardClasses(promise)}
-                  >
+                  <article key={promise.id} className={promiseCardClasses(promise)}>
                     <div className="flex items-start justify-between gap-4 flex-wrap">
                       <div>
                         <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">
                           {promise.topic || "No topic"}
                         </p>
-                        <h3 className="text-xl font-semibold mt-2">{promise.title}</h3>
+                        <Link
+                          href={`/promises/${promise.slug}`}
+                          className="text-xl font-semibold mt-2 inline-block accent-link"
+                        >
+                          {promise.title}
+                        </Link>
                       </div>
                       <div className="flex flex-wrap gap-2">
                         <PromiseRelevanceBadge relevance={promise.relevance} />
                         <PromiseImpactDirectionBadge impact={promise.impact_direction_for_curation} />
+                        <Link
+                          href={buildPromiseCardHref(promise)}
+                          className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-3 py-1 text-xs font-medium"
+                        >
+                          Share Card
+                        </Link>
                       </div>
                     </div>
 
@@ -265,7 +273,7 @@ export default async function PromisePresidentPage({ params, searchParams }) {
                         <span>Overlapping record under editorial review</span>
                       ) : null}
                     </div>
-                  </Link>
+                  </article>
                 ))}
               </div>
             )}
