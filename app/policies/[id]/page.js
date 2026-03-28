@@ -47,6 +47,8 @@ export async function generateMetadata({ params }) {
       policy.summary ||
       "Read a detailed EquityStack policy record with sources, metrics, impact scoring, and related explainers.",
     path: `/policies/${id}`,
+    imagePath: `${buildPolicyCardHref(policy)}/opengraph-image`,
+    type: "article",
   });
 }
 

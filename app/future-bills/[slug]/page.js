@@ -22,39 +22,17 @@ export async function generateMetadata({ params }) {
     });
   }
 
-  const title = `${bill.title} Future Bill`;
+  const title = bill.title;
   const description =
     bill.summary ||
     "A standalone EquityStack future bill page with linked legislation, sponsors, updates, explainers, and source links.";
-  const imageUrl = `${bill.cardPath}/opengraph-image`;
-
-  return {
+  return buildPageMetadata({
     title,
     description,
-    alternates: {
-      canonical: bill.detailPath,
-    },
-    openGraph: {
-      title,
-      description,
-      url: bill.detailPath,
-      type: "article",
-      images: [
-        {
-          url: imageUrl,
-          width: 1200,
-          height: 630,
-          alt: bill.title,
-        },
-      ],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description,
-      images: [imageUrl],
-    },
-  };
+    path: bill.detailPath,
+    imagePath: `${bill.cardPath}/opengraph-image`,
+    type: "article",
+  });
 }
 
 function MetaPill({ children }) {

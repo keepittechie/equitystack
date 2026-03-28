@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PromiseStatusBadge } from "@/app/components/policy-badges";
 import { fetchInternalJson } from "@/lib/api";
+import { buildPageMetadata } from "@/lib/metadata";
 import { buildExplainerJsonLd, serializeJsonLd } from "@/lib/structured-data";
 import { buildExplainerCardHref } from "@/lib/shareable-card-links";
 
@@ -17,18 +18,22 @@ export async function generateMetadata({ params }) {
   const explainer = await getExplainer(slug);
 
   if (!explainer) {
-    return {
+    return buildPageMetadata({
       title: "Explainer Not Found | EquityStack",
       description: "The requested explainer could not be found on EquityStack.",
-    };
+      path: `/explainers/${slug}`,
+    });
   }
 
-  return {
-    title: `${explainer.title} | EquityStack`,
+  return buildPageMetadata({
+    title: explainer.title,
     description:
       explainer.summary ||
       "Evidence-backed historical and policy analysis from EquityStack.",
-  };
+    path: `/explainers/${slug}`,
+    imagePath: `${buildExplainerCardHref(explainer)}/opengraph-image`,
+    type: "article",
+  });
 }
 
 function SectionBlock({ title, children }) {

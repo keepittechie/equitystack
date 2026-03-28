@@ -39,6 +39,8 @@ export async function generateMetadata({ params }) {
       promise.summary ||
       "Review this presidential promise alongside the actions, outcomes, and documented equity impacts tied to it.",
     path: `/promises/${slug}`,
+    imagePath: `${buildPromiseCardHref(promise)}/opengraph-image`,
+    type: "article",
   });
 }
 

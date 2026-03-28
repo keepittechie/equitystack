@@ -29,7 +29,7 @@ export function buildCardMetadata(card) {
   const image = toAbsoluteUrl(`${card.sharePath}/opengraph-image`);
 
   return {
-    title: `${card.title} Card`,
+    title: card.title,
     description,
     alternates: {
       canonical: card.canonicalPath,
