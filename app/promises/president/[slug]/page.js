@@ -34,9 +34,11 @@ export async function generateMetadata({ params }) {
     });
   }
 
+  const termLabel = formatTermRange(president.term_start, president.term_end);
+
   return buildPageMetadata({
-    title: `${president.president} Promise Tracker`,
-    description: `Review Promise Tracker records for ${president.president}, grouped by status.`,
+    title: `${president.president} (${termLabel}) Promise Tracker`,
+    description: `Review Promise Tracker records for the ${termLabel} ${president.president} term, grouped by status.`,
     path: `/promises/president/${slug}`,
   });
 }
@@ -73,6 +75,21 @@ function formatDate(dateString) {
 
 function formatTermRange(start, end) {
   return `${formatDate(start) || "Unknown"} to ${end ? formatDate(end) : "Present"}`;
+}
+
+function formatTermBadgeLabel(start, end) {
+  const startYear = start ? new Date(start).getFullYear() : null;
+  const endYear = end ? new Date(end).getFullYear() : null;
+
+  if (Number.isFinite(startYear) && Number.isFinite(endYear)) {
+    return `${startYear}-${endYear} term`;
+  }
+
+  if (Number.isFinite(startYear)) {
+    return `${startYear}-present term`;
+  }
+
+  return "Current term";
 }
 
 function getVisiblePromiseSourceCount(president) {
@@ -114,7 +131,7 @@ export default async function PromisePresidentPage({ params, searchParams }) {
           href="/promises"
           className="inline-flex items-center rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
         >
-          Back to Presidents
+          Back to Presidency Terms
         </Link>
         <Link
           href={showAll ? "/promises/all?show_all=1" : "/promises/all"}
@@ -141,16 +158,20 @@ export default async function PromisePresidentPage({ params, searchParams }) {
           <p className="eyebrow mb-4">Promise Tracker</p>
           <h1 className="text-3xl md:text-4xl font-bold">{president.president}</h1>
           <p className="text-base md:text-lg text-[var(--ink-soft)] mt-4 leading-8">
-            Promise Tracker groups this presidency’s records by status. The default view prioritizes
-            promises with direct or meaningful downstream Black-community impact.
+            Promise Tracker groups this presidency term&apos;s records by status. The default view prioritizes
+            promises with direct or meaningful downstream Black-community impact while keeping repeated administrations distinct.
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
             {president.president_party ? <MetaPill>{president.president_party}</MetaPill> : null}
+            <MetaPill>{formatTermBadgeLabel(president.term_start, president.term_end)}</MetaPill>
             <MetaPill>{formatTermRange(president.term_start, president.term_end)}</MetaPill>
             <MetaPill>
               {showAll ? president.total_tracked_promises : president.visible_promise_count} shown
             </MetaPill>
           </div>
+          <p className="text-sm text-[var(--ink-soft)] mt-4 leading-7">
+            This page covers the <strong>{formatTermBadgeLabel(president.term_start, president.term_end)}</strong> for {president.president}.
+          </p>
           <p className="text-sm text-[var(--ink-soft)] mt-4 leading-7">
             {showAll
               ? "All tracked promises for this president are visible, including secondary and deprioritized records."

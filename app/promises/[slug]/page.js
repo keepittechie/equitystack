@@ -35,8 +35,10 @@ export async function generateMetadata({ params }) {
     });
   }
 
+  const termLabel = formatTermBadgeLabel(promise.term_start, promise.term_end);
+
   return buildPageMetadata({
-    title: promise.title,
+    title: `${promise.title} | ${promise.president} (${termLabel})`,
     description:
       promise.summary ||
       "Review this presidential promise alongside the actions, outcomes, and documented equity impacts tied to it.",
@@ -75,6 +77,21 @@ function formatDate(dateString) {
     month: "short",
     day: "numeric",
   });
+}
+
+function formatTermBadgeLabel(start, end) {
+  const startYear = start ? new Date(start).getFullYear() : null;
+  const endYear = end ? new Date(end).getFullYear() : null;
+
+  if (Number.isFinite(startYear) && Number.isFinite(endYear)) {
+    return `${startYear}-${endYear} term`;
+  }
+
+  if (Number.isFinite(startYear)) {
+    return `${startYear}-present term`;
+  }
+
+  return "Current term";
 }
 
 function isScoringReadyPromise(promise) {
@@ -332,7 +349,7 @@ export default async function PromiseDetailPage({ params }) {
           href={`/promises/president/${promise.president_slug}`}
           className="inline-flex items-center rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
         >
-          Back to {promise.president} Promise Tracker
+          Back to {promise.president} {formatTermBadgeLabel(promise.term_start, promise.term_end)} Promise Tracker
         </Link>
         <Link
           href="/promises/all"
@@ -345,7 +362,9 @@ export default async function PromiseDetailPage({ params }) {
       <section className="hero-panel p-8 md:p-10 mb-6">
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div className="max-w-4xl">
-            <p className="eyebrow mb-4">{promise.president}</p>
+            <p className="eyebrow mb-4">
+              {promise.president} · {formatTermBadgeLabel(promise.term_start, promise.term_end)}
+            </p>
             <h1 className="text-3xl md:text-4xl font-bold">{promise.title}</h1>
             <p className="text-base md:text-lg text-[var(--ink-soft)] mt-4 leading-8">
               {promise.summary || "This Promise Tracker record compares a public commitment with the actions and outcomes that followed."}

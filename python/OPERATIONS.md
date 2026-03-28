@@ -12,3 +12,19 @@
 10. Refresh feedback analysis: `python3 scripts/analyze_feedback.py`
 11. Rebuild the review bundle after apply/import/rerun: `python3 scripts/build_review_bundle.py --csv --use-feedback`
 12. Treat `README.md` as the canonical workflow and script reference.
+
+## Current-administration curated batch flow
+
+Run this separately from the daily future-bills workflow:
+
+1. Optional discovery: `python3 scripts/discover_current_admin_updates.py --president-slug <term-slug> --dry-run`
+2. Review `reports/current_admin/discovery_report.json`
+3. Export selected suggestions into a draft batch: `python3 scripts/export_current_admin_discovery_candidates.py --candidate-id <section:index> --output-name <draft>`
+4. Edit the draft under `data/current_admin_batches/` into a curated batch
+5. Normalize a batch: `python3 scripts/normalize_current_admin_batch.py --input data/current_admin_batches/<batch>.json`
+6. Review with Ollama: `python3 scripts/review_current_admin_batch_with_ollama.py --input reports/current_admin/<batch>.normalized.json`
+7. Build the manual queue: `python3 scripts/apply_current_admin_ai_review.py --batch reports/current_admin/<batch>.normalized.json --review reports/current_admin/<batch>.ai-review.json`
+8. Approve or edit records in the manual queue JSON
+9. Dry-run import: `python3 scripts/import_curated_current_admin_batch.py --input reports/current_admin/<batch>.manual-review-queue.json`
+10. Apply import: `python3 scripts/import_curated_current_admin_batch.py --input reports/current_admin/<batch>.manual-review-queue.json --apply --yes`
+11. Validate import: `python3 scripts/validate_current_admin_import.py --input reports/current_admin/<batch>.manual-review-queue.json`

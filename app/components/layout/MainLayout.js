@@ -8,6 +8,7 @@ const NAV_LINKS = [
   { href: "/", label: "Home" },
   { href: "/start", label: "Start Here" },
   { href: "/reports/black-impact-score", label: "Impact Score" },
+  { href: "/current-administration", label: "Current Administration" },
   { href: "/reports", label: "Reports" },
   { href: "/future-bills", label: "Future Bills" },
   { href: "/promises", label: "Promise Tracker" },
@@ -131,6 +132,9 @@ export default function MainLayout({ children }) {
                 </Link>
                 <Link href="/promises" className="text-[var(--ink-soft)] hover:text-[var(--accent)]">
                   Promise Tracker
+                </Link>
+                <Link href="/current-administration" className="text-[var(--ink-soft)] hover:text-[var(--accent)]">
+                  Current Administration
                 </Link>
                 <Link href="/future-bills" className="text-[var(--ink-soft)] hover:text-[var(--accent)]">
                   Future Bills

@@ -3,6 +3,8 @@
 ## Summary
 Promise Tracker v1 is a read-only public feature for tracking presidential promises, the actions tied to them, the outcomes that followed, and the documented source trail behind each record. The current UX is president-first: users begin at a presidency index, drill into a president-specific Promise Tracker page, and then open individual promise detail pages.
 
+Promise Tracker routing is presidency-term based. Repeated presidents appear as separate terms when needed, rather than being merged into a single person-level page.
+
 ## Public Transparency Principles
 
 Promise Tracker is designed so public users can inspect the record structure directly.
@@ -274,6 +276,28 @@ This phase is intentionally manual:
 This does not block saving. It is a readiness check for later scoring workflows.
 
 Public report views may reference `scoring-ready` as a transparency filter, but that does not expose admin state. It only reflects whether the public record already has the visible outcome and source detail needed for score inclusion.
+
+### Curated Current-Administration Batch Import
+
+When a current-administration dataset has already passed normalization and editorial validation, it can be imported without going through raw staging ingestion.
+
+Use:
+- [`python/scripts/import_curated_current_admin_batch.py`](/home/josh/Documents/GitHub/equitystack/python/scripts/import_curated_current_admin_batch.py)
+
+Batch modules live under:
+- [`python/data/current_admin_batches`](/home/josh/Documents/GitHub/equitystack/python/data/current_admin_batches)
+
+Reports are written to:
+- [`python/reports/current_admin`](/home/josh/Documents/GitHub/equitystack/python/reports/current_admin)
+
+Suggested sequence:
+- raw staging intake for noisy current White House feeds
+- manual review and promotion for individual staged items
+- editorial enrichment for outcomes and sources
+- curated batch import for already reviewed multi-record editorial batches
+
+The first live curated batch imported the 2025 Trump term starter set and is recorded in:
+- [`python/reports/current_admin/trump-2025-batch-01.import-apply.json`](/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.import-apply.json)
 
 ### Remaining Promise Tracker Reference File
 - [`database/promise_tracker_import_batch_2_sources.md`](/home/josh/Documents/GitHub/equitystack/database/promise_tracker_import_batch_2_sources.md)

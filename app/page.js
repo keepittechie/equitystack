@@ -225,7 +225,14 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="grid gap-4 md:grid-cols-2">
+      <section className="grid gap-4 md:grid-cols-3">
+        <FlagshipViewCard
+          eyebrow="Live Tracking"
+          title="Current Administration"
+          description="Start with the current presidency overview to see what is being tracked now, what changed recently, and where to verify it."
+          href="/current-administration"
+          linkLabel="Open Current Administration"
+        />
         <FlagshipViewCard
           eyebrow="Reports Hub"
           title="Browse Reports"

@@ -1,0 +1,283 @@
+{
+  "batch_name": "trump-2025-batch-01",
+  "input_path": "reports/current_admin/trump-2025-batch-01.normalized.json",
+  "model": "qwen3.5:latest",
+  "dry_run": true,
+  "reviewed_count": 10,
+  "items": [
+    {
+      "slug": "trump-2025-election-integrity-proof-citizenship-paper-ballots",
+      "title": "Require proof of citizenship and paper-ballot election safeguards",
+      "review_mode": "dry-run",
+      "existing_matches": [
+        {
+          "id": 110,
+          "slug": "trump-2025-election-integrity-proof-citizenship-paper-ballots",
+          "title": "Require proof of citizenship and paper-ballot election safeguards",
+          "status": "Partial"
+        }
+      ],
+      "suggestions": {
+        "title_normalized": "Require proof of citizenship and paper-ballot election safeguards",
+        "summary_suggestion": "A March 2025 executive order advanced part of the administration's election-integrity agenda, but full implementation remained incomplete.",
+        "topic_suggestion": "Voting Rights",
+        "impacted_group_suggestion": "Black voters and Black-majority communities affected by voter registration, ballot access, and election administration rules",
+        "status_suggestion": "Partial",
+        "impact_direction_suggestion": "Mixed",
+        "evidence_strength_suggestion": "Moderate",
+        "record_action_suggestion": "update_existing",
+        "caution_flags": [
+          "implementation_still_in_progress"
+        ],
+        "ambiguity_notes": "Dry-run heuristic review only. Operator should confirm wording, match choice, and downstream effect notes."
+      }
+    },
+    {
+      "slug": "trump-2025-end-federal-dei-equity-programs",
+      "title": "End federal DEI and equity-based government programs",
+      "review_mode": "dry-run",
+      "existing_matches": [
+        {
+          "id": 111,
+          "slug": "trump-2025-end-federal-dei-equity-programs",
+          "title": "End federal DEI and equity-based government programs",
+          "status": "Partial"
+        }
+      ],
+      "suggestions": {
+        "title_normalized": "End federal DEI and equity-based government programs",
+        "summary_suggestion": "The administration ordered the termination of federal DEI and equity structures, but implementation remained an active multi-agency process.",
+        "topic_suggestion": "Economic Opportunity",
+        "impacted_group_suggestion": "Black workers, Black students, and Black communities affected by targeted federal equity initiatives and program design",
+        "status_suggestion": "Partial",
+        "impact_direction_suggestion": "Negative",
+        "evidence_strength_suggestion": "Moderate",
+        "record_action_suggestion": "update_existing",
+        "caution_flags": [
+          "implementation_still_in_progress"
+        ],
+        "ambiguity_notes": "Dry-run heuristic review only. Operator should confirm wording, match choice, and downstream effect notes."
+      }
+    },
+    {
+      "slug": "trump-2025-strengthen-local-law-enforcement",
+      "title": "Increase federal support for state and local law enforcement",
+      "review_mode": "dry-run",
+      "existing_matches": [
+        {
+          "id": 112,
+          "slug": "trump-2025-strengthen-local-law-enforcement",
+          "title": "Increase federal support for state and local law enforcement",
+          "status": "Partial"
+        }
+      ],
+      "suggestions": {
+        "title_normalized": "Increase federal support for state and local law enforcement",
+        "summary_suggestion": "A 2025 executive order expanded federal support and protections for local law enforcement, but downstream local effects remained early.",
+        "topic_suggestion": "Criminal Justice",
+        "impacted_group_suggestion": "Black communities affected by policing, public safety policy, arrest exposure, and federal oversight of local law enforcement",
+        "status_suggestion": "Partial",
+        "impact_direction_suggestion": "Mixed",
+        "evidence_strength_suggestion": "Moderate",
+        "record_action_suggestion": "update_existing",
+        "caution_flags": [
+          "implementation_still_in_progress"
+        ],
+        "ambiguity_notes": "Dry-run heuristic review only. Operator should confirm wording, match choice, and downstream effect notes."
+      }
+    },
+    {
+      "slug": "trump-2025-clear-street-encampments-expand-civil-commitment",
+      "title": "Clear street encampments and expand treatment-oriented street-order responses",
+      "review_mode": "dry-run",
+      "existing_matches": [
+        {
+          "id": 113,
+          "slug": "trump-2025-clear-street-encampments-expand-civil-commitment",
+          "title": "Clear street encampments and expand treatment-oriented street-order responses",
+          "status": "Partial"
+        }
+      ],
+      "suggestions": {
+        "title_normalized": "Clear street encampments and expand treatment-oriented street-order responses",
+        "summary_suggestion": "A 2025 order advanced the administration's street-order agenda, but the balance between enforcement and treatment outcomes remained unresolved.",
+        "topic_suggestion": "Housing",
+        "impacted_group_suggestion": "Black unhoused people and Black neighborhoods affected by homelessness policy, encampment enforcement, and access to treatment services",
+        "status_suggestion": "Partial",
+        "impact_direction_suggestion": "Mixed",
+        "evidence_strength_suggestion": "Moderate",
+        "record_action_suggestion": "update_existing",
+        "caution_flags": [
+          "implementation_still_in_progress"
+        ],
+        "ambiguity_notes": "Dry-run heuristic review only. Operator should confirm wording, match choice, and downstream effect notes."
+      }
+    },
+    {
+      "slug": "trump-2025-domestic-production-of-critical-medicines",
+      "title": "Expand domestic production of critical medicines",
+      "review_mode": "dry-run",
+      "existing_matches": [
+        {
+          "id": 114,
+          "slug": "trump-2025-domestic-production-of-critical-medicines",
+          "title": "Expand domestic production of critical medicines",
+          "status": "Partial"
+        }
+      ],
+      "suggestions": {
+        "title_normalized": "Expand domestic production of critical medicines",
+        "summary_suggestion": "A 2025 executive order advanced domestic-medicine production goals, but measurable supply and access outcomes remained early.",
+        "topic_suggestion": "Healthcare",
+        "impacted_group_suggestion": "Black patients and Black communities affected by medicine shortages, chronic-disease treatment continuity, and pharmaceutical supply disruptions",
+        "status_suggestion": "Partial",
+        "impact_direction_suggestion": "Positive",
+        "evidence_strength_suggestion": "Moderate",
+        "record_action_suggestion": "update_existing",
+        "caution_flags": [
+          "implementation_still_in_progress"
+        ],
+        "ambiguity_notes": "Dry-run heuristic review only. Operator should confirm wording, match choice, and downstream effect notes."
+      }
+    },
+    {
+      "slug": "trump-2025-expand-educational-freedom-for-families",
+      "title": "Expand educational freedom and school-choice options for families",
+      "review_mode": "dry-run",
+      "existing_matches": [
+        {
+          "id": 115,
+          "slug": "trump-2025-expand-educational-freedom-for-families",
+          "title": "Expand educational freedom and school-choice options for families",
+          "status": "Partial"
+        }
+      ],
+      "suggestions": {
+        "title_normalized": "Expand educational freedom and school-choice options for families",
+        "summary_suggestion": "The administration launched a federal school-choice initiative in early 2025, but the effects remained dependent on later state and grant implementation.",
+        "topic_suggestion": "Education",
+        "impacted_group_suggestion": "Black students and Black families affected by school access, public-school quality, transportation, and alternative education options",
+        "status_suggestion": "Partial",
+        "impact_direction_suggestion": "Mixed",
+        "evidence_strength_suggestion": "Moderate",
+        "record_action_suggestion": "update_existing",
+        "caution_flags": [
+          "implementation_still_in_progress",
+          "education_record_can_have_mixed_downstream_effects"
+        ],
+        "ambiguity_notes": "Dry-run heuristic review only. Operator should confirm wording, match choice, and downstream effect notes."
+      }
+    },
+    {
+      "slug": "trump-2025-reform-higher-education-accreditation",
+      "title": "Reform higher-education accreditation around student outcomes",
+      "review_mode": "dry-run",
+      "existing_matches": [
+        {
+          "id": 116,
+          "slug": "trump-2025-reform-higher-education-accreditation",
+          "title": "Reform higher-education accreditation around student outcomes",
+          "status": "In Progress"
+        }
+      ],
+      "suggestions": {
+        "title_normalized": "Reform higher-education accreditation around student outcomes",
+        "summary_suggestion": "The administration launched accreditation reform in 2025, but institutional and student-level effects remained in an early implementation stage.",
+        "topic_suggestion": "Education",
+        "impacted_group_suggestion": "Black college students and institutions serving large Black student populations, including HBCUs and other minority-serving institutions",
+        "status_suggestion": "In Progress",
+        "impact_direction_suggestion": "Mixed",
+        "evidence_strength_suggestion": "Moderate",
+        "record_action_suggestion": "update_existing",
+        "caution_flags": [
+          "implementation_still_in_progress",
+          "education_record_can_have_mixed_downstream_effects"
+        ],
+        "ambiguity_notes": "Dry-run heuristic review only. Operator should confirm wording, match choice, and downstream effect notes."
+      }
+    },
+    {
+      "slug": "trump-2025-promote-hbcu-excellence-and-innovation",
+      "title": "Promote excellence and innovation at HBCUs",
+      "review_mode": "dry-run",
+      "existing_matches": [
+        {
+          "id": 117,
+          "slug": "trump-2025-promote-hbcu-excellence-and-innovation",
+          "title": "Promote excellence and innovation at HBCUs",
+          "status": "Partial"
+        }
+      ],
+      "suggestions": {
+        "title_normalized": "Promote excellence and innovation at HBCUs",
+        "summary_suggestion": "The administration reestablished a White House HBCU initiative in 2025, with broader institutional effects still dependent on implementation.",
+        "topic_suggestion": "Education",
+        "impacted_group_suggestion": "Black students, faculty, and institutions at Historically Black Colleges and Universities",
+        "status_suggestion": "Partial",
+        "impact_direction_suggestion": "Positive",
+        "evidence_strength_suggestion": "Moderate",
+        "record_action_suggestion": "update_existing",
+        "caution_flags": [
+          "implementation_still_in_progress",
+          "education_record_can_have_mixed_downstream_effects"
+        ],
+        "ambiguity_notes": "Dry-run heuristic review only. Operator should confirm wording, match choice, and downstream effect notes."
+      }
+    },
+    {
+      "slug": "trump-2025-reinstate-school-discipline-policies",
+      "title": "Reinstate school discipline policies without equity-based disparate-impact framing",
+      "review_mode": "dry-run",
+      "existing_matches": [
+        {
+          "id": 118,
+          "slug": "trump-2025-reinstate-school-discipline-policies",
+          "title": "Reinstate school discipline policies without equity-based disparate-impact framing",
+          "status": "In Progress"
+        }
+      ],
+      "suggestions": {
+        "title_normalized": "Reinstate school discipline policies without equity-based disparate-impact framing",
+        "summary_suggestion": "The administration ordered a review and replacement process for federal school-discipline guidance, but school-level effects remained unmeasured.",
+        "topic_suggestion": "Education",
+        "impacted_group_suggestion": "Black students and Black families affected by suspension, expulsion, referral-to-law-enforcement, and school discipline policies",
+        "status_suggestion": "In Progress",
+        "impact_direction_suggestion": "Negative",
+        "evidence_strength_suggestion": "Moderate",
+        "record_action_suggestion": "update_existing",
+        "caution_flags": [
+          "implementation_still_in_progress",
+          "education_record_can_have_mixed_downstream_effects"
+        ],
+        "ambiguity_notes": "Dry-run heuristic review only. Operator should confirm wording, match choice, and downstream effect notes."
+      }
+    },
+    {
+      "slug": "trump-2025-high-paying-skilled-trade-jobs",
+      "title": "Prepare Americans for high-paying skilled trade jobs",
+      "review_mode": "dry-run",
+      "existing_matches": [
+        {
+          "id": 119,
+          "slug": "trump-2025-high-paying-skilled-trade-jobs",
+          "title": "Prepare Americans for high-paying skilled trade jobs",
+          "status": "In Progress"
+        }
+      ],
+      "suggestions": {
+        "title_normalized": "Prepare Americans for high-paying skilled trade jobs",
+        "summary_suggestion": "The administration launched a skilled-trades workforce initiative in 2025, but measurable labor-market effects remained early.",
+        "topic_suggestion": "Economic Opportunity",
+        "impacted_group_suggestion": "Black workers and Black jobseekers affected by access to apprenticeships, workforce programs, and higher-wage skilled trades",
+        "status_suggestion": "In Progress",
+        "impact_direction_suggestion": "Positive",
+        "evidence_strength_suggestion": "Moderate",
+        "record_action_suggestion": "update_existing",
+        "caution_flags": [
+          "implementation_still_in_progress"
+        ],
+        "ambiguity_notes": "Dry-run heuristic review only. Operator should confirm wording, match choice, and downstream effect notes."
+      }
+    }
+  ]
+}

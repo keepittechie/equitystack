@@ -1,0 +1,626 @@
+{
+  "batch_name": "trump-2025-batch-01",
+  "president_slug": "donald-j-trump-2025",
+  "records": [
+    {
+      "slug": "trump-2025-election-integrity-proof-citizenship-paper-ballots",
+      "title": "Require proof of citizenship and paper-ballot election safeguards",
+      "promise_text": "Trump and the 2024 Republican platform supported stricter federal election-integrity rules, including documentary proof of citizenship, voter identification, paper ballots, and tighter mail-ballot rules.",
+      "promise_date": "2024-07-08",
+      "promise_type": "Campaign Promise",
+      "campaign_or_official": "Campaign",
+      "topic": "Voting Rights",
+      "impacted_group": "Black voters and Black-majority communities affected by voter registration, ballot access, and election administration rules",
+      "status": "Partial",
+      "summary": "A March 2025 executive order advanced part of the administration's election-integrity agenda, but full implementation remained incomplete.",
+      "notes": "Included because federal election-administration changes can alter access, verification burdens, and ballot-processing rules in jurisdictions with large Black voter populations. Evidence is still incomplete because implementation depends on agency action and election-system adoption beyond the order itself.",
+      "promise_sources": [
+        {
+          "source_title": "2024 Republican Platform",
+          "source_url": "https://prod-static.gop.com/media/RNC2024-Platform.pdf",
+          "source_type": "Other",
+          "publisher": "Republican National Committee",
+          "published_date": "2024-07-08",
+          "notes": "Primary promise-level source."
+        }
+      ],
+      "actions": [
+        {
+          "action_type": "Executive Order",
+          "action_date": "2025-03-25",
+          "title": "Preserving and Protecting the Integrity of American Elections",
+          "description": "The order directed federal action on documentary proof-of-citizenship requirements and related election-integrity measures.",
+          "action_sources": [
+            {
+              "source_title": "Preserving and Protecting the Integrity of American Elections",
+              "source_url": "https://www.whitehouse.gov/presidential-actions/2025/03/preserving-and-protecting-the-integrity-of-american-elections/",
+              "source_type": "Government",
+              "publisher": "The White House",
+              "published_date": "2025-03-25",
+              "notes": "Primary action-level source."
+            }
+          ],
+          "outcomes": [
+            {
+              "outcome_summary": "The administration created a formal federal election-integrity directive, but nationwide implementation was not complete.",
+              "outcome_type": "Administrative Outcome",
+              "measurable_impact": "Federal agencies were directed to change election-related procedures, but implementation varied and remained incomplete.",
+              "impact_direction": "Mixed",
+              "black_community_impact_note": "Documentary-proof and ballot-processing changes can affect registration and voting access in Black communities where administrative barriers already shape turnout and ballot acceptance.",
+              "evidence_strength": "Moderate",
+              "status_override": "Partial",
+              "outcome_sources": [
+                {
+                  "source_title": "Preserving and Protecting the Integrity of American Elections",
+                  "source_url": "https://www.whitehouse.gov/presidential-actions/2025/03/preserving-and-protecting-the-integrity-of-american-elections/",
+                  "source_type": "Government",
+                  "publisher": "The White House",
+                  "published_date": "2025-03-25",
+                  "notes": "Primary outcome-level source."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "trump-2025-end-federal-dei-equity-programs",
+      "title": "End federal DEI and equity-based government programs",
+      "promise_text": "Trump committed the administration to ending federal DEI, DEIA, and equity-program structures across the executive branch.",
+      "promise_date": "2025-01-20",
+      "promise_type": "Official Promise",
+      "campaign_or_official": "Official",
+      "topic": "Economic Opportunity",
+      "impacted_group": "Black workers, Black students, and Black communities affected by targeted federal equity initiatives and program design",
+      "status": "Partial",
+      "summary": "The administration ordered the termination of federal DEI and equity structures, but implementation remained an active multi-agency process.",
+      "notes": "Included because the order directly targeted federal programs and offices previously used to address documented disparities affecting Black communities. Evidence is incomplete because downstream program, grant, and enforcement effects require agency-level follow-through.",
+      "promise_sources": [
+        {
+          "source_title": "Ending Radical And Wasteful Government DEI Programs And Preferencing",
+          "source_url": "https://www.whitehouse.gov/presidential-actions/2025/01/ending-radical-and-wasteful-government-dei-programs-and-preferencing/",
+          "source_type": "Government",
+          "publisher": "The White House",
+          "published_date": "2025-01-20",
+          "notes": "Primary promise-level source."
+        }
+      ],
+      "actions": [
+        {
+          "action_type": "Executive Order",
+          "action_date": "2025-01-20",
+          "title": "Ending Radical And Wasteful Government DEI Programs And Preferencing",
+          "description": "The order directed agencies to terminate DEI, DEIA, environmental justice, and equity-related offices, plans, grants, and policies to the maximum extent allowed by law.",
+          "action_sources": [
+            {
+              "source_title": "Ending Radical And Wasteful Government DEI Programs And Preferencing",
+              "source_url": "https://www.whitehouse.gov/presidential-actions/2025/01/ending-radical-and-wasteful-government-dei-programs-and-preferencing/",
+              "source_type": "Government",
+              "publisher": "The White House",
+              "published_date": "2025-01-20",
+              "notes": "Primary action-level source."
+            }
+          ],
+          "outcomes": [
+            {
+              "outcome_summary": "The administration initiated the removal of federal DEI and equity structures across agencies.",
+              "outcome_type": "Administrative Outcome",
+              "measurable_impact": "Agencies were directed to identify and terminate covered offices, policies, grants, and related activities.",
+              "impact_direction": "Negative",
+              "black_community_impact_note": "Eliminating equity-focused federal offices, plans, and grant structures can reduce targeted federal attention to disparities in employment, education, contracting, and service access that affect Black communities.",
+              "evidence_strength": "Moderate",
+              "status_override": "Partial",
+              "outcome_sources": [
+                {
+                  "source_title": "Ending Radical And Wasteful Government DEI Programs And Preferencing",
+                  "source_url": "https://www.whitehouse.gov/presidential-actions/2025/01/ending-radical-and-wasteful-government-dei-programs-and-preferencing/",
+                  "source_type": "Government",
+                  "publisher": "The White House",
+                  "published_date": "2025-01-20",
+                  "notes": "Primary outcome-level source."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "trump-2025-strengthen-local-law-enforcement",
+      "title": "Increase federal support for state and local law enforcement",
+      "promise_text": "Trump's public law-and-order agenda called for more police hiring, training, legal protection, and operational support for state and local law enforcement.",
+      "promise_date": "2023-02-20",
+      "promise_type": "Campaign Promise",
+      "campaign_or_official": "Campaign",
+      "topic": "Criminal Justice",
+      "impacted_group": "Black communities affected by policing, public safety policy, arrest exposure, and federal oversight of local law enforcement",
+      "status": "Partial",
+      "summary": "A 2025 executive order expanded federal support and protections for local law enforcement, but downstream local effects remained early.",
+      "notes": "Included because changes in law-enforcement funding, training, and oversight can materially affect Black communities through both public-safety outcomes and police-contact patterns. Evidence is incomplete because community-level effects depend on later implementation by DOJ and local agencies.",
+      "promise_sources": [
+        {
+          "source_title": "Agenda47: President Trump Announces Plan to End Crime and Restore Law and Order",
+          "source_url": "https://www.donaldjtrump.com/news/b95289b6-0fb3-4404-808c-2e91c09e7bce",
+          "source_type": "Other",
+          "publisher": "DonaldJTrump.com",
+          "published_date": "2023-02-20",
+          "notes": "Primary promise-level source."
+        }
+      ],
+      "actions": [
+        {
+          "action_type": "Executive Order",
+          "action_date": "2025-04-28",
+          "title": "Strengthening and Unleashing America's Law Enforcement to Pursue Criminals and Protect Innocent Citizens",
+          "description": "The administration directed expanded federal support, legal protections, training, and resource coordination for state and local law enforcement.",
+          "action_sources": [
+            {
+              "source_title": "Strengthening and Unleashing America's Law Enforcement to Pursue Criminals and Protect Innocent Citizens",
+              "source_url": "https://www.whitehouse.gov/presidential-actions/2025/04/strengthening-and-unleashing-americas-law-enforcement-to-pursue-criminals-and-protect-innocent-citizens/",
+              "source_type": "Government",
+              "publisher": "The White House",
+              "published_date": "2025-04-28",
+              "notes": "Primary action-level source."
+            }
+          ],
+          "outcomes": [
+            {
+              "outcome_summary": "The administration formally expanded federal support for local law enforcement agencies through a 2025 executive order.",
+              "outcome_type": "Administrative Outcome",
+              "measurable_impact": "The order directed DOJ and related agencies to expand training, support, legal assistance, and review of consent decrees.",
+              "impact_direction": "Mixed",
+              "black_community_impact_note": "Expanded policing support and reduced federal constraints can affect Black communities through changes in violent-crime response, arrest exposure, police-accountability oversight, and use-of-force monitoring.",
+              "evidence_strength": "Moderate",
+              "status_override": "Partial",
+              "outcome_sources": [
+                {
+                  "source_title": "Strengthening and Unleashing America's Law Enforcement to Pursue Criminals and Protect Innocent Citizens",
+                  "source_url": "https://www.whitehouse.gov/presidential-actions/2025/04/strengthening-and-unleashing-americas-law-enforcement-to-pursue-criminals-and-protect-innocent-citizens/",
+                  "source_type": "Government",
+                  "publisher": "The White House",
+                  "published_date": "2025-04-28",
+                  "notes": "Primary outcome-level source."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "trump-2025-clear-street-encampments-expand-civil-commitment",
+      "title": "Clear street encampments and expand treatment-oriented street-order responses",
+      "promise_text": "Trump's homelessness agenda called for removing street encampments, expanding treatment and rehabilitation responses, and increasing use of civil commitment and related enforcement tools.",
+      "promise_date": "2023-04-18",
+      "promise_type": "Campaign Promise",
+      "campaign_or_official": "Campaign",
+      "topic": "Housing",
+      "impacted_group": "Black unhoused people and Black neighborhoods affected by homelessness policy, encampment enforcement, and access to treatment services",
+      "status": "Partial",
+      "summary": "A 2025 order advanced the administration's street-order agenda, but the balance between enforcement and treatment outcomes remained unresolved.",
+      "notes": "Included because Black Americans are overrepresented in homelessness counts in many jurisdictions, making federal street-order and treatment policy materially relevant. Evidence is incomplete because implementation and measurable effects will depend on state and local follow-through.",
+      "promise_sources": [
+        {
+          "source_title": "Agenda47: Ending the Nightmare of the Homeless, Drug Addicts, and Dangerously Deranged",
+          "source_url": "https://www.donaldjtrump.com/agenda47/agenda47-ending-the-nightmare-of-the-homeless-drug-addicts-and-dangerously-deranged",
+          "source_type": "Other",
+          "publisher": "DonaldJTrump.com",
+          "published_date": "2023-04-18",
+          "notes": "Primary promise-level source."
+        }
+      ],
+      "actions": [
+        {
+          "action_type": "Policy",
+          "action_date": "2025-07-24",
+          "title": "President Donald J. Trump Takes Action to End Crime and Disorder on America's Streets",
+          "description": "The administration directed federal resources toward anti-encampment enforcement, substance-use response, and civil-commitment related approaches.",
+          "action_sources": [
+            {
+              "source_title": "Fact Sheet: President Donald J. Trump Takes Action to End Crime and Disorder on America's Streets",
+              "source_url": "https://www.whitehouse.gov/fact-sheets/2025/07/fact-sheet-president-donald-j-trump-takes-action-to-end-crime-and-disorder-on-americas-streets/",
+              "source_type": "Government",
+              "publisher": "The White House",
+              "published_date": "2025-07-24",
+              "notes": "Primary action-level source."
+            }
+          ],
+          "outcomes": [
+            {
+              "outcome_summary": "The administration formally prioritized anti-encampment enforcement and treatment-linked street-order policies.",
+              "outcome_type": "Housing Outcome",
+              "measurable_impact": "Federal grant and enforcement priorities were redirected toward jurisdictions using stricter anti-camping and related street-order policies.",
+              "impact_direction": "Mixed",
+              "black_community_impact_note": "Encampment enforcement and civil-commitment policy can affect Black unhoused people through displacement, arrest exposure, treatment access, and continuity of shelter or housing placement.",
+              "evidence_strength": "Moderate",
+              "status_override": "Partial",
+              "outcome_sources": [
+                {
+                  "source_title": "Fact Sheet: President Donald J. Trump Takes Action to End Crime and Disorder on America's Streets",
+                  "source_url": "https://www.whitehouse.gov/fact-sheets/2025/07/fact-sheet-president-donald-j-trump-takes-action-to-end-crime-and-disorder-on-americas-streets/",
+                  "source_type": "Government",
+                  "publisher": "The White House",
+                  "published_date": "2025-07-24",
+                  "notes": "Primary outcome-level source."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "trump-2025-domestic-production-of-critical-medicines",
+      "title": "Expand domestic production of critical medicines",
+      "promise_text": "Trump pledged to restore domestic production capacity for essential medicines and reduce supply-chain vulnerability and shortages.",
+      "promise_date": "2023-08-29",
+      "promise_type": "Campaign Promise",
+      "campaign_or_official": "Campaign",
+      "topic": "Healthcare",
+      "impacted_group": "Black patients and Black communities affected by medicine shortages, chronic-disease treatment continuity, and pharmaceutical supply disruptions",
+      "status": "Partial",
+      "summary": "A 2025 executive order advanced domestic-medicine production goals, but measurable supply and access outcomes remained early.",
+      "notes": "Included because pharmaceutical shortages and supply instability can affect continuity of care in conditions that disproportionately burden Black patients. Evidence is incomplete because the order primarily changed regulatory and production incentives rather than producing immediate patient-level outcomes.",
+      "promise_sources": [
+        {
+          "source_title": "Agenda47: Returning Production of Essential Medicines Back to America and Ending Pharmaceutical Shortages",
+          "source_url": "https://www.donaldjtrump.com/news/7c12c37a-67b0-4824-81f0-3b6307b72065",
+          "source_type": "Other",
+          "publisher": "DonaldJTrump.com",
+          "published_date": "2023-08-29",
+          "notes": "Primary promise-level source."
+        }
+      ],
+      "actions": [
+        {
+          "action_type": "Executive Order",
+          "action_date": "2025-05-05",
+          "title": "Regulatory Relief to Promote Domestic Production of Critical Medicines",
+          "description": "The order directed FDA and EPA regulatory changes to speed domestic pharmaceutical manufacturing and review.",
+          "action_sources": [
+            {
+              "source_title": "Regulatory Relief to Promote Domestic Production of Critical Medicines",
+              "source_url": "https://www.whitehouse.gov/presidential-actions/2025/05/regulatory-relief-to-promote-domestic-production-of-critical-medicines/",
+              "source_type": "Government",
+              "publisher": "The White House",
+              "published_date": "2025-05-05",
+              "notes": "Primary action-level source."
+            }
+          ],
+          "outcomes": [
+            {
+              "outcome_summary": "The administration initiated federal regulatory changes intended to support domestic pharmaceutical manufacturing.",
+              "outcome_type": "Administrative Outcome",
+              "measurable_impact": "FDA and EPA were directed to streamline parts of domestic manufacturing review and permitting.",
+              "impact_direction": "Positive",
+              "black_community_impact_note": "More stable medicine supply chains can affect Black patients by reducing treatment disruption risks in high-burden chronic conditions, but direct community-level effects are not yet measured.",
+              "evidence_strength": "Moderate",
+              "status_override": "Partial",
+              "outcome_sources": [
+                {
+                  "source_title": "Regulatory Relief to Promote Domestic Production of Critical Medicines",
+                  "source_url": "https://www.whitehouse.gov/presidential-actions/2025/05/regulatory-relief-to-promote-domestic-production-of-critical-medicines/",
+                  "source_type": "Government",
+                  "publisher": "The White House",
+                  "published_date": "2025-05-05",
+                  "notes": "Primary outcome-level source."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "trump-2025-expand-educational-freedom-for-families",
+      "title": "Expand educational freedom and school-choice options for families",
+      "promise_text": "The administration committed to expanding education-freedom policies and supporting state and federal pathways for family-directed school choice.",
+      "promise_date": "2025-01-29",
+      "promise_type": "Official Promise",
+      "campaign_or_official": "Official",
+      "topic": "Education",
+      "impacted_group": "Black students and Black families affected by school access, public-school quality, transportation, and alternative education options",
+      "status": "Partial",
+      "summary": "The administration launched a federal school-choice initiative in early 2025, but the effects remained dependent on later state and grant implementation.",
+      "notes": "Included because school-choice policy can affect access to schooling options, funding flows, and local education quality for Black families. Evidence is incomplete because the order relied on later agency guidance and state uptake rather than immediate nationwide change.",
+      "promise_sources": [
+        {
+          "source_title": "Expanding Educational Freedom and Opportunity for Families",
+          "source_url": "https://www.whitehouse.gov/presidential-actions/2025/01/expanding-educational-freedom-and-opportunity-for-families/",
+          "source_type": "Government",
+          "publisher": "The White House",
+          "published_date": "2025-01-29",
+          "notes": "Primary promise-level source."
+        }
+      ],
+      "actions": [
+        {
+          "action_type": "Executive Order",
+          "action_date": "2025-01-29",
+          "title": "Expanding Educational Freedom and Opportunity for Families",
+          "description": "The order directed federal education, labor, HHS, and defense pathways to support school-choice and education-freedom initiatives.",
+          "action_sources": [
+            {
+              "source_title": "Expanding Educational Freedom and Opportunity for Families",
+              "source_url": "https://www.whitehouse.gov/presidential-actions/2025/01/expanding-educational-freedom-and-opportunity-for-families/",
+              "source_type": "Government",
+              "publisher": "The White House",
+              "published_date": "2025-01-29",
+              "notes": "Primary action-level source."
+            }
+          ],
+          "outcomes": [
+            {
+              "outcome_summary": "The administration established a federal policy framework to support education-freedom initiatives.",
+              "outcome_type": "Administrative Outcome",
+              "measurable_impact": "Multiple agencies were directed to issue guidance and use discretionary programs to expand educational-choice options.",
+              "impact_direction": "Mixed",
+              "black_community_impact_note": "School-choice expansion can affect Black families through changes in access to alternative schools, transportation burdens, and public-school resource distribution, with outcomes differing by state and program design.",
+              "evidence_strength": "Moderate",
+              "status_override": "Partial",
+              "outcome_sources": [
+                {
+                  "source_title": "Expanding Educational Freedom and Opportunity for Families",
+                  "source_url": "https://www.whitehouse.gov/presidential-actions/2025/01/expanding-educational-freedom-and-opportunity-for-families/",
+                  "source_type": "Government",
+                  "publisher": "The White House",
+                  "published_date": "2025-01-29",
+                  "notes": "Primary outcome-level source."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "trump-2025-reform-higher-education-accreditation",
+      "title": "Reform higher-education accreditation around student outcomes",
+      "promise_text": "The administration committed to reforming accreditation rules to emphasize student outcomes, legal compliance, and competition among accreditors.",
+      "promise_date": "2025-04-23",
+      "promise_type": "Official Promise",
+      "campaign_or_official": "Official",
+      "topic": "Education",
+      "impacted_group": "Black college students and institutions serving large Black student populations, including HBCUs and other minority-serving institutions",
+      "status": "In Progress",
+      "summary": "The administration launched accreditation reform in 2025, but institutional and student-level effects remained in an early implementation stage.",
+      "notes": "Included because accreditation policy can affect federal-aid eligibility, institutional oversight, and compliance expectations at colleges enrolling large numbers of Black students. Evidence is incomplete because the order set a reform process but did not itself produce immediate campus-level outcomes.",
+      "promise_sources": [
+        {
+          "source_title": "Reforming Accreditation to Strengthen Higher Education",
+          "source_url": "https://www.whitehouse.gov/presidential-actions/2025/04/reforming-accreditation-to-strengthen-higher-education/",
+          "source_type": "Government",
+          "publisher": "The White House",
+          "published_date": "2025-04-23",
+          "notes": "Primary promise-level source."
+        }
+      ],
+      "actions": [
+        {
+          "action_type": "Executive Order",
+          "action_date": "2025-04-23",
+          "title": "Reforming Accreditation to Strengthen Higher Education",
+          "description": "The order directed the Education Department to pursue accreditation reforms focused on student outcomes, competition, and legal compliance.",
+          "action_sources": [
+            {
+              "source_title": "Reforming Accreditation to Strengthen Higher Education",
+              "source_url": "https://www.whitehouse.gov/presidential-actions/2025/04/reforming-accreditation-to-strengthen-higher-education/",
+              "source_type": "Government",
+              "publisher": "The White House",
+              "published_date": "2025-04-23",
+              "notes": "Primary action-level source."
+            }
+          ],
+          "outcomes": [
+            {
+              "outcome_summary": "The administration initiated an accreditation-reform process centered on student outcomes and federal oversight.",
+              "outcome_type": "Administrative Outcome",
+              "measurable_impact": "The order directed Education Department review and future action on recognition standards, accreditor accountability, and accreditation pathways.",
+              "impact_direction": "Mixed",
+              "black_community_impact_note": "Accreditation changes can affect institutional oversight, program continuity, and federal-aid access at colleges serving substantial numbers of Black students, but measurable downstream effects were not yet established.",
+              "evidence_strength": "Moderate",
+              "status_override": "In Progress",
+              "outcome_sources": [
+                {
+                  "source_title": "Reforming Accreditation to Strengthen Higher Education",
+                  "source_url": "https://www.whitehouse.gov/presidential-actions/2025/04/reforming-accreditation-to-strengthen-higher-education/",
+                  "source_type": "Government",
+                  "publisher": "The White House",
+                  "published_date": "2025-04-23",
+                  "notes": "Primary outcome-level source."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "trump-2025-promote-hbcu-excellence-and-innovation",
+      "title": "Promote excellence and innovation at HBCUs",
+      "promise_text": "The administration committed to restoring a White House HBCU initiative and improving HBCU access to partnerships, affordability support, and research opportunities.",
+      "promise_date": "2025-04-23",
+      "promise_type": "Official Promise",
+      "campaign_or_official": "Official",
+      "topic": "Education",
+      "impacted_group": "Black students, faculty, and institutions at Historically Black Colleges and Universities",
+      "status": "Partial",
+      "summary": "The administration reestablished a White House HBCU initiative in 2025, with broader institutional effects still dependent on implementation.",
+      "notes": "Included because HBCUs directly serve Black students and are central to Black educational attainment, research capacity, and professional mobility. Evidence is incomplete because the order created an initiative and coordination structure but longer-term funding and student outcomes still require follow-through.",
+      "promise_sources": [
+        {
+          "source_title": "Fact Sheet: President Donald J. Trump Promotes Excellence and Innovation at HBCUs",
+          "source_url": "https://www.whitehouse.gov/fact-sheets/2025/04/fact-sheet-president-donald-j-trump-promotes-excellence-and-innovation-at-hbcus/",
+          "source_type": "Government",
+          "publisher": "The White House",
+          "published_date": "2025-04-23",
+          "notes": "Primary promise-level source."
+        }
+      ],
+      "actions": [
+        {
+          "action_type": "Policy",
+          "action_date": "2025-04-23",
+          "title": "White House Initiative to Promote Excellence and Innovation at Historically Black Colleges and Universities",
+          "description": "The administration established a White House HBCU initiative and advisory structure intended to improve institutional development, research competitiveness, and opportunity pathways.",
+          "action_sources": [
+            {
+              "source_title": "Fact Sheet: President Donald J. Trump Promotes Excellence and Innovation at HBCUs",
+              "source_url": "https://www.whitehouse.gov/fact-sheets/2025/04/fact-sheet-president-donald-j-trump-promotes-excellence-and-innovation-at-hbcus/",
+              "source_type": "Government",
+              "publisher": "The White House",
+              "published_date": "2025-04-23",
+              "notes": "Primary action-level source."
+            }
+          ],
+          "outcomes": [
+            {
+              "outcome_summary": "The administration formally created a White House HBCU initiative and related advisory structure.",
+              "outcome_type": "Administrative Outcome",
+              "measurable_impact": "A White House HBCU initiative and board structure were established to support partnerships, research access, and institutional development.",
+              "impact_direction": "Positive",
+              "black_community_impact_note": "Federal coordination and support for HBCUs can affect affordability, retention, research capacity, and workforce pipelines at institutions that disproportionately serve Black students.",
+              "evidence_strength": "Moderate",
+              "status_override": "Partial",
+              "outcome_sources": [
+                {
+                  "source_title": "Fact Sheet: President Donald J. Trump Promotes Excellence and Innovation at HBCUs",
+                  "source_url": "https://www.whitehouse.gov/fact-sheets/2025/04/fact-sheet-president-donald-j-trump-promotes-excellence-and-innovation-at-hbcus/",
+                  "source_type": "Government",
+                  "publisher": "The White House",
+                  "published_date": "2025-04-23",
+                  "notes": "Primary outcome-level source."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "trump-2025-reinstate-school-discipline-policies",
+      "title": "Reinstate school discipline policies without equity-based disparate-impact framing",
+      "promise_text": "The administration committed to replacing school-discipline guidance tied to equity-based disparate-impact analysis with a different federal discipline framework.",
+      "promise_date": "2025-04-23",
+      "promise_type": "Official Promise",
+      "campaign_or_official": "Official",
+      "topic": "Education",
+      "impacted_group": "Black students and Black families affected by suspension, expulsion, referral-to-law-enforcement, and school discipline policies",
+      "status": "In Progress",
+      "summary": "The administration ordered a review and replacement process for federal school-discipline guidance, but school-level effects remained unmeasured.",
+      "notes": "Included because federal school-discipline guidance is directly relevant to racial disparities in exclusionary discipline affecting Black students. Evidence is incomplete because the order initiated a policy process rather than producing immediate nationwide discipline outcomes.",
+      "promise_sources": [
+        {
+          "source_title": "Reinstating Common Sense School Discipline Policies",
+          "source_url": "https://www.whitehouse.gov/presidential-actions/2025/04/reinstating-common-sense-school-discipline-policies/",
+          "source_type": "Government",
+          "publisher": "The White House",
+          "published_date": "2025-04-23",
+          "notes": "Primary promise-level source."
+        }
+      ],
+      "actions": [
+        {
+          "action_type": "Executive Order",
+          "action_date": "2025-04-23",
+          "title": "Reinstating Common Sense School Discipline Policies",
+          "description": "The order directed review and replacement of prior federal school-discipline guidance and the development of alternative model policies.",
+          "action_sources": [
+            {
+              "source_title": "Reinstating Common Sense School Discipline Policies",
+              "source_url": "https://www.whitehouse.gov/presidential-actions/2025/04/reinstating-common-sense-school-discipline-policies/",
+              "source_type": "Government",
+              "publisher": "The White House",
+              "published_date": "2025-04-23",
+              "notes": "Primary action-level source."
+            }
+          ],
+          "outcomes": [
+            {
+              "outcome_summary": "The administration began replacing prior federal school-discipline guidance with a different disciplinary framework.",
+              "outcome_type": "Administrative Outcome",
+              "measurable_impact": "Federal agencies were directed to review existing guidance and propose replacement discipline policies.",
+              "impact_direction": "Negative",
+              "black_community_impact_note": "Reducing attention to racially disparate discipline patterns can affect Black students through suspension, expulsion, and referral-to-law-enforcement rates that have historically fallen disproportionately on them.",
+              "evidence_strength": "Moderate",
+              "status_override": "In Progress",
+              "outcome_sources": [
+                {
+                  "source_title": "Reinstating Common Sense School Discipline Policies",
+                  "source_url": "https://www.whitehouse.gov/presidential-actions/2025/04/reinstating-common-sense-school-discipline-policies/",
+                  "source_type": "Government",
+                  "publisher": "The White House",
+                  "published_date": "2025-04-23",
+                  "notes": "Primary outcome-level source."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "trump-2025-high-paying-skilled-trade-jobs",
+      "title": "Prepare Americans for high-paying skilled trade jobs",
+      "promise_text": "The administration committed to aligning federal workforce policy with skilled trades, apprenticeships, and reindustrialization needs.",
+      "promise_date": "2025-04-23",
+      "promise_type": "Official Promise",
+      "campaign_or_official": "Official",
+      "topic": "Economic Opportunity",
+      "impacted_group": "Black workers and Black jobseekers affected by access to apprenticeships, workforce programs, and higher-wage skilled trades",
+      "status": "In Progress",
+      "summary": "The administration launched a skilled-trades workforce initiative in 2025, but measurable labor-market effects remained early.",
+      "notes": "Included because apprenticeship and skilled-trade access can affect income mobility and labor-market opportunity for Black workers. Evidence is incomplete because the order primarily set federal direction and targets rather than documenting completed labor-market outcomes.",
+      "promise_sources": [
+        {
+          "source_title": "Preparing Americans for High-Paying Skilled Trade Jobs of the Future",
+          "source_url": "https://www.whitehouse.gov/presidential-actions/2025/04/preparing-americans-for-high-paying-skilled-trade-jobs-of-the-future/",
+          "source_type": "Government",
+          "publisher": "The White House",
+          "published_date": "2025-04-23",
+          "notes": "Primary promise-level source."
+        }
+      ],
+      "actions": [
+        {
+          "action_type": "Executive Order",
+          "action_date": "2025-04-23",
+          "title": "Preparing Americans for High-Paying Skilled Trade Jobs of the Future",
+          "description": "The order directed agencies to streamline workforce programs and expand apprenticeship and skills pathways tied to reindustrialization.",
+          "action_sources": [
+            {
+              "source_title": "Preparing Americans for High-Paying Skilled Trade Jobs of the Future",
+              "source_url": "https://www.whitehouse.gov/presidential-actions/2025/04/preparing-americans-for-high-paying-skilled-trade-jobs-of-the-future/",
+              "source_type": "Government",
+              "publisher": "The White House",
+              "published_date": "2025-04-23",
+              "notes": "Primary action-level source."
+            }
+          ],
+          "outcomes": [
+            {
+              "outcome_summary": "The administration began a federal workforce-policy effort centered on apprenticeships and skilled trades.",
+              "outcome_type": "Economic Outcome",
+              "measurable_impact": "Agencies were directed to streamline workforce investments and expand apprenticeship-focused policy coordination.",
+              "impact_direction": "Positive",
+              "black_community_impact_note": "Expanded apprenticeship and skills pathways can affect Black workers through access to higher-wage trades, credential completion, and workforce entry if implementation expands participation equitably.",
+              "evidence_strength": "Moderate",
+              "status_override": "In Progress",
+              "outcome_sources": [
+                {
+                  "source_title": "Preparing Americans for High-Paying Skilled Trade Jobs of the Future",
+                  "source_url": "https://www.whitehouse.gov/presidential-actions/2025/04/preparing-americans-for-high-paying-skilled-trade-jobs-of-the-future/",
+                  "source_type": "Government",
+                  "publisher": "The White House",
+                  "published_date": "2025-04-23",
+                  "notes": "Primary outcome-level source."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

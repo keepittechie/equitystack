@@ -6,7 +6,7 @@ import { buildPageMetadata } from "@/lib/metadata";
 export const metadata = buildPageMetadata({
   title: "Promise Tracker",
   description:
-    "Review Promise Tracker records by president, then drill into the promises, actions, and outcomes tracked for each administration.",
+    "Review Promise Tracker records by presidency term, then drill into the promises, actions, and outcomes tracked for each administration.",
   path: "/promises",
 });
 
@@ -69,10 +69,10 @@ export default async function PromisesPage({ searchParams }) {
       <section className="hero-panel p-8 md:p-10 mb-6">
         <div className="section-intro">
           <p className="eyebrow mb-4">Promise Tracker</p>
-          <h1 className="text-4xl md:text-5xl font-bold">Promises by President</h1>
+          <h1 className="text-4xl md:text-5xl font-bold">Promises by Presidency</h1>
           <p className="text-base md:text-lg text-[var(--ink-soft)] mt-4 leading-8 max-w-3xl">
-            Review Promise Tracker by presidency. The default view prioritizes promises with direct
-            or meaningful downstream Black-community impact, while still allowing access to the full archive.
+            Review Promise Tracker by presidency term. This keeps repeated presidents separated by administration,
+            while the default view still prioritizes promises with direct or meaningful downstream Black-community impact.
           </p>
           <div className="mt-5 flex flex-wrap gap-2">
             <MetaPill>{presidents.length} presidents with tracked promises</MetaPill>
@@ -87,7 +87,7 @@ export default async function PromisesPage({ searchParams }) {
           href={showAll ? "/promises/all?show_all=1" : "/promises/all"}
           className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
         >
-          Browse All Promise Records
+          Browse All Promises
         </Link>
         <Link
           href={showAll ? "/promises" : "/promises?show_all=1"}

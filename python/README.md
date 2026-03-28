@@ -107,6 +107,142 @@ python3 run_equitystack_pipeline.py --only-future-bill-id 2 --csv
 python3 run_equitystack_pipeline.py --model qwen3.5:latest --csv
 ```
 
+## Current-administration curated workflow
+
+Current-administration Promise Tracker now has a separate Python-first operator workflow. It is aligned with the legislative pipeline style, but it is not merged into the daily future-bills refresh by default.
+
+Work from `python/`:
+
+```bash
+cd /home/josh/Documents/GitHub/equitystack/python
+```
+
+Primary batch location:
+
+```bash
+python/data/current_admin_batches/
+```
+
+Primary reports location:
+
+```bash
+python/reports/current_admin/
+```
+
+Current scripts:
+
+```bash
+python3 scripts/discover_current_admin_updates.py --president-slug donald-j-trump-2025 --dry-run
+python3 scripts/export_current_admin_discovery_candidates.py --candidate-id update_candidates:2 --output-name trump_2025_housing_refresh_draft
+python3 scripts/normalize_current_admin_batch.py --input data/current_admin_batches/trump_2025_batch_01.json
+python3 scripts/review_current_admin_batch_with_ollama.py --input reports/current_admin/trump-2025-batch-01.normalized.json
+python3 scripts/apply_current_admin_ai_review.py --batch reports/current_admin/trump-2025-batch-01.normalized.json --review reports/current_admin/trump-2025-batch-01.ai-review.json
+python3 scripts/import_curated_current_admin_batch.py --input reports/current_admin/trump-2025-batch-01.manual-review-queue.json
+python3 scripts/import_curated_current_admin_batch.py --input reports/current_admin/trump-2025-batch-01.manual-review-queue.json --apply --yes
+python3 scripts/validate_current_admin_import.py --input reports/current_admin/trump-2025-batch-01.manual-review-queue.json
+```
+
+Workflow shape:
+
+1. optionally run discovery to surface stale records, missing actions, and possible new promise candidates
+2. optionally export selected discovery suggestions into a draft starter batch
+3. edit the draft into a real curated batch JSON
+4. normalize and validate it
+5. run Ollama review for advisory suggestions
+6. generate a manual review queue
+7. approve or edit records in the queue
+8. dry-run import
+9. apply import with `--apply --yes`
+10. run post-import validation
+
+Important behavior:
+
+- dry-run by default
+- `--apply --yes` required for writes
+- discovery never writes to the database
+- AI suggestions are advisory only
+- no scoring is performed during import
+- reports are written for normalization, AI review, manual review queue generation, import, and validation
+- the current-administration flow stays separate from the daily legislative refresh unless intentionally orchestrated later
+
+### Current-administration discovery
+
+Discovery is a read-only research step that helps the operator decide what belongs in the next curated batch. It does not mutate Promise Tracker tables and it does not auto-promote anything into import files.
+
+Basic discovery run:
+
+```bash
+python3 scripts/discover_current_admin_updates.py \
+  --president-slug donald-j-trump-2025 \
+  --dry-run
+```
+
+Optional feed-assisted discovery:
+
+```bash
+python3 scripts/discover_current_admin_updates.py \
+  --president-slug donald-j-trump-2025 \
+  --feed-url "https://example.gov/rss.xml" \
+  --feed-json data/current_admin_batches/local_feed_snapshot.json
+```
+
+Discovery report output:
+
+- `reports/current_admin/discovery_report.json`
+
+Export selected discovery suggestions into a draft starter batch:
+
+```bash
+python3 scripts/export_current_admin_discovery_candidates.py \
+  --candidate-id update_candidates:2 \
+  --output-name trump_2025_housing_refresh_draft
+```
+
+Common export shortcuts:
+
+```bash
+python3 scripts/export_current_admin_discovery_candidates.py --all-new-promises
+python3 scripts/export_current_admin_discovery_candidates.py --all-new-actions
+python3 scripts/export_current_admin_discovery_candidates.py --linked-promise-slug trump-2025-domestic-production-of-critical-medicines
+python3 scripts/export_current_admin_discovery_candidates.py --candidate-type stale_record
+```
+
+Report sections:
+
+- `new_action_candidates`
+- `update_candidates`
+- `new_promise_candidates`
+
+How to use it:
+
+1. inspect the discovery report
+2. export selected high-confidence items into a draft starter batch
+3. edit that draft into a new curated batch JSON or an enrichment/update batch
+4. run the normal current-administration workflow from normalization through validation
+
+Draft export behavior:
+
+- exported files are written under `data/current_admin_batches/`
+- they are marked `draft_current_admin_batch`
+- they are review-required and not ready for direct import
+- they preserve discovery reasoning, confidence, caution flags, and source references
+- they do not overwrite existing files unless `--allow-overwrite` is passed
+
+What discovery is for:
+
+- stale in-progress records
+- promises missing actions or outcomes
+- thinly sourced records
+- possible new actions tied to existing promises
+- possible new promise candidates from trusted feeds or local feed snapshots
+
+What discovery is not for:
+
+- writing to the database
+- auto-updating verified records
+- bypassing manual approval
+- replacing curated batch import
+
 ### 2. Inspect the review bundle
 
 The bundle combines the current day’s outputs into one operator package:

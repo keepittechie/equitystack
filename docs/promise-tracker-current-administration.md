@@ -4,6 +4,8 @@
 
 Promise Tracker remains a curated public record system. Current-administration monitoring is handled separately so raw White House intake does not automatically become a public Promise Tracker record or affect Black Impact Score.
 
+The first live curated current-administration batch has now been imported for the `donald-j-trump-2025` term. That batch created public Promise Tracker records only after editorial normalization, source validation, and production-safe ingest checks.
+
 ## Why Intake Is Separate
 
 Historical/manual Promise Tracker imports assume records are already curated. Current-administration monitoring is noisier and must pass through staging first.
@@ -97,6 +99,90 @@ Approval means:
 Rejection means:
 - the item remains stored for internal reference
 - the item will not be promoted unless it is returned to pending review later
+
+## Curated Batch Import
+
+Current-administration records can now enter Promise Tracker through two different paths:
+- staging ingestion and manual promotion for action-by-action review
+- curated batch import for a pre-validated editorial dataset
+
+There is also a separate discovery layer for suggestion-only research. Discovery does not write to the database and does not bypass curated batch review.
+
+Curated batch import is for cases where the dataset has already passed:
+- editorial normalization
+- source validation
+- status and impact consistency review
+- duplicate and relationship checks
+
+Primary Python scripts:
+- [`python/scripts/discover_current_admin_updates.py`](/home/josh/Documents/GitHub/equitystack/python/scripts/discover_current_admin_updates.py)
+- [`python/scripts/export_current_admin_discovery_candidates.py`](/home/josh/Documents/GitHub/equitystack/python/scripts/export_current_admin_discovery_candidates.py)
+- [`python/scripts/normalize_current_admin_batch.py`](/home/josh/Documents/GitHub/equitystack/python/scripts/normalize_current_admin_batch.py)
+- [`python/scripts/review_current_admin_batch_with_ollama.py`](/home/josh/Documents/GitHub/equitystack/python/scripts/review_current_admin_batch_with_ollama.py)
+- [`python/scripts/apply_current_admin_ai_review.py`](/home/josh/Documents/GitHub/equitystack/python/scripts/apply_current_admin_ai_review.py)
+- [`python/scripts/import_curated_current_admin_batch.py`](/home/josh/Documents/GitHub/equitystack/python/scripts/import_curated_current_admin_batch.py)
+- [`python/scripts/validate_current_admin_import.py`](/home/josh/Documents/GitHub/equitystack/python/scripts/validate_current_admin_import.py)
+
+Current batch file:
+- [`python/data/current_admin_batches/trump_2025_batch_01.json`](/home/josh/Documents/GitHub/equitystack/python/data/current_admin_batches/trump_2025_batch_01.json)
+
+Audit report directory:
+- [`python/reports/current_admin`](/home/josh/Documents/GitHub/equitystack/python/reports/current_admin)
+
+Recommended workflow:
+- optionally run discovery to identify stale records, missing actions, and possible new promise candidates
+- review `python/reports/current_admin/discovery_report.json`
+- export selected discovery suggestions into a draft batch file
+- edit that draft into a curated batch JSON or enrichment batch
+- run a dry run first
+- inspect the generated ingest report for duplicates, conflicts, and validation results
+- rerun with `--apply` only after the dry run is clean
+- keep the apply report in the audit directory
+
+Example commands:
+
+```bash
+python3 scripts/discover_current_admin_updates.py --president-slug donald-j-trump-2025 --dry-run
+python3 scripts/export_current_admin_discovery_candidates.py --candidate-id update_candidates:2 --output-name trump_2025_refresh_draft
+python3 scripts/normalize_current_admin_batch.py --input data/current_admin_batches/trump_2025_batch_01.json
+python3 scripts/review_current_admin_batch_with_ollama.py --input reports/current_admin/trump-2025-batch-01.normalized.json
+python3 scripts/apply_current_admin_ai_review.py --batch reports/current_admin/trump-2025-batch-01.normalized.json --review reports/current_admin/trump-2025-batch-01.ai-review.json
+python3 scripts/import_curated_current_admin_batch.py --input reports/current_admin/trump-2025-batch-01.manual-review-queue.json
+python3 scripts/import_curated_current_admin_batch.py --input reports/current_admin/trump-2025-batch-01.manual-review-queue.json --apply --yes
+python3 scripts/validate_current_admin_import.py --input reports/current_admin/trump-2025-batch-01.manual-review-queue.json
+```
+
+The import script remains non-destructive:
+- promise matching prefers existing slug or title-plus-president matches
+- missing fields are filled only when safe
+- existing verified summaries and notes are preserved
+- action, outcome, and source links are deduplicated
+
+The discovery script is also non-destructive:
+- it reads current Promise Tracker data and optional trusted feed inputs
+- it writes a JSON suggestion report only
+- it never creates or updates Promise Tracker records by itself
+
+The export helper is also non-destructive:
+- it reads `python/reports/current_admin/discovery_report.json`
+- it writes a draft starter batch under `python/data/current_admin_batches/`
+- it requires explicit operator selection
+- it marks exported files as review-required and not ready for direct import
+
+### First Live Curated Batch
+
+The first live curated current-administration batch is:
+- `trump-2025-batch-01`
+
+Production apply result:
+- 10 promises created
+- 10 actions created
+- 10 outcomes created
+- 14 sources created
+- 16 sources reused
+
+Audit file:
+- [`python/reports/current_admin/trump-2025-batch-01.import-apply.json`](/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.import-apply.json)
 
 ### AI Review Assistant
 
@@ -239,6 +325,16 @@ Enrichment does not:
 - infer Black-community effect
 - auto-score the promise
 - change Black Impact Score logic
+
+## Public Term Representation
+
+Promise Tracker public pages are presidency-term based, not person based.
+
+That means:
+- `/promises` lists presidency terms in chronological order
+- `/promises/president/donald-j-trump` refers to the 2017-2021 Trump term
+- `/promises/president/donald-j-trump-2025` refers to the 2025-present Trump term
+- promise detail pages inherit the correct presidency-term context from their linked president record
 
 ## Biden Bipartisan Border Bill
 
