@@ -19,7 +19,9 @@ function navClasses(pathname, href) {
   const isActive =
     href === "/"
       ? pathname === "/"
-      : pathname === href || pathname.startsWith(`${href}/`);
+      : href === "/reports"
+        ? pathname === href
+        : pathname === href || pathname.startsWith(`${href}/`);
 
   return isActive
     ? "rounded-full bg-[rgba(138,59,18,0.1)] px-4 py-2 text-[var(--accent)] font-semibold"
@@ -69,7 +71,11 @@ export default function MainLayout({ children }) {
                   key={item.href}
                   href={item.href}
                   className={`whitespace-nowrap rounded-full border px-3 py-2 text-sm ${
-                    pathname === item.href || pathname.startsWith(`${item.href}/`)
+                    item.href === "/"
+                      ? pathname === item.href
+                      : item.href === "/reports"
+                        ? pathname === item.href
+                        : pathname === item.href || pathname.startsWith(`${item.href}/`)
                       ? "bg-[var(--accent)] text-white border-[var(--accent)]"
                       : "bg-white/70 text-[var(--ink-soft)] border-[rgba(120,53,15,0.12)]"
                   }`}

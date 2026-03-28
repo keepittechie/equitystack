@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ImpactBadge, PromiseStatusBadge } from "@/app/components/policy-badges";
 import TrackedLink from "@/app/components/telemetry/TrackedLink";
+import CopyShareLinkButton from "@/app/reports/black-impact-score/CopyShareLinkButton";
 import { fetchInternalJson } from "@/lib/api";
 import { PUBLIC_REVALIDATE_SECONDS, withRevalidate } from "@/lib/cache";
 import { buildPageMetadata } from "@/lib/metadata";
@@ -32,10 +33,11 @@ export async function generateMetadata() {
   );
 
   return buildPageMetadata({
-    title: `${overview.administration_name} (${termLabel})`,
+    title: `${overview.administration_name} (${termLabel}) | EquityStack`,
     description:
-      "Review the current administration's tracked promises, actions, outcomes, and recent updates in one public overview.",
+      "A live public overview of the current administration's reviewed promises, actions, outcomes, and recent updates on EquityStack.",
     path: "/current-administration",
+    imagePath: "/current-administration/opengraph-image",
     type: "article",
   });
 }
@@ -153,6 +155,7 @@ export default async function CurrentAdministrationPage() {
     overview?.president?.term_start,
     overview?.president?.term_end
   );
+  const latestReviewedDate = overview.recent_activity.find((item) => item.latest_action_date)?.latest_action_date;
   const featuredShareHref = overview.featured_records[0]
     ? buildPromiseCardHref(overview.featured_records[0])
     : `/promises/president/${overview.president.slug}?show_all=1`;
@@ -166,9 +169,8 @@ export default async function CurrentAdministrationPage() {
             {overview.administration_name} ({termLabel})
           </h1>
           <p className="mt-5 max-w-3xl text-base leading-8 text-[var(--ink-soft)] md:text-lg">
-            This public overview tracks the current administration&apos;s reviewed Promise Tracker
-            records, including promises, linked actions, documented outcomes, and source-backed
-            evidence before inclusion.
+            This page tracks the current presidency term through reviewed Promise Tracker records,
+            showing the promises, actions, outcomes, and public sources currently in the system.
           </p>
           <div className="mt-5 flex flex-wrap gap-2">
             {overview?.president?.president_party ? (
@@ -178,6 +180,30 @@ export default async function CurrentAdministrationPage() {
             <MetaPill>{overview.total_actions} actions recorded</MetaPill>
             <MetaPill>{overview.total_outcomes} outcomes documented</MetaPill>
           </div>
+          <div className="mt-5 flex flex-wrap gap-2">
+            <CopyShareLinkButton
+              path="/current-administration"
+              defaultLabel="Share This Overview"
+              copiedLabel="Copied!"
+              trackPayload={{
+                route_kind: "current_administration",
+                entity_type: "presidency",
+                entity_key: overview.president.slug,
+              }}
+            />
+            <TrackedLink
+              href={`/promises/president/${overview.president.slug}?show_all=1`}
+              pagePath={pagePath}
+              eventType="detail_click"
+              routeKind="current_administration"
+              entityType="presidency"
+              entityKey={overview.president.slug}
+              targetPath={`/promises/president/${overview.president.slug}?show_all=1`}
+              className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium text-[var(--ink-soft)]"
+            >
+              View all current-term promises
+            </TrackedLink>
+          </div>
         </div>
       </section>
 
@@ -185,6 +211,11 @@ export default async function CurrentAdministrationPage() {
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div className="max-w-3xl">
             <h2 className="text-2xl font-semibold">Current Term Summary</h2>
+            <p className="mt-2 text-xs uppercase tracking-[0.14em] text-[var(--ink-soft)]">
+              {latestReviewedDate
+                ? `Data reflects latest reviewed records through ${formatDate(latestReviewedDate)}`
+                : "Data reflects latest reviewed records"}
+            </p>
             <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
               {impactPattern}
             </p>
@@ -213,7 +244,7 @@ export default async function CurrentAdministrationPage() {
           <div>
             <h2 className="text-2xl font-semibold">Recent Activity</h2>
             <p className="mt-1 text-sm text-[var(--ink-soft)]">
-              The newest tracked current-administration records and updates.
+              The newest reviewed records and updates in the current term.
             </p>
           </div>
           <TrackedLink
@@ -350,7 +381,7 @@ export default async function CurrentAdministrationPage() {
           <div>
             <h2 className="text-2xl font-semibold">Featured Current-Administration Records</h2>
             <p className="mt-1 text-sm text-[var(--ink-soft)]">
-              A few high-signal records from the current term to review first.
+              A few high-signal records from the current term to open first.
             </p>
           </div>
         </div>

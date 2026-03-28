@@ -109,6 +109,21 @@ function isScoringReadyPromise(promise) {
   });
 }
 
+function getLatestActionDate(promise) {
+  const actionDates = (promise?.actions || [])
+    .map((action) => action?.action_date)
+    .filter(Boolean)
+    .map((value) => new Date(value))
+    .filter((value) => !Number.isNaN(value.getTime()))
+    .sort((left, right) => right.getTime() - left.getTime());
+
+  if (!actionDates.length) {
+    return null;
+  }
+
+  return actionDates[0].toISOString();
+}
+
 function actionBadgeClasses(type) {
   switch (type) {
     case "Executive Order":
@@ -334,6 +349,7 @@ export default async function PromiseDetailPage({ params }) {
   const visibleSourceLinkCount =
     (promise.source_summary?.action_sources || 0) +
     (promise.source_summary?.outcome_sources || 0);
+  const latestActionDate = getLatestActionDate(promise);
 
   return (
     <main className="max-w-7xl mx-auto p-6">
@@ -368,6 +384,11 @@ export default async function PromiseDetailPage({ params }) {
             <h1 className="text-3xl md:text-4xl font-bold">{promise.title}</h1>
             <p className="text-base md:text-lg text-[var(--ink-soft)] mt-4 leading-8">
               {promise.summary || "This Promise Tracker record compares a public commitment with the actions and outcomes that followed."}
+            </p>
+            <p className="mt-4 text-xs uppercase tracking-[0.14em] text-[var(--ink-soft)]">
+              {latestActionDate
+                ? `Latest reviewed action recorded: ${formatDate(latestActionDate)}`
+                : "Data reflects latest reviewed records"}
             </p>
             <div className="flex flex-wrap gap-2 mt-4">
               <PromiseStatusBadge status={promise.status} />

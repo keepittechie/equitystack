@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ImpactBadge } from "@/app/components/policy-badges";
 import { fetchInternalJson } from "@/lib/api";
 import { REPORT_REVALIDATE_SECONDS, withRevalidate } from "@/lib/cache";
 import { buildPageMetadata } from "@/lib/metadata";
@@ -13,6 +14,13 @@ export const metadata = buildPageMetadata({
 
 async function getJson(url) {
   return fetchInternalJson(url, withRevalidate(REPORT_REVALIDATE_SECONDS));
+}
+
+async function getOptionalJson(url) {
+  return fetchInternalJson(url, {
+    ...withRevalidate(REPORT_REVALIDATE_SECONDS),
+    allow404: true,
+  });
 }
 
 function sumTotals(rows, key = "total") {
@@ -70,6 +78,31 @@ function FlagshipViewCard({ eyebrow, title, description, href, linkLabel }) {
   );
 }
 
+function RecentActivityCard({ item }) {
+  return (
+    <article className="panel-link rounded-[1.3rem] p-5">
+      <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">
+        {item.topic || "Current Administration"}
+      </p>
+      <h3 className="mt-3 text-base font-semibold leading-6">{item.title}</h3>
+      <p className="mt-2 text-sm leading-6 text-[var(--ink-soft)]">
+        {item.latest_action_title || item.summary || "Tracked current-term update"}
+      </p>
+      <div className="mt-4 flex flex-wrap gap-2">
+        {item.latest_action_date ? (
+          <span className="inline-flex items-center rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-3 py-1 text-xs text-[var(--ink-soft)]">
+            {formatDate(item.latest_action_date)}
+          </span>
+        ) : null}
+        {item.latest_impact_direction ? <ImpactBadge impact={item.latest_impact_direction} /> : null}
+      </div>
+      <Link href={`/promises/${item.slug}`} className="accent-link text-sm inline-block mt-4">
+        Open promise record
+      </Link>
+    </article>
+  );
+}
+
 function categoryClasses(category) {
   switch (category) {
     case "Politics":
@@ -100,12 +133,13 @@ function formatDate(dateString) {
 }
 
 export default async function HomePage() {
-  const [byParty, byEra, futureBills, topPolicies, featuredExplainers] = await Promise.all([
+  const [byParty, byEra, futureBills, topPolicies, featuredExplainers, currentAdministration] = await Promise.all([
     getJson("/api/reports/by-party"),
     getJson("/api/reports/by-era"),
     getJson("/api/future-bills"),
     getJson("/api/reports/top-policies"),
     getJson("/api/explainers/featured"),
+    getOptionalJson("/api/current-administration"),
   ]);
 
   const totalPolicies = sumTotals(byParty);
@@ -127,6 +161,7 @@ export default async function HomePage() {
     .filter((bill) => bill.latest_tracked_update)
     .sort((a, b) => String(b.latest_tracked_update).localeCompare(String(a.latest_tracked_update)))
     .slice(0, 4);
+  const latestCurrentAdministrationActivity = (currentAdministration?.recent_activity || []).slice(0, 4);
 
   return (
     <main className="max-w-7xl mx-auto p-6 space-y-10">
@@ -211,7 +246,7 @@ export default async function HomePage() {
           <FlagshipViewCard
             eyebrow="Outcomes"
             title="Black Impact Score"
-            description="Compare how presidential records affected Black communities using a transparent accountability framework built from Promise Tracker data."
+            description="Use the score view to understand the documented outcome pattern across presidential records, separate from the live current-term overview."
             href="/reports/black-impact-score"
             linkLabel="Open Black Impact Score"
           />
@@ -229,7 +264,7 @@ export default async function HomePage() {
         <FlagshipViewCard
           eyebrow="Live Tracking"
           title="Current Administration"
-          description="Start with the current presidency overview to see what is being tracked now, what changed recently, and where to verify it."
+          description="Start here for the live public overview of the current presidency term: what is being tracked now, what changed recently, and where to verify it."
           href="/current-administration"
           linkLabel="Open Current Administration"
         />
@@ -248,6 +283,34 @@ export default async function HomePage() {
           linkLabel="Open Future Bills"
         />
       </section>
+
+      {latestCurrentAdministrationActivity.length ? (
+        <section className="card-surface rounded-[1.6rem] p-6">
+          <div className="flex items-center justify-between gap-4 flex-wrap">
+            <div className="max-w-3xl">
+              <h2 className="text-2xl font-semibold">What Changed Recently</h2>
+              <p className="text-xs uppercase tracking-[0.14em] text-[var(--ink-soft)] mt-2">
+                Based on latest reviewed records
+              </p>
+              <p className="text-sm text-[var(--ink-soft)] mt-2">
+                A quick look at the latest reviewed current-administration activity now visible on EquityStack.
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            {latestCurrentAdministrationActivity.map((item) => (
+              <RecentActivityCard key={item.slug} item={item} />
+            ))}
+          </div>
+
+          <div className="mt-5">
+            <Link href="/current-administration" className="accent-link text-sm">
+              View Current Administration →
+            </Link>
+          </div>
+        </section>
+      ) : null}
 
       <section className="card-surface rounded-[1.6rem] p-6">
         <div className="flex items-center justify-between gap-4 mb-4">
