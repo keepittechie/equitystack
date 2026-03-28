@@ -46,15 +46,9 @@ python/scripts/__pycache__/
 python/venv/
 
 # Database dumps
-*.sql
-!database/promise_tracker_current_admin_phase1.sql
-!database/promise_tracker_current_admin_phase2.sql
-!database/promise_tracker_current_admin_phase3.sql
-!database/promise_tracker_current_admin_phase4.sql
+database/equitystack.sql
+*.dump.sql
+*.sql.gz
 
 # PM2 logs
 *.log
-
-# Large/full DB dumps
-database/equitystack.sql
-!database/equitystack.sql
