@@ -33,9 +33,9 @@ export async function generateMetadata() {
   );
 
   return buildPageMetadata({
-    title: `${overview.administration_name} (${termLabel}) | EquityStack`,
+    title: `${overview.administration_name} (${termLabel}) | Live Overview`,
     description:
-      "A live public overview of the current administration's reviewed promises, actions, outcomes, and recent updates on EquityStack.",
+      "Follow the current administration's reviewed promises, actions, outcomes, and recent verified updates in one public overview.",
     path: "/current-administration",
     imagePath: "/current-administration/opengraph-image",
     type: "article",
@@ -169,8 +169,8 @@ export default async function CurrentAdministrationPage() {
             {overview.administration_name} ({termLabel})
           </h1>
           <p className="mt-5 max-w-3xl text-base leading-8 text-[var(--ink-soft)] md:text-lg">
-            This page tracks the current presidency term through reviewed Promise Tracker records,
-            showing the promises, actions, outcomes, and public sources currently in the system.
+            This page tracks the current presidency term through reviewed Promise Tracker records.
+            It shows what has been promised, what actions have happened, and what documented outcomes are in the public record so far.
           </p>
           <div className="mt-5 flex flex-wrap gap-2">
             {overview?.president?.president_party ? (

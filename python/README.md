@@ -120,13 +120,13 @@ cd /home/josh/Documents/GitHub/equitystack/python
 Primary batch location:
 
 ```bash
-python/data/current_admin_batches/
+data/current_admin_batches/
 ```
 
 Primary reports location:
 
 ```bash
-python/reports/current_admin/
+reports/current_admin/
 ```
 
 Current scripts:

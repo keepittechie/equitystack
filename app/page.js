@@ -6,9 +6,9 @@ import { buildPageMetadata } from "@/lib/metadata";
 import { buildSiteJsonLd, serializeJsonLd } from "@/lib/structured-data";
 
 export const metadata = buildPageMetadata({
-  title: "EquityStack",
+  title: "EquityStack | Black Policy History and Current Tracking",
   description:
-    "Track how U.S. laws, court cases, executive actions, and proposed reforms have helped, harmed, or failed Black Americans over time.",
+    "Track how U.S. policy shaped Black communities across history and the present, from live current-administration records to the Black Impact Score.",
   path: "/",
 });
 

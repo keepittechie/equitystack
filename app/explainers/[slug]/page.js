@@ -26,10 +26,10 @@ export async function generateMetadata({ params }) {
   }
 
   return buildPageMetadata({
-    title: explainer.title,
+    title: `${explainer.title} | Explainer`,
     description:
       explainer.summary ||
-      "Evidence-backed historical and policy analysis from EquityStack.",
+      "Evidence-backed explainer connecting policy history, current context, and public records on EquityStack.",
     path: `/explainers/${slug}`,
     imagePath: `${buildExplainerCardHref(explainer)}/opengraph-image`,
     type: "article",

@@ -35,13 +35,11 @@ export async function generateMetadata({ params }) {
     });
   }
 
-  const termLabel = formatTermBadgeLabel(promise.term_start, promise.term_end);
-
   return buildPageMetadata({
-    title: `${promise.title} | ${promise.president} (${termLabel})`,
+    title: `${promise.title} | Promise Tracker`,
     description:
       promise.summary ||
-      "Review this presidential promise alongside the actions, outcomes, and documented equity impacts tied to it.",
+      "Reviewed Promise Tracker record with linked actions, outcomes, sources, and Black community impact context.",
     path: `/promises/${slug}`,
     imagePath: `${buildPromiseCardHref(promise)}/opengraph-image`,
     type: "article",

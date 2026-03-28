@@ -12,9 +12,9 @@ import CopyShareLinkButton from "./CopyShareLinkButton";
 import SnapshotLibraryPanel from "./SnapshotLibraryPanel";
 
 const REPORT_PATH = "/reports/black-impact-score";
-const DEFAULT_TITLE = "Black Impact Score Report";
+const DEFAULT_TITLE = "Black Impact Score | Outcome-Based Presidential Report";
 const DEFAULT_DESCRIPTION =
-  "A data-driven report on presidential impact based on documented real-world outcomes affecting Black Americans.";
+  "See how presidential records affected Black communities using reviewed, source-backed outcomes rather than campaign promises alone.";
 
 function normalizeSearchParamEntries(value) {
   const items = Array.isArray(value) ? value : value ? [value] : [];
@@ -1227,8 +1227,8 @@ function ScoringTransparencySection({ usingLegacyModel, isLegacyFallbackActive }
         <div className="max-w-3xl">
           <h2 className="text-lg font-semibold mb-2">How this was scored</h2>
           <p className="text-sm text-[var(--ink-soft)] leading-7">
-            This report starts with tracked actions, checks what actually happened, reviews the sources,
-            and then rolls those outcomes into a president-level score.
+            This report tracks what government actions led to, checks the public evidence behind those outcomes,
+            and rolls the documented results into a president-level score.
           </p>
         </div>
         <MetaPill>{usingLegacyModel ? "Legacy framing" : "Outcome-based framing"}</MetaPill>
@@ -3129,11 +3129,10 @@ export default async function BlackImpactScorePage({ searchParams }) {
         <p className="eyebrow mb-4">Promise Tracker Report</p>
         <h1 className="text-4xl md:text-5xl font-bold">Black Impact Score</h1>
         <p className="text-base md:text-lg text-[var(--ink-soft)] mt-4 max-w-3xl leading-8">
-          This report measures presidential accountability through documented outcomes tied to Black-community impacts.
-          It emphasizes what happened in practice, not just what was promised or enacted.
+          This score reflects documented outcomes, not campaign promises alone. It shows how presidential records affected Black communities using reviewed actions, outcomes, and source-backed evidence.
         </p>
         <p className="text-sm text-[var(--ink-soft)] mt-3 max-w-3xl leading-7">
-          Start with the score below. Open the timeline or advanced tools only when you want more context.
+          Start with the score below, then open the timeline or linked Promise Tracker records when you want more context.
         </p>
         <div className="mt-5 flex flex-wrap gap-2">
           <MetaPill>{presidents.length} presidents scored</MetaPill>
