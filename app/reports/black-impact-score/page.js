@@ -41,6 +41,7 @@ function buildReportHref({
   presidentB,
   model,
   topic,
+  scoringReady,
 }) {
   const params = new URLSearchParams();
   appendViewFlags(params, new Set(viewFlags));
@@ -67,6 +68,10 @@ function buildReportHref({
 
   if (typeof presidentB === "string" && presidentB.trim()) {
     params.set("president_b", presidentB.trim());
+  }
+
+  if (scoringReady) {
+    params.set("scoring_ready", "1");
   }
 
   const query = params.toString();
@@ -129,6 +134,10 @@ function buildMetadataUrl(searchParams = {}) {
     params.set("president_b", searchParams.presidentB.trim());
   }
 
+  if (searchParams.scoringReady) {
+    params.set("scoring_ready", "1");
+  }
+
   const query = params.toString();
   return query ? `${REPORT_PATH}?${query}` : REPORT_PATH;
 }
@@ -161,6 +170,10 @@ function buildOgImageUrl(searchParams = {}) {
     params.set("president_b", searchParams.presidentB.trim());
   }
 
+  if (searchParams.scoringReady) {
+    params.set("scoring_ready", "1");
+  }
+
   const query = params.toString();
   return query
     ? `${REPORT_PATH}/opengraph-image?${query}`
@@ -191,6 +204,7 @@ export async function generateMetadata({ searchParams }) {
     resolvedSearchParams.model === "legacy" || resolvedSearchParams.model === "compare"
       ? resolvedSearchParams.model
       : "outcome";
+  const isScoringReadyFilterRequested = resolvedSearchParams.scoring_ready === "1";
 
   let title = DEFAULT_TITLE;
   let description = DEFAULT_DESCRIPTION;
@@ -252,6 +266,11 @@ export async function generateMetadata({ searchParams }) {
     description = `${description} Filtered to ${topicLabel}.`;
   }
 
+  if (isScoringReadyFilterRequested) {
+    title = `${title} · Scoring-Ready`;
+    description = `${description} Limited to records with visible outcome and source-backed scoring detail.`;
+  }
+
   if (isDebateMode) {
     title = presidentName
       ? `${presidentName} Black Impact Score Debate View`
@@ -280,6 +299,7 @@ export async function generateMetadata({ searchParams }) {
     presidentB: presidentBSlug || null,
     model: requestedModel,
     topic: topicParam || null,
+    scoringReady: isScoringReadyFilterRequested,
   });
   const imageUrl = buildOgImageUrl({
     viewFlags,
@@ -289,6 +309,7 @@ export async function generateMetadata({ searchParams }) {
     presidentB: presidentBSlug || null,
     model: requestedModel,
     topic: topicParam || null,
+    scoringReady: isScoringReadyFilterRequested,
   });
 
   return {
@@ -528,6 +549,43 @@ function getPromiseEvidenceSourceCount(promise) {
   return derivedCount > 0 ? derivedCount : null;
 }
 
+function hasOutcomeSummary(outcome) {
+  if (!outcome || typeof outcome !== "object") {
+    return false;
+  }
+
+  const summary =
+    typeof outcome?.outcome?.outcome_summary === "string"
+      ? outcome.outcome.outcome_summary
+      : typeof outcome?.outcome_summary === "string"
+        ? outcome.outcome_summary
+        : "";
+
+  return Boolean(summary.trim());
+}
+
+function isScoringReadyRecord(record, usingLegacyModel = false) {
+  if (usingLegacyModel || !record || typeof record !== "object") {
+    return false;
+  }
+
+  const scoredOutcomes = Array.isArray(record.scored_outcomes) ? record.scored_outcomes : [];
+
+  if (!scoredOutcomes.length || Number(record.outcome_count || 0) < 1) {
+    return false;
+  }
+
+  return scoredOutcomes.every((outcome) => {
+    const hasDirection = Boolean(outcome?.impact_direction);
+    const hasSource = Number(outcome?.factors?.source_count || 0) > 0;
+    return hasDirection && hasSource && hasOutcomeSummary(outcome);
+  });
+}
+
+function getVisibleSourceReferenceCount(records = []) {
+  return records.reduce((count, record) => count + Number(getPromiseEvidenceSourceCount(record) || 0), 0);
+}
+
 function getTopAndBottomPresidents(presidents = []) {
   const sorted = [...presidents].sort((left, right) => {
     const scoreDiff = Number(right.normalized_score || 0) - Number(left.normalized_score || 0);
@@ -760,6 +818,10 @@ function EvidencePanelContent({ promise, linkToPromises = true }) {
 
       <p className="text-sm text-[var(--ink-soft)] leading-7">
         {promise.explanation_summary || "No explanation summary is available for this record."}
+      </p>
+
+      <p className="text-sm text-[var(--ink-soft)] leading-7">
+        This score view is built from the documented outcomes attached to this record and the linked source support visible on its Promise Tracker page.
       </p>
 
       {sourceCount ? (
@@ -1152,6 +1214,165 @@ function MethodologySection({ methodology, metadata, usingLegacyModel, isLegacyF
           </>
         )}
       </div>
+    </section>
+  );
+}
+
+function ScoringTransparencySection({ usingLegacyModel, isLegacyFallbackActive }) {
+  return (
+    <section className="card-surface rounded-[1.6rem] p-5">
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div className="max-w-3xl">
+          <h2 className="text-lg font-semibold mb-2">How this was scored</h2>
+          <p className="text-sm text-[var(--ink-soft)] leading-7">
+            Black Impact Score is a public summary built from curated Promise Tracker records. It uses manually reviewed outcomes and linked sources, not unreviewed staging data or internal drafts.
+          </p>
+        </div>
+        <MetaPill>{usingLegacyModel ? "Legacy framing" : "Outcome-based framing"}</MetaPill>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4 mt-5">
+        <div className="card-muted rounded-[1.25rem] p-4">
+          <h3 className="text-base font-semibold">Positive</h3>
+          <p className="text-sm text-[var(--ink-soft)] mt-2 leading-7">
+            Outcomes documented as beneficial in practice.
+          </p>
+        </div>
+        <div className="card-muted rounded-[1.25rem] p-4">
+          <h3 className="text-base font-semibold">Negative</h3>
+          <p className="text-sm text-[var(--ink-soft)] mt-2 leading-7">
+            Outcomes documented as harmful in practice.
+          </p>
+        </div>
+        <div className="card-muted rounded-[1.25rem] p-4">
+          <h3 className="text-base font-semibold">Mixed</h3>
+          <p className="text-sm text-[var(--ink-soft)] mt-2 leading-7">
+            Outcomes with both gains and meaningful limits or exclusions.
+          </p>
+        </div>
+        <div className="card-muted rounded-[1.25rem] p-4">
+          <h3 className="text-base font-semibold">Blocked</h3>
+          <p className="text-sm text-[var(--ink-soft)] mt-2 leading-7">
+            Documented attempts that did not fully take effect.
+          </p>
+        </div>
+      </div>
+
+      <div className="grid gap-4 xl:grid-cols-2 mt-5">
+        <div className="card-muted rounded-[1.25rem] p-4">
+          <h3 className="text-base font-semibold">What counts</h3>
+          <ul className="mt-3 space-y-2 text-sm text-[var(--ink-soft)] leading-7">
+            <li>Curated Promise Tracker records.</li>
+            <li>Documented outcomes attached to those records.</li>
+            <li>Evidence strength and linked source support.</li>
+          </ul>
+        </div>
+        <div className="card-muted rounded-[1.25rem] p-4">
+          <h3 className="text-base font-semibold">What does not count</h3>
+          <ul className="mt-3 space-y-2 text-sm text-[var(--ink-soft)] leading-7">
+            <li>Unreviewed staging items or admin-only notes.</li>
+            <li>AI review assistance or internal promotion drafts.</li>
+            <li>Outcomes that have not been curated into the public record yet.</li>
+            {isLegacyFallbackActive ? (
+              <li>Outcome-based weighting is temporarily unavailable in legacy fallback mode.</li>
+            ) : null}
+          </ul>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function HowThisWasBuiltSection({
+  promiseCount,
+  outcomeCount,
+  sourceReferenceCount,
+  effectiveScoringModel,
+  isScoringReadyFilterActive,
+  usingLegacyModel,
+}) {
+  return (
+    <section className="card-surface rounded-[1.6rem] p-5">
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div className="max-w-3xl">
+          <h2 className="text-lg font-semibold mb-2">How this was built</h2>
+          <p className="text-sm text-[var(--ink-soft)] leading-7">
+            This public view rolls up curated Promise Tracker records into a president-level report. Records are manually reviewed, outcomes are evidence-backed, and the underlying source trail remains visible on each Promise Tracker page.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <MetaPill>{effectiveScoringModel}</MetaPill>
+          {isScoringReadyFilterActive ? <MetaPill>Scoring-ready only</MetaPill> : null}
+        </div>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-3 mt-5">
+        <ScoreCard
+          label="Promise Records"
+          value={promiseCount}
+          subtitle="Visible curated records in this report state"
+        />
+        <ScoreCard
+          label="Outcomes"
+          value={usingLegacyModel ? "\u2014" : outcomeCount}
+          subtitle={usingLegacyModel ? "Outcome counts are not available in legacy mode" : "Documented outcomes used in this view"}
+        />
+        <ScoreCard
+          label="Source References"
+          value={usingLegacyModel ? "\u2014" : sourceReferenceCount}
+          subtitle={usingLegacyModel ? "Source-reference totals are only shown for outcome-based views" : "Visible source-backed references across the current report state"}
+        />
+      </div>
+
+      <p className="text-sm text-[var(--ink-soft)] mt-4 leading-7">
+        This report does not include staging items, internal admin review states, or unpublished editorial notes.
+      </p>
+    </section>
+  );
+}
+
+function ScoringReadyFilterSection({
+  filterHref,
+  clearHref,
+  isActive,
+  availableCount,
+  totalCount,
+  usingLegacyModel,
+  isLegacyFallbackActive,
+}) {
+  return (
+    <section className="card-surface rounded-[1.6rem] p-5 print:hidden">
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div className="max-w-3xl">
+          <h2 className="text-lg font-semibold mb-2">Scoring-ready view</h2>
+          <p className="text-sm text-[var(--ink-soft)] leading-7">
+            Use this optional filter to show only records that already have outcome summaries, impact direction, and at least one linked source in the public scoring model.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <MetaPill>{availableCount} scoring-ready</MetaPill>
+          <MetaPill>{totalCount} visible records</MetaPill>
+        </div>
+      </div>
+
+      <div className="flex flex-wrap gap-3 mt-4">
+        <Link
+          href={isActive ? clearHref : filterHref}
+          className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
+        >
+          {isActive ? "Show All Visible Records" : "Show Only Scoring-Ready Records"}
+        </Link>
+      </div>
+
+      <p className="text-sm text-[var(--ink-soft)] mt-4 leading-7">
+        {usingLegacyModel
+          ? isLegacyFallbackActive
+            ? "Scoring-ready filtering is unavailable while legacy fallback is active."
+            : "Scoring-ready filtering is only available for outcome-based views."
+          : isActive
+            ? "The current report is filtered to records with visible scoring-ready evidence."
+            : "This filter is off by default so non-ready records remain visible for context."}
+      </p>
     </section>
   );
 }
@@ -2542,6 +2763,7 @@ export default async function BlackImpactScorePage({ searchParams }) {
     resolvedSearchParams.model === "legacy" || resolvedSearchParams.model === "compare"
       ? resolvedSearchParams.model
       : "outcome";
+  const requestedScoringReadyOnly = resolvedSearchParams.scoring_ready === "1";
   const data = await getBlackImpactScores(requestedModel);
   const comparisonMode = data.model === "compare";
   const publicOutcomeMethodology = getBlackImpactScoreMethodology();
@@ -2585,6 +2807,15 @@ export default async function BlackImpactScorePage({ searchParams }) {
     baseRecords = baseRecords.filter(
       (record) => normalizeTopicSlug(record.topic) === selectedTopic.value
     );
+  }
+
+  const scoringReadyAvailableCount = usingLegacyModel
+    ? 0
+    : baseRecords.filter((record) => isScoringReadyRecord(record, false)).length;
+  const isScoringReadyFilterActive = !usingLegacyModel && requestedScoringReadyOnly;
+
+  if (isScoringReadyFilterActive) {
+    baseRecords = baseRecords.filter((record) => isScoringReadyRecord(record, false));
   }
 
   if (usingLegacyModel) {
@@ -2653,6 +2884,7 @@ export default async function BlackImpactScorePage({ searchParams }) {
     presidentB: requestedPresidentBSlug,
     model: requestedModel,
     topic: selectedTopic?.value || requestedTopicParam,
+    scoringReady: requestedScoringReadyOnly,
   });
   const permalinkUrl = buildReportHref({
     viewFlags,
@@ -2662,6 +2894,7 @@ export default async function BlackImpactScorePage({ searchParams }) {
     presidentB: requestedPresidentBSlug,
     model: requestedModel,
     topic: selectedTopic?.value || requestedTopicParam,
+    scoringReady: requestedScoringReadyOnly,
   });
   const modelStatusLabel = getModelStatusLabel({
     metadata,
@@ -2676,6 +2909,7 @@ export default async function BlackImpactScorePage({ searchParams }) {
     presidentB: requestedPresidentBSlug,
     model: requestedModel,
     topic: selectedTopic?.value || requestedTopicParam,
+    scoringReady: requestedScoringReadyOnly,
   });
   const timelineReportHref = buildReportHref({
     viewFlags: new Set(
@@ -2687,6 +2921,7 @@ export default async function BlackImpactScorePage({ searchParams }) {
     presidentB: requestedPresidentBSlug,
     model: requestedModel,
     topic: selectedTopic?.value || requestedTopicParam,
+    scoringReady: requestedScoringReadyOnly,
   });
   const topicCompareHref = buildReportHref({
     viewFlags: new Set(
@@ -2698,6 +2933,7 @@ export default async function BlackImpactScorePage({ searchParams }) {
     presidentB: requestedPresidentBSlug,
     model: requestedModel,
     topic: selectedTopic?.value || requestedTopicParam,
+    scoringReady: requestedScoringReadyOnly,
   });
   const presidentCompareHref = buildReportHref({
     viewFlags: new Set(
@@ -2711,6 +2947,7 @@ export default async function BlackImpactScorePage({ searchParams }) {
     presidentB: requestedPresidentBSlug,
     model: requestedModel,
     topic: selectedTopic?.value || requestedTopicParam,
+    scoringReady: requestedScoringReadyOnly,
   });
   const compareHref = buildReportHref({
     viewFlags,
@@ -2720,6 +2957,7 @@ export default async function BlackImpactScorePage({ searchParams }) {
     presidentB: requestedPresidentBSlug,
     model: "compare",
     topic: selectedTopic?.value || requestedTopicParam,
+    scoringReady: requestedScoringReadyOnly,
   });
   const debateHref = buildReportHref({
     viewFlags,
@@ -2729,12 +2967,14 @@ export default async function BlackImpactScorePage({ searchParams }) {
     presidentB: requestedPresidentBSlug,
     model: requestedModel,
     topic: selectedTopic?.value || requestedTopicParam,
+    scoringReady: requestedScoringReadyOnly,
   });
   const allTopicsHref = buildReportHref({
     viewFlags,
     mode: isDebateMode ? "debate" : null,
     president: requestedPresidentSlug,
     model: requestedModel,
+    scoringReady: requestedScoringReadyOnly,
   });
   const buildTopicHref = (topicValue) =>
     buildReportHref({
@@ -2745,6 +2985,7 @@ export default async function BlackImpactScorePage({ searchParams }) {
       presidentB: requestedPresidentBSlug,
       model: requestedModel,
       topic: topicValue,
+      scoringReady: requestedScoringReadyOnly,
     });
   const buildPresidentCompareHref = (presidentASlug, presidentBSlug) =>
     buildReportHref({
@@ -2758,7 +2999,28 @@ export default async function BlackImpactScorePage({ searchParams }) {
       presidentB: presidentBSlug,
       model: requestedModel,
       topic: selectedTopic?.value || requestedTopicParam,
+      scoringReady: requestedScoringReadyOnly,
     });
+  const scoringReadyFilterHref = buildReportHref({
+    viewFlags,
+    mode: isDebateMode ? "debate" : null,
+    president: requestedPresidentSlug,
+    presidentA: requestedPresidentASlug,
+    presidentB: requestedPresidentBSlug,
+    model: requestedModel,
+    topic: selectedTopic?.value || requestedTopicParam,
+    scoringReady: true,
+  });
+  const scoringReadyClearHref = buildReportHref({
+    viewFlags,
+    mode: isDebateMode ? "debate" : null,
+    president: requestedPresidentSlug,
+    presidentA: requestedPresidentASlug,
+    presidentB: requestedPresidentBSlug,
+    model: requestedModel,
+    topic: selectedTopic?.value || requestedTopicParam,
+    scoringReady: false,
+  });
   const shareEvidenceItems = collectShareEvidenceItems({
     presidents,
     selectedPresidentA,
@@ -2875,6 +3137,16 @@ export default async function BlackImpactScorePage({ searchParams }) {
         buildTopicHref={buildTopicHref}
       />
 
+      <ScoringReadyFilterSection
+        filterHref={scoringReadyFilterHref}
+        clearHref={scoringReadyClearHref}
+        isActive={isScoringReadyFilterActive}
+        availableCount={scoringReadyAvailableCount}
+        totalCount={records.length}
+        usingLegacyModel={usingLegacyModel}
+        isLegacyFallbackActive={isLegacyFallbackActive}
+      />
+
       <AdvancedReportToolsSection
         debateHref={debateHref}
         presidentCompareHref={presidentCompareHref}
@@ -2923,7 +3195,21 @@ export default async function BlackImpactScorePage({ searchParams }) {
         isLegacyFallbackActive={isLegacyFallbackActive}
       />
 
+      <HowThisWasBuiltSection
+        promiseCount={records.length}
+        outcomeCount={metadata?.total_outcomes ?? 0}
+        sourceReferenceCount={getVisibleSourceReferenceCount(records)}
+        effectiveScoringModel={effectiveScoringModel}
+        isScoringReadyFilterActive={isScoringReadyFilterActive}
+        usingLegacyModel={usingLegacyModel}
+      />
+
       {presidents.length && !isTopicCompareView && !isPresidentCompareView ? <TopSummarySection presidents={presidents} /> : null}
+
+      <ScoringTransparencySection
+        usingLegacyModel={usingLegacyModel}
+        isLegacyFallbackActive={isLegacyFallbackActive}
+      />
 
       <MethodologySection
         methodology={methodology}

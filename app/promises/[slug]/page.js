@@ -72,6 +72,21 @@ function formatDate(dateString) {
   });
 }
 
+function isScoringReadyPromise(promise) {
+  const outcomes = Array.isArray(promise?.outcomes) ? promise.outcomes : [];
+
+  if (!outcomes.length) {
+    return false;
+  }
+
+  return outcomes.every((outcome) => {
+    const hasSummary = Boolean(String(outcome?.outcome_summary || "").trim());
+    const hasDirection = Boolean(outcome?.impact_direction);
+    const hasSources = Array.isArray(outcome?.outcome_sources) && outcome.outcome_sources.length > 0;
+    return hasSummary && hasDirection && hasSources;
+  });
+}
+
 function actionBadgeClasses(type) {
   switch (type) {
     case "Executive Order":
@@ -293,6 +308,10 @@ export default async function PromiseDetailPage({ params }) {
     "incoming"
   );
   const nextRecord = selectContextNavRecord(promise.related_to_promises, "outgoing");
+  const isScoringReady = isScoringReadyPromise(promise);
+  const visibleSourceLinkCount =
+    (promise.source_summary?.action_sources || 0) +
+    (promise.source_summary?.outcome_sources || 0);
 
   return (
     <main className="max-w-7xl mx-auto p-6">
@@ -333,6 +352,7 @@ export default async function PromiseDetailPage({ params }) {
               <MetaPill>{promise.promise_type}</MetaPill>
               <MetaPill>{promise.campaign_or_official}</MetaPill>
               {promise.topic ? <MetaPill>{promise.topic}</MetaPill> : null}
+              <MetaPill>{isScoringReady ? "Scoring-ready evidence" : "Needs more outcome evidence"}</MetaPill>
               {promise.is_demo ? <MetaPill>Demo seed data</MetaPill> : null}
             </div>
           </div>
@@ -401,6 +421,9 @@ export default async function PromiseDetailPage({ params }) {
 
           <section className="card-surface rounded-[1.6rem] p-5">
             <h2 className="text-xl font-semibold mb-4">Action Timeline</h2>
+            <p className="text-sm text-[var(--ink-soft)] leading-7 mb-4">
+              Actions document what the federal government did. Outcomes below describe what changed, and each source list shows where the public record comes from.
+            </p>
             <div className="space-y-4">
               {promise.actions?.length ? (
                 promise.actions.map((action) => (
@@ -428,6 +451,10 @@ export default async function PromiseDetailPage({ params }) {
                     ) : null}
 
                     <div className="flex flex-wrap gap-4 mt-4 text-sm">
+                      <span className="text-[var(--ink-soft)]">
+                        {action.action_sources?.length || 0} source
+                        {action.action_sources?.length === 1 ? "" : "s"} linked
+                      </span>
                       {action.related_policy_id ? (
                         <Link href={`/policies/${action.related_policy_id}`} className="accent-link">
                           Related policy: {action.related_policy_title}
@@ -454,6 +481,9 @@ export default async function PromiseDetailPage({ params }) {
 
           <section className="card-surface rounded-[1.6rem] p-5">
             <h2 className="text-xl font-semibold mb-4">Outcomes</h2>
+            <p className="text-sm text-[var(--ink-soft)] leading-7 mb-4">
+              Outcomes are the part of the record that can contribute to public scoring. They stay visible here with impact direction and linked sources so readers can verify what shaped the record.
+            </p>
             <div className="space-y-4">
               {promise.outcomes?.length ? (
                 promise.outcomes.map((outcome) => (
@@ -491,6 +521,10 @@ export default async function PromiseDetailPage({ params }) {
                       <strong>Evidence strength:</strong> {outcome.evidence_strength}
                     </p>
 
+                    <p className="mt-3 text-sm text-[var(--ink-soft)]">
+                      <strong>Linked sources:</strong> {outcome.outcome_sources?.length || 0}
+                    </p>
+
                     <SourceDisclosure
                       label="Outcome Sources"
                       sources={outcome.outcome_sources}
@@ -521,22 +555,28 @@ export default async function PromiseDetailPage({ params }) {
           </section>
 
           <section className="card-surface rounded-[1.6rem] p-5">
-            <h2 className="text-lg font-semibold mb-3">Promise Snapshot</h2>
+            <h2 className="text-lg font-semibold mb-3">How this record was built</h2>
             <div className="grid gap-4">
               <MiniStat label="Actions" value={promise.actions?.length || 0} />
               <MiniStat label="Outcomes" value={promise.outcomes?.length || 0} />
               <MiniStat
                 label="Source Links"
-                value={
-                  (promise.source_summary?.action_sources || 0) +
-                  (promise.source_summary?.outcome_sources || 0)
-                }
+                value={visibleSourceLinkCount}
                 subtitle="Visible links attached to action and outcome records."
               />
             </div>
+            <p className="text-sm text-[var(--ink-soft)] mt-4 leading-7">
+              Promise Tracker separates the public record into the original promise, the actions that followed, the outcomes that were documented, and the evidence linked to those outcomes.
+            </p>
+            <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
+              {isScoringReady
+                ? "This record currently has enough visible outcome and source detail to support public scoring."
+                : "This record remains visible even if it is not yet scoring-ready, so readers can inspect the public record before editorial enrichment is complete."}
+            </p>
             <div className="mt-4 text-xs text-[var(--ink-soft)] space-y-1">
               <p>Action source links: {promise.source_summary?.action_sources || 0}</p>
               <p>Outcome source links: {promise.source_summary?.outcome_sources || 0}</p>
+              <p>Scoring-ready: {isScoringReady ? "Yes" : "Not yet"}</p>
             </div>
           </section>
 

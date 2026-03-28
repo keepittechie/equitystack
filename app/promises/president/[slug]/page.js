@@ -73,6 +73,15 @@ function formatTermRange(start, end) {
   return `${formatDate(start) || "Unknown"} to ${end ? formatDate(end) : "Present"}`;
 }
 
+function getVisiblePromiseSourceCount(president) {
+  return (president.status_sections || []).reduce(
+    (count, section) =>
+      count +
+      (section.items || []).reduce((sectionCount, promise) => sectionCount + Number(promise.source_count || 0), 0),
+    0
+  );
+}
+
 function promiseCardClasses(promise) {
   if (promise.impact_direction_for_curation === "Mixed") {
     return "panel-link block rounded-[1.35rem] p-5 border-[rgba(180,83,9,0.14)] bg-[linear-gradient(180deg,rgba(255,251,235,0.86),rgba(255,255,255,0.98))]";
@@ -90,6 +99,11 @@ export default async function PromisePresidentPage({ params, searchParams }) {
   if (!president) {
     notFound();
   }
+
+  const visibleSourceCount =
+    typeof president.visible_source_count === "number"
+      ? president.visible_source_count
+      : getVisiblePromiseSourceCount(president);
 
   return (
     <main className="max-w-7xl mx-auto p-6">
@@ -154,12 +168,21 @@ export default async function PromisePresidentPage({ params, searchParams }) {
       <section className="card-surface rounded-[1.6rem] p-5 mb-8">
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div className="max-w-3xl">
-            <h2 className="text-lg font-semibold mb-2">See the Score View</h2>
+            <h2 className="text-lg font-semibold mb-2">How this was built</h2>
             <p className="text-sm text-[var(--ink-soft)] leading-7">
-              Black Impact Score uses these Promise Tracker records as a president-level accountability layer.
-              Open it to compare this presidency against the broader Promise Tracker dataset.
+              This presidency view groups curated Promise Tracker records by status. It keeps the records visible first, then points into Black Impact Score when you want a score summary built from the same public evidence base.
             </p>
           </div>
+          <div className="flex flex-wrap gap-2">
+            <MetaPill>{showAll ? president.total_tracked_promises : president.visible_promise_count} promise records</MetaPill>
+            <MetaPill>{president.visible_outcome_count || 0} outcomes</MetaPill>
+            <MetaPill>{visibleSourceCount} source references</MetaPill>
+          </div>
+        </div>
+        <p className="text-sm text-[var(--ink-soft)] mt-4 leading-7">
+          Records remain visible here even before they are complete enough for scoring. Open Black Impact Score when you want the summarized score view, then return to these record pages to verify the underlying actions, outcomes, and sources.
+        </p>
+        <div className="mt-4">
           <Link
             href="/reports/black-impact-score"
             className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
@@ -212,6 +235,9 @@ export default async function PromisePresidentPage({ params, searchParams }) {
                     <div className="flex flex-wrap gap-2 mt-4">
                       <MetaPill>
                         {promise.action_count} action{promise.action_count === 1 ? "" : "s"}
+                      </MetaPill>
+                      <MetaPill>
+                        {promise.outcome_count || 0} outcome{promise.outcome_count === 1 ? "" : "s"}
                       </MetaPill>
                       <MetaPill>
                         {promise.source_count} distinct source{promise.source_count === 1 ? "" : "s"}

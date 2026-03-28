@@ -38,6 +38,39 @@ Advanced tools:
 
 These advanced tools remain available, but they should be treated as secondary to the primary report modes above.
 
+## Public Transparency
+
+The report layer should help readers answer three public questions quickly:
+
+1. What records are visible in this view?
+2. How are those records scored at a high level?
+3. Where do I go to verify the evidence?
+
+Black Impact Score now exposes that publicly through:
+
+- visible evidence panels that link back to Promise Tracker
+- a plain-language `How this was scored` explanation
+- a `How this was built` section with visible record, outcome, and source-reference totals
+- share links that preserve the current public report state without exposing internal review data
+
+## Scoring-Ready View
+
+Black Impact Score includes an optional `scoring-ready` view filter.
+
+This filter is public and advisory. It shows only records that already have:
+
+- at least one visible outcome
+- an explicit impact direction on each scored outcome
+- a visible outcome summary
+- at least one linked source for each scored outcome
+
+Important:
+
+- this filter does not change score logic
+- this filter does not silently replace the default view
+- non-ready records remain visible by default for context
+- staging, admin review, and unpublished records are never part of this public filter
+
 ## Reports Landing Page
 
 `/reports` should act as a curated entry point first.

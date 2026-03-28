@@ -1,3 +1,4 @@
+import Link from "next/link";
 import AdminPolicyForm from "./AdminPolicyForm";
 import { fetchInternalJson } from "@/lib/api";
 
@@ -16,6 +17,18 @@ export default async function AdminPage() {
       <p className="text-gray-700 mb-8">
         Add a new policy record to the Black Policy Tracker database.
       </p>
+
+      <div className="mb-8 flex flex-wrap gap-3">
+        <Link href="/admin/review" className="border rounded-lg px-4 py-2">
+          Review Queue
+        </Link>
+        <Link
+          href="/admin/promises/current-administration"
+          className="border rounded-lg px-4 py-2"
+        >
+          Current-Administration Review
+        </Link>
+      </div>
 
       <AdminPolicyForm lookups={lookups} />
     </main>

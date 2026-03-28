@@ -3,6 +3,23 @@
 ## Summary
 Promise Tracker v1 is a read-only public feature for tracking presidential promises, the actions tied to them, the outcomes that followed, and the documented source trail behind each record. The current UX is president-first: users begin at a presidency index, drill into a president-specific Promise Tracker page, and then open individual promise detail pages.
 
+## Public Transparency Principles
+
+Promise Tracker is designed so public users can inspect the record structure directly.
+
+The public product should keep these distinctions clear:
+
+- `Promise`
+  - the public commitment or federal posture being tracked
+- `Action`
+  - what the administration or federal government did
+- `Outcome`
+  - what happened in practice after that action
+- `Evidence`
+  - the linked public sources supporting the action or outcome
+
+Public pages should help users verify a score by moving from summary to record detail, not by hiding record-level complexity.
+
 ## Route Map
 
 ### Public Pages
@@ -115,11 +132,16 @@ Primary file:
 
 Current service responsibilities:
 - define Promise Tracker status ordering via `PROMISE_STATUSES`
-- provide president slug generation with `getPromisePresidentSlug`
+- provide president slug fallback normalization with `getPromisePresidentSlug`
 - provide the flat promise browser with `fetchPromiseList`
 - provide promise detail data with `fetchPromiseDetail`
 - provide president index data with `fetchPromisePresidentIndex`
 - provide president detail data with `fetchPromisePresidentDetail`
+
+Current presidency-routing note:
+- Promise Tracker now uses the DB-backed `presidents.slug` column as the source of truth for presidency routing.
+- Historical slugs were backfilled to match the existing public URLs.
+- This keeps existing routes stable while allowing nonconsecutive presidencies to exist as separate administration terms.
 
 Key query patterns:
 - flat list queries use direct SQL with `WHERE` filters for:
@@ -164,11 +186,94 @@ The count is distinct by `source_id`, so a source linked at more than one level 
 
 ### Current Database Snapshot
 - [`database/equitystack.sql`](/home/josh/Documents/GitHub/equitystack/database/equitystack.sql)
+- [`database/promise_tracker_current_admin_phase1.sql`](/home/josh/Documents/GitHub/equitystack/database/promise_tracker_current_admin_phase1.sql)
 
 Current repo convention:
 - the full database dump is the schema source of truth
 - Promise Tracker tables are included in that dump
 - standalone migration and seed helper files used during implementation may be archived or removed once the dump has been refreshed
+
+## Current-Administration Intake
+
+Promise Tracker public records remain a curated editorial layer.
+
+Current-administration monitoring is intentionally separate from historical/manual imports:
+- raw White House intake lands in `current_administration_staging_items`
+- staged records are review-only and not public
+- staged records must not affect Promise Tracker pages or Black Impact Score until explicitly promoted
+- no outcomes are auto-created from staged items
+
+### Phase 2.5 AI-Assisted Triage
+
+The internal current-administration review flow now supports an AI review assistant using Ollama `qwen3.5:latest`.
+
+AI review is advisory only:
+- it can suggest whether a staged item looks trackable, noisy, or unclear
+- it can suggest likely classification fields
+- it can suggest a cleaned-up title and summary
+- it can suggest whether the item looks more like a new record or an update candidate
+
+AI review cannot:
+- approve a staged item
+- reject a staged item permanently
+- promote a staged item
+- create outcomes
+- change scoring
+
+Human review remains the approval boundary.
+
+### Phase 2 Review and Promotion
+
+Phase 2 adds an internal review workflow for staged current-administration items.
+
+Internal review responsibilities:
+- list staged items by review status
+- inspect one staged item in detail
+- approve, reject, or return an item to pending review
+- build a cautious promotion draft
+- manually promote an approved staged item into curated Promise Tracker data
+
+Promotion creates only the minimum curated shell:
+- one `promises` row when needed
+- one `promise_actions` row
+- one linked source record when no existing source matches the canonical URL
+- a staging link back to the promoted promise, action, and source
+
+Promotion does **not** create:
+- `promise_outcomes`
+- score metadata
+- automatic impact-direction judgments
+- automatic Black-community impact notes
+
+That enrichment remains a later editorial step after promotion.
+
+### Phase 3 Enrichment
+
+Phase 3 adds a post-promotion editor for curated Promise Tracker records at:
+- `/admin/promises/[id]`
+
+The enrichment layer is where operators:
+- refine the promise shell after promotion
+- edit action metadata
+- manually add and edit outcomes
+- assign impact direction
+- link outcome evidence
+- determine whether a record is scoring-ready
+
+This phase is intentionally manual:
+- no outcomes are auto-created
+- no impact direction is inferred
+- no score is computed during editing
+
+`Scoring Ready` is an internal editorial signal only. A promise is considered scoring-ready when:
+- at least one outcome exists
+- each outcome has a description
+- each outcome has an impact direction
+- each outcome has at least one linked source
+
+This does not block saving. It is a readiness check for later scoring workflows.
+
+Public report views may reference `scoring-ready` as a transparency filter, but that does not expose admin state. It only reflects whether the public record already has the visible outcome and source detail needed for score inclusion.
 
 ### Remaining Promise Tracker Reference File
 - [`database/promise_tracker_import_batch_2_sources.md`](/home/josh/Documents/GitHub/equitystack/database/promise_tracker_import_batch_2_sources.md)

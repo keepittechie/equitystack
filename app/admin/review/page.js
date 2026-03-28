@@ -18,6 +18,15 @@ export default async function AdminReviewPage() {
         should be treated as fully developed records.
       </p>
 
+      <div className="mb-6 flex flex-wrap gap-3">
+        <Link
+          href="/admin/promises/current-administration"
+          className="border rounded-lg px-4 py-2 inline-block"
+        >
+          Current-Administration Review
+        </Link>
+      </div>
+
       <div className="space-y-4">
         {items.length === 0 && (
           <div className="border rounded-2xl p-5">
