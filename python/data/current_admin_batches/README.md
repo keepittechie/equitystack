@@ -1,15 +1,18 @@
 # Current-Administration Batch Files
 
-Store curated current-administration Promise Tracker batches here.
-
-Primary operator instructions live in `python/CURRENT_ADMIN_PIPELINE.md`.
+Store curated current-admin batch JSON files here.
 
 Use this directory for:
 
-- curated batch JSON files that are ready for normalization
-- draft exports from discovery that still need manual editing
+- hand-curated batch files ready for normalization
+- discovery exports that still need manual editing
 
-Current live starter batch:
-- `trump_2025_batch_01.json`
+Primary docs:
 
-Draft exports from discovery are allowed here, but they are not import-ready until manually edited and reviewed.
+- `python/CURRENT_ADMIN_DAILY.md`
+- `python/CURRENT_ADMIN_PIPELINE.md`
+
+Notes:
+
+- discovery exports are drafts, not import-ready artifacts
+- the canonical workflow starts with `./bin/equitystack current-admin workflow start --input data/current_admin_batches/<batch-file>.json`

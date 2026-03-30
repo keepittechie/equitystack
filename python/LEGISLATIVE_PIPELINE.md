@@ -1,6 +1,6 @@
 # Legislative Pipeline
 
-Use this for the daily future-bills / tracked-bills workflow.
+Use this for the future-bills / tracked-bills workflow.
 
 Work from:
 
@@ -8,37 +8,20 @@ Work from:
 cd python
 ```
 
-## Run This Daily
-
-Default daily refresh:
+If local Python is not set up yet:
 
 ```bash
-./bin/equitystack legislative run
+./bin/bootstrap-python-env
 ```
 
-This runs the normal review-first sequence:
-
-1. refresh tracked bills, sponsors, legislators, and scorecard snapshots
-2. rebuild the future-bill link audit
-3. run the AI review on risky links
-4. build the manual review queue and safe-removal report
-5. generate partial-link suggestions
-6. run candidate discovery only when unresolved rows still need it
-7. build the consolidated review bundle
-
-Main outputs:
-
-- `reports/equitystack_pipeline_report.json`
-- `reports/equitystack_review_bundle.json`
-
-## Shortest Safe Path
-
-Most days, use this sequence:
+## Canonical Operator Commands
 
 ```bash
 ./bin/equitystack legislative run
 ./bin/equitystack legislative review
 ./bin/equitystack legislative apply
+./bin/equitystack legislative import
+./bin/equitystack legislative feedback
 ```
 
 Legacy shortcuts still work:
@@ -49,118 +32,97 @@ Legacy shortcuts still work:
 ./bin/equitystack apply
 ```
 
-## Import Approved Tracked Bills Only When Needed
+## What `legislative run` Actually Does
 
-Run this only if the apply report wrote approved tracked-bill seed rows:
+The wrapper runs these stages in order:
+
+1. `run_equitystack_pipeline.py`
+2. `scripts/auto_triage_review_bundle.py --apply --yes --auto-approve-safe-actions`
+3. `scripts/build_review_bundle.py --csv --use-feedback`
+
+Inside `run_equitystack_pipeline.py`, the daily pipeline runs:
+
+1. `update_database.py`
+2. `scripts/review_future_bill_audit_with_ollama.py`
+3. `scripts/apply_future_bill_ai_review.py`
+4. `scripts/suggest_partial_future_bill_links.py`
+5. `scripts/find_candidate_tracked_bills.py` only when the suggestion output still needs discovery
+6. `scripts/build_review_bundle.py`
+
+Default review model:
+
+- `qwen3.5:27b`
+
+Primary outputs:
+
+- `reports/equitystack_pipeline_report.json`
+- `reports/future_bill_link_ai_review.json`
+- `reports/future_bill_link_manual_review_queue.json`
+- `reports/future_bill_link_partial_suggestions.json`
+- `reports/future_bill_candidate_discovery.json`
+- `reports/equitystack_review_bundle.json`
+
+## Safe Operator Path
+
+Most days:
+
+```bash
+./bin/equitystack legislative run
+./bin/equitystack legislative review
+./bin/equitystack legislative apply
+```
+
+Use these only when needed:
 
 ```bash
 ./bin/equitystack legislative import
-```
-
-Refresh feedback analysis when needed:
-
-```bash
 ./bin/equitystack legislative feedback
 ```
 
-## Use This Only When Needed
+## Dry-Run And Mutating Stages
 
-Rebuild the bundle without rerunning the whole pipeline:
+- `review_future_bill_audit_with_ollama.py` is advisory.
+- `apply_future_bill_ai_review.py` is dry-run unless `--apply --yes` is supplied.
+- `suggest_partial_future_bill_links.py` never mutates the DB.
+- `find_candidate_tracked_bills.py` never mutates the DB unless you explicitly write a seed file.
+- `import_approved_tracked_bills.py` is dry-run unless `--apply --yes` is supplied.
+- `apply_review_bundle.py` is mutating and should only be run through the normal approval path.
 
-```bash
-python3 scripts/build_review_bundle.py --csv --use-feedback
-```
+## Environment Notes
 
-Preview auto-triage decisions:
+- Production Ollama is `http://10.10.0.60:11434`.
+- DB-backed legislative helpers now honor runtime env overrides such as `DB_HOST=10.10.0.13`.
+- `import_tracked_bills.py` also honors `CONGRESS_API_KEY` from the runtime environment.
+- Preferred local path: rebuild `python/venv` with `./bin/bootstrap-python-env`.
+- Fallback override: `EQUITYSTACK_PYTHON_BIN=/path/to/python`.
 
-```bash
-python3 scripts/auto_triage_review_bundle.py --dry-run
-```
-
-Persist only the conservative safe-action auto-approvals:
-
-```bash
-python3 scripts/auto_triage_review_bundle.py --apply --yes --auto-approve-safe-actions
-```
-
-Refresh operator feedback analysis:
+Example production-style dry run:
 
 ```bash
-python3 scripts/analyze_feedback.py
+EQUITYSTACK_PYTHON_BIN=/path/to/python \
+DB_HOST=10.10.0.13 \
+python3 scripts/import_approved_tracked_bills.py --input reports/approved_tracked_bills_seed.json
 ```
 
-## Advanced And Debug Only
+## Lower-Level Scripts
 
-Use these only when you need to inspect or rerun a specific stage without the wrapper.
+Primary supporting scripts:
 
-Low-level legislative refresh without the full review bundle:
+- `update_database.py`
+- `scripts/review_future_bill_audit_with_ollama.py`
+- `scripts/apply_future_bill_ai_review.py`
+- `scripts/suggest_partial_future_bill_links.py`
+- `scripts/find_candidate_tracked_bills.py`
+- `scripts/build_review_bundle.py`
+- `scripts/review_bundle_actions.py`
+- `scripts/apply_review_bundle.py`
+- `scripts/import_approved_tracked_bills.py`
+- `scripts/analyze_feedback.py`
 
-```bash
-python3 update_database.py
-```
+Helper / maintenance scripts:
 
-Direct AI review of the audit:
-
-```bash
-python3 scripts/review_future_bill_audit_with_ollama.py --model qwen3.5:latest --csv
-```
-
-Direct safe-removal stage:
-
-```bash
-python3 scripts/apply_future_bill_ai_review.py \
-  --input reports/future_bill_link_ai_review.json \
-  --csv
-```
-
-Suggestion stage only:
-
-```bash
-python3 scripts/suggest_partial_future_bill_links.py \
-  --input-review-report reports/future_bill_link_ai_review.json \
-  --input-manual-queue reports/future_bill_link_manual_review_queue.json \
-  --top-k 5 \
-  --csv
-```
-
-Discovery stage only:
-
-```bash
-python3 scripts/find_candidate_tracked_bills.py \
-  --trigger-from-suggestions reports/future_bill_link_partial_suggestions.json \
-  --trigger-from-review reports/future_bill_link_ai_review.json \
-  --top-k 5 \
-  --csv
-```
-
-## Primary Entrypoints
-
-- `bin/equitystack legislative run`: default daily command
-- `bin/equitystack legislative review`: manual approval loop
-- `bin/equitystack legislative apply`: apply approved bundle actions and rebuild bundle
-- `bin/equitystack legislative import`: import approved seed rows when present
-- `bin/equitystack legislative feedback`: refresh feedback analysis and rebuild bundle
-
-## Helper And Debug Scripts
-
-- `update_database.py`: refresh-only wrapper around the sync and audit layer
-- `scripts/run_all_updates.py`: lower-level refresh entrypoint used by `update_database.py`
-- `scripts/build_review_bundle.py`: rebuild bundle from existing reports
-- `scripts/auto_triage_review_bundle.py`: optional score-based auto-triage
-- `scripts/analyze_feedback.py`: update feedback analysis report
-- `scripts/review_future_bill_audit_with_ollama.py`: review audit output directly
-- `scripts/apply_future_bill_ai_review.py`: direct safe-removal stage
-- `scripts/suggest_partial_future_bill_links.py`: suggestion stage only
-- `scripts/find_candidate_tracked_bills.py`: discovery stage only
-
-## De-Emphasized In Operator Docs
-
-These exist, but they are not part of the normal operator path:
-
-- `run_legislative_updates.sh`: thin shell wrapper for `update_database.py`
-- `scripts/import_tracked_bills.py`: low-level tracked-bill sync internals
-- `scripts/import_legislators_from_tracked_bills.py`: low-level legislator sync internals
-- `scripts/audit_future_bill_links.py`: low-level deterministic audit stage
-- `scripts/import_policies.py`: policy-pack import utility, not part of the daily pipeline
-- `scripts/import_audit.py`: enrichment import utility, not part of the daily pipeline
-- `scripts/audit_policy_pack_duplicates.py`: policy-pack duplicate audit helper
+- `scripts/import_tracked_bills.py`
+- `scripts/import_legislators_from_tracked_bills.py`
+- `scripts/audit_future_bill_links.py`
+- `scripts/run_all_updates.py`
+- `scripts/auto_triage_review_bundle.py`

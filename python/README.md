@@ -1,8 +1,8 @@
 # EquityStack Python Workflows
 
-Start here if you are running the Python side of EquityStack.
+This directory contains the operator-facing Python workflows for EquityStack.
 
-From the repo root:
+Work from:
 
 ```bash
 cd python
@@ -14,32 +14,61 @@ Main CLI:
 ./bin/equitystack --help
 ```
 
-There are two separate workflows here:
+## Local Python Bootstrap
 
-- Legislative / future-bills
+Recommended local setup from the repo root:
+
+```bash
+cd python
+./bin/bootstrap-python-env
+```
+
+That script:
+
+- rebuilds `python/venv` in place with a local path
+- upgrades `pip`
+- installs `requirements-local.txt`
+
+Manual equivalent:
+
+```bash
+cd python
+python3 -m venv --clear venv
+./venv/bin/python -m pip install --upgrade pip
+./venv/bin/python -m pip install -r requirements-local.txt
+```
+
+## Verified Environment Rules
+
+- The CLI is self-locating. It resolves the Python workspace from `python/bin/equitystack`.
+- Production Ollama is remote: `http://10.10.0.60:11434`.
+- Review and decision steps should use `qwen3.5:27b`.
+- Lightweight discovery-style AI steps should use `qwen3.5:9b`.
+- DB-backed scripts read `.env.local`, but legislative helpers now also honor runtime env overrides such as `DB_HOST=10.10.0.13`.
+- `python/venv` is the preferred local-dev interpreter after bootstrap.
+- If local `python/venv` is unavailable, you can point the wrapper at another interpreter with `EQUITYSTACK_PYTHON_BIN=/path/to/python`.
+
+Example production-style local verification:
+
+```bash
+EQUITYSTACK_PYTHON_BIN=/path/to/python \
+DB_HOST=10.10.0.13 \
+./bin/equitystack current-admin status
+```
+
+## Workflows
+
+- Legislative / future bills
 - Current-administration Promise Tracker
 
-Do not mix them together.
-
-## Read This First
-
-If you are doing daily current-admin work, read this first:
+Read these next:
 
 - `CURRENT_ADMIN_DAILY.md`
-
-If you need the full system explanation, read:
-
 - `CURRENT_ADMIN_PIPELINE.md`
-
-If you are doing the legislative workflow, read:
-
 - `LEGISLATIVE_PIPELINE.md`
-
-If you want a very short checklist, read:
-
 - `OPERATIONS.md`
 
-## Current-Admin Shortest Safe Path
+## Current-Admin Safe Path
 
 From `python/`:
 
@@ -54,13 +83,15 @@ From `python/`:
 
 Important:
 
-- the Python pipeline is the canonical current-admin workflow
-- the dashboard is for visibility and guidance only
-- pre-commit is read-only
-- import is dry-run by default
-- database writes only happen with explicit apply confirmation
+- `workflow start` runs `normalize -> review -> queue`.
+- `workflow review` only generates a decision template.
+- `workflow finalize` writes a decision log under `reports/current_admin/review_decisions/*.decision-log.json`.
+- `pre-commit` is read-only.
+- `import` is dry-run by default.
+- database writes only happen with `--apply --yes`.
+- `current-admin status` prints the current state machine and next step.
 
-## Legislative Shortest Safe Path
+## Legislative Safe Path
 
 From `python/`:
 
@@ -70,47 +101,16 @@ From `python/`:
 ./bin/equitystack legislative apply
 ```
 
-## Most Common Commands
+Important:
 
-Current-admin:
-
-```bash
-./bin/equitystack current-admin status
-./bin/equitystack current-admin workflow start --input data/current_admin_batches/<batch-file>.json
-./bin/equitystack current-admin workflow review --input reports/current_admin/<batch-name>.ai-review.json --output /tmp/<batch-name>.decision-template.json
-./bin/equitystack current-admin workflow finalize --review reports/current_admin/<batch-name>.ai-review.json --decision-file /tmp/<batch-name>.decision-template.json --log-decisions
-./bin/equitystack current-admin pre-commit --input reports/current_admin/<batch-name>.manual-review-queue.json
-./bin/equitystack current-admin workflow resume
-```
-
-Legislative:
-
-```bash
-./bin/equitystack legislative run
-./bin/equitystack legislative review
-./bin/equitystack legislative apply
-./bin/equitystack legislative import
-./bin/equitystack legislative feedback
-```
+- `legislative run` executes the daily pipeline, auto-triages safe bundle actions, then rebuilds the review bundle.
+- the daily AI review step now defaults to `qwen3.5:27b`.
+- `legislative import` is dry-run unless `--apply --yes` is passed to the underlying script directly.
 
 ## Directory Notes
 
-- `bin/equitystack` is the main operator entrypoint
-- `data/current_admin_batches/` stores curated current-admin batch files
-- `reports/current_admin/` stores current-admin review artifacts
-- `scripts/` stores the lower-level Python entrypoints
-
-## Dashboard Role
-
-The dashboard is useful for:
-
-- review visibility
-- pre-commit readiness visibility
-- decision/session visibility
-- next-command guidance
-
-The dashboard is not for:
-
-- generating AI reviews
-- importing records
-- replacing the Python workflow
+- `bin/equitystack`: main operator entrypoint
+- `data/current_admin_batches/`: curated current-admin batches and discovery exports
+- `reports/current_admin/`: durable current-admin artifacts
+- `reports/`: legislative pipeline artifacts
+- `scripts/`: lower-level Python entrypoints

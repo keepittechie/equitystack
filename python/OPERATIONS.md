@@ -2,19 +2,14 @@
 
 Work from `python/`.
 
-## Read This First
+## Environment Defaults
 
-Daily current-admin work:
-
-- `CURRENT_ADMIN_DAILY.md`
-
-Full current-admin system reference:
-
-- `CURRENT_ADMIN_PIPELINE.md`
-
-Legislative workflow:
-
-- `LEGISLATIVE_PIPELINE.md`
+- Production Ollama: `http://10.10.0.60:11434`
+- Review / decision model: `qwen3.5:27b`
+- Discovery model: `qwen3.5:9b`
+- Preferred local Python setup: `cd python && ./bin/bootstrap-python-env`
+- Fallback interpreter override: `EQUITYSTACK_PYTHON_BIN=/path/to/python`
+- For production-style DB access from local dev, override `DB_HOST=10.10.0.13`
 
 ## Daily Legislative Flow
 
@@ -35,14 +30,8 @@ Legislative workflow:
 7. Only when ready: `./bin/equitystack current-admin import --input reports/current_admin/<batch-name>.manual-review-queue.json --apply --yes`
 8. `./bin/equitystack current-admin validate --input reports/current_admin/<batch-name>.manual-review-queue.json`
 
-## When You Are Stuck
+## Fast Recovery Commands
 
 - `./bin/equitystack current-admin status`
 - `./bin/equitystack current-admin workflow resume`
-
-## Optional Extras
-
-- Deep review: add `--deep-review` to `workflow start`
-- Focus risky items first: `current-admin review --priority high,medium --attention-needed --preview`
-- Export a worklist: `current-admin review --suggested-batch high_attention --export-worklist /tmp/high_attention.json`
-- Export analytics: `node scripts/export_current_admin_feedback_summary.mjs`
+- `./bin/equitystack legislative review`
