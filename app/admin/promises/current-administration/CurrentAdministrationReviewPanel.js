@@ -22,6 +22,22 @@ function formatTimestamp(value) {
   }
 }
 
+function formatDateValue(value) {
+  if (!value) {
+    return "Unavailable";
+  }
+
+  try {
+    return new Intl.DateTimeFormat("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    }).format(new Date(value));
+  } catch {
+    return String(value);
+  }
+}
+
 export default function CurrentAdministrationReviewPanel({
   item,
   draft,
@@ -51,7 +67,7 @@ export default function CurrentAdministrationReviewPanel({
       <section className="border rounded-2xl p-5 bg-white shadow-sm">
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <div>
-            <h2 className="text-lg font-semibold">Staging AI Review</h2>
+            <h2 className="text-lg font-semibold">Legacy Staging AI Review</h2>
             <p className="text-sm text-gray-700 mt-1">
               Historical staging-only AI notes can still be viewed here, but the canonical
               current-admin AI review now runs through the Python artifact pipeline.
@@ -219,6 +235,13 @@ export default function CurrentAdministrationReviewPanel({
               Direct staging approval and promotion are disabled here so the web admin cannot bypass
               the canonical artifact workflow, decision logs, pre-commit, or dry-run import.
             </p>
+            <p className="mt-2">
+              Treat this page as supporting context only. The real action-oriented workspace is{" "}
+              <Link href="/admin/current-admin-review" className="underline">
+                Current Admin Review
+              </Link>
+              .
+            </p>
           </div>
 
           <label className="block text-sm font-medium">
@@ -295,7 +318,7 @@ export default function CurrentAdministrationReviewPanel({
                 <p><strong>Title:</strong> {draft?.draft_promise?.title}</p>
                 <p><strong>Status:</strong> {draft?.draft_promise?.status}</p>
                 <p><strong>Type:</strong> {draft?.draft_promise?.promise_type}</p>
-                <p><strong>Date:</strong> {draft?.draft_promise?.promise_date || "Unavailable"}</p>
+                <p><strong>Date:</strong> {formatDateValue(draft?.draft_promise?.promise_date)}</p>
               </div>
             )}
           </div>

@@ -51,3 +51,26 @@ Work from `python/`.
 - `./bin/equitystack current-admin status`
 - `./bin/equitystack current-admin workflow resume`
 - `./bin/equitystack legislative review`
+## Fresh Walkthrough Reset
+
+Use the operational reset command before a demo or walkthrough when old reports, logs, operator history,
+or recommendation feedback are making the admin control surface noisy:
+
+```bash
+./bin/equitystack admin-reset-operational-state --dry-run
+./bin/equitystack admin-reset-operational-state --apply --yes
+```
+
+What it archives:
+- admin operator history
+- recommendation feedback history
+- current-admin report artifacts
+- legislative report artifacts
+- EquityStack log files
+
+What it does not touch:
+- database content
+- canonical policy data
+- source files
+
+The command archives operational artifacts under `python/reports/admin_resets/<timestamp>/`.

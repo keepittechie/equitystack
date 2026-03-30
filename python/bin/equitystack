@@ -1370,6 +1370,7 @@ main_usage() {
 Usage:
   equitystack legislative <command> [args]
   equitystack current-admin <command> [args]
+  equitystack admin-reset-operational-state [--dry-run | --apply --yes]
 
 Shared runtime defaults:
   verifier AI:      $DEFAULT_MODEL_VERIFIER
@@ -1406,12 +1407,41 @@ Current-admin workflow subcommands:
   workflow finalize     Log explicit operator decisions against a canonical review artifact
   workflow resume       Show the latest current-admin session and recommended next step
 
+Operational maintenance:
+  admin-reset-operational-state   Archive non-canonical run-state artifacts for a fresh walkthrough
+
 Examples:
   $(cli_hint) legislative run
   $(cli_hint) legislative run --model qwen3.5:27b
   $(cli_hint) current-admin status
+  $(cli_hint) admin-reset-operational-state --dry-run
   $(cli_hint) current-admin workflow start --input data/current_admin_batches/<batch-file>.json
   $(cli_hint) current-admin workflow review --input reports/current_admin/<batch-name>.ai-review.json --output /tmp/<batch-name>.decision-template.json
+EOF
+}
+
+admin_reset_operational_state_usage() {
+  cat <<EOF
+Usage:
+  equitystack admin-reset-operational-state [--dry-run | --apply --yes]
+
+Archives operational run-state artifacts for a clean walkthrough baseline.
+
+This reset affects only:
+  - operator history
+  - recommendation feedback history
+  - current-admin report artifacts
+  - legislative report artifacts
+  - EquityStack log files
+
+This reset does NOT touch:
+  - database content
+  - canonical policy data
+  - source files
+
+Examples:
+  $(cli_hint) admin-reset-operational-state --dry-run
+  $(cli_hint) admin-reset-operational-state --apply --yes
 EOF
 }
 
@@ -1652,6 +1682,15 @@ EOF
 case "${1:-}" in
   ""|-h|--help|help)
     main_usage
+    ;;
+  admin-reset-operational-state)
+    shift
+    if [ "${1:-}" = "--help" ] || [ "${1:-}" = "-h" ]; then
+      admin_reset_operational_state_usage
+      exit 0
+    fi
+    run_step "1/1" "Reset Operational State" "Operational artifacts archived for a fresh walkthrough" -- \
+      "$VENV_PYTHON" scripts/admin_reset_operational_state.py "$@"
     ;;
   legislative)
     shift

@@ -104,6 +104,28 @@ export default async function AdminRunbookPage() {
         </div>
       </section>
 
+      <section className="border rounded-2xl p-5 bg-white shadow-sm">
+        <h2 className="text-xl font-semibold">Fresh Walkthrough Reset</h2>
+        <div className="mt-4 space-y-3 text-sm text-gray-700">
+          <p>
+            Before a fresh demo or walkthrough, you can archive old operational artifacts so the
+            dashboard, recommendations, operator history, and pipeline reports start from a clean baseline.
+          </p>
+          <p>
+            The safe reset command is:
+            <code className="ml-2 rounded bg-gray-100 px-2 py-1">./bin/equitystack admin-reset-operational-state --dry-run</code>
+          </p>
+          <p>
+            To apply it after reviewing the dry-run output:
+            <code className="ml-2 rounded bg-gray-100 px-2 py-1">./bin/equitystack admin-reset-operational-state --apply --yes</code>
+          </p>
+          <p>
+            This archives operational run-state only. It does not remove canonical policy data, database content,
+            or source files.
+          </p>
+        </div>
+      </section>
+
       <section className="grid gap-6 xl:grid-cols-2">
         <div className="border rounded-2xl p-5 bg-white shadow-sm">
           <h2 className="text-xl font-semibold">How to Respond</h2>

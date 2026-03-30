@@ -111,15 +111,14 @@ export default async function CurrentAdministrationReviewPage({ searchParams }) 
     <main className="max-w-7xl mx-auto p-6 space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="text-sm text-gray-600">Internal review workflow</p>
+          <p className="text-sm text-gray-600">Legacy staging intake browser</p>
           <h1 className="text-3xl font-bold mt-1">
-            Current-Administration Staging
+            Current-Administration Staging Intake
           </h1>
           <p className="text-gray-700 mt-3 max-w-3xl">
-            Browse legacy White House intake candidates and their historical AI
-            staging notes. Canonical current-admin review, decision logging,
-            pre-commit, and import now run through the Python artifact workflow
-            surfaced in the dedicated admin pages, not through this legacy staging UI.
+            Use this page to inspect older White House staging candidates, promotion drafts,
+            and historical staging-only AI notes. It is supporting context for current-admin
+            operations, not the live approval queue or canonical workflow workspace.
           </p>
         </div>
 
@@ -135,6 +134,15 @@ export default async function CurrentAdministrationReviewPage({ searchParams }) 
           </Link>
         </div>
       </div>
+
+      <section className="rounded-2xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950">
+        <p className="font-semibold">What this page is for</p>
+        <p className="mt-2">
+          This is a legacy intake browser only. Use it when you need background on older staged
+          items or promotion drafts. For live current-admin review, decision logging, pre-commit,
+          and import readiness, use the dedicated workflow pages linked above.
+        </p>
+      </section>
 
       <section className="border rounded-2xl p-4 bg-white">
         <div className="flex flex-wrap gap-2">

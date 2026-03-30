@@ -1,5 +1,8 @@
 import Link from "next/link";
-import { getOperatorConsoleState } from "@/lib/services/operatorConsoleService";
+import {
+  getOperatorConsoleQuickActions,
+  getOperatorConsoleState,
+} from "@/lib/services/operatorConsoleService";
 import OperatorConsole from "./OperatorConsole";
 
 export const dynamic = "force-dynamic";
@@ -12,15 +15,61 @@ function pickQueryValue(value) {
 }
 
 export default async function OperatorConsolePage({ searchParams }) {
-  const state = await getOperatorConsoleState();
   const resolvedSearchParams = searchParams ? await searchParams : {};
+  let state;
+  let loadError = "";
+
+  try {
+    state = await getOperatorConsoleState();
+  } catch (error) {
+    console.error("operator console page load failed:", error);
+    const quickActions = await getOperatorConsoleQuickActions();
+    state = {
+      quick_actions: quickActions,
+      history: [],
+      initial_trace: {
+        user_input: null,
+        mapped_action_id: null,
+        action_label: "Operator Console Safe Fallback",
+        execution_path: "Read-only page fallback after operator-console state load failure",
+        status: "failed",
+        summary:
+          "Operator Console loaded in safe fallback mode because its server-side state could not be assembled completely.",
+        blocked_reason: null,
+        failure_reason:
+          error instanceof Error
+            ? error.message
+            : "Unknown operator-console state load failure.",
+        execution_duration_ms: null,
+        was_blocked: false,
+        had_artifacts: false,
+        artifact_references: [],
+        contextual_recommendations: [],
+        next_recommended_step: {
+          label: "Return to Dashboard",
+          href: "/admin",
+        },
+        safety_note:
+          "No commands were run. This fallback keeps the console read-only until state loads cleanly again.",
+        retry_guidance:
+          "Check the dashboard and logs first, then retry a registry-backed action only after confirming workflow state.",
+        command: null,
+        stdout: "",
+        stderr: "",
+      },
+    };
+    loadError =
+      "Operator Console state could not be loaded fully. The page is showing a safe fallback instead of failing completely.";
+  }
+
   const requestedActionId = pickQueryValue(resolvedSearchParams?.action_id);
   const requestedInput = pickQueryValue(resolvedSearchParams?.input);
   const matchedAction = state.quick_actions.find((action) => action.id === requestedActionId);
   const initialInput = matchedAction?.canonical_input || requestedInput || "";
   const initialActionId = matchedAction?.id || "";
-  const initialNotice =
-    requestedActionId && !matchedAction
+  const initialNotice = loadError
+    ? loadError
+    : requestedActionId && !matchedAction
       ? "The requested operator action is no longer available. Review the registry-backed actions below before running anything."
       : requestedInput && !matchedAction
         ? "The prefilled text did not map to a current registry action. Select a suggested action before running anything."
@@ -43,6 +92,11 @@ export default async function OperatorConsolePage({ searchParams }) {
           </Link>
           . This console remains supervised, registry-driven, and inside the existing guardrails.
         </p>
+        {loadError ? (
+          <div className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950">
+            {loadError}
+          </div>
+        ) : null}
       </section>
 
       <OperatorConsole

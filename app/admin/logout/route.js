@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
-export async function GET(request) {
-  const destination = new URL("/", request.url);
+export async function GET() {
+  const destination = new URL("https://equitystack.org");
   return NextResponse.redirect(destination, {
     status: 302,
     headers: {
