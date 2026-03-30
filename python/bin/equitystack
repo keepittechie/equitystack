@@ -1685,11 +1685,20 @@ case "${1:-}" in
     ;;
   admin-reset-operational-state)
     shift
+    reset_success_message="Operational reset preview complete"
+    reset_step_title="Preview Operational Reset"
     if [ "${1:-}" = "--help" ] || [ "${1:-}" = "-h" ]; then
       admin_reset_operational_state_usage
       exit 0
     fi
-    run_step "1/1" "Reset Operational State" "Operational artifacts archived for a fresh walkthrough" -- \
+    for arg in "$@"; do
+      if [ "$arg" = "--apply" ]; then
+        reset_success_message="Operational artifacts archived for a fresh walkthrough"
+        reset_step_title="Reset Operational State"
+        break
+      fi
+    done
+    run_step "1/1" "$reset_step_title" "$reset_success_message" -- \
       "$VENV_PYTHON" scripts/admin_reset_operational_state.py "$@"
     ;;
   legislative)

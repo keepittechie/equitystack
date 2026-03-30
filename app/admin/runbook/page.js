@@ -36,15 +36,17 @@ export default async function AdminRunbookPage() {
             <div>
               <p className="font-semibold">Dashboard / Command Center</p>
               <p className="mt-1">
-                Read, understand, and navigate. Use it to see attention items, workflow state,
-                operator insights, friction, and recommendations.
+                Start here first. Use it to understand workflow state, see what is blocked or ready,
+                review attention items and recommendations, and decide which page should be opened next.
+                The dashboard is for reading and navigation, not for running commands directly.
               </p>
             </div>
             <div>
               <p className="font-semibold">Operator Console</p>
               <p className="mt-1">
-                Run only approved registry-backed actions through the existing wrapped backend/CLI
-                path. It can summarize, inspect, and trigger safe supervised commands.
+                Use this when you intentionally want to run an approved registry-backed action after
+                checking the dashboard. It can summarize state, inspect readiness, and run safe
+                supervised discovery, status, pre-commit, or dry-run commands through the existing wrapped backend/CLI path.
               </p>
             </div>
             <div>
