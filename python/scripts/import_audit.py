@@ -30,6 +30,9 @@ def get_db_connection():
     env_file = project_root / ".env.local"
 
     env_values = load_env_file(env_file)
+    for key in ("DB_HOST", "DB_PORT", "DB_USER", "DB_PASSWORD", "DB_NAME"):
+        if os.environ.get(key):
+            env_values[key] = os.environ[key]
 
     return pymysql.connect(
         host=env_values.get("DB_HOST", "127.0.0.1"),

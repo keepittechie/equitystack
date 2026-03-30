@@ -13,7 +13,7 @@ import requests
 
 
 DEFAULT_OLLAMA_URL = "http://10.10.0.60:11434"
-DEFAULT_MODEL = "qwen3.5:latest"
+DEFAULT_MODEL = "qwen3.5:27b"
 FALLBACK_MODELS = ["qwen3:latest", "llama3.2:latest"]
 DEFAULT_TIMEOUT = 90
 DEFAULT_TEMPERATURE = 0.1

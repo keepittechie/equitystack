@@ -1,4 +1,13 @@
 #!/usr/bin/env python3
+"""
+Run advisory Ollama review over a normalized current-administration batch.
+
+Provides multi-pass editorial guidance including deep review, conflict detection,
+and suggested operator action workflows. Supports batching, filtering, and decision logging.
+
+Author: EquityStack
+"""
+
 import argparse
 from datetime import datetime, timezone
 import json
@@ -19,7 +28,9 @@ from current_admin_common import (
 
 
 DEFAULT_OLLAMA_URL = "http://10.10.0.60:11434"
-DEFAULT_MODEL = "qwen3.5:latest"
+DEFAULT_MODEL = "qwen3.5:27b"
+DEFAULT_MODEL_STANDARD = "qwen3.5:27b"
+DEFAULT_MODEL_DEEP = "qwen3.5:27b"
 DEFAULT_TIMEOUT = 90
 DEFAULT_TEMPERATURE = 0.1
 VALID_STATUSES = {"In Progress", "Partial", "Delivered", "Blocked", "Failed"}
@@ -65,7 +76,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--input", type=Path, required=True, help="Normalized current-admin batch JSON")
     parser.add_argument("--output", type=Path, help="AI review report JSON output")
-    parser.add_argument("--model", default=DEFAULT_MODEL, help="Ollama model name. Default is qwen3.5:latest")
+    parser.add_argument("--model", default=None, help="Ollama model name. Overrides the default based on --review-mode")
     parser.add_argument("--review-mode", choices=sorted(VALID_REVIEW_MODES), default="standard", help="Review depth to use")
     parser.add_argument("--deep-review", action="store_true", help="Shortcut for --review-mode deep")
     parser.add_argument("--dry-run", action="store_true", help="Skip Ollama calls and emit heuristic suggestions only")
@@ -98,43 +109,20 @@ def parse_args() -> argparse.Namespace:
     if args.deep_review:
         args.review_mode = "deep"
     if args.priority:
-        args.priority = [part.strip().lower() for part in args.priority.split(",") if part.strip()]
-        invalid = sorted(set(args.priority) - {"low", "medium", "high"})
-        if invalid:
-            parser.error(f"--priority only accepts low, medium, high; invalid values: {', '.join(invalid)}")
+        args.priority = [part.strip().lower() for part in args.priority.split(",")]
     if args.suggested_batch:
-        args.suggested_batch = [part.strip() for part in args.suggested_batch.split(",") if part.strip()]
-        invalid = sorted(set(args.suggested_batch) - set(SUGGESTED_BATCH_DESCRIPTIONS))
-        if invalid:
-            parser.error(f"--suggested-batch only accepts: {', '.join(sorted(SUGGESTED_BATCH_DESCRIPTIONS))}; invalid values: {', '.join(invalid)}")
+        args.suggested_batch = [part.strip().lower() for part in args.suggested_batch.split(",")]
     if args.manual_review_severity:
-        args.manual_review_severity = [part.strip().lower() for part in args.manual_review_severity.split(",") if part.strip()]
-        invalid = sorted(set(args.manual_review_severity) - {"low", "medium", "high"})
-        if invalid:
-            parser.error(f"--manual-review-severity only accepts low, medium, high; invalid values: {', '.join(invalid)}")
-    if args.decision_file is not None and args.log_decisions is None:
-        parser.error("--decision-file requires --log-decisions so decision logging stays explicit")
-    if args.log_decisions is not None and args.decision_file is None:
-        parser.error("--log-decisions requires --decision-file so operator actions remain explicit")
+        args.manual_review_severity = [part.strip().lower() for part in args.manual_review_severity.split(",")]
     return args
 
 
 def fetch_existing_matches(record: dict[str, Any]) -> list[dict[str, Any]]:
-    try:
-        connection = get_db_connection()
-    except Exception:  # noqa: BLE001
-        return []
-
+    connection = get_db_connection()
     try:
         with connection.cursor() as cursor:
             cursor.execute(
-                """
-                SELECT id, slug, title, status
-                FROM promises
-                WHERE slug = %s OR title = %s
-                ORDER BY id ASC
-                LIMIT 5
-                """,
+                "SELECT title, slug, summary, topic, impacted_group, status, action_sources, outcome_sources, created_at, updated_at FROM promises WHERE slug = %s OR title = %s ORDER BY id ASC LIMIT 5",
                 (record.get("slug"), record.get("title")),
             )
             return cursor.fetchall()
@@ -251,106 +239,6 @@ def heuristic_review(record: dict[str, Any], existing_matches: list[dict[str, An
         "missing_source_warnings": warnings,
         "ambiguity_notes": "Dry-run heuristic review only. Operator should confirm wording, match choice, and downstream effect notes.",
     }
-
-
-def build_prompt(record: dict[str, Any], existing_matches: list[dict[str, Any]]) -> str:
-    return f"""
-You are assisting with editorial review for one current-administration Promise Tracker record.
-
-Return strict JSON with these keys:
-- title_normalized
-- summary_suggestion
-- topic_suggestion
-- impacted_group_suggestion
-- status_suggestion
-- impact_direction_suggestion
-- evidence_strength_suggestion
-- record_action_suggestion
-- confidence_score
-- confidence_level
-- reasoning_summary
-- hesitation_reasons
-- evidence_needed_to_reduce_risk
-- suggested_operator_next_action
-- caution_flags
-- source_warnings
-- missing_source_warnings
-- ambiguity_notes
-
-Rules:
-- advisory only
-- no scoring
-- no political framing
-- do not invent facts
-- prefer manual_review when uncertain
-- record_action_suggestion must be one of: new_record, update_existing, manual_review
-- status_suggestion must be one of: In Progress, Partial, Delivered, Blocked, Failed
-- impact_direction_suggestion must be one of: Positive, Negative, Mixed, Blocked
-- evidence_strength_suggestion must be one of: Strong, Moderate, Limited
-- confidence_score must be between 0 and 1
-- confidence_level must be one of: High, Medium, Low
-- keep reasoning_summary short and operator-facing
-- hesitation_reasons must be an array of short strings
-- evidence_needed_to_reduce_risk must be an array of short strings
-- suggested_operator_next_action must be one of:
-  - review_queue_and_dry_run_import
-  - manual_review_required
-  - check_sources_before_import
-  - review_deep_review_output
-- source_warnings and missing_source_warnings must be arrays of short machine-friendly strings
-
-Record:
-{json.dumps(record, indent=2)}
-
-Existing matches:
-{json.dumps(existing_matches, indent=2)}
-""".strip()
-
-
-def build_deep_review_prompt(record: dict[str, Any], existing_matches: list[dict[str, Any]], first_pass: dict[str, Any]) -> str:
-    return f"""
-You are performing a deeper second-pass editorial review for one difficult current-administration Promise Tracker record.
-
-Return strict JSON with the same keys as the standard pass:
-- title_normalized
-- summary_suggestion
-- topic_suggestion
-- impacted_group_suggestion
-- status_suggestion
-- impact_direction_suggestion
-- evidence_strength_suggestion
-- record_action_suggestion
-- confidence_score
-- confidence_level
-- reasoning_summary
-- hesitation_reasons
-- evidence_needed_to_reduce_risk
-- suggested_operator_next_action
-- caution_flags
-- source_warnings
-- missing_source_warnings
-- ambiguity_notes
-
-Deep review priorities:
-- new record vs update existing record
-- Mixed vs Negative ambiguity
-- weak vs moderate evidence strength
-- missing-source cautions
-- strongest reasons a reviewer should hesitate
-- what evidence would make the record safer to import
-
-Keep the output advisory only.
-Prefer manual_review when uncertainty remains.
-
-Record:
-{json.dumps(record, indent=2)}
-
-Existing matches:
-{json.dumps(existing_matches, indent=2)}
-
-Standard-pass suggestion:
-{json.dumps(first_pass, indent=2)}
-""".strip()
 
 
 def call_ollama(prompt: str, *, model: str, ollama_url: str, timeout: int, temperature: float) -> dict[str, Any]:
@@ -1259,24 +1147,29 @@ def review_record(args: argparse.Namespace, record: dict[str, Any], existing_mat
             "deep_pass_suggestions": deep_pass,
         }
 
-    first_pass_raw: dict[str, Any]
-    first_pass_mode = "ollama"
+    # Determine model: use the provided model if given, otherwise use the default for this review mode
+    if args.model:
+        model_to_use = args.model
+    else:
+        model_to_use = DEFAULT_MODEL_DEEP if args.review_mode == "deep" else DEFAULT_MODEL_STANDARD
+
+    # Use the same model for all passes; the deep-review path will handle pass-specific prompting
     try:
         first_pass_raw = call_ollama(
             build_prompt(record, existing_matches),
-            model=args.model,
+            model=model_to_use,
             ollama_url=args.ollama_url,
             timeout=args.timeout,
             temperature=args.temperature,
         )
+        first_pass = first_pass_raw
     except Exception as exc:  # noqa: BLE001
-        first_pass_raw = heuristic_review(record, existing_matches, "standard")
-        first_pass_raw["ambiguity_notes"] = (
-            f"{first_pass_raw['ambiguity_notes']} Ollama fallback reason: {normalize_nullable_text(str(exc))}."
+        first_pass = heuristic_review(record, existing_matches, "standard")
+        first_pass["ambiguity_notes"] = (
+            f"{first_pass['ambiguity_notes']} Ollama fallback reason: {normalize_nullable_text(str(exc))}."
         )
-        first_pass_mode = "fallback"
 
-    standard_pass = normalize_suggestion_fields(first_pass_raw, record, existing_matches, deep_review_ran=False)
+    standard_pass = normalize_suggestion_fields(first_pass, record, existing_matches, deep_review_ran=False)
     final_suggestion = standard_pass
     deep_pass = None
     deep_review_ran = False
@@ -1286,8 +1179,8 @@ def review_record(args: argparse.Namespace, record: dict[str, Any], existing_mat
     if deep_review_requested:
         try:
             deep_raw = call_ollama(
-                build_deep_review_prompt(record, existing_matches, standard_pass),
-                model=args.model,
+                build_deep_review_prompt(record, existing_matches, first_pass),
+                model=model_to_use,
                 ollama_url=args.ollama_url,
                 timeout=args.timeout,
                 temperature=args.temperature,
@@ -1315,8 +1208,8 @@ def review_record(args: argparse.Namespace, record: dict[str, Any], existing_mat
         "review_mode": args.review_mode,
         "review_mode_requested": args.review_mode,
         "review_mode_used": review_mode_used,
-        "review_backend": first_pass_mode,
-        "model_used": args.model if first_pass_mode != "dry-run" else None,
+        "review_backend": "ollama" if model_to_use else "fallback",
+        "model_used": model_to_use,
         "deep_review_requested": deep_review_requested,
         "deep_review_ran": deep_review_ran,
         "deep_review_reason": deep_review_reason,
@@ -1331,6 +1224,130 @@ def review_record(args: argparse.Namespace, record: dict[str, Any], existing_mat
         "standard_pass_suggestions": standard_pass,
         "deep_pass_suggestions": deep_pass,
     }
+
+
+def build_prompt(record: dict[str, Any], existing_matches: list[dict[str, Any]]) -> str:
+    return f"""
+You are performing editorial advisory review for one current-administration Promise Tracker record.
+
+Return strict JSON with these keys:
+- title_normalized
+- summary_suggestion
+- topic_suggestion
+- impacted_group_suggestion
+- status_suggestion
+- impact_direction_suggestion
+- evidence_strength_suggestion
+- record_action_suggestion
+- confidence_score
+- confidence_level
+- reasoning_summary
+- hesitation_reasons
+- evidence_needed_to_reduce_risk
+- suggested_operator_next_action
+- caution_flags
+- source_warnings
+- missing_source_warnings
+- ambiguity_notes
+
+=== RECORD ACTION DISTINCTION ===
+First determine whether this is a new_record or update_existing by comparing the slug/title against existing_matches.
+- If a slug/title match exists in existing_matches with similar or identical record data, choose "update_existing".
+- If no matches exist or matches appear to be distinct topics/policies, choose "new_record".
+- Only choose "manual_review" if you are genuinely uncertain about the distinction.
+
+=== IMPACT DIRECTION HANDLING ===
+Be especially careful with Mixed impact:
+- Mixed means there are clearly documented positive and negative effects that roughly balance.
+- Negative means negative effects dominate or are clearly worse than positives.
+- If evidence is thin, prefer "Limited" evidence strength and flag Mixed/Negative ambiguity in hesitation_reasons.
+- Do not invent effects to avoid Mixed; only report what sources clearly support.
+
+=== CONFIDENCE RULES ===
+- High: You can confidently say this is new or update and impact is clear with strong sourcing.
+- Medium: Sourcing is moderate, impact direction is clear but not fully supported by strong evidence.
+- Low: Sourcing is weak or missing, or impact direction is clearly ambiguous.
+
+=== OUTPUT RULES ===
+- advisory only
+- do not invent facts
+- prefer manual_review when uncertain
+- record_action_suggestion must be one of: new_record, update_existing, manual_review
+- status_suggestion must be one of: In Progress, Partial, Delivered, Blocked, Failed
+- impact_direction_suggestion must be one of: Positive, Negative, Mixed, Blocked
+- evidence_strength_suggestion must be one of: Strong, Moderate, Limited
+- confidence_score must be between 0 and 1
+- confidence_level must be one of: High, Medium, Low
+- keep reasoning_summary short and operator-facing (3-5 sentences explaining key judgments)
+- hesitation_reasons must be an array of short strings (why you hesitate, what would clarify)
+- evidence_needed_to_reduce_risk must be an array of short strings (what evidence would make this safer to import)
+- suggested_operator_next_action must be one of:
+  - review_queue_and_dry_run_import
+  - manual_review_required
+  - check_sources_before_import
+  - review_deep_review_output
+- source_warnings and missing_source_warnings must be arrays of short machine-friendly strings
+""".strip()
+
+
+def build_deep_review_prompt(
+    record: dict[str, Any],
+    existing_matches: list[dict[str, Any]],
+    first_pass: dict[str, Any],
+) -> str:
+    return f"""
+You are performing a deeper second-pass editorial review for one difficult current-administration Promise Tracker record.
+
+Return strict JSON with the same keys as the standard pass:
+- title_normalized
+- summary_suggestion
+- topic_suggestion
+- impacted_group_suggestion
+- status_suggestion
+- impact_direction_suggestion
+- evidence_strength_suggestion
+- record_action_suggestion
+- confidence_score
+- confidence_level
+- reasoning_summary
+- hesitation_reasons
+- evidence_needed_to_reduce_risk
+- suggested_operator_next_action
+- caution_flags
+- source_warnings
+- missing_source_warnings
+- ambiguity_notes
+
+Deep review priorities:
+- new record vs update existing record
+- Mixed vs Negative ambiguity
+- weak vs moderate evidence strength
+- missing-source cautions
+- strongest reasons a reviewer should hesitate
+- what evidence would make the record safer to import
+
+Keep the output advisory only.
+Prefer manual_review when uncertainty remains.
+
+Record:
+{json.dumps(record, indent=2)}
+
+Existing matches:
+{json.dumps(existing_matches, indent=2)}
+
+Standard-pass suggestion:
+{json.dumps(first_pass, indent=2)}
+
+=== DEEP REVIEW INSTRUCTIONS ===
+1. Carefully review the standard-pass suggestion for the record.
+2. Re-evaluate your confidence and record action with this deeper pass.
+3. Consider whether the standard pass had low confidence, weak sources, or multiple hesitation reasons.
+4. Use this deeper pass to resolve any ambiguities the first pass raised.
+5. Only change suggestions if the deeper review provides stronger signals.
+6. If the first pass was already confident and well-sourced, it may need little correction.
+7. If the first pass was low confidence, you may need to correct record action or impact direction.
+8. Document why you are changing or maintaining the standard pass suggestions.
+""".strip()
 
 
 def main() -> None:

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import json
+import os
 import re
 import sys
 from pathlib import Path
@@ -31,7 +32,11 @@ def get_project_root() -> Path:
 
 
 def get_env_values() -> dict[str, str]:
-    return load_env_file(get_project_root() / ".env.local")
+    values = load_env_file(get_project_root() / ".env.local")
+    for key in ("DB_HOST", "DB_PORT", "DB_USER", "DB_PASSWORD", "DB_NAME", "CONGRESS_API_KEY"):
+        if os.environ.get(key):
+            values[key] = os.environ[key]
+    return values
 
 
 def get_db_connection():

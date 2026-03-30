@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Any
 
 
-DEFAULT_MODEL = "qwen3.5:latest"
+DEFAULT_MODEL = "qwen3.5:27b"
 
 
 def python_dir() -> Path:

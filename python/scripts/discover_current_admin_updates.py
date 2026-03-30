@@ -23,7 +23,7 @@ from current_admin_common import (
 
 
 DEFAULT_OLLAMA_URL = "http://10.10.0.60:11434"
-DEFAULT_MODEL = "qwen3.5:latest"
+DEFAULT_MODEL = "qwen3.5:9b"
 DEFAULT_TIMEOUT = 90
 DEFAULT_TEMPERATURE = 0.1
 DEFAULT_PRESIDENT_SLUG = "donald-j-trump-2025"

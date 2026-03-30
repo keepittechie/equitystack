@@ -11,7 +11,7 @@ from typing import Any
 import requests
 
 DEFAULT_OLLAMA_URL = "http://10.10.0.60:11434"
-DEFAULT_MODEL = "qwen3.5:latest"
+DEFAULT_MODEL = "qwen3.5:9b"
 DEFAULT_TIMEOUT = 300
 DEFAULT_TEMPERATURE = 0.1
 DEFAULT_TOP_K = 5

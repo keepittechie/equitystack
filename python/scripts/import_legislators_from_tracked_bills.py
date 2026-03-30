@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import os
 from pathlib import Path
 
 import pymysql
@@ -22,6 +23,9 @@ def load_env_file(env_path: Path) -> dict[str, str]:
 def get_db_connection():
     project_root = Path(__file__).resolve().parents[2]
     env_values = load_env_file(project_root / ".env.local")
+    for key in ("DB_HOST", "DB_PORT", "DB_USER", "DB_PASSWORD", "DB_NAME"):
+        if os.environ.get(key):
+            env_values[key] = os.environ[key]
 
     return pymysql.connect(
         host=env_values.get("DB_HOST", "127.0.0.1"),
