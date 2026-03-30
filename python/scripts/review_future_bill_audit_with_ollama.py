@@ -14,8 +14,11 @@ import requests
 
 DEFAULT_OLLAMA_URL = "http://10.10.0.60:11434"
 DEFAULT_MODEL = "qwen3.5:27b"
-FALLBACK_MODELS = ["qwen3:latest", "llama3.2:latest"]
-DEFAULT_TIMEOUT = 90
+DEFAULT_MODEL_VERIFIER = "qwen3.5:9b"
+DEFAULT_MODEL_FALLBACK = "qwen3.5:9b"
+DEFAULT_SENIOR_TIMEOUT = 300
+DEFAULT_VERIFIER_TIMEOUT = 240
+DEFAULT_TIMEOUT = DEFAULT_SENIOR_TIMEOUT
 DEFAULT_TEMPERATURE = 0.1
 DEFAULT_SEED = 7
 VALID_DECISIONS = {
@@ -116,12 +119,16 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--input", type=Path, default=get_default_input_path(), help="Path to future_bill_link_audit.json")
     parser.add_argument("--output", type=Path, default=get_default_output_path(), help="Path to write the AI review JSON report")
-    parser.add_argument("--model", default=DEFAULT_MODEL, help="Ollama model name")
+    parser.add_argument("--model", default=DEFAULT_MODEL, help="Senior review model name")
+    parser.add_argument("--verifier-model", default=DEFAULT_MODEL_VERIFIER, help="Verifier / first-pass model name")
+    parser.add_argument("--fallback-model", default=DEFAULT_MODEL_FALLBACK, help="Fallback review model name")
     parser.add_argument("--include-medium", action="store_true", help="Review medium-risk items in addition to high-risk items")
     parser.add_argument("--max-items", type=int, help="Limit the number of items reviewed after filtering")
     parser.add_argument("--only-link-id", type=int, help="Review only a single future_bill_link_id")
     parser.add_argument("--dry-run", action="store_true", help="Skip Ollama calls and emit placeholder manual-review rows")
-    parser.add_argument("--timeout", type=int, default=DEFAULT_TIMEOUT, help="Request timeout in seconds for each Ollama call")
+    parser.add_argument("--timeout", type=int, help="Legacy alias that sets both senior and verifier timeouts")
+    parser.add_argument("--senior-timeout", type=int, help="Timeout in seconds for the senior review model")
+    parser.add_argument("--verifier-timeout", type=int, help="Timeout in seconds for the verifier/fallback review model")
     parser.add_argument("--temperature", type=float, default=DEFAULT_TEMPERATURE, help="Sampling temperature passed to Ollama")
     parser.add_argument(
         "--csv",
@@ -130,7 +137,15 @@ def parse_args() -> argparse.Namespace:
         help="Optionally write a CSV review file. Pass a path or omit the value to derive one from --output.",
     )
     parser.add_argument("--ollama-url", default=DEFAULT_OLLAMA_URL, help="Base URL for the Ollama server")
-    return parser.parse_args()
+    args = parser.parse_args()
+    shared_timeout = args.timeout
+    args.senior_timeout = args.senior_timeout or shared_timeout or DEFAULT_SENIOR_TIMEOUT
+    args.verifier_timeout = args.verifier_timeout or shared_timeout or DEFAULT_VERIFIER_TIMEOUT
+    if args.senior_timeout <= 0:
+        parser.error("--senior-timeout must be greater than 0")
+    if args.verifier_timeout <= 0:
+        parser.error("--verifier-timeout must be greater than 0")
+    return args
 
 
 def load_audit_report(path: Path) -> dict[str, Any]:
@@ -155,37 +170,6 @@ def fetch_available_models(ollama_url: str, timeout_seconds: int) -> list[str]:
     return models
 
 
-def preferred_model_candidates(requested_model: str) -> list[str]:
-    candidates = [requested_model, *FALLBACK_MODELS]
-    family = re.match(r"[a-z]+", requested_model.lower())
-    family_name = family.group(0) if family else requested_model.split(":", 1)[0].lower()
-    if family_name == "qwen":
-        candidates.extend(["qwen3:latest"])
-    elif family_name == "llama":
-        candidates.extend(["llama3.2:latest"])
-    return candidates
-
-
-def resolve_model_name(requested_model: str, available_models: list[str]) -> tuple[str, str | None]:
-    available_set = {name.lower(): name for name in available_models}
-    if requested_model.lower() in available_set:
-        return available_set[requested_model.lower()], None
-
-    for candidate in preferred_model_candidates(requested_model):
-        if candidate.lower() in available_set:
-            return available_set[candidate.lower()], candidate
-
-    prefix_match = re.match(r"[a-z]+", requested_model.lower())
-    requested_prefix = prefix_match.group(0) if prefix_match else requested_model.split(":", 1)[0].lower()
-    for name in available_models:
-        candidate_prefix_match = re.match(r"[a-z]+", name.lower())
-        candidate_prefix = candidate_prefix_match.group(0) if candidate_prefix_match else name.split(":", 1)[0].lower()
-        if candidate_prefix == requested_prefix:
-            return name, name
-
-    return requested_model, None
-
-
 def select_rows(payload: dict[str, Any], include_medium: bool, only_link_id: int | None, max_items: int | None) -> list[dict[str, Any]]:
     selected = list(payload.get("high_risk") or [])
     if include_medium:
@@ -204,6 +188,14 @@ def select_rows(payload: dict[str, Any], include_medium: bool, only_link_id: int
 
 def normalize_whitespace(text: str | None) -> str:
     return re.sub(r"\s+", " ", (text or "")).strip()
+
+
+def first_nonempty_text(*values: Any) -> str | None:
+    for value in values:
+        normalized = normalize_whitespace(str(value)) if value not in (None, "") else ""
+        if normalized:
+            return normalized
+    return None
 
 
 def contains_any(text: str, phrases: set[str]) -> bool:
@@ -526,6 +518,31 @@ def call_ollama(prompt: str, model: str, ollama_url: str, timeout_seconds: int, 
     return body
 
 
+def call_ollama_with_retry(
+    prompt: str,
+    model: str,
+    ollama_url: str,
+    timeout_seconds: int,
+    temperature: float,
+) -> tuple[dict[str, Any] | None, int, list[str]]:
+    errors: list[str] = []
+    attempts = 0
+    for _ in range(2):
+        attempts += 1
+        try:
+            raw_text = call_ollama(prompt, model, ollama_url, timeout_seconds, temperature)
+            raw_payload = parse_json_response(raw_text)
+            return raw_payload, attempts, errors
+        except (json.JSONDecodeError, requests.RequestException, ValueError) as error:
+            errors.append(str(error))
+    return None, attempts, errors
+
+
+def build_retry_reason(label: str, errors: list[str]) -> str:
+    details = " | ".join(errors) if errors else "No error detail was returned."
+    return f"{label} failed after one retry: {details}"
+
+
 def parse_json_response(text: str) -> dict[str, Any]:
     candidate = text.strip()
     if candidate.startswith("```"):
@@ -798,36 +815,86 @@ def normalize_model_result(raw: dict[str, Any], row: dict[str, Any], heuristics:
 def review_row(
     row: dict[str, Any],
     model: str,
+    verifier_model: str,
+    fallback_model: str,
     ollama_url: str,
-    timeout_seconds: int,
+    senior_timeout_seconds: int,
+    verifier_timeout_seconds: int,
     temperature: float,
     dry_run: bool,
 ) -> dict[str, Any]:
     heuristics = build_heuristic_context(row)
     timestamp = datetime.now(UTC).isoformat()
+    verifier_model_used = None
+    senior_model_used = None
+    effective_model = None
+    fallback_used = False
+    fallback_reason = None
+    review_backend = "dry_run" if dry_run else "ollama"
+    model_resolution_status = "dry_run" if dry_run else "exact_requested"
+    retry_count = 0
+    senior_attempted = False
+    senior_retry_attempted = False
+    verifier_attempted = False
+    verifier_retry_attempted = False
+    resolved_model = None
 
     if dry_run:
         normalized = fallback_review(row, "Dry run mode skipped the Ollama review call.", heuristics)
     else:
         prompt = build_prompt(row, heuristics)
-        errors: list[str] = []
-        normalized: dict[str, Any] | None = None
+        senior_payload, senior_attempts, senior_errors = call_ollama_with_retry(
+            prompt,
+            model,
+            ollama_url,
+            senior_timeout_seconds,
+            temperature,
+        )
+        senior_attempted = senior_attempts > 0
+        senior_retry_attempted = senior_attempts > 1
+        retry_count += max(0, senior_attempts - 1)
 
-        for _attempt in range(2):
-            try:
-                raw_text = call_ollama(prompt, model, ollama_url, timeout_seconds, temperature)
-                raw_payload = parse_json_response(raw_text)
-                normalized = normalize_model_result(raw_payload, row, heuristics)
-                break
-            except (json.JSONDecodeError, requests.RequestException, ValueError) as error:
-                errors.append(str(error))
-
-        if normalized is None:
-            normalized = fallback_review(
-                row,
-                f"Ollama response could not be normalized after one retry: {' | '.join(errors)}",
-                heuristics,
+        if senior_payload is not None:
+            normalized = normalize_model_result(senior_payload, row, heuristics)
+            senior_model_used = model
+            effective_model = model
+            resolved_model = model
+            review_backend = "ollama"
+        else:
+            senior_reason = build_retry_reason("Senior model", senior_errors)
+            verifier_payload, verifier_attempts, verifier_errors = call_ollama_with_retry(
+                prompt,
+                fallback_model,
+                ollama_url,
+                verifier_timeout_seconds,
+                temperature,
             )
+            verifier_attempted = verifier_attempts > 0
+            verifier_retry_attempted = verifier_attempts > 1
+            retry_count += max(0, verifier_attempts - 1)
+
+            if verifier_payload is not None:
+                normalized = normalize_model_result(verifier_payload, row, heuristics)
+                verifier_model_used = fallback_model
+                effective_model = fallback_model
+                resolved_model = fallback_model
+                review_backend = "fallback"
+                fallback_used = True
+                fallback_reason = senior_reason
+                model_resolution_status = "senior_failed_using_fallback_model"
+            else:
+                verifier_reason = build_retry_reason("Verifier/fallback model", verifier_errors)
+                fallback_reason = (
+                    f"{senior_reason} Verifier/fallback model also failed after one retry: "
+                    f"{' | '.join(verifier_errors) if verifier_errors else 'No error detail was returned.'} "
+                    "Heuristic fallback used as last resort."
+                )
+                normalized = fallback_review(row, fallback_reason, heuristics)
+                review_backend = "heuristic_fallback"
+                fallback_used = True
+                effective_model = None
+                resolved_model = None
+                model_resolution_status = "senior_and_verifier_failed_using_heuristic"
 
     return {
         "future_bill_link_id": row["future_bill_link_id"],
@@ -857,6 +924,26 @@ def review_row(
         "final_decision": normalized["final_decision"],
         "recommended_action": normalized["recommended_action"],
         "suggested_new_link_type": normalized["suggested_new_link_type"],
+        "requested_model": model,
+        "effective_model": effective_model,
+        "resolved_model": resolved_model,
+        "review_backend": review_backend,
+        "fallback_used": fallback_used,
+        "fallback_reason": fallback_reason,
+        "model_resolution_status": model_resolution_status,
+        "timeout_seconds": senior_timeout_seconds,
+        "senior_timeout_seconds": senior_timeout_seconds,
+        "verifier_timeout_seconds": verifier_timeout_seconds,
+        "retry_count": retry_count,
+        "senior_attempted": senior_attempted,
+        "senior_retry_attempted": senior_retry_attempted,
+        "verifier_attempted": verifier_attempted,
+        "verifier_retry_attempted": verifier_retry_attempted,
+        "verifier_model_requested": verifier_model,
+        "verifier_model_used": verifier_model_used,
+        "senior_model_requested": model,
+        "senior_model_used": senior_model_used,
+        "fallback_model": fallback_model,
         "heuristic_flags": {
             "bias_remove": heuristics.bias_remove,
             "bias_partial": heuristics.bias_partial,
@@ -886,6 +973,7 @@ def build_summary(reviewed_items: list[dict[str, Any]]) -> dict[str, int]:
         "weak_matches_count": 0,
         "partial_matches_count": 0,
         "strong_matches_count": 0,
+        "fallback_count": 0,
     }
 
     for item in reviewed_items:
@@ -907,6 +995,8 @@ def build_summary(reviewed_items: list[dict[str, Any]]) -> dict[str, int]:
             summary["partial_matches_count"] += 1
         elif label == "strong_match":
             summary["strong_matches_count"] += 1
+        if item.get("fallback_used"):
+            summary["fallback_count"] += 1
 
     return summary
 
@@ -941,6 +1031,21 @@ def write_csv_report(path: Path, reviewed_items: list[dict[str, Any]]) -> None:
         "final_decision",
         "recommended_action",
         "suggested_new_link_type",
+        "requested_model",
+        "effective_model",
+        "resolved_model",
+        "review_backend",
+        "fallback_used",
+        "fallback_reason",
+        "model_resolution_status",
+        "timeout_seconds",
+        "senior_timeout_seconds",
+        "verifier_timeout_seconds",
+        "retry_count",
+        "senior_attempted",
+        "senior_retry_attempted",
+        "verifier_attempted",
+        "verifier_retry_attempted",
         "review_timestamp",
     ]
     with path.open("w", newline="") as handle:
@@ -954,19 +1059,40 @@ def write_json_report(
     path: Path,
     input_path: Path,
     requested_model: str,
-    resolved_model: str,
+    verifier_model: str,
+    fallback_model: str,
     include_medium: bool,
     dry_run: bool,
+    senior_timeout_seconds: int,
+    verifier_timeout_seconds: int,
     reviewed_items: list[dict[str, Any]],
 ) -> None:
+    effective_models = sorted({item.get("effective_model") for item in reviewed_items if item.get("effective_model")})
+    review_backends = sorted({item.get("review_backend") for item in reviewed_items if item.get("review_backend")})
+    fallback_reasons = sorted({item.get("fallback_reason") for item in reviewed_items if item.get("fallback_reason")})
+    model_statuses = sorted({item.get("model_resolution_status") for item in reviewed_items if item.get("model_resolution_status")})
     payload = {
         "generated_at": datetime.now(UTC).isoformat(),
         "input_report": str(input_path),
         "requested_model": requested_model,
-        "resolved_model": resolved_model,
-        "fallback_models": FALLBACK_MODELS,
+        "effective_model": effective_models[0] if len(effective_models) == 1 else ("mixed" if effective_models else None),
+        "resolved_model": effective_models[0] if len(effective_models) == 1 else ("mixed" if effective_models else None),
+        "review_backend": review_backends[0] if len(review_backends) == 1 else ("mixed" if review_backends else None),
+        "fallback_used": any(bool(item.get("fallback_used")) for item in reviewed_items),
+        "fallback_reason": fallback_reasons[0] if len(fallback_reasons) == 1 else ("Multiple fallback reasons; inspect item-level metadata." if fallback_reasons else None),
+        "model_resolution_status": model_statuses[0] if len(model_statuses) == 1 else ("mixed" if model_statuses else None),
+        "verifier_model": verifier_model,
+        "fallback_model": fallback_model,
         "review_scope": "high_and_medium_risk" if include_medium else "high_risk_only",
         "dry_run": dry_run,
+        "timeout_seconds": senior_timeout_seconds,
+        "senior_timeout_seconds": senior_timeout_seconds,
+        "verifier_timeout_seconds": verifier_timeout_seconds,
+        "retry_count": sum(int(item.get("retry_count") or 0) for item in reviewed_items),
+        "senior_attempted": any(bool(item.get("senior_attempted")) for item in reviewed_items),
+        "senior_retry_attempted": any(bool(item.get("senior_retry_attempted")) for item in reviewed_items),
+        "verifier_attempted": any(bool(item.get("verifier_attempted")) for item in reviewed_items),
+        "verifier_retry_attempted": any(bool(item.get("verifier_retry_attempted")) for item in reviewed_items),
         "summary": build_summary(reviewed_items),
         "items": reviewed_items,
     }
@@ -982,9 +1108,6 @@ def main() -> None:
     if args.max_items is not None and args.max_items <= 0:
         raise SystemExit("--max-items must be greater than 0")
 
-    if args.timeout <= 0:
-        raise SystemExit("--timeout must be greater than 0")
-
     if not 0.0 <= args.temperature <= 1.0:
         raise SystemExit("--temperature must be between 0.0 and 1.0")
 
@@ -999,27 +1122,14 @@ def main() -> None:
     if csv_path:
         csv_path.parent.mkdir(parents=True, exist_ok=True)
 
-    resolved_model = args.model
-    if not args.dry_run:
-        available_models = fetch_available_models(args.ollama_url, args.timeout)
-        resolved_model, matched_candidate = resolve_model_name(args.model, available_models)
-        if resolved_model != args.model:
-            print(f"Requested model {args.model} not found. Using {resolved_model} instead.")
-        elif matched_candidate is None and args.model not in available_models:
-            print(
-                "Requested model was not found on the Ollama server.",
-                file=sys.stderr,
-            )
-            print(
-                f"Available models: {', '.join(available_models) or 'none reported'}",
-                file=sys.stderr,
-            )
-            raise SystemExit(1)
-
     print("Future Bill Link AI Review")
     print(f"Input report: {input_path}")
     print(f"Selected items: {len(rows)}")
-    print(f"Model: {resolved_model}")
+    print(f"Senior model: {args.model}")
+    print(f"Verifier model: {args.verifier_model}")
+    print(f"Fallback model: {args.fallback_model}")
+    print(f"Senior timeout: {args.senior_timeout}s")
+    print(f"Verifier timeout: {args.verifier_timeout}s")
     print(f"Dry run: {'yes' if args.dry_run else 'no'}")
 
     reviewed_items = []
@@ -1031,21 +1141,38 @@ def main() -> None:
         reviewed_items.append(
             review_row(
                 row,
-                model=resolved_model,
+                model=args.model,
+                verifier_model=args.verifier_model,
+                fallback_model=args.fallback_model,
                 ollama_url=args.ollama_url,
-                timeout_seconds=args.timeout,
+                senior_timeout_seconds=args.senior_timeout,
+                verifier_timeout_seconds=args.verifier_timeout,
                 temperature=args.temperature,
                 dry_run=args.dry_run,
             )
+        )
+        latest_item = reviewed_items[-1]
+        print(
+            "  -> "
+            f"backend={latest_item['review_backend']} "
+            f"effective_model={latest_item.get('effective_model') or 'none'} "
+            f"retry_count={latest_item.get('retry_count', 0)} "
+            f"senior_attempted={'yes' if latest_item.get('senior_attempted') else 'no'} "
+            f"senior_retry={'yes' if latest_item.get('senior_retry_attempted') else 'no'} "
+            f"verifier_attempted={'yes' if latest_item.get('verifier_attempted') else 'no'} "
+            f"verifier_retry={'yes' if latest_item.get('verifier_retry_attempted') else 'no'}"
         )
 
     write_json_report(
         output_path,
         input_path,
         args.model,
-        resolved_model,
+        args.verifier_model,
+        args.fallback_model,
         args.include_medium,
         args.dry_run,
+        args.senior_timeout,
+        args.verifier_timeout,
         reviewed_items,
     )
     print(f"Wrote JSON report to {output_path}")
@@ -1060,7 +1187,8 @@ def main() -> None:
         f"keep_direct={summary['keep_direct_count']} | "
         f"change_to_partial={summary['change_to_partial_count']} | "
         f"remove_link={summary['remove_link_count']} | "
-        f"review_manually={summary['review_manually_count']}"
+        f"review_manually={summary['review_manually_count']} | "
+        f"fallbacks={summary['fallback_count']}"
     )
 
 

@@ -5,8 +5,10 @@ Work from `python/`.
 ## Environment Defaults
 
 - Production Ollama: `http://10.10.0.60:11434`
-- Review / decision model: `qwen3.5:27b`
-- Discovery model: `qwen3.5:9b`
+- Senior review / decision model: `qwen3.5:27b`
+- Verifier / fallback model: `qwen3.5:9b`
+- Executor model: `rnj-1:latest`
+- Default Ollama timeout: `240`
 - Preferred local Python setup: `cd python && ./bin/bootstrap-python-env`
 - Fallback interpreter override: `EQUITYSTACK_PYTHON_BIN=/path/to/python`
 - For production-style DB access from local dev, override `DB_HOST=10.10.0.13`
@@ -29,6 +31,20 @@ Work from `python/`.
 6. `./bin/equitystack current-admin import --input reports/current_admin/<batch-name>.manual-review-queue.json`
 7. Only when ready: `./bin/equitystack current-admin import --input reports/current_admin/<batch-name>.manual-review-queue.json --apply --yes`
 8. `./bin/equitystack current-admin validate --input reports/current_admin/<batch-name>.manual-review-queue.json`
+
+## Admin Surface
+
+- `/admin/current-admin-review` is the canonical web approval surface for decision drafting and finalize.
+- `/admin/pre-commit` reruns and displays the canonical pre-commit artifact.
+- `/admin/import-history` wraps the canonical import and validation commands and enforces the same readiness gates as the CLI.
+- `/admin/legislative-workflow` is the legislative approval surface. It saves bundle approvals and wraps legislative apply/import dry-run and apply commands behind readiness checks.
+- `/admin/promises/current-administration` is now legacy intake visibility only and must not be used to bypass the artifact workflow.
+
+## Executor Boundary
+
+- `rnj-1` may preprocess, summarize, run approved wrapper commands, and assist with MCP tools.
+- `rnj-1` must not approve imports, bypass decision logs, bypass pre-commit, or bypass dry-run/apply checkpoints.
+- Operator approval remains the final control point.
 
 ## Fast Recovery Commands
 

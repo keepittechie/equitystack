@@ -63,11 +63,15 @@ After `validate`:
 
 ## Daily Safety Notes
 
-- Review and decision stages default to `qwen3.5:27b`.
+- Verifier review defaults to `qwen3.5:9b`.
+- Senior review and decision stages default to `qwen3.5:27b`.
+- Senior-review fallback defaults to `qwen3.5:9b`.
+- Ollama review timeout defaults to `240` seconds.
 - Production Ollama is remote: `http://10.10.0.60:11434`.
 - `current-admin status` is the fastest way to see the current state and next command.
 - `pre-commit` is read-only.
 - `import` is dry-run by default.
+- Review artifacts clearly stamp requested model, effective model, backend, and fallback status.
 - DB-backed commands honor runtime overrides such as `DB_HOST=10.10.0.13`.
 - Preferred local path: rebuild `python/venv` with `./bin/bootstrap-python-env`.
 - Fallback override: `EQUITYSTACK_PYTHON_BIN=/path/to/python`.

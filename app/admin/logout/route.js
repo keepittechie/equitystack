@@ -1,10 +1,11 @@
-export async function GET() {
-  return new Response("Admin session cleared. Revisit /admin to log in again.", {
-    status: 401,
+import { NextResponse } from "next/server";
+
+export async function GET(request) {
+  const destination = new URL("/", request.url);
+  return NextResponse.redirect(destination, {
+    status: 302,
     headers: {
-      "Content-Type": "text/plain; charset=utf-8",
       "Cache-Control": "no-store",
-      "WWW-Authenticate": 'Basic realm="Admin Area"',
     },
   });
 }

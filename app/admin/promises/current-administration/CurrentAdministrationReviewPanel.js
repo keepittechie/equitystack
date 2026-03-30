@@ -2,13 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState, useTransition } from "react";
-
-const REVIEW_ACTIONS = [
-  { label: "Approve", status: "approved" },
-  { label: "Reject", status: "rejected" },
-  { label: "Return to Pending", status: "pending_review" },
-];
+import { useState } from "react";
 
 function formatTimestamp(value) {
   if (!value) {
@@ -36,8 +30,6 @@ export default function CurrentAdministrationReviewPanel({
   const router = useRouter();
   const searchParams = useSearchParams();
   const [reviewNotes, setReviewNotes] = useState(item.review_notes || "");
-  const [message, setMessage] = useState("");
-  const [isPending, startTransition] = useTransition();
 
   const selectedExistingPromiseId =
     draft?.match_assessment?.selected_existing_promise_id != null
@@ -52,73 +44,6 @@ export default function CurrentAdministrationReviewPanel({
       params.set("existing_promise_id", nextExistingPromiseId);
     }
     router.push(`?${params.toString()}`);
-  }
-
-  async function mutateReviewStatus(status) {
-    setMessage("");
-    startTransition(async () => {
-      try {
-        const response = await fetch(
-          `/api/admin/current-administration-staging/${item.id}/status`,
-          {
-            method: "PATCH",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              status,
-              review_notes: reviewNotes,
-            }),
-          }
-        );
-
-        const payload = await response.json();
-        if (!response.ok) {
-          throw new Error(payload.error || "Failed to update status");
-        }
-
-        setMessage(`Review status updated to ${payload.item.review_status}.`);
-        router.refresh();
-      } catch (error) {
-        setMessage(error.message);
-      }
-    });
-  }
-
-  async function promoteItem() {
-    setMessage("");
-    startTransition(async () => {
-      try {
-        const response = await fetch(
-          `/api/admin/current-administration-staging/${item.id}/promote`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              existing_promise_id:
-                selectedExistingPromiseId === "new"
-                  ? null
-                  : Number(selectedExistingPromiseId),
-              review_notes: reviewNotes,
-            }),
-          }
-        );
-
-        const payload = await response.json();
-        if (!response.ok) {
-          throw new Error(payload.error || "Failed to promote staged item");
-        }
-
-        setMessage(
-          `Promoted to promise #${payload.item.promoted_promise_id} and action #${payload.item.promoted_action_id}.`
-        );
-        router.refresh();
-      } catch (error) {
-        setMessage(error.message);
-      }
-    });
   }
 
   return (
@@ -137,7 +62,8 @@ export default function CurrentAdministrationReviewPanel({
         <div className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950 mt-4">
           This staging AI generator is deprecated.
           Use the Python current-admin workflow to generate canonical review artifacts, decision logs,
-          and feedback summaries. This admin page remains a manual staging review and promotion surface.
+          and feedback summaries. This page is now a legacy intake browser only. Review, finalize,
+          pre-commit, and import must run through the canonical current-admin admin pages or CLI.
         </div>
 
         {!aiReview ? (
@@ -283,30 +209,38 @@ export default function CurrentAdministrationReviewPanel({
       </section>
 
       <section className="border rounded-2xl p-5 bg-white shadow-sm">
-        <h2 className="text-lg font-semibold mb-3">Review Actions</h2>
+        <h2 className="text-lg font-semibold mb-3">Canonical Workflow Handoff</h2>
         <div className="space-y-3">
+          <div className="rounded-xl border p-4 bg-gray-50 text-sm text-gray-700">
+            <p>
+              Current staging status: <strong>{item.review_status.replace(/_/g, " ")}</strong>
+            </p>
+            <p className="mt-2">
+              Direct staging approval and promotion are disabled here so the web admin cannot bypass
+              the canonical artifact workflow, decision logs, pre-commit, or dry-run import.
+            </p>
+          </div>
+
           <label className="block text-sm font-medium">
-            Review notes
+            Legacy review notes
             <textarea
               value={reviewNotes}
               onChange={(event) => setReviewNotes(event.target.value)}
               className="mt-1 w-full border rounded-lg px-3 py-2 min-h-28"
-              placeholder="Optional operator notes"
+              placeholder="Local notes for this legacy staging view"
             />
           </label>
 
           <div className="flex flex-wrap gap-2">
-            {REVIEW_ACTIONS.map((action) => (
-              <button
-                key={action.status}
-                type="button"
-                onClick={() => mutateReviewStatus(action.status)}
-                disabled={isPending}
-                className="rounded-full border px-4 py-2 text-sm font-medium disabled:opacity-60"
-              >
-                {action.label}
-              </button>
-            ))}
+            <Link href="/admin/current-admin-review" className="rounded-full border px-4 py-2 text-sm font-medium">
+              Open Current Admin Review
+            </Link>
+            <Link href="/admin/pre-commit" className="rounded-full border px-4 py-2 text-sm font-medium">
+              Open Pre-Commit Status
+            </Link>
+            <Link href="/admin/import-history" className="rounded-full border px-4 py-2 text-sm font-medium">
+              Open Import History
+            </Link>
           </div>
         </div>
       </section>
@@ -377,37 +311,22 @@ export default function CurrentAdministrationReviewPanel({
           </div>
         </div>
 
-        <div className="mt-5">
-          <button
-            type="button"
-            onClick={promoteItem}
-            disabled={isPending || item.review_status !== "approved"}
-            className="rounded-full border bg-black text-white px-5 py-2 text-sm font-medium disabled:opacity-60"
-          >
-            Promote Approved Item
-          </button>
-          {item.review_status !== "approved" ? (
-            <p className="text-xs text-gray-600 mt-2">
-              Only approved staged items can be promoted.
-            </p>
-          ) : null}
-
-          {item.promoted_promise_id ? (
-            <div className="mt-4">
-              <Link
-                href={`/admin/promises/${item.promoted_promise_id}`}
-                className="inline-flex rounded-full border px-4 py-2 text-sm font-medium"
-              >
-                Open Enrichment Editor
-              </Link>
-            </div>
-          ) : null}
+        <div className="mt-5 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950">
+          Direct promotion from this staging page has been disabled. Use the canonical current-admin
+          review, finalize, pre-commit, and import flow so promotion remains tied to the real pipeline state.
         </div>
-      </section>
 
-      {message ? (
-        <p className="text-sm text-gray-700">{message}</p>
-      ) : null}
+        {item.promoted_promise_id ? (
+          <div className="mt-4">
+            <Link
+              href={`/admin/promises/${item.promoted_promise_id}`}
+              className="inline-flex rounded-full border px-4 py-2 text-sm font-medium"
+            >
+              Open Enrichment Editor
+            </Link>
+          </div>
+        ) : null}
+      </section>
     </div>
   );
 }

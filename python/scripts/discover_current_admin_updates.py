@@ -24,7 +24,7 @@ from current_admin_common import (
 
 DEFAULT_OLLAMA_URL = "http://10.10.0.60:11434"
 DEFAULT_MODEL = "qwen3.5:9b"
-DEFAULT_TIMEOUT = 90
+DEFAULT_TIMEOUT = 240
 DEFAULT_TEMPERATURE = 0.1
 DEFAULT_PRESIDENT_SLUG = "donald-j-trump-2025"
 
@@ -684,6 +684,7 @@ def analyze_feed_items(
         if dry_run:
             suggestion = heuristic_feed_suggestion(feed_item, promises)
             review_mode = "dry-run"
+            fallback_reason = None
         else:
             try:
                 suggestion = sanitize_ollama_suggestion(
@@ -696,10 +697,12 @@ def analyze_feed_items(
                     )
                 )
                 review_mode = "ollama"
+                fallback_reason = None
             except Exception as exc:  # noqa: BLE001
                 suggestion = heuristic_feed_suggestion(feed_item, promises)
                 suggestion.setdefault("caution_flags", []).append("ollama_fallback")
-                suggestion["reasoning"] = f"{suggestion.get('reasoning')} Fallback reason: {normalize_text(str(exc))}."
+                fallback_reason = normalize_text(str(exc))
+                suggestion["reasoning"] = f"{suggestion.get('reasoning')} Fallback reason: {fallback_reason}."
                 review_mode = "fallback"
 
         candidate = {
@@ -710,6 +713,12 @@ def analyze_feed_items(
             "reasoning": suggestion.get("reasoning"),
             "confidence": suggestion.get("confidence"),
             "caution_flags": suggestion.get("caution_flags") or [],
+            "requested_model": model,
+            "effective_model": model if review_mode == "ollama" else None,
+            "review_backend": review_mode,
+            "fallback_used": review_mode == "fallback",
+            "fallback_reason": fallback_reason,
+            "model_resolution_status": "exact_requested" if review_mode == "ollama" else ("fallback_used" if review_mode == "fallback" else "dry_run"),
             "source_references": [
                 {
                     "source_title": feed_item.get("title"),
@@ -800,12 +809,21 @@ def main() -> None:
         timeout=args.timeout,
         temperature=args.temperature,
     )
+    all_ai_candidates = [*new_action_candidates, *feed_update_candidates, *new_promise_candidates]
+    fallback_reasons = sorted({item.get("fallback_reason") for item in all_ai_candidates if item.get("fallback_reason")})
 
     report = {
         "generated_at": datetime.now(UTC).replace(microsecond=0).isoformat(),
         "president_slug": args.president_slug,
         "dry_run": args.dry_run,
         "model": args.model,
+        "requested_model": args.model,
+        "effective_model": args.model if not args.dry_run and not any(item.get("fallback_used") for item in all_ai_candidates) else ("mixed" if not args.dry_run else None),
+        "review_backend": "fallback" if any(item.get("fallback_used") for item in all_ai_candidates) else ("ollama" if not args.dry_run else "dry_run"),
+        "fallback_used": any(item.get("fallback_used") for item in all_ai_candidates),
+        "fallback_reason": fallback_reasons[0] if len(fallback_reasons) == 1 else ("Multiple fallback reasons; inspect item-level metadata." if fallback_reasons else None),
+        "model_resolution_status": ("fallback_used" if any(item.get("fallback_used") for item in all_ai_candidates) else "exact_requested") if not args.dry_run else "dry_run",
+        "timeout_seconds": args.timeout,
         "lookback_days": args.lookback_days,
         "promise_count": len(promises),
         "source_inputs": {

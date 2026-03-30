@@ -30,6 +30,10 @@ export default function ImportHistoryPanel({ workspace }) {
   const [isPending, startTransition] = useTransition();
   const batch = workspace.batch;
   const precommit = workspace.latest_pre_commit_review;
+  const permissions = workspace.action_permissions || {};
+  const dryRunPermission = permissions.run_import_dry_run || { allowed: false, reasons: [] };
+  const applyPermission = permissions.apply_import || { allowed: false, reasons: [] };
+  const validatePermission = permissions.validate_import || { allowed: false, reasons: [] };
 
   function runAction(url, body, successMessage) {
     setMessage("");
@@ -86,7 +90,7 @@ export default function ImportHistoryPanel({ workspace }) {
                   "Dry-run import finished. Review the new import report before applying."
                 )
               }
-              disabled={isPending}
+              disabled={isPending || !dryRunPermission.allowed}
               className="rounded-lg border px-4 py-2 bg-white"
             >
               Run Dry-Run Import
@@ -103,7 +107,7 @@ export default function ImportHistoryPanel({ workspace }) {
                   "Apply import finished. Run validation next."
                 );
               }}
-              disabled={isPending}
+              disabled={isPending || !applyPermission.allowed}
               className="rounded-lg border px-4 py-2 bg-black text-white"
             >
               Apply Import
@@ -117,11 +121,49 @@ export default function ImportHistoryPanel({ workspace }) {
                   "Validation finished. Review the validation report for issues."
                 )
               }
-              disabled={isPending}
+              disabled={isPending || !validatePermission.allowed}
               className="rounded-lg border px-4 py-2 bg-white"
             >
               Validate Import
             </button>
+          </div>
+        </div>
+        <div className="grid gap-3 md:grid-cols-3 text-sm">
+          <div className="rounded-xl border p-4 bg-gray-50">
+            <p className="font-semibold">Dry-run gate</p>
+            {dryRunPermission.allowed ? (
+              <p className="mt-2 text-gray-700">Ready to run.</p>
+            ) : (
+              <div className="mt-2 space-y-1 text-gray-700">
+                {dryRunPermission.reasons.map((reason) => (
+                  <p key={reason}>{reason}</p>
+                ))}
+              </div>
+            )}
+          </div>
+          <div className="rounded-xl border p-4 bg-gray-50">
+            <p className="font-semibold">Apply gate</p>
+            {applyPermission.allowed ? (
+              <p className="mt-2 text-gray-700">Ready after explicit confirmation.</p>
+            ) : (
+              <div className="mt-2 space-y-1 text-gray-700">
+                {applyPermission.reasons.map((reason) => (
+                  <p key={reason}>{reason}</p>
+                ))}
+              </div>
+            )}
+          </div>
+          <div className="rounded-xl border p-4 bg-gray-50">
+            <p className="font-semibold">Validation gate</p>
+            {validatePermission.allowed ? (
+              <p className="mt-2 text-gray-700">Ready to validate the applied import.</p>
+            ) : (
+              <div className="mt-2 space-y-1 text-gray-700">
+                {validatePermission.reasons.map((reason) => (
+                  <p key={reason}>{reason}</p>
+                ))}
+              </div>
+            )}
           </div>
         </div>
         {message ? <p className="text-sm text-gray-700">{message}</p> : null}

@@ -8,7 +8,8 @@ from pathlib import Path
 from typing import Any
 
 
-DEFAULT_MODEL = "qwen3.5:27b"
+DEFAULT_MODEL = "qwen3.5:9b"
+DEFAULT_TIMEOUT = 240
 
 
 def python_dir() -> Path:
@@ -39,7 +40,8 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Rerun only the minimum downstream steps for affected future bills.")
     parser.add_argument("--future-bill-id", type=int, action="append", help="One or more future_bill_id values to rerun")
     parser.add_argument("--from-apply-report", type=Path, default=default_apply_report(), help="Apply report JSON used to derive affected future_bill_id values")
-    parser.add_argument("--model", default=DEFAULT_MODEL, help="Reserved model value for follow-up scripts")
+    parser.add_argument("--model", default=DEFAULT_MODEL, help="Verifier model for follow-up suggestion/discovery scripts")
+    parser.add_argument("--timeout", type=int, default=DEFAULT_TIMEOUT, help="Ollama timeout in seconds for follow-up verifier stages")
     parser.add_argument("--csv", action="store_true", help="Write CSV outputs from rerun scripts where supported")
     parser.add_argument("--output", type=Path, default=default_output_report(), help="Rerun report JSON")
     return parser.parse_args()
@@ -121,6 +123,11 @@ def main() -> None:
             str(future_bill_id),
             "--top-k",
             "5",
+            "--use-ollama",
+            "--model",
+            args.model,
+            "--timeout",
+            str(args.timeout),
             "--output",
             str(suggestion_output),
         ]
@@ -166,6 +173,11 @@ def main() -> None:
                 str(future_bill_id),
                 "--top-k",
                 "5",
+                "--use-ollama",
+                "--model",
+                args.model,
+                "--timeout",
+                str(args.timeout),
                 "--output",
                 str(discovery_output),
             ]
@@ -206,6 +218,8 @@ def main() -> None:
         "source_apply_report": str(args.from_apply_report.resolve()),
         "resolved_from": source,
         "affected_future_bill_ids": future_bill_ids,
+        "verifier_model": args.model,
+        "timeout_seconds": args.timeout,
         "stages_run": stages_run,
         "stages_skipped": stages_skipped,
         "errors": errors,

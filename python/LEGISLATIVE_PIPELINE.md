@@ -43,15 +43,17 @@ The wrapper runs these stages in order:
 Inside `run_equitystack_pipeline.py`, the daily pipeline runs:
 
 1. `update_database.py`
-2. `scripts/review_future_bill_audit_with_ollama.py`
+2. `scripts/review_future_bill_audit_with_ollama.py` with verifier `qwen3.5:9b`, senior `qwen3.5:27b`, fallback `qwen3.5:9b`
 3. `scripts/apply_future_bill_ai_review.py`
-4. `scripts/suggest_partial_future_bill_links.py`
-5. `scripts/find_candidate_tracked_bills.py` only when the suggestion output still needs discovery
+4. `scripts/suggest_partial_future_bill_links.py` with verifier `qwen3.5:9b`
+5. `scripts/find_candidate_tracked_bills.py` with verifier `qwen3.5:9b` only when the suggestion output still needs discovery
 6. `scripts/build_review_bundle.py`
 
-Default review model:
+Default review models:
 
-- `qwen3.5:27b`
+- senior review: `qwen3.5:27b`
+- verifier / fallback review: `qwen3.5:9b`
+- default Ollama timeout: `240` seconds
 
 Primary outputs:
 
@@ -62,6 +64,12 @@ Primary outputs:
 - `reports/future_bill_candidate_discovery.json`
 - `reports/equitystack_review_bundle.json`
 
+Admin visibility:
+
+- `/admin/legislative-workflow` is the web approval surface for the legislative review bundle.
+- The admin page reads the canonical artifacts, saves operator approval decisions back into the review bundle, and only triggers wrapped legislative commands when readiness checks pass.
+- Legislative apply/import still run through wrapped CLI execution. The admin must not create a direct DB write path around the pipeline.
+
 ## Safe Operator Path
 
 Most days:
@@ -69,13 +77,15 @@ Most days:
 ```bash
 ./bin/equitystack legislative run
 ./bin/equitystack legislative review
-./bin/equitystack legislative apply
+./bin/equitystack legislative apply --dry-run
+./bin/equitystack legislative apply --apply --yes
 ```
 
 Use these only when needed:
 
 ```bash
-./bin/equitystack legislative import
+./bin/equitystack legislative import --dry-run
+./bin/equitystack legislative import --apply --yes
 ./bin/equitystack legislative feedback
 ```
 
@@ -95,6 +105,7 @@ Use these only when needed:
 - `import_tracked_bills.py` also honors `CONGRESS_API_KEY` from the runtime environment.
 - Preferred local path: rebuild `python/venv` with `./bin/bootstrap-python-env`.
 - Fallback override: `EQUITYSTACK_PYTHON_BIN=/path/to/python`.
+- Review artifacts stamp requested model, effective model, backend, fallback status, and fallback reason.
 
 Example production-style dry run:
 

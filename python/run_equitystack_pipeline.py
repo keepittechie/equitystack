@@ -9,7 +9,12 @@ from pathlib import Path
 from typing import Any
 
 
-DEFAULT_MODEL = "qwen3.5:27b"
+DEFAULT_REVIEW_MODEL = "qwen3.5:27b"
+DEFAULT_VERIFIER_MODEL = "qwen3.5:9b"
+DEFAULT_FALLBACK_MODEL = "qwen3.5:9b"
+DEFAULT_SENIOR_TIMEOUT = 300
+DEFAULT_VERIFIER_TIMEOUT = 240
+DEFAULT_TIMEOUT = DEFAULT_SENIOR_TIMEOUT
 
 
 def python_dir() -> Path:
@@ -49,10 +54,20 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--skip-discovery", action="store_true", help="Skip the missing-candidate discovery step")
     parser.add_argument("--apply-safe-removals", action="store_true", help="Run the safe-removal step in apply mode")
     parser.add_argument("--only-future-bill-id", type=int, action="append", help="Limit suggestion/discovery/bundle focus to one or more future_bill_id values")
-    parser.add_argument("--model", default=DEFAULT_MODEL, help="Ollama model for the AI review step")
+    parser.add_argument("--model", help="Legacy alias for --review-model")
+    parser.add_argument("--review-model", default=DEFAULT_REVIEW_MODEL, help="Senior review model for safety-impacting stages")
+    parser.add_argument("--verifier-model", default=DEFAULT_VERIFIER_MODEL, help="Verifier / first-pass model for draft and fallback review paths")
+    parser.add_argument("--fallback-model", default=DEFAULT_FALLBACK_MODEL, help="Fallback model used after senior-review failure")
+    parser.add_argument("--timeout", type=int, help="Legacy alias that sets both senior and verifier timeouts")
+    parser.add_argument("--senior-timeout", type=int, help="Ollama timeout in seconds for the senior review stage")
+    parser.add_argument("--verifier-timeout", type=int, help="Ollama timeout in seconds for verifier/fallback stages")
     parser.add_argument("--csv", action="store_true", help="Write CSV outputs for steps that support it")
     parser.add_argument("--output-report", type=Path, default=default_pipeline_report(), help="Path to write the pipeline summary report")
-    return parser.parse_args()
+    args = parser.parse_args()
+    shared_timeout = args.timeout
+    args.senior_timeout = args.senior_timeout or shared_timeout or DEFAULT_SENIOR_TIMEOUT
+    args.verifier_timeout = args.verifier_timeout or shared_timeout or DEFAULT_VERIFIER_TIMEOUT
+    return args
 
 
 def load_json(path: Path) -> dict[str, Any] | None:
@@ -92,7 +107,12 @@ def run_step(name: str, command: list[str]) -> dict[str, Any]:
 
 def main() -> None:
     args = parse_args()
+    if args.senior_timeout <= 0:
+        raise SystemExit("--senior-timeout must be greater than 0")
+    if args.verifier_timeout <= 0:
+        raise SystemExit("--verifier-timeout must be greater than 0")
     only_future_bill_ids = args.only_future_bill_id or []
+    review_model = args.model or args.review_model
     report_path = args.output_report.resolve()
     report_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -108,7 +128,15 @@ def main() -> None:
             sys.executable,
             "scripts/review_future_bill_audit_with_ollama.py",
             "--model",
-            args.model,
+            review_model,
+            "--verifier-model",
+            args.verifier_model,
+            "--fallback-model",
+            args.fallback_model,
+            "--senior-timeout",
+            str(args.senior_timeout),
+            "--verifier-timeout",
+            str(args.verifier_timeout),
         ]
         if args.csv:
             review_command.append("--csv")
@@ -135,6 +163,11 @@ def main() -> None:
             str(manual_queue_path()),
             "--top-k",
             "5",
+            "--use-ollama",
+            "--model",
+            args.verifier_model,
+            "--timeout",
+            str(args.verifier_timeout),
         ]
         for future_bill_id in only_future_bill_ids:
             suggest_command.extend(["--only-future-bill-id", str(future_bill_id)])
@@ -153,6 +186,11 @@ def main() -> None:
                 str(ai_review_path()),
                 "--top-k",
                 "5",
+                "--use-ollama",
+                "--model",
+                args.verifier_model,
+                "--timeout",
+                str(args.verifier_timeout),
             ]
             for future_bill_id in only_future_bill_ids:
                 discovery_command.extend(["--only-future-bill-id", str(future_bill_id)])
@@ -185,7 +223,11 @@ def main() -> None:
         "generated_at": datetime.now(UTC).isoformat(),
         "started_at": started_at,
         "status": status,
-        "requested_model": args.model,
+        "requested_model": review_model,
+        "review_model": review_model,
+        "verifier_model": args.verifier_model,
+        "fallback_model": args.fallback_model,
+        "timeout_seconds": args.timeout,
         "apply_safe_removals": args.apply_safe_removals,
         "skip_discovery": args.skip_discovery,
         "only_future_bill_ids": only_future_bill_ids,

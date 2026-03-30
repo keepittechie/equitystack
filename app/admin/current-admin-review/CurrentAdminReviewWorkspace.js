@@ -24,6 +24,9 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
   const [message, setMessage] = useState("");
   const [isPending, startTransition] = useTransition();
   const batch = workspace.batch;
+  const actionPermissions = workspace.action_permissions || {};
+  const finalizePermission = actionPermissions.finalize || { allowed: false, reasons: [] };
+  const artifactStatus = workspace.artifact_status || {};
 
   function updateItem(slug, field, value) {
     setItems((current) =>
@@ -139,7 +142,7 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
             <button
               type="button"
               onClick={finalize}
-              disabled={isPending}
+              disabled={isPending || !finalizePermission.allowed}
               className="rounded-lg border px-4 py-2 bg-black text-white"
             >
               Finalize
@@ -150,7 +153,63 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
           Saving writes the decision file only. Finalize runs the existing Python
           finalize step and refreshes the append-only decision log.
         </p>
+        {!finalizePermission.allowed ? (
+          <div className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950">
+            <p className="font-semibold">Finalize is blocked</p>
+            <div className="mt-2 space-y-1">
+              {finalizePermission.reasons.map((reason) => (
+                <p key={reason}>{reason}</p>
+              ))}
+            </div>
+          </div>
+        ) : null}
         {message ? <p className="text-sm text-gray-700">{message}</p> : null}
+      </section>
+
+      <section className="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
+        <div className="border rounded-2xl p-5 bg-white shadow-sm">
+          <h2 className="text-lg font-semibold">Workflow blockers</h2>
+          <p className="text-sm text-gray-600 mt-1">
+            These are the current reasons the canonical pipeline cannot advance automatically.
+          </p>
+          <div className="mt-4 space-y-3 text-sm">
+            {(workspace.blockers || []).length ? (
+              workspace.blockers.map((blocker) => (
+                <div key={blocker} className="rounded-xl border p-4 bg-gray-50">
+                  {blocker}
+                </div>
+              ))
+            ) : (
+              <p className="text-gray-600">No active blockers are recorded for the current batch.</p>
+            )}
+          </div>
+        </div>
+
+        <div className="border rounded-2xl p-5 bg-white shadow-sm">
+          <h2 className="text-lg font-semibold">Artifact state</h2>
+          <p className="text-sm text-gray-600 mt-1">
+            The admin workflow follows these canonical files under `python/reports/current_admin/`.
+          </p>
+          <div className="mt-4 space-y-3 text-sm">
+            {Object.entries(artifactStatus).map(([key, artifact]) => (
+              <div key={key} className="rounded-xl border p-4">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <p className="font-semibold">{artifact.label}</p>
+                  <span className="rounded-full border px-3 py-1 text-xs">
+                    {artifact.exists ? "present" : "missing"}
+                  </span>
+                </div>
+                <p className="mt-2 break-all text-gray-700">{artifact.path || "Unavailable"}</p>
+                {artifact.generated_at ? (
+                  <p className="mt-1 text-gray-600">Updated: {artifact.generated_at}</p>
+                ) : null}
+                {artifact.summary ? (
+                  <p className="mt-1 text-gray-600">Summary: {artifact.summary}</p>
+                ) : null}
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
 
       <section className="space-y-4">

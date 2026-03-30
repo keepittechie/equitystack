@@ -16,7 +16,10 @@ const NAV_LINKS = [
 ];
 
 const ADMIN_NAV_LINKS = [
-  { href: "/admin", label: "Dashboard" },
+  { href: "/admin", label: "Command Center" },
+  { href: "/admin/runbook", label: "Runbook" },
+  { href: "/admin/operator-console", label: "Operator Console" },
+  { href: "/admin/legislative-workflow", label: "Legislative Workflow" },
   { href: "/admin/current-admin-review", label: "Current Admin Review" },
   { href: "/admin/pre-commit", label: "Pre-Commit Status" },
   { href: "/admin/import-history", label: "Import History" },

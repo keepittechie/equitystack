@@ -29,9 +29,12 @@ from current_admin_common import (
 
 DEFAULT_OLLAMA_URL = "http://10.10.0.60:11434"
 DEFAULT_MODEL = "qwen3.5:27b"
-DEFAULT_MODEL_STANDARD = "qwen3.5:27b"
-DEFAULT_MODEL_DEEP = "qwen3.5:27b"
-DEFAULT_TIMEOUT = 90
+DEFAULT_MODEL_SENIOR = "qwen3.5:27b"
+DEFAULT_MODEL_VERIFIER = "qwen3.5:9b"
+DEFAULT_MODEL_FALLBACK = "qwen3.5:9b"
+DEFAULT_SENIOR_TIMEOUT = 300
+DEFAULT_VERIFIER_TIMEOUT = 240
+DEFAULT_TIMEOUT = DEFAULT_SENIOR_TIMEOUT
 DEFAULT_TEMPERATURE = 0.1
 VALID_STATUSES = {"In Progress", "Partial", "Delivered", "Blocked", "Failed"}
 VALID_IMPACT_DIRECTIONS = {"Positive", "Negative", "Mixed", "Blocked"}
@@ -76,8 +79,10 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--input", type=Path, required=True, help="Normalized current-admin batch JSON")
     parser.add_argument("--output", type=Path, help="AI review report JSON output")
-    parser.add_argument("--model", default=None, help="Ollama model name. Overrides the default based on --review-mode")
-    parser.add_argument("--review-mode", choices=sorted(VALID_REVIEW_MODES), default="standard", help="Review depth to use")
+    parser.add_argument("--model", default=None, help="Senior review model name")
+    parser.add_argument("--verifier-model", default=DEFAULT_MODEL_VERIFIER, help="Verifier / first-pass model name")
+    parser.add_argument("--fallback-model", default=DEFAULT_MODEL_FALLBACK, help="Fallback review model name")
+    parser.add_argument("--review-mode", choices=sorted(VALID_REVIEW_MODES), default="deep", help="Review depth to use")
     parser.add_argument("--deep-review", action="store_true", help="Shortcut for --review-mode deep")
     parser.add_argument("--dry-run", action="store_true", help="Skip Ollama calls and emit heuristic suggestions only")
     parser.add_argument("--max-items", type=int, help="Limit the number of records reviewed")
@@ -96,7 +101,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--log-decisions", nargs="?", const="", help="Optionally write a decision log JSON. Pass a path or omit the value to write under reports/current_admin/review_decisions/")
     parser.add_argument("--preview", action="store_true", help="Print a condensed operator-facing preview instead of the full JSON report")
     parser.add_argument("--summary", action="store_true", help="Print a human-readable review summary instead of the full JSON report")
-    parser.add_argument("--timeout", type=int, default=DEFAULT_TIMEOUT, help="Per-request timeout in seconds")
+    parser.add_argument("--timeout", type=int, help="Legacy alias that sets both senior and verifier timeouts")
+    parser.add_argument("--senior-timeout", type=int, help="Timeout in seconds for the senior review model")
+    parser.add_argument("--verifier-timeout", type=int, help="Timeout in seconds for the verifier/fallback review model")
     parser.add_argument("--temperature", type=float, default=DEFAULT_TEMPERATURE, help="Sampling temperature for Ollama")
     parser.add_argument("--ollama-url", default=DEFAULT_OLLAMA_URL, help="Base URL for the Ollama server")
     parser.add_argument(
@@ -114,6 +121,13 @@ def parse_args() -> argparse.Namespace:
         args.suggested_batch = [part.strip().lower() for part in args.suggested_batch.split(",")]
     if args.manual_review_severity:
         args.manual_review_severity = [part.strip().lower() for part in args.manual_review_severity.split(",")]
+    shared_timeout = args.timeout
+    args.senior_timeout = args.senior_timeout or shared_timeout or DEFAULT_SENIOR_TIMEOUT
+    args.verifier_timeout = args.verifier_timeout or shared_timeout or DEFAULT_VERIFIER_TIMEOUT
+    if args.senior_timeout <= 0:
+        parser.error("--senior-timeout must be greater than 0")
+    if args.verifier_timeout <= 0:
+        parser.error("--verifier-timeout must be greater than 0")
     return args
 
 
@@ -260,6 +274,164 @@ def call_ollama(prompt: str, *, model: str, ollama_url: str, timeout: int, tempe
     response.raise_for_status()
     payload = response.json()
     return json.loads(payload.get("response") or "{}")
+
+
+def append_fallback_reason(base_note: str | None, reason: str) -> str:
+    prefix = normalize_nullable_text(base_note) or "Operator should manually verify this advisory suggestion."
+    return f"{prefix} Ollama fallback reason: {reason}."
+
+
+def call_ollama_with_retry(
+    prompt: str,
+    *,
+    model: str,
+    ollama_url: str,
+    timeout: int,
+    temperature: float,
+) -> tuple[dict[str, Any] | None, int, list[str]]:
+    errors: list[str] = []
+    attempts = 0
+    for _ in range(2):
+        attempts += 1
+        try:
+            return (
+                call_ollama(
+                    prompt,
+                    model=model,
+                    ollama_url=ollama_url,
+                    timeout=timeout,
+                    temperature=temperature,
+                ),
+                attempts,
+                errors,
+            )
+        except Exception as exc:  # noqa: BLE001
+            reason = normalize_nullable_text(str(exc)) or f"{model} failed without a usable error message"
+            errors.append(reason)
+    return None, attempts, errors
+
+
+def build_retry_reason(label: str, errors: list[str]) -> str:
+    details = " | ".join(errors) if errors else "No error detail was returned."
+    return f"{label} failed after one retry: {details}"
+
+
+def execute_review_ladder(
+    *,
+    prompt: str,
+    args: argparse.Namespace,
+    record: dict[str, Any],
+    existing_matches: list[dict[str, Any]],
+    heuristic_mode: str,
+    senior_requested_model: str,
+    verifier_requested_model: str,
+    fallback_requested_model: str,
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    senior_raw, senior_attempts, senior_errors = call_ollama_with_retry(
+        prompt,
+        model=senior_requested_model,
+        ollama_url=args.ollama_url,
+        timeout=args.senior_timeout,
+        temperature=args.temperature,
+    )
+    senior_attempted = senior_attempts > 0
+    senior_retry_attempted = senior_attempts > 1
+
+    if senior_raw is not None:
+        return senior_raw, {
+            "resolved_model": senior_requested_model,
+            "effective_model": senior_requested_model,
+            "review_backend": "ollama",
+            "fallback_used": False,
+            "fallback_reason": None,
+            "model_resolution_status": "exact_requested",
+            "retry_count": max(0, senior_attempts - 1),
+            "senior_attempted": senior_attempted,
+            "senior_retry_attempted": senior_retry_attempted,
+            "verifier_attempted": False,
+            "verifier_retry_attempted": False,
+            "verifier_model_used": None,
+            "senior_model_used": senior_requested_model,
+            "senior_timeout_seconds": args.senior_timeout,
+            "verifier_timeout_seconds": args.verifier_timeout,
+            "senior_failure_reason": None,
+            "verifier_failure_reason": None,
+        }
+
+    verifier_raw, verifier_attempts, verifier_errors = call_ollama_with_retry(
+        prompt,
+        model=fallback_requested_model,
+        ollama_url=args.ollama_url,
+        timeout=args.verifier_timeout,
+        temperature=args.temperature,
+    )
+    verifier_attempted = verifier_attempts > 0
+    verifier_retry_attempted = verifier_attempts > 1
+    senior_reason = build_retry_reason("Senior model", senior_errors)
+
+    if verifier_raw is not None:
+        return verifier_raw, {
+            "resolved_model": fallback_requested_model,
+            "effective_model": fallback_requested_model,
+            "review_backend": "fallback",
+            "fallback_used": True,
+            "fallback_reason": senior_reason,
+            "model_resolution_status": "senior_failed_using_fallback_model",
+            "retry_count": max(0, senior_attempts - 1) + max(0, verifier_attempts - 1),
+            "senior_attempted": senior_attempted,
+            "senior_retry_attempted": senior_retry_attempted,
+            "verifier_attempted": verifier_attempted,
+            "verifier_retry_attempted": verifier_retry_attempted,
+            "verifier_model_used": fallback_requested_model,
+            "senior_model_used": None,
+            "senior_timeout_seconds": args.senior_timeout,
+            "verifier_timeout_seconds": args.verifier_timeout,
+            "senior_failure_reason": senior_reason,
+            "verifier_failure_reason": None,
+        }
+
+    verifier_reason = build_retry_reason("Verifier/fallback model", verifier_errors)
+    combined_reason = (
+        f"{senior_reason} Verifier/fallback model also failed after one retry: "
+        f"{' | '.join(verifier_errors) if verifier_errors else 'No error detail was returned.'} "
+        "Heuristic fallback used as last resort."
+    )
+    heuristic_raw = heuristic_review(record, existing_matches, heuristic_mode)
+    heuristic_raw["ambiguity_notes"] = append_fallback_reason(
+        heuristic_raw.get("ambiguity_notes"),
+        combined_reason,
+    )
+    return heuristic_raw, {
+        "resolved_model": None,
+        "effective_model": None,
+        "review_backend": "heuristic_fallback",
+        "fallback_used": True,
+        "fallback_reason": combined_reason,
+        "model_resolution_status": "senior_and_verifier_failed_using_heuristic",
+        "retry_count": max(0, senior_attempts - 1) + max(0, verifier_attempts - 1),
+        "senior_attempted": senior_attempted,
+        "senior_retry_attempted": senior_retry_attempted,
+        "verifier_attempted": verifier_attempted,
+        "verifier_retry_attempted": verifier_retry_attempted,
+        "verifier_model_used": None,
+        "senior_model_used": None,
+        "senior_timeout_seconds": args.senior_timeout,
+        "verifier_timeout_seconds": args.verifier_timeout,
+        "senior_failure_reason": senior_reason,
+        "verifier_failure_reason": verifier_reason,
+    }
+
+
+def normalize_backend_reason(value: Any) -> str | None:
+    return normalize_nullable_text(value)
+
+
+def first_nonempty_text(*values: Any) -> str | None:
+    for value in values:
+        normalized = normalize_nullable_text(value)
+        if normalized:
+            return normalized
+    return None
 
 
 def normalize_confidence_score(value: Any) -> float:
@@ -864,6 +1036,7 @@ def build_display_summary(display_items: list[dict[str, Any]], total_items: int)
     attention = sum(1 for item in display_items if item.get("operator_attention_needed"))
     conflicts = sum(1 for item in display_items if item.get("has_material_conflict"))
     deep_recommended = sum(1 for item in display_items if item.get("deep_review_recommended"))
+    fallback_count = sum(1 for item in display_items if item.get("fallback_used"))
     batch_list, batch_counts = build_suggested_batch_summary(display_items)
     lines = [
         "Review Summary",
@@ -875,6 +1048,7 @@ def build_display_summary(display_items: list[dict[str, Any]], total_items: int)
         f"Items needing attention: {attention}",
         f"Items with material conflicts: {conflicts}",
         f"Items recommended for deep review: {deep_recommended}",
+        f"Fallback items: {fallback_count}",
     ]
     if batch_counts:
         lines.append("Suggested batches:")
@@ -897,6 +1071,12 @@ def build_preview_lines(display_items: list[dict[str, Any]]) -> list[str]:
                 f"  impact_direction: {suggestion.get('impact_direction_suggestion')}",
                 f"  confidence: {suggestion.get('confidence_level')}",
                 f"  review_priority: {item.get('review_priority')} ({item.get('review_priority_score')})",
+                f"  backend: {item.get('review_backend')}",
+                f"  effective_model: {item.get('effective_model') or 'none'}",
+                f"  fallback_used: {'yes' if item.get('fallback_used') else 'no'}",
+                f"  retry_count: {item.get('retry_count')}",
+                f"  senior_attempted: {'yes' if item.get('senior_attempted') else 'no'}",
+                f"  verifier_attempted: {'yes' if item.get('verifier_attempted') else 'no'}",
                 f"  suggested_batch: {item.get('suggested_batch')}",
                 f"  batch_reason: {item.get('suggested_batch_reason')}",
                 f"  attention_needed: {attention_flag}",
@@ -932,6 +1112,19 @@ def build_worklist_payload(report: dict[str, Any], items: list[dict[str, Any]], 
             "input_path": report.get("input_path"),
             "review_output_path": report.get("resolved_output_path"),
             "model": report.get("model"),
+            "requested_model": report.get("requested_model"),
+            "effective_model": report.get("effective_model"),
+            "review_backend": report.get("review_backend"),
+            "fallback_used": report.get("fallback_used"),
+            "fallback_reason": report.get("fallback_reason"),
+            "timeout_seconds": report.get("timeout_seconds"),
+            "senior_timeout_seconds": report.get("senior_timeout_seconds"),
+            "verifier_timeout_seconds": report.get("verifier_timeout_seconds"),
+            "retry_count": report.get("retry_count"),
+            "senior_attempted": report.get("senior_attempted"),
+            "senior_retry_attempted": report.get("senior_retry_attempted"),
+            "verifier_attempted": report.get("verifier_attempted"),
+            "verifier_retry_attempted": report.get("verifier_retry_attempted"),
             "review_mode": report.get("review_mode"),
             "dry_run": report.get("dry_run"),
         },
@@ -1103,6 +1296,9 @@ def select_records(payload: dict[str, Any], only_slugs: list[str] | None, max_it
 
 def review_record(args: argparse.Namespace, record: dict[str, Any], existing_matches: list[dict[str, Any]]) -> dict[str, Any]:
     deep_review_requested = args.review_mode == "deep"
+    senior_requested_model = args.model or DEFAULT_MODEL_SENIOR
+    verifier_requested_model = args.verifier_model or DEFAULT_MODEL_VERIFIER
+    fallback_requested_model = args.fallback_model or verifier_requested_model
 
     if args.dry_run:
         standard_raw = heuristic_review(record, existing_matches, "standard")
@@ -1127,11 +1323,30 @@ def review_record(args: argparse.Namespace, record: dict[str, Any], existing_mat
         return {
             "slug": record.get("slug"),
             "title": record.get("title"),
+            "requested_model": senior_requested_model,
+            "effective_model": None,
+            "resolved_model": None,
             "review_mode": args.review_mode,
             "review_mode_requested": args.review_mode,
             "review_mode_used": review_mode_used,
             "review_backend": "dry_run",
             "model_used": None,
+            "verifier_model_requested": verifier_requested_model,
+            "verifier_model_used": None,
+            "senior_model_requested": senior_requested_model,
+            "senior_model_used": None,
+            "fallback_model": fallback_requested_model,
+            "fallback_used": False,
+            "fallback_reason": None,
+            "model_resolution_status": "dry_run",
+            "timeout_seconds": args.senior_timeout,
+            "senior_timeout_seconds": args.senior_timeout,
+            "verifier_timeout_seconds": args.verifier_timeout,
+            "retry_count": 0,
+            "senior_attempted": False,
+            "senior_retry_attempted": False,
+            "verifier_attempted": False,
+            "verifier_retry_attempted": False,
             "deep_review_requested": deep_review_requested,
             "deep_review_ran": deep_review_ran,
             "deep_review_reason": deep_review_reason,
@@ -1147,55 +1362,70 @@ def review_record(args: argparse.Namespace, record: dict[str, Any], existing_mat
             "deep_pass_suggestions": deep_pass,
         }
 
-    # Determine model: use the provided model if given, otherwise use the default for this review mode
-    if args.model:
-        model_to_use = args.model
-    else:
-        model_to_use = DEFAULT_MODEL_DEEP if args.review_mode == "deep" else DEFAULT_MODEL_STANDARD
-
-    # Use the same model for all passes; the deep-review path will handle pass-specific prompting
-    try:
-        first_pass_raw = call_ollama(
-            build_prompt(record, existing_matches),
-            model=model_to_use,
-            ollama_url=args.ollama_url,
-            timeout=args.timeout,
-            temperature=args.temperature,
-        )
-        first_pass = first_pass_raw
-    except Exception as exc:  # noqa: BLE001
-        first_pass = heuristic_review(record, existing_matches, "standard")
-        first_pass["ambiguity_notes"] = (
-            f"{first_pass['ambiguity_notes']} Ollama fallback reason: {normalize_nullable_text(str(exc))}."
-        )
-
-    standard_pass = normalize_suggestion_fields(first_pass, record, existing_matches, deep_review_ran=False)
+    standard_raw, standard_execution = execute_review_ladder(
+        prompt=build_prompt(record, existing_matches),
+        args=args,
+        record=record,
+        existing_matches=existing_matches,
+        heuristic_mode="standard",
+        senior_requested_model=senior_requested_model,
+        verifier_requested_model=verifier_requested_model,
+        fallback_requested_model=fallback_requested_model,
+    )
+    standard_pass = normalize_suggestion_fields(standard_raw, record, existing_matches, deep_review_ran=False)
     final_suggestion = standard_pass
     deep_pass = None
     deep_review_ran = False
-    deep_review_reason = None
+    deep_review_reason = "standard_review_completed"
     review_mode_used = "standard"
+    review_backend = standard_execution["review_backend"]
+    effective_model = standard_execution["effective_model"]
+    resolved_model = standard_execution["resolved_model"]
+    fallback_used = standard_execution["fallback_used"]
+    fallback_reason = standard_execution["fallback_reason"]
+    model_resolution_status = standard_execution["model_resolution_status"]
+    verifier_model_used = standard_execution["verifier_model_used"]
+    senior_model_used = standard_execution["senior_model_used"]
+    retry_count = standard_execution["retry_count"]
+    senior_attempted = standard_execution["senior_attempted"]
+    senior_retry_attempted = standard_execution["senior_retry_attempted"]
+    verifier_attempted = standard_execution["verifier_attempted"]
+    verifier_retry_attempted = standard_execution["verifier_retry_attempted"]
 
     if deep_review_requested:
-        try:
-            deep_raw = call_ollama(
-                build_deep_review_prompt(record, existing_matches, first_pass),
-                model=model_to_use,
-                ollama_url=args.ollama_url,
-                timeout=args.timeout,
-                temperature=args.temperature,
-            )
-            deep_pass = normalize_suggestion_fields(deep_raw, record, existing_matches, deep_review_ran=True)
-            final_suggestion = deep_pass
-            deep_review_ran = True
-            deep_review_reason = "operator_requested"
-            review_mode_used = "deep"
-        except Exception as exc:  # noqa: BLE001
-            final_suggestion["ambiguity_notes"] = (
-                f"{final_suggestion['ambiguity_notes']} Deep review fallback reason: {normalize_nullable_text(str(exc))}."
-            )
-            deep_review_reason = "operator_requested_but_fallback"
-            review_mode_used = "standard"
+        deep_raw, deep_execution = execute_review_ladder(
+            prompt=build_deep_review_prompt(record, existing_matches, standard_pass),
+            args=args,
+            record=record,
+            existing_matches=existing_matches,
+            heuristic_mode="deep",
+            senior_requested_model=senior_requested_model,
+            verifier_requested_model=verifier_requested_model,
+            fallback_requested_model=fallback_requested_model,
+        )
+        deep_pass = normalize_suggestion_fields(deep_raw, record, existing_matches, deep_review_ran=True)
+        final_suggestion = deep_pass
+        deep_review_ran = True
+        review_mode_used = "deep"
+        review_backend = deep_execution["review_backend"]
+        effective_model = deep_execution["effective_model"]
+        resolved_model = deep_execution["resolved_model"]
+        fallback_used = deep_execution["fallback_used"]
+        fallback_reason = deep_execution["fallback_reason"]
+        model_resolution_status = deep_execution["model_resolution_status"]
+        verifier_model_used = deep_execution["verifier_model_used"]
+        senior_model_used = deep_execution["senior_model_used"]
+        retry_count = standard_execution["retry_count"] + deep_execution["retry_count"]
+        senior_attempted = standard_execution["senior_attempted"] or deep_execution["senior_attempted"]
+        senior_retry_attempted = standard_execution["senior_retry_attempted"] or deep_execution["senior_retry_attempted"]
+        verifier_attempted = standard_execution["verifier_attempted"] or deep_execution["verifier_attempted"]
+        verifier_retry_attempted = standard_execution["verifier_retry_attempted"] or deep_execution["verifier_retry_attempted"]
+        if review_backend == "ollama":
+            deep_review_reason = "operator_requested_with_senior_review"
+        elif review_backend == "fallback":
+            deep_review_reason = "operator_requested_but_senior_failed_using_verifier_fallback"
+        else:
+            deep_review_reason = "operator_requested_but_senior_and_verifier_failed_using_heuristic"
 
     recommendation = build_deep_review_recommendation(record, final_suggestion, existing_matches)
     conflict_analysis = build_suggestion_conflict_analysis(standard_pass, deep_pass)
@@ -1205,11 +1435,30 @@ def review_record(args: argparse.Namespace, record: dict[str, Any], existing_mat
     return {
         "slug": record.get("slug"),
         "title": record.get("title"),
+        "requested_model": senior_requested_model,
+        "effective_model": effective_model,
+        "resolved_model": resolved_model,
         "review_mode": args.review_mode,
         "review_mode_requested": args.review_mode,
         "review_mode_used": review_mode_used,
-        "review_backend": "ollama" if model_to_use else "fallback",
-        "model_used": model_to_use,
+        "review_backend": review_backend,
+        "model_used": effective_model,
+        "verifier_model_requested": verifier_requested_model,
+        "verifier_model_used": verifier_model_used,
+        "senior_model_requested": senior_requested_model,
+        "senior_model_used": senior_model_used,
+        "fallback_model": fallback_requested_model,
+        "fallback_used": fallback_used,
+        "fallback_reason": fallback_reason,
+        "model_resolution_status": model_resolution_status,
+        "timeout_seconds": args.senior_timeout,
+        "senior_timeout_seconds": args.senior_timeout,
+        "verifier_timeout_seconds": args.verifier_timeout,
+        "retry_count": retry_count,
+        "senior_attempted": senior_attempted,
+        "senior_retry_attempted": senior_retry_attempted,
+        "verifier_attempted": verifier_attempted,
+        "verifier_retry_attempted": verifier_retry_attempted,
         "deep_review_requested": deep_review_requested,
         "deep_review_ran": deep_review_ran,
         "deep_review_reason": deep_review_reason,
@@ -1368,11 +1617,25 @@ def main() -> None:
             {
                 "slug": record.get("slug"),
                 "title": record.get("title"),
+                "requested_model": item.get("requested_model"),
+                "effective_model": item.get("effective_model"),
+                "resolved_model": item.get("resolved_model"),
                 "review_mode": item.get("review_mode"),
                 "review_mode_requested": item.get("review_mode_requested"),
                 "review_mode_used": item.get("review_mode_used"),
                 "review_backend": item.get("review_backend"),
                 "model_used": item.get("model_used"),
+                "fallback_used": item.get("fallback_used"),
+                "fallback_reason": item.get("fallback_reason"),
+                "model_resolution_status": item.get("model_resolution_status"),
+                "timeout_seconds": item.get("timeout_seconds"),
+                "senior_timeout_seconds": item.get("senior_timeout_seconds"),
+                "verifier_timeout_seconds": item.get("verifier_timeout_seconds"),
+                "retry_count": item.get("retry_count"),
+                "senior_attempted": item.get("senior_attempted"),
+                "senior_retry_attempted": item.get("senior_retry_attempted"),
+                "verifier_attempted": item.get("verifier_attempted"),
+                "verifier_retry_attempted": item.get("verifier_retry_attempted"),
                 "deep_review_requested": item.get("deep_review_requested"),
                 "deep_review_ran": item.get("deep_review_ran"),
                 "second_pass_ran": item.get("second_pass_ran"),
@@ -1392,15 +1655,39 @@ def main() -> None:
             }
         )
 
+    requested_model = args.model or DEFAULT_MODEL_SENIOR
+    effective_models = sorted({item.get("effective_model") for item in items if item.get("effective_model")})
+    review_backends = sorted({item.get("review_backend") for item in items if item.get("review_backend")})
+    model_statuses = sorted({item.get("model_resolution_status") for item in items if item.get("model_resolution_status")})
+    fallback_reasons = sorted({item.get("fallback_reason") for item in items if item.get("fallback_reason")})
+
     report = {
         "batch_name": payload.get("batch_name"),
         "input_path": str(args.input),
-        "model": args.model,
+        "model": requested_model,
+        "requested_model": requested_model,
+        "effective_model": effective_models[0] if len(effective_models) == 1 else ("mixed" if effective_models else None),
+        "resolved_model": effective_models[0] if len(effective_models) == 1 else ("mixed" if effective_models else None),
+        "review_backend": review_backends[0] if len(review_backends) == 1 else ("mixed" if review_backends else None),
+        "fallback_used": any(bool(item.get("fallback_used")) for item in items),
+        "fallback_reason": fallback_reasons[0] if len(fallback_reasons) == 1 else ("Multiple fallback reasons; inspect item-level metadata." if fallback_reasons else None),
+        "model_resolution_status": model_statuses[0] if len(model_statuses) == 1 else ("mixed" if model_statuses else None),
+        "verifier_model": args.verifier_model or DEFAULT_MODEL_VERIFIER,
+        "fallback_model": args.fallback_model or DEFAULT_MODEL_FALLBACK,
         "review_mode": args.review_mode,
         "dry_run": args.dry_run,
+        "timeout_seconds": args.senior_timeout,
+        "senior_timeout_seconds": args.senior_timeout,
+        "verifier_timeout_seconds": args.verifier_timeout,
+        "retry_count": sum(int(item.get("retry_count") or 0) for item in items),
+        "senior_attempted": any(bool(item.get("senior_attempted")) for item in items),
+        "senior_retry_attempted": any(bool(item.get("senior_retry_attempted")) for item in items),
+        "verifier_attempted": any(bool(item.get("verifier_attempted")) for item in items),
+        "verifier_retry_attempted": any(bool(item.get("verifier_retry_attempted")) for item in items),
         "resolved_output_path": str(output_path),
         "reviewed_count": len(items),
         "deep_review_count": sum(1 for item in items if item.get("deep_review_ran")),
+        "fallback_count": sum(1 for item in items if item.get("fallback_used")),
         "review_priority_counts": {
             "low": sum(1 for item in items if item.get("review_priority") == "low"),
             "medium": sum(1 for item in items if item.get("review_priority") == "medium"),

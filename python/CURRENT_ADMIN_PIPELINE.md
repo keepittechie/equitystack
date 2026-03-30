@@ -87,15 +87,18 @@ Optional discovery path:
 Wrapper defaults:
 
 - `current-admin discover`: `qwen3.5:9b`
-- `current-admin review`: `qwen3.5:27b`
-- `current-admin workflow start`: `qwen3.5:27b`
-- `current-admin workflow finalize`: `qwen3.5:27b`
+- `current-admin review` verifier pass: `qwen3.5:9b`
+- `current-admin review` senior pass: `qwen3.5:27b`
+- `current-admin workflow start`: verifier `qwen3.5:9b`, senior `qwen3.5:27b`
+- `current-admin workflow finalize`: verifier `qwen3.5:9b`, senior `qwen3.5:27b`
+- senior-review fallback model: `qwen3.5:9b`
+- default Ollama timeout: `240` seconds
 
 Remote Ollama:
 
 - `http://10.10.0.60:11434`
 
-The review script also stores the effective model in the generated `.ai-review.json`.
+The review artifact stores requested model, effective model, backend, fallback status, fallback reason, and timeout metadata in the generated `.ai-review.json`.
 
 ## Required Files In The Main Path
 
@@ -144,11 +147,29 @@ DB_HOST=10.10.0.13 \
 
 The Python workflow is canonical.
 
-The dashboard is read-only and should be treated as:
+The admin dashboard should be treated as:
 
 - visibility
 - artifact browsing
 - session / decision inspection
-- next-command guidance
+- wrapped control surface for:
+  - saving decision drafts
+  - finalizing decisions through `workflow finalize --log-decisions`
+  - rerunning `pre-commit`
+  - running import dry-runs
+  - running apply import only after the existing dry-run + confirmation guardrails
+  - running validation
 
-It is not a second ingestion or AI-review pipeline.
+It is not a second ingestion or AI-review pipeline, and it must not bypass:
+
+- explicit operator decisions
+- decision logs
+- pre-commit review
+- dry-run import
+- `--apply --yes`
+
+## Executor Boundary
+
+- `rnj-1:latest` is the executor model for preprocessing, summaries, MCP tool work, and approved wrapper-command execution.
+- `rnj-1` does not approve imports.
+- `rnj-1` does not bypass decision logs, pre-commit, dry-run import, or `--apply --yes`.

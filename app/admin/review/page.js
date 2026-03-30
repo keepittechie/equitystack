@@ -15,15 +15,28 @@ export default async function AdminReviewPage() {
       <h1 className="text-3xl font-bold mb-4">Needs Review</h1>
       <p className="text-gray-700 mb-8">
         Policies listed here need more sourcing, scoring, or metrics before they
-        should be treated as fully developed records.
+        should be treated as fully developed records. For the canonical operational
+        workflows, use the dedicated current-admin and legislative workflow pages.
       </p>
 
       <div className="mb-6 flex flex-wrap gap-3">
         <Link
+          href="/admin/legislative-workflow"
+          className="border rounded-lg px-4 py-2 inline-block"
+        >
+          Legislative Workflow
+        </Link>
+        <Link
+          href="/admin/current-admin-review"
+          className="border rounded-lg px-4 py-2 inline-block"
+        >
+          Current Admin Review
+        </Link>
+        <Link
           href="/admin/promises/current-administration"
           className="border rounded-lg px-4 py-2 inline-block"
         >
-          Current-Administration Review
+          Legacy Staging Intake
         </Link>
       </div>
 

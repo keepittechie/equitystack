@@ -116,11 +116,10 @@ export default async function CurrentAdministrationReviewPage({ searchParams }) 
             Current-Administration Staging
           </h1>
           <p className="text-gray-700 mt-3 max-w-3xl">
-            Review White House intake candidates, mark them approved or rejected,
-            and manually promote approved items into curated Promise Tracker
-            records. Staged items here remain internal until promotion. Canonical
-            current-admin AI review and analytics now come from the Python artifact
-            pipeline, not from this staging UI.
+            Browse legacy White House intake candidates and their historical AI
+            staging notes. Canonical current-admin review, decision logging,
+            pre-commit, and import now run through the Python artifact workflow
+            surfaced in the dedicated admin pages, not through this legacy staging UI.
           </p>
         </div>
 
@@ -128,8 +127,11 @@ export default async function CurrentAdministrationReviewPage({ searchParams }) 
           <Link href="/admin" className="border rounded-lg px-4 py-2">
             Admin Home
           </Link>
-          <Link href="/admin/review" className="border rounded-lg px-4 py-2">
-            Review Queue
+          <Link href="/admin/current-admin-review" className="border rounded-lg px-4 py-2">
+            Current Admin Review
+          </Link>
+          <Link href="/admin/import-history" className="border rounded-lg px-4 py-2">
+            Import History
           </Link>
         </div>
       </div>

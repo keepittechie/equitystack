@@ -243,9 +243,13 @@ else:
 print(review_file)
 print(batch_name)
 print(normalized_path)
-print(payload.get("model") or "")
+print(payload.get("requested_model") or payload.get("model") or "")
+print(payload.get("verifier_model") or "")
+print(payload.get("fallback_model") or "")
 print(payload.get("review_mode") or "standard")
 print("true" if payload.get("dry_run") else "false")
+print(payload.get("senior_timeout_seconds") or payload.get("timeout_seconds") or "")
+print(payload.get("verifier_timeout_seconds") or payload.get("timeout_seconds") or "")
 print(reports_dir / f"{batch_name}.manual-review-queue.json")
 PY
   )
@@ -254,9 +258,13 @@ PY
   REVIEW_ARTIFACT_BATCH_NAME="${context_lines[1]}"
   REVIEW_ARTIFACT_NORMALIZED_PATH="${context_lines[2]}"
   REVIEW_ARTIFACT_MODEL="${context_lines[3]}"
-  REVIEW_ARTIFACT_MODE="${context_lines[4]}"
-  REVIEW_ARTIFACT_DRY_RUN="${context_lines[5]}"
-  REVIEW_ARTIFACT_QUEUE_PATH="${context_lines[6]}"
+  REVIEW_ARTIFACT_VERIFIER_MODEL="${context_lines[4]}"
+  REVIEW_ARTIFACT_FALLBACK_MODEL="${context_lines[5]}"
+  REVIEW_ARTIFACT_MODE="${context_lines[6]}"
+  REVIEW_ARTIFACT_DRY_RUN="${context_lines[7]}"
+  REVIEW_ARTIFACT_TIMEOUT="${context_lines[8]}"
+  REVIEW_ARTIFACT_VERIFIER_TIMEOUT="${context_lines[9]}"
+  REVIEW_ARTIFACT_QUEUE_PATH="${context_lines[10]}"
 }
 
 detect_current_admin_state() {
@@ -459,6 +467,22 @@ run_current_admin_workflow_finalize() {
   if [ -z "$review_model" ]; then
     review_model="$DEFAULT_MODEL_REVIEW"
   fi
+  local verifier_model="$REVIEW_ARTIFACT_VERIFIER_MODEL"
+  if [ -z "$verifier_model" ]; then
+    verifier_model="$DEFAULT_MODEL_VERIFIER"
+  fi
+  local fallback_model="$REVIEW_ARTIFACT_FALLBACK_MODEL"
+  if [ -z "$fallback_model" ]; then
+    fallback_model="$DEFAULT_MODEL_FALLBACK"
+  fi
+  local senior_timeout="$REVIEW_ARTIFACT_TIMEOUT"
+  if [ -z "$senior_timeout" ]; then
+    senior_timeout="$DEFAULT_OLLAMA_TIMEOUT_SENIOR"
+  fi
+  local verifier_timeout="$REVIEW_ARTIFACT_VERIFIER_TIMEOUT"
+  if [ -z "$verifier_timeout" ]; then
+    verifier_timeout="$DEFAULT_OLLAMA_TIMEOUT_VERIFIER"
+  fi
 
   local -a finalize_args=(
     "$VENV_PYTHON"
@@ -467,8 +491,12 @@ run_current_admin_workflow_finalize() {
     --decision-file "$decision_file"
     --summary
     --model "$review_model"
+    --verifier-model "$verifier_model"
+    --fallback-model "$fallback_model"
     --review-mode "$REVIEW_ARTIFACT_MODE"
     --ollama-url "$DEFAULT_OLLAMA_URL"
+    --senior-timeout "$senior_timeout"
+    --verifier-timeout "$verifier_timeout"
   )
   if [ "$REVIEW_ARTIFACT_DRY_RUN" = "true" ]; then
     finalize_args+=(--dry-run)
@@ -569,9 +597,14 @@ run_current_admin_workflow_start() {
   local review_dry_run="false"
   local prefill_suggestions="false"
   local review_model=""
+  local verifier_model=""
+  local fallback_model=""
   local review_mode=""
   local deep_review="false"
   local ollama_url="$DEFAULT_OLLAMA_URL"
+  local timeout=""
+  local senior_timeout="$DEFAULT_OLLAMA_TIMEOUT_SENIOR"
+  local verifier_timeout="$DEFAULT_OLLAMA_TIMEOUT_VERIFIER"
 
   while [ "$#" -gt 0 ]; do
     case "$1" in
@@ -598,6 +631,16 @@ run_current_admin_workflow_start() {
         [ -n "$review_model" ] || { echo "--model requires a value" >&2; exit 1; }
         shift 2
         ;;
+      --verifier-model)
+        verifier_model="${2:-}"
+        [ -n "$verifier_model" ] || { echo "--verifier-model requires a value" >&2; exit 1; }
+        shift 2
+        ;;
+      --fallback-model)
+        fallback_model="${2:-}"
+        [ -n "$fallback_model" ] || { echo "--fallback-model requires a value" >&2; exit 1; }
+        shift 2
+        ;;
       --review-mode)
         review_mode="${2:-}"
         [ -n "$review_mode" ] || { echo "--review-mode requires a value" >&2; exit 1; }
@@ -616,6 +659,21 @@ run_current_admin_workflow_start() {
         [ -n "$ollama_url" ] || { echo "--ollama-url requires a value" >&2; exit 1; }
         shift 2
         ;;
+      --timeout)
+        timeout="${2:-}"
+        [ -n "$timeout" ] || { echo "--timeout requires a value" >&2; exit 1; }
+        shift 2
+        ;;
+      --senior-timeout)
+        senior_timeout="${2:-}"
+        [ -n "$senior_timeout" ] || { echo "--senior-timeout requires a value" >&2; exit 1; }
+        shift 2
+        ;;
+      --verifier-timeout)
+        verifier_timeout="${2:-}"
+        [ -n "$verifier_timeout" ] || { echo "--verifier-timeout requires a value" >&2; exit 1; }
+        shift 2
+        ;;
       -h|--help)
         current_admin_workflow_subcommand_usage start
         exit 0
@@ -630,6 +688,19 @@ run_current_admin_workflow_start() {
   if [ -z "$review_model" ]; then
     review_model="$DEFAULT_MODEL_REVIEW"
   fi
+  if [ -z "$verifier_model" ]; then
+    verifier_model="$DEFAULT_MODEL_VERIFIER"
+  fi
+  if [ -z "$fallback_model" ]; then
+    fallback_model="$DEFAULT_MODEL_FALLBACK"
+  fi
+  if [ -z "$review_mode" ]; then
+    review_mode="deep"
+  fi
+  if [ -n "$timeout" ]; then
+    senior_timeout="$timeout"
+    verifier_timeout="$timeout"
+  fi
 
   resolve_current_admin_context "$input_path" "$batch_name"
 
@@ -641,13 +712,15 @@ run_current_admin_workflow_start() {
     scripts/review_current_admin_batch_with_ollama.py
     --input "$CURRENT_ADMIN_NORMALIZED_PATH"
     --model "$review_model"
+    --verifier-model "$verifier_model"
+    --fallback-model "$fallback_model"
     --ollama-url "$ollama_url"
+    --senior-timeout "$senior_timeout"
+    --verifier-timeout "$verifier_timeout"
+    --review-mode "$review_mode"
   )
   if [ "$review_dry_run" = "true" ]; then
     review_args+=(--dry-run)
-  fi
-  if [ -n "$review_mode" ]; then
-    review_args+=(--review-mode "$review_mode")
   fi
   if [ "$deep_review" = "true" ]; then
     review_args+=(--deep-review)
@@ -674,14 +747,24 @@ run_current_admin_workflow_start() {
     "Generate a decision template or inspect batch status" \
     "$(cli_hint) current-admin workflow review --input $(repo_relative_path "$CURRENT_ADMIN_REVIEW_PATH") --output /tmp/${CURRENT_ADMIN_BATCH_NAME}.decision-template.json" \
     "BATCH: $CURRENT_ADMIN_BATCH_NAME" \
-    "MODEL: $review_model" \
+    "SENIOR MODEL: $review_model" \
+    "VERIFIER MODEL: $verifier_model" \
+    "FALLBACK MODEL: $fallback_model" \
+    "SENIOR TIMEOUT: ${senior_timeout}s" \
+    "VERIFIER TIMEOUT: ${verifier_timeout}s" \
     "OLLAMA URL: $ollama_url"
 }
 
 run_current_admin_review_command() {
   local -a passthrough=()
   local has_model="false"
+  local has_verifier_model="false"
+  local has_fallback_model="false"
   local has_ollama_url="false"
+  local has_timeout="false"
+  local has_senior_timeout="false"
+  local has_verifier_timeout="false"
+  local has_review_mode="false"
 
   while [ "$#" -gt 0 ]; do
     case "$1" in
@@ -700,11 +783,77 @@ run_current_admin_review_command() {
           shift
         fi
         ;;
+      --verifier-model|--verifier-model=*)
+        has_verifier_model="true"
+        passthrough+=("$1")
+        if [ "$1" = "--verifier-model" ]; then
+          [ -n "${2:-}" ] || { echo "--verifier-model requires a value" >&2; exit 1; }
+          passthrough+=("$2")
+          shift 2
+        else
+          shift
+        fi
+        ;;
+      --fallback-model|--fallback-model=*)
+        has_fallback_model="true"
+        passthrough+=("$1")
+        if [ "$1" = "--fallback-model" ]; then
+          [ -n "${2:-}" ] || { echo "--fallback-model requires a value" >&2; exit 1; }
+          passthrough+=("$2")
+          shift 2
+        else
+          shift
+        fi
+        ;;
       --ollama-url|--ollama-url=*)
         has_ollama_url="true"
         passthrough+=("$1")
         if [ "$1" = "--ollama-url" ]; then
           [ -n "${2:-}" ] || { echo "--ollama-url requires a value" >&2; exit 1; }
+          passthrough+=("$2")
+          shift 2
+        else
+          shift
+        fi
+        ;;
+      --timeout|--timeout=*)
+        has_timeout="true"
+        passthrough+=("$1")
+        if [ "$1" = "--timeout" ]; then
+          [ -n "${2:-}" ] || { echo "--timeout requires a value" >&2; exit 1; }
+          passthrough+=("$2")
+          shift 2
+        else
+          shift
+        fi
+        ;;
+      --senior-timeout|--senior-timeout=*)
+        has_senior_timeout="true"
+        passthrough+=("$1")
+        if [ "$1" = "--senior-timeout" ]; then
+          [ -n "${2:-}" ] || { echo "--senior-timeout requires a value" >&2; exit 1; }
+          passthrough+=("$2")
+          shift 2
+        else
+          shift
+        fi
+        ;;
+      --verifier-timeout|--verifier-timeout=*)
+        has_verifier_timeout="true"
+        passthrough+=("$1")
+        if [ "$1" = "--verifier-timeout" ]; then
+          [ -n "${2:-}" ] || { echo "--verifier-timeout requires a value" >&2; exit 1; }
+          passthrough+=("$2")
+          shift 2
+        else
+          shift
+        fi
+        ;;
+      --review-mode|--review-mode=*|--deep-review)
+        has_review_mode="true"
+        passthrough+=("$1")
+        if [ "$1" = "--review-mode" ]; then
+          [ -n "${2:-}" ] || { echo "--review-mode requires a value" >&2; exit 1; }
           passthrough+=("$2")
           shift 2
         else
@@ -721,8 +870,27 @@ run_current_admin_review_command() {
   if [ "$has_model" = "false" ]; then
     passthrough+=(--model "$DEFAULT_MODEL_REVIEW")
   fi
+  if [ "$has_verifier_model" = "false" ]; then
+    passthrough+=(--verifier-model "$DEFAULT_MODEL_VERIFIER")
+  fi
+  if [ "$has_fallback_model" = "false" ]; then
+    passthrough+=(--fallback-model "$DEFAULT_MODEL_FALLBACK")
+  fi
   if [ "$has_ollama_url" = "false" ]; then
     passthrough+=(--ollama-url "$DEFAULT_OLLAMA_URL")
+  fi
+  if [ "$has_timeout" = "true" ]; then
+    :
+  else
+    if [ "$has_senior_timeout" = "false" ]; then
+      passthrough+=(--senior-timeout "$DEFAULT_OLLAMA_TIMEOUT_SENIOR")
+    fi
+    if [ "$has_verifier_timeout" = "false" ]; then
+      passthrough+=(--verifier-timeout "$DEFAULT_OLLAMA_TIMEOUT_VERIFIER")
+    fi
+  fi
+  if [ "$has_review_mode" = "false" ]; then
+    passthrough+=(--review-mode deep)
   fi
 
   run_step "1/1" "AI Review" "AI review command complete" -- \
@@ -733,6 +901,7 @@ run_current_admin_discover_command() {
   local -a passthrough=()
   local has_model="false"
   local has_ollama_url="false"
+  local has_timeout="false"
 
   while [ "$#" -gt 0 ]; do
     case "$1" in
@@ -762,6 +931,17 @@ run_current_admin_discover_command() {
           shift
         fi
         ;;
+      --timeout|--timeout=*)
+        has_timeout="true"
+        passthrough+=("$1")
+        if [ "$1" = "--timeout" ]; then
+          [ -n "${2:-}" ] || { echo "--timeout requires a value" >&2; exit 1; }
+          passthrough+=("$2")
+          shift 2
+        else
+          shift
+        fi
+        ;;
       *)
         passthrough+=("$1")
         shift
@@ -774,6 +954,9 @@ run_current_admin_discover_command() {
   fi
   if [ "$has_ollama_url" = "false" ]; then
     passthrough+=(--ollama-url "$DEFAULT_OLLAMA_URL")
+  fi
+  if [ "$has_timeout" = "false" ]; then
+    passthrough+=(--timeout "$DEFAULT_OLLAMA_TIMEOUT_VERIFIER")
   fi
 
   run_step "1/1" "Discover Current-Admin Updates" "Discovery run complete" -- \
@@ -819,6 +1002,11 @@ run_legislative_command() {
   case "$command" in
     run)
       local review_model="$DEFAULT_MODEL_REVIEW"
+      local verifier_model="$DEFAULT_MODEL_VERIFIER"
+      local fallback_model="$DEFAULT_MODEL_FALLBACK"
+      local timeout=""
+      local senior_timeout="$DEFAULT_OLLAMA_TIMEOUT_SENIOR"
+      local verifier_timeout="$DEFAULT_OLLAMA_TIMEOUT_VERIFIER"
       local -a passthrough=()
 
       while [ "$#" -gt 0 ]; do
@@ -826,6 +1014,31 @@ run_legislative_command() {
           --model)
             review_model="${2:-}"
             [ -n "$review_model" ] || { echo "--model requires a value" >&2; exit 1; }
+            shift 2
+            ;;
+          --verifier-model)
+            verifier_model="${2:-}"
+            [ -n "$verifier_model" ] || { echo "--verifier-model requires a value" >&2; exit 1; }
+            shift 2
+            ;;
+          --fallback-model)
+            fallback_model="${2:-}"
+            [ -n "$fallback_model" ] || { echo "--fallback-model requires a value" >&2; exit 1; }
+            shift 2
+            ;;
+          --timeout)
+            timeout="${2:-}"
+            [ -n "$timeout" ] || { echo "--timeout requires a value" >&2; exit 1; }
+            shift 2
+            ;;
+          --senior-timeout)
+            senior_timeout="${2:-}"
+            [ -n "$senior_timeout" ] || { echo "--senior-timeout requires a value" >&2; exit 1; }
+            shift 2
+            ;;
+          --verifier-timeout)
+            verifier_timeout="${2:-}"
+            [ -n "$verifier_timeout" ] || { echo "--verifier-timeout requires a value" >&2; exit 1; }
             shift 2
             ;;
           --skip-discovery|--apply-safe-removals|--csv)
@@ -848,6 +1061,11 @@ run_legislative_command() {
         esac
       done
 
+      if [ -n "$timeout" ]; then
+        senior_timeout="$timeout"
+        verifier_timeout="$timeout"
+      fi
+
       if ! command_has_flag "--csv" "${passthrough[@]}"; then
         passthrough+=(--csv)
       fi
@@ -861,7 +1079,13 @@ run_legislative_command() {
         --output "$(future_bill_manual_queue_path)" \
         --output "$(future_bill_suggestion_path)" \
         -- \
-        "$VENV_PYTHON" run_equitystack_pipeline.py --model "$review_model" "${passthrough[@]}"
+        "$VENV_PYTHON" run_equitystack_pipeline.py \
+          --review-model "$review_model" \
+          --verifier-model "$verifier_model" \
+          --fallback-model "$fallback_model" \
+          --senior-timeout "$senior_timeout" \
+          --verifier-timeout "$verifier_timeout" \
+          "${passthrough[@]}"
 
       run_step "2/3" "Auto-Triage Review Bundle" "Safe review bundle actions auto-triaged" -- \
         "$VENV_PYTHON" scripts/auto_triage_review_bundle.py --apply --yes --auto-approve-safe-actions
@@ -873,7 +1097,11 @@ run_legislative_command() {
         "REVIEW_READY" \
         "Review the updated bundle and approve or reject actions" \
         "$(cli_hint) legislative review" \
-        "MODEL: $review_model" \
+        "SENIOR MODEL: $review_model" \
+        "VERIFIER MODEL: $verifier_model" \
+        "FALLBACK MODEL: $fallback_model" \
+        "SENIOR TIMEOUT: ${senior_timeout}s" \
+        "VERIFIER TIMEOUT: ${verifier_timeout}s" \
         "PIPELINE REPORT: $(repo_relative_path "$(pipeline_report_path)")"
       ;;
     review)
@@ -882,38 +1110,132 @@ run_legislative_command() {
         "$VENV_PYTHON" scripts/review_bundle_actions.py
       ;;
     apply)
-      [ "$#" -eq 0 ] || { echo "equitystack legislative apply does not accept extra arguments" >&2; exit 1; }
-      run_step "1/3" "Apply Review Bundle" "Approved legislative actions applied" --output "$(apply_report_path)" -- \
-        "$VENV_PYTHON" scripts/apply_review_bundle.py --apply --yes --csv
+      local dry_run="false"
+      local explicit_apply="false"
+      local confirmed="false"
+      while [ "$#" -gt 0 ]; do
+        case "$1" in
+          --dry-run)
+            dry_run="true"
+            shift
+            ;;
+          --apply)
+            explicit_apply="true"
+            shift
+            ;;
+          --yes)
+            confirmed="true"
+            shift
+            ;;
+          -h|--help)
+            legislative_usage
+            exit 0
+            ;;
+          *)
+            echo "Unknown argument for legislative apply: $1" >&2
+            exit 1
+            ;;
+        esac
+      done
 
-      if apply_report_has_affected_bills; then
-        run_step "2/3" "Rerun Affected Future Bills" "Affected future bills rerun" -- \
-          "$VENV_PYTHON" scripts/rerun_affected_future_bills.py --from-apply-report "$(apply_report_path)" --csv
-      else
-        print_step_header "2/3" "Rerun Affected Future Bills"
-        printf 'SUCCESS: No affected future bills were recorded. Skipping rerun.\n'
+      if [ "$dry_run" = "true" ] && [ "$explicit_apply" = "true" ]; then
+        echo "Use either --dry-run or --apply --yes for legislative apply" >&2
+        exit 1
       fi
 
-      run_step "3/3" "Rebuild Review Bundle" "Review bundle rebuilt" --output "$(review_bundle_path)" -- \
-        "$VENV_PYTHON" scripts/build_review_bundle.py --csv --use-feedback
+      if [ "$dry_run" = "true" ]; then
+        run_step "1/1" "Dry-Run Apply Review Bundle" "Legislative apply preview complete" --output "$(apply_report_path)" -- \
+          "$VENV_PYTHON" scripts/apply_review_bundle.py --csv
 
-      print_system_state \
-        "REVIEW_READY" \
-        "Inspect the refreshed review bundle" \
-        "$(cli_hint) legislative review"
+        print_system_state \
+          "APPLY_READY" \
+          "Inspect the dry-run report, then apply approved legislative actions when ready" \
+          "$(cli_hint) legislative apply --apply --yes"
+      else
+        if [ "$explicit_apply" = "true" ] && [ "$confirmed" != "true" ]; then
+          echo "equitystack legislative apply --apply requires --yes" >&2
+          exit 1
+        fi
+
+        run_step "1/3" "Apply Review Bundle" "Approved legislative actions applied" --output "$(apply_report_path)" -- \
+          "$VENV_PYTHON" scripts/apply_review_bundle.py --apply --yes --csv
+
+        if apply_report_has_affected_bills; then
+          run_step "2/3" "Rerun Affected Future Bills" "Affected future bills rerun" -- \
+            "$VENV_PYTHON" scripts/rerun_affected_future_bills.py --from-apply-report "$(apply_report_path)" --csv
+        else
+          print_step_header "2/3" "Rerun Affected Future Bills"
+          printf 'SUCCESS: No affected future bills were recorded. Skipping rerun.\n'
+        fi
+
+        run_step "3/3" "Rebuild Review Bundle" "Review bundle rebuilt" --output "$(review_bundle_path)" -- \
+          "$VENV_PYTHON" scripts/build_review_bundle.py --csv --use-feedback
+
+        print_system_state \
+          "REVIEW_READY" \
+          "Inspect the refreshed review bundle" \
+          "$(cli_hint) legislative review"
+      fi
       ;;
     import)
-      [ "$#" -eq 0 ] || { echo "equitystack legislative import does not accept extra arguments" >&2; exit 1; }
-      run_step "1/2" "Import Approved Tracked Bills" "Approved tracked bills imported" -- \
-        "$VENV_PYTHON" scripts/import_approved_tracked_bills.py --apply --yes --link-imported-bills --enrich-metadata --csv
+      local dry_run="false"
+      local explicit_apply="false"
+      local confirmed="false"
+      while [ "$#" -gt 0 ]; do
+        case "$1" in
+          --dry-run)
+            dry_run="true"
+            shift
+            ;;
+          --apply)
+            explicit_apply="true"
+            shift
+            ;;
+          --yes)
+            confirmed="true"
+            shift
+            ;;
+          -h|--help)
+            legislative_usage
+            exit 0
+            ;;
+          *)
+            echo "Unknown argument for legislative import: $1" >&2
+            exit 1
+            ;;
+        esac
+      done
 
-      run_step "2/2" "Rebuild Review Bundle" "Review bundle rebuilt" --output "$(review_bundle_path)" -- \
-        "$VENV_PYTHON" scripts/build_review_bundle.py --csv --use-feedback
+      if [ "$dry_run" = "true" ] && [ "$explicit_apply" = "true" ]; then
+        echo "Use either --dry-run or --apply --yes for legislative import" >&2
+        exit 1
+      fi
 
-      print_system_state \
-        "REVIEW_READY" \
-        "Review the new bundle after import" \
-        "$(cli_hint) legislative review"
+      if [ "$dry_run" = "true" ]; then
+        run_step "1/1" "Dry-Run Import Approved Tracked Bills" "Legislative import preview complete" -- \
+          "$VENV_PYTHON" scripts/import_approved_tracked_bills.py --link-imported-bills --enrich-metadata --csv
+
+        print_system_state \
+          "IMPORT_READY" \
+          "Inspect the dry-run import report, then apply the approved tracked-bill import when ready" \
+          "$(cli_hint) legislative import --apply --yes"
+      else
+        if [ "$explicit_apply" = "true" ] && [ "$confirmed" != "true" ]; then
+          echo "equitystack legislative import --apply requires --yes" >&2
+          exit 1
+        fi
+
+        run_step "1/2" "Import Approved Tracked Bills" "Approved tracked bills imported" -- \
+          "$VENV_PYTHON" scripts/import_approved_tracked_bills.py --apply --yes --link-imported-bills --enrich-metadata --csv
+
+        run_step "2/2" "Rebuild Review Bundle" "Review bundle rebuilt" --output "$(review_bundle_path)" -- \
+          "$VENV_PYTHON" scripts/build_review_bundle.py --csv --use-feedback
+
+        print_system_state \
+          "REVIEW_READY" \
+          "Review the new bundle after import" \
+          "$(cli_hint) legislative review"
+      fi
       ;;
     feedback)
       [ "$#" -eq 0 ] || { echo "equitystack legislative feedback does not accept extra arguments" >&2; exit 1; }
@@ -1050,9 +1372,13 @@ Usage:
   equitystack current-admin <command> [args]
 
 Shared runtime defaults:
-  cheap AI steps:   $DEFAULT_MODEL_CHEAP
-  review AI steps:  $DEFAULT_MODEL_REVIEW
+  verifier AI:      $DEFAULT_MODEL_VERIFIER
+  review AI:        $DEFAULT_MODEL_REVIEW
+  fallback AI:      $DEFAULT_MODEL_FALLBACK
+  executor model:   $DEFAULT_MODEL_EXECUTOR
   Ollama server:    $DEFAULT_OLLAMA_URL
+  senior timeout:   ${DEFAULT_OLLAMA_TIMEOUT_SENIOR}s
+  verifier timeout: ${DEFAULT_OLLAMA_TIMEOUT_VERIFIER}s
 
 Legislative commands:
   run        Run the daily review-first pipeline, auto-triage safe actions, rebuild the bundle
@@ -1097,17 +1423,28 @@ Usage:
 Commands:
   run        Run the daily pipeline, auto-triage safe actions, and rebuild the review bundle
   review     Open the legislative review CLI
-  apply      Apply approved legislative actions, rerun affected bills if needed, rebuild the bundle
-  import     Import approved tracked-bill seed rows and rebuild the bundle
+  apply      Dry-run or apply approved legislative actions
+  import     Dry-run or apply approved tracked-bill seed rows
   feedback   Refresh feedback analysis and rebuild the bundle
 
 Run options:
-  --model <name>                Override the review model for the daily pipeline
+  --model <name>                Override the senior review model for the daily pipeline
+  --verifier-model <name>       Override the 9B-style verifier model for draft/assist stages
+  --fallback-model <name>       Override the fallback reviewer model used after senior-review failure
+  --timeout <seconds>           Legacy alias that sets both senior and verifier timeouts
+  --senior-timeout <seconds>    Override the 27B review timeout
+  --verifier-timeout <seconds>  Override the 9B verifier/fallback timeout
   --skip-discovery              Pass through to run_equitystack_pipeline.py
   --apply-safe-removals         Pass through to run_equitystack_pipeline.py
   --only-future-bill-id <id>    Limit the pipeline to one or more future bills
   --output-report <path>        Override the pipeline report path
   --csv                         Ensure supporting CSV reports are written
+
+Apply / import options:
+  legislative apply --dry-run
+  legislative apply --apply --yes
+  legislative import --dry-run
+  legislative import --apply --yes
 EOF
 }
 
@@ -1131,12 +1468,17 @@ Commands:
 
 Defaults:
   current-admin review and workflow decision steps default to:
-    model      $DEFAULT_MODEL_REVIEW
-    ollama-url $DEFAULT_OLLAMA_URL
+    senior-model   $DEFAULT_MODEL_REVIEW
+    verifier-model $DEFAULT_MODEL_VERIFIER
+    fallback-model $DEFAULT_MODEL_FALLBACK
+    senior-timeout ${DEFAULT_OLLAMA_TIMEOUT_SENIOR}s
+    verifier-timeout ${DEFAULT_OLLAMA_TIMEOUT_VERIFIER}s
+    ollama-url     $DEFAULT_OLLAMA_URL
 
   current-admin discovery defaults to:
-    model      $DEFAULT_MODEL_CHEAP
-    ollama-url $DEFAULT_OLLAMA_URL
+    model       $DEFAULT_MODEL_VERIFIER
+    timeout     ${DEFAULT_OLLAMA_TIMEOUT_VERIFIER}s
+    ollama-url  $DEFAULT_OLLAMA_URL
 EOF
 }
 
@@ -1159,7 +1501,7 @@ current_admin_workflow_subcommand_usage() {
     start)
       cat <<EOF
 Usage:
-  equitystack current-admin workflow start [--input <batch-file> | --batch-name <batch-name>] [--review-dry-run] [--prefill-suggestions] [--model <name>] [--ollama-url <url>] [--deep-review | --review-mode <standard|deep>]
+  equitystack current-admin workflow start [--input <batch-file> | --batch-name <batch-name>] [--review-dry-run] [--prefill-suggestions] [--model <senior-name>] [--verifier-model <name>] [--fallback-model <name>] [--timeout <seconds>] [--senior-timeout <seconds>] [--verifier-timeout <seconds>] [--ollama-url <url>] [--deep-review | --review-mode <standard|deep>]
 
 Runs the existing safe pre-import workflow:
   normalize -> review -> queue
@@ -1211,7 +1553,8 @@ Runs:
   python3 scripts/discover_current_admin_updates.py [args]
 
 Wrapper defaults:
-  --model $DEFAULT_MODEL_CHEAP
+  --model $DEFAULT_MODEL_VERIFIER
+  --timeout $DEFAULT_OLLAMA_TIMEOUT_VERIFIER
   --ollama-url $DEFAULT_OLLAMA_URL
 EOF
       ;;
@@ -1243,6 +1586,11 @@ Runs:
 
 Wrapper defaults:
   --model $DEFAULT_MODEL_REVIEW
+  --verifier-model $DEFAULT_MODEL_VERIFIER
+  --fallback-model $DEFAULT_MODEL_FALLBACK
+  --senior-timeout $DEFAULT_OLLAMA_TIMEOUT_SENIOR
+  --verifier-timeout $DEFAULT_OLLAMA_TIMEOUT_VERIFIER
+  --review-mode deep
   --ollama-url $DEFAULT_OLLAMA_URL
 EOF
       ;;
