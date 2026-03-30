@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PYTHON_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+cd "$PYTHON_DIR"
+
+python3 -m venv --clear venv
+./venv/bin/python -m pip install --upgrade pip
+./venv/bin/python -m pip install -r requirements-local.txt
+
+cat <<'EOF'
+
+Local Python environment is ready.
+
+Recommended usage:
+  cd python
+  ./bin/equitystack --help
+
+If you need production-style DB access from local dev:
+  DB_HOST=10.10.0.13 ./bin/equitystack current-admin status
+EOF

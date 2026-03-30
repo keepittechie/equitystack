@@ -1,0 +1,6 @@
+# Local runtime dependencies for the EquityStack Python CLI and scripts.
+# This file is intentionally minimal and only includes the third-party
+# packages imported by the Python workflow code.
+
+PyMySQL==1.1.2
+requests==2.32.5
