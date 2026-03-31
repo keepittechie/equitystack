@@ -429,42 +429,38 @@ export default function OperatorConsole({
           </div>
         </div>
 
-        <div className="mt-4">
-          <p className="text-[11px] font-medium uppercase tracking-wide text-gray-500">Filters</p>
-          <div className="mt-2 grid gap-2 md:grid-cols-4">
-            {ACTION_COLUMNS.map((group) => {
-              const isSelectedColumn = selectedWorkflow === group.key;
-              return (
-                <button
-                  key={`filter-${group.key}`}
-                  type="button"
-                  onClick={() => setSelectedWorkflow(group.key)}
-                  disabled={isLocked}
-                  aria-pressed={isSelectedColumn}
-                  className={`rounded-lg border px-3 py-2 text-left text-sm font-medium disabled:cursor-not-allowed disabled:opacity-60 ${
-                    isSelectedColumn ? "border-black bg-black text-white" : "bg-white text-gray-900"
-                  }`}
-                >
-                  {group.label}
-                </button>
-              );
-            })}
-          </div>
+        <div className="mt-4 grid gap-2 md:grid-cols-4">
+          {ACTION_COLUMNS.map((group) => {
+            const isSelectedColumn = selectedWorkflow === group.key;
+            return (
+              <button
+                key={`filter-${group.key}`}
+                type="button"
+                onClick={() => setSelectedWorkflow(group.key)}
+                disabled={isLocked}
+                aria-pressed={isSelectedColumn}
+                className={`rounded-lg border px-3 py-2 text-left text-sm font-medium disabled:cursor-not-allowed disabled:opacity-60 ${
+                  isSelectedColumn ? "border-black bg-black text-white" : "bg-white text-gray-900"
+                }`}
+              >
+                {group.label}
+              </button>
+            );
+          })}
         </div>
 
-        <div className="mt-4 grid gap-3 xl:grid-cols-4">
+        <div className="mt-2 grid gap-2 xl:grid-cols-4">
           {ACTION_COLUMNS.map((group) => {
             const actions = groupedActions[group.key] || [];
             const isSelectedColumn = selectedWorkflow === group.key;
             return (
               <div
                 key={group.key}
-                className={`rounded-xl border p-3 ${
+                className={`rounded-xl border p-2 ${
                   isSelectedColumn ? "border-black bg-gray-50" : "border-gray-200"
                 }`}
               >
-                <p className="text-sm font-semibold">{group.label}</p>
-                <div className="mt-3 space-y-2">
+                <div className="space-y-1.5">
                   {actions.length ? (
                     actions.map((action) => {
                       const isSelectedAction = selectedActionId === action.id;
@@ -474,14 +470,16 @@ export default function OperatorConsole({
                           type="button"
                           onClick={() => selectAction(action)}
                           disabled={isLocked}
-                          className={`block w-full rounded-lg border px-3 py-2 text-left text-sm disabled:cursor-not-allowed disabled:opacity-60 ${
+                          className={`block w-full rounded-lg border px-2.5 py-2 text-left text-xs disabled:cursor-not-allowed disabled:opacity-60 ${
                             isSelectedAction
                               ? "border-black bg-white"
                               : "border-gray-200 bg-white hover:bg-gray-50"
                           }`}
                         >
-                          <p className="font-medium">{action.label}</p>
-                          <p className="mt-1 text-xs text-gray-600">{action.description}</p>
+                          <p className="font-medium text-sm">{action.label}</p>
+                          <p className="mt-1 font-mono text-[11px] text-gray-600">
+                            {action.canonical_input}
+                          </p>
                         </button>
                       );
                     })
