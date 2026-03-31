@@ -560,7 +560,7 @@ export default function OperatorConsole({
                     onClick={() => setSelectedWorkflow(column.key)}
                     disabled={isLocked}
                     aria-pressed={isSelectedColumn}
-                    className={`border-r px-3 py-2 text-left text-sm font-semibold last:border-r-0 disabled:cursor-not-allowed disabled:opacity-60 ${
+                    className={`border-r px-3 py-2 text-center text-sm font-semibold last:border-r-0 disabled:cursor-not-allowed disabled:opacity-60 ${
                       isSelectedColumn ? "bg-black text-white" : "text-gray-900"
                     }`}
                   >
@@ -589,19 +589,16 @@ export default function OperatorConsole({
                             type="button"
                             onClick={() => selectAction(cell.action)}
                             disabled={isLocked}
-                            className={`block h-full w-full rounded-lg border px-2.5 py-2 text-left disabled:cursor-not-allowed disabled:opacity-60 ${
+                            className={`block h-full w-full rounded-lg border px-2.5 py-2 text-center disabled:cursor-not-allowed disabled:opacity-60 ${
                               selectedActionId === cell.action.id
                                 ? "border-black bg-white"
                                 : "border-gray-200 bg-white hover:bg-gray-50"
                             }`}
                           >
                             <p className="text-sm font-medium text-gray-900">{cell.action.label}</p>
-                            <p className="mt-1 font-mono text-[11px] text-gray-600">
-                              {cell.action.canonical_input}
-                            </p>
                           </button>
                         ) : cell.type === "placeholder" ? (
-                          <div className="flex h-full items-start rounded-lg border border-dashed px-2.5 py-2 text-xs text-gray-500">
+                          <div className="flex h-full items-center justify-center rounded-lg border border-dashed px-2.5 py-2 text-center text-xs text-gray-500">
                             {cell.text}
                           </div>
                         ) : (
