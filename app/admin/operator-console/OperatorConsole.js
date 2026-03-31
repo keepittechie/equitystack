@@ -5,15 +5,81 @@ import { useMemo, useState, useTransition } from "react";
 import RecommendationList from "../components/RecommendationList";
 import {
   getSuggestedOperatorActions,
-  groupOperatorActionsByWorkflow,
   resolveExactOperatorActionFromInput,
 } from "@/lib/operator/operatorActionUtils.js";
 
 const ACTION_COLUMNS = [
-  { key: "current-admin", label: "Current-Admin" },
-  { key: "legislative", label: "Legislative" },
-  { key: "policies", label: "Policies" },
-  { key: "system", label: "System" },
+  {
+    key: "current-admin",
+    label: "Current-Admin",
+    actions: [
+      {
+        id: "current_admin_workflow_start",
+        label: "Start Current-Admin Workflow",
+        canonical_input:
+          "./bin/equitystack current-admin workflow start --input data/current_admin_batches/<batch-file>.json",
+      },
+      {
+        id: "current_admin_workflow_resume",
+        label: "Resume Current-Admin Workflow",
+        canonical_input: "./bin/equitystack current-admin workflow resume",
+      },
+      {
+        id: "current_admin_discover",
+        label: "Run Current-Admin Discovery",
+        canonical_input: "./bin/equitystack current-admin discover",
+      },
+      {
+        id: "current_admin_status",
+        label: "Run Current-Admin Status",
+        canonical_input: "./bin/equitystack current-admin status",
+      },
+      {
+        id: "current_admin_precommit",
+        label: "Run Current-Admin Pre-Commit",
+        canonical_input:
+          "./bin/equitystack current-admin pre-commit --input reports/current_admin/<batch-name>.manual-review-queue.json",
+      },
+    ],
+  },
+  {
+    key: "legislative",
+    label: "Legislative",
+    actions: [
+      {
+        id: "legislative_run",
+        label: "Run Legislative Workflow",
+        canonical_input: "./bin/equitystack legislative run",
+      },
+      {
+        id: "legislative_apply_dry_run",
+        label: "Run Legislative Apply Dry-Run",
+        canonical_input: "./bin/equitystack legislative apply --dry-run",
+      },
+    ],
+  },
+  {
+    key: "policies",
+    label: "Policies",
+    actions: [],
+    placeholder: "Policy workflow actions coming soon",
+  },
+  {
+    key: "system",
+    label: "System",
+    actions: [
+      {
+        id: "summarize_state",
+        label: "Summarize Latest Workflow State",
+        canonical_input: "summarize state",
+      },
+      {
+        id: "show_attention",
+        label: "Show What Needs Attention",
+        canonical_input: "show what needs attention",
+      },
+    ],
+  },
 ];
 const HISTORY_PAGE_SIZE = 10;
 
@@ -118,6 +184,29 @@ function SpinnerDot() {
   );
 }
 
+function buildFixedActionColumns(quickActions) {
+  const quickActionById = new Map((quickActions || []).map((action) => [action.id, action]));
+
+  return ACTION_COLUMNS.map((column) => ({
+    ...column,
+    actions: column.actions.map((action) => ({
+      ...action,
+      ...(quickActionById.get(action.id) || {}),
+      id: action.id,
+      label: action.label,
+      canonical_input: action.canonical_input,
+      workflow: column.key,
+    })),
+  }));
+}
+
+function findColumnForActionId(actionId) {
+  return (
+    ACTION_COLUMNS.find((column) => column.actions.some((action) => action.id === actionId))?.key ||
+    "current-admin"
+  );
+}
+
 export default function OperatorConsole({
   quickActions,
   initialTrace,
@@ -127,10 +216,11 @@ export default function OperatorConsole({
   initialNotice,
   initialActiveExecution,
 }) {
+  const fixedActionColumns = useMemo(() => buildFixedActionColumns(quickActions), [quickActions]);
   const [message, setMessage] = useState(initialInput || "");
   const [selectedActionId, setSelectedActionId] = useState(initialActionId || "");
   const [selectedWorkflow, setSelectedWorkflow] = useState(
-    quickActions.find((action) => action.id === initialActionId)?.workflow || "current-admin"
+    findColumnForActionId(initialActionId)
   );
   const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
   const [trace, setTrace] = useState(initialTrace);
@@ -151,13 +241,11 @@ export default function OperatorConsole({
     [quickActions, message]
   );
 
-  const groupedActions = useMemo(
-    () => groupOperatorActionsByWorkflow(quickActions || []),
-    [quickActions]
-  );
-
   const selectedAction =
     quickActions.find((action) => action.id === selectedActionId) ||
+    fixedActionColumns
+      .flatMap((column) => column.actions)
+      .find((action) => action.id === selectedActionId) ||
     exactMatchAction ||
     null;
   const effectiveExecution = activeExecution;
@@ -174,14 +262,14 @@ export default function OperatorConsole({
     setMessage(nextValue);
     const matchedAction = resolveExactOperatorActionFromInput(quickActions, nextValue);
     setSelectedActionId(matchedAction?.id || "");
-    setSelectedWorkflow(matchedAction?.workflow || selectedWorkflow);
+    setSelectedWorkflow(matchedAction?.id ? findColumnForActionId(matchedAction.id) : selectedWorkflow);
     setActiveSuggestionIndex(-1);
     setNotice("");
   }
 
   function selectAction(action) {
     setSelectedActionId(action.id);
-    setSelectedWorkflow(action.workflow);
+    setSelectedWorkflow(findColumnForActionId(action.id));
     setMessage(action.canonical_input);
     setActiveSuggestionIndex(-1);
     setNotice("");
@@ -430,39 +518,38 @@ export default function OperatorConsole({
         </div>
 
         <div className="mt-4 grid gap-2 md:grid-cols-4">
-          {ACTION_COLUMNS.map((group) => {
-            const isSelectedColumn = selectedWorkflow === group.key;
+          {fixedActionColumns.map((column) => {
+            const isSelectedColumn = selectedWorkflow === column.key;
             return (
               <button
-                key={`filter-${group.key}`}
+                key={`filter-${column.key}`}
                 type="button"
-                onClick={() => setSelectedWorkflow(group.key)}
+                onClick={() => setSelectedWorkflow(column.key)}
                 disabled={isLocked}
                 aria-pressed={isSelectedColumn}
                 className={`rounded-lg border px-3 py-2 text-left text-sm font-medium disabled:cursor-not-allowed disabled:opacity-60 ${
                   isSelectedColumn ? "border-black bg-black text-white" : "bg-white text-gray-900"
                 }`}
               >
-                {group.label}
+                {column.label}
               </button>
             );
           })}
         </div>
 
         <div className="mt-2 grid gap-2 xl:grid-cols-4">
-          {ACTION_COLUMNS.map((group) => {
-            const actions = groupedActions[group.key] || [];
-            const isSelectedColumn = selectedWorkflow === group.key;
+          {fixedActionColumns.map((column) => {
+            const isSelectedColumn = selectedWorkflow === column.key;
             return (
               <div
-                key={group.key}
+                key={column.key}
                 className={`rounded-xl border p-2 ${
                   isSelectedColumn ? "border-black bg-gray-50" : "border-gray-200"
                 }`}
               >
                 <div className="space-y-1.5">
-                  {actions.length ? (
-                    actions.map((action) => {
+                  {column.actions.length ? (
+                    column.actions.map((action) => {
                       const isSelectedAction = selectedActionId === action.id;
                       return (
                         <button
@@ -485,8 +572,8 @@ export default function OperatorConsole({
                     })
                   ) : (
                     <div className="rounded-lg border border-dashed px-3 py-3 text-xs text-gray-500">
-                      {group.key === "policies"
-                        ? "Policy workflow actions coming soon."
+                      {column.key === "policies"
+                        ? column.placeholder
                         : "No actions are registered in this column."}
                     </div>
                   )}
