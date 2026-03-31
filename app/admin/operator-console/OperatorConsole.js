@@ -429,6 +429,29 @@ export default function OperatorConsole({
           </div>
         </div>
 
+        <div className="mt-4">
+          <p className="text-[11px] font-medium uppercase tracking-wide text-gray-500">Filters</p>
+          <div className="mt-2 grid gap-2 md:grid-cols-4">
+            {ACTION_COLUMNS.map((group) => {
+              const isSelectedColumn = selectedWorkflow === group.key;
+              return (
+                <button
+                  key={`filter-${group.key}`}
+                  type="button"
+                  onClick={() => setSelectedWorkflow(group.key)}
+                  disabled={isLocked}
+                  aria-pressed={isSelectedColumn}
+                  className={`rounded-lg border px-3 py-2 text-left text-sm font-medium disabled:cursor-not-allowed disabled:opacity-60 ${
+                    isSelectedColumn ? "border-black bg-black text-white" : "bg-white text-gray-900"
+                  }`}
+                >
+                  {group.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
         <div className="mt-4 grid gap-3 xl:grid-cols-4">
           {ACTION_COLUMNS.map((group) => {
             const actions = groupedActions[group.key] || [];
@@ -440,14 +463,7 @@ export default function OperatorConsole({
                   isSelectedColumn ? "border-black bg-gray-50" : "border-gray-200"
                 }`}
               >
-                <button
-                  type="button"
-                  onClick={() => setSelectedWorkflow(group.key)}
-                  disabled={isLocked}
-                  className="w-full text-left disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  <p className="text-sm font-semibold">{group.label}</p>
-                </button>
+                <p className="text-sm font-semibold">{group.label}</p>
                 <div className="mt-3 space-y-2">
                   {actions.length ? (
                     actions.map((action) => {
