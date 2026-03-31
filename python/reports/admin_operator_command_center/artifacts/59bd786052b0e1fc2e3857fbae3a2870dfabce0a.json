@@ -1,0 +1,42 @@
+{
+  "id": "artifact_d7e1db4fe17811fbb8ec33b364ef87106ff6b1d5",
+  "sessionId": "legislative:review-bundle",
+  "workflowFamily": "legislative",
+  "artifactKey": "partial_suggestions",
+  "label": "partial suggestions",
+  "stage": "partial_suggestions",
+  "canonicalPath": "/home/josh/Documents/GitHub/equitystack/python/reports/future_bill_link_partial_suggestions.json",
+  "fileName": "future_bill_link_partial_suggestions.json",
+  "exists": false,
+  "generatedAt": null,
+  "source": "canonical_artifact",
+  "latestJobRunId": null,
+  "relatedJobRunIds": [],
+  "metadataJson": {
+    "summary": null,
+    "executor": {
+      "execution_mode": "local_cli",
+      "executor_model": null,
+      "executor_backend": "local_cli",
+      "executor_host": "localhost",
+      "executor_transport": "shell"
+    },
+    "execution_mode": "local_cli",
+    "executor_transport": "shell",
+    "execution_runtime": {
+      "execution_mode": "local_cli",
+      "executor": {
+        "execution_mode": "local_cli",
+        "executor_model": null,
+        "executor_backend": "local_cli",
+        "executor_host": "localhost",
+        "executor_transport": "shell"
+      },
+      "executor_transport": "shell"
+    },
+    "session_key": "equitystack_review_bundle.json",
+    "workflow_state": "DISCOVERY_READY"
+  },
+  "createdAt": "2026-03-31T20:22:21.758Z",
+  "updatedAt": "2026-03-31T22:35:05.469Z"
+}

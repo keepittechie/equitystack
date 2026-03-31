@@ -1,0 +1,42 @@
+{
+  "id": "artifact_364852340c42775964741359387bcdaa9cdfc7dc",
+  "sessionId": "current-admin:trump-2025-batch-01",
+  "workflowFamily": "current-admin",
+  "artifactKey": "manual_review_queue",
+  "label": "Manual review queue",
+  "stage": "QUEUE_READY",
+  "canonicalPath": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.manual-review-queue.json",
+  "fileName": "trump-2025-batch-01.manual-review-queue.json",
+  "exists": false,
+  "generatedAt": null,
+  "source": "canonical_artifact",
+  "latestJobRunId": null,
+  "relatedJobRunIds": [],
+  "metadataJson": {
+    "summary": null,
+    "executor": {
+      "execution_mode": "local_cli",
+      "executor_model": null,
+      "executor_backend": "local_cli",
+      "executor_host": "localhost",
+      "executor_transport": "shell"
+    },
+    "execution_mode": "local_cli",
+    "executor_transport": "shell",
+    "execution_runtime": {
+      "execution_mode": "local_cli",
+      "executor": {
+        "execution_mode": "local_cli",
+        "executor_model": null,
+        "executor_backend": "local_cli",
+        "executor_host": "localhost",
+        "executor_transport": "shell"
+      },
+      "executor_transport": "shell"
+    },
+    "session_key": "trump-2025-batch-01",
+    "workflow_state": "DISCOVERY_READY"
+  },
+  "createdAt": "2026-03-31T20:22:21.786Z",
+  "updatedAt": "2026-03-31T22:35:05.518Z"
+}

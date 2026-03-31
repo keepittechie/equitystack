@@ -1,0 +1,834 @@
+{
+  "session_id": "20260331T094353Z",
+  "generated_at": "2026-03-31T09:44:24.611845+00:00",
+  "source_review_file": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/current-admin-wrapper-test.ai-review.json",
+  "source_decision_file": "reports/current_admin/current-admin-wrapper-test.decision-template.json",
+  "worklist_used": null,
+  "selection_filters": {
+    "priority": null,
+    "suggested_batch": null,
+    "attention_needed": false,
+    "with_conflicts": false,
+    "deep_review_recommended": false,
+    "manual_review_severity": null,
+    "session_focus": null,
+    "sort_by_priority": false,
+    "descending": false
+  },
+  "session_focus": null,
+  "items": [
+    {
+      "index": 1,
+      "slug": "trump-2025-election-integrity-proof-citizenship-paper-ballots",
+      "title": "Require proof of citizenship and paper-ballot election safeguards",
+      "suggested_batch": "high_attention",
+      "review_priority": "high",
+      "review_priority_score": 8,
+      "operator_action": "approve_with_changes",
+      "operator_notes": "Wrapper validation approval path.",
+      "final_decision_summary": "Approved for guarded import validation.",
+      "timestamp": "2026-03-31T02:44:00Z",
+      "ai_record_action_suggestion": "new_record",
+      "decision_alignment": "match",
+      "ai_suggestions_snapshot": {
+        "title_normalized": "Require proof of citizenship and paper-ballot election safeguards",
+        "summary_suggestion": "A March 2025 executive order advanced part of the administration's election-integrity agenda, but full implementation remained incomplete.",
+        "topic_suggestion": "Voting Rights",
+        "impacted_group_suggestion": "Black voters and Black-majority communities affected by voter registration, ballot access, and election administration rules",
+        "status_suggestion": "Partial",
+        "impact_direction_suggestion": "Mixed",
+        "evidence_strength_suggestion": "Moderate",
+        "record_action_suggestion": "new_record",
+        "confidence_score": 0.55,
+        "confidence_level": "Low",
+        "reasoning_summary": "Heuristic deep review. Operator should scrutinize ambiguity, sourcing, and whether this is a new record or an update.",
+        "hesitation_reasons": [
+          "manual verification still required"
+        ],
+        "evidence_needed_to_reduce_risk": [
+          "add clearer evidence for whether effects are mixed or predominantly negative",
+          "document why the current evidence supports this record more strongly than the closest alternative interpretation"
+        ],
+        "suggested_operator_next_action": "manual_review_required",
+        "caution_flags": [
+          "deep_review_requested",
+          "implementation_still_in_progress"
+        ],
+        "source_warnings": [],
+        "missing_source_warnings": [],
+        "ambiguity_notes": "Dry-run heuristic review only. Operator should confirm wording, match choice, and downstream effect notes.",
+        "signal_evidence_strength": "Moderate",
+        "signal_evidence_gaps": [
+          "add clearer evidence for whether effects are mixed or predominantly negative",
+          "document why the current evidence supports this record more strongly than the closest alternative interpretation"
+        ],
+        "signal_ambiguity": "High",
+        "signal_conflicts": [],
+        "applied_penalties": [],
+        "self_check": "Cautious reviewer check not supplied; review the evidence gaps and ambiguity before import.",
+        "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. Mixed impact direction makes the downstream interpretation less settled. Confidence is supported because No source warnings were carried into the normalized suggestion. Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
+        "confidence_signals": [
+          {
+            "code": "low_confidence",
+            "direction": "reduces",
+            "reason": "The normalized confidence score remains low after review."
+          },
+          {
+            "code": "source_coverage_present",
+            "direction": "supports",
+            "reason": "No source warnings were carried into the normalized suggestion."
+          },
+          {
+            "code": "mixed_impact_direction",
+            "direction": "reduces",
+            "reason": "Mixed impact direction makes the downstream interpretation less settled."
+          },
+          {
+            "code": "evidence_gaps_present",
+            "direction": "reduces",
+            "reason": "The pass identified evidence gaps that should be closed before import."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      }
+    },
+    {
+      "index": 2,
+      "slug": "trump-2025-end-federal-dei-equity-programs",
+      "title": "End federal DEI and equity-based government programs",
+      "suggested_batch": "source_check_needed",
+      "review_priority": "low",
+      "review_priority_score": 2,
+      "operator_action": "reject",
+      "operator_notes": "Wrapper validation non-import path.",
+      "final_decision_summary": "Rejected for validation fixture.",
+      "timestamp": "2026-03-31T02:44:00Z",
+      "ai_record_action_suggestion": "new_record",
+      "decision_alignment": "mismatch",
+      "ai_suggestions_snapshot": {
+        "title_normalized": "End federal DEI and equity-based government programs",
+        "summary_suggestion": "The administration ordered the termination of federal DEI and equity structures, but implementation remained an active multi-agency process.",
+        "topic_suggestion": "Economic Opportunity",
+        "impacted_group_suggestion": "Black workers, Black students, and Black communities affected by targeted federal equity initiatives and program design",
+        "status_suggestion": "Partial",
+        "impact_direction_suggestion": "Negative",
+        "evidence_strength_suggestion": "Moderate",
+        "record_action_suggestion": "new_record",
+        "confidence_score": 0.7,
+        "confidence_level": "Medium",
+        "reasoning_summary": "Heuristic deep review. Operator should scrutinize ambiguity, sourcing, and whether this is a new record or an update.",
+        "hesitation_reasons": [
+          "manual verification still required"
+        ],
+        "evidence_needed_to_reduce_risk": [
+          "document why the current evidence supports this record more strongly than the closest alternative interpretation"
+        ],
+        "suggested_operator_next_action": "review_deep_review_output",
+        "caution_flags": [
+          "deep_review_requested",
+          "implementation_still_in_progress"
+        ],
+        "source_warnings": [],
+        "missing_source_warnings": [],
+        "ambiguity_notes": "Dry-run heuristic review only. Operator should confirm wording, match choice, and downstream effect notes.",
+        "signal_evidence_strength": "Moderate",
+        "signal_evidence_gaps": [
+          "document why the current evidence supports this record more strongly than the closest alternative interpretation"
+        ],
+        "signal_ambiguity": "Medium",
+        "signal_conflicts": [],
+        "applied_penalties": [],
+        "self_check": "Cautious reviewer check not supplied; review the evidence gaps and ambiguity before import.",
+        "confidence_reasoning": "Confidence is reduced because The pass identified evidence gaps that should be closed before import. Confidence is supported because No source warnings were carried into the normalized suggestion. Core suggestion fields are populated for operator review. Context that still needs operator judgment: The normalized confidence score is usable but not decisive.",
+        "confidence_signals": [
+          {
+            "code": "medium_confidence",
+            "direction": "mixed",
+            "reason": "The normalized confidence score is usable but not decisive."
+          },
+          {
+            "code": "source_coverage_present",
+            "direction": "supports",
+            "reason": "No source warnings were carried into the normalized suggestion."
+          },
+          {
+            "code": "evidence_gaps_present",
+            "direction": "reduces",
+            "reason": "The pass identified evidence gaps that should be closed before import."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      }
+    },
+    {
+      "index": 3,
+      "slug": "trump-2025-strengthen-local-law-enforcement",
+      "title": "Increase federal support for state and local law enforcement",
+      "suggested_batch": "high_attention",
+      "review_priority": "high",
+      "review_priority_score": 8,
+      "operator_action": "reject",
+      "operator_notes": "Wrapper validation non-import path.",
+      "final_decision_summary": "Rejected for validation fixture.",
+      "timestamp": "2026-03-31T02:44:00Z",
+      "ai_record_action_suggestion": "new_record",
+      "decision_alignment": "mismatch",
+      "ai_suggestions_snapshot": {
+        "title_normalized": "Increase federal support for state and local law enforcement",
+        "summary_suggestion": "A 2025 executive order expanded federal support and protections for local law enforcement, but downstream local effects remained early.",
+        "topic_suggestion": "Criminal Justice",
+        "impacted_group_suggestion": "Black communities affected by policing, public safety policy, arrest exposure, and federal oversight of local law enforcement",
+        "status_suggestion": "Partial",
+        "impact_direction_suggestion": "Mixed",
+        "evidence_strength_suggestion": "Moderate",
+        "record_action_suggestion": "new_record",
+        "confidence_score": 0.55,
+        "confidence_level": "Low",
+        "reasoning_summary": "Heuristic deep review. Operator should scrutinize ambiguity, sourcing, and whether this is a new record or an update.",
+        "hesitation_reasons": [
+          "manual verification still required"
+        ],
+        "evidence_needed_to_reduce_risk": [
+          "add clearer evidence for whether effects are mixed or predominantly negative",
+          "document why the current evidence supports this record more strongly than the closest alternative interpretation"
+        ],
+        "suggested_operator_next_action": "manual_review_required",
+        "caution_flags": [
+          "deep_review_requested",
+          "implementation_still_in_progress"
+        ],
+        "source_warnings": [],
+        "missing_source_warnings": [],
+        "ambiguity_notes": "Dry-run heuristic review only. Operator should confirm wording, match choice, and downstream effect notes.",
+        "signal_evidence_strength": "Moderate",
+        "signal_evidence_gaps": [
+          "add clearer evidence for whether effects are mixed or predominantly negative",
+          "document why the current evidence supports this record more strongly than the closest alternative interpretation"
+        ],
+        "signal_ambiguity": "High",
+        "signal_conflicts": [],
+        "applied_penalties": [],
+        "self_check": "Cautious reviewer check not supplied; review the evidence gaps and ambiguity before import.",
+        "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. Mixed impact direction makes the downstream interpretation less settled. Confidence is supported because No source warnings were carried into the normalized suggestion. Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
+        "confidence_signals": [
+          {
+            "code": "low_confidence",
+            "direction": "reduces",
+            "reason": "The normalized confidence score remains low after review."
+          },
+          {
+            "code": "source_coverage_present",
+            "direction": "supports",
+            "reason": "No source warnings were carried into the normalized suggestion."
+          },
+          {
+            "code": "mixed_impact_direction",
+            "direction": "reduces",
+            "reason": "Mixed impact direction makes the downstream interpretation less settled."
+          },
+          {
+            "code": "evidence_gaps_present",
+            "direction": "reduces",
+            "reason": "The pass identified evidence gaps that should be closed before import."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      }
+    },
+    {
+      "index": 4,
+      "slug": "trump-2025-clear-street-encampments-expand-civil-commitment",
+      "title": "Clear street encampments and expand treatment-oriented street-order responses",
+      "suggested_batch": "high_attention",
+      "review_priority": "high",
+      "review_priority_score": 8,
+      "operator_action": "reject",
+      "operator_notes": "Wrapper validation non-import path.",
+      "final_decision_summary": "Rejected for validation fixture.",
+      "timestamp": "2026-03-31T02:44:00Z",
+      "ai_record_action_suggestion": "new_record",
+      "decision_alignment": "mismatch",
+      "ai_suggestions_snapshot": {
+        "title_normalized": "Clear street encampments and expand treatment-oriented street-order responses",
+        "summary_suggestion": "A 2025 order advanced the administration's street-order agenda, but the balance between enforcement and treatment outcomes remained unresolved.",
+        "topic_suggestion": "Housing",
+        "impacted_group_suggestion": "Black unhoused people and Black neighborhoods affected by homelessness policy, encampment enforcement, and access to treatment services",
+        "status_suggestion": "Partial",
+        "impact_direction_suggestion": "Mixed",
+        "evidence_strength_suggestion": "Moderate",
+        "record_action_suggestion": "new_record",
+        "confidence_score": 0.55,
+        "confidence_level": "Low",
+        "reasoning_summary": "Heuristic deep review. Operator should scrutinize ambiguity, sourcing, and whether this is a new record or an update.",
+        "hesitation_reasons": [
+          "manual verification still required"
+        ],
+        "evidence_needed_to_reduce_risk": [
+          "add clearer evidence for whether effects are mixed or predominantly negative",
+          "document why the current evidence supports this record more strongly than the closest alternative interpretation"
+        ],
+        "suggested_operator_next_action": "manual_review_required",
+        "caution_flags": [
+          "deep_review_requested",
+          "implementation_still_in_progress"
+        ],
+        "source_warnings": [],
+        "missing_source_warnings": [],
+        "ambiguity_notes": "Dry-run heuristic review only. Operator should confirm wording, match choice, and downstream effect notes.",
+        "signal_evidence_strength": "Moderate",
+        "signal_evidence_gaps": [
+          "add clearer evidence for whether effects are mixed or predominantly negative",
+          "document why the current evidence supports this record more strongly than the closest alternative interpretation"
+        ],
+        "signal_ambiguity": "High",
+        "signal_conflicts": [],
+        "applied_penalties": [],
+        "self_check": "Cautious reviewer check not supplied; review the evidence gaps and ambiguity before import.",
+        "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. Mixed impact direction makes the downstream interpretation less settled. Confidence is supported because No source warnings were carried into the normalized suggestion. Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
+        "confidence_signals": [
+          {
+            "code": "low_confidence",
+            "direction": "reduces",
+            "reason": "The normalized confidence score remains low after review."
+          },
+          {
+            "code": "source_coverage_present",
+            "direction": "supports",
+            "reason": "No source warnings were carried into the normalized suggestion."
+          },
+          {
+            "code": "mixed_impact_direction",
+            "direction": "reduces",
+            "reason": "Mixed impact direction makes the downstream interpretation less settled."
+          },
+          {
+            "code": "evidence_gaps_present",
+            "direction": "reduces",
+            "reason": "The pass identified evidence gaps that should be closed before import."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      }
+    },
+    {
+      "index": 5,
+      "slug": "trump-2025-domestic-production-of-critical-medicines",
+      "title": "Expand domestic production of critical medicines",
+      "suggested_batch": "source_check_needed",
+      "review_priority": "low",
+      "review_priority_score": 2,
+      "operator_action": "reject",
+      "operator_notes": "Wrapper validation non-import path.",
+      "final_decision_summary": "Rejected for validation fixture.",
+      "timestamp": "2026-03-31T02:44:00Z",
+      "ai_record_action_suggestion": "new_record",
+      "decision_alignment": "mismatch",
+      "ai_suggestions_snapshot": {
+        "title_normalized": "Expand domestic production of critical medicines",
+        "summary_suggestion": "A 2025 executive order advanced domestic-medicine production goals, but measurable supply and access outcomes remained early.",
+        "topic_suggestion": "Healthcare",
+        "impacted_group_suggestion": "Black patients and Black communities affected by medicine shortages, chronic-disease treatment continuity, and pharmaceutical supply disruptions",
+        "status_suggestion": "Partial",
+        "impact_direction_suggestion": "Positive",
+        "evidence_strength_suggestion": "Moderate",
+        "record_action_suggestion": "new_record",
+        "confidence_score": 0.7,
+        "confidence_level": "Medium",
+        "reasoning_summary": "Heuristic deep review. Operator should scrutinize ambiguity, sourcing, and whether this is a new record or an update.",
+        "hesitation_reasons": [
+          "manual verification still required"
+        ],
+        "evidence_needed_to_reduce_risk": [
+          "document why the current evidence supports this record more strongly than the closest alternative interpretation"
+        ],
+        "suggested_operator_next_action": "review_deep_review_output",
+        "caution_flags": [
+          "deep_review_requested",
+          "implementation_still_in_progress"
+        ],
+        "source_warnings": [],
+        "missing_source_warnings": [],
+        "ambiguity_notes": "Dry-run heuristic review only. Operator should confirm wording, match choice, and downstream effect notes.",
+        "signal_evidence_strength": "Moderate",
+        "signal_evidence_gaps": [
+          "document why the current evidence supports this record more strongly than the closest alternative interpretation"
+        ],
+        "signal_ambiguity": "Medium",
+        "signal_conflicts": [],
+        "applied_penalties": [],
+        "self_check": "Cautious reviewer check not supplied; review the evidence gaps and ambiguity before import.",
+        "confidence_reasoning": "Confidence is reduced because The pass identified evidence gaps that should be closed before import. Confidence is supported because No source warnings were carried into the normalized suggestion. Core suggestion fields are populated for operator review. Context that still needs operator judgment: The normalized confidence score is usable but not decisive.",
+        "confidence_signals": [
+          {
+            "code": "medium_confidence",
+            "direction": "mixed",
+            "reason": "The normalized confidence score is usable but not decisive."
+          },
+          {
+            "code": "source_coverage_present",
+            "direction": "supports",
+            "reason": "No source warnings were carried into the normalized suggestion."
+          },
+          {
+            "code": "evidence_gaps_present",
+            "direction": "reduces",
+            "reason": "The pass identified evidence gaps that should be closed before import."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      }
+    },
+    {
+      "index": 6,
+      "slug": "trump-2025-expand-educational-freedom-for-families",
+      "title": "Expand educational freedom and school-choice options for families",
+      "suggested_batch": "high_attention",
+      "review_priority": "high",
+      "review_priority_score": 8,
+      "operator_action": "reject",
+      "operator_notes": "Wrapper validation non-import path.",
+      "final_decision_summary": "Rejected for validation fixture.",
+      "timestamp": "2026-03-31T02:44:00Z",
+      "ai_record_action_suggestion": "new_record",
+      "decision_alignment": "mismatch",
+      "ai_suggestions_snapshot": {
+        "title_normalized": "Expand educational freedom and school-choice options for families",
+        "summary_suggestion": "The administration launched a federal school-choice initiative in early 2025, but the effects remained dependent on later state and grant implementation.",
+        "topic_suggestion": "Education",
+        "impacted_group_suggestion": "Black students and Black families affected by school access, public-school quality, transportation, and alternative education options",
+        "status_suggestion": "Partial",
+        "impact_direction_suggestion": "Mixed",
+        "evidence_strength_suggestion": "Moderate",
+        "record_action_suggestion": "new_record",
+        "confidence_score": 0.55,
+        "confidence_level": "Low",
+        "reasoning_summary": "Heuristic deep review. Operator should scrutinize ambiguity, sourcing, and whether this is a new record or an update.",
+        "hesitation_reasons": [
+          "manual verification still required"
+        ],
+        "evidence_needed_to_reduce_risk": [
+          "add clearer evidence for whether effects are mixed or predominantly negative",
+          "document why the current evidence supports this record more strongly than the closest alternative interpretation"
+        ],
+        "suggested_operator_next_action": "manual_review_required",
+        "caution_flags": [
+          "deep_review_requested",
+          "education_record_can_have_mixed_downstream_effects",
+          "implementation_still_in_progress"
+        ],
+        "source_warnings": [],
+        "missing_source_warnings": [],
+        "ambiguity_notes": "Dry-run heuristic review only. Operator should confirm wording, match choice, and downstream effect notes.",
+        "signal_evidence_strength": "Moderate",
+        "signal_evidence_gaps": [
+          "add clearer evidence for whether effects are mixed or predominantly negative",
+          "document why the current evidence supports this record more strongly than the closest alternative interpretation"
+        ],
+        "signal_ambiguity": "High",
+        "signal_conflicts": [],
+        "applied_penalties": [],
+        "self_check": "Cautious reviewer check not supplied; review the evidence gaps and ambiguity before import.",
+        "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. Mixed impact direction makes the downstream interpretation less settled. Confidence is supported because No source warnings were carried into the normalized suggestion. Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
+        "confidence_signals": [
+          {
+            "code": "low_confidence",
+            "direction": "reduces",
+            "reason": "The normalized confidence score remains low after review."
+          },
+          {
+            "code": "source_coverage_present",
+            "direction": "supports",
+            "reason": "No source warnings were carried into the normalized suggestion."
+          },
+          {
+            "code": "mixed_impact_direction",
+            "direction": "reduces",
+            "reason": "Mixed impact direction makes the downstream interpretation less settled."
+          },
+          {
+            "code": "evidence_gaps_present",
+            "direction": "reduces",
+            "reason": "The pass identified evidence gaps that should be closed before import."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      }
+    },
+    {
+      "index": 7,
+      "slug": "trump-2025-reform-higher-education-accreditation",
+      "title": "Reform higher-education accreditation around student outcomes",
+      "suggested_batch": "high_attention",
+      "review_priority": "high",
+      "review_priority_score": 8,
+      "operator_action": "reject",
+      "operator_notes": "Wrapper validation non-import path.",
+      "final_decision_summary": "Rejected for validation fixture.",
+      "timestamp": "2026-03-31T02:44:00Z",
+      "ai_record_action_suggestion": "new_record",
+      "decision_alignment": "mismatch",
+      "ai_suggestions_snapshot": {
+        "title_normalized": "Reform higher-education accreditation around student outcomes",
+        "summary_suggestion": "The administration launched accreditation reform in 2025, but institutional and student-level effects remained in an early implementation stage.",
+        "topic_suggestion": "Education",
+        "impacted_group_suggestion": "Black college students and institutions serving large Black student populations, including HBCUs and other minority-serving institutions",
+        "status_suggestion": "In Progress",
+        "impact_direction_suggestion": "Mixed",
+        "evidence_strength_suggestion": "Moderate",
+        "record_action_suggestion": "new_record",
+        "confidence_score": 0.55,
+        "confidence_level": "Low",
+        "reasoning_summary": "Heuristic deep review. Operator should scrutinize ambiguity, sourcing, and whether this is a new record or an update.",
+        "hesitation_reasons": [
+          "manual verification still required"
+        ],
+        "evidence_needed_to_reduce_risk": [
+          "add clearer evidence for whether effects are mixed or predominantly negative",
+          "document why the current evidence supports this record more strongly than the closest alternative interpretation"
+        ],
+        "suggested_operator_next_action": "manual_review_required",
+        "caution_flags": [
+          "deep_review_requested",
+          "education_record_can_have_mixed_downstream_effects",
+          "implementation_still_in_progress"
+        ],
+        "source_warnings": [],
+        "missing_source_warnings": [],
+        "ambiguity_notes": "Dry-run heuristic review only. Operator should confirm wording, match choice, and downstream effect notes.",
+        "signal_evidence_strength": "Moderate",
+        "signal_evidence_gaps": [
+          "add clearer evidence for whether effects are mixed or predominantly negative",
+          "document why the current evidence supports this record more strongly than the closest alternative interpretation"
+        ],
+        "signal_ambiguity": "High",
+        "signal_conflicts": [],
+        "applied_penalties": [],
+        "self_check": "Cautious reviewer check not supplied; review the evidence gaps and ambiguity before import.",
+        "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. Mixed impact direction makes the downstream interpretation less settled. Confidence is supported because No source warnings were carried into the normalized suggestion. Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
+        "confidence_signals": [
+          {
+            "code": "low_confidence",
+            "direction": "reduces",
+            "reason": "The normalized confidence score remains low after review."
+          },
+          {
+            "code": "source_coverage_present",
+            "direction": "supports",
+            "reason": "No source warnings were carried into the normalized suggestion."
+          },
+          {
+            "code": "mixed_impact_direction",
+            "direction": "reduces",
+            "reason": "Mixed impact direction makes the downstream interpretation less settled."
+          },
+          {
+            "code": "evidence_gaps_present",
+            "direction": "reduces",
+            "reason": "The pass identified evidence gaps that should be closed before import."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      }
+    },
+    {
+      "index": 8,
+      "slug": "trump-2025-promote-hbcu-excellence-and-innovation",
+      "title": "Promote excellence and innovation at HBCUs",
+      "suggested_batch": "source_check_needed",
+      "review_priority": "low",
+      "review_priority_score": 2,
+      "operator_action": "reject",
+      "operator_notes": "Wrapper validation non-import path.",
+      "final_decision_summary": "Rejected for validation fixture.",
+      "timestamp": "2026-03-31T02:44:00Z",
+      "ai_record_action_suggestion": "new_record",
+      "decision_alignment": "mismatch",
+      "ai_suggestions_snapshot": {
+        "title_normalized": "Promote excellence and innovation at HBCUs",
+        "summary_suggestion": "The administration reestablished a White House HBCU initiative in 2025, with broader institutional effects still dependent on implementation.",
+        "topic_suggestion": "Education",
+        "impacted_group_suggestion": "Black students, faculty, and institutions at Historically Black Colleges and Universities",
+        "status_suggestion": "Partial",
+        "impact_direction_suggestion": "Positive",
+        "evidence_strength_suggestion": "Moderate",
+        "record_action_suggestion": "new_record",
+        "confidence_score": 0.7,
+        "confidence_level": "Medium",
+        "reasoning_summary": "Heuristic deep review. Operator should scrutinize ambiguity, sourcing, and whether this is a new record or an update.",
+        "hesitation_reasons": [
+          "manual verification still required"
+        ],
+        "evidence_needed_to_reduce_risk": [
+          "document why the current evidence supports this record more strongly than the closest alternative interpretation"
+        ],
+        "suggested_operator_next_action": "review_deep_review_output",
+        "caution_flags": [
+          "deep_review_requested",
+          "education_record_can_have_mixed_downstream_effects",
+          "implementation_still_in_progress"
+        ],
+        "source_warnings": [],
+        "missing_source_warnings": [],
+        "ambiguity_notes": "Dry-run heuristic review only. Operator should confirm wording, match choice, and downstream effect notes.",
+        "signal_evidence_strength": "Moderate",
+        "signal_evidence_gaps": [
+          "document why the current evidence supports this record more strongly than the closest alternative interpretation"
+        ],
+        "signal_ambiguity": "Medium",
+        "signal_conflicts": [],
+        "applied_penalties": [],
+        "self_check": "Cautious reviewer check not supplied; review the evidence gaps and ambiguity before import.",
+        "confidence_reasoning": "Confidence is reduced because The pass identified evidence gaps that should be closed before import. Confidence is supported because No source warnings were carried into the normalized suggestion. Core suggestion fields are populated for operator review. Context that still needs operator judgment: The normalized confidence score is usable but not decisive.",
+        "confidence_signals": [
+          {
+            "code": "medium_confidence",
+            "direction": "mixed",
+            "reason": "The normalized confidence score is usable but not decisive."
+          },
+          {
+            "code": "source_coverage_present",
+            "direction": "supports",
+            "reason": "No source warnings were carried into the normalized suggestion."
+          },
+          {
+            "code": "evidence_gaps_present",
+            "direction": "reduces",
+            "reason": "The pass identified evidence gaps that should be closed before import."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      }
+    },
+    {
+      "index": 9,
+      "slug": "trump-2025-reinstate-school-discipline-policies",
+      "title": "Reinstate school discipline policies without equity-based disparate-impact framing",
+      "suggested_batch": "source_check_needed",
+      "review_priority": "low",
+      "review_priority_score": 2,
+      "operator_action": "reject",
+      "operator_notes": "Wrapper validation non-import path.",
+      "final_decision_summary": "Rejected for validation fixture.",
+      "timestamp": "2026-03-31T02:44:00Z",
+      "ai_record_action_suggestion": "new_record",
+      "decision_alignment": "mismatch",
+      "ai_suggestions_snapshot": {
+        "title_normalized": "Reinstate school discipline policies without equity-based disparate-impact framing",
+        "summary_suggestion": "The administration ordered a review and replacement process for federal school-discipline guidance, but school-level effects remained unmeasured.",
+        "topic_suggestion": "Education",
+        "impacted_group_suggestion": "Black students and Black families affected by suspension, expulsion, referral-to-law-enforcement, and school discipline policies",
+        "status_suggestion": "In Progress",
+        "impact_direction_suggestion": "Negative",
+        "evidence_strength_suggestion": "Moderate",
+        "record_action_suggestion": "new_record",
+        "confidence_score": 0.7,
+        "confidence_level": "Medium",
+        "reasoning_summary": "Heuristic deep review. Operator should scrutinize ambiguity, sourcing, and whether this is a new record or an update.",
+        "hesitation_reasons": [
+          "manual verification still required"
+        ],
+        "evidence_needed_to_reduce_risk": [
+          "document why the current evidence supports this record more strongly than the closest alternative interpretation"
+        ],
+        "suggested_operator_next_action": "review_deep_review_output",
+        "caution_flags": [
+          "deep_review_requested",
+          "education_record_can_have_mixed_downstream_effects",
+          "implementation_still_in_progress"
+        ],
+        "source_warnings": [],
+        "missing_source_warnings": [],
+        "ambiguity_notes": "Dry-run heuristic review only. Operator should confirm wording, match choice, and downstream effect notes.",
+        "signal_evidence_strength": "Moderate",
+        "signal_evidence_gaps": [
+          "document why the current evidence supports this record more strongly than the closest alternative interpretation"
+        ],
+        "signal_ambiguity": "Medium",
+        "signal_conflicts": [],
+        "applied_penalties": [],
+        "self_check": "Cautious reviewer check not supplied; review the evidence gaps and ambiguity before import.",
+        "confidence_reasoning": "Confidence is reduced because The pass identified evidence gaps that should be closed before import. Confidence is supported because No source warnings were carried into the normalized suggestion. Core suggestion fields are populated for operator review. Context that still needs operator judgment: The normalized confidence score is usable but not decisive.",
+        "confidence_signals": [
+          {
+            "code": "medium_confidence",
+            "direction": "mixed",
+            "reason": "The normalized confidence score is usable but not decisive."
+          },
+          {
+            "code": "source_coverage_present",
+            "direction": "supports",
+            "reason": "No source warnings were carried into the normalized suggestion."
+          },
+          {
+            "code": "evidence_gaps_present",
+            "direction": "reduces",
+            "reason": "The pass identified evidence gaps that should be closed before import."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      }
+    },
+    {
+      "index": 10,
+      "slug": "trump-2025-high-paying-skilled-trade-jobs",
+      "title": "Prepare Americans for high-paying skilled trade jobs",
+      "suggested_batch": "source_check_needed",
+      "review_priority": "low",
+      "review_priority_score": 2,
+      "operator_action": "reject",
+      "operator_notes": "Wrapper validation non-import path.",
+      "final_decision_summary": "Rejected for validation fixture.",
+      "timestamp": "2026-03-31T02:44:00Z",
+      "ai_record_action_suggestion": "new_record",
+      "decision_alignment": "mismatch",
+      "ai_suggestions_snapshot": {
+        "title_normalized": "Prepare Americans for high-paying skilled trade jobs",
+        "summary_suggestion": "The administration launched a skilled-trades workforce initiative in 2025, but measurable labor-market effects remained early.",
+        "topic_suggestion": "Economic Opportunity",
+        "impacted_group_suggestion": "Black workers and Black jobseekers affected by access to apprenticeships, workforce programs, and higher-wage skilled trades",
+        "status_suggestion": "In Progress",
+        "impact_direction_suggestion": "Positive",
+        "evidence_strength_suggestion": "Moderate",
+        "record_action_suggestion": "new_record",
+        "confidence_score": 0.7,
+        "confidence_level": "Medium",
+        "reasoning_summary": "Heuristic deep review. Operator should scrutinize ambiguity, sourcing, and whether this is a new record or an update.",
+        "hesitation_reasons": [
+          "manual verification still required"
+        ],
+        "evidence_needed_to_reduce_risk": [
+          "document why the current evidence supports this record more strongly than the closest alternative interpretation"
+        ],
+        "suggested_operator_next_action": "review_deep_review_output",
+        "caution_flags": [
+          "deep_review_requested",
+          "implementation_still_in_progress"
+        ],
+        "source_warnings": [],
+        "missing_source_warnings": [],
+        "ambiguity_notes": "Dry-run heuristic review only. Operator should confirm wording, match choice, and downstream effect notes.",
+        "signal_evidence_strength": "Moderate",
+        "signal_evidence_gaps": [
+          "document why the current evidence supports this record more strongly than the closest alternative interpretation"
+        ],
+        "signal_ambiguity": "Medium",
+        "signal_conflicts": [],
+        "applied_penalties": [],
+        "self_check": "Cautious reviewer check not supplied; review the evidence gaps and ambiguity before import.",
+        "confidence_reasoning": "Confidence is reduced because The pass identified evidence gaps that should be closed before import. Confidence is supported because No source warnings were carried into the normalized suggestion. Core suggestion fields are populated for operator review. Context that still needs operator judgment: The normalized confidence score is usable but not decisive.",
+        "confidence_signals": [
+          {
+            "code": "medium_confidence",
+            "direction": "mixed",
+            "reason": "The normalized confidence score is usable but not decisive."
+          },
+          {
+            "code": "source_coverage_present",
+            "direction": "supports",
+            "reason": "No source warnings were carried into the normalized suggestion."
+          },
+          {
+            "code": "evidence_gaps_present",
+            "direction": "reduces",
+            "reason": "The pass identified evidence gaps that should be closed before import."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      }
+    }
+  ],
+  "decision_counts": {
+    "match": 1,
+    "mismatch": 9
+  }
+}

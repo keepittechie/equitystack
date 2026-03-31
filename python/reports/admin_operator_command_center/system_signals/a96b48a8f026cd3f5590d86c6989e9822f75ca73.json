@@ -1,0 +1,22 @@
+{
+  "id": "bWlzc2luZy1hcnRpZmFjdDpiR1ZuYVhOc1lYUnBkbVU2YkdWbmFYTnNZWFJwZG1VNmNtVjJhV1YzTFdKMWJtUnNaVHB5WlhacFpYZGZZblZ1Wkd4bE9pOW9iMjFsTDJwdmMyZ3ZSRzlqZFcxbGJuUnpMMGRwZEVoMVlpOWxjWFZwZEhsemRHRmpheTl3ZVhSb2IyNHZjbVZ3YjNKMGN5OWxjWFZwZEhsemRHRmphMTl5WlhacFpYZGZZblZ1Wkd4bExtcHpiMjQ",
+  "workflowFamily": "legislative",
+  "signalType": "missing_artifact",
+  "severity": "warning",
+  "state": "open",
+  "title": "review bundle is missing",
+  "summary": "A canonical artifact expected by the operator surface is currently missing.",
+  "href": "/admin/workflows/legislative%3Areview-bundle",
+  "active": true,
+  "sessionId": "legislative:review-bundle",
+  "artifactId": "bGVnaXNsYXRpdmU6bGVnaXNsYXRpdmU6cmV2aWV3LWJ1bmRsZTpyZXZpZXdfYnVuZGxlOi9ob21lL2pvc2gvRG9jdW1lbnRzL0dpdEh1Yi9lcXVpdHlzdGFjay9weXRob24vcmVwb3J0cy9lcXVpdHlzdGFja19yZXZpZXdfYnVuZGxlLmpzb24",
+  "jobRunId": null,
+  "metadataJson": {
+    "artifact_key": "review_bundle",
+    "canonical_path": "/home/josh/Documents/GitHub/equitystack/python/reports/equitystack_review_bundle.json"
+  },
+  "observedAt": "2026-03-31T16:37:41.956Z",
+  "resolvedAt": null,
+  "createdAt": "2026-03-31T16:37:41.956Z",
+  "updatedAt": "2026-03-31T18:21:52.439Z"
+}

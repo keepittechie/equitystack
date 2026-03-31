@@ -1,0 +1,41 @@
+{
+  "id": "legislative:review-bundle",
+  "workflowFamily": "legislative",
+  "canonicalSessionKey": "equitystack_review_bundle.json",
+  "canonicalState": "DISCOVERY_READY",
+  "active": true,
+  "recommendedActionId": "legislative.run",
+  "source": "canonical_artifacts",
+  "startedAt": null,
+  "updatedAt": "2026-03-31T10:37:21.726Z",
+  "title": "Legislative Workflow",
+  "summary": "Legislative is waiting for the next wrapped run.",
+  "href": "/admin/workflows/legislative%3Areview-bundle",
+  "operatorSurfaceHref": "/admin/legislative-workflow",
+  "metadataJson": {
+    "executor": {
+      "executor_model": "rnj-1:latest",
+      "executor_backend": "ollama",
+      "executor_host": "10.10.0.60"
+    },
+    "canonical_bundle_path": null,
+    "blockers": [
+      "The review bundle artifact is missing.",
+      "Approve at least one pending legislative operator action before running the apply preview."
+    ],
+    "counts": {
+      "pendingReview": 0,
+      "approvedPendingActions": 0,
+      "blockers": 2,
+      "artifacts": 0,
+      "reviewQueueItems": 0
+    },
+    "latest_artifacts": {
+      "review_bundle": null,
+      "apply_report": null,
+      "import_report": null
+    },
+    "last_refreshed_at": "2026-03-31T10:37:21.726Z"
+  },
+  "relatedJobRunIds": []
+}

@@ -15,19 +15,6 @@ const NAV_LINKS = [
   { href: "/reports/civil-rights-timeline", label: "Civil Rights Timeline" },
 ];
 
-const ADMIN_NAV_LINKS = [
-  { href: "/admin", label: "Command Center" },
-  { href: "/admin/runbook", label: "Runbook" },
-  { href: "/admin/operator-console", label: "Operator Console" },
-  { href: "/admin/legislative-workflow", label: "Legislative Workflow" },
-  { href: "/admin/current-admin-review", label: "Current Admin Review" },
-  { href: "/admin/pre-commit", label: "Pre-Commit Status" },
-  { href: "/admin/import-history", label: "Import History" },
-  { href: "/admin/logs", label: "Logs / Decisions" },
-  { href: "/admin/promises/current-administration", label: "Staging Intake" },
-  { href: "/admin/logout", label: "Logout", external: true },
-];
-
 function isActiveNavItem(pathname, href) {
   return href === "/"
     ? pathname === "/"
@@ -47,7 +34,11 @@ function navClasses(pathname, href) {
 export default function MainLayout({ children }) {
   const pathname = usePathname();
   const isAdminPath = pathname?.startsWith("/admin");
-  const navLinks = isAdminPath ? ADMIN_NAV_LINKS : NAV_LINKS;
+  if (isAdminPath) {
+    return <div className="min-h-screen bg-zinc-100 text-zinc-900">{children}</div>;
+  }
+
+  const navLinks = NAV_LINKS;
 
   function renderNavItem(item, className) {
     if (item.external) {

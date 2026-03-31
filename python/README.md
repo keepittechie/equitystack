@@ -75,6 +75,7 @@ Read these next:
 - `LEGISLATIVE_PIPELINE.md`
 - `OPERATIONS.md`
 - `RNJ1_EXECUTOR_GUARDRAILS.md`
+- `../docs/admin-operator-system.md`
 
 ## Current-Admin Safe Path
 

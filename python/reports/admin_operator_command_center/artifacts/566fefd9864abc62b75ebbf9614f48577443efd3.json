@@ -1,0 +1,42 @@
+{
+  "id": "artifact_2c9c5c89ef537e48f8be94d716eb5eab79931f2c",
+  "sessionId": "current-admin:trump-2025-batch-01",
+  "workflowFamily": "current-admin",
+  "artifactKey": "review_artifact",
+  "label": "AI review",
+  "stage": "REVIEW_READY",
+  "canonicalPath": null,
+  "fileName": null,
+  "exists": false,
+  "generatedAt": null,
+  "source": "canonical_artifact",
+  "latestJobRunId": null,
+  "relatedJobRunIds": [],
+  "metadataJson": {
+    "summary": null,
+    "executor": {
+      "execution_mode": "local_cli",
+      "executor_model": null,
+      "executor_backend": "local_cli",
+      "executor_host": "localhost",
+      "executor_transport": "shell"
+    },
+    "execution_mode": "local_cli",
+    "executor_transport": "shell",
+    "execution_runtime": {
+      "execution_mode": "local_cli",
+      "executor": {
+        "execution_mode": "local_cli",
+        "executor_model": null,
+        "executor_backend": "local_cli",
+        "executor_host": "localhost",
+        "executor_transport": "shell"
+      },
+      "executor_transport": "shell"
+    },
+    "session_key": "trump-2025-batch-01",
+    "workflow_state": "DISCOVERY_READY"
+  },
+  "createdAt": "2026-03-31T20:22:21.786Z",
+  "updatedAt": "2026-03-31T22:35:05.518Z"
+}

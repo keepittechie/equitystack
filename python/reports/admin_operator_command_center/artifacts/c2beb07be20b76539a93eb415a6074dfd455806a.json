@@ -1,0 +1,42 @@
+{
+  "id": "artifact_5a11c94dc20367396c8a38b26db0d7c977d24d12",
+  "sessionId": "current-admin:trump-2025-batch-01",
+  "workflowFamily": "current-admin",
+  "artifactKey": "pre_commit_review",
+  "label": "Pre-commit review",
+  "stage": "PRECOMMIT_READY",
+  "canonicalPath": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.pre-commit-review.json",
+  "fileName": "trump-2025-batch-01.pre-commit-review.json",
+  "exists": false,
+  "generatedAt": null,
+  "source": "canonical_artifact",
+  "latestJobRunId": null,
+  "relatedJobRunIds": [],
+  "metadataJson": {
+    "summary": null,
+    "executor": {
+      "execution_mode": "local_cli",
+      "executor_model": null,
+      "executor_backend": "local_cli",
+      "executor_host": "localhost",
+      "executor_transport": "shell"
+    },
+    "execution_mode": "local_cli",
+    "executor_transport": "shell",
+    "execution_runtime": {
+      "execution_mode": "local_cli",
+      "executor": {
+        "execution_mode": "local_cli",
+        "executor_model": null,
+        "executor_backend": "local_cli",
+        "executor_host": "localhost",
+        "executor_transport": "shell"
+      },
+      "executor_transport": "shell"
+    },
+    "session_key": "trump-2025-batch-01",
+    "workflow_state": "DISCOVERY_READY"
+  },
+  "createdAt": "2026-03-31T20:22:21.786Z",
+  "updatedAt": "2026-03-31T22:35:05.518Z"
+}

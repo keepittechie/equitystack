@@ -1,0 +1,42 @@
+{
+  "id": "Y3VycmVudC1hZG1pbjpjdXJyZW50LWFkbWluOmN1cnJlbnQtYWRtaW4td3JhcHBlci10ZXN0OmltcG9ydF9kcnlfcnVuOi9ob21lL2pvc2gvRG9jdW1lbnRzL0dpdEh1Yi9lcXVpdHlzdGFjay9weXRob24vcmVwb3J0cy9jdXJyZW50X2FkbWluL2N1cnJlbnQtYWRtaW4td3JhcHBlci10ZXN0LmltcG9ydC1kcnktcnVuLmpzb24",
+  "sessionId": "current-admin:current-admin-wrapper-test",
+  "workflowFamily": "current-admin",
+  "artifactKey": "import_dry_run",
+  "label": "Import dry-run",
+  "stage": "IMPORT_READY",
+  "canonicalPath": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/current-admin-wrapper-test.import-dry-run.json",
+  "fileName": "current-admin-wrapper-test.import-dry-run.json",
+  "exists": true,
+  "generatedAt": "2026-03-31T09:45:11.403Z",
+  "source": "canonical_artifact",
+  "latestJobRunId": null,
+  "relatedJobRunIds": [],
+  "metadataJson": {
+    "summary": null,
+    "executor": {
+      "execution_mode": "local_cli",
+      "executor_model": null,
+      "executor_backend": "local_cli",
+      "executor_host": "localhost",
+      "executor_transport": "shell"
+    },
+    "execution_mode": "local_cli",
+    "executor_transport": "shell",
+    "execution_runtime": {
+      "execution_mode": "local_cli",
+      "executor": {
+        "execution_mode": "local_cli",
+        "executor_model": null,
+        "executor_backend": "local_cli",
+        "executor_host": "localhost",
+        "executor_transport": "shell"
+      },
+      "executor_transport": "shell"
+    },
+    "session_key": "current-admin-wrapper-test",
+    "workflow_state": "IMPORT_READY"
+  },
+  "createdAt": "2026-03-31T10:38:01.304Z",
+  "updatedAt": "2026-03-31T18:30:39.326Z"
+}

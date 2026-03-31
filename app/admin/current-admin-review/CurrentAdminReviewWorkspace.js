@@ -88,54 +88,54 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
 
   if (!batch) {
     return (
-      <section className="border rounded-2xl p-6 bg-white shadow-sm">
+      <section className="rounded border border-zinc-300 bg-white p-4 shadow-sm">
         <p>No current-admin review artifact is available yet.</p>
       </section>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <section className="grid gap-4 lg:grid-cols-4">
-        <div className="border rounded-2xl p-5 bg-white shadow-sm">
-          <p className="text-sm text-gray-600">Batch</p>
-          <p className="text-xl font-semibold mt-2">{batch.batch_name}</p>
-          <p className="text-sm text-gray-600 mt-2">Stage: {batch.stage}</p>
+    <div className="space-y-4">
+      <section className="grid gap-3 lg:grid-cols-4">
+        <div className="rounded border border-zinc-300 bg-white p-3 shadow-sm">
+          <p className="text-[11px] text-gray-600">Batch</p>
+          <p className="mt-1 text-base font-semibold">{batch.batch_name}</p>
+          <p className="mt-1 text-[11px] text-gray-600">Stage: {batch.stage}</p>
         </div>
-        <div className="border rounded-2xl p-5 bg-white shadow-sm">
-          <p className="text-sm text-gray-600">Model / mode</p>
-          <p className="text-xl font-semibold mt-2">
+        <div className="rounded border border-zinc-300 bg-white p-3 shadow-sm">
+          <p className="text-[11px] text-gray-600">Model / mode</p>
+          <p className="mt-1 text-base font-semibold">
             {batch.model || "unknown"} / {batch.review_mode || "standard"}
           </p>
         </div>
-        <div className="border rounded-2xl p-5 bg-white shadow-sm">
-          <p className="text-sm text-gray-600">Items</p>
-          <p className="text-xl font-semibold mt-2">{workspace.counts.total_items}</p>
-          <p className="text-sm text-gray-600 mt-2">
+        <div className="rounded border border-zinc-300 bg-white p-3 shadow-sm">
+          <p className="text-[11px] text-gray-600">Items</p>
+          <p className="mt-1 text-base font-semibold">{workspace.counts.total_items}</p>
+          <p className="mt-1 text-[11px] text-gray-600">
             Approved: {workspace.counts.approved} • Pending: {workspace.counts.pending} •
             Blocked: {workspace.counts.blocked}
           </p>
         </div>
-        <div className="border rounded-2xl p-5 bg-white shadow-sm">
-          <p className="text-sm text-gray-600">Next recommended action</p>
-          <p className="font-semibold mt-2">{workspace.next_recommended_action.next_step_label}</p>
+        <div className="rounded border border-zinc-300 bg-white p-3 shadow-sm">
+          <p className="text-[11px] text-gray-600">Next recommended action</p>
+          <p className="mt-1 font-semibold">{workspace.next_recommended_action.next_step_label}</p>
         </div>
       </section>
 
-      <section className="border rounded-2xl p-5 bg-white shadow-sm space-y-4">
+      <section className="rounded border border-zinc-300 bg-white p-4 shadow-sm space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <p className="text-sm text-gray-600">Review artifact</p>
-            <p className="text-sm break-all">{batch.paths.review}</p>
-            <p className="text-sm text-gray-600 mt-2">Decision file</p>
-            <p className="text-sm break-all">{batch.paths.decision_template}</p>
+            <p className="text-[11px] text-gray-600">Review artifact</p>
+            <p className="break-all font-mono text-[11px]">{batch.paths.review}</p>
+            <p className="mt-2 text-[11px] text-gray-600">Decision file</p>
+            <p className="break-all font-mono text-[11px]">{batch.paths.decision_template}</p>
           </div>
           <div className="flex flex-wrap gap-3">
             <button
               type="button"
               onClick={saveDraft}
               disabled={isPending}
-              className="rounded-lg border px-4 py-2 bg-white"
+              className="rounded border px-3 py-1.5 bg-white text-[12px]"
             >
               Save Decisions
             </button>
@@ -143,18 +143,18 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
               type="button"
               onClick={finalize}
               disabled={isPending || !finalizePermission.allowed}
-              className="rounded-lg border px-4 py-2 bg-black text-white"
+              className="rounded border px-3 py-1.5 bg-black text-[12px] text-white"
             >
               Finalize
             </button>
           </div>
         </div>
-        <p className="text-sm text-gray-700">
+        <p className="text-[12px] text-gray-700">
           Saving writes the decision file only. Finalize runs the existing Python
           finalize step and refreshes the append-only decision log.
         </p>
         {!finalizePermission.allowed ? (
-          <div className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950">
+          <div className="rounded border border-amber-300 bg-amber-50 p-3 text-[12px] text-amber-950">
             <p className="font-semibold">Finalize is blocked</p>
             <div className="mt-2 space-y-1">
               {finalizePermission.reasons.map((reason) => (
@@ -163,19 +163,19 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
             </div>
           </div>
         ) : null}
-        {message ? <p className="text-sm text-gray-700">{message}</p> : null}
+        {message ? <p className="text-[12px] text-gray-700">{message}</p> : null}
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
-        <div className="border rounded-2xl p-5 bg-white shadow-sm">
-          <h2 className="text-lg font-semibold">Workflow blockers</h2>
-          <p className="text-sm text-gray-600 mt-1">
+      <section className="grid gap-4 xl:grid-cols-[0.9fr_1.1fr]">
+        <div className="rounded border border-zinc-300 bg-white p-4 shadow-sm">
+          <h2 className="text-base font-semibold">Workflow blockers</h2>
+          <p className="mt-1 text-[12px] text-gray-600">
             These are the current reasons the canonical pipeline cannot advance automatically.
           </p>
-          <div className="mt-4 space-y-3 text-sm">
+          <div className="mt-3 space-y-2 text-[12px]">
             {(workspace.blockers || []).length ? (
               workspace.blockers.map((blocker) => (
-                <div key={blocker} className="rounded-xl border p-4 bg-gray-50">
+                <div key={blocker} className="rounded border p-3 bg-gray-50">
                   {blocker}
                 </div>
               ))
@@ -185,26 +185,26 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
           </div>
         </div>
 
-        <div className="border rounded-2xl p-5 bg-white shadow-sm">
-          <h2 className="text-lg font-semibold">Artifact state</h2>
-          <p className="text-sm text-gray-600 mt-1">
+        <div className="rounded border border-zinc-300 bg-white p-4 shadow-sm">
+          <h2 className="text-base font-semibold">Artifact state</h2>
+          <p className="mt-1 text-[12px] text-gray-600">
             The admin workflow follows these canonical files under `python/reports/current_admin/`.
           </p>
-          <div className="mt-4 space-y-3 text-sm">
+          <div className="mt-3 space-y-2 text-[12px]">
             {Object.entries(artifactStatus).map(([key, artifact]) => (
-              <div key={key} className="rounded-xl border p-4">
+              <div key={key} className="rounded border p-3">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <p className="font-semibold">{artifact.label}</p>
-                  <span className="rounded-full border px-3 py-1 text-xs">
+                  <span className="rounded border px-2 py-0.5 text-[11px] uppercase tracking-wide">
                     {artifact.exists ? "present" : "missing"}
                   </span>
                 </div>
-                <p className="mt-2 break-all text-gray-700">{artifact.path || "Unavailable"}</p>
+                <p className="mt-1 break-all font-mono text-[11px] text-gray-700">{artifact.path || "Unavailable"}</p>
                 {artifact.generated_at ? (
-                  <p className="mt-1 text-gray-600">Updated: {artifact.generated_at}</p>
+                  <p className="mt-1 text-[11px] text-gray-600">Updated: {artifact.generated_at}</p>
                 ) : null}
                 {artifact.summary ? (
-                  <p className="mt-1 text-gray-600">Summary: {artifact.summary}</p>
+                  <p className="mt-1 text-[11px] text-gray-600">Summary: {artifact.summary}</p>
                 ) : null}
               </div>
             ))}
@@ -212,92 +212,92 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
         </div>
       </section>
 
-      <section className="space-y-4">
-        {(items || []).map((item) => (
-          <article key={item.slug} className="border rounded-2xl p-5 bg-white shadow-sm space-y-4">
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div>
-                <p className="text-sm text-gray-600">{item.slug}</p>
-                <h2 className="text-xl font-semibold mt-1">{item.title}</h2>
-              </div>
-              <div className="flex flex-wrap gap-2 text-xs">
-                <span className="rounded-full border px-3 py-1">
-                  {item.review_priority} ({item.review_priority_score})
-                </span>
-                <span className="rounded-full border px-3 py-1">{item.suggested_batch}</span>
-                {item.operator_attention_needed ? (
-                  <span className="rounded-full border px-3 py-1">attention needed</span>
-                ) : null}
-              </div>
-            </div>
-
-            <div className="grid gap-4 xl:grid-cols-[1.2fr_0.8fr]">
-              <div className="space-y-3">
-                <div className="rounded-xl border p-4 bg-gray-50">
-                  <p className="text-sm text-gray-600">Attention summary</p>
-                  <p className="mt-1 text-sm">{item.attention_summary}</p>
-                </div>
-                <div className="rounded-xl border p-4">
-                  <p className="text-sm text-gray-600">Suggested checks</p>
-                  {(item.suggested_checks || []).length ? (
-                    <ul className="mt-2 list-disc pl-5 text-sm space-y-1">
-                      {item.suggested_checks.map((entry) => (
-                        <li key={entry}>{entry}</li>
+      <section className="rounded border border-zinc-300 bg-white p-4 shadow-sm">
+        <div className="mb-3">
+          <h2 className="text-base font-semibold">Review items</h2>
+          <p className="mt-1 text-[12px] text-gray-600">
+            Dense operator review table. Use quick row actions for common decisions and expand rows for notes and full context.
+          </p>
+        </div>
+        <div className="overflow-x-auto rounded border border-zinc-200">
+          <table className="min-w-full text-[12px]">
+            <thead className="bg-zinc-100 text-left text-[11px] uppercase tracking-wide text-zinc-600">
+              <tr>
+                <th className="border-b border-zinc-200 px-3 py-2">Item</th>
+                <th className="border-b border-zinc-200 px-3 py-2">Priority / AI</th>
+                <th className="border-b border-zinc-200 px-3 py-2">Decision</th>
+                <th className="border-b border-zinc-200 px-3 py-2">Inspect</th>
+              </tr>
+            </thead>
+            <tbody>
+              {(items || []).map((item) => (
+                <tr key={item.slug} className="align-top odd:bg-white even:bg-zinc-50/50">
+                  <td className="border-b border-zinc-200 px-3 py-2">
+                    <div className="font-mono text-[11px] text-zinc-500">{item.slug}</div>
+                    <div className="font-medium">{item.title}</div>
+                    <div className="mt-1 text-[11px] text-zinc-700">{item.attention_summary}</div>
+                  </td>
+                  <td className="border-b border-zinc-200 px-3 py-2 text-[11px] text-zinc-600">
+                    <div>{item.review_priority} ({item.review_priority_score})</div>
+                    <div className="mt-1">{item.suggested_batch}</div>
+                    <div className="mt-1">AI: {item.ai_record_action_suggestion || "Unavailable"}</div>
+                    {item.operator_attention_needed ? (
+                      <div className="mt-1 text-red-900">attention needed</div>
+                    ) : null}
+                  </td>
+                  <td className="border-b border-zinc-200 px-3 py-2">
+                    <select
+                      value={item.operator_action}
+                      onChange={(event) => updateItem(item.slug, "operator_action", event.target.value)}
+                      className="w-full min-w-[11rem] rounded border px-2 py-1 text-[12px]"
+                    >
+                      {DECISION_OPTIONS.map((option) => (
+                        <option key={option.value || "blank"} value={option.value}>
+                          {option.label}
+                        </option>
                       ))}
-                    </ul>
-                  ) : (
-                    <p className="mt-2 text-sm text-gray-600">No extra checks were attached.</p>
-                  )}
-                </div>
-                <div className="rounded-xl border p-4">
-                  <p className="text-sm text-gray-600">AI suggestion</p>
-                  <p className="mt-1 text-sm">{item.ai_record_action_suggestion || "Unavailable"}</p>
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <label className="block">
-                  <span className="block text-sm font-medium mb-1">Operator action</span>
-                  <select
-                    value={item.operator_action}
-                    onChange={(event) =>
-                      updateItem(item.slug, "operator_action", event.target.value)
-                    }
-                    className="w-full rounded-lg border px-3 py-2"
-                  >
-                    {DECISION_OPTIONS.map((option) => (
-                      <option key={option.value || "blank"} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-
-                <label className="block">
-                  <span className="block text-sm font-medium mb-1">Operator notes</span>
-                  <textarea
-                    value={item.operator_notes}
-                    onChange={(event) =>
-                      updateItem(item.slug, "operator_notes", event.target.value)
-                    }
-                    className="min-h-24 w-full rounded-lg border px-3 py-2"
-                  />
-                </label>
-
-                <label className="block">
-                  <span className="block text-sm font-medium mb-1">Decision summary</span>
-                  <textarea
-                    value={item.final_decision_summary}
-                    onChange={(event) =>
-                      updateItem(item.slug, "final_decision_summary", event.target.value)
-                    }
-                    className="min-h-20 w-full rounded-lg border px-3 py-2"
-                  />
-                </label>
-              </div>
-            </div>
-          </article>
-        ))}
+                    </select>
+                  </td>
+                  <td className="border-b border-zinc-200 px-3 py-2">
+                    <details className="rounded border bg-white p-2">
+                      <summary className="cursor-pointer text-[12px] font-medium">Inspect</summary>
+                      <div className="mt-2 space-y-2 text-[11px] text-zinc-700">
+                        <div>
+                          <p className="font-medium">Suggested checks</p>
+                          {(item.suggested_checks || []).length ? (
+                            <ul className="mt-1 list-disc pl-4">
+                              {item.suggested_checks.map((entry) => (
+                                <li key={entry}>{entry}</li>
+                              ))}
+                            </ul>
+                          ) : (
+                            <p className="mt-1 text-zinc-500">No extra checks were attached.</p>
+                          )}
+                        </div>
+                        <label className="block">
+                          <span className="block font-medium">Operator notes</span>
+                          <textarea
+                            value={item.operator_notes}
+                            onChange={(event) => updateItem(item.slug, "operator_notes", event.target.value)}
+                            className="mt-1 min-h-20 w-full rounded border px-2 py-1.5 text-[12px]"
+                          />
+                        </label>
+                        <label className="block">
+                          <span className="block font-medium">Decision summary</span>
+                          <textarea
+                            value={item.final_decision_summary}
+                            onChange={(event) => updateItem(item.slug, "final_decision_summary", event.target.value)}
+                            className="mt-1 min-h-16 w-full rounded border px-2 py-1.5 text-[12px]"
+                          />
+                        </label>
+                      </div>
+                    </details>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </section>
     </div>
   );

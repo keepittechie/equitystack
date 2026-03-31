@@ -1,0 +1,68 @@
+{
+  "id": "current-admin:current-admin-wrapper-test",
+  "workflowFamily": "current-admin",
+  "canonicalSessionKey": "current-admin-wrapper-test",
+  "canonicalState": "IMPORT_READY",
+  "active": false,
+  "recommendedActionId": "currentAdmin.apply",
+  "source": "canonical_artifacts",
+  "startedAt": "2026-03-31T09:46:12.244Z",
+  "updatedAt": "2026-03-31T19:16:37.214Z",
+  "title": "Current-Admin current-admin-wrapper-test",
+  "summary": "current-admin-wrapper-test has a dry-run import and is waiting for explicit apply confirmation.",
+  "href": "/admin/workflows/current-admin%3Acurrent-admin-wrapper-test",
+  "operatorSurfaceHref": "/admin/current-admin-review",
+  "metadataJson": {
+    "executor": {
+      "execution_mode": "local_cli",
+      "executor_model": null,
+      "executor_backend": "local_cli",
+      "executor_host": "localhost",
+      "executor_transport": "shell"
+    },
+    "execution_mode": "local_cli",
+    "executor_transport": "shell",
+    "execution_runtime": {
+      "execution_mode": "local_cli",
+      "executor": {
+        "execution_mode": "local_cli",
+        "executor_model": null,
+        "executor_backend": "local_cli",
+        "executor_host": "localhost",
+        "executor_transport": "shell"
+      },
+      "executor_transport": "shell"
+    },
+    "canonical_batch_name": "current-admin-wrapper-test",
+    "canonical_paths": {
+      "review": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/current-admin-wrapper-test.ai-review.json",
+      "normalized": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/current-admin-wrapper-test.normalized.json",
+      "normalization_report": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/current-admin-wrapper-test.normalization-report.json",
+      "decision_template": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/current-admin-wrapper-test.decision-template.json",
+      "queue": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/current-admin-wrapper-test.manual-review-queue.json",
+      "pre_commit": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/current-admin-wrapper-test.pre-commit-review.json"
+    },
+    "blockers": [],
+    "counts": {
+      "pendingReview": 0,
+      "approved": 1,
+      "blockedReviewItems": 9,
+      "blockers": 0,
+      "artifacts": 8,
+      "reviewQueueItems": 1
+    },
+    "latest_artifacts": {
+      "review": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/current-admin-wrapper-test.ai-review.json",
+      "decision_log": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/review_decisions/current-admin-wrapper-test.20260331T094612Z.decision-log.json",
+      "pre_commit": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/current-admin-wrapper-test.pre-commit-review.json",
+      "import_dry_run": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/current-admin-wrapper-test.import-dry-run.json",
+      "import_apply": null,
+      "validation": null
+    },
+    "next_action_reason": "A dry-run import already exists, so only an explicitly confirmed final apply remains.",
+    "last_refreshed_at": "2026-03-31T18:30:39.338Z",
+    "last_refresh_reason": "operator_state_refresh"
+  },
+  "relatedJobRunIds": [],
+  "createdAt": "2026-03-31T16:37:41.838Z"
+}

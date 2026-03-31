@@ -1,0 +1,22 @@
+{
+  "id": "bWlzc2luZy1hcnRpZmFjdDpZM1Z5Y21WdWRDMWhaRzFwYmpwamRYSnlaVzUwTFdGa2JXbHVPbU4xY25KbGJuUXRZV1J0YVc0dGQzSmhjSEJsY2kxMFpYTjBPbWx0Y0c5eWRGOWhjSEJzZVRwSmJYQnZjblFnWVhCd2JIaw",
+  "workflowFamily": "current-admin",
+  "signalType": "missing_artifact",
+  "severity": "warning",
+  "state": "open",
+  "title": "Import apply is missing",
+  "summary": "A canonical artifact expected by the operator surface is currently missing.",
+  "href": "/admin/workflows/current-admin%3Acurrent-admin-wrapper-test",
+  "active": true,
+  "sessionId": "current-admin:current-admin-wrapper-test",
+  "artifactId": "Y3VycmVudC1hZG1pbjpjdXJyZW50LWFkbWluOmN1cnJlbnQtYWRtaW4td3JhcHBlci10ZXN0OmltcG9ydF9hcHBseTpJbXBvcnQgYXBwbHk",
+  "jobRunId": null,
+  "metadataJson": {
+    "artifact_key": "import_apply",
+    "canonical_path": null
+  },
+  "observedAt": "2026-03-31T16:37:41.951Z",
+  "resolvedAt": null,
+  "createdAt": "2026-03-31T16:37:41.951Z",
+  "updatedAt": "2026-03-31T18:21:52.434Z"
+}

@@ -41,10 +41,11 @@ The current database source of truth is:
 
 - [`database/equitystack.sql`](database/equitystack.sql)
 
-Active Promise Tracker reference docs now live in:
+Active Promise Tracker and operator reference docs now live in:
 
 - [`database/promise_tracker_import_batch_2_sources.md`](database/promise_tracker_import_batch_2_sources.md) for manual source reconciliation on the approved import batch
-- [`docs/promise-tracker-v1.md`](docs/promise-tracker-v1.md) for the feature summary
+- [`docs/promise-tracker-current-administration.md`](docs/promise-tracker-current-administration.md) for current-admin workflow notes
+- [`docs/admin-operator-system.md`](docs/admin-operator-system.md) for the live operator/admin system
 
 ## Black Impact Score in Plain Language
 

@@ -30,8 +30,11 @@ ssh josh@10.10.0.13 "bash -lc '
   export NVM_DIR=\"\$HOME/.nvm\"
   [ -s \"\$NVM_DIR/nvm.sh\" ] && . \"\$NVM_DIR/nvm.sh\"
   cd /home/josh/black-policy-site
-  rm -rf .next
   npm run build
-  pm2 restart nextjs-app
+  if pm2 describe nextjs-app >/dev/null 2>&1; then
+    pm2 restart nextjs-app
+  else
+    pm2 start npm --name nextjs-app -- start
+  fi
   pm2 status
 '"

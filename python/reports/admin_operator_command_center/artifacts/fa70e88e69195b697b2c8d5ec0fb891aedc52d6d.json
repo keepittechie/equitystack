@@ -1,0 +1,42 @@
+{
+  "id": "artifact_71e905a16e2b8bc80e2c5736d284ba4e9867bc3a",
+  "sessionId": "current-admin:trump-2025-batch-01",
+  "workflowFamily": "current-admin",
+  "artifactKey": "normalization_report",
+  "label": "Normalization report",
+  "stage": "NORMALIZED",
+  "canonicalPath": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.normalization-report.json",
+  "fileName": "trump-2025-batch-01.normalization-report.json",
+  "exists": false,
+  "generatedAt": null,
+  "source": "canonical_artifact",
+  "latestJobRunId": null,
+  "relatedJobRunIds": [],
+  "metadataJson": {
+    "summary": null,
+    "executor": {
+      "execution_mode": "local_cli",
+      "executor_model": null,
+      "executor_backend": "local_cli",
+      "executor_host": "localhost",
+      "executor_transport": "shell"
+    },
+    "execution_mode": "local_cli",
+    "executor_transport": "shell",
+    "execution_runtime": {
+      "execution_mode": "local_cli",
+      "executor": {
+        "execution_mode": "local_cli",
+        "executor_model": null,
+        "executor_backend": "local_cli",
+        "executor_host": "localhost",
+        "executor_transport": "shell"
+      },
+      "executor_transport": "shell"
+    },
+    "session_key": "trump-2025-batch-01",
+    "workflow_state": "DISCOVERY_READY"
+  },
+  "createdAt": "2026-03-31T20:22:21.786Z",
+  "updatedAt": "2026-03-31T22:35:05.518Z"
+}

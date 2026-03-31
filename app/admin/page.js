@@ -1,406 +1,743 @@
 import Link from "next/link";
-import { getAdminCommandCenterData } from "@/lib/services/adminCommandCenterService";
-import { formatWorkflowLabel } from "@/lib/operator/operatorActionUtils.js";
-import RecommendationList from "./components/RecommendationList";
+import { getCommandCenterSummary } from "@/lib/server/admin-operator/workflowData.js";
+import ActionLauncher from "./components/ActionLauncher";
+import OperatorActionButton from "./components/OperatorActionButton";
+import OperatorPageAutoRefresh from "./components/OperatorPageAutoRefresh";
+import JobStatusBadge from "./jobs/JobStatusBadge";
 
-function stateBannerClasses(tone) {
-  if (tone === "attention") {
-    return "border-amber-300 bg-amber-50";
-  }
-  if (tone === "ready") {
-    return "border-green-300 bg-green-50";
-  }
-  return "border-gray-300 bg-gray-50";
+export const dynamic = "force-dynamic";
+
+const EMPTY_BUCKET = {
+  title: "No items",
+  description: "",
+  items: [],
+};
+
+function normalizeString(value) {
+  return typeof value === "string" ? value.trim() : "";
 }
 
-function stateBadgeClasses(tone) {
-  if (tone === "attention") {
-    return "border-amber-300 bg-amber-100 text-amber-900";
+function toWorkflowLabel(value) {
+  if (value === "current-admin") {
+    return "Current Admin";
   }
-  if (tone === "ready") {
-    return "border-green-300 bg-green-100 text-green-900";
+  if (value === "legislative") {
+    return "Legislative";
   }
-  return "border-gray-300 bg-gray-100 text-gray-900";
+  if (value === "system") {
+    return "System";
+  }
+  return value || "Unknown";
 }
 
-function WorkflowPanel({ summary, primaryHref, primaryLabel }) {
+function toPriorityCode(label) {
+  if (label === "critical" || label === "high") {
+    return "P1";
+  }
+  if (label === "medium") {
+    return "P2";
+  }
+  return "P3";
+}
+
+function formatDateTime(value) {
+  if (!value) {
+    return "—";
+  }
+
+  try {
+    return new Intl.DateTimeFormat("en-US", {
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+    }).format(new Date(value));
+  } catch {
+    return value;
+  }
+}
+
+function formatDuration(startedAt, finishedAt) {
+  if (!startedAt || !finishedAt) {
+    return "—";
+  }
+
+  const durationMs = new Date(finishedAt).getTime() - new Date(startedAt).getTime();
+  if (!Number.isFinite(durationMs) || durationMs < 0) {
+    return "—";
+  }
+
+  if (durationMs < 1000) {
+    return `${durationMs}ms`;
+  }
+
+  const totalSeconds = Math.round(durationMs / 1000);
+  if (totalSeconds < 60) {
+    return `${totalSeconds}s`;
+  }
+
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  if (minutes < 60) {
+    return `${minutes}m ${seconds}s`;
+  }
+
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+  return `${hours}h ${remainingMinutes}m`;
+}
+
+function CompactBadge({ children, tone = "default", mono = false }) {
+  const palette =
+    tone === "danger"
+      ? "border-red-300 bg-red-50 text-red-900"
+      : tone === "warning"
+        ? "border-amber-300 bg-amber-50 text-amber-900"
+        : tone === "success"
+          ? "border-green-300 bg-green-50 text-green-900"
+          : "border-zinc-300 bg-zinc-50 text-zinc-700";
+
   return (
-    <div className="border rounded-2xl p-5 bg-white shadow-sm space-y-4">
-      <div>
-        <p className="text-sm text-gray-600">{summary.title}</p>
-        <h2 className="text-xl font-semibold mt-1">{summary.state}</h2>
-        <p className="mt-2 text-sm text-gray-700">{summary.why_this_matters}</p>
-      </div>
+    <span
+      className={`inline-flex items-center rounded border px-1.5 py-0.5 text-[10px] uppercase tracking-wide ${palette}${mono ? " font-mono" : " font-medium"}`}
+    >
+      {children}
+    </span>
+  );
+}
 
-      <div className="grid gap-3 md:grid-cols-2">
-        <div className="rounded-xl border p-4">
-          <p className="text-sm text-gray-600">Pending approvals</p>
-          <p className="text-xl font-semibold mt-1">{summary.pending_review}</p>
-        </div>
-        <div className="rounded-xl border p-4">
-          <p className="text-sm text-gray-600">Blockers</p>
-          <p className="text-xl font-semibold mt-1">{summary.blocked_count}</p>
-        </div>
-        {"precommit_readiness" in summary ? (
-          <div className="rounded-xl border p-4">
-            <p className="text-sm text-gray-600">Pre-commit readiness</p>
-            <p className="text-xl font-semibold mt-1">{summary.precommit_readiness}</p>
-          </div>
-        ) : (
-          <div className="rounded-xl border p-4">
-            <p className="text-sm text-gray-600">Apply ready</p>
-            <p className="text-xl font-semibold mt-1">{summary.apply_ready ? "yes" : "no"}</p>
-          </div>
-        )}
-        <div className="rounded-xl border p-4">
-          <p className="text-sm text-gray-600">Safe next action</p>
-          <p className="text-xl font-semibold mt-1">{summary.safe_next_action}</p>
-          <p className="mt-2 text-sm text-gray-700">{summary.safe_next_action_reason}</p>
-        </div>
-      </div>
+function StateBadge({ value }) {
+  const text = normalizeString(value) || "unknown";
+  const upper = text.toUpperCase();
+  const tone =
+    upper.includes("BLOCK") || upper === "FAILED" || upper === "MISSING"
+      ? "danger"
+      : upper.includes("REVIEW") || upper.includes("QUEUE") || upper === "QUEUED"
+        ? "warning"
+        : upper.includes("READY") || upper === "SUCCESS" || upper === "RUNNING"
+          ? "success"
+          : "default";
 
-      <div className="rounded-xl border p-4">
-        <p className="text-sm text-gray-600">Artifact awareness</p>
-        <p className="mt-2 text-sm text-gray-700">{summary.artifact_signal}</p>
-        {summary.artifact_path ? (
-          <p className="mt-2 break-all text-xs text-gray-600">{summary.artifact_path}</p>
-        ) : null}
-      </div>
+  return <CompactBadge tone={tone}>{text}</CompactBadge>;
+}
 
-      <div className="flex flex-wrap gap-3">
-        <Link href={summary.next_href} className="border rounded-lg px-4 py-2">
-          {summary.next_label}
-        </Link>
-        <Link href={summary.operator_console_href} className="border rounded-lg px-4 py-2">
-          Open in Workflow Console
-        </Link>
-        <Link href={primaryHref} className="border rounded-lg px-4 py-2">
-          {primaryLabel}
-        </Link>
-      </div>
+function RoutineTypeBadge({ step }) {
+  let label = "Run";
+  if (step.executionSafety.blocked) {
+    label = "Blocked";
+  } else if (step.executionSafety.requires_review) {
+    label = "Review";
+  } else if (step.actionType === "retry_safely") {
+    label = "Retry";
+  } else if (step.sourceType === "schedule") {
+    label = "Schedule";
+  }
+
+  const tone =
+    label === "Blocked"
+      ? "danger"
+      : label === "Review"
+        ? "warning"
+        : label === "Run"
+          ? "success"
+          : "default";
+
+  return <CompactBadge tone={tone}>{label}</CompactBadge>;
+}
+
+function DashboardCounter({ label, value, href }) {
+  return (
+    <Link
+      href={href}
+      className="flex min-h-0 items-center justify-between gap-3 rounded border border-zinc-300 bg-white px-2 py-1.5 text-[11px] hover:bg-zinc-50"
+    >
+      <span className="font-mono uppercase tracking-wide text-zinc-600">{label}</span>
+      <span className="text-sm font-semibold text-zinc-900">{value}</span>
+    </Link>
+  );
+}
+
+function TableShell({ children }) {
+  return (
+    <div className="overflow-x-auto rounded border border-zinc-200 bg-white">
+      {children}
     </div>
   );
 }
 
-export default async function AdminPage() {
-  const commandCenter = await getAdminCommandCenterData();
-  const currentAdmin = commandCenter.current_admin_summary;
-  const legislative = commandCenter.legislative_summary;
-  const indicators = commandCenter.global_indicators;
-  const attentionItems = commandCenter.attention_items || [];
-  const quickActions = commandCenter.quick_actions || [];
-  const operatorInsights = commandCenter.operator_insights || {};
-  const potentialFriction = commandCenter.potential_friction || [];
-  const smartRecommendations = commandCenter.smart_recommendations || [];
-  const whatNow = commandCenter.what_now;
+function TableLink({ href, children }) {
+  return (
+    <Link href={href} className="text-[11px] underline underline-offset-2">
+      {children}
+    </Link>
+  );
+}
+
+function renderPrimaryAction(actionConfig, fallbackHref, fallbackLabel = "Inspect") {
+  if (actionConfig?.type === "action" && actionConfig.action) {
+    return (
+      <OperatorActionButton
+        action={actionConfig.action}
+        label={actionConfig.label}
+        input={actionConfig.input}
+        context={actionConfig.context}
+        tone={actionConfig.tone}
+        helperText=""
+        confirmation={actionConfig.confirmation}
+      />
+    );
+  }
+
+  if (actionConfig?.type === "link" && actionConfig.href) {
+    return (
+      <TableLink href={actionConfig.href}>
+        {actionConfig.label}
+      </TableLink>
+    );
+  }
+
+  if (fallbackHref) {
+    return <TableLink href={fallbackHref}>{fallbackLabel}</TableLink>;
+  }
+
+  return <span className="text-[11px] text-zinc-400">—</span>;
+}
+
+function SectionHeader({ eyebrow, title, description, href, hrefLabel = "View all" }) {
+  return (
+    <div className="flex flex-wrap items-end justify-between gap-3">
+      <div className="space-y-1">
+        <p className="font-mono text-[11px] uppercase tracking-wide text-zinc-600">{eyebrow}</p>
+        <h2 className="text-sm font-semibold text-zinc-900">{title}</h2>
+        {description ? <p className="text-[11px] text-zinc-600">{description}</p> : null}
+      </div>
+      {href ? <TableLink href={href}>{hrefLabel}</TableLink> : null}
+    </div>
+  );
+}
+
+function DailyRoutineTable({ steps, itemIndex }) {
+  return (
+    <section className="space-y-2">
+      <SectionHeader
+        eyebrow="Daily Routine"
+        title="Top sequenced operator work"
+        description="Only the highest-value first-wave steps are shown here."
+      />
+      <TableShell>
+        <table className="min-w-[1160px] w-full text-[11px]">
+          <thead className="bg-zinc-100 text-left uppercase tracking-wide text-zinc-600">
+            <tr>
+              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Priority</th>
+              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Type</th>
+              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Workflow</th>
+              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Item</th>
+              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Why Now</th>
+              <th className="border-b border-zinc-200 px-2 py-1 font-medium">State</th>
+              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Source</th>
+              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {steps.length ? (
+              steps.map((step) => {
+                const sourceItem = itemIndex.get(step.sourceItemId);
+                return (
+                  <tr key={step.id} className="align-top odd:bg-white even:bg-zinc-50/40">
+                    <td className="border-b border-zinc-200 px-2 py-1 font-mono font-medium text-zinc-700">
+                      {toPriorityCode(step.priorityLabel)}
+                    </td>
+                    <td className="border-b border-zinc-200 px-2 py-1">
+                      <RoutineTypeBadge step={step} />
+                    </td>
+                    <td className="border-b border-zinc-200 px-2 py-1">{toWorkflowLabel(step.workflowFamily)}</td>
+                    <td className="border-b border-zinc-200 px-2 py-1">
+                      <div className="font-medium text-zinc-900">{step.title}</div>
+                    </td>
+                    <td className="border-b border-zinc-200 px-2 py-1 text-zinc-700">
+                      {step.priorityReason || step.explanation}
+                    </td>
+                    <td className="border-b border-zinc-200 px-2 py-1">
+                      <StateBadge value={sourceItem?.status || "pending"} />
+                    </td>
+                    <td className="border-b border-zinc-200 px-2 py-1 font-mono text-[10px] text-zinc-600">
+                      {step.sourceId}
+                    </td>
+                    <td className="border-b border-zinc-200 px-2 py-1">
+                      {renderPrimaryAction(step.primaryAction, step.deepLinkTarget, "Open")}
+                    </td>
+                  </tr>
+                );
+              })
+            ) : (
+              <tr>
+                <td colSpan={8} className="px-2 py-3 text-[11px] text-zinc-600">
+                  No routine items are active right now.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </TableShell>
+    </section>
+  );
+}
+
+function BucketTable({ id, title, description, href, items }) {
+  const rows = items.slice(0, 4);
 
   return (
-    <main className="max-w-7xl mx-auto p-6 space-y-8">
-      <section className="space-y-4">
-        <p className="text-sm text-gray-600">Dashboard / Command Center</p>
-        <h1 className="text-3xl font-bold">Admin Command Center</h1>
-        <p className="text-gray-700 max-w-4xl">
-          This dashboard is the top-level operational view for EquityStack. It derives
-          state from the canonical current-admin and legislative artifacts, highlights what
-          needs attention, explains why it matters, and points you to the next safe control surface.
+    <section id={id} className="space-y-2">
+      <SectionHeader eyebrow={title} title={title} description={description} href={href} />
+      <TableShell>
+        <table className="min-w-[760px] w-full text-[11px]">
+          <thead className="bg-zinc-100 text-left uppercase tracking-wide text-zinc-600">
+            <tr>
+              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Workflow</th>
+              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Item</th>
+              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Why Now</th>
+              <th className="border-b border-zinc-200 px-2 py-1 font-medium">State</th>
+              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.length ? (
+              rows.map((item) => (
+                <tr key={item.id} className="align-top odd:bg-white even:bg-zinc-50/40">
+                  <td className="border-b border-zinc-200 px-2 py-1">{toWorkflowLabel(item.workflowFamily)}</td>
+                  <td className="border-b border-zinc-200 px-2 py-1">
+                    <div className="font-medium text-zinc-900">{item.title}</div>
+                    <div className="mt-0.5 font-mono text-[10px] text-zinc-500">
+                      {item.metadata?.sourceId || item.id}
+                    </div>
+                  </td>
+                  <td className="border-b border-zinc-200 px-2 py-1 text-zinc-700">
+                    {item.priorityReason || item.summary}
+                  </td>
+                  <td className="border-b border-zinc-200 px-2 py-1">
+                    <StateBadge value={item.status || "pending"} />
+                  </td>
+                  <td className="border-b border-zinc-200 px-2 py-1">
+                    {item.quickAction?.action ? (
+                      <OperatorActionButton
+                        action={item.quickAction.action}
+                        label={item.quickAction.label}
+                        input={item.quickAction.input}
+                        context={item.quickAction.context}
+                        tone={item.quickAction.tone}
+                        helperText=""
+                        confirmation={item.quickAction.confirmation}
+                      />
+                    ) : item.href ? (
+                      <TableLink href={item.href}>Inspect</TableLink>
+                    ) : (
+                      <span className="text-[11px] text-zinc-400">—</span>
+                    )}
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={5} className="px-2 py-3 text-[11px] text-zinc-600">
+                  Nothing active in this bucket right now.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </TableShell>
+    </section>
+  );
+}
+
+function SessionSnapshotTable({ sessions }) {
+  return (
+    <section className="space-y-2">
+      <SectionHeader
+        eyebrow="Session Snapshots"
+        title="Active workflow sessions"
+        description="This is the spreadsheet backbone of the command center."
+        href="/admin/workflows"
+      />
+      <TableShell>
+        <table className="min-w-[1380px] w-full text-[11px]">
+          <thead className="bg-zinc-100 text-left uppercase tracking-wide text-zinc-600">
+            <tr>
+              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Workflow</th>
+              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Session</th>
+              <th className="border-b border-zinc-200 px-2 py-1 font-medium">State</th>
+              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Review</th>
+              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Blocker</th>
+              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Next Action</th>
+              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Latest Job</th>
+              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Mode</th>
+              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Schedule</th>
+              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Fallback</th>
+              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {sessions.length ? (
+              sessions.slice(0, 8).map((session) => {
+                const blocker =
+                  session.blockerPreview?.[0] ||
+                  session.missingArtifactsPreview?.[0] ||
+                  "—";
+                const primaryAction =
+                  session.quickActions?.nextAction ||
+                  session.quickActions?.retryAction ||
+                  null;
+
+                return (
+                  <tr key={session.id} className="align-top odd:bg-white even:bg-zinc-50/40">
+                    <td className="border-b border-zinc-200 px-2 py-1">{toWorkflowLabel(session.workflowFamily)}</td>
+                    <td className="border-b border-zinc-200 px-2 py-1">
+                      <div className="font-mono text-[10px] text-zinc-700">
+                        {session.canonicalSessionKey || session.id}
+                      </div>
+                    </td>
+                    <td className="border-b border-zinc-200 px-2 py-1">
+                      <StateBadge value={session.canonicalState} />
+                    </td>
+                    <td className="border-b border-zinc-200 px-2 py-1">
+                      {session.reviewPendingCount > 0 ? (
+                        <CompactBadge tone="warning">Yes</CompactBadge>
+                      ) : (
+                        <CompactBadge>No</CompactBadge>
+                      )}
+                    </td>
+                    <td className="border-b border-zinc-200 px-2 py-1">
+                      <div className="max-w-[220px] truncate text-zinc-700" title={blocker}>
+                        {blocker}
+                      </div>
+                    </td>
+                    <td className="border-b border-zinc-200 px-2 py-1">
+                      <div className="max-w-[180px] truncate text-zinc-700" title={session.recommendedAction?.title || ""}>
+                        {session.recommendedAction?.title || "—"}
+                      </div>
+                    </td>
+                    <td className="border-b border-zinc-200 px-2 py-1">
+                      {session.lastJob ? (
+                        <div className="space-y-1">
+                          <JobStatusBadge status={session.lastJob.status} />
+                          <div className="font-mono text-[10px] text-zinc-600">
+                            {session.lastJob.id}
+                          </div>
+                        </div>
+                      ) : (
+                        <span className="text-zinc-400">—</span>
+                      )}
+                    </td>
+                    <td className="border-b border-zinc-200 px-2 py-1 font-mono text-[10px] text-zinc-700">
+                      {session.execution?.execution_mode || "local_cli"}
+                    </td>
+                    <td className="border-b border-zinc-200 px-2 py-1 font-mono text-[10px] text-zinc-700">
+                      {session.linkedSchedule?.title || "—"}
+                    </td>
+                    <td className="border-b border-zinc-200 px-2 py-1">
+                      {session.fallbackPreview ? <CompactBadge tone="warning">Yes</CompactBadge> : <CompactBadge>No</CompactBadge>}
+                    </td>
+                    <td className="border-b border-zinc-200 px-2 py-1">
+                      {primaryAction ? (
+                        <OperatorActionButton
+                          action={primaryAction.action}
+                          label={primaryAction.title}
+                          input={primaryAction.input}
+                          context={primaryAction.context}
+                          tone={primaryAction.tone}
+                          helperText=""
+                          confirmation={primaryAction.confirmation}
+                        />
+                      ) : (
+                        <TableLink href={session.href}>Open</TableLink>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })
+            ) : (
+              <tr>
+                <td colSpan={11} className="px-2 py-3 text-[11px] text-zinc-600">
+                  No active sessions are currently recorded.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </TableShell>
+    </section>
+  );
+}
+
+function SchedulesTable({ schedules }) {
+  return (
+    <section className="space-y-2">
+      <SectionHeader
+        eyebrow="Schedules"
+        title="Preparation timing"
+        description="Schedules stay lower on the page and do not outrank urgent human work."
+        href="/admin/schedules"
+      />
+      <TableShell>
+        <table className="min-w-[980px] w-full text-[11px]">
+          <thead className="bg-zinc-100 text-left uppercase tracking-wide text-zinc-600">
+            <tr>
+              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Title</th>
+              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Action</th>
+              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Workflow</th>
+              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Mode</th>
+              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Status</th>
+              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Next Run</th>
+              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Last Run</th>
+              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Last Result</th>
+              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {schedules.length ? (
+              schedules.slice(0, 5).map((schedule) => (
+                <tr key={schedule.id} className="align-top odd:bg-white even:bg-zinc-50/40">
+                  <td className="border-b border-zinc-200 px-2 py-1">
+                    <div className="font-medium">{schedule.title}</div>
+                    <div className="font-mono text-[10px] text-zinc-500">{schedule.id}</div>
+                  </td>
+                  <td className="border-b border-zinc-200 px-2 py-1">
+                    {schedule.action?.title || schedule.actionId}
+                  </td>
+                  <td className="border-b border-zinc-200 px-2 py-1">{toWorkflowLabel(schedule.workflowFamily)}</td>
+                  <td className="border-b border-zinc-200 px-2 py-1 font-mono text-[10px] text-zinc-700">
+                    {schedule.executionMode || "local_cli"}
+                  </td>
+                  <td className="border-b border-zinc-200 px-2 py-1">
+                    <StateBadge value={schedule.status} />
+                  </td>
+                  <td className="border-b border-zinc-200 px-2 py-1">{formatDateTime(schedule.nextRunAt)}</td>
+                  <td className="border-b border-zinc-200 px-2 py-1">{formatDateTime(schedule.lastRunAt)}</td>
+                  <td className="border-b border-zinc-200 px-2 py-1">
+                    <div className="max-w-[220px] truncate text-zinc-700" title={schedule.lastJob?.summary || schedule.lastResultSummary || schedule.summary}>
+                      {schedule.lastJob?.summary || schedule.lastResultSummary || schedule.summary}
+                    </div>
+                  </td>
+                  <td className="border-b border-zinc-200 px-2 py-1">
+                    <TableLink href="/admin/schedules">Open schedule</TableLink>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={9} className="px-2 py-3 text-[11px] text-zinc-600">
+                  No schedules are currently recorded.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </TableShell>
+    </section>
+  );
+}
+
+function HealthTable({ banner, signals }) {
+  return (
+    <section className="space-y-2">
+      <SectionHeader
+        eyebrow="System Health"
+        title="Verification and active signals"
+        description="Keep this lower than urgent workflow work, but make drift visible."
+        href="/admin/tools"
+      />
+      <TableShell>
+        <table className="min-w-[860px] w-full text-[11px]">
+          <thead className="bg-zinc-100 text-left uppercase tracking-wide text-zinc-600">
+            <tr>
+              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Check</th>
+              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Status</th>
+              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Summary</th>
+              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {banner ? (
+              <tr className="align-top odd:bg-white even:bg-zinc-50/40">
+                <td className="border-b border-zinc-200 px-2 py-1 font-medium">{banner.title}</td>
+                <td className="border-b border-zinc-200 px-2 py-1">
+                  <StateBadge value={banner.status} />
+                </td>
+                <td className="border-b border-zinc-200 px-2 py-1 text-zinc-700">
+                  {banner.summary}
+                </td>
+                <td className="border-b border-zinc-200 px-2 py-1">
+                  <TableLink href={banner.href || "/admin/tools"}>Open tools</TableLink>
+                </td>
+              </tr>
+            ) : null}
+            {signals.slice(0, 4).map((signal) => (
+              <tr key={signal.id} className="align-top odd:bg-white even:bg-zinc-50/40">
+                <td className="border-b border-zinc-200 px-2 py-1 font-medium">{signal.title}</td>
+                <td className="border-b border-zinc-200 px-2 py-1">
+                  <StateBadge value={signal.signalType} />
+                </td>
+                <td className="border-b border-zinc-200 px-2 py-1 text-zinc-700">{signal.summary}</td>
+                <td className="border-b border-zinc-200 px-2 py-1">
+                  {signal.href ? <TableLink href={signal.href}>Inspect</TableLink> : <TableLink href="/admin/tools">Open tools</TableLink>}
+                </td>
+              </tr>
+            ))}
+            {!banner && !signals.length ? (
+              <tr>
+                <td colSpan={4} className="px-2 py-3 text-[11px] text-zinc-600">
+                  No verification or signal warnings are active right now.
+                </td>
+              </tr>
+            ) : null}
+          </tbody>
+        </table>
+      </TableShell>
+    </section>
+  );
+}
+
+export default async function AdminPage() {
+  let summary;
+  let loadError = "";
+
+  try {
+    summary = await getCommandCenterSummary();
+  } catch (error) {
+    console.error("admin dashboard summary load failed:", error);
+    loadError =
+      error instanceof Error
+        ? error.message
+        : "The dashboard summary could not be assembled.";
+    summary = {
+      verificationBanner: null,
+      overview: {
+        blockedSessions: 0,
+        readyToRun: 0,
+        overdueSchedules: 0,
+        recentFailures: 0,
+      },
+      reviewQueueSummary: {
+        pendingReviewItems: 0,
+      },
+      dailyRoutine: { steps: [] },
+      buckets: {},
+      sessionCards: [],
+      schedulesNeedingAttention: [],
+      upcomingSchedules: [],
+      signals: [],
+      recentJobs: [],
+      featuredActions: [],
+    };
+  }
+
+  const buckets = summary.buckets || {};
+  const blockedBucket = buckets.blockedNeedsFix || EMPTY_BUCKET;
+  const reviewBucket = buckets.awaitingHumanReview || EMPTY_BUCKET;
+  const readyBucket = buckets.readyToRun || EMPTY_BUCKET;
+  const failureBucket = buckets.recentFailures || EMPTY_BUCKET;
+  const allBucketItems = Object.values(buckets).flatMap((bucket) => bucket?.items || []);
+  const itemIndex = new Map(allBucketItems.map((item) => [item.id, item]));
+  const runningJobs = (summary.recentJobs || []).filter((job) => ["queued", "running"].includes(job.status)).length;
+  const schedules = [
+    ...(summary.schedulesNeedingAttention || []),
+    ...((summary.upcomingSchedules || []).filter(
+      (candidate) => !(summary.schedulesNeedingAttention || []).some((item) => item.id === candidate.id)
+    )),
+  ].slice(0, 5);
+
+  return (
+    <main className="mx-auto max-w-[1700px] space-y-4 px-4 py-4">
+      <OperatorPageAutoRefresh />
+
+      <section className="space-y-1">
+        <p className="font-mono text-[11px] uppercase tracking-wide text-zinc-600">Operator Dashboard</p>
+        <h1 className="text-lg font-semibold text-zinc-900">What needs attention right now</h1>
+        <p className="text-[11px] text-zinc-600">
+          This page is optimized for triage, next action, and safe progression through broker-backed operator work.
         </p>
-        <p className="text-sm text-gray-600">
-          Need a refresher? Use the{" "}
-          <Link href="/admin/runbook" className="underline">
-            Operator Runbook
-          </Link>{" "}
-          for daily guidance and recovery steps.
-        </p>
       </section>
 
-      <section className={`border rounded-2xl p-5 shadow-sm ${stateBannerClasses(whatNow?.tone)}`}>
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div className="max-w-4xl">
-            <p className="text-sm text-gray-600">What Should I Do Right Now?</p>
-            <div className="mt-2 flex flex-wrap items-center gap-2">
-              <h2 className="text-2xl font-semibold">{whatNow?.title || "Review the dashboard"}</h2>
-              {whatNow?.scenario_label ? (
-                <span
-                  className={`rounded-full border px-3 py-1 text-xs font-medium ${stateBadgeClasses(
-                    whatNow.tone
-                  )}`}
-                >
-                  {whatNow.scenario_label}
-                </span>
-              ) : null}
-            </div>
-            <p className="mt-3 text-sm text-gray-700">
-              {whatNow?.summary ||
-                "The command center will point you to the next safe workflow page as state changes."}
-            </p>
-            {whatNow?.safety_note ? (
-              <p className="mt-3 text-sm text-gray-600">Safety: {whatNow.safety_note}</p>
-            ) : null}
+      {loadError ? (
+        <section className="rounded border border-amber-300 bg-amber-50 p-3 text-[11px] text-amber-950">
+          <div className="font-medium">Dashboard fallback</div>
+          <p className="mt-1">{loadError}</p>
+          <div className="mt-2 flex flex-wrap gap-3">
+            <TableLink href="/admin/tools">Open tools</TableLink>
+            <TableLink href="/admin/jobs">Open jobs</TableLink>
+            <TableLink href="/admin/workflows">Open sessions</TableLink>
+            <TableLink href="/admin/command">Open command console</TableLink>
           </div>
-          <div className="flex flex-wrap gap-3">
-            {whatNow?.next_step_href ? (
-              <Link href={whatNow.next_step_href} className="border rounded-lg px-4 py-2 bg-white">
-                {whatNow.next_step_label}
-              </Link>
-            ) : null}
-            {whatNow?.operator_console_href ? (
-              <Link href={whatNow.operator_console_href} className="border rounded-lg px-4 py-2 bg-white">
-                Open in Workflow Console
-              </Link>
-            ) : null}
-          </div>
-        </div>
+        </section>
+      ) : null}
+
+      <section className="grid gap-2 md:grid-cols-3 xl:grid-cols-6">
+        <DashboardCounter label="Blocked" value={summary.overview.blockedSessions} href="#blocked-needs-fix" />
+        <DashboardCounter label="Needs Review" value={summary.reviewQueueSummary.pendingReviewItems} href="#awaiting-human-review" />
+        <DashboardCounter label="Ready Now" value={summary.overview.readyToRun} href="#ready-to-run" />
+        <DashboardCounter label="Failed Jobs" value={summary.overview.recentFailures} href="#recent-failures" />
+        <DashboardCounter label="Overdue Schedules" value={summary.overview.overdueSchedules} href="/admin/schedules" />
+        <DashboardCounter label="Running Jobs" value={runningJobs} href="/admin/jobs" />
       </section>
 
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
-        <div className="border rounded-2xl p-5 bg-white shadow-sm">
-          <p className="text-sm text-gray-600">Blocked workflows</p>
-          <p className="text-2xl font-semibold mt-2">{indicators.blocked_workflows}</p>
-        </div>
-        <div className="border rounded-2xl p-5 bg-white shadow-sm">
-          <p className="text-sm text-gray-600">Approvals pending</p>
-          <p className="text-2xl font-semibold mt-2">{indicators.approvals_pending}</p>
-        </div>
-        <div className="border rounded-2xl p-5 bg-white shadow-sm">
-          <p className="text-sm text-gray-600">Imports ready</p>
-          <p className="text-2xl font-semibold mt-2">{indicators.imports_ready}</p>
-          <p className="mt-2 text-sm text-gray-700">
-            Ready means the existing guardrails say a supervised next step is available.
-          </p>
-        </div>
-        <div className="border rounded-2xl p-5 bg-white shadow-sm">
-          <p className="text-sm text-gray-600">Validation failures</p>
-          <p className="text-2xl font-semibold mt-2">{indicators.validation_failures}</p>
-        </div>
-        <div className="border rounded-2xl p-5 bg-white shadow-sm">
-          <p className="text-sm text-gray-600">Missing artifacts</p>
-          <p className="text-2xl font-semibold mt-2">{indicators.missing_artifacts}</p>
-        </div>
-      </section>
+      <DailyRoutineTable
+        steps={(summary.dailyRoutine?.steps || []).slice(0, 5)}
+        itemIndex={itemIndex}
+      />
 
-      <section className="grid gap-6 xl:grid-cols-[1fr_1fr]">
-        <WorkflowPanel
-          summary={currentAdmin}
-          primaryHref="/admin/current-admin-review"
-          primaryLabel="Open Current-Admin Workflow"
+      <section className="grid gap-4 xl:grid-cols-2">
+        <BucketTable
+          id="blocked-needs-fix"
+          title="Blocked / Needs Fix"
+          description="Inspect blockers before lower-priority ready work."
+          href="/admin/workflows"
+          items={blockedBucket.items || []}
         />
-        <WorkflowPanel
-          summary={legislative}
-          primaryHref="/admin/legislative-workflow"
-          primaryLabel="Open Legislative Workflow"
+        <BucketTable
+          id="awaiting-human-review"
+          title="Awaiting Human Review"
+          description="Human checkpoints that cannot be automated."
+          href="/admin/review-queue"
+          items={reviewBucket.items || []}
+        />
+        <BucketTable
+          id="ready-to-run"
+          title="Ready To Run"
+          description="Safe next-step work that can be run now."
+          href="/admin/workflows"
+          items={readyBucket.items || []}
+        />
+        <BucketTable
+          id="recent-failures"
+          title="Recent Failures"
+          description="Recent blocked or failed broker jobs that may need inspection or retry."
+          href="/admin/jobs"
+          items={failureBucket.items || []}
         />
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
-        <div className="border rounded-2xl p-5 bg-white shadow-sm">
-          <h2 className="text-xl font-semibold">Operator Insights</h2>
-          <div className="mt-4 grid gap-4 xl:grid-cols-2">
-            <div className="rounded-xl border p-4">
-              <p className="text-sm text-gray-600">Most used actions</p>
-              <div className="mt-3 space-y-2 text-sm">
-                {(operatorInsights.most_used_actions || []).length ? (
-                  operatorInsights.most_used_actions.map((entry) => (
-                    <div key={`used-${entry.action_id}`} className="flex items-center justify-between gap-3">
-                      <span>{entry.action_label}</span>
-                      <span className="text-gray-600">{entry.count}</span>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-gray-600">No operator actions have been recorded yet.</p>
-                )}
-              </div>
-            </div>
+      <SessionSnapshotTable sessions={summary.sessionCards || []} />
 
-            <div className="rounded-xl border p-4">
-              <p className="text-sm text-gray-600">Most blocked actions</p>
-              <div className="mt-3 space-y-2 text-sm">
-                {(operatorInsights.most_blocked_actions || []).length ? (
-                  operatorInsights.most_blocked_actions.map((entry) => (
-                    <div key={`blocked-${entry.action_id}`} className="flex items-center justify-between gap-3">
-                      <span>{entry.action_label}</span>
-                      <span className="text-gray-600">{entry.count}</span>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-gray-600">No blocked operator actions appear in recent history.</p>
-                )}
-              </div>
-            </div>
-
-            <div className="rounded-xl border p-4">
-              <p className="text-sm text-gray-600">Recent activity</p>
-              <p className="mt-3 text-sm text-gray-700">
-                {operatorInsights.recent_activity_summary?.summary ||
-                  "No recent operator activity has been recorded yet."}
-              </p>
-            </div>
-
-            <div className="rounded-xl border p-4">
-              <p className="text-sm text-gray-600">Most recent failure</p>
-              {operatorInsights.most_recent_failure ? (
-                <div className="mt-3 text-sm text-gray-700 space-y-1">
-                  <p className="font-medium">
-                    {operatorInsights.most_recent_failure.action_label ||
-                      operatorInsights.most_recent_failure.action_id}
-                  </p>
-                  <p>{operatorInsights.most_recent_failure.summary}</p>
-                  <p className="text-gray-600">{operatorInsights.most_recent_failure.timestamp}</p>
-                </div>
-              ) : (
-                <p className="mt-3 text-sm text-gray-600">
-                  No failed operator actions appear in recent history.
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
-
-        <div className="border rounded-2xl p-5 bg-white shadow-sm">
-          <h2 className="text-xl font-semibold">Potential Friction</h2>
-          <div className="mt-4 space-y-3 text-sm">
-            {potentialFriction.length ? (
-              potentialFriction.map((item, index) => (
-                <div key={`${item.type}-${index}`} className="rounded-xl border p-4">
-                  <p className="font-semibold">{item.action_label || "Recent friction detected"}</p>
-                  <p className="mt-2 text-gray-700">{item.summary}</p>
-                </div>
-              ))
-            ) : (
-              <div className="rounded-xl border border-green-200 bg-green-50 p-4 text-gray-700">
-                No obvious operator friction is showing in recent history.
-              </div>
-            )}
-          </div>
-        </div>
+      <section className="grid gap-4 xl:grid-cols-[1.2fr_0.8fr]">
+        <SchedulesTable schedules={schedules} />
+        <HealthTable
+          banner={summary.verificationBanner}
+          signals={summary.signals || []}
+        />
       </section>
 
-      <section className="border rounded-2xl p-5 bg-white shadow-sm">
-        <h2 className="text-xl font-semibold">Smart Recommendations</h2>
-        <p className="mt-2 text-sm text-gray-600">
-          Recommendations are guidance only. They help you choose the next safe step, but they do
-          not approve, import, or execute anything by themselves.
-        </p>
-        <div className="mt-4">
-          <RecommendationList
-            recommendations={smartRecommendations}
-            emptyState="No smart recommendations are active right now. Recent workflow activity looks stable."
-          />
-        </div>
-      </section>
-
-      <section className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
-        <div className="border rounded-2xl p-5 bg-white shadow-sm">
-          <h2 className="text-xl font-semibold">Needs Attention</h2>
-          <div className="mt-4 space-y-3 text-sm">
-            {attentionItems.length ? (
-              attentionItems.map((item, index) => (
-                <div key={`${item.workflow}-${index}`} className="rounded-xl border p-4">
-                  <p className="font-semibold">{item.title}</p>
-                  <p className="mt-2 text-gray-700">{item.what_is_wrong}</p>
-                  <p className="mt-2 text-gray-600">Why this matters: {item.why_it_matters}</p>
-                  <p className="mt-2 text-gray-700">Next: {item.recommended_next_step}</p>
-                  {item.artifact_label || item.artifact_path ? (
-                    <div className="mt-3 rounded-lg border bg-gray-50 p-3">
-                      <p className="text-xs uppercase tracking-wide text-gray-500">Artifact</p>
-                      {item.artifact_label ? (
-                        <p className="mt-1 font-medium text-gray-900">{item.artifact_label}</p>
-                      ) : null}
-                      {item.artifact_path ? (
-                        <p className="mt-1 break-all text-gray-600">{item.artifact_path}</p>
-                      ) : null}
-                    </div>
-                  ) : null}
-                  <div className="mt-3 flex flex-wrap gap-3">
-                    <Link href={item.href} className="underline">
-                      Open workflow
-                    </Link>
-                    {item.operator_console_href ? (
-                      <Link href={item.operator_console_href} className="underline">
-                        Open in Workflow Console
-                      </Link>
-                    ) : null}
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="rounded-xl border border-green-200 bg-green-50 p-4 text-gray-700">
-                No urgent blockers are recorded right now. The command center is healthy and ready
-                for supervised review as new artifacts arrive.
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="border rounded-2xl p-5 bg-white shadow-sm">
-          <h2 className="text-xl font-semibold">Recommended Next Steps</h2>
-          <p className="mt-2 text-sm text-gray-600">
-            These links move you into the right review surface. If you need a refresher on the
-            daily flow, open the{" "}
-            <Link href="/admin/runbook" className="underline">
-              Operator Runbook
-            </Link>
-            .
-          </p>
-          <div className="mt-4 space-y-3">
-            {quickActions.length ? (
-              quickActions.map((action) => (
-                <div key={`${action.workflow}-${action.href}`} className="rounded-xl border p-4">
-                  <p className="font-semibold">{action.label}</p>
-                  <p className="mt-2 text-sm text-gray-600">
-                    {formatWorkflowLabel(action.workflow)}
-                  </p>
-                  <div className="mt-3 flex flex-wrap gap-3 text-sm">
-                    <Link href={action.href} className="underline">
-                      Open workflow page
-                    </Link>
-                    {action.operator_console_href ? (
-                      <Link href={action.operator_console_href} className="underline">
-                        Open in Workflow Console
-                      </Link>
-                    ) : null}
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="rounded-xl border border-green-200 bg-green-50 p-4 text-sm text-gray-700">
-                No recommended next steps are queued right now. The dashboard is healthy and ready
-                to surface the next safe workflow change.
-              </div>
-            )}
-          </div>
-        </div>
-      </section>
-
-      <section className="border rounded-2xl p-5 bg-white shadow-sm">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <p className="text-sm text-gray-600">Supervised control surface</p>
-            <h2 className="text-xl font-semibold mt-1">Workflow Console</h2>
-            <p className="text-sm text-gray-700 mt-2">
-              Run approved wrapped commands, summarize artifacts, and navigate to the right
-              workflow page without creating a second execution engine.
-            </p>
-            <p className="text-sm text-gray-600 mt-2">
-              For daily operating guidance, check the{" "}
-              <Link href="/admin/runbook" className="underline">
-                Operator Runbook
-              </Link>
-              .
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-3">
-            <Link href="/admin/admin-approval" className="border rounded-lg px-4 py-2">
-              Open Admin Approval
-            </Link>
-            <Link href="/admin/runbook" className="border rounded-lg px-4 py-2">
-              Open Runbook
-            </Link>
-            <Link href="/admin/operator-console" className="border rounded-lg px-4 py-2">
-              Open Workflow Console
-            </Link>
-          </div>
-        </div>
-      </section>
+      <ActionLauncher
+        title="Quick launch"
+        description="Use this when you already know the safe next wrapped action."
+        allowedActionIds={[
+          "currentAdmin.run",
+          "currentAdmin.review",
+          "currentAdmin.apply",
+          "legislative.run",
+        ]}
+        buttonLabel="Start action"
+        compact
+      />
     </main>
   );
 }

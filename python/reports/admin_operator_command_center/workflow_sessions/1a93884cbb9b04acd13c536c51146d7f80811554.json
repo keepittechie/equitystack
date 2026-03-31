@@ -1,0 +1,86 @@
+{
+  "id": "current-admin:trump-2025-batch-01",
+  "workflowFamily": "current-admin",
+  "canonicalSessionKey": "trump-2025-batch-01",
+  "canonicalState": "DISCOVERY_READY",
+  "active": true,
+  "recommendedActionId": "currentAdmin.run",
+  "source": "canonical_batch_file",
+  "startedAt": "2026-03-28T09:11:57.915Z",
+  "updatedAt": "2026-03-28T09:11:57.915Z",
+  "title": "Current-Admin trump-2025-batch-01",
+  "summary": "trump-2025-batch-01 is DISCOVERY_READY with 0 pending review decisions.",
+  "href": "/admin/workflows/current-admin%3Atrump-2025-batch-01",
+  "operatorSurfaceHref": "/admin/current-admin-review",
+  "metadataJson": {
+    "executor": {
+      "execution_mode": "local_cli",
+      "executor_model": null,
+      "executor_backend": "local_cli",
+      "executor_host": "localhost",
+      "executor_transport": "shell"
+    },
+    "execution_mode": "local_cli",
+    "executor_transport": "shell",
+    "execution_runtime": {
+      "execution_mode": "local_cli",
+      "executor": {
+        "execution_mode": "local_cli",
+        "executor_model": null,
+        "executor_backend": "local_cli",
+        "executor_host": "localhost",
+        "executor_transport": "shell"
+      },
+      "executor_transport": "shell"
+    },
+    "canonical_batch_name": "trump-2025-batch-01",
+    "canonical_paths": {
+      "input": "/home/josh/Documents/GitHub/equitystack/python/data/current_admin_batches/trump_2025_batch_01.json",
+      "review": null,
+      "normalized": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.normalized.json",
+      "normalization_report": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.normalization-report.json",
+      "decision_template": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.decision-template.json",
+      "queue": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.manual-review-queue.json",
+      "pre_commit": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.pre-commit-review.json"
+    },
+    "missing_artifacts": [
+      "Normalized batch",
+      "Normalization report",
+      "AI review",
+      "Decision template",
+      "Decision log",
+      "Manual review queue",
+      "Pre-commit review",
+      "Import dry-run",
+      "Import apply",
+      "Validation report"
+    ],
+    "review_runtime": null,
+    "blockers": [
+      "No canonical current-admin review artifact is available.",
+      "The canonical manual-review queue artifact is missing.",
+      "Finalize the decision file so the canonical decision log exists first."
+    ],
+    "counts": {
+      "pendingReview": 0,
+      "approved": 0,
+      "blockedReviewItems": 0,
+      "blockers": 3,
+      "artifacts": 0,
+      "reviewQueueItems": 0
+    },
+    "latest_artifacts": {
+      "review": null,
+      "decision_log": null,
+      "pre_commit": null,
+      "import_dry_run": null,
+      "import_apply": null,
+      "validation": null
+    },
+    "next_action_reason": "No active batch is ready yet, so the next step is to run discovery and prepare the next batch.",
+    "last_refreshed_at": "2026-03-31T22:35:05.540Z",
+    "last_refresh_reason": "operator_state_refresh"
+  },
+  "relatedJobRunIds": [],
+  "createdAt": "2026-03-31T19:16:37.191Z"
+}

@@ -1,0 +1,42 @@
+{
+  "id": "artifact_0deeeab780a3383fccb17648dd90b79f50f6fef9",
+  "sessionId": "legislative:review-bundle",
+  "workflowFamily": "legislative",
+  "artifactKey": "review_bundle",
+  "label": "review bundle",
+  "stage": "review_bundle",
+  "canonicalPath": "/home/josh/Documents/GitHub/equitystack/python/reports/equitystack_review_bundle.json",
+  "fileName": "equitystack_review_bundle.json",
+  "exists": false,
+  "generatedAt": null,
+  "source": "canonical_artifact",
+  "latestJobRunId": null,
+  "relatedJobRunIds": [],
+  "metadataJson": {
+    "summary": null,
+    "executor": {
+      "execution_mode": "local_cli",
+      "executor_model": null,
+      "executor_backend": "local_cli",
+      "executor_host": "localhost",
+      "executor_transport": "shell"
+    },
+    "execution_mode": "local_cli",
+    "executor_transport": "shell",
+    "execution_runtime": {
+      "execution_mode": "local_cli",
+      "executor": {
+        "execution_mode": "local_cli",
+        "executor_model": null,
+        "executor_backend": "local_cli",
+        "executor_host": "localhost",
+        "executor_transport": "shell"
+      },
+      "executor_transport": "shell"
+    },
+    "session_key": "equitystack_review_bundle.json",
+    "workflow_state": "DISCOVERY_READY"
+  },
+  "createdAt": "2026-03-31T20:22:21.758Z",
+  "updatedAt": "2026-03-31T22:35:05.468Z"
+}

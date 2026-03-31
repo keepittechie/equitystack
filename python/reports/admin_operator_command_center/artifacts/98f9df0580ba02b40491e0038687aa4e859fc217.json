@@ -1,0 +1,42 @@
+{
+  "id": "artifact_e4f45a6ac0249197c57e491f39e1d77a7e8bb61a",
+  "sessionId": "legislative:review-bundle",
+  "workflowFamily": "legislative",
+  "artifactKey": "pipeline_report",
+  "label": "pipeline report",
+  "stage": "pipeline_report",
+  "canonicalPath": "/home/josh/Documents/GitHub/equitystack/python/reports/equitystack_pipeline_report.json",
+  "fileName": "equitystack_pipeline_report.json",
+  "exists": false,
+  "generatedAt": null,
+  "source": "canonical_artifact",
+  "latestJobRunId": null,
+  "relatedJobRunIds": [],
+  "metadataJson": {
+    "summary": null,
+    "executor": {
+      "execution_mode": "local_cli",
+      "executor_model": null,
+      "executor_backend": "local_cli",
+      "executor_host": "localhost",
+      "executor_transport": "shell"
+    },
+    "execution_mode": "local_cli",
+    "executor_transport": "shell",
+    "execution_runtime": {
+      "execution_mode": "local_cli",
+      "executor": {
+        "execution_mode": "local_cli",
+        "executor_model": null,
+        "executor_backend": "local_cli",
+        "executor_host": "localhost",
+        "executor_transport": "shell"
+      },
+      "executor_transport": "shell"
+    },
+    "session_key": "equitystack_review_bundle.json",
+    "workflow_state": "DISCOVERY_READY"
+  },
+  "createdAt": "2026-03-31T20:22:21.757Z",
+  "updatedAt": "2026-03-31T22:35:05.468Z"
+}

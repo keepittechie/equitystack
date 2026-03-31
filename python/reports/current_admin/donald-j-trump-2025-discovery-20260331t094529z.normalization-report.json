@@ -1,0 +1,14 @@
+{
+  "batch_name": "donald-j-trump-2025-discovery-20260331t094529z",
+  "source_path": "/tmp/current_admin_wrapper_generated.json",
+  "normalized_output_path": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/donald-j-trump-2025-discovery-20260331t094529z.normalized.json",
+  "record_count": 11,
+  "issue_count": 1,
+  "issues": [
+    {
+      "record_index": 1,
+      "field": "promise_sources",
+      "issue": "Missing promise-level source"
+    }
+  ]
+}

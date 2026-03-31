@@ -7,11 +7,11 @@ export default async function CurrentAdminReviewPage() {
   const workspace = await getCurrentAdministrationOperatorWorkspace();
 
   return (
-    <main className="max-w-7xl mx-auto p-6 space-y-6">
+    <main className="mx-auto max-w-[1700px] space-y-4 px-4 py-4">
       <section className="space-y-3">
-        <p className="text-sm text-gray-600">Canonical review workspace</p>
-        <h1 className="text-3xl font-bold">Current Admin Review</h1>
-        <p className="text-gray-700 max-w-4xl">
+        <p className="font-mono text-[11px] uppercase tracking-wide text-gray-600">Canonical review workspace</p>
+        <h1 className="text-lg font-semibold">Current Admin Review</h1>
+        <p className="max-w-5xl text-[12px] text-gray-700">
           This page mirrors the Python workflow step that sits between AI review and
           decision logging. Saving writes a decision file only. Finalize calls the
           existing Python finalize step and keeps the manual review queue as the

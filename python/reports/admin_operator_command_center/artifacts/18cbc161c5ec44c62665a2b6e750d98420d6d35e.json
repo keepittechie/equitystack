@@ -1,0 +1,42 @@
+{
+  "id": "bGVnaXNsYXRpdmU6bGVnaXNsYXRpdmU6cmV2aWV3LWJ1bmRsZTptYW51YWxfcmV2aWV3X3F1ZXVlOi9ob21lL2pvc2gvRG9jdW1lbnRzL0dpdEh1Yi9lcXVpdHlzdGFjay9weXRob24vcmVwb3J0cy9mdXR1cmVfYmlsbF9saW5rX21hbnVhbF9yZXZpZXdfcXVldWUuanNvbg",
+  "sessionId": "legislative:review-bundle",
+  "workflowFamily": "legislative",
+  "artifactKey": "manual_review_queue",
+  "label": "manual review queue",
+  "stage": "manual_review_queue",
+  "canonicalPath": "/home/josh/Documents/GitHub/equitystack/python/reports/future_bill_link_manual_review_queue.json",
+  "fileName": "future_bill_link_manual_review_queue.json",
+  "exists": false,
+  "generatedAt": null,
+  "source": "canonical_artifact",
+  "latestJobRunId": null,
+  "relatedJobRunIds": [],
+  "metadataJson": {
+    "summary": null,
+    "executor": {
+      "execution_mode": "local_cli",
+      "executor_model": null,
+      "executor_backend": "local_cli",
+      "executor_host": "localhost",
+      "executor_transport": "shell"
+    },
+    "execution_mode": "local_cli",
+    "executor_transport": "shell",
+    "execution_runtime": {
+      "execution_mode": "local_cli",
+      "executor": {
+        "execution_mode": "local_cli",
+        "executor_model": null,
+        "executor_backend": "local_cli",
+        "executor_host": "localhost",
+        "executor_transport": "shell"
+      },
+      "executor_transport": "shell"
+    },
+    "session_key": "equitystack_review_bundle.json",
+    "workflow_state": "DISCOVERY_READY"
+  },
+  "createdAt": "2026-03-31T10:38:01.299Z",
+  "updatedAt": "2026-03-31T20:11:25.295Z"
+}

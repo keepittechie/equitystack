@@ -1,0 +1,42 @@
+{
+  "id": "artifact_8349375d9eb50eef0dc2030a8361ccd38d29c8c5",
+  "sessionId": "legislative:review-bundle",
+  "workflowFamily": "legislative",
+  "artifactKey": "import_report",
+  "label": "import report",
+  "stage": "import_report",
+  "canonicalPath": "/home/josh/Documents/GitHub/equitystack/python/reports/import_approved_tracked_bills_report.json",
+  "fileName": "import_approved_tracked_bills_report.json",
+  "exists": false,
+  "generatedAt": null,
+  "source": "canonical_artifact",
+  "latestJobRunId": null,
+  "relatedJobRunIds": [],
+  "metadataJson": {
+    "summary": null,
+    "executor": {
+      "execution_mode": "local_cli",
+      "executor_model": null,
+      "executor_backend": "local_cli",
+      "executor_host": "localhost",
+      "executor_transport": "shell"
+    },
+    "execution_mode": "local_cli",
+    "executor_transport": "shell",
+    "execution_runtime": {
+      "execution_mode": "local_cli",
+      "executor": {
+        "execution_mode": "local_cli",
+        "executor_model": null,
+        "executor_backend": "local_cli",
+        "executor_host": "localhost",
+        "executor_transport": "shell"
+      },
+      "executor_transport": "shell"
+    },
+    "session_key": "equitystack_review_bundle.json",
+    "workflow_state": "DISCOVERY_READY"
+  },
+  "createdAt": "2026-03-31T20:22:21.758Z",
+  "updatedAt": "2026-03-31T22:35:05.470Z"
+}

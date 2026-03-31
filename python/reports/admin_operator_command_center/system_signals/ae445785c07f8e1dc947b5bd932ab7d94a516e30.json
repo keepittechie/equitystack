@@ -1,0 +1,22 @@
+{
+  "id": "bWlzc2luZy1hcnRpZmFjdDpZM1Z5Y21WdWRDMWhaRzFwYmpwamRYSnlaVzUwTFdGa2JXbHVPbU4xY25KbGJuUXRZV1J0YVc0dGQzSmhjSEJsY2kxMFpYTjBPblpoYkdsa1lYUnBiMjVmY21Wd2IzSjBPbFpoYkdsa1lYUnBiMjRnY21Wd2IzSjA",
+  "workflowFamily": "current-admin",
+  "signalType": "missing_artifact",
+  "severity": "warning",
+  "state": "open",
+  "title": "Validation report is missing",
+  "summary": "A canonical artifact expected by the operator surface is currently missing.",
+  "href": "/admin/workflows/current-admin%3Acurrent-admin-wrapper-test",
+  "active": true,
+  "sessionId": "current-admin:current-admin-wrapper-test",
+  "artifactId": "Y3VycmVudC1hZG1pbjpjdXJyZW50LWFkbWluOmN1cnJlbnQtYWRtaW4td3JhcHBlci10ZXN0OnZhbGlkYXRpb25fcmVwb3J0OlZhbGlkYXRpb24gcmVwb3J0",
+  "jobRunId": null,
+  "metadataJson": {
+    "artifact_key": "validation_report",
+    "canonical_path": null
+  },
+  "observedAt": "2026-03-31T16:37:41.951Z",
+  "resolvedAt": null,
+  "createdAt": "2026-03-31T16:37:41.951Z",
+  "updatedAt": "2026-03-31T18:21:52.434Z"
+}

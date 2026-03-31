@@ -1,0 +1,22 @@
+{
+  "id": "bWlzc2luZy1hcnRpZmFjdDpiR1ZuYVhOc1lYUnBkbVU2YkdWbmFYTnNZWFJwZG1VNmNtVjJhV1YzTFdKMWJtUnNaVHBwYlhCdmNuUmZjbVZ3YjNKME9pOW9iMjFsTDJwdmMyZ3ZSRzlqZFcxbGJuUnpMMGRwZEVoMVlpOWxjWFZwZEhsemRHRmpheTl3ZVhSb2IyNHZjbVZ3YjNKMGN5OXBiWEJ2Y25SZllYQndjbTkyWldSZmRISmhZMnRsWkY5aWFXeHNjMTl5WlhCdmNuUXVhbk52Ymc",
+  "workflowFamily": "legislative",
+  "signalType": "missing_artifact",
+  "severity": "warning",
+  "state": "open",
+  "title": "import report is missing",
+  "summary": "A canonical artifact expected by the operator surface is currently missing.",
+  "href": "/admin/workflows/legislative%3Areview-bundle",
+  "active": true,
+  "sessionId": "legislative:review-bundle",
+  "artifactId": "bGVnaXNsYXRpdmU6bGVnaXNsYXRpdmU6cmV2aWV3LWJ1bmRsZTppbXBvcnRfcmVwb3J0Oi9ob21lL2pvc2gvRG9jdW1lbnRzL0dpdEh1Yi9lcXVpdHlzdGFjay9weXRob24vcmVwb3J0cy9pbXBvcnRfYXBwcm92ZWRfdHJhY2tlZF9iaWxsc19yZXBvcnQuanNvbg",
+  "jobRunId": null,
+  "metadataJson": {
+    "artifact_key": "import_report",
+    "canonical_path": "/home/josh/Documents/GitHub/equitystack/python/reports/import_approved_tracked_bills_report.json"
+  },
+  "observedAt": "2026-03-31T16:37:41.955Z",
+  "resolvedAt": null,
+  "createdAt": "2026-03-31T16:37:41.955Z",
+  "updatedAt": "2026-03-31T18:21:52.437Z"
+}
