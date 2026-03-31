@@ -184,6 +184,36 @@ function SpinnerDot() {
   );
 }
 
+function buildActionRows(columns) {
+  const rowCount = Math.max(
+    ...columns.map((column) =>
+      Math.max(column.actions.length, column.placeholder ? 1 : 0)
+    )
+  );
+
+  return Array.from({ length: rowCount }, (_, rowIndex) =>
+    columns.map((column) => {
+      if (column.actions[rowIndex]) {
+        return {
+          type: "action",
+          action: column.actions[rowIndex],
+        };
+      }
+
+      if (column.placeholder && rowIndex === 0) {
+        return {
+          type: "placeholder",
+          text: column.placeholder,
+        };
+      }
+
+      return {
+        type: "empty",
+      };
+    })
+  );
+}
+
 function buildFixedActionColumns(quickActions) {
   const quickActionById = new Map((quickActions || []).map((action) => [action.id, action]));
 
@@ -217,6 +247,7 @@ export default function OperatorConsole({
   initialActiveExecution,
 }) {
   const fixedActionColumns = useMemo(() => buildFixedActionColumns(quickActions), [quickActions]);
+  const actionRows = useMemo(() => buildActionRows(fixedActionColumns), [fixedActionColumns]);
   const [message, setMessage] = useState(initialInput || "");
   const [selectedActionId, setSelectedActionId] = useState(initialActionId || "");
   const [selectedWorkflow, setSelectedWorkflow] = useState(
@@ -517,70 +548,72 @@ export default function OperatorConsole({
           </div>
         </div>
 
-        <div className="mt-4 grid gap-2 md:grid-cols-4">
-          {fixedActionColumns.map((column) => {
-            const isSelectedColumn = selectedWorkflow === column.key;
-            return (
-              <button
-                key={`filter-${column.key}`}
-                type="button"
-                onClick={() => setSelectedWorkflow(column.key)}
-                disabled={isLocked}
-                aria-pressed={isSelectedColumn}
-                className={`rounded-lg border px-3 py-2 text-left text-sm font-medium disabled:cursor-not-allowed disabled:opacity-60 ${
-                  isSelectedColumn ? "border-black bg-black text-white" : "bg-white text-gray-900"
-                }`}
-              >
-                {column.label}
-              </button>
-            );
-          })}
-        </div>
+        <div className="mt-4 overflow-x-auto rounded-xl border">
+          <div className="min-w-[980px]">
+            <div className="grid grid-cols-4 border-b bg-gray-50">
+              {fixedActionColumns.map((column) => {
+                const isSelectedColumn = selectedWorkflow === column.key;
+                return (
+                  <button
+                    key={`filter-${column.key}`}
+                    type="button"
+                    onClick={() => setSelectedWorkflow(column.key)}
+                    disabled={isLocked}
+                    aria-pressed={isSelectedColumn}
+                    className={`border-r px-3 py-2 text-left text-sm font-semibold last:border-r-0 disabled:cursor-not-allowed disabled:opacity-60 ${
+                      isSelectedColumn ? "bg-black text-white" : "text-gray-900"
+                    }`}
+                  >
+                    {column.label}
+                  </button>
+                );
+              })}
+            </div>
 
-        <div className="mt-2 grid gap-2 xl:grid-cols-4">
-          {fixedActionColumns.map((column) => {
-            const isSelectedColumn = selectedWorkflow === column.key;
-            return (
-              <div
-                key={column.key}
-                className={`rounded-xl border p-2 ${
-                  isSelectedColumn ? "border-black bg-gray-50" : "border-gray-200"
-                }`}
-              >
-                <div className="space-y-1.5">
-                  {column.actions.length ? (
-                    column.actions.map((action) => {
-                      const isSelectedAction = selectedActionId === action.id;
-                      return (
-                        <button
-                          key={action.id}
-                          type="button"
-                          onClick={() => selectAction(action)}
-                          disabled={isLocked}
-                          className={`block w-full rounded-lg border px-2.5 py-2 text-left text-xs disabled:cursor-not-allowed disabled:opacity-60 ${
-                            isSelectedAction
-                              ? "border-black bg-white"
-                              : "border-gray-200 bg-white hover:bg-gray-50"
-                          }`}
-                        >
-                          <p className="font-medium text-sm">{action.label}</p>
-                          <p className="mt-1 font-mono text-[11px] text-gray-600">
-                            {action.canonical_input}
-                          </p>
-                        </button>
-                      );
-                    })
-                  ) : (
-                    <div className="rounded-lg border border-dashed px-3 py-3 text-xs text-gray-500">
-                      {column.key === "policies"
-                        ? column.placeholder
-                        : "No actions are registered in this column."}
-                    </div>
-                  )}
+            <div className="divide-y">
+              {actionRows.map((row, rowIndex) => (
+                <div key={`action-row-${rowIndex}`} className="grid grid-cols-4">
+                  {row.map((cell, cellIndex) => {
+                    const column = fixedActionColumns[cellIndex];
+                    const isSelectedColumn = selectedWorkflow === column.key;
+
+                    return (
+                      <div
+                        key={`${column.key}-${rowIndex}`}
+                        className={`min-h-28 border-r px-2 py-2 last:border-r-0 ${
+                          isSelectedColumn ? "bg-gray-50" : "bg-white"
+                        }`}
+                      >
+                        {cell.type === "action" ? (
+                          <button
+                            type="button"
+                            onClick={() => selectAction(cell.action)}
+                            disabled={isLocked}
+                            className={`block h-full w-full rounded-lg border px-2.5 py-2 text-left disabled:cursor-not-allowed disabled:opacity-60 ${
+                              selectedActionId === cell.action.id
+                                ? "border-black bg-white"
+                                : "border-gray-200 bg-white hover:bg-gray-50"
+                            }`}
+                          >
+                            <p className="text-sm font-medium text-gray-900">{cell.action.label}</p>
+                            <p className="mt-1 font-mono text-[11px] text-gray-600">
+                              {cell.action.canonical_input}
+                            </p>
+                          </button>
+                        ) : cell.type === "placeholder" ? (
+                          <div className="flex h-full items-start rounded-lg border border-dashed px-2.5 py-2 text-xs text-gray-500">
+                            {cell.text}
+                          </div>
+                        ) : (
+                          <div className="h-full rounded-lg border border-transparent" aria-hidden="true" />
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
-              </div>
-            );
-          })}
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
