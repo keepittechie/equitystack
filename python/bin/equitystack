@@ -153,12 +153,23 @@ def find_batch_file_by_name(target: str) -> Path | None:
     return None
 
 
+def resolve_cli_input_path(raw_value: str) -> Path:
+    candidate = Path(raw_value)
+    if candidate.is_absolute():
+        return candidate.resolve()
+
+    candidates = [
+        (python_dir / candidate).resolve(),
+        (python_dir.parent / candidate).resolve(),
+    ]
+    for resolved in candidates:
+        if resolved.exists():
+            return resolved
+    return candidates[0]
+
+
 if input_arg:
-    batch_file = Path(input_arg)
-    if not batch_file.is_absolute():
-        batch_file = (python_dir / batch_file).resolve()
-    else:
-        batch_file = batch_file.resolve()
+    batch_file = resolve_cli_input_path(input_arg)
     if not batch_file.exists():
         raise SystemExit(f"Batch file not found: {batch_file}")
     resolved_batch_name = read_batch_name(batch_file)
@@ -184,6 +195,11 @@ print(reports_dir / f"{resolved_batch_name}.import-apply.json")
 print(reports_dir / f"{resolved_batch_name}.import-validation.json")
 PY
   )
+
+  if [ "${#context_lines[@]}" -lt 9 ]; then
+    echo "Failed to resolve current-admin batch context." >&2
+    exit 1
+  fi
 
   CURRENT_ADMIN_INPUT_PATH="${context_lines[0]}"
   CURRENT_ADMIN_BATCH_NAME="${context_lines[1]}"
@@ -215,11 +231,22 @@ input_arg = os.environ.get("REVIEW_ARTIFACT_INPUT", "").strip()
 if not input_arg:
     raise SystemExit("A review artifact path is required.")
 
-review_file = Path(input_arg)
-if not review_file.is_absolute():
-    review_file = (python_dir / review_file).resolve()
-else:
-    review_file = review_file.resolve()
+def resolve_cli_input_path(raw_value: str) -> Path:
+    candidate = Path(raw_value)
+    if candidate.is_absolute():
+        return candidate.resolve()
+
+    candidates = [
+        (python_dir / candidate).resolve(),
+        (python_dir.parent / candidate).resolve(),
+    ]
+    for resolved in candidates:
+        if resolved.exists():
+            return resolved
+    return candidates[0]
+
+
+review_file = resolve_cli_input_path(input_arg)
 
 if not review_file.exists():
     raise SystemExit(f"Review artifact not found: {review_file}")
@@ -234,11 +261,7 @@ normalized_input = payload.get("input_path")
 if not isinstance(normalized_input, str) or not normalized_input.strip():
     raise SystemExit(f"Review artifact missing input_path: {review_file}")
 
-normalized_path = Path(normalized_input)
-if not normalized_path.is_absolute():
-    normalized_path = (python_dir / normalized_path).resolve()
-else:
-    normalized_path = normalized_path.resolve()
+normalized_path = resolve_cli_input_path(normalized_input)
 
 print(review_file)
 print(batch_name)
@@ -253,6 +276,11 @@ print(payload.get("verifier_timeout_seconds") or payload.get("timeout_seconds") 
 print(reports_dir / f"{batch_name}.manual-review-queue.json")
 PY
   )
+
+  if [ "${#context_lines[@]}" -lt 11 ]; then
+    echo "Failed to resolve review artifact context." >&2
+    exit 1
+  fi
 
   REVIEW_ARTIFACT_PATH="${context_lines[0]}"
   REVIEW_ARTIFACT_BATCH_NAME="${context_lines[1]}"
@@ -380,7 +408,11 @@ print_current_admin_status() {
 run_current_admin_workflow_review() {
   local summary_requested="false"
   local preview_requested="false"
+  local -a normalized_args=()
   local -a passthrough=()
+
+  normalize_current_admin_path_args normalized_args "$@"
+  set -- "${normalized_args[@]}"
 
   while [ "$#" -gt 0 ]; do
     case "$1" in
@@ -460,6 +492,12 @@ run_current_admin_workflow_finalize() {
   [ -n "$review_path" ] || { echo "--review is required" >&2; exit 1; }
   [ -n "$decision_file" ] || { echo "--decision-file is required" >&2; exit 1; }
   [ "$log_decisions_set" = "true" ] || { echo "--log-decisions is required so decision logging stays explicit" >&2; exit 1; }
+
+  review_path="$(normalize_python_workspace_path "$review_path")"
+  decision_file="$(normalize_python_workspace_path "$decision_file")"
+  if [ -n "$log_decisions_value" ]; then
+    log_decisions_value="$(normalize_python_workspace_path "$log_decisions_value")"
+  fi
 
   resolve_review_artifact_context "$review_path"
 
@@ -685,6 +723,10 @@ run_current_admin_workflow_start() {
     esac
   done
 
+  if [ -n "$input_path" ]; then
+    input_path="$(normalize_python_workspace_path "$input_path")"
+  fi
+
   if [ -z "$review_model" ]; then
     review_model="$DEFAULT_MODEL_REVIEW"
   fi
@@ -756,6 +798,7 @@ run_current_admin_workflow_start() {
 }
 
 run_current_admin_review_command() {
+  local -a normalized_args=()
   local -a passthrough=()
   local has_model="false"
   local has_verifier_model="false"
@@ -765,6 +808,9 @@ run_current_admin_review_command() {
   local has_senior_timeout="false"
   local has_verifier_timeout="false"
   local has_review_mode="false"
+
+  normalize_current_admin_path_args normalized_args "$@"
+  set -- "${normalized_args[@]}"
 
   while [ "$#" -gt 0 ]; do
     case "$1" in
@@ -1274,16 +1320,20 @@ run_current_admin_command() {
         current_admin_subcommand_usage export
         exit 0
       fi
+      local -a export_args=()
+      normalize_current_admin_path_args export_args "$@"
       run_step "1/1" "Export Discovery Candidates" "Discovery export complete" -- \
-        "$VENV_PYTHON" scripts/export_current_admin_discovery_candidates.py "$@"
+        "$VENV_PYTHON" scripts/export_current_admin_discovery_candidates.py "${export_args[@]}"
       ;;
     normalize)
       if [ "${1:-}" = "--help" ] || [ "${1:-}" = "-h" ]; then
         current_admin_subcommand_usage normalize
         exit 0
       fi
+      local -a normalize_args=()
+      normalize_current_admin_path_args normalize_args "$@"
       run_step "1/1" "Normalize Batch" "Normalization complete" -- \
-        "$VENV_PYTHON" scripts/normalize_current_admin_batch.py "$@"
+        "$VENV_PYTHON" scripts/normalize_current_admin_batch.py "${normalize_args[@]}"
       ;;
     review)
       run_current_admin_review_command "$@"
@@ -1293,16 +1343,20 @@ run_current_admin_command() {
         current_admin_subcommand_usage queue
         exit 0
       fi
+      local -a queue_args=()
+      normalize_current_admin_path_args queue_args "$@"
       run_step "1/1" "Build Manual Queue" "Manual review queue build complete" -- \
-        "$VENV_PYTHON" scripts/apply_current_admin_ai_review.py "$@"
+        "$VENV_PYTHON" scripts/apply_current_admin_ai_review.py "${queue_args[@]}"
       ;;
     pre-commit)
       if [ "${1:-}" = "--help" ] || [ "${1:-}" = "-h" ]; then
         current_admin_subcommand_usage pre-commit
         exit 0
       fi
+      local -a precommit_args=()
+      normalize_current_admin_path_args precommit_args "$@"
       run_step "1/1" "Build Pre-Commit Review" "Pre-commit review build complete" -- \
-        "$VENV_PYTHON" scripts/build_current_admin_precommit_review.py "$@"
+        "$VENV_PYTHON" scripts/build_current_admin_precommit_review.py "${precommit_args[@]}"
       ;;
     run)
       run_current_admin_workflow_start "$@"
@@ -1333,6 +1387,9 @@ run_current_admin_command() {
             ;;
         esac
       done
+      if [ -n "$input_path" ]; then
+        input_path="$(normalize_python_workspace_path "$input_path")"
+      fi
       print_current_admin_status "$input_path" "$batch_name"
       ;;
     workflow)
@@ -1343,16 +1400,20 @@ run_current_admin_command() {
         current_admin_subcommand_usage import
         exit 0
       fi
+      local -a import_args=()
+      normalize_current_admin_path_args import_args "$@"
       run_step "1/1" "Import Curated Batch" "Current-admin import command complete" -- \
-        "$VENV_PYTHON" scripts/import_curated_current_admin_batch.py "$@"
+        "$VENV_PYTHON" scripts/import_curated_current_admin_batch.py "${import_args[@]}"
       ;;
     validate)
       if [ "${1:-}" = "--help" ] || [ "${1:-}" = "-h" ]; then
         current_admin_subcommand_usage validate
         exit 0
       fi
+      local -a validate_args=()
+      normalize_current_admin_path_args validate_args "$@"
       run_step "1/1" "Validate Import" "Current-admin validation complete" -- \
-        "$VENV_PYTHON" scripts/validate_current_admin_import.py "$@"
+        "$VENV_PYTHON" scripts/validate_current_admin_import.py "${validate_args[@]}"
       ;;
     help|-h|--help|"")
       current_admin_usage
@@ -1412,7 +1473,7 @@ Operational maintenance:
 
 Examples:
   $(cli_hint) legislative run
-  $(cli_hint) legislative run --model qwen3.5:27b
+  $(cli_hint) legislative run --model qwen3.5:9b
   $(cli_hint) current-admin status
   $(cli_hint) admin-reset-operational-state --dry-run
   $(cli_hint) current-admin workflow start --input data/current_admin_batches/<batch-file>.json
@@ -1459,11 +1520,11 @@ Commands:
 
 Run options:
   --model <name>                Override the senior review model for the daily pipeline
-  --verifier-model <name>       Override the 9B-style verifier model for draft/assist stages
+  --verifier-model <name>       Override the verifier model for draft/assist stages
   --fallback-model <name>       Override the fallback reviewer model used after senior-review failure
   --timeout <seconds>           Legacy alias that sets both senior and verifier timeouts
-  --senior-timeout <seconds>    Override the 27B review timeout
-  --verifier-timeout <seconds>  Override the 9B verifier/fallback timeout
+  --senior-timeout <seconds>    Override the senior review timeout
+  --verifier-timeout <seconds>  Override the verifier/fallback timeout
   --skip-discovery              Pass through to run_equitystack_pipeline.py
   --apply-safe-removals         Pass through to run_equitystack_pipeline.py
   --only-future-bill-id <id>    Limit the pipeline to one or more future bills
@@ -1509,6 +1570,11 @@ Defaults:
     model       $DEFAULT_MODEL_VERIFIER
     timeout     ${DEFAULT_OLLAMA_TIMEOUT_VERIFIER}s
     ollama-url  $DEFAULT_OLLAMA_URL
+
+Path handling:
+  Current-admin path flags accept python-rooted paths like data/... or reports/... .
+  The installed ~/bin/equitystack wrapper also accepts repo-rooted paths like
+  python/data/... or python/reports/... and normalizes them automatically.
 EOF
 }
 
@@ -1537,6 +1603,8 @@ Runs the existing safe pre-import workflow:
   normalize -> review -> queue
 
 This does not import records or write to the database.
+
+Relative --input paths may be given as data/... or python/data/...
 EOF
       ;;
     review|generate-decision-template)
@@ -1546,6 +1614,8 @@ Usage:
 
 Runs:
   python3 scripts/generate_current_admin_decision_template.py [args]
+
+Relative --input/--output paths may be given as reports/... or python/reports/...
 EOF
       ;;
     finalize)
@@ -1555,6 +1625,8 @@ Usage:
 
 Replays the canonical review settings from the source AI review artifact and writes a decision log.
 This does not import records or write to the database.
+
+Relative --review and --decision-file paths may be given as reports/... or python/reports/...
 EOF
       ;;
     resume)
@@ -1642,6 +1714,8 @@ Usage:
   equitystack current-admin status [--input <batch-file> | --batch-name <batch-name>]
 
 Shows artifact presence, current workflow state, blocking issues, and the recommended next command.
+
+Relative --input paths may be given as data/... or python/data/...
 EOF
       ;;
     import)

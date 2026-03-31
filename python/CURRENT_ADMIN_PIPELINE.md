@@ -14,6 +14,11 @@ Bootstrap local Python first if needed:
 ./bin/bootstrap-python-env
 ```
 
+Path handling:
+
+- From `python/`, use `data/...` and `reports/...` relative paths with `./bin/equitystack`.
+- From the repo root, the installed `equitystack` wrapper also accepts repo-rooted current-admin paths like `python/data/...` and `python/reports/...`.
+
 Artifacts:
 
 - batch files: `data/current_admin_batches/`
@@ -88,9 +93,9 @@ Wrapper defaults:
 
 - `current-admin discover`: `qwen3.5:9b`
 - `current-admin review` verifier pass: `qwen3.5:9b`
-- `current-admin review` senior pass: `qwen3.5:27b`
-- `current-admin workflow start`: verifier `qwen3.5:9b`, senior `qwen3.5:27b`
-- `current-admin workflow finalize`: verifier `qwen3.5:9b`, senior `qwen3.5:27b`
+- `current-admin review` senior pass: `qwen3.5:9b`
+- `current-admin workflow start`: verifier `qwen3.5:9b`, senior `qwen3.5:9b`
+- `current-admin workflow finalize`: verifier `qwen3.5:9b`, senior `qwen3.5:9b`
 - senior-review fallback model: `qwen3.5:9b`
 - default Ollama timeout: `240` seconds
 

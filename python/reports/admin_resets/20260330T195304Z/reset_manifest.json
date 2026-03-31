@@ -1,0 +1,10 @@
+{
+  "generated_at": "2026-03-30T19:53:04.097013+00:00",
+  "python_dir": "/home/josh/Documents/GitHub/equitystack/python",
+  "archive_dir": "/home/josh/Documents/GitHub/equitystack/python/reports/admin_resets/20260330T195304Z",
+  "reset_scope": "Operational run-state only: admin operator history, recommendation feedback, pipeline reports, current-admin report artifacts, legislative report artifacts, and logs.",
+  "does_not_touch": "Database content, canonical policy data, source files, and non-operational repository content.",
+  "archived_files": [
+    "logs/equitystack-2026-03-30.log"
+  ]
+}

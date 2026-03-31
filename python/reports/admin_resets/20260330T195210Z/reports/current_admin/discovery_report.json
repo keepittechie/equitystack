@@ -1,15 +1,8 @@
 {
-  "generated_at": "2026-03-30T21:35:40+00:00",
+  "generated_at": "2026-03-28T09:28:49+00:00",
   "president_slug": "donald-j-trump-2025",
-  "dry_run": false,
-  "model": "qwen3.5:9b",
-  "requested_model": "qwen3.5:9b",
-  "effective_model": "qwen3.5:9b",
-  "review_backend": "ollama",
-  "fallback_used": false,
-  "fallback_reason": null,
-  "model_resolution_status": "exact_requested",
-  "timeout_seconds": 240,
+  "dry_run": true,
+  "model": "qwen3.5:latest",
   "lookback_days": 120,
   "promise_count": 11,
   "source_inputs": {

@@ -22,7 +22,7 @@ export default async function OperatorConsolePage({ searchParams }) {
   try {
     state = await getOperatorConsoleState();
   } catch (error) {
-    console.error("operator console page load failed:", error);
+    console.error("workflow console page load failed:", error);
     const quickActions = await getOperatorConsoleQuickActions();
     state = {
       quick_actions: quickActions,
@@ -30,11 +30,11 @@ export default async function OperatorConsolePage({ searchParams }) {
       initial_trace: {
         user_input: null,
         mapped_action_id: null,
-        action_label: "Operator Console Safe Fallback",
+        action_label: "Workflow Console Safe Fallback",
         execution_path: "Read-only page fallback after operator-console state load failure",
         status: "failed",
         summary:
-          "Operator Console loaded in safe fallback mode because its server-side state could not be assembled completely.",
+          "Workflow Console loaded in safe fallback mode because its server-side state could not be assembled completely.",
         blocked_reason: null,
         failure_reason:
           error instanceof Error
@@ -59,7 +59,7 @@ export default async function OperatorConsolePage({ searchParams }) {
       },
     };
     loadError =
-      "Operator Console state could not be loaded fully. The page is showing a safe fallback instead of failing completely.";
+      "Workflow Console state could not be loaded fully. The page is showing a safe fallback instead of failing completely.";
   }
 
   const requestedActionId = pickQueryValue(resolvedSearchParams?.action_id);
@@ -78,12 +78,12 @@ export default async function OperatorConsolePage({ searchParams }) {
   return (
     <main className="max-w-7xl mx-auto p-6 space-y-6">
       <section className="space-y-3">
-        <p className="text-sm text-gray-600">Operator Console</p>
-        <h1 className="text-3xl font-bold">Supervised Operator Console</h1>
+        <p className="text-sm text-gray-600">Workflow Console</p>
+        <h1 className="text-3xl font-bold">Supervised Workflow Console</h1>
         <p className="text-gray-700 max-w-4xl">
-          This is the controlled manual execution surface for safe wrapped pipeline commands.
-          Every action resolves through a centralized registry, produces a visible execution trace,
-          and is recorded in recent operator history for auditability.
+          This is the controlled manual execution surface for canonical workflow commands. Every
+          action resolves through the wrapped CLI or the existing read-only services, preserves the
+          required stop points, and records a compact execution trace for auditability.
         </p>
         <p className="text-sm text-gray-600">
           Need the day-to-day operating guide? Open the{" "}
@@ -106,6 +106,7 @@ export default async function OperatorConsolePage({ searchParams }) {
         initialInput={initialInput}
         initialActionId={initialActionId}
         initialNotice={initialNotice}
+        initialActiveExecution={state.active_execution}
       />
     </main>
   );

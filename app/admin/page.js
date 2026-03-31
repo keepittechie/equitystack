@@ -72,7 +72,7 @@ function WorkflowPanel({ summary, primaryHref, primaryLabel }) {
           {summary.next_label}
         </Link>
         <Link href={summary.operator_console_href} className="border rounded-lg px-4 py-2">
-          Open in Operator Console
+          Open in Workflow Console
         </Link>
         <Link href={primaryHref} className="border rounded-lg px-4 py-2">
           {primaryLabel}
@@ -145,7 +145,7 @@ export default async function AdminPage() {
             ) : null}
             {whatNow?.operator_console_href ? (
               <Link href={whatNow.operator_console_href} className="border rounded-lg px-4 py-2 bg-white">
-                Open in Operator Console
+                Open in Workflow Console
               </Link>
             ) : null}
           </div>
@@ -316,7 +316,7 @@ export default async function AdminPage() {
                     </Link>
                     {item.operator_console_href ? (
                       <Link href={item.operator_console_href} className="underline">
-                        Open in Operator Console
+                        Open in Workflow Console
                       </Link>
                     ) : null}
                   </div>
@@ -355,7 +355,7 @@ export default async function AdminPage() {
                     </Link>
                     {action.operator_console_href ? (
                       <Link href={action.operator_console_href} className="underline">
-                        Open in Operator Console
+                        Open in Workflow Console
                       </Link>
                     ) : null}
                   </div>
@@ -375,7 +375,7 @@ export default async function AdminPage() {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className="text-sm text-gray-600">Supervised control surface</p>
-            <h2 className="text-xl font-semibold mt-1">Operator Console</h2>
+            <h2 className="text-xl font-semibold mt-1">Workflow Console</h2>
             <p className="text-sm text-gray-700 mt-2">
               Run approved wrapped commands, summarize artifacts, and navigate to the right
               workflow page without creating a second execution engine.
@@ -389,11 +389,14 @@ export default async function AdminPage() {
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
+            <Link href="/admin/admin-approval" className="border rounded-lg px-4 py-2">
+              Open Admin Approval
+            </Link>
             <Link href="/admin/runbook" className="border rounded-lg px-4 py-2">
               Open Runbook
             </Link>
             <Link href="/admin/operator-console" className="border rounded-lg px-4 py-2">
-              Open Operator Console
+              Open Workflow Console
             </Link>
           </div>
         </div>

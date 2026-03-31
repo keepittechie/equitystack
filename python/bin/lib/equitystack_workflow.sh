@@ -51,11 +51,11 @@ initialize_equitystack_environment() {
 
   DEFAULT_MODEL_VERIFIER="${EQUITYSTACK_MODEL_VERIFIER:-${EQUITYSTACK_MODEL_CHEAP:-qwen3.5:9b}}"
   DEFAULT_MODEL_CHEAP="$DEFAULT_MODEL_VERIFIER"
-  DEFAULT_MODEL_REVIEW="${EQUITYSTACK_MODEL_REVIEW:-qwen3.5:27b}"
+  DEFAULT_MODEL_REVIEW="${EQUITYSTACK_MODEL_REVIEW:-qwen3.5:9b}"
   DEFAULT_MODEL_FALLBACK="${EQUITYSTACK_MODEL_FALLBACK:-$DEFAULT_MODEL_VERIFIER}"
   DEFAULT_MODEL_EXECUTOR="${EQUITYSTACK_MODEL_EXECUTOR:-rnj-1:latest}"
   DEFAULT_OLLAMA_URL="${EQUITYSTACK_OLLAMA_URL:-http://10.10.0.60:11434}"
-  DEFAULT_OLLAMA_TIMEOUT="${EQUITYSTACK_OLLAMA_TIMEOUT:-300}"
+  DEFAULT_OLLAMA_TIMEOUT="${EQUITYSTACK_OLLAMA_TIMEOUT:-240}"
   DEFAULT_OLLAMA_TIMEOUT_SENIOR="${EQUITYSTACK_OLLAMA_TIMEOUT_SENIOR:-$DEFAULT_OLLAMA_TIMEOUT}"
   DEFAULT_OLLAMA_TIMEOUT_VERIFIER="${EQUITYSTACK_OLLAMA_TIMEOUT_VERIFIER:-240}"
 }
@@ -88,6 +88,69 @@ repo_relative_path() {
       printf '%s\n' "$path_value"
       ;;
   esac
+}
+
+normalize_python_workspace_path() {
+  local path_value="${1:-}"
+
+  if [ -z "$path_value" ]; then
+    printf '\n'
+    return 0
+  fi
+
+  case "$path_value" in
+    /*)
+      printf '%s\n' "$path_value"
+      ;;
+    ./python/*)
+      printf '%s\n' "${path_value#./python/}"
+      ;;
+    python/*)
+      printf '%s\n' "${path_value#python/}"
+      ;;
+    *)
+      printf '%s\n' "$path_value"
+      ;;
+  esac
+}
+
+normalize_current_admin_path_args() {
+  local -n output_args_ref="$1"
+  shift || true
+
+  output_args_ref=()
+
+  while [ "$#" -gt 0 ]; do
+    case "$1" in
+      --input|--output|--report|--batch|--review|--decision-log|--decision-file|--export-worklist)
+        local flag="$1"
+        local value="${2:-}"
+        [ -n "$value" ] || { output_args_ref+=("$1"); shift; continue; }
+        output_args_ref+=("$flag" "$(normalize_python_workspace_path "$value")")
+        shift 2
+        ;;
+      --csv|--log-decisions)
+        local flag="$1"
+        if [ -n "${2:-}" ] && [[ "${2:-}" != --* ]]; then
+          output_args_ref+=("$flag" "$(normalize_python_workspace_path "${2:-}")")
+          shift 2
+        else
+          output_args_ref+=("$flag")
+          shift
+        fi
+        ;;
+      --input=*|--output=*|--report=*|--batch=*|--review=*|--decision-log=*|--decision-file=*|--export-worklist=*|--csv=*|--log-decisions=*)
+        local flag="${1%%=*}"
+        local value="${1#*=}"
+        output_args_ref+=("$flag=$(normalize_python_workspace_path "$value")")
+        shift
+        ;;
+      *)
+        output_args_ref+=("$1")
+        shift
+        ;;
+    esac
+  done
 }
 
 artifact_status_text() {

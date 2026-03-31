@@ -14,6 +14,11 @@ If local Python is not set up yet:
 ./bin/bootstrap-python-env
 ```
 
+Path handling:
+
+- From `python/`, use `data/...` and `reports/...` with `./bin/equitystack`.
+- From the repo root, the installed `equitystack` wrapper also accepts `python/data/...` and `python/reports/...` for current-admin commands.
+
 ## Shortest Safe Path
 
 ```bash
@@ -64,7 +69,7 @@ After `validate`:
 ## Daily Safety Notes
 
 - Verifier review defaults to `qwen3.5:9b`.
-- Senior review and decision stages default to `qwen3.5:27b`.
+- Senior review and decision stages default to `qwen3.5:9b`.
 - Senior-review fallback defaults to `qwen3.5:9b`.
 - Ollama review timeout defaults to `240` seconds.
 - Production Ollama is remote: `http://10.10.0.60:11434`.

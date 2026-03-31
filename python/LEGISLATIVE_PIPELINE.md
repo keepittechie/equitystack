@@ -43,7 +43,7 @@ The wrapper runs these stages in order:
 Inside `run_equitystack_pipeline.py`, the daily pipeline runs:
 
 1. `update_database.py`
-2. `scripts/review_future_bill_audit_with_ollama.py` with verifier `qwen3.5:9b`, senior `qwen3.5:27b`, fallback `qwen3.5:9b`
+2. `scripts/review_future_bill_audit_with_ollama.py` with verifier `qwen3.5:9b`, senior `qwen3.5:9b`, fallback `qwen3.5:9b`
 3. `scripts/apply_future_bill_ai_review.py`
 4. `scripts/suggest_partial_future_bill_links.py` with verifier `qwen3.5:9b`
 5. `scripts/find_candidate_tracked_bills.py` with verifier `qwen3.5:9b` only when the suggestion output still needs discovery
@@ -51,7 +51,7 @@ Inside `run_equitystack_pipeline.py`, the daily pipeline runs:
 
 Default review models:
 
-- senior review: `qwen3.5:27b`
+- senior review: `qwen3.5:9b`
 - verifier / fallback review: `qwen3.5:9b`
 - default Ollama timeout: `240` seconds
 

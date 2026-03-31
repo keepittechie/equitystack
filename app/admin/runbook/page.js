@@ -23,7 +23,7 @@ export default async function AdminRunbookPage() {
         <h1 className="text-3xl font-bold">How to Use This System</h1>
         <p className="text-gray-700 max-w-4xl">
           This page is the daily operating guide for EquityStack. The CLI remains canonical,
-          the dashboard is for understanding and navigation, the Operator Console is supervised
+          the dashboard is for understanding and navigation, the Workflow Console is supervised
           and registry-driven, and recommendations are guidance only. Nothing here auto-approves,
           auto-imports, or bypasses existing guardrails.
         </p>
@@ -42,17 +42,18 @@ export default async function AdminRunbookPage() {
               </p>
             </div>
             <div>
-              <p className="font-semibold">Operator Console</p>
+              <p className="font-semibold">Workflow Console</p>
               <p className="mt-1">
                 Use this when you intentionally want to run an approved registry-backed action after
                 checking the dashboard. It can summarize state, inspect readiness, and run safe
-                supervised discovery, status, pre-commit, or dry-run commands through the existing wrapped backend/CLI path.
+                supervised workflow start, status, resume, pre-commit, and dry-run commands through
+                the existing wrapped backend/CLI path.
               </p>
             </div>
             <div>
-              <p className="font-semibold">What the Operator Console can do</p>
+              <p className="font-semibold">What the Workflow Console can do</p>
               <p className="mt-1">
-                Run safe status/discovery/pre-commit or dry-run actions that are already exposed in
+                Run safe start, status, resume, pre-commit, or dry-run actions that are already exposed in
                 the registry and respect readiness checks.
               </p>
             </div>
@@ -88,8 +89,8 @@ export default async function AdminRunbookPage() {
           <ul className="mt-4 list-disc pl-5 space-y-2 text-sm text-gray-700">
             <li>Review dashboard attention items and smart recommendations first.</li>
             <li>Inspect repeated blocked or failed actions in Operator Insights.</li>
-            <li>Run a safe status summary from the Operator Console if the system appears stuck.</li>
-            <li>Move to current-admin or legislative approval pages when pending work exists.</li>
+            <li>Run a safe status summary from the Workflow Console if the system appears stuck.</li>
+            <li>Move to current-admin review or admin approval when the console reaches a stop point.</li>
             <li>Only run dry-run or review-oriented actions after checking readiness and blockers.</li>
           </ul>
         </div>
@@ -177,7 +178,7 @@ export default async function AdminRunbookPage() {
               Open Command Center
             </Link>
             <Link href="/admin/operator-console" className="rounded-lg border px-4 py-2">
-              Open Operator Console
+              Open Workflow Console
             </Link>
             <Link href="/admin/current-admin-review" className="rounded-lg border px-4 py-2">
               Current-Admin Review

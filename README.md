@@ -131,7 +131,7 @@ python3 scripts/apply_review_bundle.py --apply --yes --csv
 python3 scripts/import_approved_tracked_bills.py --apply --yes --link-imported-bills --enrich-metadata --csv
 ```
 
-The server wrapper command is `~/bin/equitystack`, which runs the same Python workflow from the deployed environment.
+The server wrapper command is `~/bin/equitystack`, which runs the same Python workflow from the deployed environment. For current-admin commands, its path flags accept both python-rooted paths like `data/current_admin_batches/...` and repo-rooted paths like `python/data/current_admin_batches/...`.
 
 Pipeline details, supporting scripts, and the full operator runbook are documented in [`python/README.md`](python/README.md).
 

@@ -28,11 +28,11 @@ from current_admin_common import (
 
 
 DEFAULT_OLLAMA_URL = "http://10.10.0.60:11434"
-DEFAULT_MODEL = "qwen3.5:27b"
-DEFAULT_MODEL_SENIOR = "qwen3.5:27b"
+DEFAULT_MODEL = "qwen3.5:9b"
+DEFAULT_MODEL_SENIOR = "qwen3.5:9b"
 DEFAULT_MODEL_VERIFIER = "qwen3.5:9b"
 DEFAULT_MODEL_FALLBACK = "qwen3.5:9b"
-DEFAULT_SENIOR_TIMEOUT = 300
+DEFAULT_SENIOR_TIMEOUT = 240
 DEFAULT_VERIFIER_TIMEOUT = 240
 DEFAULT_TIMEOUT = DEFAULT_SENIOR_TIMEOUT
 DEFAULT_TEMPERATURE = 0.1
@@ -460,6 +460,17 @@ def normalize_string_list(value: Any) -> list[str]:
         return []
     text = normalize_nullable_text(value)
     return [text] if text else []
+
+
+def normalize_signal_level(value: Any) -> str:
+    text = (normalize_nullable_text(value) or "").strip().lower()
+    mapping = {
+        "low": "Low",
+        "medium": "Medium",
+        "moderate": "Medium",
+        "high": "High",
+    }
+    return mapping.get(text, "")
 
 
 def build_deep_review_recommendation(
@@ -961,6 +972,24 @@ def normalize_suggestion_fields(raw: dict[str, Any], record: dict[str, Any], exi
     suggestion["caution_flags"] = caution_flags
     suggestion["hesitation_reasons"] = normalize_string_list(suggestion.get("hesitation_reasons"))
     suggestion["evidence_needed_to_reduce_risk"] = normalize_string_list(suggestion.get("evidence_needed_to_reduce_risk"))
+    suggestion["signal_evidence_strength"] = (
+        map_evidence_strength(suggestion.get("signal_evidence_strength"))
+        or suggestion["evidence_strength_suggestion"]
+    )
+    suggestion["signal_evidence_gaps"] = normalize_string_list(suggestion.get("signal_evidence_gaps"))
+    if not suggestion["signal_evidence_gaps"]:
+        suggestion["signal_evidence_gaps"] = list(suggestion["evidence_needed_to_reduce_risk"])
+    suggestion["signal_ambiguity"] = normalize_signal_level(suggestion.get("signal_ambiguity"))
+    if not suggestion["signal_ambiguity"]:
+        suggestion["signal_ambiguity"] = (
+            "High" if level == "Low" else "Medium" if level == "Medium" else "Low"
+        )
+    suggestion["signal_conflicts"] = normalize_string_list(suggestion.get("signal_conflicts"))
+    suggestion["applied_penalties"] = normalize_string_list(suggestion.get("applied_penalties"))
+    suggestion["self_check"] = (
+        normalize_nullable_text(suggestion.get("self_check"))
+        or "Cautious reviewer check not supplied; review the evidence gaps and ambiguity before import."
+    )
     suggestion["suggested_operator_next_action"] = (
         suggestion.get("suggested_operator_next_action")
         if suggestion.get("suggested_operator_next_action") in {
@@ -1490,6 +1519,12 @@ Return strict JSON with these keys:
 - record_action_suggestion
 - confidence_score
 - confidence_level
+- signal_evidence_strength
+- signal_evidence_gaps
+- signal_ambiguity
+- signal_conflicts
+- applied_penalties
+- self_check
 - reasoning_summary
 - hesitation_reasons
 - evidence_needed_to_reduce_risk
@@ -1512,10 +1547,31 @@ Be especially careful with Mixed impact:
 - If evidence is thin, prefer "Limited" evidence strength and flag Mixed/Negative ambiguity in hesitation_reasons.
 - Do not invent effects to avoid Mixed; only report what sources clearly support.
 
-=== CONFIDENCE RULES ===
-- High: You can confidently say this is new or update and impact is clear with strong sourcing.
-- Medium: Sourcing is moderate, impact direction is clear but not fully supported by strong evidence.
-- Low: Sourcing is weak or missing, or impact direction is clearly ambiguous.
+=== REQUIRED SIGNAL EXTRACTION ===
+Before writing the final answer, explicitly evaluate:
+1. signal_evidence_strength: Strong, Moderate, or Limited.
+2. signal_evidence_gaps: short list of what evidence is missing.
+3. signal_ambiguity: Low, Medium, or High.
+4. signal_conflicts: short list of conflicts, competing interpretations, or unresolved update-vs-new issues.
+5. confidence_score: 0 to 1 after penalties, not before.
+
+=== SCORE DERIVATION RULES ===
+- High confidence requires strong evidence, low ambiguity, minimal evidence gaps, and no material conflicts.
+- Medium confidence is allowed when the core interpretation is plausible but still has moderate uncertainty.
+- Low confidence is required when ambiguity is high, evidence gaps are material, or conflicts remain unresolved.
+- If you are unsure whether a cautious reviewer would approve import-facing use, do not use High.
+
+=== PENALTY LOGIC ===
+- Ambiguity reduces confidence.
+- Evidence gaps reduce confidence.
+- Conflicts reduce confidence.
+- Missing source coverage reduces confidence.
+- If ambiguity or evidence gaps remain high, prefer manual_review or source-checking actions over optimistic recommendations.
+
+=== SELF-CHECK ===
+Before finalizing:
+- Ask whether a cautious reviewer would downgrade this because evidence is weak, ambiguity is unresolved, or conflicts are still present.
+- If yes, lower confidence_score, lower confidence_level, and record the downgrade in applied_penalties or self_check.
 
 === OUTPUT RULES ===
 - advisory only
@@ -1527,6 +1583,12 @@ Be especially careful with Mixed impact:
 - evidence_strength_suggestion must be one of: Strong, Moderate, Limited
 - confidence_score must be between 0 and 1
 - confidence_level must be one of: High, Medium, Low
+- signal_evidence_strength must be one of: Strong, Moderate, Limited
+- signal_ambiguity must be one of: Low, Medium, High
+- signal_evidence_gaps must be an array of short strings
+- signal_conflicts must be an array of short strings
+- applied_penalties must be an array of short strings describing any downgrade pressure you applied
+- self_check must be one short sentence describing whether a cautious reviewer would keep or downgrade your first instinct
 - keep reasoning_summary short and operator-facing (3-5 sentences explaining key judgments)
 - hesitation_reasons must be an array of short strings (why you hesitate, what would clarify)
 - evidence_needed_to_reduce_risk must be an array of short strings (what evidence would make this safer to import)
@@ -1558,6 +1620,12 @@ Return strict JSON with the same keys as the standard pass:
 - record_action_suggestion
 - confidence_score
 - confidence_level
+- signal_evidence_strength
+- signal_evidence_gaps
+- signal_ambiguity
+- signal_conflicts
+- applied_penalties
+- self_check
 - reasoning_summary
 - hesitation_reasons
 - evidence_needed_to_reduce_risk
@@ -1574,6 +1642,7 @@ Deep review priorities:
 - missing-source cautions
 - strongest reasons a reviewer should hesitate
 - what evidence would make the record safer to import
+- explicit downgrade signals from ambiguity, evidence gaps, conflicts, and low confidence
 
 Keep the output advisory only.
 Prefer manual_review when uncertainty remains.
@@ -1596,6 +1665,9 @@ Standard-pass suggestion:
 6. If the first pass was already confident and well-sourced, it may need little correction.
 7. If the first pass was low confidence, you may need to correct record action or impact direction.
 8. Document why you are changing or maintaining the standard pass suggestions.
+9. Re-extract signal_evidence_strength, signal_evidence_gaps, signal_ambiguity, signal_conflicts, and confidence_score from this deeper pass.
+10. Apply downgrade penalties whenever ambiguity, evidence gaps, or conflicts still remain.
+11. Add a self_check sentence stating whether a cautious reviewer would downgrade further.
 """.strip()
 
 

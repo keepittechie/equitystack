@@ -5,7 +5,7 @@ Work from `python/`.
 ## Environment Defaults
 
 - Production Ollama: `http://10.10.0.60:11434`
-- Senior review / decision model: `qwen3.5:27b`
+- Senior review / decision model: `qwen3.5:9b`
 - Verifier / fallback model: `qwen3.5:9b`
 - Executor model: `rnj-1:latest`
 - Default Ollama timeout: `240`
@@ -22,6 +22,11 @@ Work from `python/`.
 5. When needed: `./bin/equitystack legislative feedback`
 
 ## Daily Current-Admin Flow
+
+Path note:
+
+- From `python/`, use `data/...` and `reports/...` paths with `./bin/equitystack`.
+- From the repo root, the installed `equitystack` wrapper also accepts `python/data/...` and `python/reports/...` for current-admin commands.
 
 1. `./bin/equitystack current-admin workflow start --input data/current_admin_batches/<batch-file>.json`
 2. `./bin/equitystack current-admin workflow review --input reports/current_admin/<batch-name>.ai-review.json --output /tmp/<batch-name>.decision-template.json`

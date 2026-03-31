@@ -13,10 +13,10 @@ import requests
 
 
 DEFAULT_OLLAMA_URL = "http://10.10.0.60:11434"
-DEFAULT_MODEL = "qwen3.5:27b"
+DEFAULT_MODEL = "qwen3.5:9b"
 DEFAULT_MODEL_VERIFIER = "qwen3.5:9b"
 DEFAULT_MODEL_FALLBACK = "qwen3.5:9b"
-DEFAULT_SENIOR_TIMEOUT = 300
+DEFAULT_SENIOR_TIMEOUT = 240
 DEFAULT_VERIFIER_TIMEOUT = 240
 DEFAULT_TIMEOUT = DEFAULT_SENIOR_TIMEOUT
 DEFAULT_TEMPERATURE = 0.1
@@ -188,6 +188,13 @@ def select_rows(payload: dict[str, Any], include_medium: bool, only_link_id: int
 
 def normalize_whitespace(text: str | None) -> str:
     return re.sub(r"\s+", " ", (text or "")).strip()
+
+
+def normalize_string_list(value: Any) -> list[str]:
+    if isinstance(value, list):
+        return [item for item in (normalize_whitespace(str(part)) for part in value) if item]
+    text = normalize_whitespace(None if value is None else str(value))
+    return [text] if text else []
 
 
 def first_nonempty_text(*values: Any) -> str | None:
@@ -422,7 +429,28 @@ Override rules:
 - If solution_alignment is 0, the result usually cannot be keep_direct.
 - If mechanism_specificity is 0 and the future bill requires a direct material benefit but the tracked bill is a study/report/commission, prefer change_to_partial or remove_link.
 - If evidence_strength is 0 or 1 because the official summary is missing and the title is vague, prefer review_manually unless the match is still clearly strong.
-- If problem_alignment is 0 and population_alignment is 0, strongly prefer remove_link."""
+- If problem_alignment is 0 and population_alignment is 0, strongly prefer remove_link.
+
+Signal extraction:
+- Explicitly identify evidence gaps before deciding.
+- Explicitly rate ambiguity as low, medium, or high.
+- Explicitly list conflicts or competing interpretations.
+- Confidence must be a 0 to 1 value after penalties, not before.
+
+Score derivation:
+- High-end scores require strong evidence and low ambiguity.
+- Medium scores allow moderate uncertainty when the core alignment is still credible.
+- Low scores are required when ambiguity, conflicts, or evidence gaps are substantial.
+
+Penalty logic:
+- Ambiguity reduces confidence.
+- Evidence gaps reduce confidence.
+- Conflicts reduce confidence.
+- Low confidence should push the result toward change_to_partial, remove_link, or review_manually rather than keep_direct.
+
+Self-check:
+- Reconsider whether a cautious reviewer would downgrade because the evidence is weak, ambiguous, or conflicting.
+- If yes, apply that downgrade before finalizing the JSON."""
 
 
 def build_prompt(row: dict[str, Any], heuristics: HeuristicContext) -> str:
@@ -462,6 +490,11 @@ def build_prompt(row: dict[str, Any], heuristics: HeuristicContext) -> str:
         "total_score": 0,
         "decision": "keep_direct | change_to_partial | remove_link | review_manually",
         "confidence": 0.0,
+        "signal_evidence_gaps": ["missing summary detail"],
+        "signal_ambiguity": "low | medium | high",
+        "signal_conflicts": ["topic overlap without mechanism overlap"],
+        "applied_penalties": ["downgraded for weak evidence"],
+        "self_check": "A cautious reviewer would downgrade because evidence is still weak.",
         "reasoning_short": "short explanation",
         "suggested_new_link_type": "Direct | Partial | None",
         "recommended_action": "keep | convert_to_partial | remove | manual_review",
@@ -474,11 +507,15 @@ def build_prompt(row: dict[str, Any], heuristics: HeuristicContext) -> str:
         "Input item:\n"
         f"{json.dumps(review_payload, indent=2, ensure_ascii=True)}\n\n"
         "Instructions:\n"
+        "- First extract signals: evidence gaps, ambiguity, conflicts, and post-penalty confidence.\n"
         "- Score each rubric dimension from 0 to 3.\n"
         "- Recompute total_score as the sum of the five dimension scores.\n"
         "- Use the score bands as guidance, but follow the override rules.\n"
-        "- Be decisive. If the Direct link is clearly wrong, prefer remove_link or change_to_partial.\n"
-        "- Use review_manually only when evidence is genuinely insufficient or unusually ambiguous.\n"
+        "- High scoring requires strong evidence and low ambiguity; do not award high scores on topic similarity alone.\n"
+        "- Apply explicit penalties for ambiguity, evidence gaps, conflicts, and low confidence before choosing the final decision.\n"
+        "- If the Direct link is not strongly supported, prefer remove_link, change_to_partial, or review_manually.\n"
+        "- Use review_manually when evidence is genuinely insufficient or ambiguity/conflicts remain too high for a reliable downgrade path.\n"
+        "- Perform a self-check: ask whether a cautious reviewer would downgrade this result; if yes, do it before finalizing.\n"
         "- Keep reasoning_short to one short paragraph or less.\n"
         "- The JSON must exactly use these keys:\n"
         f"{json.dumps(schema, indent=2, ensure_ascii=True)}"
@@ -684,6 +721,11 @@ def fallback_review(row: dict[str, Any], reason: str, heuristics: HeuristicConte
         "total_score": 0,
         "llm_decision": "review_manually",
         "llm_confidence": 0.0,
+        "signal_evidence_gaps": [reason],
+        "signal_ambiguity": "high",
+        "signal_conflicts": [],
+        "applied_penalties": ["downgraded to manual review because no usable Ollama result was available"],
+        "self_check": "A cautious reviewer would not keep or strengthen this link without a usable model result.",
         "llm_reasoning_short": reason,
         "llm_suggested_new_link_type": "None",
         "llm_recommended_action": "manual_review",
@@ -799,15 +841,25 @@ def normalize_model_result(raw: dict[str, Any], row: dict[str, Any], heuristics:
         "total_score": total_score,
         "llm_decision": decision,
         "llm_confidence": normalize_confidence(raw.get("confidence")),
+        "signal_evidence_gaps": normalize_string_list(raw.get("signal_evidence_gaps")),
+        "signal_ambiguity": str(raw.get("signal_ambiguity") or "").strip().lower() or "medium",
+        "signal_conflicts": normalize_string_list(raw.get("signal_conflicts")),
+        "applied_penalties": normalize_string_list(raw.get("applied_penalties")),
+        "self_check": normalize_whitespace(raw.get("self_check"))[:240],
         "llm_reasoning_short": normalize_whitespace(raw.get("reasoning_short"))[:400],
         "llm_suggested_new_link_type": normalize_link_type(raw.get("suggested_new_link_type"), decision),
         "llm_recommended_action": normalize_action(raw.get("recommended_action"), decision),
     }
 
+    if normalized["signal_ambiguity"] not in {"low", "medium", "high"}:
+        normalized["signal_ambiguity"] = "medium"
+
     if not normalized["llm_reasoning_short"]:
         normalized["llm_reasoning_short"] = (
             f"Model response for future_bill_link_id {row['future_bill_link_id']} did not include usable reasoning."
         )
+    if not normalized["self_check"]:
+        normalized["self_check"] = "Cautious reviewer check missing; review ambiguity, conflicts, and evidence gaps before trusting a strong match."
 
     return apply_post_processing(row, normalized, heuristics)
 
@@ -918,6 +970,11 @@ def review_row(
         "match_label": normalized["match_label"],
         "llm_decision": normalized["llm_decision"],
         "llm_confidence": normalized["llm_confidence"],
+        "signal_evidence_gaps": normalized["signal_evidence_gaps"],
+        "signal_ambiguity": normalized["signal_ambiguity"],
+        "signal_conflicts": normalized["signal_conflicts"],
+        "applied_penalties": normalized["applied_penalties"],
+        "self_check": normalized["self_check"],
         "llm_reasoning_short": normalized["llm_reasoning_short"],
         "llm_suggested_new_link_type": normalized["llm_suggested_new_link_type"],
         "llm_recommended_action": normalized["llm_recommended_action"],

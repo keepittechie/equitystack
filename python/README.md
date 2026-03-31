@@ -14,6 +14,11 @@ Main CLI:
 ./bin/equitystack --help
 ```
 
+Path handling:
+
+- When you run `./bin/equitystack` from `python/`, use paths like `data/...` and `reports/...`.
+- The installed `~/bin/equitystack` wrapper also accepts repo-rooted current-admin paths like `python/data/...` and `python/reports/...`.
+
 ## Local Python Bootstrap
 
 Recommended local setup from the repo root:
@@ -42,7 +47,7 @@ python3 -m venv --clear venv
 
 - The CLI is self-locating. It resolves the Python workspace from `python/bin/equitystack`.
 - Production Ollama is remote: `http://10.10.0.60:11434`.
-- Senior review and decision steps should use `qwen3.5:27b`.
+- Senior review and decision steps should use `qwen3.5:9b`.
 - Verifier, draft, and fallback review steps should use `qwen3.5:9b`.
 - Scheduled Ollama review stages now default to a 240 second timeout.
 - `rnj-1:latest` is the executor model for preprocessing, summaries, and approved command execution.
@@ -84,9 +89,16 @@ From `python/`:
 ./bin/equitystack current-admin validate --input reports/current_admin/<batch-name>.manual-review-queue.json
 ```
 
+From the repo root with `~/bin/equitystack`, both of these are valid:
+
+```bash
+equitystack current-admin workflow start --input data/current_admin_batches/<batch-file>.json
+equitystack current-admin workflow start --input python/data/current_admin_batches/<batch-file>.json
+```
+
 Important:
 
-- `workflow start` runs verifier-assisted review with `qwen3.5:9b`, senior review with `qwen3.5:27b`, then queue generation.
+- `workflow start` runs verifier-assisted review with `qwen3.5:9b`, senior review with `qwen3.5:9b`, then queue generation.
 - `workflow review` only generates a decision template.
 - `workflow finalize` writes a decision log under `reports/current_admin/review_decisions/*.decision-log.json`.
 - `pre-commit` is read-only.
@@ -107,7 +119,7 @@ From `python/`:
 
 Important:
 
-- `legislative run` executes verifier-assisted suggestion/discovery with `qwen3.5:9b`, senior audit review with `qwen3.5:27b`, auto-triages safe bundle actions, then rebuilds the review bundle.
+- `legislative run` executes verifier-assisted suggestion/discovery with `qwen3.5:9b`, senior audit review with `qwen3.5:9b`, auto-triages safe bundle actions, then rebuilds the review bundle.
 - the daily review path now uses a 240 second Ollama timeout.
 - `legislative import` is dry-run unless `--apply --yes` is passed to the underlying script directly.
 
