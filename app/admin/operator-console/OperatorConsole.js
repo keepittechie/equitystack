@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import RecommendationList from "../components/RecommendationList";
 import {
   getSuggestedOperatorActions,
@@ -184,6 +184,60 @@ function SpinnerDot() {
   );
 }
 
+function isExecutionRunning(execution) {
+  return Boolean(
+    execution &&
+      (execution.status === "running" || execution.status === "queued")
+  );
+}
+
+async function readApiResponse(response) {
+  const contentType = response.headers.get("content-type") || "";
+  const isJson = contentType.toLowerCase().includes("application/json");
+  const bodyText = await response.text();
+
+  if (isJson) {
+    try {
+      const payload = bodyText ? JSON.parse(bodyText) : {};
+      if (!response.ok) {
+        throw new Error(payload.error || "Workflow console action failed.");
+      }
+      return payload;
+    } catch (error) {
+      if (error instanceof Error && error.message !== "Workflow console action failed.") {
+        throw error;
+      }
+      throw new Error("Workflow console action returned invalid JSON.");
+    }
+  }
+
+  const bodySnippet = bodyText
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 180);
+  const looksLikeHtml = /<!doctype|<html|<body/i.test(bodyText);
+  const statusText = `${response.status}${response.statusText ? ` ${response.statusText}` : ""}`;
+
+  if (response.redirected) {
+    throw new Error(
+      `Workflow console request was redirected instead of returning JSON (${statusText}). ` +
+      `This may be an auth or proxy redirect. Final URL: ${response.url || "unknown"}.`
+    );
+  }
+
+  if (looksLikeHtml) {
+    throw new Error(
+      `Workflow console request returned HTML instead of JSON (${statusText}). ` +
+      "This usually means a proxy timeout, upstream error page, or auth page was returned while the command kept running."
+    );
+  }
+
+  throw new Error(
+    `Workflow console request returned ${contentType || "an unknown content type"} instead of JSON (${statusText}).` +
+    (bodySnippet ? ` Response preview: ${bodySnippet}` : "")
+  );
+}
+
 function buildActionRows(columns) {
   const rowCount = Math.max(
     ...columns.map((column) =>
@@ -237,6 +291,11 @@ function findColumnForActionId(actionId) {
   );
 }
 
+function resolveTemplateCommand(action, inputValue) {
+  const templateCommand = action?.template_command || action?.canonical_input || "";
+  return templateCommand.replace("{{input}}", (inputValue || "").trim());
+}
+
 export default function OperatorConsole({
   quickActions,
   initialTrace,
@@ -259,6 +318,7 @@ export default function OperatorConsole({
   const [historyPage, setHistoryPage] = useState(1);
   const [notice, setNotice] = useState(initialNotice || "");
   const [error, setError] = useState("");
+  const [templateInputs, setTemplateInputs] = useState({});
   const [activeExecution, setActiveExecution] = useState(initialActiveExecution || null);
   const [isPending, startTransition] = useTransition();
 
@@ -279,8 +339,17 @@ export default function OperatorConsole({
       .find((action) => action.id === selectedActionId) ||
     exactMatchAction ||
     null;
+  const selectedTemplateInput = selectedAction?.requires_input
+    ? templateInputs[selectedAction.id] || ""
+    : "";
   const effectiveExecution = activeExecution;
-  const isLocked = isPending || Boolean(effectiveExecution?.status === "running" || effectiveExecution);
+  const isLocked = isPending || isExecutionRunning(effectiveExecution);
+  const usesSelectedAction = Boolean(selectedActionId && selectedAction);
+  const resolvedCommandPreview = usesSelectedAction
+    ? selectedAction.requires_input
+      ? resolveTemplateCommand(selectedAction, selectedTemplateInput)
+      : selectedAction.canonical_input
+    : message.trim();
 
   const paginatedHistory = useMemo(() => {
     const startIndex = (historyPage - 1) * HISTORY_PAGE_SIZE;
@@ -315,16 +384,26 @@ export default function OperatorConsole({
     setError("");
   }
 
+  function updateTemplateInput(actionId, value) {
+    setTemplateInputs((current) => ({
+      ...current,
+      [actionId]: value,
+    }));
+    setError("");
+  }
+
   function buildRunningTrace(nextAction, commandText) {
     return {
       ...trace,
+      execution_id: null,
       user_input: commandText,
       mapped_action_id: nextAction?.id || selectedActionId || null,
       action_label: nextAction?.label || "Workflow Command",
       workflow_type: nextAction?.workflow || selectedWorkflow || null,
       execution_path: nextAction?.execution_path || nextAction?.execution_method || "Wrapped CLI execution",
       status: "running",
-      summary: "Workflow execution is in progress. The console remains locked until the wrapped command returns.",
+      summary:
+        "Workflow execution is in progress. The console remains locked until the wrapped command reaches a stop point or completes.",
       blocked_reason: null,
       failure_reason: null,
       command: commandText,
@@ -337,6 +416,66 @@ export default function OperatorConsole({
       artifact_references: [],
     };
   }
+
+  useEffect(() => {
+    if (!isExecutionRunning(activeExecution) || !activeExecution?.execution_id) {
+      return undefined;
+    }
+
+    let cancelled = false;
+    let timeoutId;
+
+    async function pollExecution() {
+      let shouldContinue = true;
+      try {
+        const response = await fetch(
+          `/api/admin/operator-console?job_id=${encodeURIComponent(activeExecution.execution_id)}`,
+          {
+            method: "GET",
+            headers: {
+              Accept: "application/json",
+            },
+            cache: "no-store",
+          }
+        );
+        const nextResult = await readApiResponse(response);
+        if (cancelled) {
+          return;
+        }
+
+        if (nextResult.trace) {
+          setTrace(nextResult.trace);
+        }
+        if (nextResult.history) {
+          setHistory(nextResult.history);
+          setHistoryPage(1);
+        }
+        setError("");
+        setActiveExecution(nextResult.active_execution || null);
+
+        shouldContinue = Boolean(
+          nextResult.active_execution && isExecutionRunning(nextResult.active_execution)
+        );
+      } catch (pollError) {
+        if (!cancelled) {
+          setError(pollError.message);
+        }
+      } finally {
+        if (!cancelled && shouldContinue) {
+          timeoutId = window.setTimeout(pollExecution, 3000);
+        }
+      }
+    }
+
+    timeoutId = window.setTimeout(pollExecution, 1500);
+
+    return () => {
+      cancelled = true;
+      if (timeoutId) {
+        window.clearTimeout(timeoutId);
+      }
+    };
+  }, [activeExecution]);
 
   function runRequest(payload, nextAction, commandText) {
     setError("");
@@ -358,13 +497,11 @@ export default function OperatorConsole({
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Accept: "application/json",
           },
           body: JSON.stringify(payload),
         });
-        const nextResult = await response.json();
-        if (!response.ok) {
-          throw new Error(nextResult.error || "Workflow console action failed.");
-        }
+        const nextResult = await readApiResponse(response);
         setTrace(nextResult.trace);
         setHistory(nextResult.history || []);
         setHistoryPage(1);
@@ -377,11 +514,18 @@ export default function OperatorConsole({
   }
 
   function handleExecute() {
-    const commandText = message.trim();
+    const commandText = resolvedCommandPreview.trim();
     if (!commandText) {
       return;
     }
     const nextAction = selectedAction || exactMatchAction || null;
+    if (nextAction?.requires_input && !selectedTemplateInput.trim()) {
+      setError(
+        nextAction.validation_message ||
+          `${nextAction.label} requires input before execution.`
+      );
+      return;
+    }
     runRequest(
       nextAction ? { actionId: nextAction.id, message: commandText } : { message: commandText },
       nextAction,
@@ -441,7 +585,7 @@ export default function OperatorConsole({
           {effectiveExecution ? (
             <div className="flex items-center gap-2 rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-xs font-medium text-sky-900">
               <SpinnerDot />
-              Active execution
+              Active execution{effectiveExecution.execution_id ? ` · ${effectiveExecution.execution_id}` : ""}
             </div>
           ) : null}
         </div>
@@ -472,13 +616,31 @@ export default function OperatorConsole({
               Press Enter on a highlighted suggestion to fill the command. Execution only happens
               from the Execute button.
             </p>
+            {selectedAction?.requires_input ? (
+              <label className="block">
+                <span className="mb-1 block text-sm font-medium">
+                  {selectedAction.input_label || "Required input"}
+                </span>
+                <input
+                  value={selectedTemplateInput}
+                  onChange={(event) => updateTemplateInput(selectedAction.id, event.target.value)}
+                  disabled={isLocked}
+                  className="h-10 w-full rounded-lg border px-3 text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black disabled:cursor-not-allowed disabled:bg-gray-100"
+                  placeholder={selectedAction.input_placeholder || ""}
+                />
+              </label>
+            ) : null}
           </div>
 
           <div className="flex flex-wrap items-end gap-2 lg:justify-end">
             <button
               type="button"
               onClick={handleExecute}
-              disabled={isLocked || !message.trim()}
+              disabled={
+                isLocked ||
+                !resolvedCommandPreview.trim() ||
+                Boolean(selectedAction?.requires_input && !selectedTemplateInput.trim())
+              }
               className="rounded-lg border border-black px-4 py-2 text-sm font-medium bg-black text-white disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isLocked ? "Running" : "Execute"}
@@ -492,6 +654,23 @@ export default function OperatorConsole({
               Clear
             </button>
           </div>
+        </div>
+
+        <div className="mt-4 rounded-xl border bg-gray-50 px-4 py-3 text-sm">
+          <div className="flex flex-wrap items-center gap-2 text-xs uppercase tracking-wide text-gray-500">
+            <span>Execute Target</span>
+            <span className="rounded-full border px-2 py-0.5 text-[11px] normal-case text-gray-700">
+              {usesSelectedAction ? "Selected action" : "Typed command"}
+            </span>
+          </div>
+          <p className="mt-2 text-xs text-gray-600">
+            {usesSelectedAction
+              ? `${selectedAction.label}${selectedAction.requires_input ? " requires input first." : " is directly runnable."}`
+              : "The typed command will run only if it matches an allowed workflow command."}
+          </p>
+          <p className="mt-2 break-all font-mono text-xs text-gray-800">
+            {resolvedCommandPreview || "No command resolved yet."}
+          </p>
         </div>
 
         {suggestionActions.length ? (
@@ -598,6 +777,11 @@ export default function OperatorConsole({
                             <p className="text-sm font-medium leading-snug text-gray-900">
                               {cell.action.label}
                             </p>
+                            <div className="mt-1 flex justify-center">
+                              <span className="rounded-full border px-2 py-0.5 text-[10px] uppercase tracking-wide text-gray-500">
+                                {cell.action.requires_input ? "Input required" : "Runnable"}
+                              </span>
+                            </div>
                           </button>
                         ) : cell.type === "placeholder" ? (
                           <div className="flex h-full items-center justify-center rounded-lg border border-dashed px-2 py-1.5 text-center text-xs leading-snug text-gray-500">
@@ -638,6 +822,9 @@ export default function OperatorConsole({
         <div className="mt-4 grid gap-3 xl:grid-cols-3">
           <TraceCell label="Current Command" mono>
             {trace?.command || trace?.user_input || "No command selected yet."}
+          </TraceCell>
+          <TraceCell label="Execution ID" mono>
+            {trace?.execution_id || effectiveExecution?.execution_id || "—"}
           </TraceCell>
           <TraceCell label="Workflow">
             {trace?.workflow_type || "—"}
