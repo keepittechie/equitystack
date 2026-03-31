@@ -81,31 +81,28 @@ Read these next:
 From `python/`:
 
 ```bash
-./bin/equitystack current-admin workflow start --input data/current_admin_batches/<batch-file>.json
-./bin/equitystack current-admin workflow review --input reports/current_admin/<batch-name>.ai-review.json --output /tmp/<batch-name>.decision-template.json
-./bin/equitystack current-admin workflow finalize --review reports/current_admin/<batch-name>.ai-review.json --decision-file /tmp/<batch-name>.decision-template.json --log-decisions
-./bin/equitystack current-admin pre-commit --input reports/current_admin/<batch-name>.manual-review-queue.json
-./bin/equitystack current-admin import --input reports/current_admin/<batch-name>.manual-review-queue.json
-./bin/equitystack current-admin validate --input reports/current_admin/<batch-name>.manual-review-queue.json
+./bin/equitystack current-admin run
+./bin/equitystack current-admin review
+./bin/equitystack current-admin apply
+./bin/equitystack current-admin apply --apply --yes
 ```
 
 From the repo root with `~/bin/equitystack`, both of these are valid:
 
 ```bash
-equitystack current-admin workflow start --input data/current_admin_batches/<batch-file>.json
-equitystack current-admin workflow start --input python/data/current_admin_batches/<batch-file>.json
+equitystack current-admin run --input data/current_admin_batches/<batch-file>.json
+equitystack current-admin run --input python/data/current_admin_batches/<batch-file>.json
 ```
 
 Important:
 
-- `workflow start` runs verifier-assisted review with `qwen3.5:9b`, senior review with `qwen3.5:9b`, then queue generation.
-- `workflow review` only generates a decision template.
-- `workflow finalize` writes a decision log under `reports/current_admin/review_decisions/*.decision-log.json`.
-- `pre-commit` is read-only.
-- `import` is dry-run by default.
+- `current-admin run` discovers and generates the next batch by default, or starts directly from `--input`.
+- `current-admin review` writes or refreshes the canonical decision template and finalizes only when explicit operator decisions are valid.
+- `current-admin apply` always reruns pre-commit and import dry-run before any mutating apply.
 - database writes only happen with `--apply --yes`.
 - `current-admin status` prints the current state machine and next step.
 - review artifacts stamp requested model, effective model, backend, fallback status, and fallback reason.
+- legacy/manual commands remain available: `discover`, `gen-batch`, `workflow start`, `workflow review`, `workflow finalize`, `pre-commit`, `import`, `validate`, `status`, `workflow resume`.
 
 ## Legislative Safe Path
 

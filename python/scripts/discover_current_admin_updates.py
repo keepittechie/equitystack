@@ -555,18 +555,33 @@ def sanitize_ollama_suggestion(payload: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def compact_linked_promise(promise: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "id": promise.get("id"),
+        "slug": promise.get("slug"),
+        "title": promise.get("title"),
+        "topic": promise.get("topic"),
+        "status": promise.get("status"),
+        "summary": promise.get("summary"),
+        "impacted_group": promise.get("impacted_group"),
+        "notes": promise.get("notes"),
+        "promise_date": promise.get("promise_date"),
+        "latest_action_date": promise.get("latest_action_date"),
+        "action_count": promise.get("action_count"),
+        "outcome_count": promise.get("outcome_count"),
+        "promise_source_count": promise.get("promise_source_count"),
+        "promise_sources": promise.get("promise_sources") or [],
+        "actions": promise.get("actions") or [],
+        "outcomes": promise.get("outcomes") or [],
+    }
+
+
 def build_maintenance_candidates(promises: list[dict[str, Any]], lookback_days: int) -> list[dict[str, Any]]:
     stale_before = datetime.now(UTC).date() - timedelta(days=lookback_days)
     candidates = []
     for promise in promises:
         source_refs = list(promise.get("promise_sources") or [])[:3]
-        linked_promise = {
-            "id": promise.get("id"),
-            "slug": promise.get("slug"),
-            "title": promise.get("title"),
-            "topic": promise.get("topic"),
-            "status": promise.get("status"),
-        }
+        linked_promise = compact_linked_promise(promise)
 
         if int(promise.get("action_count") or 0) < 1:
             candidates.append(
@@ -735,13 +750,7 @@ def analyze_feed_items(
         if linked_slug:
             matched = next((promise for promise in promises if promise.get("slug") == linked_slug), None)
             if matched:
-                candidate["linked_promise"] = {
-                    "id": matched.get("id"),
-                    "slug": matched.get("slug"),
-                    "title": matched.get("title"),
-                    "topic": matched.get("topic"),
-                    "status": matched.get("status"),
-                }
+                candidate["linked_promise"] = compact_linked_promise(matched)
 
         if suggestion.get("suggestion_type") == "new_action":
             new_action_candidates.append(candidate)

@@ -139,31 +139,38 @@ Audit report directory:
 - [`python/reports/current_admin`](../python/reports/current_admin)
 
 Recommended workflow:
-- optionally run discovery to identify stale records, missing actions, and possible new promise candidates
-- review `python/reports/current_admin/discovery_report.json`
-- export selected discovery suggestions into a draft batch file
-- edit that draft into a curated batch JSON or enrichment batch
-- run the canonical Python wrapper flow
-- fill explicit operator actions in the generated decision template
-- run the read-only pre-commit review before import
-- inspect the generated ingest report for duplicates, conflicts, and validation results
-- rerun with `--apply` only after the dry run is clean
-- keep the apply report in the audit directory
+- run `current-admin run` for the default daily path
+- if you already have a curated batch, run `current-admin run --input ...`
+- run `current-admin review` to generate or finalize explicit operator decisions
+- run `current-admin apply` for the guarded pre-commit plus dry-run path
+- rerun `current-admin apply --apply --yes` only after the dry-run is clean
+- keep the apply and validation reports in the audit directory
 
 Example commands:
 
 ```bash
 cd python
+./bin/equitystack current-admin run
+./bin/equitystack current-admin review
+./bin/equitystack current-admin apply
+./bin/equitystack current-admin apply --apply --yes
+```
+
+Raw Python entrypoints still exist under `python/scripts/` for debugging, but the wrapper is the recommended operator interface.
+
+Advanced/manual commands still work:
+
+```bash
+./bin/equitystack current-admin discover
+./bin/equitystack current-admin gen-batch --all-candidates
 ./bin/equitystack current-admin workflow start --input data/current_admin_batches/trump_2025_batch_01.json
-./bin/equitystack current-admin workflow review --input reports/current_admin/trump-2025-batch-01.ai-review.json --output /tmp/trump-2025-batch-01.decision-template.json
-./bin/equitystack current-admin workflow finalize --review reports/current_admin/trump-2025-batch-01.ai-review.json --decision-file /tmp/trump-2025-batch-01.decision-template.json --log-decisions
+./bin/equitystack current-admin workflow review --input reports/current_admin/trump-2025-batch-01.ai-review.json --output reports/current_admin/trump-2025-batch-01.decision-template.json
+./bin/equitystack current-admin workflow finalize --review reports/current_admin/trump-2025-batch-01.ai-review.json --decision-file reports/current_admin/trump-2025-batch-01.decision-template.json --log-decisions
 ./bin/equitystack current-admin pre-commit --input reports/current_admin/trump-2025-batch-01.manual-review-queue.json
 ./bin/equitystack current-admin import --input reports/current_admin/trump-2025-batch-01.manual-review-queue.json
 ./bin/equitystack current-admin import --input reports/current_admin/trump-2025-batch-01.manual-review-queue.json --apply --yes
 ./bin/equitystack current-admin validate --input reports/current_admin/trump-2025-batch-01.manual-review-queue.json
 ```
-
-Raw Python entrypoints still exist under `python/scripts/` for debugging, but the wrapper is the recommended operator interface.
 
 The import script remains non-destructive:
 - promise matching prefers existing slug or title-plus-president matches

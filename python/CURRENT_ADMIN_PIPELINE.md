@@ -27,17 +27,34 @@ Artifacts:
 ## Canonical Operator Commands
 
 ```bash
-./bin/equitystack current-admin status
+./bin/equitystack current-admin run
+./bin/equitystack current-admin review
+./bin/equitystack current-admin apply
+./bin/equitystack current-admin apply --apply --yes
+```
+
+Manual batch path:
+
+```bash
+./bin/equitystack current-admin run --input data/current_admin_batches/<batch-file>.json
+./bin/equitystack current-admin review --input reports/current_admin/<batch-name>.ai-review.json
+./bin/equitystack current-admin apply --input reports/current_admin/<batch-name>.manual-review-queue.json
+./bin/equitystack current-admin apply --input reports/current_admin/<batch-name>.manual-review-queue.json --apply --yes
+```
+
+Advanced/manual commands still remain available:
+
+```bash
+./bin/equitystack current-admin discover
+./bin/equitystack current-admin gen-batch --all-candidates
 ./bin/equitystack current-admin workflow start --input data/current_admin_batches/<batch-file>.json
-./bin/equitystack current-admin workflow review --input reports/current_admin/<batch-name>.ai-review.json --output /tmp/<batch-name>.decision-template.json
-./bin/equitystack current-admin workflow finalize --review reports/current_admin/<batch-name>.ai-review.json --decision-file /tmp/<batch-name>.decision-template.json --log-decisions
+./bin/equitystack current-admin workflow review --input reports/current_admin/<batch-name>.ai-review.json --output reports/current_admin/<batch-name>.decision-template.json
+./bin/equitystack current-admin workflow finalize --review reports/current_admin/<batch-name>.ai-review.json --decision-file reports/current_admin/<batch-name>.decision-template.json --log-decisions
 ./bin/equitystack current-admin pre-commit --input reports/current_admin/<batch-name>.manual-review-queue.json
 ./bin/equitystack current-admin import --input reports/current_admin/<batch-name>.manual-review-queue.json
 ./bin/equitystack current-admin import --input reports/current_admin/<batch-name>.manual-review-queue.json --apply --yes
 ./bin/equitystack current-admin validate --input reports/current_admin/<batch-name>.manual-review-queue.json
 ```
-
-`current-admin run` is an alias for `current-admin workflow start`.
 
 ## State Machine
 
@@ -56,35 +73,43 @@ The command also prints artifact presence, blocking issues, and the recommended 
 
 ## What Each Stage Does
 
-`workflow start` runs the pre-import path:
+`run` without `--input` runs:
+
+1. `scripts/discover_current_admin_updates.py`
+2. `scripts/generate_current_admin_batch_from_discovery.py`
+3. `scripts/normalize_current_admin_batch.py`
+4. `scripts/review_current_admin_batch_with_ollama.py`
+5. `scripts/apply_current_admin_ai_review.py`
+
+`run --input ...` and `workflow start` run the pre-import path:
 
 1. `scripts/normalize_current_admin_batch.py`
 2. `scripts/review_current_admin_batch_with_ollama.py`
 3. `scripts/apply_current_admin_ai_review.py`
 
-`workflow review` runs:
+`review` wraps:
+
+- `scripts/generate_current_admin_decision_template.py`
+- `scripts/review_current_admin_batch_with_ollama.py --decision-file ... --log-decisions`
+
+`workflow review` still runs only:
 
 - `scripts/generate_current_admin_decision_template.py`
 
-`workflow finalize` replays the canonical review artifact settings and writes a decision log via:
+`workflow finalize` still replays the canonical review artifact settings and writes a decision log via:
 
 - `scripts/review_current_admin_batch_with_ollama.py --decision-file ... --log-decisions`
 
-`pre-commit` runs:
+`apply` wraps:
 
 - `scripts/build_current_admin_precommit_review.py`
-
-`import` runs:
-
 - `scripts/import_curated_current_admin_batch.py`
-
-`validate` runs:
-
 - `scripts/validate_current_admin_import.py`
 
 Optional discovery path:
 
 - `scripts/discover_current_admin_updates.py`
+- `scripts/generate_current_admin_batch_from_discovery.py`
 - `scripts/export_current_admin_discovery_candidates.py`
 
 ## Verified Model Strategy
@@ -92,8 +117,8 @@ Optional discovery path:
 Wrapper defaults:
 
 - `current-admin discover`: `qwen3.5:9b`
-- `current-admin review` verifier pass: `qwen3.5:9b`
-- `current-admin review` senior pass: `qwen3.5:9b`
+- `current-admin ai-review` verifier pass: `qwen3.5:9b`
+- `current-admin ai-review` senior pass: `qwen3.5:9b`
 - `current-admin workflow start`: verifier `qwen3.5:9b`, senior `qwen3.5:9b`
 - `current-admin workflow finalize`: verifier `qwen3.5:9b`, senior `qwen3.5:9b`
 - senior-review fallback model: `qwen3.5:9b`
@@ -112,7 +137,7 @@ The review artifact stores requested model, effective model, backend, fallback s
 - normalization report: `reports/current_admin/<batch-name>.normalization-report.json`
 - AI review: `reports/current_admin/<batch-name>.ai-review.json`
 - manual review queue: `reports/current_admin/<batch-name>.manual-review-queue.json`
-- decision template: usually `/tmp/<batch-name>.decision-template.json`
+- decision template: `reports/current_admin/<batch-name>.decision-template.json`
 - decision log: `reports/current_admin/review_decisions/<batch-name>.<timestamp>.decision-log.json`
 - pre-commit review: `reports/current_admin/<batch-name>.pre-commit-review.json`
 - import dry run: `reports/current_admin/<batch-name>.import-dry-run.json`
@@ -122,12 +147,15 @@ The review artifact stores requested model, effective model, backend, fallback s
 ## Read-Only Vs Mutating
 
 - discovery: read-only
+- gen-batch: writes a canonical workflow batch file only
 - export: writes a draft batch file only
 - normalize: read-only
 - AI review: advisory only
 - queue: writes queue artifacts only
+- review: writes a decision template and, when valid operator decisions exist, a decision log only
 - workflow review: writes a decision template only
 - workflow finalize: writes a decision log only
+- apply: dry-run unless `--apply --yes`; validation runs only after a mutating apply
 - pre-commit: read-only
 - import: dry-run unless `--apply --yes`
 - validate: read-only
@@ -159,10 +187,9 @@ The admin dashboard should be treated as:
 - session / decision inspection
 - wrapped control surface for:
   - saving decision drafts
-  - finalizing decisions through `workflow finalize --log-decisions`
-  - rerunning `pre-commit`
-  - running import dry-runs
-  - running apply import only after the existing dry-run + confirmation guardrails
+  - running `current-admin review` over the canonical decision file and decision log path
+  - rerunning `current-admin apply` for pre-commit and dry-run
+  - running mutating apply only after the existing dry-run plus confirmation guardrails
   - running validation
 
 It is not a second ingestion or AI-review pipeline, and it must not bypass:

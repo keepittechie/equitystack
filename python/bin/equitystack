@@ -5,6 +5,8 @@ SCRIPT_PATH="${BASH_SOURCE[0]}"
 SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_PATH")" && pwd)"
 # shellcheck source=bin/lib/equitystack_workflow.sh
 source "$SCRIPT_DIR/lib/equitystack_workflow.sh"
+# shellcheck source=bin/lib/current_admin_operator_surface.sh
+source "$SCRIPT_DIR/lib/current_admin_operator_surface.sh"
 initialize_equitystack_environment "$SCRIPT_PATH"
 cd "$EQUITYSTACK_PYTHON_DIR"
 
@@ -153,6 +155,38 @@ def find_batch_file_by_name(target: str) -> Path | None:
     return None
 
 
+def infer_batch_path_from_reports(target: str) -> Path | None:
+    normalization_report = reports_dir / f"{target}.normalization-report.json"
+    if normalization_report.is_file():
+        try:
+            payload = json.loads(normalization_report.read_text())
+            source_path = payload.get("source_path")
+            if isinstance(source_path, str) and source_path.strip():
+                return resolve_cli_input_path(source_path)
+        except Exception:
+            pass
+
+    normalized_path = reports_dir / f"{target}.normalized.json"
+    if normalized_path.is_file():
+        return normalized_path
+
+    queue_path = reports_dir / f"{target}.manual-review-queue.json"
+    if queue_path.is_file():
+        try:
+            payload = json.loads(queue_path.read_text())
+            source_batch = payload.get("source_batch_path")
+            if isinstance(source_batch, str) and source_batch.strip():
+                return resolve_cli_input_path(source_batch)
+        except Exception:
+            pass
+
+    review_path = reports_dir / f"{target}.ai-review.json"
+    if review_path.is_file():
+        return review_path
+
+    return None
+
+
 def resolve_cli_input_path(raw_value: str) -> Path:
     candidate = Path(raw_value)
     if candidate.is_absolute():
@@ -176,7 +210,9 @@ if input_arg:
 elif batch_name_arg:
     batch_file = find_batch_file_by_name(batch_name_arg)
     if batch_file is None:
-        raise SystemExit(f"Could not find a batch file for batch_name={batch_name_arg}")
+        batch_file = infer_batch_path_from_reports(batch_name_arg)
+    if batch_file is None:
+        raise SystemExit(f"Could not find current-admin artifacts for batch_name={batch_name_arg}")
     resolved_batch_name = batch_name_arg
 else:
     batch_file = latest_batch_file()
@@ -299,15 +335,15 @@ detect_current_admin_state() {
   local precommit_status="${1:-missing}"
 
   CURRENT_ADMIN_STATE="DISCOVERY_READY"
-  CURRENT_ADMIN_NEXT_STEP="Normalize the curated batch"
-  CURRENT_ADMIN_NEXT_COMMAND="$(cli_hint) current-admin normalize --input $(repo_relative_path "$CURRENT_ADMIN_INPUT_PATH")"
+  CURRENT_ADMIN_NEXT_STEP="Run the next current-admin batch and prepare operator review"
+  CURRENT_ADMIN_NEXT_COMMAND="$(cli_hint) current-admin run --input $(repo_relative_path "$CURRENT_ADMIN_INPUT_PATH")"
   CURRENT_ADMIN_BLOCKING_ISSUES=()
   CURRENT_ADMIN_MISSING_ARTIFACTS=()
 
   if [ -f "$CURRENT_ADMIN_PRECOMMIT_PATH" ] && [ "$precommit_status" = "blocked" ]; then
     CURRENT_ADMIN_STATE="BLOCKED"
     CURRENT_ADMIN_NEXT_STEP="Resolve the blocking issues in the pre-commit review"
-    CURRENT_ADMIN_NEXT_COMMAND="$(cli_hint) current-admin pre-commit --input $(repo_relative_path "$CURRENT_ADMIN_QUEUE_PATH")"
+    CURRENT_ADMIN_NEXT_COMMAND="$(cli_hint) current-admin apply --input $(repo_relative_path "$CURRENT_ADMIN_QUEUE_PATH")"
     CURRENT_ADMIN_BLOCKING_ISSUES=("pre-commit review is blocked")
     return 0
   fi
@@ -320,7 +356,7 @@ detect_current_admin_state() {
   if [ ! -f "$CURRENT_ADMIN_REVIEW_PATH" ]; then
     CURRENT_ADMIN_STATE="NORMALIZED"
     CURRENT_ADMIN_NEXT_STEP="Run the operator review against the normalized batch"
-    CURRENT_ADMIN_NEXT_COMMAND="$(cli_hint) current-admin review --input $(repo_relative_path "$CURRENT_ADMIN_NORMALIZED_PATH")"
+    CURRENT_ADMIN_NEXT_COMMAND="$(cli_hint) current-admin ai-review --input $(repo_relative_path "$CURRENT_ADMIN_NORMALIZED_PATH")"
     CURRENT_ADMIN_MISSING_ARTIFACTS=("AI review report")
     return 0
   fi
@@ -335,16 +371,16 @@ detect_current_admin_state() {
 
   if [ ! -f "$CURRENT_ADMIN_PRECOMMIT_PATH" ]; then
     CURRENT_ADMIN_STATE="QUEUE_READY"
-    CURRENT_ADMIN_NEXT_STEP="Generate the pre-commit readiness report"
-    CURRENT_ADMIN_NEXT_COMMAND="$(cli_hint) current-admin pre-commit --input $(repo_relative_path "$CURRENT_ADMIN_QUEUE_PATH")"
+    CURRENT_ADMIN_NEXT_STEP="Run the guarded apply path starting with pre-commit and dry-run import"
+    CURRENT_ADMIN_NEXT_COMMAND="$(cli_hint) current-admin apply --input $(repo_relative_path "$CURRENT_ADMIN_QUEUE_PATH")"
     CURRENT_ADMIN_MISSING_ARTIFACTS=("pre-commit review")
     return 0
   fi
 
   if [ ! -f "$CURRENT_ADMIN_IMPORT_APPLY_PATH" ]; then
     CURRENT_ADMIN_STATE="PRECOMMIT_READY"
-    CURRENT_ADMIN_NEXT_STEP="Run the import workflow. Start with the dry-run report if you want a non-mutating preview."
-    CURRENT_ADMIN_NEXT_COMMAND="$(cli_hint) current-admin import --input $(repo_relative_path "$CURRENT_ADMIN_QUEUE_PATH")"
+    CURRENT_ADMIN_NEXT_STEP="Run the guarded apply path. It will rerun pre-commit and then import dry-run before any explicit apply."
+    CURRENT_ADMIN_NEXT_COMMAND="$(cli_hint) current-admin apply --input $(repo_relative_path "$CURRENT_ADMIN_QUEUE_PATH")"
     if [ ! -f "$CURRENT_ADMIN_IMPORT_DRY_RUN_PATH" ]; then
       CURRENT_ADMIN_MISSING_ARTIFACTS=("import apply report")
     fi
@@ -361,7 +397,7 @@ detect_current_admin_state() {
 
   CURRENT_ADMIN_STATE="COMPLETE"
   CURRENT_ADMIN_NEXT_STEP="Workflow complete. Start the next discovery or review cycle."
-  CURRENT_ADMIN_NEXT_COMMAND="$(cli_hint) current-admin discover"
+  CURRENT_ADMIN_NEXT_COMMAND="$(cli_hint) current-admin run"
 }
 
 print_current_admin_status() {
@@ -599,10 +635,10 @@ if latest_decision is not None:
     print(f"SOURCE REVIEW: {review_path or 'unknown'}")
     print()
     print("SYSTEM STATE: PRECOMMIT_READY")
-    print("NEXT STEP: Generate the pre-commit readiness artifact")
+    print("NEXT STEP: Run the guarded apply flow starting with pre-commit")
     if batch_name != "unknown":
         queue_path = f"reports/current_admin/{batch_name}.manual-review-queue.json"
-        print(f"RECOMMENDED COMMAND: ./bin/equitystack current-admin pre-commit --input {queue_path}")
+        print(f"RECOMMENDED COMMAND: ./bin/equitystack current-admin apply --input {queue_path}")
         print(f"FOLLOW UP: ./bin/equitystack current-admin status --batch-name {batch_name}")
     else:
         print("RECOMMENDED COMMAND: ./bin/equitystack current-admin status")
@@ -615,17 +651,15 @@ elif latest_review is not None:
     print(f"BATCH NAME: {batch_name}")
     print()
     print("SYSTEM STATE: REVIEW_READY")
-    print("NEXT STEP: Generate a decision template for operator review")
+    print("NEXT STEP: Generate or finalize operator decisions for the review artifact")
     print(
         "RECOMMENDED COMMAND: "
-        "./bin/equitystack current-admin workflow review "
-        f"--input reports/current_admin/{latest_review.name} "
-        f"--output /tmp/{output_name}"
+        f"./bin/equitystack current-admin review --input reports/current_admin/{latest_review.name}"
     )
 else:
     print("SYSTEM STATE: DISCOVERY_READY")
-    print("NEXT STEP: Start with batch status or discovery")
-    print("RECOMMENDED COMMAND: ./bin/equitystack current-admin status")
+    print("NEXT STEP: Start the next current-admin run")
+    print("RECOMMENDED COMMAND: ./bin/equitystack current-admin run")
 PY
 }
 
@@ -1009,6 +1043,366 @@ run_current_admin_discover_command() {
     "$VENV_PYTHON" scripts/discover_current_admin_updates.py "${passthrough[@]}"
 }
 
+run_current_admin_gen_batch_command() {
+  if [ "${1:-}" = "--help" ] || [ "${1:-}" = "-h" ]; then
+    current_admin_subcommand_usage gen-batch
+    exit 0
+  fi
+
+  local -a batch_args=()
+  normalize_current_admin_path_args batch_args "$@"
+  run_step "1/1" "Generate Current-Admin Batch" "Canonical batch generation complete" -- \
+    "$VENV_PYTHON" scripts/generate_current_admin_batch_from_discovery.py "${batch_args[@]}"
+}
+
+run_current_admin_run_command() {
+  local input_path=""
+  local batch_name=""
+  local discovery_dry_run="false"
+  local discovery_output=""
+  local batch_output=""
+  local output_name=""
+  local allow_overwrite="false"
+  local -a discovery_args=()
+  local -a workflow_args=()
+
+  while [ "$#" -gt 0 ]; do
+    case "$1" in
+      --input)
+        input_path="${2:-}"
+        [ -n "$input_path" ] || { echo "--input requires a value" >&2; exit 1; }
+        shift 2
+        ;;
+      --batch-name)
+        batch_name="${2:-}"
+        [ -n "$batch_name" ] || { echo "--batch-name requires a value" >&2; exit 1; }
+        shift 2
+        ;;
+      --discovery-dry-run)
+        discovery_dry_run="true"
+        shift
+        ;;
+      --discovery-output)
+        discovery_output="${2:-}"
+        [ -n "$discovery_output" ] || { echo "--discovery-output requires a value" >&2; exit 1; }
+        shift 2
+        ;;
+      --output)
+        batch_output="${2:-}"
+        [ -n "$batch_output" ] || { echo "--output requires a value" >&2; exit 1; }
+        shift 2
+        ;;
+      --output-name)
+        output_name="${2:-}"
+        [ -n "$output_name" ] || { echo "--output-name requires a value" >&2; exit 1; }
+        shift 2
+        ;;
+      --allow-overwrite)
+        allow_overwrite="true"
+        shift
+        ;;
+      --feed-url|--feed-json|--max-promises|--max-feed-items|--lookback-days)
+        discovery_args+=("$1" "${2:-}")
+        [ -n "${2:-}" ] || { echo "$1 requires a value" >&2; exit 1; }
+        shift 2
+        ;;
+      --model|--verifier-model|--fallback-model|--ollama-url|--timeout|--senior-timeout|--verifier-timeout|--review-mode)
+        workflow_args+=("$1" "${2:-}")
+        [ -n "${2:-}" ] || { echo "$1 requires a value" >&2; exit 1; }
+        shift 2
+        ;;
+      --review-dry-run|--prefill-suggestions|--deep-review)
+        workflow_args+=("$1")
+        shift
+        ;;
+      -h|--help)
+        current_admin_subcommand_usage run
+        exit 0
+        ;;
+      *)
+        echo "Unknown argument for current-admin run: $1" >&2
+        exit 1
+        ;;
+    esac
+  done
+
+  if [ -n "$input_path" ] && [ -n "$batch_name" ]; then
+    echo "Use either --input or --batch-name for current-admin run" >&2
+    exit 1
+  fi
+
+  if [ -n "$input_path" ] || [ -n "$batch_name" ]; then
+    if [ -n "$input_path" ]; then
+      workflow_args=(--input "$input_path" "${workflow_args[@]}")
+    else
+      workflow_args=(--batch-name "$batch_name" "${workflow_args[@]}")
+    fi
+    run_current_admin_workflow_start "${workflow_args[@]}"
+    resolve_current_admin_context "$input_path" "$batch_name"
+    print_current_admin_run_summary "$CURRENT_ADMIN_INPUT_PATH"
+    return 0
+  fi
+
+  local discovery_path="${discovery_output:-$(current_admin_reports_dir)/discovery_report.json}"
+  discovery_path="$(normalize_python_workspace_path "$discovery_path")"
+  if [ "$discovery_dry_run" = "true" ]; then
+    discovery_args=(--dry-run "${discovery_args[@]}")
+  fi
+  discovery_args=(--output "$discovery_path" "${discovery_args[@]}")
+  run_current_admin_discover_command "${discovery_args[@]}"
+
+  discovery_path="$(normalize_python_workspace_path "$discovery_path")"
+  local discovery_abs="$EQUITYSTACK_PYTHON_DIR/$discovery_path"
+  if [ ! -f "$discovery_abs" ]; then
+    discovery_abs="$discovery_path"
+  fi
+
+  local discovered_count="0"
+  discovered_count="$(current_admin_total_discovery_candidates "$discovery_abs")"
+  if [ "${discovered_count:-0}" = "0" ]; then
+    print_system_state \
+      "DISCOVERY_CLEAR" \
+      "No current-admin discovery candidates were found. Run discovery again later or provide --input for a manual batch." \
+      "$(cli_hint) current-admin discover" \
+      "DISCOVERY REPORT: $(repo_relative_path "$discovery_abs")" \
+      "DISCOVERED ITEMS: 0"
+    return 0
+  fi
+
+  local generated_batch_name=""
+  if [ -n "$output_name" ]; then
+    generated_batch_name="$(normalize_python_workspace_path "$output_name")"
+    generated_batch_name="$(basename "$generated_batch_name")"
+    generated_batch_name="${generated_batch_name%.json}"
+  else
+    generated_batch_name="$(current_admin_generate_auto_batch_name "$discovery_abs")"
+  fi
+
+  local generated_batch_output="$batch_output"
+  if [ -n "$generated_batch_output" ]; then
+    generated_batch_output="$(normalize_python_workspace_path "$generated_batch_output")"
+  else
+    generated_batch_output="data/current_admin_batches/${generated_batch_name}.json"
+  fi
+
+  local -a gen_batch_args=(
+    --input "$discovery_path"
+    --all-candidates
+    --batch-name "$generated_batch_name"
+    --output "$generated_batch_output"
+  )
+  if [ "$allow_overwrite" = "true" ]; then
+    gen_batch_args+=(--allow-overwrite)
+  fi
+
+  run_step "1/1" "Generate Current-Admin Batch" "Canonical batch generation complete" --output "$generated_batch_output" -- \
+    "$VENV_PYTHON" scripts/generate_current_admin_batch_from_discovery.py "${gen_batch_args[@]}"
+
+  workflow_args=(--input "$generated_batch_output" "${workflow_args[@]}")
+  run_current_admin_workflow_start "${workflow_args[@]}"
+  resolve_current_admin_context "$generated_batch_output" ""
+  print_current_admin_run_summary "$CURRENT_ADMIN_INPUT_PATH" "$discovery_abs"
+}
+
+run_current_admin_operator_review_command() {
+  local input_path=""
+  local batch_name=""
+  local decision_file=""
+  local refresh_template="false"
+  local feedback_summary="false"
+  local log_decisions_path=""
+
+  while [ "$#" -gt 0 ]; do
+    case "$1" in
+      --input)
+        input_path="${2:-}"
+        [ -n "$input_path" ] || { echo "--input requires a value" >&2; exit 1; }
+        shift 2
+        ;;
+      --batch-name)
+        batch_name="${2:-}"
+        [ -n "$batch_name" ] || { echo "--batch-name requires a value" >&2; exit 1; }
+        shift 2
+        ;;
+      --decision-file)
+        decision_file="${2:-}"
+        [ -n "$decision_file" ] || { echo "--decision-file requires a value" >&2; exit 1; }
+        shift 2
+        ;;
+      --log-decisions)
+        if [ -n "${2:-}" ] && [[ "${2:-}" != --* ]]; then
+          log_decisions_path="${2:-}"
+          shift 2
+        else
+          log_decisions_path=""
+          shift
+        fi
+        ;;
+      --refresh-template)
+        refresh_template="true"
+        shift
+        ;;
+      --feedback-summary)
+        feedback_summary="true"
+        shift
+        ;;
+      -h|--help)
+        current_admin_subcommand_usage review
+        exit 0
+        ;;
+      *)
+        echo "Unknown argument for current-admin review: $1" >&2
+        exit 1
+        ;;
+    esac
+  done
+
+  if [ -n "$input_path" ] && [ -n "$batch_name" ]; then
+    echo "Use either --input or --batch-name for current-admin review" >&2
+    exit 1
+  fi
+
+  resolve_current_admin_review_target "$input_path" "$batch_name"
+  local review_path="$CURRENT_ADMIN_REVIEW_TARGET_PATH"
+  if [ -n "$decision_file" ]; then
+    decision_file="$(normalize_python_workspace_path "$decision_file")"
+  else
+    decision_file="$CURRENT_ADMIN_REVIEW_TARGET_DECISION_TEMPLATE"
+  fi
+
+  if [ "$refresh_template" = "true" ] || [ ! -f "$decision_file" ]; then
+    run_current_admin_workflow_review --input "$review_path" --output "$decision_file" --summary
+  fi
+
+  local -a decision_status_lines=()
+  mapfile -t decision_status_lines < <(current_admin_decision_file_status "$review_path" "$decision_file")
+  local decision_status="${decision_status_lines[0]:-invalid}"
+  if [ "$decision_status" = "mismatch" ]; then
+    echo "Decision file does not match the selected review artifact. Use --refresh-template or pass the correct --decision-file." >&2
+    exit 1
+  fi
+
+  if [ "$decision_status" != "ready" ]; then
+    print_current_admin_review_summary "$review_path" "$decision_file" "$(current_admin_decision_log_dir)/placeholder.decision-log.json" "false"
+    return 0
+  fi
+
+  if [ -n "$log_decisions_path" ]; then
+    log_decisions_path="$(normalize_python_workspace_path "$log_decisions_path")"
+  else
+    log_decisions_path="$(current_admin_decision_log_dir)/${CURRENT_ADMIN_REVIEW_TARGET_BATCH_NAME}.$(date -u +%Y%m%dT%H%M%SZ).decision-log.json"
+  fi
+
+  local -a finalize_args=(
+    --review "$review_path"
+    --decision-file "$decision_file"
+    --log-decisions "$log_decisions_path"
+  )
+  if [ "$feedback_summary" = "true" ]; then
+    finalize_args+=(--feedback-summary)
+  fi
+
+  run_current_admin_workflow_finalize "${finalize_args[@]}"
+  print_current_admin_review_summary "$review_path" "$decision_file" "$log_decisions_path" "true"
+}
+
+run_current_admin_apply_command() {
+  local input_path=""
+  local batch_name=""
+  local explicit_apply="false"
+  local confirmed="false"
+
+  while [ "$#" -gt 0 ]; do
+    case "$1" in
+      --input)
+        input_path="${2:-}"
+        [ -n "$input_path" ] || { echo "--input requires a value" >&2; exit 1; }
+        shift 2
+        ;;
+      --batch-name)
+        batch_name="${2:-}"
+        [ -n "$batch_name" ] || { echo "--batch-name requires a value" >&2; exit 1; }
+        shift 2
+        ;;
+      --apply)
+        explicit_apply="true"
+        shift
+        ;;
+      --yes)
+        confirmed="true"
+        shift
+        ;;
+      -h|--help)
+        current_admin_subcommand_usage apply
+        exit 0
+        ;;
+      *)
+        echo "Unknown argument for current-admin apply: $1" >&2
+        exit 1
+        ;;
+    esac
+  done
+
+  if [ -n "$input_path" ] && [ -n "$batch_name" ]; then
+    echo "Use either --input or --batch-name for current-admin apply" >&2
+    exit 1
+  fi
+  if [ "$explicit_apply" = "true" ] && [ "$confirmed" != "true" ]; then
+    echo "equitystack current-admin apply --apply requires --yes" >&2
+    exit 1
+  fi
+  if [ "$explicit_apply" != "true" ] && [ "$confirmed" = "true" ]; then
+    echo "Use --yes only with --apply for current-admin apply" >&2
+    exit 1
+  fi
+
+  resolve_current_admin_apply_target "$input_path" "$batch_name"
+
+  run_step "1/4" "Build Pre-Commit Review" "Pre-commit review build complete" --output "$CURRENT_ADMIN_APPLY_PRECOMMIT_PATH" -- \
+    "$VENV_PYTHON" scripts/build_current_admin_precommit_review.py --input "$CURRENT_ADMIN_APPLY_QUEUE_PATH"
+
+  local precommit_status="missing"
+  precommit_status="$(read_precommit_status "$CURRENT_ADMIN_APPLY_PRECOMMIT_PATH")"
+  if [ "$precommit_status" = "blocked" ]; then
+    print_current_admin_apply_summary \
+      "$CURRENT_ADMIN_APPLY_QUEUE_PATH" \
+      "$CURRENT_ADMIN_APPLY_PRECOMMIT_PATH" \
+      "$CURRENT_ADMIN_APPLY_DRY_RUN_PATH" \
+      "$CURRENT_ADMIN_APPLY_IMPORT_APPLY_PATH" \
+      "$CURRENT_ADMIN_APPLY_VALIDATION_PATH" \
+      "false"
+    return 0
+  fi
+
+  run_step "2/4" "Import Dry-Run" "Current-admin import dry-run complete" --output "$CURRENT_ADMIN_APPLY_DRY_RUN_PATH" -- \
+    "$VENV_PYTHON" scripts/import_curated_current_admin_batch.py --input "$CURRENT_ADMIN_APPLY_QUEUE_PATH" --output "$CURRENT_ADMIN_APPLY_DRY_RUN_PATH"
+
+  if [ "$explicit_apply" != "true" ]; then
+    print_current_admin_apply_summary \
+      "$CURRENT_ADMIN_APPLY_QUEUE_PATH" \
+      "$CURRENT_ADMIN_APPLY_PRECOMMIT_PATH" \
+      "$CURRENT_ADMIN_APPLY_DRY_RUN_PATH" \
+      "$CURRENT_ADMIN_APPLY_IMPORT_APPLY_PATH" \
+      "$CURRENT_ADMIN_APPLY_VALIDATION_PATH" \
+      "false"
+    return 0
+  fi
+
+  run_step "3/4" "Import Apply" "Current-admin import apply complete" --output "$CURRENT_ADMIN_APPLY_IMPORT_APPLY_PATH" -- \
+    "$VENV_PYTHON" scripts/import_curated_current_admin_batch.py --input "$CURRENT_ADMIN_APPLY_QUEUE_PATH" --output "$CURRENT_ADMIN_APPLY_IMPORT_APPLY_PATH" --apply --yes
+
+  run_step "4/4" "Validate Import" "Current-admin validation complete" --output "$CURRENT_ADMIN_APPLY_VALIDATION_PATH" -- \
+    "$VENV_PYTHON" scripts/validate_current_admin_import.py --input "$CURRENT_ADMIN_APPLY_QUEUE_PATH" --output "$CURRENT_ADMIN_APPLY_VALIDATION_PATH"
+
+  print_current_admin_apply_summary \
+    "$CURRENT_ADMIN_APPLY_QUEUE_PATH" \
+    "$CURRENT_ADMIN_APPLY_PRECOMMIT_PATH" \
+    "$CURRENT_ADMIN_APPLY_DRY_RUN_PATH" \
+    "$CURRENT_ADMIN_APPLY_IMPORT_APPLY_PATH" \
+    "$CURRENT_ADMIN_APPLY_VALIDATION_PATH" \
+    "true"
+}
+
 run_current_admin_workflow_command() {
   local command="${1:-}"
   shift || true
@@ -1315,6 +1709,9 @@ run_current_admin_command() {
     discover)
       run_current_admin_discover_command "$@"
       ;;
+    gen-batch|generate-batch)
+      run_current_admin_gen_batch_command "$@"
+      ;;
     export)
       if [ "${1:-}" = "--help" ] || [ "${1:-}" = "-h" ]; then
         current_admin_subcommand_usage export
@@ -1336,6 +1733,9 @@ run_current_admin_command() {
         "$VENV_PYTHON" scripts/normalize_current_admin_batch.py "${normalize_args[@]}"
       ;;
     review)
+      run_current_admin_operator_review_command "$@"
+      ;;
+    ai-review)
       run_current_admin_review_command "$@"
       ;;
     queue)
@@ -1359,7 +1759,10 @@ run_current_admin_command() {
         "$VENV_PYTHON" scripts/build_current_admin_precommit_review.py "${precommit_args[@]}"
       ;;
     run)
-      run_current_admin_workflow_start "$@"
+      run_current_admin_run_command "$@"
+      ;;
+    apply)
+      run_current_admin_apply_command "$@"
       ;;
     status)
       local input_path=""
@@ -1451,11 +1854,14 @@ Legislative commands:
 
 Current-admin commands:
   discover   Run read-only discovery for current-administration updates
+  gen-batch  Generate a canonical current-admin batch from discovery candidates
   export     Export selected discovery suggestions into a draft batch
   normalize  Normalize a curated batch file
-  review     Run advisory Ollama review on a normalized batch
+  ai-review  Run advisory Ollama review on a normalized batch
   queue      Build the manual review queue from normalized batch plus AI review
-  run        Run normalize, review, and queue for one batch
+  run        Discover and generate the next batch by default, then normalize, review, and queue it
+  review     Generate or finalize operator decisions for a review artifact
+  apply      Run pre-commit, import dry-run, optional apply, and validation
   status     Show current-admin artifact state and recommended next step
   workflow   Guided wrapper around the canonical current-admin artifact flow
   pre-commit Generate the import guardrail artifact
@@ -1474,10 +1880,11 @@ Operational maintenance:
 Examples:
   $(cli_hint) legislative run
   $(cli_hint) legislative run --model qwen3.5:9b
+  $(cli_hint) current-admin run
   $(cli_hint) current-admin status
   $(cli_hint) admin-reset-operational-state --dry-run
   $(cli_hint) current-admin workflow start --input data/current_admin_batches/<batch-file>.json
-  $(cli_hint) current-admin workflow review --input reports/current_admin/<batch-name>.ai-review.json --output /tmp/<batch-name>.decision-template.json
+  $(cli_hint) current-admin review --input reports/current_admin/<batch-name>.ai-review.json
 EOF
 }
 
@@ -1546,11 +1953,14 @@ Usage:
 
 Commands:
   discover   Wrapper for scripts/discover_current_admin_updates.py
+  gen-batch  Wrapper for scripts/generate_current_admin_batch_from_discovery.py
   export     Wrapper for scripts/export_current_admin_discovery_candidates.py
   normalize  Wrapper for scripts/normalize_current_admin_batch.py
-  review     Wrapper for scripts/review_current_admin_batch_with_ollama.py
+  ai-review  Wrapper for scripts/review_current_admin_batch_with_ollama.py
   queue      Wrapper for scripts/apply_current_admin_ai_review.py
-  run        Run normalize, review, and queue for one batch
+  run        Discover and generate the next batch by default, then normalize, review, and queue it
+  review     Generate or finalize operator decisions for a review artifact
+  apply      Run pre-commit, import dry-run, optional apply, and validation
   status     Show current-admin batch state and recommended next step
   workflow   Guided artifact-first operator workflow helpers
   pre-commit Wrapper for scripts/build_current_admin_precommit_review.py
@@ -1558,7 +1968,7 @@ Commands:
   validate   Wrapper for scripts/validate_current_admin_import.py
 
 Defaults:
-  current-admin review and workflow decision steps default to:
+  current-admin ai-review, current-admin run, and workflow decision steps default to:
     senior-model   $DEFAULT_MODEL_REVIEW
     verifier-model $DEFAULT_MODEL_VERIFIER
     fallback-model $DEFAULT_MODEL_FALLBACK
@@ -1669,6 +2079,17 @@ Runs:
   python3 scripts/export_current_admin_discovery_candidates.py [args]
 EOF
       ;;
+    gen-batch|generate-batch)
+      cat <<EOF
+Usage:
+  equitystack current-admin gen-batch [--input <discovery-report.json>] [selection flags | --all-candidates] [--batch-name <batch-name>] [--output <batch.json>]
+
+Runs:
+  python3 scripts/generate_current_admin_batch_from_discovery.py [args]
+
+This generates a canonical current-admin batch ready for workflow start or current-admin run --input.
+EOF
+      ;;
     normalize)
       cat <<EOF
 Usage:
@@ -1681,7 +2102,16 @@ EOF
     review)
       cat <<EOF
 Usage:
-  equitystack current-admin review [args]
+  equitystack current-admin review [--input <ai-review.json> | --batch-name <batch-name>] [--decision-file <decision-template.json>] [--refresh-template] [--log-decisions [path]] [--feedback-summary]
+
+Generates the canonical decision template when needed and finalizes explicit operator decisions only when the decision file is valid.
+The default decision template path is reports/current_admin/<batch-name>.decision-template.json.
+EOF
+      ;;
+    ai-review)
+      cat <<EOF
+Usage:
+  equitystack current-admin ai-review [args]
 
 Runs:
   python3 scripts/review_current_admin_batch_with_ollama.py [args]
@@ -1706,7 +2136,27 @@ Runs:
 EOF
       ;;
     run)
-      current_admin_workflow_subcommand_usage start
+      cat <<EOF
+Usage:
+  equitystack current-admin run [--input <batch-file> | --batch-name <batch-name>] [--discovery-dry-run] [--discovery-output <report.json>] [--output <batch.json>] [--output-name <batch-name>] [workflow review args]
+
+Default path without --input:
+  discover -> gen-batch -> workflow start
+
+Manual path with --input:
+  workflow start only
+EOF
+      ;;
+    apply)
+      cat <<EOF
+Usage:
+  equitystack current-admin apply [--input <manual-review-queue.json> | --batch-name <batch-name>] [--apply --yes]
+
+Runs the guarded operator apply path:
+  pre-commit -> import dry-run -> optional import apply -> validate
+
+Database writes still require --apply --yes.
+EOF
       ;;
     status)
       cat <<EOF
