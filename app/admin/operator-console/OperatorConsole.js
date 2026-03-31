@@ -560,7 +560,7 @@ export default function OperatorConsole({
                     onClick={() => setSelectedWorkflow(column.key)}
                     disabled={isLocked}
                     aria-pressed={isSelectedColumn}
-                    className={`border-r px-3 py-2 text-center text-sm font-semibold last:border-r-0 disabled:cursor-not-allowed disabled:opacity-60 ${
+                    className={`border-r px-2 py-1.5 text-center text-sm font-semibold last:border-r-0 disabled:cursor-not-allowed disabled:opacity-60 ${
                       isSelectedColumn ? "bg-black text-white" : "text-gray-900"
                     }`}
                   >
@@ -580,7 +580,7 @@ export default function OperatorConsole({
                     return (
                       <div
                         key={`${column.key}-${rowIndex}`}
-                        className={`min-h-28 border-r px-2 py-2 last:border-r-0 ${
+                        className={`min-h-[4.5rem] border-r px-1.5 py-1.5 last:border-r-0 ${
                           isSelectedColumn ? "bg-gray-50" : "bg-white"
                         }`}
                       >
@@ -589,16 +589,18 @@ export default function OperatorConsole({
                             type="button"
                             onClick={() => selectAction(cell.action)}
                             disabled={isLocked}
-                            className={`block h-full w-full rounded-lg border px-2.5 py-2 text-center disabled:cursor-not-allowed disabled:opacity-60 ${
+                            className={`block h-full w-full rounded-lg border px-2 py-1.5 text-center disabled:cursor-not-allowed disabled:opacity-60 ${
                               selectedActionId === cell.action.id
                                 ? "border-black bg-white"
                                 : "border-gray-200 bg-white hover:bg-gray-50"
                             }`}
                           >
-                            <p className="text-sm font-medium text-gray-900">{cell.action.label}</p>
+                            <p className="text-sm font-medium leading-snug text-gray-900">
+                              {cell.action.label}
+                            </p>
                           </button>
                         ) : cell.type === "placeholder" ? (
-                          <div className="flex h-full items-center justify-center rounded-lg border border-dashed px-2.5 py-2 text-center text-xs text-gray-500">
+                          <div className="flex h-full items-center justify-center rounded-lg border border-dashed px-2 py-1.5 text-center text-xs leading-snug text-gray-500">
                             {cell.text}
                           </div>
                         ) : (
