@@ -333,6 +333,7 @@ PY
 
 detect_current_admin_state() {
   local precommit_status="${1:-missing}"
+  local queue_approved_count="0"
 
   CURRENT_ADMIN_STATE="DISCOVERY_READY"
   CURRENT_ADMIN_NEXT_STEP="Run the next current-admin batch and prepare operator review"
@@ -369,11 +370,38 @@ detect_current_admin_state() {
     return 0
   fi
 
+  if [ -f "$CURRENT_ADMIN_QUEUE_PATH" ]; then
+    queue_approved_count="$(
+      CURRENT_ADMIN_QUEUE_PATH="$CURRENT_ADMIN_QUEUE_PATH" "$VENV_PYTHON" - <<'PY'
+import json
+import os
+from pathlib import Path
+
+queue_path = Path(os.environ["CURRENT_ADMIN_QUEUE_PATH"]).resolve()
+payload = json.loads(queue_path.read_text()) if queue_path.exists() else {}
+items = payload.get("items") or []
+count = sum(
+    1
+    for item in items
+    if isinstance(item, dict) and (item.get("approved") or item.get("operator_status") == "approved")
+)
+print(count)
+PY
+    )"
+  fi
+
   if [ ! -f "$CURRENT_ADMIN_PRECOMMIT_PATH" ]; then
-    CURRENT_ADMIN_STATE="QUEUE_READY"
-    CURRENT_ADMIN_NEXT_STEP="Run the guarded apply path starting with pre-commit and dry-run import"
-    CURRENT_ADMIN_NEXT_COMMAND="$(cli_hint) current-admin apply --input $(repo_relative_path "$CURRENT_ADMIN_QUEUE_PATH")"
-    CURRENT_ADMIN_MISSING_ARTIFACTS=("pre-commit review")
+    if [ "${queue_approved_count:-0}" -le 0 ]; then
+      CURRENT_ADMIN_STATE="BLOCKED"
+      CURRENT_ADMIN_NEXT_STEP="No queue items are approved for import. Reopen current-admin review and rerun finalize if import candidates should proceed."
+      CURRENT_ADMIN_NEXT_COMMAND="$(cli_hint) current-admin review --input $(repo_relative_path "$CURRENT_ADMIN_REVIEW_PATH")"
+      CURRENT_ADMIN_BLOCKING_ISSUES=("no queue items are approved for import")
+    else
+      CURRENT_ADMIN_STATE="QUEUE_READY"
+      CURRENT_ADMIN_NEXT_STEP="Run the guarded apply path starting with pre-commit and dry-run import"
+      CURRENT_ADMIN_NEXT_COMMAND="$(cli_hint) current-admin apply --input $(repo_relative_path "$CURRENT_ADMIN_QUEUE_PATH")"
+      CURRENT_ADMIN_MISSING_ARTIFACTS=("pre-commit review")
+    fi
     return 0
   fi
 
@@ -557,6 +585,10 @@ run_current_admin_workflow_finalize() {
   if [ -z "$verifier_timeout" ]; then
     verifier_timeout="$DEFAULT_OLLAMA_TIMEOUT_VERIFIER"
   fi
+  local total_steps="2"
+  if [ "$feedback_summary" = "true" ]; then
+    total_steps="3"
+  fi
 
   local -a finalize_args=(
     "$VENV_PYTHON"
@@ -581,17 +613,30 @@ run_current_admin_workflow_finalize() {
     finalize_args+=(--log-decisions)
   fi
 
-  run_step "1/2" "Replay Review Decisions" "Decision log written against the canonical review artifact" -- \
+  run_step "1/${total_steps}" "Replay Review Decisions" "Decision log written against the canonical review artifact" -- \
     "${finalize_args[@]}"
 
+  local -a sync_queue_args=(
+    "$VENV_PYTHON"
+    scripts/sync_current_admin_queue_decisions.py
+    --queue "$REVIEW_ARTIFACT_QUEUE_PATH"
+    --decision-file "$decision_file"
+  )
+  if [ -n "$log_decisions_value" ]; then
+    sync_queue_args+=(--decision-log "$log_decisions_value")
+  fi
+
+  run_step "2/${total_steps}" "Sync Manual Review Queue" "Queue approval state refreshed from canonical operator decisions" -- \
+    "${sync_queue_args[@]}"
+
   if [ "$feedback_summary" = "true" ]; then
-    run_step "2/2" "Export Feedback Summary" "Feedback summary exported" -- \
+    run_step "3/${total_steps}" "Export Feedback Summary" "Feedback summary exported" -- \
       node scripts/export_current_admin_feedback_summary.mjs
   fi
 
   print_system_state \
-    "PRECOMMIT_READY" \
-    "Generate the pre-commit artifact from the manual review queue" \
+    "QUEUE_READY" \
+    "Generate the pre-commit artifact from the synchronized manual review queue" \
     "$(cli_hint) current-admin pre-commit --input $(repo_relative_path "$REVIEW_ARTIFACT_QUEUE_PATH")" \
     "REVIEW ARTIFACT: $(repo_relative_path "$REVIEW_ARTIFACT_PATH")" \
     "DECISION FILE: $decision_file" \
@@ -627,18 +672,38 @@ if latest_decision is not None:
     generated_at = payload.get("generated_at") or "unknown"
     item_count = len(payload.get("items") or [])
     batch_name = Path(review_path).name.replace(".ai-review.json", "") if review_path else "unknown"
+    queue_path = reports_dir / f"{batch_name}.manual-review-queue.json" if batch_name != "unknown" else None
+    queue_payload = json.loads(queue_path.read_text()) if queue_path and queue_path.exists() else {}
+    queue_items = queue_payload.get("items") or []
+    queue_approved = sum(
+        1
+        for item in queue_items
+        if isinstance(item, dict) and (item.get("approved") or item.get("operator_status") == "approved")
+    )
 
     print(f"LATEST SESSION: {session_id}")
     print(f"SESSION FOCUS: {session_focus}")
     print(f"GENERATED: {generated_at}")
     print(f"ITEMS LOGGED: {item_count}")
     print(f"SOURCE REVIEW: {review_path or 'unknown'}")
+    if queue_path is not None:
+        print(f"QUEUE APPROVED FOR IMPORT: {queue_approved}")
     print()
-    print("SYSTEM STATE: PRECOMMIT_READY")
-    print("NEXT STEP: Run the guarded apply flow starting with pre-commit")
+    if queue_approved > 0:
+        print("SYSTEM STATE: QUEUE_READY")
+        print("NEXT STEP: Run the guarded apply flow starting with pre-commit")
+    else:
+        print("SYSTEM STATE: BLOCKED")
+        print("NEXT STEP: Review decisions are logged, but no queue items are approved for import yet.")
     if batch_name != "unknown":
-        queue_path = f"reports/current_admin/{batch_name}.manual-review-queue.json"
-        print(f"RECOMMENDED COMMAND: ./bin/equitystack current-admin apply --input {queue_path}")
+        queue_path_text = f"reports/current_admin/{batch_name}.manual-review-queue.json"
+        if queue_approved > 0:
+            print(f"RECOMMENDED COMMAND: ./bin/equitystack current-admin apply --input {queue_path_text}")
+        else:
+            print(
+                "RECOMMENDED COMMAND: "
+                f"./bin/equitystack current-admin review --input reports/current_admin/{Path(review_path).name}"
+            )
         print(f"FOLLOW UP: ./bin/equitystack current-admin status --batch-name {batch_name}")
     else:
         print("RECOMMENDED COMMAND: ./bin/equitystack current-admin status")

@@ -2,27 +2,11 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { formatAdminDateTime } from "@/app/admin/components/adminDateTime";
 import JobStatusBadge from "./JobStatusBadge";
 import JobRerunButton from "./JobRerunButton";
 
 const ACTIVE_STATUSES = new Set(["queued", "running"]);
-
-function formatDateTime(value) {
-  if (!value) {
-    return "—";
-  }
-
-  try {
-    return new Intl.DateTimeFormat("en-US", {
-      month: "short",
-      day: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-    }).format(new Date(value));
-  } catch {
-    return value;
-  }
-}
 
 function formatDuration(startedAt, finishedAt) {
   if (!startedAt || !finishedAt) {
@@ -128,7 +112,7 @@ export default function JobsTableClient({ initialJobs }) {
                   ) : null}
                 </td>
                 <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">
-                  {formatDateTime(job.timestamps?.startedAt || job.timestamps?.createdAt)}
+                  {formatAdminDateTime(job.timestamps?.startedAt || job.timestamps?.createdAt)}
                 </td>
                 <td className="border-b border-[#E5EAF0] px-2 py-1 font-mono text-[10px] text-[#111827]">
                   {formatDuration(job.timestamps?.startedAt, job.timestamps?.finishedAt)}

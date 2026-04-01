@@ -27,6 +27,7 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
   const actionPermissions = workspace.action_permissions || {};
   const finalizePermission = actionPermissions.finalize || { allowed: false, reasons: [] };
   const artifactStatus = workspace.artifact_status || {};
+  const importReadiness = workspace.import_readiness || {};
 
   function updateItem(slug, field, value) {
     setItems((current) =>
@@ -96,7 +97,7 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
 
   return (
     <div className="space-y-4">
-      <section className="grid gap-3 lg:grid-cols-4">
+      <section className="grid gap-3 lg:grid-cols-5">
         <div className="rounded border border-zinc-300 bg-white p-3 shadow-sm">
           <p className="text-[11px] text-gray-600">Batch</p>
           <p className="mt-1 text-base font-semibold">{batch.batch_name}</p>
@@ -109,11 +110,22 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
           </p>
         </div>
         <div className="rounded border border-zinc-300 bg-white p-3 shadow-sm">
-          <p className="text-[11px] text-gray-600">Items</p>
+          <p className="text-[11px] text-gray-600">Review items</p>
           <p className="mt-1 text-base font-semibold">{workspace.counts.total_items}</p>
           <p className="mt-1 text-[11px] text-gray-600">
-            Approved: {workspace.counts.approved} • Pending: {workspace.counts.pending} •
-            Blocked: {workspace.counts.blocked}
+            Import-ready decisions: {workspace.counts.approval_style_decisions} • Pending review:{" "}
+            {workspace.counts.pending_review} • Held back: {workspace.counts.held_for_followup}
+          </p>
+        </div>
+        <div className="rounded border border-zinc-300 bg-white p-3 shadow-sm">
+          <p className="text-[11px] text-gray-600">Queue import readiness</p>
+          <p className="mt-1 text-base font-semibold">
+            {importReadiness.readiness_label || "Review In Progress"}
+          </p>
+          <p className="mt-1 text-[11px] text-gray-600">
+            Queue approved: {importReadiness.queue_approved_for_import_count || 0} • Held in queue:{" "}
+            {importReadiness.queue_pending_manual_review_count || 0} • Queue pending:{" "}
+            {importReadiness.queue_pending_count || 0}
           </p>
         </div>
         <div className="rounded border border-zinc-300 bg-white p-3 shadow-sm">
@@ -151,7 +163,13 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
         </div>
         <p className="text-[12px] text-gray-700">
           Saving writes the decision file only. Finalize runs the existing Python
-          finalize step and refreshes the append-only decision log.
+          finalize step, refreshes the append-only decision log, and synchronizes
+          manual-review queue approval state from the operator decisions.
+        </p>
+        <p className="text-[12px] text-gray-700">
+          `approve_as_is` and `approve_with_changes` are approval-style review decisions. Items
+          only become import candidates when the canonical manual-review queue marks them approved
+          for import.
         </p>
         {!finalizePermission.allowed ? (
           <div className="rounded border border-amber-300 bg-amber-50 p-3 text-[12px] text-amber-950">
@@ -161,6 +179,18 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
                 <p key={reason}>{reason}</p>
               ))}
             </div>
+          </div>
+        ) : null}
+        {importReadiness.readiness_explanation ? (
+          <div
+            className={`rounded border p-3 text-[12px] ${
+              importReadiness.readiness_status === "blocked"
+                ? "border-amber-300 bg-amber-50 text-amber-950"
+                : "border-zinc-300 bg-gray-50 text-gray-800"
+            }`}
+          >
+            <p className="font-semibold">Import readiness</p>
+            <p className="mt-2">{importReadiness.readiness_explanation}</p>
           </div>
         ) : null}
         {message ? <p className="text-[12px] text-gray-700">{message}</p> : null}
@@ -173,12 +203,19 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
             These are the current reasons the canonical pipeline cannot advance automatically.
           </p>
           <div className="mt-3 space-y-2 text-[12px]">
-            {(workspace.blockers || []).length ? (
-              workspace.blockers.map((blocker) => (
-                <div key={blocker} className="rounded border p-3 bg-gray-50">
-                  {blocker}
-                </div>
-              ))
+            {(workspace.blockers || []).length || importReadiness.readiness_status === "blocked" ? (
+              <>
+                {importReadiness.readiness_status === "blocked" ? (
+                  <div className="rounded border p-3 bg-gray-50">
+                    {importReadiness.readiness_explanation}
+                  </div>
+                ) : null}
+                {(workspace.blockers || []).map((blocker) => (
+                  <div key={blocker} className="rounded border p-3 bg-gray-50">
+                    {blocker}
+                  </div>
+                ))}
+              </>
             ) : (
               <p className="text-gray-600">No active blockers are recorded for the current batch.</p>
             )}

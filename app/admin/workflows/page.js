@@ -3,26 +3,10 @@ import { listSerializedWorkflows } from "@/lib/server/admin-operator/workflowReg
 import { listBrokerJobs } from "@/lib/server/admin-operator/commandBroker.js";
 import { listOperatorSchedules } from "@/lib/server/admin-operator/schedulerService.js";
 import { listWorkflowSessions } from "@/lib/server/admin-operator/workflowData.js";
+import { formatAdminDateTime } from "@/app/admin/components/adminDateTime";
 import OperatorPageAutoRefresh from "@/app/admin/components/OperatorPageAutoRefresh";
 import OperatorActionButton from "@/app/admin/components/OperatorActionButton";
 import JobStatusBadge from "../jobs/JobStatusBadge";
-
-function formatDateTime(value) {
-  if (!value) {
-    return "—";
-  }
-
-  try {
-    return new Intl.DateTimeFormat("en-US", {
-      month: "short",
-      day: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-    }).format(new Date(value));
-  } catch {
-    return value;
-  }
-}
 
 function toWorkflowLabel(value) {
   if (value === "current-admin") {
@@ -107,6 +91,12 @@ export default async function AdminWorkflowsPage() {
                   tracker?.nextStep?.action || tracker?.currentStep?.action || null;
                 const workflowHref =
                   tracker?.operatorSurfaceHref || session.operatorSurfaceHref || session.href;
+                const workflowLinkLabel =
+                  primaryAction?.type === "link"
+                    ? primaryAction.label || "Open"
+                    : tracker?.nextStep?.status === "blocked"
+                      ? "Inspect blocker"
+                      : "Workflow";
                 const stepLabel =
                   tracker?.nextStep?.title ||
                   tracker?.currentStep?.title ||
@@ -157,13 +147,13 @@ export default async function AdminWorkflowsPage() {
                   <td className="border-b border-[#E5EAF0] px-2 py-1 font-mono text-[10px] text-[#111827]">
                     {session.linkedSchedule?.title || "—"}
                   </td>
-                  <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">{formatDateTime(session.updatedAt)}</td>
-                  <td className="border-b border-[#E5EAF0] px-2 py-1">
-                    <div className="flex flex-wrap gap-2">
-                      <Link href={session.href} className="text-[11px] text-[#3B82F6] underline">
-                        Open
-                      </Link>
-                      {primaryAction ? (
+                  <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">{formatAdminDateTime(session.updatedAt)}</td>
+                    <td className="border-b border-[#E5EAF0] px-2 py-1">
+                      <div className="flex flex-wrap gap-2">
+                        <Link href={session.href} className="text-[11px] text-[#3B82F6] underline">
+                          Open
+                        </Link>
+                      {primaryAction?.action ? (
                         <OperatorActionButton
                           action={primaryAction.action}
                           label={primaryAction.label || primaryAction.title}
@@ -174,8 +164,11 @@ export default async function AdminWorkflowsPage() {
                           confirmation={primaryAction.confirmation}
                         />
                       ) : (
-                        <Link href={workflowHref} className="text-[11px] text-[#3B82F6] underline">
-                          {tracker?.nextStep?.status === "blocked" ? "Inspect blocker" : "Workflow"}
+                        <Link
+                          href={primaryAction?.href || workflowHref}
+                          className="text-[11px] text-[#3B82F6] underline"
+                        >
+                          {workflowLinkLabel}
                         </Link>
                       )}
                     </div>

@@ -21,7 +21,8 @@ export default async function CurrentAdminReviewPage() {
           This page mirrors the Python workflow step that sits between AI review and
           decision logging. Saving writes a decision file only. Finalize calls the
           existing Python finalize step and keeps the manual review queue as the
-          canonical import source.
+          canonical import source. Approval-style review decisions and queue items
+          approved for import are shown separately so the next gate is explicit.
         </p>
       </section>
 

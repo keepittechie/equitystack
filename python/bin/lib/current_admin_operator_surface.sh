@@ -463,6 +463,8 @@ print(f"DECISION FILE: {repo_relative(decision_file)}")
 
 if finalized and decision_log.exists():
     payload = json.loads(decision_log.read_text())
+    queue_payload = json.loads(queue_path.read_text()) if queue_path.exists() else {}
+    queue_items = queue_payload.get("items") or []
     counts = {}
     for item in payload.get("items") or []:
         if not isinstance(item, dict):
@@ -471,15 +473,27 @@ if finalized and decision_log.exists():
         if not action:
             continue
         counts[action] = int(counts.get(action) or 0) + 1
-    approved = int(counts.get("approve_as_is") or 0) + int(counts.get("approve_with_changes") or 0)
+    approval_style = int(counts.get("approve_as_is") or 0) + int(counts.get("approve_with_changes") or 0)
     rejected = int(counts.get("reject") or 0)
     deferred = int(counts.get("defer") or 0)
+    queue_approved = sum(1 for item in queue_items if isinstance(item, dict) and (item.get("approved") or item.get("operator_status") == "approved"))
+    queue_pending_manual = sum(1 for item in queue_items if isinstance(item, dict) and item.get("operator_status") == "pending_manual_review")
+    queue_pending = sum(1 for item in queue_items if isinstance(item, dict) and item.get("operator_status") == "pending")
     print(f"DECISION LOG: {repo_relative(decision_log)}")
-    print(f"APPROVED: {approved}")
+    print(f"APPROVAL-STYLE DECISIONS: {approval_style}")
+    print(f"QUEUE APPROVED FOR IMPORT: {queue_approved}")
+    print(f"QUEUE HELD FOR REVIEW: {queue_pending_manual}")
+    print(f"QUEUE STILL PENDING: {queue_pending}")
     print(f"REJECTED: {rejected}")
     print(f"DEFERRED: {deferred}")
-    print("CURRENT STATE: PRECOMMIT_READY")
-    print(f"RECOMMENDED COMMAND: ./bin/equitystack current-admin apply --input {repo_relative(queue_path)}")
+    if queue_approved > 0:
+        print("CURRENT STATE: QUEUE_READY")
+        print("NEXT STEP: Run the guarded apply flow starting with pre-commit.")
+        print(f"RECOMMENDED COMMAND: ./bin/equitystack current-admin apply --input {repo_relative(queue_path)}")
+    else:
+        print("CURRENT STATE: BLOCKED")
+        print("NEXT STEP: No queue items are approved for import. Reopen current-admin review, confirm which rows should move into import, then rerun finalize.")
+        print(f"RECOMMENDED COMMAND: ./bin/equitystack current-admin review --input {repo_relative(review_path)} --decision-file {repo_relative(decision_file)}")
 else:
     print("CURRENT STATE: REVIEW_READY")
     print("NEXT STEP: Fill explicit operator_action values in the decision file, then rerun current-admin review.")

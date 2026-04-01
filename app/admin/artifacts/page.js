@@ -1,23 +1,7 @@
 import Link from "next/link";
 import { listArtifacts, listWorkflowSessions } from "@/lib/server/admin-operator/workflowData.js";
+import { formatAdminDateTime } from "@/app/admin/components/adminDateTime";
 import OperatorPageAutoRefresh from "@/app/admin/components/OperatorPageAutoRefresh";
-
-function formatDateTime(value) {
-  if (!value) {
-    return "—";
-  }
-
-  try {
-    return new Intl.DateTimeFormat("en-US", {
-      month: "short",
-      day: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-    }).format(new Date(value));
-  } catch {
-    return value;
-  }
-}
 
 function toWorkflowLabel(value) {
   if (value === "current-admin") {
@@ -87,7 +71,7 @@ export default async function AdminArtifactsPage() {
                     {artifact.exists ? "yes" : "no"}
                   </span>
                 </td>
-                <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">{formatDateTime(artifact.generatedAt)}</td>
+                <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">{formatAdminDateTime(artifact.generatedAt)}</td>
                 <td className="border-b border-[#E5EAF0] px-2 py-1 font-mono text-[10px] text-[#111827]">
                   {artifact.latestJobRunId || "—"}
                 </td>

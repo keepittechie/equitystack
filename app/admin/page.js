@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getCommandCenterSummary } from "@/lib/server/admin-operator/workflowData.js";
 import ActionLauncher from "./components/ActionLauncher";
+import { formatAdminDateTime } from "./components/adminDateTime";
 import CurrentAdminWorkflowTracker from "./components/CurrentAdminWorkflowTracker";
 import OperatorActionButton from "./components/OperatorActionButton";
 import OperatorPageAutoRefresh from "./components/OperatorPageAutoRefresh";
@@ -39,23 +40,6 @@ function toPriorityCode(label) {
     return "P2";
   }
   return "P3";
-}
-
-function formatDateTime(value) {
-  if (!value) {
-    return "—";
-  }
-
-  try {
-    return new Intl.DateTimeFormat("en-US", {
-      month: "short",
-      day: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-    }).format(new Date(value));
-  } catch {
-    return value;
-  }
 }
 
 function formatDuration(startedAt, finishedAt) {
@@ -391,6 +375,12 @@ function SessionSnapshotTable({ sessions }) {
                   session.quickActions?.nextAction ||
                   session.quickActions?.retryAction ||
                   null;
+                const trackerLinkLabel =
+                  primaryAction?.type === "link"
+                    ? primaryAction.label || "Open next step"
+                    : workflowTracker?.nextStep?.status === "blocked"
+                      ? "Inspect blocker"
+                      : "Open next step";
                 const nextActionLabel =
                   workflowTracker?.nextStep?.title ||
                   workflowTracker?.currentStep?.title ||
@@ -447,7 +437,7 @@ function SessionSnapshotTable({ sessions }) {
                       {session.fallbackPreview ? <CompactBadge tone="warning">Yes</CompactBadge> : <CompactBadge>No</CompactBadge>}
                     </td>
                     <td className="border-b border-[#E5EAF0] px-2 py-1">
-                      {primaryAction ? (
+                      {primaryAction?.action ? (
                         <OperatorActionButton
                           action={primaryAction.action}
                           label={primaryAction.label || primaryAction.title}
@@ -457,9 +447,13 @@ function SessionSnapshotTable({ sessions }) {
                           helperText=""
                           confirmation={primaryAction.confirmation}
                         />
+                      ) : primaryAction?.type === "link" ? (
+                        <TableLink href={primaryAction.href}>
+                          {trackerLinkLabel}
+                        </TableLink>
                       ) : workflowTracker?.operatorSurfaceHref ? (
                         <TableLink href={workflowTracker.operatorSurfaceHref}>
-                          {workflowTracker?.nextStep?.status === "blocked" ? "Inspect blocker" : "Open next step"}
+                          {trackerLinkLabel}
                         </TableLink>
                       ) : (
                         <TableLink href={session.href}>Open</TableLink>
@@ -524,8 +518,8 @@ function SchedulesTable({ schedules }) {
                   <td className="border-b border-[#E5EAF0] px-2 py-1">
                     <StateBadge value={schedule.status} />
                   </td>
-                  <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">{formatDateTime(schedule.nextRunAt)}</td>
-                  <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">{formatDateTime(schedule.lastRunAt)}</td>
+                  <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">{formatAdminDateTime(schedule.nextRunAt)}</td>
+                  <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">{formatAdminDateTime(schedule.lastRunAt)}</td>
                   <td className="border-b border-[#E5EAF0] px-2 py-1">
                     <div className="max-w-[220px] truncate text-[#4B5563]" title={schedule.lastJob?.summary || schedule.lastResultSummary || schedule.summary}>
                       {schedule.lastJob?.summary || schedule.lastResultSummary || schedule.summary}

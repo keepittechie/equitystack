@@ -1,3 +1,5 @@
+import { formatAdminDateTime } from "@/app/admin/components/adminDateTime";
+
 const REVIEW_ACTION_IDS = new Set(["currentAdmin.review", "legislative.review"]);
 const APPROVAL_ACTION_IDS = new Set([
   "currentAdmin.apply",
@@ -123,10 +125,10 @@ export function deriveExecutionMonitorState(job, options = {}) {
 
   const trace = [
     job.timestamps?.createdAt
-      ? { key: "queued", label: "Queued", value: job.timestamps.createdAt }
+      ? { key: "queued", label: "Queued", value: formatAdminDateTime(job.timestamps.createdAt) }
       : null,
     job.timestamps?.startedAt
-      ? { key: "started", label: "Execution started", value: job.timestamps.startedAt }
+      ? { key: "started", label: "Execution started", value: formatAdminDateTime(job.timestamps.startedAt) }
       : null,
     latestLine
       ? { key: "latest", label: "Latest update", value: latestLine }
@@ -143,7 +145,7 @@ export function deriveExecutionMonitorState(job, options = {}) {
                 : status === "blocked"
                   ? "Execution blocked"
                   : "Execution finished",
-          value: job.timestamps.finishedAt,
+          value: formatAdminDateTime(job.timestamps.finishedAt),
         }
       : null,
   ].filter(Boolean);

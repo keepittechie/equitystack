@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { formatAdminDateTime } from "@/app/admin/components/adminDateTime";
 import JobStatusBadge from "./JobStatusBadge";
 import JobRerunButton from "./JobRerunButton";
 
@@ -126,19 +127,19 @@ export default function JobDetailClient({ jobId, initialJob }) {
         <div className="mt-3 grid gap-2 md:grid-cols-4">
             <div className="rounded border border-[#E5EAF0] bg-white p-2">
               <p className="text-[11px] text-[#6B7280]">Created</p>
-              <p className="mt-1 text-[12px] text-[#1F2937]">{job.timestamps?.createdAt || "-"}</p>
+              <p className="mt-1 text-[12px] text-[#1F2937]">{formatAdminDateTime(job.timestamps?.createdAt, "-")}</p>
             </div>
             <div className="rounded border border-[#E5EAF0] bg-white p-2">
               <p className="text-[11px] text-[#6B7280]">Started</p>
-              <p className="mt-1 text-[12px] text-[#1F2937]">{job.timestamps?.startedAt || "-"}</p>
+              <p className="mt-1 text-[12px] text-[#1F2937]">{formatAdminDateTime(job.timestamps?.startedAt, "-")}</p>
             </div>
             <div className="rounded border border-[#E5EAF0] bg-white p-2">
               <p className="text-[11px] text-[#6B7280]">Finished</p>
-              <p className="mt-1 text-[12px] text-[#1F2937]">{job.timestamps?.finishedAt || "-"}</p>
+              <p className="mt-1 text-[12px] text-[#1F2937]">{formatAdminDateTime(job.timestamps?.finishedAt, "-")}</p>
             </div>
             <div className="rounded border border-[#E5EAF0] bg-white p-2">
               <p className="text-[11px] text-[#6B7280]">Updated</p>
-              <p className="mt-1 text-[12px] text-[#1F2937]">{job.timestamps?.updatedAt || "-"}</p>
+              <p className="mt-1 text-[12px] text-[#1F2937]">{formatAdminDateTime(job.timestamps?.updatedAt, "-")}</p>
             </div>
           </div>
 
@@ -271,7 +272,7 @@ export default function JobDetailClient({ jobId, initialJob }) {
                   <p className="text-[12px] font-medium">{artifact.label}</p>
                   <p className="mt-1 break-all font-mono text-[11px] text-gray-500">{artifact.path || "No path recorded."}</p>
                   <p className="mt-1 text-[12px] text-gray-700">
-                    {artifact.generatedAt || artifact.summary || "Artifact updated in this run."}
+                    {artifact.generatedAt ? formatAdminDateTime(artifact.generatedAt) : artifact.summary || "Artifact updated in this run."}
                   </p>
                 </div>
               ))

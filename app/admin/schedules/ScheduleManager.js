@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState, useTransition } from "react";
+import { formatAdminDateTime } from "@/app/admin/components/adminDateTime";
 import JobStatusBadge from "@/app/admin/jobs/JobStatusBadge";
 
 const ACTIVE_JOB_STATUSES = new Set(["queued", "running"]);
@@ -243,8 +244,8 @@ export default function ScheduleManager({ initialSchedules = [], initialActions 
                     <td className="border-b border-[#E5EAF0] px-2 py-1">
                       <JobStatusBadge status={schedule.status} />
                     </td>
-                    <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">{schedule.nextRunAt || "—"}</td>
-                    <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">{schedule.lastRunAt || "—"}</td>
+                    <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">{formatAdminDateTime(schedule.nextRunAt)}</td>
+                    <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">{formatAdminDateTime(schedule.lastRunAt)}</td>
                     <td className="border-b border-[#E5EAF0] px-2 py-1">
                       <div className="max-w-[260px] truncate text-[#4B5563]" title={schedule.lastJob?.summary || schedule.lastResultSummary || schedule.summary}>
                         {schedule.lastJob?.summary || schedule.lastResultSummary || schedule.summary}

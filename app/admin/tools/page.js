@@ -1,5 +1,6 @@
 import { listSerializedOperatorActions } from "@/lib/server/admin-operator/actionRegistry.js";
 import { getOperatorVerificationReport } from "@/lib/server/admin-operator/verificationService.js";
+import { formatAdminDateTime } from "@/app/admin/components/adminDateTime";
 
 export const dynamic = "force-dynamic";
 
@@ -28,7 +29,7 @@ function VerificationReportCard({ report }) {
         <div>
           <p className="font-mono text-[11px] uppercase tracking-wide text-[#6B7280]">{report.scope}</p>
           <h3 className="mt-1 text-base font-semibold text-[#1F2937]">{report.title}</h3>
-          <p className="mt-1 text-[11px] text-[#6B7280]">Checked at {report.checkedAt}</p>
+          <p className="mt-1 text-[11px] text-[#6B7280]">Checked at {formatAdminDateTime(report.checkedAt)}</p>
         </div>
         <StatusBadge status={report.status} />
       </div>

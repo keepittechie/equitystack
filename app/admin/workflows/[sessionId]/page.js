@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getWorkflowSessionDetail } from "@/lib/server/admin-operator/workflowData.js";
 import { getReviewQueueActionDescriptors, getSessionActionDescriptors } from "@/lib/server/admin-operator/operatorActionDescriptors.js";
 import CurrentAdminWorkflowTracker from "@/app/admin/components/CurrentAdminWorkflowTracker";
+import { formatAdminDateTime } from "@/app/admin/components/adminDateTime";
 import OperatorActionButton from "@/app/admin/components/OperatorActionButton";
 import OperatorPageAutoRefresh from "@/app/admin/components/OperatorPageAutoRefresh";
 import JobStatusBadge from "@/app/admin/jobs/JobStatusBadge";
@@ -122,11 +123,11 @@ export default async function AdminWorkflowSessionPage({ params }) {
             </div>
             <div className="rounded border p-2">
               <p className="text-[11px] text-gray-500">Started</p>
-              <p className="mt-1 text-[12px]">{toDisplayText(metadata.startedAt)}</p>
+              <p className="mt-1 text-[12px]">{formatAdminDateTime(metadata.startedAt)}</p>
             </div>
             <div className="rounded border p-2">
               <p className="text-[11px] text-gray-500">Updated</p>
-              <p className="mt-1 text-[12px]">{toDisplayText(metadata.updatedAt)}</p>
+              <p className="mt-1 text-[12px]">{formatAdminDateTime(metadata.updatedAt)}</p>
             </div>
           </div>
 
@@ -339,7 +340,7 @@ export default async function AdminWorkflowSessionPage({ params }) {
                   {toDisplayText(artifact.canonicalPath, "No canonical path recorded.")}
                 </p>
                 <p className="mt-1 text-[12px] text-gray-700">
-                  {toDisplayText(artifact.summary, `Generated at ${toDisplayText(artifact.generatedAt, "unknown time")}.`)}
+                  {toDisplayText(artifact.summary, `Generated at ${formatAdminDateTime(artifact.generatedAt, "unknown time")}.`)}
                 </p>
                 {artifact.latestJobRunId ? (
                   <div className="mt-2">

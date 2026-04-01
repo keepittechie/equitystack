@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { formatAdminDateTime } from "@/app/admin/components/adminDateTime";
 import JobStatusBadge from "@/app/admin/jobs/JobStatusBadge";
 import { deriveExecutionMonitorState, executionPhaseLabel, TERMINAL_JOB_STATUSES } from "@/app/admin/components/executionMonitor";
 
@@ -25,24 +26,6 @@ function mapHistoryEntry(entry) {
     relatedSessionId: entry.relatedSessionId || null,
     executionMode: entry.payloadJson?.executionMode || entry.payloadJson?.parsedCommand?.executionMode || null,
   };
-}
-
-function formatDateTime(value) {
-  if (!value) {
-    return "—";
-  }
-
-  try {
-    return new Intl.DateTimeFormat("en-US", {
-      month: "short",
-      day: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-      second: "2-digit",
-    }).format(new Date(value));
-  } catch {
-    return value;
-  }
 }
 
 function TraceTable({ trace = [] }) {
@@ -304,7 +287,7 @@ function renderInspectResult(result) {
             <div>
               <p className="text-sm text-[#6B7280]">{report?.scope}</p>
               <p className="mt-1 font-medium text-[#1F2937]">{report?.title}</p>
-              <p className="mt-2 text-xs text-[#6B7280]">Checked at {report?.checkedAt}</p>
+              <p className="mt-2 text-xs text-[#6B7280]">Checked at {formatAdminDateTime(report?.checkedAt)}</p>
             </div>
             <span className="rounded border border-[#E5EAF0] bg-[#F9FBFD] px-3 py-1 text-xs font-medium text-[#4B5563]">
               {report?.status || "unknown"}
@@ -741,7 +724,7 @@ export default function OperatorCommandConsole() {
             <div className="rounded border border-[#E5EAF0] bg-white px-2 py-1.5">
               <p className="text-[10px] uppercase tracking-wide text-[#6B7280]">Started</p>
               <p className="mt-1 text-[11px] text-[#1F2937]">
-                {formatDateTime(activeExecution.job.timestamps?.startedAt || activeExecution.job.timestamps?.createdAt)}
+                {formatAdminDateTime(activeExecution.job.timestamps?.startedAt || activeExecution.job.timestamps?.createdAt)}
               </p>
             </div>
             <div className="rounded border border-[#E5EAF0] bg-white px-2 py-1.5">
@@ -828,7 +811,7 @@ export default function OperatorCommandConsole() {
                     <td className="border-b border-[#E5EAF0] px-2 py-1 font-mono text-[#111827]">{entry.job.id}</td>
                     <td className="border-b border-[#E5EAF0] px-2 py-1 font-mono text-[#111827]">{entry.commandText || "—"}</td>
                     <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">
-                      {formatDateTime(entry.job.timestamps?.finishedAt || entry.job.timestamps?.updatedAt)}
+                      {formatAdminDateTime(entry.job.timestamps?.finishedAt || entry.job.timestamps?.updatedAt)}
                     </td>
                     <td className="border-b border-[#E5EAF0] px-2 py-1">
                       <Link href={`/admin/jobs/${entry.job.id}`} className="text-[#3B82F6] underline underline-offset-2">
