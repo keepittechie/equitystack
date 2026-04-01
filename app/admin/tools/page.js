@@ -70,10 +70,12 @@ function VerificationReportCard({ report }) {
 export default async function AdminToolsPage() {
   const actions = listSerializedOperatorActions();
   const grouped = groupActions(actions);
-  const [environmentReport, remoteExecutorReport, controlPlaneReport] = await Promise.all([
+  const [environmentReport, remoteExecutorReport, controlPlaneReport, dataIntegrityReport, deepIntegrityReport] = await Promise.all([
     getOperatorVerificationReport("environment"),
     getOperatorVerificationReport("remote-executor"),
     getOperatorVerificationReport("control-plane"),
+    getOperatorVerificationReport("data-integrity"),
+    getOperatorVerificationReport("deep-integrity"),
   ]);
 
   return (
@@ -84,14 +86,19 @@ export default async function AdminToolsPage() {
         <p className="max-w-5xl text-[12px] text-[#4B5563]">
           Verification checks are read-only and never enqueue broker jobs. Use them to confirm production readiness
           on 10.10.0.13, remote executor health against 10.10.0.60, and control-plane configuration before you rely
-          on remote mode in the operator surface.
+          on remote mode in the operator surface. The data-integrity report checks canonical promise, source,
+          relationship, and legislative-link records for missing fields, orphans, duplicates, and attribution gaps.
+          The deep-integrity report adds source-gap classification, duplicate-source merge safety, and current-admin
+          provenance completeness.
         </p>
       </section>
 
-      <section className="grid gap-4 xl:grid-cols-3">
+      <section className="grid gap-4 xl:grid-cols-2 2xl:grid-cols-5">
         <VerificationReportCard report={environmentReport} />
         <VerificationReportCard report={remoteExecutorReport} />
         <VerificationReportCard report={controlPlaneReport} />
+        <VerificationReportCard report={dataIntegrityReport} />
+        <VerificationReportCard report={deepIntegrityReport} />
       </section>
 
       <section className="rounded border border-[#E5EAF0] bg-[#EEF2F6] p-3 shadow-sm">
@@ -103,6 +110,8 @@ export default async function AdminToolsPage() {
             "verify environment",
             "verify remote-executor",
             "verify control-plane",
+            "verify data-integrity",
+            "verify deep-integrity",
           ].map((command) => (
             <tr key={command} className="odd:bg-white even:bg-[#F9FBFD] hover:bg-[#F1F5F9]">
               <td className="border-b border-[#E5EAF0] px-3 py-2 font-mono text-[11px] text-[#111827]">{command}</td>

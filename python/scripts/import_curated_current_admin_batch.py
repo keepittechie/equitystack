@@ -6,6 +6,8 @@ from typing import Any
 from current_admin_common import (
     derive_csv_path,
     get_db_connection,
+    get_current_admin_reports_dir,
+    get_project_root,
     load_json_file,
     map_evidence_strength,
     normalize_date,
@@ -44,6 +46,11 @@ def read_import_input(path: Path) -> dict[str, Any]:
         raise ValueError("Import input must be a JSON object")
     if "records" in payload:
         records = payload.get("records") or []
+        payload = {
+            **payload,
+            "records": records,
+            "input_mode": "records",
+        }
     else:
         records = []
         for item in payload.get("items") or []:
@@ -55,10 +62,121 @@ def read_import_input(path: Path) -> dict[str, Any]:
             "batch_name": payload.get("batch_name"),
             "president_slug": payload.get("president_slug"),
             "records": records,
+            "source_batch_path": payload.get("source_batch_path"),
+            "source_review_path": payload.get("source_review_path"),
+            "input_mode": "manual_review_queue",
         }
     if not isinstance(records, list):
         raise ValueError("Import input did not resolve to a records list")
     return payload
+
+
+def resolve_lineage_path(raw_value: Any, reference_path: Path) -> Path | None:
+    value = normalize_nullable_text(raw_value)
+    if value is None:
+        return None
+    candidate = Path(value)
+    if candidate.is_absolute():
+        return candidate.resolve()
+
+    project_root = get_project_root()
+    python_dir = project_root / "python"
+    candidates = [
+        (reference_path.parent / candidate).resolve(),
+        (project_root / candidate).resolve(),
+        (python_dir / candidate).resolve(),
+    ]
+    for resolved in candidates:
+        if resolved.exists():
+            return resolved
+    return candidates[0]
+
+
+def resolve_default_decision_log(batch_name: str) -> Path | None:
+    decision_dir = get_current_admin_reports_dir() / "review_decisions"
+    candidates = sorted(
+        decision_dir.glob(f"{batch_name}*.decision-log.json"),
+        key=lambda path: path.stat().st_mtime,
+        reverse=True,
+    )
+    return candidates[0] if candidates else None
+
+
+def validate_queue_import_lineage(input_path: Path, payload: dict[str, Any]) -> dict[str, Any]:
+    if payload.get("input_mode") != "manual_review_queue":
+        return {
+            "status": "skipped",
+            "input_mode": payload.get("input_mode") or "records",
+            "reason": "Import input is not the canonical manual-review queue artifact.",
+        }
+
+    batch_name = normalize_nullable_text(payload.get("batch_name"))
+    if batch_name is None:
+        raise ValueError("Queue provenance is incomplete: queue input is missing batch_name.")
+
+    source_batch_path = resolve_lineage_path(payload.get("source_batch_path"), input_path)
+    if source_batch_path is None or not source_batch_path.exists():
+        raise ValueError(
+            "Queue provenance is incomplete: the normalized batch artifact is missing. Restore the canonical batch artifact before import."
+        )
+
+    source_review_path = resolve_lineage_path(payload.get("source_review_path"), input_path)
+    if source_review_path is None or not source_review_path.exists():
+        raise ValueError(
+            "Queue provenance is incomplete: the AI review artifact is missing. Restore the canonical review artifact before import."
+        )
+
+    precommit_path = get_current_admin_reports_dir() / f"{batch_name}.pre-commit-review.json"
+    if not precommit_path.exists():
+        raise ValueError(
+            "Queue provenance is incomplete: the pre-commit artifact is missing. Run current-admin pre-commit before import."
+        )
+
+    precommit_payload = load_json_file(precommit_path)
+    if not isinstance(precommit_payload, dict):
+        raise ValueError("Queue provenance is incomplete: pre-commit artifact is unreadable.")
+    readiness_status = normalize_nullable_text(precommit_payload.get("readiness_status")) or "unknown"
+    if readiness_status == "blocked":
+        raise ValueError("Pre-commit review is blocked. Resolve the blocking issues before import.")
+
+    precommit_queue_path = resolve_lineage_path(precommit_payload.get("source_queue_file"), precommit_path)
+    if precommit_queue_path is not None and precommit_queue_path.resolve() != input_path.resolve():
+        raise ValueError(
+            "Queue provenance is incomplete: the pre-commit artifact does not match this queue artifact."
+        )
+
+    precommit_review_path = resolve_lineage_path(precommit_payload.get("source_review_file"), precommit_path)
+    if precommit_review_path is not None and precommit_review_path.resolve() != source_review_path.resolve():
+        raise ValueError(
+            "Queue provenance is incomplete: the pre-commit artifact does not match the queue review artifact."
+        )
+
+    decision_log_path = resolve_lineage_path(precommit_payload.get("source_decision_log"), precommit_path)
+    if decision_log_path is None:
+        decision_log_path = resolve_default_decision_log(batch_name)
+    if decision_log_path is None or not decision_log_path.exists():
+        raise ValueError(
+            "Queue provenance is incomplete: the decision log artifact is missing. Finalize operator decisions before import."
+        )
+
+    decision_log_payload = load_json_file(decision_log_path)
+    if not isinstance(decision_log_payload, dict):
+        raise ValueError("Queue provenance is incomplete: decision log is unreadable.")
+    decision_log_review_path = resolve_lineage_path(decision_log_payload.get("source_review_file"), decision_log_path)
+    if decision_log_review_path is not None and decision_log_review_path.resolve() != source_review_path.resolve():
+        raise ValueError(
+            "Queue provenance is incomplete: the decision log does not match the queue review artifact."
+        )
+
+    return {
+        "status": "passed",
+        "input_mode": "manual_review_queue",
+        "source_batch_path": str(source_batch_path),
+        "source_review_path": str(source_review_path),
+        "source_precommit_path": str(precommit_path),
+        "source_decision_log_path": str(decision_log_path),
+        "precommit_readiness_status": readiness_status,
+    }
 
 
 def get_president(cursor, president_slug: str) -> dict[str, Any]:
@@ -325,10 +443,13 @@ def main() -> None:
         payload["batch_name"],
         "import-apply" if args.apply else "import-dry-run",
     )
+    provenance_guard = validate_queue_import_lineage(args.input.resolve(), payload)
     report = {
         "mode": "apply" if args.apply else "dry-run",
         "batch_name": payload.get("batch_name"),
         "president_slug": payload.get("president_slug"),
+        "source_input_path": str(args.input.resolve()),
+        "provenance_guard": provenance_guard,
         "promises_created": 0,
         "promises_updated": 0,
         "actions_created": 0,

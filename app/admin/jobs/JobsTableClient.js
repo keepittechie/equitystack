@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { formatAdminDateTime } from "@/app/admin/components/adminDateTime";
+import { readAdminJsonResponse } from "@/app/admin/components/readAdminJsonResponse";
 import JobStatusBadge from "./JobStatusBadge";
 import JobRerunButton from "./JobRerunButton";
 
@@ -48,7 +49,7 @@ export default function JobsTableClient({ initialJobs }) {
           method: "GET",
           cache: "no-store",
         });
-        const payload = await response.json();
+        const payload = await readAdminJsonResponse(response, "/api/admin/operator/jobs?limit=50");
         if (!response.ok || !payload.success) {
           throw new Error(payload.error || "Failed to refresh jobs.");
         }

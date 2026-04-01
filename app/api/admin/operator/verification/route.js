@@ -4,7 +4,17 @@ import { getOperatorVerificationReport } from "@/lib/server/admin-operator/verif
 export const dynamic = "force-dynamic";
 
 function jsonError(message, status = 500) {
-  return NextResponse.json({ success: false, error: message }, { status });
+  return NextResponse.json(
+    {
+      success: false,
+      data: null,
+      error: {
+        message,
+        code: "operator_verification_failed",
+      },
+    },
+    { status }
+  );
 }
 
 export async function GET(request) {
@@ -13,6 +23,8 @@ export async function GET(request) {
     const report = await getOperatorVerificationReport(scope);
     return NextResponse.json({
       success: true,
+      data: { report },
+      error: null,
       report,
     });
   } catch (error) {

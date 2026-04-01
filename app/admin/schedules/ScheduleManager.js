@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { formatAdminDateTime } from "@/app/admin/components/adminDateTime";
 import JobStatusBadge from "@/app/admin/jobs/JobStatusBadge";
+import { readAdminJsonResponse } from "@/app/admin/components/readAdminJsonResponse";
 
 const ACTIVE_JOB_STATUSES = new Set(["queued", "running"]);
 
@@ -63,7 +64,7 @@ export default function ScheduleManager({ initialSchedules = [], initialActions 
       method: "GET",
       cache: "no-store",
     });
-    const payload = await response.json();
+    const payload = await readAdminJsonResponse(response, "/api/admin/operator/schedules");
     if (!response.ok || !payload.success) {
       throw new Error(payload.error || "Failed to load schedules.");
     }
@@ -83,7 +84,7 @@ export default function ScheduleManager({ initialSchedules = [], initialActions 
           method: "GET",
           cache: "no-store",
         });
-        const payload = await response.json();
+        const payload = await readAdminJsonResponse(response, "/api/admin/operator/schedules");
         if (!response.ok || !payload.success) {
           throw new Error(payload.error || "Failed to refresh schedules.");
         }
@@ -126,7 +127,7 @@ export default function ScheduleManager({ initialSchedules = [], initialActions 
             safeAutoRun: true,
           }),
         });
-        const payload = await response.json();
+        const payload = await readAdminJsonResponse(response, "/api/admin/operator/schedules");
         if (!response.ok || !payload.success) {
           throw new Error(payload.error || "Failed to create the schedule.");
         }
@@ -152,7 +153,10 @@ export default function ScheduleManager({ initialSchedules = [], initialActions 
           },
           body: JSON.stringify(patch),
         });
-        const payload = await response.json();
+        const payload = await readAdminJsonResponse(
+          response,
+          `/api/admin/operator/schedules/${encodeURIComponent(scheduleId)}`
+        );
         if (!response.ok || !payload.success) {
           throw new Error(payload.error || "Failed to update the schedule.");
         }
@@ -173,7 +177,10 @@ export default function ScheduleManager({ initialSchedules = [], initialActions 
         const response = await fetch(`/api/admin/operator/schedules/${encodeURIComponent(scheduleId)}/run`, {
           method: "POST",
         });
-        const payload = await response.json();
+        const payload = await readAdminJsonResponse(
+          response,
+          `/api/admin/operator/schedules/${encodeURIComponent(scheduleId)}/run`
+        );
         if (!response.ok || !payload.success) {
           throw new Error(payload.error || "Failed to run the schedule.");
         }

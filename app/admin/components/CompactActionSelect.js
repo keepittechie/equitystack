@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import JobStatusBadge from "@/app/admin/jobs/JobStatusBadge";
+import { readAdminJsonResponse } from "@/app/admin/components/readAdminJsonResponse";
 
 function normalizeString(value) {
   return typeof value === "string" ? value.trim() : "";
@@ -31,7 +32,7 @@ export default function CompactActionSelect({ actions = [] }) {
         context: descriptor.context || {},
       }),
     });
-    const payload = await response.json();
+    const payload = await readAdminJsonResponse(response, "/api/admin/operator/jobs");
     if (!response.ok || !payload.success) {
       throw new Error(payload.error || "Failed to start the action.");
     }

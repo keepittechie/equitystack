@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import JobStatusBadge from "@/app/admin/jobs/JobStatusBadge";
+import { readAdminJsonResponse } from "@/app/admin/components/readAdminJsonResponse";
 
 const TERMINAL_JOB_STATUSES = new Set(["success", "failed", "blocked", "cancelled"]);
 
@@ -67,7 +68,7 @@ export default function OperatorActionButton({
           method: "GET",
           cache: "no-store",
         });
-        const payload = await response.json();
+        const payload = await readAdminJsonResponse(response, `/api/admin/operator/jobs/${job.id}`);
         if (!response.ok || !payload.success) {
           throw new Error(payload.error || "Failed to refresh the job.");
         }
@@ -122,7 +123,7 @@ export default function OperatorActionButton({
         context,
       }),
     });
-    const payload = await response.json();
+    const payload = await readAdminJsonResponse(response, "/api/admin/operator/jobs");
     if (!response.ok || !payload.success) {
       throw new Error(payload.error || "Failed to start the action.");
     }

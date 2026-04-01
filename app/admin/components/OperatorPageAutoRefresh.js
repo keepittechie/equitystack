@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { readAdminJsonResponse } from "@/app/admin/components/readAdminJsonResponse";
 
 const ACTIVE_JOB_STATUSES = new Set(["queued", "running"]);
 
@@ -21,7 +22,7 @@ export default function OperatorPageAutoRefresh({
           method: "GET",
           cache: "no-store",
         });
-        const payload = await response.json();
+        const payload = await readAdminJsonResponse(response, "/api/admin/operator/jobs?limit=25");
         if (!response.ok || !payload.success) {
           return;
         }

@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
+import { readAdminJsonResponse } from "@/app/admin/components/readAdminJsonResponse";
 
 const DECISION_OPTIONS = [
   { value: "", label: "Choose action" },
@@ -18,39 +19,6 @@ function cloneItems(items) {
   return items.map((item) => ({ ...item, suggested_checks: [...(item.suggested_checks || [])] }));
 }
 
-async function readJsonResponse(response) {
-  const text = await response.text();
-  const contentType = response.headers.get("content-type") || "";
-  const looksLikeJson =
-    contentType.includes("application/json") ||
-    text.trim().startsWith("{") ||
-    text.trim().startsWith("[");
-
-  if (!looksLikeJson) {
-    console.error("Current-admin action returned a non-JSON response.", {
-      status: response.status,
-      contentType,
-      bodyPreview: text.slice(0, 800),
-    });
-    throw new Error(
-      response.ok
-        ? "The server returned a non-JSON response. Check the server logs."
-        : `The server returned an unexpected ${response.status} response instead of JSON.`
-    );
-  }
-
-  try {
-    return text ? JSON.parse(text) : {};
-  } catch (error) {
-    console.error("Failed to parse current-admin action response as JSON.", {
-      status: response.status,
-      contentType,
-      bodyPreview: text.slice(0, 800),
-    });
-    throw new Error("The server returned malformed JSON. Check the server logs.");
-  }
-}
-
 export default function CurrentAdminReviewWorkspace({ workspace }) {
   const router = useRouter();
   const [items, setItems] = useState(cloneItems(workspace.review_items || []));
@@ -61,6 +29,7 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
   const finalizePermission = actionPermissions.finalize || { allowed: false, reasons: [] };
   const artifactStatus = workspace.artifact_status || {};
   const importReadiness = workspace.import_readiness || {};
+  const provenance = workspace.provenance || {};
 
   function updateItem(slug, field, value) {
     setItems((current) =>
@@ -86,7 +55,7 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
           },
           body: JSON.stringify(body),
         });
-        const payload = await readJsonResponse(response);
+        const payload = await readAdminJsonResponse(response, url);
         if (!response.ok) {
           throw new Error(payload.error || "Action failed.");
         }
@@ -130,6 +99,30 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
 
   return (
     <div className="space-y-4">
+      {provenance.provenance_incomplete ? (
+        <section className="rounded border border-amber-300 bg-amber-50 p-4 shadow-sm">
+          <p className="text-[11px] uppercase tracking-wide text-amber-900">Provenance incomplete</p>
+          <p className="mt-2 text-[12px] text-amber-950">
+            {provenance.summary}
+          </p>
+          <p className="mt-2 text-[11px] text-amber-900">
+            Import batch detected: {provenance.import_batch_detected ? "yes" : "no"} • Artifact chain missing:{" "}
+            {provenance.artifact_chain_missing ? "yes" : "no"} • Matched DB rows:{" "}
+            {provenance.matched_record_count || 0}
+          </p>
+          {(provenance.missing_artifacts || []).length ? (
+            <p className="mt-2 text-[11px] text-amber-900">
+              Missing artifacts: {provenance.missing_artifacts.join(", ")}
+            </p>
+          ) : null}
+          {(provenance.matched_slugs_sample || []).length ? (
+            <p className="mt-1 text-[11px] text-amber-900">
+              Sample DB slugs: {provenance.matched_slugs_sample.join(", ")}
+            </p>
+          ) : null}
+        </section>
+      ) : null}
+
       <section className="grid gap-3 lg:grid-cols-5">
         <div className="rounded border border-zinc-300 bg-white p-3 shadow-sm">
           <p className="text-[11px] text-gray-600">Batch</p>
@@ -167,7 +160,7 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
         </div>
       </section>
 
-      <section className="rounded border border-zinc-300 bg-white p-4 shadow-sm space-y-3">
+      <section id="review-actions" className="rounded border border-zinc-300 bg-white p-4 shadow-sm space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className="text-[11px] text-gray-600">Review artifact</p>
@@ -230,7 +223,7 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
       </section>
 
       <section className="grid gap-4 xl:grid-cols-[0.9fr_1.1fr]">
-        <div className="rounded border border-zinc-300 bg-white p-4 shadow-sm">
+        <div id="workflow-blockers" className="rounded border border-zinc-300 bg-white p-4 shadow-sm">
           <h2 className="text-base font-semibold">Workflow blockers</h2>
           <p className="mt-1 text-[12px] text-gray-600">
             These are the current reasons the canonical pipeline cannot advance automatically.
@@ -255,7 +248,7 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
           </div>
         </div>
 
-        <div className="rounded border border-zinc-300 bg-white p-4 shadow-sm">
+        <div id="artifact-state" className="rounded border border-zinc-300 bg-white p-4 shadow-sm">
           <h2 className="text-base font-semibold">Artifact state</h2>
           <p className="mt-1 text-[12px] text-gray-600">
             The admin workflow follows these canonical files under `python/reports/current_admin/`.
@@ -282,7 +275,7 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
         </div>
       </section>
 
-      <section className="rounded border border-zinc-300 bg-white p-4 shadow-sm">
+      <section id="review-items" className="rounded border border-zinc-300 bg-white p-4 shadow-sm">
         <div className="mb-3">
           <h2 className="text-base font-semibold">Review items</h2>
           <p className="mt-1 text-[12px] text-gray-600">

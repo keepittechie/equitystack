@@ -14,6 +14,37 @@ function toWorkflowLabel(value) {
   return value || "Unknown";
 }
 
+function queueTypeLabel(item) {
+  if (item.workflowFamily === "legislative" && item.queueType === "manual-review") {
+    return "Legislative Manual Review";
+  }
+  if (item.workflowFamily === "legislative" && item.queueType === "bundle-approval") {
+    return "Bundle Approval";
+  }
+  if (item.workflowFamily === "current-admin" && item.queueType === "operator-review") {
+    return "Current-Admin Operator Review";
+  }
+  if (item.workflowFamily === "current-admin" && item.queueType === "apply-readiness") {
+    return item.state === "ready_for_apply_confirmation"
+      ? "Import Approval Follow-Up"
+      : "Pre-commit / Apply Readiness";
+  }
+  return item.queueType || "Review";
+}
+
+function primaryDetailLabel(item) {
+  if (item.workflowFamily === "current-admin") {
+    return "Open current-admin review";
+  }
+  if (item.workflowFamily === "legislative" && item.queueType === "manual-review") {
+    return "Open legislative manual review";
+  }
+  if (item.workflowFamily === "legislative") {
+    return "Open legislative review";
+  }
+  return "Open workflow";
+}
+
 export default async function AdminReviewQueuePage() {
   const items = await listReviewQueueItems();
 
@@ -52,7 +83,7 @@ export default async function AdminReviewQueuePage() {
                 <tr key={item.id} className="align-top odd:bg-white even:bg-[#F9FBFD] hover:bg-[#F1F5F9]">
                   <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">{toWorkflowLabel(item.workflowFamily)}</td>
                   <td className="border-b border-[#E5EAF0] px-2 py-1">
-                    <div className="font-medium text-[#1F2937]">{item.queueType}</div>
+                    <div className="font-medium text-[#1F2937]">{queueTypeLabel(item)}</div>
                     <div className="font-mono text-[10px] text-[#6B7280]">{item.id}</div>
                   </td>
                   <td className="border-b border-[#E5EAF0] px-2 py-1">
@@ -88,10 +119,10 @@ export default async function AdminReviewQueuePage() {
                   <td className="border-b border-[#E5EAF0] px-2 py-1">
                     <div className="flex flex-wrap gap-2">
                       <Link href={item.href} className="text-[11px] text-[#3B82F6] underline">
-                        Workflow
+                        {primaryDetailLabel(item)}
                       </Link>
                       <Link href={`/admin/workflows/${encodeURIComponent(item.sessionId)}`} className="text-[11px] text-[#3B82F6] underline">
-                        Inspect
+                        Open session inspector
                       </Link>
                     </div>
                   </td>
@@ -101,7 +132,18 @@ export default async function AdminReviewQueuePage() {
             {!items.length ? (
               <tr>
                 <td colSpan={8} className="px-2 py-3 text-[11px] text-[#6B7280]">
-                  No pending review items were found in the canonical artifacts.
+                  <div>No review items pending.</div>
+                  <div className="mt-1">
+                    Next step: run the current-admin or legislative workflow again if you expected new review work.
+                  </div>
+                  <div className="mt-2 flex flex-wrap gap-3">
+                    <Link href="/admin/workflows" className="text-[#3B82F6] underline">
+                      Open workflows
+                    </Link>
+                    <Link href="/admin" className="text-[#3B82F6] underline">
+                      Open command center
+                    </Link>
+                  </div>
                 </td>
               </tr>
             ) : null}

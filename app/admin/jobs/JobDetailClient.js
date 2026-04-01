@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { formatAdminDateTime } from "@/app/admin/components/adminDateTime";
+import { readAdminJsonResponse } from "@/app/admin/components/readAdminJsonResponse";
 import JobStatusBadge from "./JobStatusBadge";
 import JobRerunButton from "./JobRerunButton";
 
@@ -74,7 +75,7 @@ export default function JobDetailClient({ jobId, initialJob }) {
           method: "GET",
           cache: "no-store",
         });
-        const payload = await response.json();
+        const payload = await readAdminJsonResponse(response, `/api/admin/operator/jobs/${jobId}`);
         if (!response.ok || !payload.success) {
           throw new Error(payload.error || "Failed to refresh the job.");
         }
@@ -111,6 +112,16 @@ export default function JobDetailClient({ jobId, initialJob }) {
     job.output?.workflowReviewRuntime ||
     job.output?.session?.metadataJson?.review_runtime ||
     null;
+  const traceability = {
+    api: `/api/admin/operator/jobs/${jobId}`,
+    session: job.links?.session || (job.sessionIds?.[0] ? `/admin/workflows/${encodeURIComponent(job.sessionIds[0])}` : null),
+    sourceOfTruth:
+      job.workflowFamily === "current-admin"
+        ? "Canonical current-admin batch, review, queue, and import artifacts"
+        : job.workflowFamily === "legislative"
+          ? "Canonical legislative review bundle, manual-review queue, apply, and import artifacts"
+          : "Operator control-plane job record",
+  };
 
   return (
     <div className="space-y-4">
@@ -287,6 +298,30 @@ export default function JobDetailClient({ jobId, initialJob }) {
           <pre className="mt-3 max-h-[36rem] overflow-auto rounded border border-[#E5EAF0] bg-[#F3F4F6] p-3 text-[11px] text-[#111827]">
             {job.log || "No logs captured."}
           </pre>
+        </div>
+      </section>
+
+      <section className="rounded border border-zinc-300 bg-white p-4 shadow-sm">
+        <h3 className="text-base font-semibold">Traceability</h3>
+        <div className="mt-3 grid gap-3 xl:grid-cols-3">
+          <div className="rounded border border-[#E5EAF0] bg-[#F9FBFD] p-3 text-[12px]">
+            <p className="text-[11px] uppercase tracking-wide text-[#6B7280]">API</p>
+            <p className="mt-1 font-mono text-[11px] text-[#111827]">{traceability.api}</p>
+          </div>
+          <div className="rounded border border-[#E5EAF0] bg-[#F9FBFD] p-3 text-[12px]">
+            <p className="text-[11px] uppercase tracking-wide text-[#6B7280]">Session</p>
+            {traceability.session ? (
+              <Link href={traceability.session} className="mt-1 inline-flex text-[#3B82F6] underline underline-offset-2">
+                Open canonical workflow session
+              </Link>
+            ) : (
+              <p className="mt-1 text-[#4B5563]">No canonical session is attached to this job.</p>
+            )}
+          </div>
+          <div className="rounded border border-[#E5EAF0] bg-[#F9FBFD] p-3 text-[12px]">
+            <p className="text-[11px] uppercase tracking-wide text-[#6B7280]">Source of truth</p>
+            <p className="mt-1 text-[#4B5563]">{traceability.sourceOfTruth}</p>
+          </div>
         </div>
       </section>
 

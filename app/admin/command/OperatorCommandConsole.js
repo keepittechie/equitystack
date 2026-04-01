@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { formatAdminDateTime } from "@/app/admin/components/adminDateTime";
 import JobStatusBadge from "@/app/admin/jobs/JobStatusBadge";
 import { deriveExecutionMonitorState, executionPhaseLabel, TERMINAL_JOB_STATUSES } from "@/app/admin/components/executionMonitor";
+import { readAdminJsonResponse } from "@/app/admin/components/readAdminJsonResponse";
 
 const HISTORY_LIMIT = 12;
 
@@ -348,7 +349,7 @@ export default function OperatorCommandConsole() {
       method: "GET",
       cache: "no-store",
     });
-    const commandPayload = await commandResponse.json();
+    const commandPayload = await readAdminJsonResponse(commandResponse, "/api/admin/operator/command");
     if (!commandResponse.ok || !commandPayload.success) {
       throw new Error(commandPayload.error || "Failed to load supported commands.");
     }
@@ -361,7 +362,7 @@ export default function OperatorCommandConsole() {
       method: "GET",
       cache: "no-store",
     });
-    const sessionPayload = await sessionResponse.json();
+    const sessionPayload = await readAdminJsonResponse(sessionResponse, "/api/admin/operator/sessions");
     if (!sessionResponse.ok || !sessionPayload.success) {
       throw new Error(sessionPayload.error || "Failed to load sessions.");
     }
@@ -434,7 +435,7 @@ export default function OperatorCommandConsole() {
           method: "GET",
           cache: "no-store",
         });
-        const payload = await response.json();
+        const payload = await readAdminJsonResponse(response, `/api/admin/operator/jobs/${activeJobId}`);
         if (!response.ok || !payload.success) {
           throw new Error(payload.error || "Failed to refresh the job.");
         }
@@ -515,7 +516,7 @@ export default function OperatorCommandConsole() {
         confirmation: overrideConfirmation || undefined,
       }),
     });
-    const payload = await response.json();
+    const payload = await readAdminJsonResponse(response, "/api/admin/operator/command");
     if (!response.ok || !payload.success) {
       throw new Error(payload.error || "Failed to run the operator command.");
     }

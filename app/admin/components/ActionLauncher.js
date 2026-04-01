@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { formatAdminDateTime } from "@/app/admin/components/adminDateTime";
 import JobStatusBadge from "@/app/admin/jobs/JobStatusBadge";
+import { readAdminJsonResponse } from "@/app/admin/components/readAdminJsonResponse";
 import {
   deriveExecutionMonitorState,
   executionPhaseLabel,
@@ -190,7 +191,7 @@ export default function ActionLauncher({
           method: "GET",
           cache: "no-store",
         });
-        const payload = await response.json();
+        const payload = await readAdminJsonResponse(response, "/api/admin/operator/actions");
         if (!response.ok || !payload.success) {
           throw new Error(payload.error || "Failed to load actions.");
         }
@@ -256,7 +257,10 @@ export default function ActionLauncher({
           method: "GET",
           cache: "no-store",
         });
-        const payload = await response.json();
+        const payload = await readAdminJsonResponse(
+          response,
+          `/api/admin/operator/jobs/${activeExecution.job.id}`
+        );
         if (!response.ok || !payload.success) {
           throw new Error(payload.error || "Failed to refresh the active execution.");
         }
@@ -365,7 +369,7 @@ export default function ActionLauncher({
         executionMode,
       }),
     });
-    const payload = await response.json();
+    const payload = await readAdminJsonResponse(response, "/api/admin/operator/jobs");
     if (!response.ok || !payload.success) {
       throw new Error(payload.error || "Failed to start the action.");
     }

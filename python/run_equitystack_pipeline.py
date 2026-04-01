@@ -76,6 +76,60 @@ def load_json(path: Path) -> dict[str, Any] | None:
     return json.loads(path.read_text())
 
 
+def build_workflow_outcome_summary(
+    ai_review_payload: dict[str, Any] | None,
+    manual_queue_payload: dict[str, Any] | None,
+) -> dict[str, Any] | None:
+    if not ai_review_payload and not manual_queue_payload:
+        return None
+
+    summary = dict(ai_review_payload.get("workflow_outcome_summary") or {}) if ai_review_payload else {}
+    manual_review_queue_count = 0
+    if manual_queue_payload:
+        manual_review_queue_count = max(
+            int(manual_queue_payload.get("manual_review_count") or 0),
+            len(manual_queue_payload.get("items") or []),
+        )
+
+    if not summary:
+        return {
+            "workflow_status": "review_required" if manual_review_queue_count else "unknown",
+            "ai_status": {
+                "run_status": "unknown",
+                "total_items": 0,
+                "ai_success": 0,
+                "primary_model_success": 0,
+                "fallback_model_success": 0,
+                "fallback_used": 0,
+                "heuristic_fallback": 0,
+                "dry_run_count": 0,
+                "ai_failure_reason": None,
+            },
+            "decisions": {
+                "kept": 0,
+                "modified": 0,
+                "removed": 0,
+                "manual_review": manual_review_queue_count,
+            },
+            "confidence_level": "low" if manual_review_queue_count else "unknown",
+            "trust_warning": manual_review_queue_count > 0,
+            "user_message": (
+                "Manual review items were generated, but the AI workflow summary is unavailable."
+                if manual_review_queue_count
+                else "No legislative workflow summary is available."
+            ),
+            "next_step": "Review required items" if manual_review_queue_count else "Inspect the workflow artifacts",
+            "manual_review_queue_count": manual_review_queue_count,
+        }
+
+    summary["manual_review_queue_count"] = max(
+        int(summary.get("manual_review_queue_count") or 0),
+        manual_review_queue_count,
+        int(summary.get("decisions", {}).get("manual_review") or 0),
+    )
+    return summary
+
+
 def needs_discovery(path: Path) -> bool:
     payload = load_json(path)
     if not payload:
@@ -241,8 +295,36 @@ def main() -> None:
         "steps": steps,
         "failure": failure,
     }
+    ai_review_payload = load_json(ai_review_path())
+    manual_queue_payload = load_json(manual_queue_path())
+    workflow_outcome_summary = build_workflow_outcome_summary(
+        ai_review_payload,
+        manual_queue_payload,
+    )
+    if workflow_outcome_summary:
+        payload["workflow_outcome_summary"] = workflow_outcome_summary
     report_path.write_text(json.dumps(payload, indent=2, default=str))
     print(f"\nWrote pipeline report to {report_path}")
+    if workflow_outcome_summary:
+        print("=== WORKFLOW SUMMARY ===")
+        print(f"AI Status: {str(workflow_outcome_summary.get('ai_status', {}).get('run_status') or 'unknown').upper()}")
+        print(
+            "Fallback Used: "
+            f"{workflow_outcome_summary.get('ai_status', {}).get('fallback_used', 0)}/"
+            f"{workflow_outcome_summary.get('ai_status', {}).get('total_items', 0)}"
+        )
+        decisions = workflow_outcome_summary.get("decisions", {})
+        print(
+            "Decisions: "
+            f"{decisions.get('kept', 0)} kept, "
+            f"{decisions.get('modified', 0)} modified, "
+            f"{decisions.get('removed', 0)} removed, "
+            f"{decisions.get('manual_review', 0)} manual review"
+        )
+        print(
+            f"Confidence: {str(workflow_outcome_summary.get('confidence_level') or 'unknown').upper()}"
+        )
+        print(f"Next Step: {workflow_outcome_summary.get('next_step') or 'Inspect the workflow artifacts'}")
     if status != "completed":
         raise SystemExit(1)
 

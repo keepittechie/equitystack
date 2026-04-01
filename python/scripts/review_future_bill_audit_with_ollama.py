@@ -1058,6 +1058,109 @@ def build_summary(reviewed_items: list[dict[str, Any]]) -> dict[str, int]:
     return summary
 
 
+def summarize_failure_reason(fallback_reasons: list[str]) -> str | None:
+    normalized = [normalize_whitespace(reason) for reason in fallback_reasons if normalize_whitespace(reason)]
+    if not normalized:
+        return None
+
+    lowered = [reason.lower() for reason in normalized]
+    if all(
+        "non-empty json string" in reason
+        or "no json object found" in reason
+        or "empty json" in reason
+        or "empty response" in reason
+        for reason in lowered
+    ):
+        return "ollama_empty_response"
+    if all("timed out" in reason or "timeout" in reason for reason in lowered):
+        return "ollama_timeout"
+    if all("connection" in reason or "refused" in reason for reason in lowered):
+        return "ollama_connection_error"
+    return normalized[0] if len(normalized) == 1 else "multiple_failures"
+
+
+def build_workflow_outcome_summary(reviewed_items: list[dict[str, Any]]) -> dict[str, Any]:
+    summary = build_summary(reviewed_items)
+    total_items = summary["total_reviewed"]
+    primary_model_success = sum(1 for item in reviewed_items if item.get("review_backend") == "ollama")
+    fallback_model_success = sum(1 for item in reviewed_items if item.get("review_backend") == "fallback")
+    heuristic_fallback = sum(1 for item in reviewed_items if item.get("review_backend") == "heuristic_fallback")
+    dry_run_count = sum(1 for item in reviewed_items if item.get("review_backend") == "dry_run")
+    fallback_used = summary["fallback_count"]
+    ai_success = primary_model_success + fallback_model_success
+    failure_reason = summarize_failure_reason(
+        [str(item.get("fallback_reason") or "") for item in reviewed_items if item.get("fallback_used")]
+    )
+
+    if total_items == 0:
+        workflow_status = "not_started"
+        ai_status = "not_started"
+        confidence_level = "low"
+        trust_warning = True
+        user_message = "No legislative AI review results are recorded yet."
+    elif dry_run_count == total_items:
+        workflow_status = "completed_with_fallback"
+        ai_status = "skipped"
+        confidence_level = "low"
+        trust_warning = True
+        user_message = "AI review was skipped. All items require manual review."
+    elif heuristic_fallback == total_items or ai_success == 0:
+        workflow_status = "completed_with_fallback"
+        ai_status = "failed"
+        confidence_level = "low"
+        trust_warning = True
+        user_message = "AI review failed. All items require manual review."
+    elif fallback_used > 0:
+        workflow_status = "completed_with_partial_fallback"
+        ai_status = "partial"
+        confidence_level = "medium" if heuristic_fallback == 0 else "low"
+        trust_warning = True
+        user_message = "AI partially succeeded. Some items used fallback and still require manual verification."
+    elif summary["review_manually_count"] > 0:
+        workflow_status = "completed_with_manual_review"
+        ai_status = "success"
+        confidence_level = "medium"
+        trust_warning = True
+        user_message = "AI review completed, but some items still require manual review."
+    else:
+        workflow_status = "completed_with_ai"
+        ai_status = "success"
+        confidence_level = "high"
+        trust_warning = False
+        user_message = "AI review completed successfully. Results are fully evaluated."
+
+    next_step = (
+        "Review required items"
+        if summary["review_manually_count"] > 0 or trust_warning
+        else "Review bundle and operator approvals"
+    )
+
+    return {
+        "workflow_status": workflow_status,
+        "ai_status": {
+            "run_status": ai_status,
+            "total_items": total_items,
+            "ai_success": ai_success,
+            "primary_model_success": primary_model_success,
+            "fallback_model_success": fallback_model_success,
+            "fallback_used": fallback_used,
+            "heuristic_fallback": heuristic_fallback,
+            "dry_run_count": dry_run_count,
+            "ai_failure_reason": failure_reason,
+        },
+        "decisions": {
+            "kept": summary["keep_direct_count"],
+            "modified": summary["change_to_partial_count"],
+            "removed": summary["remove_link_count"],
+            "manual_review": summary["review_manually_count"],
+        },
+        "confidence_level": confidence_level,
+        "trust_warning": trust_warning,
+        "user_message": user_message,
+        "next_step": next_step,
+    }
+
+
 def derive_csv_path(csv_arg: str | None, output_path: Path) -> Path | None:
     if csv_arg is None:
         return None
@@ -1124,6 +1227,7 @@ def write_json_report(
     verifier_timeout_seconds: int,
     reviewed_items: list[dict[str, Any]],
 ) -> None:
+    workflow_outcome_summary = build_workflow_outcome_summary(reviewed_items)
     effective_models = sorted({item.get("effective_model") for item in reviewed_items if item.get("effective_model")})
     review_backends = sorted({item.get("review_backend") for item in reviewed_items if item.get("review_backend")})
     fallback_reasons = sorted({item.get("fallback_reason") for item in reviewed_items if item.get("fallback_reason")})
@@ -1151,6 +1255,7 @@ def write_json_report(
         "verifier_attempted": any(bool(item.get("verifier_attempted")) for item in reviewed_items),
         "verifier_retry_attempted": any(bool(item.get("verifier_retry_attempted")) for item in reviewed_items),
         "summary": build_summary(reviewed_items),
+        "workflow_outcome_summary": workflow_outcome_summary,
         "items": reviewed_items,
     }
     path.write_text(json.dumps(payload, indent=2, default=str))
@@ -1239,6 +1344,7 @@ def main() -> None:
         print(f"Wrote CSV report to {csv_path}")
 
     summary = build_summary(reviewed_items)
+    workflow_outcome_summary = build_workflow_outcome_summary(reviewed_items)
     print(
         "Summary: "
         f"keep_direct={summary['keep_direct_count']} | "
@@ -1247,6 +1353,21 @@ def main() -> None:
         f"review_manually={summary['review_manually_count']} | "
         f"fallbacks={summary['fallback_count']}"
     )
+    print("=== WORKFLOW SUMMARY ===")
+    print(f"AI Status: {workflow_outcome_summary['ai_status']['run_status'].upper()}")
+    print(
+        f"Fallback Used: {workflow_outcome_summary['ai_status']['fallback_used']}/"
+        f"{workflow_outcome_summary['ai_status']['total_items']}"
+    )
+    print(
+        "Decisions: "
+        f"{workflow_outcome_summary['decisions']['kept']} kept, "
+        f"{workflow_outcome_summary['decisions']['modified']} modified, "
+        f"{workflow_outcome_summary['decisions']['removed']} removed, "
+        f"{workflow_outcome_summary['decisions']['manual_review']} manual review"
+    )
+    print(f"Confidence: {workflow_outcome_summary['confidence_level'].upper()}")
+    print(f"Next Step: {workflow_outcome_summary['next_step']}")
 
 
 if __name__ == "__main__":

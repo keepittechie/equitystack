@@ -28,9 +28,9 @@ export default async function CurrentAdminReviewPage() {
 
       <CurrentAdminWorkflowTracker
         tracker={tracker}
-        eyebrow="Workflow Guidance"
-        title="Current-admin overall flow"
-        description="Stay oriented in the full current-admin workflow while working inside the canonical review surface."
+        eyebrow="Current-Admin Pipeline"
+        title="Current-admin workflow step tracker"
+        description="This tracker shows what is complete, what step is active now, what is blocked, and the single next action to continue the canonical workflow."
       />
 
       <CurrentAdminReviewWorkspace workspace={workspace} />

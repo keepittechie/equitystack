@@ -1,30 +1,53 @@
+import { Fragment } from "react";
 import Link from "next/link";
 import OperatorActionButton from "./OperatorActionButton";
 
-function statusDot(status) {
+function statusTone(status) {
   if (status === "complete") {
-    return "bg-[#10B981]";
+    return {
+      shell: "border-[#A7F3D0] bg-[#ECFDF5]",
+      badge: "border-[#34D399] bg-[#ECFDF5] text-[#047857]",
+      dot: "bg-[#10B981]",
+      label: "Complete",
+      token: "Done",
+    };
   }
   if (status === "current") {
-    return "bg-[#F59E0B]";
+    return {
+      shell: "border-[#FDE68A] bg-[#FFFBEB]",
+      badge: "border-[#FCD34D] bg-[#FFFBEB] text-[#92400E]",
+      dot: "bg-[#F59E0B]",
+      label: "Current",
+      token: "Now",
+    };
   }
   if (status === "blocked") {
-    return "bg-[#EF4444]";
+    return {
+      shell: "border-[#FCA5A5] bg-[#FEF2F2]",
+      badge: "border-[#FCA5A5] bg-[#FEF2F2] text-[#B91C1C]",
+      dot: "bg-[#EF4444]",
+      label: "Blocked",
+      token: "Blocked",
+    };
   }
-  return "bg-[#CBD5E1]";
+  return {
+    shell: "border-[#E5EAF0] bg-white",
+    badge: "border-[#CBD5E1] bg-[#F8FAFC] text-[#64748B]",
+    dot: "bg-[#CBD5E1]",
+    label: "Not Started",
+    token: "Wait",
+  };
 }
 
-function statusText(status) {
-  if (status === "complete") {
-    return "Complete";
+function humanizeToken(value) {
+  if (typeof value !== "string" || !value.trim()) {
+    return "Unknown";
   }
-  if (status === "current") {
-    return "Current";
-  }
-  if (status === "blocked") {
-    return "Blocked";
-  }
-  return "Pending";
+
+  return value
+    .trim()
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (char) => char.toUpperCase());
 }
 
 function renderAction(actionConfig, fallbackHref, fallbackLabel = "Open") {
@@ -46,7 +69,10 @@ function renderAction(actionConfig, fallbackHref, fallbackLabel = "Open") {
   const label = actionConfig?.label || fallbackLabel;
   if (href) {
     return (
-      <Link href={href} className="text-[11px] text-[#3B82F6] underline underline-offset-2">
+      <Link
+        href={href}
+        className="inline-flex items-center rounded border border-[#1D4ED8] bg-[#1D4ED8] px-3 py-1.5 text-[12px] font-medium text-white hover:bg-[#1E40AF]"
+      >
         {label}
       </Link>
     );
@@ -57,6 +83,7 @@ function renderAction(actionConfig, fallbackHref, fallbackLabel = "Open") {
 
 export default function CurrentAdminWorkflowTracker({
   tracker,
+  compact = false,
   eyebrow = "Current-Admin Workflow",
   title = "Current-admin guided flow",
   description = "This tracker follows the canonical current-admin workflow state and highlights the single next valid step.",
@@ -65,9 +92,33 @@ export default function CurrentAdminWorkflowTracker({
     return null;
   }
 
-  const currentStep = tracker.currentStep || tracker.nextStep || null;
-  const nextStep = tracker.nextStep || tracker.currentStep || null;
-  const summaryAction = nextStep?.action || currentStep?.action || null;
+  const blockedStep = tracker.blockedStep || null;
+  const currentStep = tracker.currentStep || null;
+  const nextStep = tracker.nextStep || blockedStep || currentStep || null;
+  const allStepsComplete = tracker.steps.every((step) => step.status === "complete");
+  const summaryAction = nextStep?.action || null;
+  const stateHeadline = blockedStep
+    ? `Blocked at ${blockedStep.title}`
+    : currentStep
+      ? `${currentStep.title} is active`
+      : allStepsComplete
+        ? "Current-admin workflow complete"
+        : humanizeToken(tracker.canonicalState);
+  const nextStepLabel = allStepsComplete ? "Complete" : nextStep?.title || "No next step";
+  const whyItMatters = blockedStep
+    ? blockedStep.reason
+    : nextStep?.reason || tracker.summary || "No current-admin guidance is available.";
+  const summaryHref = nextStep?.href || tracker.operatorSurfaceHref || tracker.sessionHref;
+  const fallbackActionLabel = allStepsComplete
+    ? "Open current-admin session"
+    : blockedStep
+      ? blockedStep.action?.label || "Inspect current-admin blocker"
+      : nextStep?.action?.label || "Open current-admin review";
+  const summaryTone = blockedStep
+    ? "border-[#FCA5A5] bg-[#FEF2F2]"
+    : currentStep
+      ? "border-[#FDE68A] bg-[#FFFBEB]"
+      : "border-[#E5EAF0] bg-white";
 
   return (
     <section className="space-y-2">
@@ -75,38 +126,73 @@ export default function CurrentAdminWorkflowTracker({
         <div className="space-y-1">
           <p className="font-mono text-[11px] uppercase tracking-wide text-[#6B7280]">{eyebrow}</p>
           <h2 className="text-sm font-semibold text-[#1F2937]">{title}</h2>
-          <p className="text-[11px] text-[#6B7280]">{description}</p>
+          {description ? (
+            <p className="text-[11px] text-[#6B7280]">{description}</p>
+          ) : null}
+          <div className="flex flex-wrap items-center gap-3 text-[11px] text-[#4B5563]">
+            <span>Batch: <span className="font-mono text-[#111827]">{tracker.batchName || "No active batch"}</span></span>
+            <span>State: <span className="font-medium text-[#1F2937]">{humanizeToken(tracker.canonicalState)}</span></span>
+          </div>
         </div>
         {tracker.sessionHref ? (
           <Link href={tracker.sessionHref} className="text-[11px] text-[#3B82F6] underline underline-offset-2">
-            Open session
+            Open current-admin session
           </Link>
         ) : null}
       </div>
 
-      <div className="grid gap-2 xl:grid-cols-[1fr_1fr_1.4fr_auto]">
-        <div className="rounded border border-[#E5EAF0] bg-white px-3 py-2">
-          <p className="text-[11px] text-[#6B7280]">Current step</p>
+      <div className="overflow-x-auto rounded border border-[#E5EAF0] bg-white px-3 py-2">
+        <div className="flex min-w-[1100px] items-stretch gap-2">
+          {tracker.steps.map((step, index) => {
+            const tone = statusTone(step.status);
+            return (
+              <Fragment key={step.id}>
+                <div className={`min-w-[142px] rounded border px-2 py-2 ${tone.shell}`}>
+                  <div className="flex items-start gap-2">
+                    <span className={`inline-flex min-w-[48px] items-center justify-center rounded border px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${tone.badge}`}>
+                      {tone.token}
+                    </span>
+                    <div className="min-w-0">
+                      <div className="text-[11px] font-medium text-[#1F2937]">{step.title}</div>
+                      <div className="mt-0.5 flex items-center gap-1 text-[10px] text-[#6B7280]">
+                        <span className={`h-2 w-2 rounded-full ${tone.dot}`} />
+                        {tone.label}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {index < tracker.steps.length - 1 ? (
+                  <div className="flex items-center text-[14px] text-[#94A3B8]">→</div>
+                ) : null}
+              </Fragment>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className={`grid gap-2 rounded border px-3 py-3 ${summaryTone}${compact ? " lg:grid-cols-[1fr_1fr_1.6fr_auto]" : " xl:grid-cols-[1fr_1fr_1.6fr_auto]"}`}>
+        <div>
+          <p className="text-[11px] text-[#6B7280]">Current real state</p>
           <p className="mt-1 text-[12px] font-medium text-[#1F2937]">
-            {currentStep?.title || "No active current-admin step"}
+            {stateHeadline}
           </p>
         </div>
-        <div className="rounded border border-[#E5EAF0] bg-white px-3 py-2">
+        <div>
           <p className="text-[11px] text-[#6B7280]">Next step</p>
           <p className="mt-1 text-[12px] font-medium text-[#1F2937]">
-            {nextStep?.title || "No next step"}
+            {nextStepLabel}
           </p>
         </div>
-        <div className="rounded border border-[#E5EAF0] bg-white px-3 py-2">
-          <p className="text-[11px] text-[#6B7280]">Why this is next</p>
+        <div>
+          <p className="text-[11px] text-[#6B7280]">{blockedStep ? "Blocked" : "Why this matters"}</p>
           <p className="mt-1 text-[12px] text-[#4B5563]">
-            {nextStep?.reason || tracker.summary || "No current-admin guidance is available."}
+            {whyItMatters}
           </p>
         </div>
-        <div className="rounded border border-[#E5EAF0] bg-white px-3 py-2">
-          <p className="text-[11px] text-[#6B7280]">Next action</p>
+        <div>
+          <p className="text-[11px] text-[#6B7280]">Action</p>
           <div className="mt-2">
-            {renderAction(summaryAction, nextStep?.href || tracker.operatorSurfaceHref, "Open next step")}
+            {renderAction(summaryAction, summaryHref, fallbackActionLabel)}
           </div>
         </div>
       </div>
@@ -115,11 +201,11 @@ export default function CurrentAdminWorkflowTracker({
         <span className="font-medium text-[#4B5563]">Status legend</span>
         <span className="inline-flex items-center gap-1">
           <span className="h-2 w-2 rounded-full bg-[#10B981]" />
-          Complete
+          Completed
         </span>
         <span className="inline-flex items-center gap-1">
           <span className="h-2 w-2 rounded-full bg-[#F59E0B]" />
-          Next step
+          Current step
         </span>
         <span className="inline-flex items-center gap-1">
           <span className="h-2 w-2 rounded-full bg-[#EF4444]" />
@@ -129,50 +215,6 @@ export default function CurrentAdminWorkflowTracker({
           <span className="h-2 w-2 rounded-full bg-[#CBD5E1]" />
           Not yet available
         </span>
-      </div>
-
-      <div className="overflow-x-auto rounded border border-[#E5EAF0] bg-white">
-        <table className="min-w-[920px] w-full text-[11px]">
-          <thead className="bg-[#F9FBFD] text-left uppercase tracking-wide text-[#6B7280]">
-            <tr>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Status</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Step</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">What this means</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {tracker.steps.map((step) => {
-              const rowTone =
-                step.status === "current"
-                  ? "bg-[#FFFBEB]"
-                  : step.status === "blocked"
-                    ? "bg-[#FEF2F2]"
-                    : "bg-white";
-              return (
-                <tr key={step.id} className={`align-top hover:bg-[#F1F5F9] ${rowTone}`}>
-                  <td className="border-b border-[#E5EAF0] px-2 py-1">
-                    <div className="flex items-center gap-2">
-                      <span className={`h-2 w-2 rounded-full ${statusDot(step.status)}`} />
-                      <span className="text-[11px] text-[#4B5563]">{statusText(step.status)}</span>
-                    </div>
-                  </td>
-                  <td className="border-b border-[#E5EAF0] px-2 py-1">
-                    <div className="font-medium text-[#1F2937]">{step.title}</div>
-                  </td>
-                  <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">
-                    {step.reason}
-                  </td>
-                  <td className="border-b border-[#E5EAF0] px-2 py-1">
-                    {step.status === "current" || step.status === "blocked"
-                      ? renderAction(step.action, step.href, "Open")
-                      : <span className="text-[11px] text-[#6B7280]">—</span>}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
       </div>
     </section>
   );

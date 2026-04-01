@@ -8,7 +8,18 @@ export async function POST(request) {
     const headerStore = await headers();
 
     if (typeof body.helpful !== "boolean") {
-      return NextResponse.json({ error: "Helpful value is required" }, { status: 400 });
+      return NextResponse.json(
+        {
+          success: false,
+          ok: false,
+          data: null,
+          error: {
+            message: "Helpful value is required",
+            code: "invalid_feedback_payload",
+          },
+        },
+        { status: 400 }
+      );
     }
 
     await recordPublicFeedback({
@@ -22,9 +33,25 @@ export async function POST(request) {
       userAgent: headerStore.get("user-agent") || null,
     });
 
-    return NextResponse.json({ ok: true });
+    return NextResponse.json({
+      success: true,
+      ok: true,
+      data: { recorded: true },
+      error: null,
+    });
   } catch (error) {
     console.error("Error recording public feedback:", error);
-    return NextResponse.json({ error: "Failed to submit feedback" }, { status: 500 });
+    return NextResponse.json(
+      {
+        success: false,
+        ok: false,
+        data: null,
+        error: {
+          message: "Failed to submit feedback",
+          code: "public_feedback_failed",
+        },
+      },
+      { status: 500 }
+    );
   }
 }

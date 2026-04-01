@@ -19,9 +19,25 @@ export async function POST(request) {
       metadata: body.metadata && typeof body.metadata === "object" ? body.metadata : null,
     });
 
-    return NextResponse.json({ ok: true });
+    return NextResponse.json({
+      success: true,
+      ok: true,
+      data: { recorded: true },
+      error: null,
+    });
   } catch (error) {
     console.error("Error recording public signal:", error);
-    return NextResponse.json({ ok: false }, { status: 202 });
+    return NextResponse.json(
+      {
+        success: false,
+        ok: false,
+        data: null,
+        error: {
+          message: "Failed to record public signal",
+          code: "public_signal_failed",
+        },
+      },
+      { status: 202 }
+    );
   }
 }

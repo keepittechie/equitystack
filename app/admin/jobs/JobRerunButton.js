@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import JobStatusBadge from "./JobStatusBadge";
+import { readAdminJsonResponse } from "@/app/admin/components/readAdminJsonResponse";
 
 const TERMINAL_JOB_STATUSES = new Set(["success", "failed", "blocked", "cancelled"]);
 
@@ -60,7 +61,7 @@ export default function JobRerunButton({
           method: "GET",
           cache: "no-store",
         });
-        const payload = await response.json();
+        const payload = await readAdminJsonResponse(response, `/api/admin/operator/jobs/${resultJob.id}`);
         if (!response.ok || !payload.success) {
           throw new Error(payload.error || "Failed to refresh the rerun job.");
         }
@@ -97,7 +98,7 @@ export default function JobRerunButton({
         confirmation: overrideConfirmation || undefined,
       }),
     });
-    const payload = await response.json();
+    const payload = await readAdminJsonResponse(response, `/api/admin/operator/jobs/${job.id}/rerun`);
     if (!response.ok || !payload.success) {
       throw new Error(payload.error || "Failed to rerun the job.");
     }

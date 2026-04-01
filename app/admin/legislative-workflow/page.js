@@ -1,10 +1,13 @@
 import { getLegislativeWorkflowWorkspace } from "@/lib/services/legislativeWorkflowInsightsService";
+import { buildLegislativeWorkflowTracker } from "@/lib/server/admin-operator/workflowData.js";
+import LegislativeWorkflowTracker from "@/app/admin/components/LegislativeWorkflowTracker";
 import LegislativeWorkflowWorkspace from "./LegislativeWorkflowWorkspace";
 
 export const dynamic = "force-dynamic";
 
 export default async function LegislativeWorkflowPage() {
   const workspace = await getLegislativeWorkflowWorkspace();
+  const tracker = buildLegislativeWorkflowTracker(workspace);
 
   return (
     <main className="mx-auto max-w-[1700px] space-y-4 px-4 py-4">
@@ -17,6 +20,13 @@ export default async function LegislativeWorkflowPage() {
           and only triggers wrapped legislative commands when the current workflow state allows it.
         </p>
       </section>
+
+      <LegislativeWorkflowTracker
+        tracker={tracker}
+        eyebrow="Legislative Pipeline"
+        title="Legislative workflow step tracker"
+        description="This tracker shows what is complete, what step is active now, what is blocked, and the single next action to continue the canonical legislative workflow."
+      />
 
       <LegislativeWorkflowWorkspace workspace={workspace} />
     </main>
