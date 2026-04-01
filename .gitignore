@@ -47,6 +47,13 @@ python/scripts/__pycache__/
 python/venv/
 python/logs/
 python/.codex
+python/reports/admin_operator_action_history.json
+python/reports/admin_operator_command_center/
+python/reports/admin_resets/[0-9]*/
+python/reports/current_admin/current-admin-wrapper-test*.json
+python/reports/current_admin/discovery_report.json
+python/reports/current_admin/donald-j-trump-2025-discovery-*.json
+python/reports/current_admin/review_decisions/
 
 # Database dumps
 database/equitystack.sql
