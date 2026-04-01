@@ -8,7 +8,7 @@ export default function AdminLayout({ children }) {
         <div className="mx-auto max-w-[1700px] px-4 py-3">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-[#6B7280]">
+              <p className="font-Monaco text-[11px] uppercase tracking-[0.18em] text-[#6B7280]">
                 EquityStack Admin
               </p>
               <h1 className="mt-1 text-lg font-semibold tracking-tight">Operator Command Center</h1>

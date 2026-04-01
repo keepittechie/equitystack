@@ -1536,6 +1536,12 @@ Be especially careful with Mixed impact:
   - check_sources_before_import
   - review_deep_review_output
 - source_warnings and missing_source_warnings must be arrays of short machine-friendly strings
+
+Record:
+{json.dumps(record, indent=2)}
+
+Existing matches:
+{json.dumps(existing_matches, indent=2)}
 """.strip()
 
 
