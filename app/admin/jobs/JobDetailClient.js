@@ -113,34 +113,34 @@ export default function JobDetailClient({ jobId, initialJob }) {
 
   return (
     <div className="space-y-4">
-      <section className="rounded border border-zinc-300 bg-white p-4 shadow-sm">
+      <section className="rounded border border-[#E5EAF0] bg-[#EEF2F6] p-4 shadow-sm">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="font-mono text-[11px] uppercase tracking-wide text-gray-600">{job.workflowFamily}</p>
-            <h2 className="mt-1 text-lg font-semibold">{job.actionTitle}</h2>
-            <p className="mt-1 text-[12px] text-gray-700">{job.summary || "No summary recorded."}</p>
+            <p className="font-mono text-[11px] uppercase tracking-wide text-[#6B7280]">{job.workflowFamily}</p>
+            <h2 className="mt-1 text-lg font-semibold text-[#1F2937]">{job.actionTitle}</h2>
+            <p className="mt-1 text-[12px] text-[#4B5563]">{job.summary || "No summary recorded."}</p>
           </div>
           <JobStatusBadge status={job.status} />
         </div>
 
         <div className="mt-3 grid gap-2 md:grid-cols-4">
-          <div className="rounded border p-2">
-            <p className="text-[11px] text-gray-500">Created</p>
-            <p className="mt-1 text-[12px]">{job.timestamps?.createdAt || "-"}</p>
+            <div className="rounded border border-[#E5EAF0] bg-white p-2">
+              <p className="text-[11px] text-[#6B7280]">Created</p>
+              <p className="mt-1 text-[12px] text-[#1F2937]">{job.timestamps?.createdAt || "-"}</p>
+            </div>
+            <div className="rounded border border-[#E5EAF0] bg-white p-2">
+              <p className="text-[11px] text-[#6B7280]">Started</p>
+              <p className="mt-1 text-[12px] text-[#1F2937]">{job.timestamps?.startedAt || "-"}</p>
+            </div>
+            <div className="rounded border border-[#E5EAF0] bg-white p-2">
+              <p className="text-[11px] text-[#6B7280]">Finished</p>
+              <p className="mt-1 text-[12px] text-[#1F2937]">{job.timestamps?.finishedAt || "-"}</p>
+            </div>
+            <div className="rounded border border-[#E5EAF0] bg-white p-2">
+              <p className="text-[11px] text-[#6B7280]">Updated</p>
+              <p className="mt-1 text-[12px] text-[#1F2937]">{job.timestamps?.updatedAt || "-"}</p>
+            </div>
           </div>
-          <div className="rounded border p-2">
-            <p className="text-[11px] text-gray-500">Started</p>
-            <p className="mt-1 text-[12px]">{job.timestamps?.startedAt || "-"}</p>
-          </div>
-          <div className="rounded border p-2">
-            <p className="text-[11px] text-gray-500">Finished</p>
-            <p className="mt-1 text-[12px]">{job.timestamps?.finishedAt || "-"}</p>
-          </div>
-          <div className="rounded border p-2">
-            <p className="text-[11px] text-gray-500">Updated</p>
-            <p className="mt-1 text-[12px]">{job.timestamps?.updatedAt || "-"}</p>
-          </div>
-        </div>
 
         <div className="mt-3 grid gap-2 md:grid-cols-3">
           <div className="rounded border p-2">
@@ -166,11 +166,11 @@ export default function JobDetailClient({ jobId, initialJob }) {
         </div>
 
         {transportReport ? (
-          <div className="mt-3 rounded border bg-zinc-50 p-3">
+          <div className="mt-3 rounded border border-[#E5EAF0] bg-white p-3">
             <p className="text-[12px] font-medium">Remote transport lifecycle</p>
-            <div className="mt-3 grid gap-2 md:grid-cols-2 xl:grid-cols-4 text-[12px] text-gray-700">
-              <div className="rounded border bg-white p-2">
-                <p className="text-[11px] text-gray-500">Target</p>
+            <div className="mt-3 grid gap-2 md:grid-cols-2 xl:grid-cols-4 text-[12px] text-[#4B5563]">
+              <div className="rounded border border-[#E5EAF0] bg-[#F9FBFD] p-2">
+                <p className="text-[11px] text-[#6B7280]">Target</p>
                 <p className="mt-1 break-all">{transportReport.target || execution.executor?.executor_transport_target || "-"}</p>
               </div>
               <div className="rounded border bg-white p-2">
@@ -206,7 +206,7 @@ export default function JobDetailClient({ jobId, initialJob }) {
         ) : null}
 
         {job.schedule ? (
-          <div className="mt-3 rounded border bg-zinc-50 p-3 text-[12px] text-gray-700">
+          <div className="mt-3 rounded border border-[#E5EAF0] bg-[#F9FBFD] p-3 text-[12px] text-[#4B5563]">
             Scheduled origin: {job.schedule.schedule_title} via {job.schedule.trigger_type}.
           </div>
         ) : null}
@@ -254,7 +254,7 @@ export default function JobDetailClient({ jobId, initialJob }) {
         <div className="mt-4 flex flex-wrap gap-3">
           <JobRerunButton job={job} label={job.rerun?.label || "Rerun job"} redirectToJob />
           {job.links?.session ? (
-            <Link href={job.links.session} className="rounded border px-3 py-1.5 text-[12px]">
+            <Link href={job.links.session} className="rounded border border-[#E5EAF0] bg-white px-3 py-1.5 text-[12px] text-[#1F2937]">
               Open session inspector
             </Link>
           ) : null}
@@ -283,7 +283,7 @@ export default function JobDetailClient({ jobId, initialJob }) {
 
         <div className="rounded border border-zinc-300 bg-white p-4 shadow-sm">
           <h3 className="text-base font-semibold">Logs</h3>
-          <pre className="mt-3 max-h-[36rem] overflow-auto rounded border bg-stone-950 p-3 text-[11px] text-stone-100">
+          <pre className="mt-3 max-h-[36rem] overflow-auto rounded border border-[#E5EAF0] bg-[#F3F4F6] p-3 text-[11px] text-[#111827]">
             {job.log || "No logs captured."}
           </pre>
         </div>
@@ -292,13 +292,13 @@ export default function JobDetailClient({ jobId, initialJob }) {
       <section className="rounded border border-zinc-300 bg-white p-4 shadow-sm">
         <h3 className="text-base font-semibold">Command input</h3>
         <div className="mt-3 grid gap-3 xl:grid-cols-3">
-          <pre className="overflow-auto rounded border bg-zinc-50 p-3 text-[11px]">
+          <pre className="overflow-auto rounded border border-[#E5EAF0] bg-[#F3F4F6] p-3 text-[11px] text-[#111827]">
             {JSON.stringify(job.input || {}, null, 2)}
           </pre>
-          <pre className="overflow-auto rounded border bg-zinc-50 p-3 text-[11px]">
+          <pre className="overflow-auto rounded border border-[#E5EAF0] bg-[#F3F4F6] p-3 text-[11px] text-[#111827]">
             {JSON.stringify(job.command || {}, null, 2)}
           </pre>
-          <pre className="overflow-auto rounded border bg-zinc-50 p-3 text-[11px]">
+          <pre className="overflow-auto rounded border border-[#E5EAF0] bg-[#F3F4F6] p-3 text-[11px] text-[#111827]">
             {JSON.stringify(
               {
                 sessionIds: job.sessionIds || [],
@@ -311,10 +311,10 @@ export default function JobDetailClient({ jobId, initialJob }) {
           </pre>
         </div>
         <div className="mt-4 flex flex-wrap gap-3">
-          <Link href="/admin/jobs" className="rounded border px-3 py-1.5 text-[12px]">
+          <Link href="/admin/jobs" className="rounded border border-[#E5EAF0] bg-white px-3 py-1.5 text-[12px] text-[#1F2937]">
             Back to jobs
           </Link>
-          <Link href="/admin/artifacts" className="rounded border px-3 py-1.5 text-[12px]">
+          <Link href="/admin/artifacts" className="rounded border border-[#E5EAF0] bg-white px-3 py-1.5 text-[12px] text-[#1F2937]">
             Open artifact inspector
           </Link>
         </div>

@@ -39,7 +39,7 @@ export async function generateMetadata({ params }) {
 
 function MetaPill({ children }) {
   return (
-    <span className="inline-flex items-center rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-3 py-1 text-xs text-[var(--ink-soft)]">
+    <span className="public-pill">
       {children}
     </span>
   );
@@ -68,7 +68,7 @@ export default async function FutureBillDetailPage({ params }) {
       <div className="flex flex-wrap gap-3">
         <Link
           href="/future-bills"
-          className="inline-flex items-center rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
+          className="public-button-secondary"
         >
           Back to Future Bills
         </Link>
@@ -78,7 +78,7 @@ export default async function FutureBillDetailPage({ params }) {
           routeKind="detail"
           entityType="future-bill"
           entityKey={bill.slug}
-          className="inline-flex items-center rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
+          className="public-button-secondary"
         >
           Open Card Page
         </TrackedLink>
@@ -88,7 +88,7 @@ export default async function FutureBillDetailPage({ params }) {
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div className="max-w-4xl">
             <p className="eyebrow mb-4">{bill.target_area || "Future Bill"}</p>
-            <h1 className="text-4xl md:text-5xl font-bold tracking-tight">{bill.title}</h1>
+            <h1 className="page-title">{bill.title}</h1>
             <p className="text-base md:text-lg text-[var(--ink-soft)] mt-4 leading-8">
               {bill.summary}
             </p>
@@ -112,7 +112,7 @@ export default async function FutureBillDetailPage({ params }) {
               routeKind="detail"
               entityType="future-bill"
               entityKey={bill.slug}
-              className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
+              className="public-button-secondary"
             >
               Share Card
             </TrackedLink>

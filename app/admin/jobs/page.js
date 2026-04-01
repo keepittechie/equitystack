@@ -8,9 +8,9 @@ export default async function AdminJobsPage() {
   return (
     <main className="mx-auto max-w-[1700px] space-y-4 px-4 py-4">
       <section className="space-y-2">
-        <p className="font-mono text-[11px] uppercase tracking-wide text-gray-600">Jobs / Runs</p>
-        <h2 className="text-lg font-semibold">Broker-backed job history</h2>
-        <p className="max-w-5xl text-[12px] text-gray-700">
+        <p className="font-mono text-[11px] uppercase tracking-wide text-[#6B7280]">Jobs / Runs</p>
+        <h2 className="text-lg font-semibold text-[#1F2937]">Broker-backed job history</h2>
+        <p className="max-w-5xl text-[12px] text-[#4B5563]">
           Every broker action records a durable job with status, runtime metadata, captured output,
           linked session context, and rerun history.
         </p>

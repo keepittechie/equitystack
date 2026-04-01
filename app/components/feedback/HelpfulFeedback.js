@@ -48,7 +48,7 @@ export default function HelpfulFeedback({
           className={`rounded-full border px-4 py-2 text-sm font-medium ${
             selected === true
               ? "border-[var(--accent)] bg-[var(--accent)] text-white"
-              : "border-[rgba(120,53,15,0.18)] bg-white/80"
+              : "border-[var(--line-strong)] bg-white"
           }`}
         >
           Yes
@@ -60,7 +60,7 @@ export default function HelpfulFeedback({
           className={`rounded-full border px-4 py-2 text-sm font-medium ${
             selected === false
               ? "border-[var(--accent)] bg-[var(--accent)] text-white"
-              : "border-[rgba(120,53,15,0.18)] bg-white/80"
+              : "border-[var(--line-strong)] bg-white"
           }`}
         >
           No
@@ -75,7 +75,7 @@ export default function HelpfulFeedback({
           rows={3}
           maxLength={2000}
           placeholder="What was useful, confusing, or missing?"
-          className="mt-2 w-full rounded-xl border px-3 py-2 bg-white/80"
+          className="public-field mt-2"
           disabled={status === "submitted"}
         />
       </label>

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getCommandCenterSummary } from "@/lib/server/admin-operator/workflowData.js";
 import ActionLauncher from "./components/ActionLauncher";
+import CurrentAdminWorkflowTracker from "./components/CurrentAdminWorkflowTracker";
 import OperatorActionButton from "./components/OperatorActionButton";
 import OperatorPageAutoRefresh from "./components/OperatorPageAutoRefresh";
 import JobStatusBadge from "./jobs/JobStatusBadge";
@@ -90,12 +91,12 @@ function formatDuration(startedAt, finishedAt) {
 function CompactBadge({ children, tone = "default", mono = false }) {
   const palette =
     tone === "danger"
-      ? "border-red-300 bg-red-50 text-red-900"
+      ? "border-[#FECACA] bg-[#FEF2F2] text-[#B91C1C]"
       : tone === "warning"
-        ? "border-amber-300 bg-amber-50 text-amber-900"
+        ? "border-[#FDE68A] bg-[#FFFBEB] text-[#B45309]"
         : tone === "success"
-          ? "border-green-300 bg-green-50 text-green-900"
-          : "border-zinc-300 bg-zinc-50 text-zinc-700";
+          ? "border-[#A7F3D0] bg-[#ECFDF5] text-[#047857]"
+          : "border-[#E5EAF0] bg-[#F9FBFD] text-[#4B5563]";
 
   return (
     <span
@@ -149,17 +150,17 @@ function DashboardCounter({ label, value, href }) {
   return (
     <Link
       href={href}
-      className="flex min-h-0 items-center justify-between gap-3 rounded border border-zinc-300 bg-white px-2 py-1.5 text-[11px] hover:bg-zinc-50"
+      className="flex min-h-0 items-center justify-between gap-3 rounded border border-[#E5EAF0] bg-white px-2 py-1.5 text-[11px] hover:bg-[#F1F5F9]"
     >
-      <span className="font-mono uppercase tracking-wide text-zinc-600">{label}</span>
-      <span className="text-sm font-semibold text-zinc-900">{value}</span>
+      <span className="font-mono uppercase tracking-wide text-[#6B7280]">{label}</span>
+      <span className="text-sm font-semibold text-[#1F2937]">{value}</span>
     </Link>
   );
 }
 
 function TableShell({ children }) {
   return (
-    <div className="overflow-x-auto rounded border border-zinc-200 bg-white">
+    <div className="overflow-x-auto rounded border border-[#E5EAF0] bg-white">
       {children}
     </div>
   );
@@ -167,7 +168,7 @@ function TableShell({ children }) {
 
 function TableLink({ href, children }) {
   return (
-    <Link href={href} className="text-[11px] underline underline-offset-2">
+    <Link href={href} className="text-[11px] text-[#3B82F6] underline underline-offset-2">
       {children}
     </Link>
   );
@@ -200,16 +201,16 @@ function renderPrimaryAction(actionConfig, fallbackHref, fallbackLabel = "Inspec
     return <TableLink href={fallbackHref}>{fallbackLabel}</TableLink>;
   }
 
-  return <span className="text-[11px] text-zinc-400">—</span>;
+  return <span className="text-[11px] text-[#6B7280]">—</span>;
 }
 
 function SectionHeader({ eyebrow, title, description, href, hrefLabel = "View all" }) {
   return (
     <div className="flex flex-wrap items-end justify-between gap-3">
       <div className="space-y-1">
-        <p className="font-mono text-[11px] uppercase tracking-wide text-zinc-600">{eyebrow}</p>
-        <h2 className="text-sm font-semibold text-zinc-900">{title}</h2>
-        {description ? <p className="text-[11px] text-zinc-600">{description}</p> : null}
+        <p className="font-mono text-[11px] uppercase tracking-wide text-[#6B7280]">{eyebrow}</p>
+        <h2 className="text-sm font-semibold text-[#1F2937]">{title}</h2>
+        {description ? <p className="text-[11px] text-[#6B7280]">{description}</p> : null}
       </div>
       {href ? <TableLink href={href}>{hrefLabel}</TableLink> : null}
     </div>
@@ -226,16 +227,16 @@ function DailyRoutineTable({ steps, itemIndex }) {
       />
       <TableShell>
         <table className="min-w-[1160px] w-full text-[11px]">
-          <thead className="bg-zinc-100 text-left uppercase tracking-wide text-zinc-600">
+          <thead className="bg-[#F9FBFD] text-left uppercase tracking-wide text-[#6B7280]">
             <tr>
-              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Priority</th>
-              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Type</th>
-              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Workflow</th>
-              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Item</th>
-              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Why Now</th>
-              <th className="border-b border-zinc-200 px-2 py-1 font-medium">State</th>
-              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Source</th>
-              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Action</th>
+              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Priority</th>
+              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Type</th>
+              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Workflow</th>
+              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Item</th>
+              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Why Now</th>
+              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">State</th>
+              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Source</th>
+              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -243,27 +244,27 @@ function DailyRoutineTable({ steps, itemIndex }) {
               steps.map((step) => {
                 const sourceItem = itemIndex.get(step.sourceItemId);
                 return (
-                  <tr key={step.id} className="align-top odd:bg-white even:bg-zinc-50/40">
-                    <td className="border-b border-zinc-200 px-2 py-1 font-mono font-medium text-zinc-700">
+                  <tr key={step.id} className="align-top odd:bg-white even:bg-[#F9FBFD] hover:bg-[#F1F5F9]">
+                    <td className="border-b border-[#E5EAF0] px-2 py-1 font-mono font-medium text-[#111827]">
                       {toPriorityCode(step.priorityLabel)}
                     </td>
-                    <td className="border-b border-zinc-200 px-2 py-1">
+                    <td className="border-b border-[#E5EAF0] px-2 py-1">
                       <RoutineTypeBadge step={step} />
                     </td>
-                    <td className="border-b border-zinc-200 px-2 py-1">{toWorkflowLabel(step.workflowFamily)}</td>
-                    <td className="border-b border-zinc-200 px-2 py-1">
-                      <div className="font-medium text-zinc-900">{step.title}</div>
+                    <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">{toWorkflowLabel(step.workflowFamily)}</td>
+                    <td className="border-b border-[#E5EAF0] px-2 py-1">
+                      <div className="font-medium text-[#1F2937]">{step.title}</div>
                     </td>
-                    <td className="border-b border-zinc-200 px-2 py-1 text-zinc-700">
+                    <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">
                       {step.priorityReason || step.explanation}
                     </td>
-                    <td className="border-b border-zinc-200 px-2 py-1">
+                    <td className="border-b border-[#E5EAF0] px-2 py-1">
                       <StateBadge value={sourceItem?.status || "pending"} />
                     </td>
-                    <td className="border-b border-zinc-200 px-2 py-1 font-mono text-[10px] text-zinc-600">
+                    <td className="border-b border-[#E5EAF0] px-2 py-1 font-mono text-[10px] text-[#6B7280]">
                       {step.sourceId}
                     </td>
-                    <td className="border-b border-zinc-200 px-2 py-1">
+                    <td className="border-b border-[#E5EAF0] px-2 py-1">
                       {renderPrimaryAction(step.primaryAction, step.deepLinkTarget, "Open")}
                     </td>
                   </tr>
@@ -271,7 +272,7 @@ function DailyRoutineTable({ steps, itemIndex }) {
               })
             ) : (
               <tr>
-                <td colSpan={8} className="px-2 py-3 text-[11px] text-zinc-600">
+                <td colSpan={8} className="px-2 py-3 text-[11px] text-[#6B7280]">
                   No routine items are active right now.
                 </td>
               </tr>
@@ -291,33 +292,33 @@ function BucketTable({ id, title, description, href, items }) {
       <SectionHeader eyebrow={title} title={title} description={description} href={href} />
       <TableShell>
         <table className="min-w-[760px] w-full text-[11px]">
-          <thead className="bg-zinc-100 text-left uppercase tracking-wide text-zinc-600">
+          <thead className="bg-[#F9FBFD] text-left uppercase tracking-wide text-[#6B7280]">
             <tr>
-              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Workflow</th>
-              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Item</th>
-              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Why Now</th>
-              <th className="border-b border-zinc-200 px-2 py-1 font-medium">State</th>
-              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Action</th>
+              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Workflow</th>
+              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Item</th>
+              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Why Now</th>
+              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">State</th>
+              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Action</th>
             </tr>
           </thead>
           <tbody>
             {rows.length ? (
               rows.map((item) => (
-                <tr key={item.id} className="align-top odd:bg-white even:bg-zinc-50/40">
-                  <td className="border-b border-zinc-200 px-2 py-1">{toWorkflowLabel(item.workflowFamily)}</td>
-                  <td className="border-b border-zinc-200 px-2 py-1">
-                    <div className="font-medium text-zinc-900">{item.title}</div>
-                    <div className="mt-0.5 font-mono text-[10px] text-zinc-500">
+                <tr key={item.id} className="align-top odd:bg-white even:bg-[#F9FBFD] hover:bg-[#F1F5F9]">
+                  <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">{toWorkflowLabel(item.workflowFamily)}</td>
+                  <td className="border-b border-[#E5EAF0] px-2 py-1">
+                    <div className="font-medium text-[#1F2937]">{item.title}</div>
+                    <div className="mt-0.5 font-mono text-[10px] text-[#6B7280]">
                       {item.metadata?.sourceId || item.id}
                     </div>
                   </td>
-                  <td className="border-b border-zinc-200 px-2 py-1 text-zinc-700">
+                  <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">
                     {item.priorityReason || item.summary}
                   </td>
-                  <td className="border-b border-zinc-200 px-2 py-1">
+                  <td className="border-b border-[#E5EAF0] px-2 py-1">
                     <StateBadge value={item.status || "pending"} />
                   </td>
-                  <td className="border-b border-zinc-200 px-2 py-1">
+                  <td className="border-b border-[#E5EAF0] px-2 py-1">
                     {item.quickAction?.action ? (
                       <OperatorActionButton
                         action={item.quickAction.action}
@@ -331,14 +332,14 @@ function BucketTable({ id, title, description, href, items }) {
                     ) : item.href ? (
                       <TableLink href={item.href}>Inspect</TableLink>
                     ) : (
-                      <span className="text-[11px] text-zinc-400">—</span>
+                      <span className="text-[11px] text-[#6B7280]">—</span>
                     )}
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={5} className="px-2 py-3 text-[11px] text-zinc-600">
+                <td colSpan={5} className="px-2 py-3 text-[11px] text-[#6B7280]">
                   Nothing active in this bucket right now.
                 </td>
               </tr>
@@ -361,19 +362,19 @@ function SessionSnapshotTable({ sessions }) {
       />
       <TableShell>
         <table className="min-w-[1380px] w-full text-[11px]">
-          <thead className="bg-zinc-100 text-left uppercase tracking-wide text-zinc-600">
+          <thead className="bg-[#F9FBFD] text-left uppercase tracking-wide text-[#6B7280]">
             <tr>
-              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Workflow</th>
-              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Session</th>
-              <th className="border-b border-zinc-200 px-2 py-1 font-medium">State</th>
-              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Review</th>
-              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Blocker</th>
-              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Next Action</th>
-              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Latest Job</th>
-              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Mode</th>
-              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Schedule</th>
-              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Fallback</th>
-              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Action</th>
+              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Workflow</th>
+              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Session</th>
+              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">State</th>
+              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Review</th>
+              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Blocker</th>
+              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Next Action</th>
+              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Latest Job</th>
+              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Mode</th>
+              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Schedule</th>
+              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Fallback</th>
+              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -383,71 +384,83 @@ function SessionSnapshotTable({ sessions }) {
                   session.blockerPreview?.[0] ||
                   session.missingArtifactsPreview?.[0] ||
                   "—";
+                const workflowTracker = session.workflowFamily === "current-admin" ? session.workflowTracker : null;
                 const primaryAction =
+                  workflowTracker?.nextStep?.action ||
+                  workflowTracker?.currentStep?.action ||
                   session.quickActions?.nextAction ||
                   session.quickActions?.retryAction ||
                   null;
+                const nextActionLabel =
+                  workflowTracker?.nextStep?.title ||
+                  workflowTracker?.currentStep?.title ||
+                  session.recommendedAction?.title ||
+                  "—";
 
                 return (
-                  <tr key={session.id} className="align-top odd:bg-white even:bg-zinc-50/40">
-                    <td className="border-b border-zinc-200 px-2 py-1">{toWorkflowLabel(session.workflowFamily)}</td>
-                    <td className="border-b border-zinc-200 px-2 py-1">
-                      <div className="font-mono text-[10px] text-zinc-700">
+                  <tr key={session.id} className="align-top odd:bg-white even:bg-[#F9FBFD] hover:bg-[#F1F5F9]">
+                    <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">{toWorkflowLabel(session.workflowFamily)}</td>
+                    <td className="border-b border-[#E5EAF0] px-2 py-1">
+                      <div className="font-mono text-[10px] text-[#111827]">
                         {session.canonicalSessionKey || session.id}
                       </div>
                     </td>
-                    <td className="border-b border-zinc-200 px-2 py-1">
+                    <td className="border-b border-[#E5EAF0] px-2 py-1">
                       <StateBadge value={session.canonicalState} />
                     </td>
-                    <td className="border-b border-zinc-200 px-2 py-1">
+                    <td className="border-b border-[#E5EAF0] px-2 py-1">
                       {session.reviewPendingCount > 0 ? (
                         <CompactBadge tone="warning">Yes</CompactBadge>
                       ) : (
                         <CompactBadge>No</CompactBadge>
                       )}
                     </td>
-                    <td className="border-b border-zinc-200 px-2 py-1">
-                      <div className="max-w-[220px] truncate text-zinc-700" title={blocker}>
+                    <td className="border-b border-[#E5EAF0] px-2 py-1">
+                      <div className="max-w-[220px] truncate text-[#4B5563]" title={blocker}>
                         {blocker}
                       </div>
                     </td>
-                    <td className="border-b border-zinc-200 px-2 py-1">
-                      <div className="max-w-[180px] truncate text-zinc-700" title={session.recommendedAction?.title || ""}>
-                        {session.recommendedAction?.title || "—"}
+                    <td className="border-b border-[#E5EAF0] px-2 py-1">
+                      <div className="max-w-[220px] truncate text-[#4B5563]" title={nextActionLabel}>
+                        {nextActionLabel}
                       </div>
                     </td>
-                    <td className="border-b border-zinc-200 px-2 py-1">
+                    <td className="border-b border-[#E5EAF0] px-2 py-1">
                       {session.lastJob ? (
                         <div className="space-y-1">
                           <JobStatusBadge status={session.lastJob.status} />
-                          <div className="font-mono text-[10px] text-zinc-600">
+                          <div className="font-mono text-[10px] text-[#6B7280]">
                             {session.lastJob.id}
                           </div>
                         </div>
                       ) : (
-                        <span className="text-zinc-400">—</span>
+                        <span className="text-[#6B7280]">—</span>
                       )}
                     </td>
-                    <td className="border-b border-zinc-200 px-2 py-1 font-mono text-[10px] text-zinc-700">
+                    <td className="border-b border-[#E5EAF0] px-2 py-1 font-mono text-[10px] text-[#111827]">
                       {session.execution?.execution_mode || "local_cli"}
                     </td>
-                    <td className="border-b border-zinc-200 px-2 py-1 font-mono text-[10px] text-zinc-700">
+                    <td className="border-b border-[#E5EAF0] px-2 py-1 font-mono text-[10px] text-[#111827]">
                       {session.linkedSchedule?.title || "—"}
                     </td>
-                    <td className="border-b border-zinc-200 px-2 py-1">
+                    <td className="border-b border-[#E5EAF0] px-2 py-1">
                       {session.fallbackPreview ? <CompactBadge tone="warning">Yes</CompactBadge> : <CompactBadge>No</CompactBadge>}
                     </td>
-                    <td className="border-b border-zinc-200 px-2 py-1">
+                    <td className="border-b border-[#E5EAF0] px-2 py-1">
                       {primaryAction ? (
                         <OperatorActionButton
                           action={primaryAction.action}
-                          label={primaryAction.title}
+                          label={primaryAction.label || primaryAction.title}
                           input={primaryAction.input}
                           context={primaryAction.context}
                           tone={primaryAction.tone}
                           helperText=""
                           confirmation={primaryAction.confirmation}
                         />
+                      ) : workflowTracker?.operatorSurfaceHref ? (
+                        <TableLink href={workflowTracker.operatorSurfaceHref}>
+                          {workflowTracker?.nextStep?.status === "blocked" ? "Inspect blocker" : "Open next step"}
+                        </TableLink>
                       ) : (
                         <TableLink href={session.href}>Open</TableLink>
                       )}
@@ -457,7 +470,7 @@ function SessionSnapshotTable({ sessions }) {
               })
             ) : (
               <tr>
-                <td colSpan={11} className="px-2 py-3 text-[11px] text-zinc-600">
+                <td colSpan={11} className="px-2 py-3 text-[11px] text-[#6B7280]">
                   No active sessions are currently recorded.
                 </td>
               </tr>
@@ -480,52 +493,52 @@ function SchedulesTable({ schedules }) {
       />
       <TableShell>
         <table className="min-w-[980px] w-full text-[11px]">
-          <thead className="bg-zinc-100 text-left uppercase tracking-wide text-zinc-600">
+          <thead className="bg-[#F9FBFD] text-left uppercase tracking-wide text-[#6B7280]">
             <tr>
-              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Title</th>
-              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Action</th>
-              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Workflow</th>
-              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Mode</th>
-              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Status</th>
-              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Next Run</th>
-              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Last Run</th>
-              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Last Result</th>
-              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Action</th>
+              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Title</th>
+              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Action</th>
+              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Workflow</th>
+              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Mode</th>
+              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Status</th>
+              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Next Run</th>
+              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Last Run</th>
+              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Last Result</th>
+              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Action</th>
             </tr>
           </thead>
           <tbody>
             {schedules.length ? (
               schedules.slice(0, 5).map((schedule) => (
-                <tr key={schedule.id} className="align-top odd:bg-white even:bg-zinc-50/40">
-                  <td className="border-b border-zinc-200 px-2 py-1">
-                    <div className="font-medium">{schedule.title}</div>
-                    <div className="font-mono text-[10px] text-zinc-500">{schedule.id}</div>
+                <tr key={schedule.id} className="align-top odd:bg-white even:bg-[#F9FBFD] hover:bg-[#F1F5F9]">
+                  <td className="border-b border-[#E5EAF0] px-2 py-1">
+                    <div className="font-medium text-[#1F2937]">{schedule.title}</div>
+                    <div className="font-mono text-[10px] text-[#6B7280]">{schedule.id}</div>
                   </td>
-                  <td className="border-b border-zinc-200 px-2 py-1">
+                  <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">
                     {schedule.action?.title || schedule.actionId}
                   </td>
-                  <td className="border-b border-zinc-200 px-2 py-1">{toWorkflowLabel(schedule.workflowFamily)}</td>
-                  <td className="border-b border-zinc-200 px-2 py-1 font-mono text-[10px] text-zinc-700">
+                  <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">{toWorkflowLabel(schedule.workflowFamily)}</td>
+                  <td className="border-b border-[#E5EAF0] px-2 py-1 font-mono text-[10px] text-[#111827]">
                     {schedule.executionMode || "local_cli"}
                   </td>
-                  <td className="border-b border-zinc-200 px-2 py-1">
+                  <td className="border-b border-[#E5EAF0] px-2 py-1">
                     <StateBadge value={schedule.status} />
                   </td>
-                  <td className="border-b border-zinc-200 px-2 py-1">{formatDateTime(schedule.nextRunAt)}</td>
-                  <td className="border-b border-zinc-200 px-2 py-1">{formatDateTime(schedule.lastRunAt)}</td>
-                  <td className="border-b border-zinc-200 px-2 py-1">
-                    <div className="max-w-[220px] truncate text-zinc-700" title={schedule.lastJob?.summary || schedule.lastResultSummary || schedule.summary}>
+                  <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">{formatDateTime(schedule.nextRunAt)}</td>
+                  <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">{formatDateTime(schedule.lastRunAt)}</td>
+                  <td className="border-b border-[#E5EAF0] px-2 py-1">
+                    <div className="max-w-[220px] truncate text-[#4B5563]" title={schedule.lastJob?.summary || schedule.lastResultSummary || schedule.summary}>
                       {schedule.lastJob?.summary || schedule.lastResultSummary || schedule.summary}
                     </div>
                   </td>
-                  <td className="border-b border-zinc-200 px-2 py-1">
+                  <td className="border-b border-[#E5EAF0] px-2 py-1">
                     <TableLink href="/admin/schedules">Open schedule</TableLink>
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={9} className="px-2 py-3 text-[11px] text-zinc-600">
+                <td colSpan={9} className="px-2 py-3 text-[11px] text-[#6B7280]">
                   No schedules are currently recorded.
                 </td>
               </tr>
@@ -548,44 +561,44 @@ function HealthTable({ banner, signals }) {
       />
       <TableShell>
         <table className="min-w-[860px] w-full text-[11px]">
-          <thead className="bg-zinc-100 text-left uppercase tracking-wide text-zinc-600">
+          <thead className="bg-[#F9FBFD] text-left uppercase tracking-wide text-[#6B7280]">
             <tr>
-              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Check</th>
-              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Status</th>
-              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Summary</th>
-              <th className="border-b border-zinc-200 px-2 py-1 font-medium">Action</th>
+              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Check</th>
+              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Status</th>
+              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Summary</th>
+              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Action</th>
             </tr>
           </thead>
           <tbody>
             {banner ? (
-              <tr className="align-top odd:bg-white even:bg-zinc-50/40">
-                <td className="border-b border-zinc-200 px-2 py-1 font-medium">{banner.title}</td>
-                <td className="border-b border-zinc-200 px-2 py-1">
+              <tr className="align-top odd:bg-white even:bg-[#F9FBFD] hover:bg-[#F1F5F9]">
+                <td className="border-b border-[#E5EAF0] px-2 py-1 font-medium text-[#1F2937]">{banner.title}</td>
+                <td className="border-b border-[#E5EAF0] px-2 py-1">
                   <StateBadge value={banner.status} />
                 </td>
-                <td className="border-b border-zinc-200 px-2 py-1 text-zinc-700">
+                <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">
                   {banner.summary}
                 </td>
-                <td className="border-b border-zinc-200 px-2 py-1">
+                <td className="border-b border-[#E5EAF0] px-2 py-1">
                   <TableLink href={banner.href || "/admin/tools"}>Open tools</TableLink>
                 </td>
               </tr>
             ) : null}
             {signals.slice(0, 4).map((signal) => (
-              <tr key={signal.id} className="align-top odd:bg-white even:bg-zinc-50/40">
-                <td className="border-b border-zinc-200 px-2 py-1 font-medium">{signal.title}</td>
-                <td className="border-b border-zinc-200 px-2 py-1">
+              <tr key={signal.id} className="align-top odd:bg-white even:bg-[#F9FBFD] hover:bg-[#F1F5F9]">
+                <td className="border-b border-[#E5EAF0] px-2 py-1 font-medium text-[#1F2937]">{signal.title}</td>
+                <td className="border-b border-[#E5EAF0] px-2 py-1">
                   <StateBadge value={signal.signalType} />
                 </td>
-                <td className="border-b border-zinc-200 px-2 py-1 text-zinc-700">{signal.summary}</td>
-                <td className="border-b border-zinc-200 px-2 py-1">
+                <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">{signal.summary}</td>
+                <td className="border-b border-[#E5EAF0] px-2 py-1">
                   {signal.href ? <TableLink href={signal.href}>Inspect</TableLink> : <TableLink href="/admin/tools">Open tools</TableLink>}
                 </td>
               </tr>
             ))}
             {!banner && !signals.length ? (
               <tr>
-                <td colSpan={4} className="px-2 py-3 text-[11px] text-zinc-600">
+                <td colSpan={4} className="px-2 py-3 text-[11px] text-[#6B7280]">
                   No verification or signal warnings are active right now.
                 </td>
               </tr>
@@ -651,15 +664,15 @@ export default async function AdminPage() {
       <OperatorPageAutoRefresh />
 
       <section className="space-y-1">
-        <p className="font-mono text-[11px] uppercase tracking-wide text-zinc-600">Operator Dashboard</p>
-        <h1 className="text-lg font-semibold text-zinc-900">What needs attention right now</h1>
-        <p className="text-[11px] text-zinc-600">
+        <p className="font-mono text-[11px] uppercase tracking-wide text-[#6B7280]">Operator Dashboard</p>
+        <h1 className="text-lg font-semibold text-[#1F2937]">What needs attention right now</h1>
+        <p className="text-[11px] text-[#6B7280]">
           This page is optimized for triage, next action, and safe progression through broker-backed operator work.
         </p>
       </section>
 
       {loadError ? (
-        <section className="rounded border border-amber-300 bg-amber-50 p-3 text-[11px] text-amber-950">
+        <section className="rounded border border-[#FDE68A] bg-[#FFFBEB] p-3 text-[11px] text-[#B45309]">
           <div className="font-medium">Dashboard fallback</div>
           <p className="mt-1">{loadError}</p>
           <div className="mt-2 flex flex-wrap gap-3">
@@ -679,6 +692,13 @@ export default async function AdminPage() {
         <DashboardCounter label="Overdue Schedules" value={summary.overview.overdueSchedules} href="/admin/schedules" />
         <DashboardCounter label="Running Jobs" value={runningJobs} href="/admin/jobs" />
       </section>
+
+      <CurrentAdminWorkflowTracker
+        tracker={summary.currentAdminWorkflowTracker}
+        eyebrow="Current-Admin Guidance"
+        title="Current-admin workflow tracker"
+        description="Use this to see what is done, what is blocked, and the single next current-admin step."
+      />
 
       <DailyRoutineTable
         steps={(summary.dailyRoutine?.steps || []).slice(0, 5)}

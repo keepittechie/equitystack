@@ -13,11 +13,11 @@ function normalizeString(value) {
 
 function buttonClasses(tone, disabled) {
   const base =
-    "inline-flex items-center justify-center rounded-lg border px-4 py-2 text-sm font-medium transition";
+    "inline-flex items-center justify-center rounded border px-3 py-1.5 text-[12px] font-medium transition";
   const palette =
     tone === "danger"
-      ? "border-red-300 bg-red-50 text-red-900 hover:bg-red-100"
-      : "border-gray-300 bg-white text-gray-900 hover:bg-gray-50";
+      ? "border-[#FECACA] bg-[#FEF2F2] text-[#EF4444] hover:bg-[#FEE2E2]"
+      : "border-[#E5EAF0] bg-white text-[#1F2937] hover:bg-[#F9FBFD]";
   const disabledClasses = disabled ? " cursor-not-allowed opacity-60" : "";
   return `${base} ${palette}${disabledClasses}`;
 }
@@ -156,7 +156,7 @@ export default function JobRerunButton({
 
   if (!job?.rerun?.canRerun) {
     return job?.rerun?.reason ? (
-      <p className="text-xs text-gray-500">{job.rerun.reason}</p>
+      <p className="text-xs text-[#6B7280]">{job.rerun.reason}</p>
     ) : null;
   }
 
@@ -172,36 +172,36 @@ export default function JobRerunButton({
       </button>
 
       {error ? (
-        <div className="rounded-lg border border-red-300 bg-red-50 p-3 text-xs text-red-950">
+        <div className="rounded border border-[#FECACA] bg-[#FEF2F2] p-3 text-xs text-[#EF4444]">
           {error}
         </div>
       ) : null}
 
       {resultJob ? (
-        <div className="rounded-lg border bg-stone-50 p-3">
+        <div className="rounded border border-[#E5EAF0] bg-[#EEF2F6] p-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex flex-wrap items-center gap-2">
               <JobStatusBadge status={resultJob.status} />
-              <span className="text-xs text-gray-600">{resultJob.id}</span>
+              <span className="text-xs text-[#6B7280]">{resultJob.id}</span>
             </div>
-            <Link href={`/admin/jobs/${resultJob.id}`} className="text-xs underline">
+            <Link href={`/admin/jobs/${resultJob.id}`} className="text-xs text-[#3B82F6] underline">
               Open job
             </Link>
           </div>
-          <p className="mt-2 text-xs text-gray-700">{resultJob.summary || "Rerun queued."}</p>
+          <p className="mt-2 text-xs text-[#4B5563]">{resultJob.summary || "Rerun queued."}</p>
         </div>
       ) : null}
 
       {confirmation ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-950/50 px-4">
-          <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl">
+          <div className="w-full max-w-lg rounded border border-[#E5EAF0] bg-white p-6 shadow-xl">
             <div className="space-y-2">
-              <p className="text-sm text-gray-600">Rerun confirmation</p>
-              <h3 className="text-xl font-semibold">{confirmation.title}</h3>
-              <p className="text-sm text-gray-700">{confirmation.description}</p>
+              <p className="text-sm text-[#6B7280]">Rerun confirmation</p>
+              <h3 className="text-xl font-semibold text-[#1F2937]">{confirmation.title}</h3>
+              <p className="text-sm text-[#4B5563]">{confirmation.description}</p>
             </div>
 
-            <label className="mt-4 flex items-start gap-3 rounded-xl border p-3 text-sm">
+            <label className="mt-4 flex items-start gap-3 rounded border border-[#E5EAF0] bg-[#F9FBFD] p-3 text-sm text-[#1F2937]">
               <input
                 type="checkbox"
                 checked={confirmationChecked}
@@ -212,12 +212,12 @@ export default function JobRerunButton({
 
             {confirmation.requireTypedYes ? (
               <label className="mt-4 block space-y-2">
-                <span className="text-sm font-medium">Type YES to continue</span>
+                <span className="text-sm font-medium text-[#1F2937]">Type YES to continue</span>
                 <input
                   type="text"
                   value={typedYes}
                   onChange={(event) => setTypedYes(event.target.value)}
-                  className="w-full rounded-lg border px-3 py-2 text-sm"
+                  className="w-full rounded border border-[#E5EAF0] bg-white px-3 py-2 text-sm text-[#1F2937] outline-none focus:border-[#3B82F6]"
                   placeholder="YES"
                 />
               </label>
@@ -227,7 +227,7 @@ export default function JobRerunButton({
               <button
                 type="button"
                 onClick={resetConfirmation}
-                className="rounded-lg border px-4 py-2 text-sm"
+                className="rounded border border-[#E5EAF0] bg-white px-4 py-2 text-sm text-[#1F2937]"
               >
                 Cancel
               </button>

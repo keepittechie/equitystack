@@ -18,7 +18,7 @@ export default function SourceDisclosure({ label = "Sources", sources = [] }) {
         aria-expanded={isOpen}
         aria-controls={panelId}
         onClick={() => setIsOpen((current) => !current)}
-        className="inline-flex items-center rounded-full border border-[rgba(120,53,15,0.14)] bg-white/80 px-3 py-1.5 text-xs font-medium uppercase tracking-[0.12em] text-[var(--ink-soft)] hover:text-[var(--accent)]"
+        className="inline-flex items-center rounded-full border border-[var(--line)] bg-white px-3 py-1.5 text-xs font-medium uppercase tracking-[0.12em] text-[var(--ink-soft)] hover:border-[rgba(37,99,235,0.2)] hover:text-[var(--accent)]"
       >
         {isOpen ? "Hide Sources" : "View Sources"}
       </button>
@@ -26,7 +26,7 @@ export default function SourceDisclosure({ label = "Sources", sources = [] }) {
       {isOpen ? (
         <section
           id={panelId}
-          className="mt-3 rounded-[1.1rem] border border-[rgba(120,53,15,0.12)] bg-white/75 p-4"
+          className="mt-3 rounded-[1.1rem] border border-[var(--line)] bg-white p-4"
         >
           <h4 className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">{label}</h4>
           <div className="mt-3">

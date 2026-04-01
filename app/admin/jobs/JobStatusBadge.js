@@ -1,17 +1,23 @@
 function statusClasses(status) {
   if (status === "success") {
-    return "border-green-300 bg-green-100 text-green-900";
+    return "border-[#A7F3D0] bg-[#ECFDF5] text-[#10B981]";
   }
   if (status === "running" || status === "queued") {
-    return "border-amber-300 bg-amber-100 text-amber-900";
+    return "border-[#BFDBFE] bg-[#EFF6FF] text-[#3B82F6]";
+  }
+  if (status === "stopped_for_operator_review") {
+    return "border-[#FDE68A] bg-[#FFFBEB] text-[#F59E0B]";
+  }
+  if (status === "stopped_for_admin_approval") {
+    return "border-[#FDE68A] bg-[#FFFBEB] text-[#F59E0B]";
   }
   if (status === "blocked") {
-    return "border-orange-300 bg-orange-100 text-orange-900";
+    return "border-[#FDE68A] bg-[#FFFBEB] text-[#F59E0B]";
   }
   if (status === "failed" || status === "cancelled") {
-    return "border-red-300 bg-red-100 text-red-900";
+    return "border-[#FECACA] bg-[#FEF2F2] text-[#EF4444]";
   }
-  return "border-gray-300 bg-gray-100 text-gray-900";
+  return "border-[#E5EAF0] bg-[#F3F4F6] text-[#1F2937]";
 }
 
 export default function JobStatusBadge({ status }) {

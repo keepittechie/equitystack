@@ -44,7 +44,7 @@ export async function generateMetadata() {
 
 function MetaPill({ children }) {
   return (
-    <span className="inline-flex items-center rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-3 py-1 text-xs text-[var(--ink-soft)]">
+    <span className="public-pill">
       {children}
     </span>
   );
@@ -53,8 +53,8 @@ function MetaPill({ children }) {
 function SummaryStat({ label, value, tone = "default" }) {
   const toneClasses =
     tone === "accent"
-      ? "border-[rgba(138,59,18,0.16)] bg-[rgba(255,251,235,0.9)]"
-      : "border-[rgba(120,53,15,0.08)] bg-white/80";
+      ? "border-[rgba(37,99,235,0.16)] bg-[rgba(37,99,235,0.08)]"
+      : "border-[var(--line)] bg-white";
 
   return (
     <div className={`rounded-[1.2rem] border px-4 py-4 ${toneClasses}`}>
@@ -165,7 +165,7 @@ export default async function CurrentAdministrationPage() {
       <section className="hero-panel p-8 md:p-10">
         <div className="max-w-4xl">
           <p className="eyebrow mb-4">Current Administration</p>
-          <h1 className="text-3xl md:text-5xl font-bold">
+          <h1 className="page-title text-[clamp(2.2rem,4vw,3.5rem)]">
             {overview.administration_name} ({termLabel})
           </h1>
           <p className="mt-5 max-w-3xl text-base leading-8 text-[var(--ink-soft)] md:text-lg">
@@ -199,7 +199,7 @@ export default async function CurrentAdministrationPage() {
               entityType="presidency"
               entityKey={overview.president.slug}
               targetPath={`/promises/president/${overview.president.slug}?show_all=1`}
-              className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium text-[var(--ink-soft)]"
+              className="public-button-secondary"
             >
               View all current-term promises
             </TrackedLink>
@@ -298,7 +298,7 @@ export default async function CurrentAdministrationPage() {
                   entityType="promise"
                   entityKey={item.slug}
                   targetPath={`/promises/${item.slug}`}
-                  className="rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-medium text-white"
+                  className="public-button-primary px-4 py-2"
                 >
                   Open record
                 </TrackedLink>
@@ -310,7 +310,7 @@ export default async function CurrentAdministrationPage() {
                   entityType="promise"
                   entityKey={item.slug}
                   targetPath={buildPromiseCardHref(item)}
-                  className="rounded-full border border-[rgba(120,53,15,0.16)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)]"
+                  className="public-button-secondary px-4 py-2"
                 >
                   Share Card
                 </TrackedLink>
@@ -337,7 +337,7 @@ export default async function CurrentAdministrationPage() {
             ) : overview.top_topics.map((topic) => (
               <article
                 key={topic.topic}
-                className="rounded-[1.25rem] border border-[rgba(120,53,15,0.08)] bg-white/80 px-5 py-4"
+                className="rounded-[1.25rem] border border-[var(--line)] bg-white px-5 py-4"
               >
                 <div className="flex items-start justify-between gap-4 flex-wrap">
                   <div>
@@ -366,7 +366,7 @@ export default async function CurrentAdministrationPage() {
             </p>
           </div>
 
-          <div className="mt-5 rounded-[1.2rem] border border-[rgba(120,53,15,0.08)] bg-[rgba(255,251,235,0.75)] p-4">
+          <div className="mt-5 rounded-[1.2rem] border border-[var(--line)] bg-[var(--surface-alt)] p-4">
             <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">How to read it</p>
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
               Positive means helped. Negative means harmed. Mixed means both. Blocked means the

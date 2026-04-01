@@ -143,7 +143,7 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
               type="button"
               onClick={finalize}
               disabled={isPending || !finalizePermission.allowed}
-              className="rounded border px-3 py-1.5 bg-black text-[12px] text-white"
+              className="rounded border border-[#3B82F6] bg-[#3B82F6] px-3 py-1.5 text-[12px] text-white"
             >
               Finalize
             </button>

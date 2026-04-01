@@ -22,7 +22,7 @@ async function getPromisePresidents(showAll) {
 
 function MetaPill({ children }) {
   return (
-    <span className="inline-flex items-center rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-3 py-1 text-xs text-[var(--ink-soft)]">
+    <span className="public-pill">
       {children}
     </span>
   );
@@ -69,7 +69,7 @@ export default async function PromisesPage({ searchParams }) {
       <section className="hero-panel p-8 md:p-10 mb-6">
         <div className="section-intro">
           <p className="eyebrow mb-4">Promise Tracker</p>
-          <h1 className="text-4xl md:text-5xl font-bold">Promises by Presidency</h1>
+          <h1 className="page-title">Promises by Presidency</h1>
           <p className="text-base md:text-lg text-[var(--ink-soft)] mt-4 leading-8 max-w-3xl">
             Review Promise Tracker by presidency term. This keeps repeated presidents separated by administration,
             while the default view still prioritizes promises with direct or meaningful downstream Black-community impact.
@@ -85,19 +85,19 @@ export default async function PromisesPage({ searchParams }) {
       <section className="mb-6 flex flex-wrap gap-3">
         <Link
           href={showAll ? "/promises/all?show_all=1" : "/promises/all"}
-          className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
+          className="public-button-secondary"
         >
           Browse All Promises
         </Link>
         <Link
           href={showAll ? "/promises" : "/promises?show_all=1"}
-          className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
+          className="public-button-secondary"
         >
           {showAll ? "Show Prioritized View" : "Show All Promises"}
         </Link>
         <Link
           href="/reports/black-impact-score"
-          className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
+          className="public-button-secondary"
         >
           View Black Impact Score
         </Link>
@@ -114,7 +114,7 @@ export default async function PromisesPage({ searchParams }) {
           </div>
           <Link
             href="/reports/black-impact-score"
-            className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
+            className="public-button-secondary"
           >
             See Black Impact Score
           </Link>

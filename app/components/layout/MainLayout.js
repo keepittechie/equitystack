@@ -27,15 +27,15 @@ function navClasses(pathname, href) {
   const isActive = isActiveNavItem(pathname, href);
 
   return isActive
-    ? "rounded-full bg-[rgba(138,59,18,0.1)] px-4 py-2 text-[var(--accent)] font-semibold"
-    : "rounded-full px-4 py-2 text-[var(--ink-soft)] hover:bg-white/70 hover:text-[var(--accent)]";
+    ? "rounded-full bg-[rgba(37,99,235,0.1)] px-4 py-2 text-[var(--accent)] font-semibold"
+    : "rounded-full px-4 py-2 text-[var(--ink-soft)] hover:bg-white hover:text-[var(--accent)]";
 }
 
 export default function MainLayout({ children }) {
   const pathname = usePathname();
   const isAdminPath = pathname?.startsWith("/admin");
   if (isAdminPath) {
-    return <div className="min-h-screen bg-zinc-100 text-zinc-900">{children}</div>;
+    return <div className="min-h-screen bg-[#F5F7FA] text-[#1F2937]">{children}</div>;
   }
 
   const navLinks = NAV_LINKS;
@@ -58,7 +58,7 @@ export default function MainLayout({ children }) {
 
   return (
     <div className="page-shell min-h-screen text-gray-900 flex flex-col">
-      <header className="sticky top-0 z-50 border-b soft-rule bg-[rgba(252,248,241,0.9)] backdrop-blur">
+      <header className="sticky top-0 z-50 border-b soft-rule bg-[rgba(248,250,252,0.92)] backdrop-blur">
         <div className="max-w-7xl mx-auto px-6 py-3 flex justify-between items-center gap-6">
             <div className="flex flex-col items-start justify-center min-w-[180px]">
               <span className="eyebrow mb-2">{isAdminPath ? "EquityStack Admin" : "EquityStack"}</span>
@@ -72,7 +72,7 @@ export default function MainLayout({ children }) {
                   priority
                 />
               </Link>
-              <span className="text-[10px] tracking-[0.2em] text-[var(--ink-soft)] mt-1 pl-1 uppercase">
+              <span className="text-[10px] tracking-[0.2em] text-[var(--ink-muted)] mt-1 pl-1 uppercase">
                 {isAdminPath ? "Admin • Review • Workflow" : "Policy • History • Impact"}
               </span>
             </div>
@@ -95,7 +95,7 @@ export default function MainLayout({ children }) {
                   `whitespace-nowrap rounded-full border px-3 py-2 text-sm ${
                     isActiveNavItem(pathname, item.href)
                       ? "bg-[var(--accent)] text-white border-[var(--accent)]"
-                      : "bg-white/70 text-[var(--ink-soft)] border-[rgba(120,53,15,0.12)]"
+                      : "bg-white text-[var(--ink-soft)] border-[var(--line)]"
                   }`
                 )
               )}
@@ -205,7 +205,7 @@ export default function MainLayout({ children }) {
               </div>
             </div>
           </div>
-          <div className="border-t soft-rule px-6 py-4 text-sm text-[var(--ink-soft)] flex flex-col sm:flex-row justify-between gap-2">
+          <div className="border-t soft-rule px-6 py-4 text-sm text-[var(--ink-muted)] flex flex-col sm:flex-row justify-between gap-2">
             <p>© 2026 EquityStack. All rights reserved.</p>
             <p>Tracking policy. Revealing impact.</p>
           </div>

@@ -7,11 +7,11 @@ export function EvidenceBadge({ summary }) {
     "inline-flex items-center rounded-full px-3 py-1 text-xs font-medium border ";
 
   if (label === "Strong") {
-    className += "bg-green-50 text-green-700 border-green-200";
+    className += "bg-[rgba(22,163,74,0.1)] text-[#166534] border-[rgba(22,163,74,0.2)]";
   } else if (label === "Moderate") {
-    className += "bg-yellow-50 text-yellow-700 border-yellow-200";
+    className += "bg-[rgba(217,119,6,0.1)] text-[#b45309] border-[rgba(217,119,6,0.2)]";
   } else {
-    className += "bg-red-50 text-red-700 border-red-200";
+    className += "bg-[rgba(220,38,38,0.1)] text-[#b91c1c] border-[rgba(220,38,38,0.2)]";
   }
 
   return <span className={className}>Evidence: {label}</span>;
@@ -26,11 +26,11 @@ export function CompletenessBadge({ summary }) {
     "inline-flex items-center rounded-full px-3 py-1 text-xs font-medium border ";
 
   if (label === "Complete") {
-    className += "bg-green-50 text-green-700 border-green-200";
+    className += "bg-[rgba(22,163,74,0.1)] text-[#166534] border-[rgba(22,163,74,0.2)]";
   } else if (label === "Good") {
-    className += "bg-blue-50 text-blue-700 border-blue-200";
+    className += "bg-[rgba(37,99,235,0.1)] text-[#1d4ed8] border-[rgba(37,99,235,0.2)]";
   } else {
-    className += "bg-orange-50 text-orange-700 border-orange-200";
+    className += "bg-[rgba(217,119,6,0.1)] text-[#b45309] border-[rgba(217,119,6,0.2)]";
   }
 
   return <span className={className}>Data Quality: {label}</span>;
@@ -45,15 +45,15 @@ export function ImpactBadge({ impact }) {
     "inline-flex items-center rounded-full px-3 py-1 text-xs font-medium border ";
 
   if (impact === "Positive") {
-    className += "bg-green-50 text-green-700 border-green-200";
+    className += "bg-[rgba(22,163,74,0.1)] text-[#166534] border-[rgba(22,163,74,0.2)]";
   } else if (impact === "Negative") {
-    className += "bg-red-50 text-red-700 border-red-200";
+    className += "bg-[rgba(220,38,38,0.1)] text-[#b91c1c] border-[rgba(220,38,38,0.2)]";
   } else if (impact === "Mixed") {
-    className += "bg-yellow-50 text-yellow-700 border-yellow-200";
+    className += "bg-[rgba(217,119,6,0.1)] text-[#b45309] border-[rgba(217,119,6,0.2)]";
   } else if (impact === "Blocked") {
-    className += "bg-stone-100 text-stone-700 border-stone-300";
+    className += "bg-slate-100 text-slate-700 border-slate-300";
   } else {
-    className += "bg-stone-100 text-stone-700 border-stone-300";
+    className += "bg-slate-100 text-slate-700 border-slate-300";
   }
 
   return <span className={className}>{label}</span>;
@@ -66,17 +66,17 @@ export function PromiseStatusBadge({ status }) {
     "inline-flex items-center rounded-full px-3 py-1 text-xs font-medium border ";
 
   if (status === "Delivered") {
-    className += "bg-green-50 text-green-700 border-green-200";
+    className += "bg-[rgba(22,163,74,0.1)] text-[#166534] border-[rgba(22,163,74,0.2)]";
   } else if (status === "In Progress") {
-    className += "bg-blue-50 text-blue-700 border-blue-200";
+    className += "bg-[rgba(37,99,235,0.1)] text-[#1d4ed8] border-[rgba(37,99,235,0.2)]";
   } else if (status === "Partial") {
-    className += "bg-yellow-50 text-yellow-700 border-yellow-200";
+    className += "bg-[rgba(217,119,6,0.1)] text-[#b45309] border-[rgba(217,119,6,0.2)]";
   } else if (status === "Failed") {
-    className += "bg-red-50 text-red-700 border-red-200";
+    className += "bg-[rgba(220,38,38,0.1)] text-[#b91c1c] border-[rgba(220,38,38,0.2)]";
   } else if (status === "Blocked") {
-    className += "bg-stone-100 text-stone-700 border-stone-300";
+    className += "bg-slate-100 text-slate-700 border-slate-300";
   } else {
-    className += "bg-stone-100 text-stone-700 border-stone-300";
+    className += "bg-slate-100 text-slate-700 border-slate-300";
   }
 
   return <span className={className}>{status}</span>;
@@ -89,11 +89,11 @@ export function PromiseRelevanceBadge({ relevance }) {
     "inline-flex items-center rounded-full px-3 py-1 text-xs font-medium border ";
 
   if (relevance === "High") {
-    className += "bg-[rgba(120,53,15,0.08)] text-[var(--accent)] border-[rgba(120,53,15,0.18)]";
+    className += "bg-[rgba(37,99,235,0.1)] text-[#1d4ed8] border-[rgba(37,99,235,0.2)]";
   } else if (relevance === "Medium") {
-    className += "bg-blue-50 text-blue-700 border-blue-200";
+    className += "bg-[rgba(6,182,212,0.1)] text-[#0f766e] border-[rgba(6,182,212,0.2)]";
   } else {
-    className += "bg-stone-100 text-stone-700 border-stone-300";
+    className += "bg-slate-100 text-slate-700 border-slate-300";
   }
 
   return <span className={className}>{relevance} relevance</span>;
@@ -108,13 +108,13 @@ export function PromiseImpactDirectionBadge({ impact }) {
     "inline-flex items-center rounded-full px-3 py-1 text-xs font-medium border ";
 
   if (impact === "Positive") {
-    className += "bg-green-50 text-green-700 border-green-200";
+    className += "bg-[rgba(22,163,74,0.1)] text-[#166534] border-[rgba(22,163,74,0.2)]";
   } else if (impact === "Negative") {
-    className += "bg-red-50 text-red-700 border-red-200";
+    className += "bg-[rgba(220,38,38,0.1)] text-[#b91c1c] border-[rgba(220,38,38,0.2)]";
   } else if (impact === "Blocked/Unrealized") {
-    className += "bg-stone-100 text-stone-700 border-stone-300";
+    className += "bg-slate-100 text-slate-700 border-slate-300";
   } else {
-    className += "bg-yellow-50 text-yellow-700 border-yellow-200";
+    className += "bg-[rgba(217,119,6,0.1)] text-[#b45309] border-[rgba(217,119,6,0.2)]";
   }
 
   return <span className={className}>{label}</span>;

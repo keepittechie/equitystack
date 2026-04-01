@@ -1,8 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import JobStatusBadge from "@/app/admin/jobs/JobStatusBadge";
+import {
+  deriveExecutionMonitorState,
+  executionPhaseLabel,
+  TERMINAL_JOB_STATUSES,
+} from "./executionMonitor";
 
 function normalizeString(value) {
   return typeof value === "string" ? value.trim() : "";
@@ -89,6 +95,47 @@ function renderFieldHint(field) {
   return field.type;
 }
 
+function formatDateTime(value) {
+  if (!value) {
+    return "—";
+  }
+
+  try {
+    return new Intl.DateTimeFormat("en-US", {
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+      second: "2-digit",
+    }).format(new Date(value));
+  } catch {
+    return value;
+  }
+}
+
+function TraceTable({ trace = [] }) {
+  if (!trace.length) {
+    return null;
+  }
+
+  return (
+    <div className="overflow-x-auto rounded border border-[#E5EAF0] bg-white">
+      <table className="min-w-full text-[11px]">
+        <tbody>
+          {trace.map((entry) => (
+            <tr key={entry.key} className="odd:bg-white even:bg-[#F9FBFD]">
+              <td className="border-b border-[#E5EAF0] px-2 py-1 font-mono uppercase tracking-wide text-[#6B7280]">
+                {entry.label}
+              </td>
+              <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">{entry.value}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 function FieldRow({ fieldName, field, value, onChange }) {
   if (field.type === "boolean") {
     return (
@@ -130,9 +177,11 @@ export default function ActionLauncher({
   initialActionId = "",
   buttonLabel = "Start action",
   compact = false,
-  redirectToJob = true,
+  redirectToJob = false,
 }) {
   const router = useRouter();
+  const archiveRef = useRef("");
+  const refreshRef = useRef("");
   const [actions, setActions] = useState([]);
   const [selectedActionId, setSelectedActionId] = useState(initialActionId);
   const [input, setInput] = useState({});
@@ -140,7 +189,8 @@ export default function ActionLauncher({
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
   const [formError, setFormError] = useState("");
-  const [result, setResult] = useState(null);
+  const [activeExecution, setActiveExecution] = useState(null);
+  const [recentExecutions, setRecentExecutions] = useState([]);
   const [confirmationOpen, setConfirmationOpen] = useState(false);
   const [confirmationChecked, setConfirmationChecked] = useState(false);
   const [typedYes, setTypedYes] = useState("");
@@ -197,12 +247,82 @@ export default function ActionLauncher({
     };
   }, [allowedActionIds, initialActionId]);
 
-  const selectedAction = actions.find((action) => action.id === selectedActionId) || null;
+  const selectedAction = useMemo(
+    () => actions.find((action) => action.id === selectedActionId) || null,
+    [actions, selectedActionId]
+  );
   const availableExecutionModes = selectedAction?.executionModes?.allowedModes || ["local_cli"];
   const visibleFields = Object.entries(selectedAction?.inputSchema?.fields || {});
   const requiresMutatingConfirmation = Boolean(
     selectedAction?.execution?.mutating && input?.apply && input?.yes
   );
+  const activeLifecycle = deriveExecutionMonitorState(activeExecution?.job, {
+    commandText: activeExecution?.commandText,
+  });
+  const executionLocked = isPending || Boolean(activeLifecycle?.shouldPoll);
+
+  useEffect(() => {
+    if (!activeExecution?.job?.id || !activeLifecycle?.shouldPoll) {
+      return undefined;
+    }
+
+    let cancelled = false;
+    const intervalId = window.setInterval(async () => {
+      try {
+        const response = await fetch(`/api/admin/operator/jobs/${activeExecution.job.id}`, {
+          method: "GET",
+          cache: "no-store",
+        });
+        const payload = await response.json();
+        if (!response.ok || !payload.success) {
+          throw new Error(payload.error || "Failed to refresh the active execution.");
+        }
+        if (!cancelled) {
+          setActiveExecution((current) =>
+            current?.job?.id === payload.job?.id
+              ? { ...current, job: payload.job }
+              : current
+          );
+          setFormError("");
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setFormError(
+            error instanceof Error ? error.message : "Failed to refresh the active execution."
+          );
+        }
+      }
+    }, 2000);
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(intervalId);
+    };
+  }, [activeExecution, activeLifecycle]);
+
+  useEffect(() => {
+    if (!activeExecution?.job?.id || !TERMINAL_JOB_STATUSES.has(activeExecution.job.status)) {
+      return;
+    }
+
+    const key = `${activeExecution.job.id}:${activeExecution.job.status}`;
+    if (refreshRef.current !== key) {
+      refreshRef.current = key;
+      window.setTimeout(() => {
+        router.refresh();
+      }, 250);
+    }
+
+    if (activeLifecycle?.isStopPoint || archiveRef.current === key) {
+      return;
+    }
+
+    archiveRef.current = key;
+    setRecentExecutions((current) =>
+      [{ ...activeExecution }, ...current.filter((item) => item.job.id !== activeExecution.job.id)].slice(0, 6)
+    );
+    setActiveExecution(null);
+  }, [activeExecution, activeLifecycle, router]);
 
   function handleActionChange(nextActionId) {
     const nextAction = actions.find((action) => action.id === nextActionId) || null;
@@ -210,7 +330,6 @@ export default function ActionLauncher({
     setInput(buildInitialInput(nextAction));
     setExecutionMode(nextAction?.executionModes?.defaultMode || "local_cli");
     setFormError("");
-    setResult(null);
     resetConfirmation();
   }
 
@@ -236,7 +355,6 @@ export default function ActionLauncher({
     }
 
     setFormError("");
-    setResult(null);
 
     if (requiresMutatingConfirmation) {
       setConfirmationOpen(true);
@@ -269,7 +387,13 @@ export default function ActionLauncher({
       throw new Error(payload.error || "Failed to start the action.");
     }
 
-    setResult(payload);
+    const nextExecution = {
+      job: payload.job || null,
+      actionTitle: selectedAction?.title || payload.action?.title || "Workflow action",
+      commandText: selectedAction?.cliCommandTemplate || payload.action?.cliCommandTemplate || "",
+    };
+
+    setActiveExecution(nextExecution);
     if (redirectToJob && payload.job?.id) {
       router.push(`/admin/jobs/${payload.job.id}`);
       router.refresh();
@@ -296,7 +420,7 @@ export default function ActionLauncher({
   }
 
   return (
-    <section className={`rounded border border-zinc-300 bg-white shadow-sm ${compact ? "p-3" : "p-4"}`}>
+    <section className={`rounded border border-[#E5EAF0] bg-white shadow-sm ${compact ? "p-3" : "p-4"}`}>
       <div className="space-y-2">
         <p className="font-mono text-[11px] uppercase tracking-wide text-gray-600">Action Launcher</p>
         <h2 className="text-base font-semibold">{title}</h2>
@@ -311,13 +435,161 @@ export default function ActionLauncher({
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="mt-3 space-y-3">
+          {activeExecution?.job ? (
+            <section className="space-y-2 rounded border p-3">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <p className="font-mono text-[11px] uppercase tracking-wide text-gray-600">
+                    Active Execution
+                  </p>
+                  <h3 className="mt-1 text-sm font-semibold">
+                    {activeExecution.actionTitle}
+                  </h3>
+                  <p className="mt-1 text-[11px] text-gray-600">
+                    {activeLifecycle?.phase === "running" || activeLifecycle?.phase === "queued" ? (
+                  <span className="inline-flex items-center gap-2">
+                    <span className="h-2 w-2 animate-spin rounded-full border border-[#3B82F6] border-t-transparent" />
+                    {executionPhaseLabel(activeLifecycle.phase)}
+                  </span>
+                    ) : (
+                      executionPhaseLabel(activeLifecycle?.phase || activeExecution.job.status)
+                    )}
+                  </p>
+                </div>
+                <JobStatusBadge status={activeLifecycle?.phase || activeExecution.job.status} />
+              </div>
+
+              <div className="grid gap-2 md:grid-cols-4">
+                <div className="rounded border px-2 py-1.5">
+                  <p className="text-[10px] uppercase tracking-wide text-gray-500">Execution Id</p>
+                  <p className="mt-1 font-mono text-[11px]">{activeExecution.job.id}</p>
+                </div>
+                <div className="rounded border px-2 py-1.5">
+                  <p className="text-[10px] uppercase tracking-wide text-gray-500">Started</p>
+                  <p className="mt-1 text-[11px]">
+                    {formatDateTime(
+                      activeExecution.job.timestamps?.startedAt || activeExecution.job.timestamps?.createdAt
+                    )}
+                  </p>
+                </div>
+                <div className="rounded border px-2 py-1.5">
+                  <p className="text-[10px] uppercase tracking-wide text-gray-500">Current State</p>
+                  <p className="mt-1 text-[11px]">
+                    {activeLifecycle?.workspaceState || activeExecution.job.status}
+                  </p>
+                </div>
+                <div className="rounded border px-2 py-1.5">
+                  <p className="text-[10px] uppercase tracking-wide text-gray-500">Next Step</p>
+                  <p className="mt-1 text-[11px]">
+                    {activeLifecycle?.nextActionTitle || "Continue polling"}
+                  </p>
+                </div>
+              </div>
+
+              <div className="rounded border px-2 py-1.5">
+                <p className="text-[10px] uppercase tracking-wide text-gray-500">Current Command</p>
+                <p className="mt-1 break-all font-mono text-[11px]">
+                  {activeLifecycle?.currentCommand}
+                </p>
+              </div>
+
+              <div className="rounded border px-2 py-1.5">
+                <p className="text-[10px] uppercase tracking-wide text-gray-500">Most Recent Update</p>
+                <p className="mt-1 text-[11px] text-gray-700">{activeLifecycle?.latestLine}</p>
+              </div>
+
+              {activeLifecycle?.isStopPoint ? (
+                <div className="rounded border border-amber-300 bg-amber-50 px-2 py-2 text-[11px] text-amber-900">
+                  <div className="font-medium">{activeLifecycle.stopMarker}</div>
+                  <div className="mt-1">
+                    Next required operator action:{" "}
+                    {activeLifecycle.nextActionTitle || "Open the matching workflow checkpoint."}
+                  </div>
+                </div>
+              ) : null}
+
+              <TraceTable trace={activeLifecycle?.trace || []} />
+
+              <div className="flex flex-wrap gap-3">
+                {activeLifecycle?.isStopPoint && activeLifecycle.nextHref ? (
+                  <Link href={activeLifecycle.nextHref} className="rounded border border-amber-300 bg-amber-50 px-3 py-1.5 text-[11px] font-medium text-amber-900">
+                    {activeLifecycle.nextLabel}
+                  </Link>
+                ) : null}
+                <Link href={activeLifecycle?.jobHref || "/admin/jobs"} className="rounded border px-3 py-1.5 text-[11px]">
+                  Open job detail
+                </Link>
+                {activeLifecycle?.sessionHref ? (
+                  <Link href={activeLifecycle.sessionHref} className="rounded border px-3 py-1.5 text-[11px]">
+                    Open session
+                  </Link>
+                ) : null}
+              </div>
+            </section>
+          ) : null}
+
+          {recentExecutions.length ? (
+            <section className="space-y-2 rounded border p-3">
+              <div className="flex items-center justify-between gap-3">
+                <p className="font-mono text-[11px] uppercase tracking-wide text-[#6B7280]">
+                  Recent Workflow Actions
+                </p>
+                <Link href="/admin/jobs" className="text-[11px] text-[#3B82F6] underline underline-offset-2">
+                  View jobs
+                </Link>
+              </div>
+              <div className="overflow-x-auto rounded border border-[#E5EAF0] bg-white">
+                <table className="min-w-[760px] w-full text-[11px]">
+                  <thead className="bg-[#F9FBFD] text-left uppercase tracking-wide text-[#6B7280]">
+                    <tr>
+                      <th className="border-b border-[#E5EAF0] px-2 py-1">Status</th>
+                      <th className="border-b border-[#E5EAF0] px-2 py-1">Action</th>
+                      <th className="border-b border-[#E5EAF0] px-2 py-1">Execution Id</th>
+                      <th className="border-b border-[#E5EAF0] px-2 py-1">Finished</th>
+                      <th className="border-b border-[#E5EAF0] px-2 py-1">Next</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {recentExecutions.map((entry) => {
+                      const lifecycle = deriveExecutionMonitorState(entry.job, {
+                        commandText: entry.commandText,
+                      });
+                      return (
+                        <tr key={entry.job.id} className="odd:bg-white even:bg-[#F9FBFD] hover:bg-[#F1F5F9]">
+                          <td className="border-b border-[#E5EAF0] px-2 py-1">
+                            <JobStatusBadge status={lifecycle?.phase || entry.job.status} />
+                          </td>
+                          <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#1F2937]">
+                            {entry.actionTitle}
+                          </td>
+                          <td className="border-b border-[#E5EAF0] px-2 py-1 font-mono text-[#6B7280]">
+                            {entry.job.id}
+                          </td>
+                          <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">
+                            {formatDateTime(entry.job.timestamps?.finishedAt || entry.job.timestamps?.updatedAt)}
+                          </td>
+                          <td className="border-b border-[#E5EAF0] px-2 py-1">
+                            <Link href={`/admin/jobs/${entry.job.id}`} className="text-[#3B82F6] underline underline-offset-2">
+                              Open
+                            </Link>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          ) : null}
+
           {actions.length > 1 ? (
             <label className="block space-y-2">
               <span className="text-[12px] font-medium">Action</span>
               <select
                 value={selectedActionId}
                 onChange={(event) => handleActionChange(event.target.value)}
-                className="w-full rounded border px-2 py-1.5 text-[12px]"
+                disabled={executionLocked}
+                className="w-full rounded border px-2 py-1.5 text-[12px] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {actions.map((action) => (
                   <option key={action.id} value={action.id}>
@@ -330,10 +602,10 @@ export default function ActionLauncher({
 
           {selectedAction ? (
             <div className="rounded border p-3">
-              <p className="text-[11px] uppercase tracking-wide text-gray-600">{selectedAction.workflowFamily}</p>
+              <p className="text-[11px] uppercase tracking-wide text-[#6B7280]">{selectedAction.workflowFamily}</p>
               <p className="mt-1 font-medium">{selectedAction.title}</p>
-              <p className="mt-1 text-[12px] text-gray-700">{selectedAction.description}</p>
-              <p className="mt-2 break-all font-mono text-[11px] text-gray-500">{selectedAction.cliCommandTemplate}</p>
+              <p className="mt-1 text-[12px] text-[#4B5563]">{selectedAction.description}</p>
+              <p className="mt-2 break-all font-mono text-[11px] text-[#6B7280]">{selectedAction.cliCommandTemplate}</p>
             </div>
           ) : null}
 
@@ -350,7 +622,7 @@ export default function ActionLauncher({
               ))}
             </div>
           ) : (
-            <div className="rounded border p-3 text-[12px] text-gray-700">
+            <div className="rounded border border-[#E5EAF0] bg-[#EEF2F6] p-3 text-[12px] text-[#4B5563]">
               This action does not require any input fields.
             </div>
           )}
@@ -358,12 +630,13 @@ export default function ActionLauncher({
           <label className="block space-y-2">
             <div className="flex items-center justify-between gap-3">
               <span className="text-[12px] font-medium">Execution mode</span>
-              <span className="text-[11px] text-gray-500">Allowed by registry</span>
+              <span className="text-[11px] text-[#6B7280]">Allowed by registry</span>
             </div>
             <select
               value={executionMode}
               onChange={(event) => setExecutionMode(event.target.value)}
-              className="w-full rounded border px-2 py-1.5 text-[12px]"
+              disabled={executionLocked}
+              className="w-full rounded border px-2 py-1.5 text-[12px] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {availableExecutionModes.map((mode) => (
                 <option key={`${selectedActionId}-${mode}`} value={mode}>
@@ -374,9 +647,9 @@ export default function ActionLauncher({
           </label>
 
           {selectedAction?.guardrails?.length ? (
-            <div className="rounded border border-amber-300 bg-amber-50 p-3">
-              <p className="text-[12px] font-medium text-amber-950">Guardrails</p>
-              <ul className="mt-2 space-y-1 text-[12px] text-amber-900">
+            <div className="rounded border border-[#FDE68A] bg-[#FFFBEB] p-3">
+              <p className="text-[12px] font-medium text-[#B45309]">Guardrails</p>
+              <ul className="mt-2 space-y-1 text-[12px] text-[#92400E]">
                 {selectedAction.guardrails.map((guardrail) => (
                   <li key={`${selectedAction.id}-${guardrail}`}>{guardrail}</li>
                 ))}
@@ -385,35 +658,20 @@ export default function ActionLauncher({
           ) : null}
 
           {formError ? (
-            <div className="rounded border border-red-300 bg-red-50 p-3 text-[12px] text-red-900">
+            <div className="rounded border border-[#FECACA] bg-[#FEF2F2] p-3 text-[12px] text-[#EF4444]">
               {formError}
-            </div>
-          ) : null}
-
-          {result?.job?.id && !redirectToJob ? (
-            <div className="rounded border border-green-300 bg-green-50 p-3 text-[12px] text-green-950">
-              <p className="font-medium">Job started</p>
-              <p className="mt-1">{result.job.summary || "The job has been queued."}</p>
-              <div className="mt-3 flex flex-wrap gap-3">
-                <Link href={`/admin/jobs/${result.job.id}`} className="text-[12px] underline">
-                  Open job detail
-                </Link>
-                <Link href="/admin/jobs" className="text-[12px] underline">
-                  View job list
-                </Link>
-              </div>
             </div>
           ) : null}
 
           <div className="flex flex-wrap gap-3">
             <button
               type="submit"
-              disabled={isPending || isLoading || !selectedAction}
-              className="rounded border bg-stone-900 px-3 py-1.5 text-[12px] text-white disabled:cursor-not-allowed disabled:opacity-60"
+              disabled={executionLocked || isLoading || !selectedAction}
+              className="rounded border border-[#3B82F6] bg-[#3B82F6] px-3 py-1.5 text-[12px] text-white disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {isPending ? "Starting…" : buttonLabel}
+              {executionLocked ? "Execution locked…" : buttonLabel}
             </button>
-            <Link href="/admin/jobs" className="rounded border px-3 py-1.5 text-[12px]">
+            <Link href="/admin/jobs" className="rounded border border-[#E5EAF0] bg-white px-3 py-1.5 text-[12px] text-[#1F2937]">
               View jobs
             </Link>
           </div>
@@ -424,14 +682,14 @@ export default function ActionLauncher({
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-950/50 px-4">
           <div className="w-full max-w-lg rounded border bg-white p-4 shadow-xl">
             <div className="space-y-2">
-              <p className="text-[12px] text-gray-600">{selectedAction?.workflowFamily}</p>
+              <p className="text-[12px] text-[#6B7280]">{selectedAction?.workflowFamily}</p>
               <h3 className="text-lg font-semibold">Confirm mutating action</h3>
-              <p className="text-[12px] text-gray-700">
+              <p className="text-[12px] text-[#4B5563]">
                 This requests the canonical mutating path. Broker and CLI guardrails still apply, and this confirmation does not bypass pre-commit, dry-run, or explicit review requirements.
               </p>
             </div>
 
-            <label className="mt-4 flex items-start gap-3 rounded border p-3 text-[12px]">
+            <label className="mt-4 flex items-start gap-3 rounded border border-[#E5EAF0] bg-[#F9FBFD] p-3 text-[12px] text-[#1F2937]">
               <input
                 type="checkbox"
                 checked={confirmationChecked}
@@ -441,12 +699,12 @@ export default function ActionLauncher({
             </label>
 
             <label className="mt-4 block space-y-2">
-              <span className="text-[12px] font-medium">Type YES to continue</span>
+              <span className="text-[12px] font-medium text-[#1F2937]">Type YES to continue</span>
               <input
                 type="text"
                 value={typedYes}
                 onChange={(event) => setTypedYes(event.target.value)}
-                className="w-full rounded border px-2 py-1.5 text-[12px]"
+                className="w-full rounded border border-[#E5EAF0] bg-white px-2 py-1.5 text-[12px] text-[#1F2937] outline-none focus:border-[#3B82F6]"
                 placeholder="YES"
               />
             </label>
@@ -455,7 +713,7 @@ export default function ActionLauncher({
               <button
                 type="button"
                 onClick={resetConfirmation}
-                className="rounded border px-3 py-1.5 text-[12px]"
+                className="rounded border border-[#E5EAF0] bg-white px-3 py-1.5 text-[12px] text-[#1F2937]"
               >
                 Cancel
               </button>
@@ -463,7 +721,7 @@ export default function ActionLauncher({
                 type="button"
                 onClick={handleConfirmAction}
                 disabled={!confirmationChecked || normalizeString(typedYes) !== "YES" || isPending}
-                className="rounded border border-red-300 bg-red-50 px-3 py-1.5 text-[12px] font-medium text-red-900 disabled:cursor-not-allowed disabled:opacity-60"
+                className="rounded border border-[#FECACA] bg-[#FEF2F2] px-3 py-1.5 text-[12px] font-medium text-[#EF4444] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isPending ? "Starting…" : "Confirm action"}
               </button>

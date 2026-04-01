@@ -22,26 +22,26 @@ export default async function AdminReviewQueuePage() {
       <OperatorPageAutoRefresh />
 
       <section className="space-y-1">
-        <p className="font-mono text-[11px] uppercase tracking-wide text-gray-600">Review Queue</p>
-        <h2 className="text-lg font-semibold">Pending operator review work</h2>
-        <p className="max-w-5xl text-[12px] text-gray-700">
+        <p className="font-mono text-[11px] uppercase tracking-wide text-[#6B7280]">Review Queue</p>
+        <h2 className="text-lg font-semibold text-[#1F2937]">Pending operator review work</h2>
+        <p className="max-w-5xl text-[12px] text-[#4B5563]">
           This page keeps decision-critical workflow facts inline and pushes deeper inspection to
           the canonical review surfaces and session inspector.
         </p>
       </section>
 
-      <section className="overflow-x-auto rounded border border-zinc-200 bg-white">
+      <section className="overflow-x-auto rounded border border-[#E5EAF0] bg-white">
         <table className="min-w-[1320px] w-full text-[11px]">
-          <thead className="bg-zinc-100 text-left uppercase tracking-wide text-zinc-600">
+          <thead className="bg-[#F9FBFD] text-left uppercase tracking-wide text-[#6B7280]">
             <tr>
-              <th className="border-b border-zinc-200 px-2 py-1">Workflow</th>
-              <th className="border-b border-zinc-200 px-2 py-1">Queue Type</th>
-              <th className="border-b border-zinc-200 px-2 py-1">Record</th>
-              <th className="border-b border-zinc-200 px-2 py-1">Key Facts</th>
-              <th className="border-b border-zinc-200 px-2 py-1">Reason</th>
-              <th className="border-b border-zinc-200 px-2 py-1">Risk</th>
-              <th className="border-b border-zinc-200 px-2 py-1">Decision</th>
-              <th className="border-b border-zinc-200 px-2 py-1">Details</th>
+              <th className="border-b border-[#E5EAF0] px-2 py-1">Workflow</th>
+              <th className="border-b border-[#E5EAF0] px-2 py-1">Queue Type</th>
+              <th className="border-b border-[#E5EAF0] px-2 py-1">Record</th>
+              <th className="border-b border-[#E5EAF0] px-2 py-1">Key Facts</th>
+              <th className="border-b border-[#E5EAF0] px-2 py-1">Reason</th>
+              <th className="border-b border-[#E5EAF0] px-2 py-1">Risk</th>
+              <th className="border-b border-[#E5EAF0] px-2 py-1">Decision</th>
+              <th className="border-b border-[#E5EAF0] px-2 py-1">Details</th>
             </tr>
           </thead>
           <tbody>
@@ -49,48 +49,48 @@ export default async function AdminReviewQueuePage() {
               const actions = getReviewQueueActionDescriptors(item);
 
               return (
-                <tr key={item.id} className="align-top odd:bg-white even:bg-zinc-50/40">
-                  <td className="border-b border-zinc-200 px-2 py-1">{toWorkflowLabel(item.workflowFamily)}</td>
-                  <td className="border-b border-zinc-200 px-2 py-1">
-                    <div className="font-medium">{item.queueType}</div>
-                    <div className="font-mono text-[10px] text-zinc-500">{item.id}</div>
+                <tr key={item.id} className="align-top odd:bg-white even:bg-[#F9FBFD] hover:bg-[#F1F5F9]">
+                  <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">{toWorkflowLabel(item.workflowFamily)}</td>
+                  <td className="border-b border-[#E5EAF0] px-2 py-1">
+                    <div className="font-medium text-[#1F2937]">{item.queueType}</div>
+                    <div className="font-mono text-[10px] text-[#6B7280]">{item.id}</div>
                   </td>
-                  <td className="border-b border-zinc-200 px-2 py-1">
-                    <div className="font-medium">{item.title}</div>
-                    <div className="mt-0.5 max-w-[220px] truncate text-zinc-700" title={item.detail}>
+                  <td className="border-b border-[#E5EAF0] px-2 py-1">
+                    <div className="font-medium text-[#1F2937]">{item.title}</div>
+                    <div className="mt-0.5 max-w-[220px] truncate text-[#4B5563]" title={item.detail}>
                       {item.detail}
                     </div>
                   </td>
-                  <td className="border-b border-zinc-200 px-2 py-1 text-zinc-700">
+                  <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">
                     <div className="max-w-[220px] truncate" title={item.explanation?.expectedAction || ""}>
                       expected: {item.explanation?.expectedAction || "inspect canonical workflow"}
                     </div>
-                    <div className="mt-0.5 font-mono text-[10px] text-zinc-500">
+                    <div className="mt-0.5 font-mono text-[10px] text-[#6B7280]">
                       session: {item.sessionId}
                     </div>
-                    <div className="mt-0.5 max-w-[220px] truncate font-mono text-[10px] text-zinc-500" title={item.artifactPath || ""}>
+                    <div className="mt-0.5 max-w-[220px] truncate font-mono text-[10px] text-[#6B7280]" title={item.artifactPath || ""}>
                       {item.artifactPath || "no artifact path"}
                     </div>
                   </td>
-                  <td className="border-b border-zinc-200 px-2 py-1">
-                    <div className="max-w-[260px] truncate text-zinc-700" title={item.explanation?.whyExists || item.detail}>
+                  <td className="border-b border-[#E5EAF0] px-2 py-1">
+                    <div className="max-w-[260px] truncate text-[#4B5563]" title={item.explanation?.whyExists || item.detail}>
                       {item.explanation?.whyExists || item.detail}
                     </div>
                   </td>
-                  <td className="border-b border-zinc-200 px-2 py-1">
-                    <span className="rounded border border-zinc-300 bg-zinc-50 px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-zinc-700">
+                  <td className="border-b border-[#E5EAF0] px-2 py-1">
+                    <span className="rounded border border-[#E5EAF0] bg-[#F9FBFD] px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-[#4B5563]">
                       {item.riskLevel || "medium"}
                     </span>
                   </td>
-                  <td className="border-b border-zinc-200 px-2 py-1">
+                  <td className="border-b border-[#E5EAF0] px-2 py-1">
                     <CompactActionSelect actions={actions} />
                   </td>
-                  <td className="border-b border-zinc-200 px-2 py-1">
+                  <td className="border-b border-[#E5EAF0] px-2 py-1">
                     <div className="flex flex-wrap gap-2">
-                      <Link href={item.href} className="text-[11px] underline">
+                      <Link href={item.href} className="text-[11px] text-[#3B82F6] underline">
                         Workflow
                       </Link>
-                      <Link href={`/admin/workflows/${encodeURIComponent(item.sessionId)}`} className="text-[11px] underline">
+                      <Link href={`/admin/workflows/${encodeURIComponent(item.sessionId)}`} className="text-[11px] text-[#3B82F6] underline">
                         Inspect
                       </Link>
                     </div>
@@ -100,7 +100,7 @@ export default async function AdminReviewQueuePage() {
             })}
             {!items.length ? (
               <tr>
-                <td colSpan={8} className="px-2 py-3 text-[11px] text-zinc-600">
+                <td colSpan={8} className="px-2 py-3 text-[11px] text-[#6B7280]">
                   No pending review items were found in the canonical artifacts.
                 </td>
               </tr>

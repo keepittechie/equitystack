@@ -13,7 +13,7 @@ export const metadata = buildPageMetadata({
 
 function Pill({ children }) {
   return (
-    <span className="border rounded-full px-3 py-1 text-xs bg-[rgba(255,252,247,0.82)] text-[var(--ink-soft)]">
+    <span className="public-pill">
       {children}
     </span>
   );
@@ -100,7 +100,7 @@ export default async function ScorecardsPage({ searchParams }) {
     <main className="max-w-7xl mx-auto p-6 space-y-10">
       <section className="hero-panel p-8 md:p-10">
         <p className="eyebrow mb-4">Accountability Layer</p>
-        <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
+        <h1 className="page-title">
           Legislator Scorecards
         </h1>
         <p className="text-[var(--ink-soft)] text-lg max-w-3xl leading-8 mt-4">
@@ -243,7 +243,7 @@ export default async function ScorecardsPage({ searchParams }) {
               name="q"
               defaultValue={resolvedSearchParams?.q || ""}
               placeholder="Search by name, party, state, or chamber"
-              className="mt-2 w-full border rounded-xl px-3 py-2 bg-[rgba(255,252,247,0.88)]"
+              className="public-field mt-2"
             />
           </label>
 
@@ -252,7 +252,7 @@ export default async function ScorecardsPage({ searchParams }) {
             <select
               name="chamber"
               defaultValue={chamber}
-              className="mt-2 w-full border rounded-xl px-3 py-2 bg-[rgba(255,252,247,0.88)]"
+              className="public-field mt-2"
             >
               <option value="All">All chambers</option>
               <option value="House">House</option>
@@ -265,7 +265,7 @@ export default async function ScorecardsPage({ searchParams }) {
             <select
               name="party"
               defaultValue={party}
-              className="mt-2 w-full border rounded-xl px-3 py-2 bg-[rgba(255,252,247,0.88)]"
+              className="public-field mt-2"
             >
               <option value="All">All parties</option>
               <option value="Democratic">Democratic</option>
@@ -279,7 +279,7 @@ export default async function ScorecardsPage({ searchParams }) {
             <select
               name="sort"
               defaultValue={sortBy}
-              className="mt-2 w-full border rounded-xl px-3 py-2 bg-[rgba(255,252,247,0.88)]"
+              className="public-field mt-2"
             >
               <option value="impact">Highest impact</option>
               <option value="roles">Most roles</option>
@@ -348,27 +348,27 @@ export default async function ScorecardsPage({ searchParams }) {
           </p>
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="card-muted rounded-[1.25rem] p-4">
-              <h3 className="text-base font-semibold text-[var(--ink)]">Role Weight</h3>
+              <h3 className="text-base font-semibold text-[var(--foreground)]">Role Weight</h3>
               <p className="mt-2 text-sm leading-7">
                 Primary sponsors count more than cosponsors because they are more directly responsible
                 for moving a proposal.
               </p>
             </div>
             <div className="card-muted rounded-[1.25rem] p-4">
-              <h3 className="text-base font-semibold text-[var(--ink)]">Priority Weight</h3>
+              <h3 className="text-base font-semibold text-[var(--foreground)]">Priority Weight</h3>
               <p className="mt-2 text-sm leading-7">
                 Bills linked to critical or high-priority EquityStack proposals contribute more than
                 lower-priority items.
               </p>
             </div>
             <div className="card-muted rounded-[1.25rem] p-4">
-              <h3 className="text-base font-semibold text-[var(--ink)]">Progress Weight</h3>
+              <h3 className="text-base font-semibold text-[var(--foreground)]">Progress Weight</h3>
               <p className="mt-2 text-sm leading-7">
                 Bills that advance beyond introduction receive more credit than proposals that never move.
               </p>
             </div>
             <div className="card-muted rounded-[1.25rem] p-4">
-              <h3 className="text-base font-semibold text-[var(--ink)]">Current Scope</h3>
+              <h3 className="text-base font-semibold text-[var(--foreground)]">Current Scope</h3>
               <p className="mt-2 text-sm leading-7">
                 These snapshots describe the reform-bill dataset currently loaded into EquityStack, not
                 a complete historical record of every officeholder.

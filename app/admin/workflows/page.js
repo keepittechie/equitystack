@@ -4,6 +4,7 @@ import { listBrokerJobs } from "@/lib/server/admin-operator/commandBroker.js";
 import { listOperatorSchedules } from "@/lib/server/admin-operator/schedulerService.js";
 import { listWorkflowSessions } from "@/lib/server/admin-operator/workflowData.js";
 import OperatorPageAutoRefresh from "@/app/admin/components/OperatorPageAutoRefresh";
+import OperatorActionButton from "@/app/admin/components/OperatorActionButton";
 import JobStatusBadge from "../jobs/JobStatusBadge";
 
 function formatDateTime(value) {
@@ -67,9 +68,9 @@ export default async function AdminWorkflowsPage() {
       <OperatorPageAutoRefresh />
 
       <section className="space-y-1">
-        <p className="font-mono text-[11px] uppercase tracking-wide text-gray-600">Workflows</p>
-        <h2 className="text-lg font-semibold">Active sessions</h2>
-        <p className="max-w-5xl text-[12px] text-gray-700">
+        <p className="font-mono text-[11px] uppercase tracking-wide text-[#6B7280]">Workflows</p>
+        <h2 className="text-lg font-semibold text-[#1F2937]">Active sessions</h2>
+        <p className="max-w-5xl text-[12px] text-[#4B5563]">
           Session state reflects canonical workflow artifacts. Use this page to scan current state,
           blocker status, the next recommended action, and the latest related run.
         </p>
@@ -78,80 +79,112 @@ export default async function AdminWorkflowsPage() {
       <section className="space-y-2">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <p className="font-mono text-[11px] uppercase tracking-wide text-gray-600">Session Table</p>
-            <h3 className="text-sm font-semibold">Workflow sessions</h3>
+            <p className="font-mono text-[11px] uppercase tracking-wide text-[#6B7280]">Session Table</p>
+            <h3 className="text-sm font-semibold text-[#1F2937]">Workflow sessions</h3>
           </div>
         </div>
-        <div className="overflow-x-auto rounded border border-zinc-200 bg-white">
+        <div className="overflow-x-auto rounded border border-[#E5EAF0] bg-white">
           <table className="min-w-[1320px] w-full text-[11px]">
-            <thead className="bg-zinc-100 text-left uppercase tracking-wide text-zinc-600">
+            <thead className="bg-[#F9FBFD] text-left uppercase tracking-wide text-[#6B7280]">
               <tr>
-                <th className="border-b border-zinc-200 px-2 py-1">Workflow</th>
-                <th className="border-b border-zinc-200 px-2 py-1">Session</th>
-                <th className="border-b border-zinc-200 px-2 py-1">State</th>
-                <th className="border-b border-zinc-200 px-2 py-1">Recommended Action</th>
-                <th className="border-b border-zinc-200 px-2 py-1">Blocker</th>
-                <th className="border-b border-zinc-200 px-2 py-1">Latest Job</th>
-                <th className="border-b border-zinc-200 px-2 py-1">Mode</th>
-                <th className="border-b border-zinc-200 px-2 py-1">Schedule</th>
-                <th className="border-b border-zinc-200 px-2 py-1">Updated</th>
-                <th className="border-b border-zinc-200 px-2 py-1">Action</th>
+                <th className="border-b border-[#E5EAF0] px-2 py-1">Workflow</th>
+                <th className="border-b border-[#E5EAF0] px-2 py-1">Session</th>
+                <th className="border-b border-[#E5EAF0] px-2 py-1">State</th>
+                <th className="border-b border-[#E5EAF0] px-2 py-1">Current / Next</th>
+                <th className="border-b border-[#E5EAF0] px-2 py-1">Blocker</th>
+                <th className="border-b border-[#E5EAF0] px-2 py-1">Latest Job</th>
+                <th className="border-b border-[#E5EAF0] px-2 py-1">Mode</th>
+                <th className="border-b border-[#E5EAF0] px-2 py-1">Schedule</th>
+                <th className="border-b border-[#E5EAF0] px-2 py-1">Updated</th>
+                <th className="border-b border-[#E5EAF0] px-2 py-1">Action</th>
               </tr>
             </thead>
             <tbody>
-              {sessionRows.map((session) => (
-                <tr key={session.id} className="align-top odd:bg-white even:bg-zinc-50/40">
-                  <td className="border-b border-zinc-200 px-2 py-1">{toWorkflowLabel(session.workflowFamily)}</td>
-                  <td className="border-b border-zinc-200 px-2 py-1">
-                    <div className="font-mono text-[10px] text-zinc-700">
+              {sessionRows.map((session) => {
+                const tracker =
+                  session.workflowFamily === "current-admin" ? session.workflowTracker : null;
+                const primaryAction =
+                  tracker?.nextStep?.action || tracker?.currentStep?.action || null;
+                const workflowHref =
+                  tracker?.operatorSurfaceHref || session.operatorSurfaceHref || session.href;
+                const stepLabel =
+                  tracker?.nextStep?.title ||
+                  tracker?.currentStep?.title ||
+                  session.recommendedAction?.title ||
+                  "—";
+
+                return (
+                <tr key={session.id} className="align-top odd:bg-white even:bg-[#F9FBFD] hover:bg-[#F1F5F9]">
+                  <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">{toWorkflowLabel(session.workflowFamily)}</td>
+                  <td className="border-b border-[#E5EAF0] px-2 py-1">
+                    <div className="font-mono text-[10px] text-[#111827]">
                       {session.canonicalSessionKey || session.id}
                     </div>
                   </td>
-                  <td className="border-b border-zinc-200 px-2 py-1">
+                  <td className="border-b border-[#E5EAF0] px-2 py-1">
                     <JobStatusBadge status={session.canonicalState} />
                   </td>
-                  <td className="border-b border-zinc-200 px-2 py-1">
-                    <div className="max-w-[180px] truncate" title={session.recommendedAction?.title || ""}>
-                      {session.recommendedAction?.title || "—"}
+                  <td className="border-b border-[#E5EAF0] px-2 py-1">
+                    <div className="space-y-1">
+                      <div className="max-w-[220px] truncate text-[#4B5563]" title={stepLabel}>
+                        {stepLabel}
+                      </div>
+                      {tracker?.nextStep?.reason ? (
+                        <div className="max-w-[260px] truncate text-[10px] text-[#6B7280]" title={tracker.nextStep.reason}>
+                          {tracker.nextStep.reason}
+                        </div>
+                      ) : null}
                     </div>
                   </td>
-                  <td className="border-b border-zinc-200 px-2 py-1">
-                    <div className="max-w-[240px] truncate text-zinc-700" title={session.blocker || "—"}>
+                  <td className="border-b border-[#E5EAF0] px-2 py-1">
+                    <div className="max-w-[240px] truncate text-[#4B5563]" title={session.blocker || "—"}>
                       {session.blocker || "—"}
                     </div>
                   </td>
-                  <td className="border-b border-zinc-200 px-2 py-1">
+                  <td className="border-b border-[#E5EAF0] px-2 py-1">
                     {session.latestJob ? (
                       <div className="space-y-1">
                         <JobStatusBadge status={session.latestJob.status} />
-                        <div className="font-mono text-[10px] text-zinc-600">{session.latestJob.id}</div>
+                        <div className="font-mono text-[10px] text-[#6B7280]">{session.latestJob.id}</div>
                       </div>
                     ) : (
-                      <span className="text-zinc-400">—</span>
+                      <span className="text-[#6B7280]">—</span>
                     )}
                   </td>
-                  <td className="border-b border-zinc-200 px-2 py-1 font-mono text-[10px] text-zinc-700">
+                  <td className="border-b border-[#E5EAF0] px-2 py-1 font-mono text-[10px] text-[#111827]">
                     {session.execution?.execution_mode || "local_cli"}
                   </td>
-                  <td className="border-b border-zinc-200 px-2 py-1 font-mono text-[10px] text-zinc-700">
+                  <td className="border-b border-[#E5EAF0] px-2 py-1 font-mono text-[10px] text-[#111827]">
                     {session.linkedSchedule?.title || "—"}
                   </td>
-                  <td className="border-b border-zinc-200 px-2 py-1">{formatDateTime(session.updatedAt)}</td>
-                  <td className="border-b border-zinc-200 px-2 py-1">
+                  <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">{formatDateTime(session.updatedAt)}</td>
+                  <td className="border-b border-[#E5EAF0] px-2 py-1">
                     <div className="flex flex-wrap gap-2">
-                      <Link href={session.href} className="text-[11px] underline">
+                      <Link href={session.href} className="text-[11px] text-[#3B82F6] underline">
                         Open
                       </Link>
-                      <Link href={session.operatorSurfaceHref || "/admin"} className="text-[11px] underline">
-                        Workflow
-                      </Link>
+                      {primaryAction ? (
+                        <OperatorActionButton
+                          action={primaryAction.action}
+                          label={primaryAction.label || primaryAction.title}
+                          input={primaryAction.input}
+                          context={primaryAction.context}
+                          tone={primaryAction.tone}
+                          helperText=""
+                          confirmation={primaryAction.confirmation}
+                        />
+                      ) : (
+                        <Link href={workflowHref} className="text-[11px] text-[#3B82F6] underline">
+                          {tracker?.nextStep?.status === "blocked" ? "Inspect blocker" : "Workflow"}
+                        </Link>
+                      )}
                     </div>
                   </td>
                 </tr>
-              ))}
+              )})}
               {!sessionRows.length ? (
                 <tr>
-                  <td colSpan={10} className="px-2 py-3 text-[11px] text-zinc-600">
+                  <td colSpan={10} className="px-2 py-3 text-[11px] text-[#6B7280]">
                     No active sessions are currently recorded.
                   </td>
                 </tr>
@@ -164,33 +197,33 @@ export default async function AdminWorkflowsPage() {
       <section className="space-y-2">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <p className="font-mono text-[11px] uppercase tracking-wide text-gray-600">Reference</p>
-            <h3 className="text-sm font-semibold">Workflow registry</h3>
+            <p className="font-mono text-[11px] uppercase tracking-wide text-[#6B7280]">Reference</p>
+            <h3 className="text-sm font-semibold text-[#1F2937]">Workflow registry</h3>
           </div>
         </div>
-        <div className="overflow-x-auto rounded border border-zinc-200 bg-white">
+        <div className="overflow-x-auto rounded border border-[#E5EAF0] bg-white">
           <table className="min-w-[960px] w-full text-[11px]">
-            <thead className="bg-zinc-100 text-left uppercase tracking-wide text-zinc-600">
+            <thead className="bg-[#F9FBFD] text-left uppercase tracking-wide text-[#6B7280]">
               <tr>
-                <th className="border-b border-zinc-200 px-2 py-1">Workflow</th>
-                <th className="border-b border-zinc-200 px-2 py-1">Description</th>
-                <th className="border-b border-zinc-200 px-2 py-1">Steps</th>
-                <th className="border-b border-zinc-200 px-2 py-1">Surface</th>
+                <th className="border-b border-[#E5EAF0] px-2 py-1">Workflow</th>
+                <th className="border-b border-[#E5EAF0] px-2 py-1">Description</th>
+                <th className="border-b border-[#E5EAF0] px-2 py-1">Steps</th>
+                <th className="border-b border-[#E5EAF0] px-2 py-1">Surface</th>
               </tr>
             </thead>
             <tbody>
               {workflows.map((workflow) => (
-                <tr key={workflow.id} className="align-top odd:bg-white even:bg-zinc-50/40">
-                  <td className="border-b border-zinc-200 px-2 py-1">
-                    <div className="font-medium">{workflow.title}</div>
-                    <div className="font-mono text-[10px] text-zinc-500">{workflow.id}</div>
+                <tr key={workflow.id} className="align-top odd:bg-white even:bg-[#F9FBFD] hover:bg-[#F1F5F9]">
+                  <td className="border-b border-[#E5EAF0] px-2 py-1">
+                    <div className="font-medium text-[#1F2937]">{workflow.title}</div>
+                    <div className="font-mono text-[10px] text-[#6B7280]">{workflow.id}</div>
                   </td>
-                  <td className="border-b border-zinc-200 px-2 py-1 text-zinc-700">{workflow.description}</td>
-                  <td className="border-b border-zinc-200 px-2 py-1 font-mono text-[10px] text-zinc-600">
+                  <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">{workflow.description}</td>
+                  <td className="border-b border-[#E5EAF0] px-2 py-1 font-mono text-[10px] text-[#6B7280]">
                     {workflow.steps.map((step) => step.actionId).join(", ")}
                   </td>
-                  <td className="border-b border-zinc-200 px-2 py-1">
-                    <Link href={workflow.surfaceHref} className="text-[11px] underline">
+                  <td className="border-b border-[#E5EAF0] px-2 py-1">
+                    <Link href={workflow.surfaceHref} className="text-[11px] text-[#3B82F6] underline">
                       Open surface
                     </Link>
                   </td>

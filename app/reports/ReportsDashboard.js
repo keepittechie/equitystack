@@ -12,16 +12,18 @@ import {
   Tooltip,
   Legend,
 } from "recharts";
+import {
+  PUBLIC_CHART_AXIS_PROPS,
+  PUBLIC_CHART_COLORS,
+  PUBLIC_CHART_GRID_PROPS,
+  PUBLIC_CHART_LEGEND_PROPS,
+  PublicChartTooltip,
+  formatPublicChartNumber,
+  getPublicBarProps,
+} from "@/app/components/charts/publicChartTheme";
 
 function formatNumber(value) {
-  if (value === null || value === undefined || value === "") return "0";
-
-  const numeric = Number(value);
-  if (Number.isNaN(numeric)) return String(value);
-
-  return new Intl.NumberFormat("en-US", {
-    maximumFractionDigits: Math.abs(numeric % 1) > 0 ? 2 : 0,
-  }).format(numeric);
+  return formatPublicChartNumber(value);
 }
 
 function sortRows(rows, field) {
@@ -30,6 +32,12 @@ function sortRows(rows, field) {
 
 function getTopRow(rows, field) {
   return sortRows(rows, field)[0] || null;
+}
+
+function chartRows(rows, field, options = {}) {
+  if (!Array.isArray(rows)) return [];
+  if (!field || options.keepOrder) return rows;
+  return sortRows(rows, field);
 }
 
 function ChartShell({
@@ -43,7 +51,7 @@ function ChartShell({
   return (
     <section className="space-y-3">
       <div>
-        <h3 className="text-2xl font-semibold">{title}</h3>
+        <h3 className="section-title">{title}</h3>
         {description ? (
           <p className="text-sm text-[var(--ink-soft)] mt-1 max-w-3xl">{description}</p>
         ) : null}
@@ -72,7 +80,7 @@ function JumpChip({ targetId, label }) {
   return (
     <a
       href={`#${targetId}`}
-      className="rounded-full border px-4 py-2 text-sm bg-[rgba(255,252,247,0.82)] text-[var(--ink-soft)] border-[var(--line)] hover:border-[var(--line-strong)] hover:text-[var(--accent)]"
+      className="public-pill px-4 py-2 text-sm hover:border-[var(--line-strong)] hover:text-[var(--accent)]"
     >
       {label}
     </a>
@@ -116,7 +124,7 @@ function RankingList({ title, description, rows, labelKey, valueKey, valueLabel 
         {rows.map((row, index) => (
           <div
             key={`${row?.[labelKey] || row?.name || index}`}
-            className="flex items-center justify-between gap-4 rounded-[1.15rem] border bg-[rgba(255,252,247,0.82)] px-4 py-3"
+            className="flex items-center justify-between gap-4 rounded-[1.15rem] border border-[var(--line)] bg-white px-4 py-3"
           >
             <div className="min-w-0">
               <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">
@@ -160,17 +168,17 @@ function PolicyCard({ policy, titleLabel = "Total Score", titleValue }) {
       </p>
       <div className="mt-3 flex flex-wrap gap-2 text-xs text-[var(--ink-soft)]">
         {Number(policy.related_explainer_count || 0) > 0 ? (
-          <span className="border rounded-full px-3 py-1 bg-[rgba(255,252,247,0.8)]">
+          <span className="public-pill">
             Explainers: {policy.related_explainer_count}
           </span>
         ) : null}
         {Number(policy.related_future_bill_count || 0) > 0 ? (
-          <span className="border rounded-full px-3 py-1 bg-[rgba(255,252,247,0.8)]">
+          <span className="public-pill">
             Future Bills: {policy.related_future_bill_count}
           </span>
         ) : null}
         {Number(policy.linked_legislator_count || 0) > 0 ? (
-          <span className="border rounded-full px-3 py-1 bg-[rgba(255,252,247,0.8)]">
+          <span className="public-pill">
             Scorecards: {policy.linked_legislator_count}
           </span>
         ) : null}
@@ -230,6 +238,11 @@ export default function ReportsDashboard({
   const topParties = sortRows(safePartyRows, "net_weighted_impact").slice(0, 5);
   const topEras = sortRows(safeEraRows, "net_weighted_impact").slice(0, 5);
   const topCategories = sortRows(safeCategoryRows, "avg_policy_impact_score").slice(0, 6);
+  const partyImpactRows = chartRows(safePartyRows, "net_weighted_impact");
+  const partyDirectionRows = chartRows(safePartyRows, "positive_count");
+  const directPartyRows = chartRows(safeDirectPartyRows, "direct_black_impact_count");
+  const categoryScoreRows = chartRows(safeCategoryRows, "avg_policy_impact_score");
+  const categoryImpactRows = chartRows(safeCategoryRows, "net_weighted_impact");
   const recentAccountability = [...safeFutureBills]
     .filter((bill) => bill.latest_tracked_update)
     .sort((a, b) => String(b.latest_tracked_update).localeCompare(String(a.latest_tracked_update)))
@@ -358,18 +371,18 @@ export default function ReportsDashboard({
                       {[bill.target_area, bill.priority_level, bill.status].filter(Boolean).join(" • ")}
                     </p>
                   </div>
-                  <span className="border rounded-full px-3 py-1 text-xs bg-[rgba(255,252,247,0.82)] text-[var(--ink-soft)]">
-                    {formatDate(bill.latest_tracked_update)}
-                  </span>
+                    <span className="public-pill">
+                      {formatDate(bill.latest_tracked_update)}
+                    </span>
                 </div>
                 <div className="mt-3 flex flex-wrap gap-2 text-xs text-[var(--ink-soft)]">
-                  <span className="border rounded-full px-3 py-1 bg-[rgba(255,252,247,0.8)]">
+                  <span className="public-pill">
                     Linked Bills: {bill.tracked_bills?.length || 0}
                   </span>
-                  <span className="border rounded-full px-3 py-1 bg-[rgba(255,252,247,0.8)]">
+                  <span className="public-pill">
                     Scorecards: {bill.linked_legislators?.length || 0}
                   </span>
-                  <span className="border rounded-full px-3 py-1 bg-[rgba(255,252,247,0.8)]">
+                  <span className="public-pill">
                     Explainers: {bill.related_explainers?.length || 0}
                   </span>
                 </div>
@@ -394,13 +407,13 @@ export default function ReportsDashboard({
             ready={mounted}
           >
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={safePartyRows}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="net_weighted_impact" name="Net Weighted Impact" fill="#8a3b12" />
+              <BarChart data={partyImpactRows} margin={{ top: 8, right: 8, left: 4, bottom: 4 }}>
+                <CartesianGrid {...PUBLIC_CHART_GRID_PROPS} />
+                <XAxis dataKey="name" {...PUBLIC_CHART_AXIS_PROPS} />
+                <YAxis {...PUBLIC_CHART_AXIS_PROPS} />
+                <Tooltip content={<PublicChartTooltip />} />
+                <Legend {...PUBLIC_CHART_LEGEND_PROPS} />
+                <Bar dataKey="net_weighted_impact" name="Net Weighted Impact" {...getPublicBarProps(PUBLIC_CHART_COLORS.primary)} />
               </BarChart>
             </ResponsiveContainer>
           </ChartShell>
@@ -424,16 +437,16 @@ export default function ReportsDashboard({
             ready={mounted}
           >
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={safePartyRows}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis allowDecimals={false} />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="positive_count" name="Positive" fill="#16a34a" />
-                <Bar dataKey="mixed_count" name="Mixed" fill="#ca8a04" />
-                <Bar dataKey="negative_count" name="Negative" fill="#dc2626" />
-                <Bar dataKey="blocked_impact_count" name="Blocked" fill="#78716c" />
+              <BarChart data={partyDirectionRows} margin={{ top: 8, right: 8, left: 4, bottom: 4 }}>
+                <CartesianGrid {...PUBLIC_CHART_GRID_PROPS} />
+                <XAxis dataKey="name" {...PUBLIC_CHART_AXIS_PROPS} />
+                <YAxis allowDecimals={false} {...PUBLIC_CHART_AXIS_PROPS} />
+                <Tooltip content={<PublicChartTooltip />} />
+                <Legend {...PUBLIC_CHART_LEGEND_PROPS} />
+                <Bar dataKey="positive_count" name="Positive" {...getPublicBarProps(PUBLIC_CHART_COLORS.positive)} />
+                <Bar dataKey="mixed_count" name="Mixed" {...getPublicBarProps(PUBLIC_CHART_COLORS.warning)} />
+                <Bar dataKey="negative_count" name="Negative" {...getPublicBarProps(PUBLIC_CHART_COLORS.negative)} />
+                <Bar dataKey="blocked_impact_count" name="Blocked" {...getPublicBarProps(PUBLIC_CHART_COLORS.blocked)} />
               </BarChart>
             </ResponsiveContainer>
           </ChartShell>
@@ -446,18 +459,18 @@ export default function ReportsDashboard({
             ready={mounted}
           >
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={safeDirectPartyRows}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis allowDecimals={false} />
-                <Tooltip />
-                <Legend />
+              <BarChart data={directPartyRows} margin={{ top: 8, right: 8, left: 4, bottom: 4 }}>
+                <CartesianGrid {...PUBLIC_CHART_GRID_PROPS} />
+                <XAxis dataKey="name" {...PUBLIC_CHART_AXIS_PROPS} />
+                <YAxis allowDecimals={false} {...PUBLIC_CHART_AXIS_PROPS} />
+                <Tooltip content={<PublicChartTooltip />} />
+                <Legend {...PUBLIC_CHART_LEGEND_PROPS} />
                 <Bar
                   dataKey="direct_black_impact_count"
                   name="Direct Black Impact Policies"
-                  fill="#2563eb"
+                  {...getPublicBarProps(PUBLIC_CHART_COLORS.primary)}
                 />
-                <Bar dataKey="total_policies" name="Total Policies" fill="#cbd5e1" />
+                <Bar dataKey="total_policies" name="Total Policies" {...getPublicBarProps(PUBLIC_CHART_COLORS.neutral)} />
               </BarChart>
             </ResponsiveContainer>
           </ChartShell>
@@ -479,13 +492,13 @@ export default function ReportsDashboard({
             ready={mounted}
           >
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={safeEraRows}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" interval={0} angle={-15} textAnchor="end" height={90} />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="net_weighted_impact" name="Net Weighted Impact" fill="#8a3b12" />
+              <BarChart data={safeEraRows} margin={{ top: 8, right: 8, left: 4, bottom: 4 }}>
+                <CartesianGrid {...PUBLIC_CHART_GRID_PROPS} />
+                <XAxis dataKey="name" interval={0} angle={-15} textAnchor="end" height={90} {...PUBLIC_CHART_AXIS_PROPS} />
+                <YAxis {...PUBLIC_CHART_AXIS_PROPS} />
+                <Tooltip content={<PublicChartTooltip />} />
+                <Legend {...PUBLIC_CHART_LEGEND_PROPS} />
+                <Bar dataKey="net_weighted_impact" name="Net Weighted Impact" {...getPublicBarProps(PUBLIC_CHART_COLORS.primary)} />
               </BarChart>
             </ResponsiveContainer>
           </ChartShell>
@@ -509,16 +522,16 @@ export default function ReportsDashboard({
             ready={mounted}
           >
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={safeEraRows}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" interval={0} angle={-15} textAnchor="end" height={90} />
-                <YAxis allowDecimals={false} />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="positive_count" name="Positive" fill="#16a34a" />
-                <Bar dataKey="mixed_count" name="Mixed" fill="#ca8a04" />
-                <Bar dataKey="negative_count" name="Negative" fill="#dc2626" />
-                <Bar dataKey="blocked_impact_count" name="Blocked" fill="#78716c" />
+              <BarChart data={safeEraRows} margin={{ top: 8, right: 8, left: 4, bottom: 4 }}>
+                <CartesianGrid {...PUBLIC_CHART_GRID_PROPS} />
+                <XAxis dataKey="name" interval={0} angle={-15} textAnchor="end" height={90} {...PUBLIC_CHART_AXIS_PROPS} />
+                <YAxis allowDecimals={false} {...PUBLIC_CHART_AXIS_PROPS} />
+                <Tooltip content={<PublicChartTooltip />} />
+                <Legend {...PUBLIC_CHART_LEGEND_PROPS} />
+                <Bar dataKey="positive_count" name="Positive" {...getPublicBarProps(PUBLIC_CHART_COLORS.positive)} />
+                <Bar dataKey="mixed_count" name="Mixed" {...getPublicBarProps(PUBLIC_CHART_COLORS.warning)} />
+                <Bar dataKey="negative_count" name="Negative" {...getPublicBarProps(PUBLIC_CHART_COLORS.negative)} />
+                <Bar dataKey="blocked_impact_count" name="Blocked" {...getPublicBarProps(PUBLIC_CHART_COLORS.blocked)} />
               </BarChart>
             </ResponsiveContainer>
           </ChartShell>
@@ -531,18 +544,18 @@ export default function ReportsDashboard({
             ready={mounted}
           >
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={safeDirectEraRows}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" interval={0} angle={-15} textAnchor="end" height={90} />
-                <YAxis allowDecimals={false} />
-                <Tooltip />
-                <Legend />
+              <BarChart data={safeDirectEraRows} margin={{ top: 8, right: 8, left: 4, bottom: 4 }}>
+                <CartesianGrid {...PUBLIC_CHART_GRID_PROPS} />
+                <XAxis dataKey="name" interval={0} angle={-15} textAnchor="end" height={90} {...PUBLIC_CHART_AXIS_PROPS} />
+                <YAxis allowDecimals={false} {...PUBLIC_CHART_AXIS_PROPS} />
+                <Tooltip content={<PublicChartTooltip />} />
+                <Legend {...PUBLIC_CHART_LEGEND_PROPS} />
                 <Bar
                   dataKey="direct_black_impact_count"
                   name="Direct Black Impact Policies"
-                  fill="#2563eb"
+                  {...getPublicBarProps(PUBLIC_CHART_COLORS.primary)}
                 />
-                <Bar dataKey="total_policies" name="Total Policies" fill="#cbd5e1" />
+                <Bar dataKey="total_policies" name="Total Policies" {...getPublicBarProps(PUBLIC_CHART_COLORS.neutral)} />
               </BarChart>
             </ResponsiveContainer>
           </ChartShell>
@@ -564,13 +577,13 @@ export default function ReportsDashboard({
             ready={mounted}
           >
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={safeCategoryRows}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" interval={0} angle={-15} textAnchor="end" height={110} />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="avg_policy_impact_score" name="Avg Policy Impact Score" fill="#8a3b12" />
+              <BarChart data={categoryScoreRows} margin={{ top: 8, right: 8, left: 4, bottom: 4 }}>
+                <CartesianGrid {...PUBLIC_CHART_GRID_PROPS} />
+                <XAxis dataKey="name" interval={0} angle={-15} textAnchor="end" height={110} {...PUBLIC_CHART_AXIS_PROPS} />
+                <YAxis {...PUBLIC_CHART_AXIS_PROPS} />
+                <Tooltip content={<PublicChartTooltip />} />
+                <Legend {...PUBLIC_CHART_LEGEND_PROPS} />
+                <Bar dataKey="avg_policy_impact_score" name="Avg Policy Impact Score" {...getPublicBarProps(PUBLIC_CHART_COLORS.secondary)} />
               </BarChart>
             </ResponsiveContainer>
           </ChartShell>
@@ -593,13 +606,13 @@ export default function ReportsDashboard({
           ready={mounted}
         >
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={safeCategoryRows}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" interval={0} angle={-15} textAnchor="end" height={110} />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="net_weighted_impact" name="Net Weighted Impact" fill="#8a3b12" />
+            <BarChart data={categoryImpactRows} margin={{ top: 8, right: 8, left: 4, bottom: 4 }}>
+              <CartesianGrid {...PUBLIC_CHART_GRID_PROPS} />
+              <XAxis dataKey="name" interval={0} angle={-15} textAnchor="end" height={110} {...PUBLIC_CHART_AXIS_PROPS} />
+              <YAxis {...PUBLIC_CHART_AXIS_PROPS} />
+              <Tooltip content={<PublicChartTooltip />} />
+              <Legend {...PUBLIC_CHART_LEGEND_PROPS} />
+              <Bar dataKey="net_weighted_impact" name="Net Weighted Impact" {...getPublicBarProps(PUBLIC_CHART_COLORS.primary)} />
             </BarChart>
           </ResponsiveContainer>
         </ChartShell>

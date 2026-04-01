@@ -71,6 +71,36 @@ Advanced/manual commands still remain available:
 
 The command also prints artifact presence, blocking issues, and the recommended next command.
 
+## Guided Admin Workflow Mapping
+
+The admin tracker uses the same canonical state and artifact set. It does not create a parallel
+workflow engine.
+
+Admin step mapping:
+
+1. `Discover / Batch Ready`
+   - complete when the active batch file is present
+2. `Run current-admin`
+   - complete when the review artifact exists
+3. `Operator Review`
+   - current while operator decisions are still pending
+4. `Decision Log Finalized`
+   - complete when the decision log and manual review queue exist
+5. `Pre-commit / Apply Readiness`
+   - current when pre-commit or dry-run is the next valid checkpoint
+   - blocked when the canonical pre-commit report marks readiness as blocked
+6. `Admin Approval / Final Apply`
+   - current when the dry-run import exists and final apply is waiting on confirmation
+7. `Validation / Complete`
+   - complete when the validation report exists
+
+Tracker status meaning:
+
+- green dot: complete
+- yellow dot: current or next required step
+- red dot: blocked
+- gray dot: not yet available
+
 ## What Each Stage Does
 
 `run` without `--input` runs:

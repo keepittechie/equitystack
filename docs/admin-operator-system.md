@@ -67,6 +67,7 @@ Everything in the admin UI is derived from or wrapped around canonical workflow 
 - `/admin`
   - daily routine
   - prioritized work buckets
+  - current-admin workflow tracker
   - suggested actions
   - session snapshots
 - `/admin/command`
@@ -94,6 +95,61 @@ These remain necessary because they are the actual human checkpoint pages:
 - `/admin/legislative-workflow`
 
 The command center links into them when the next step requires human review.
+
+## Current-Admin Guided Workflow
+
+The current-admin flow is now surfaced as a guided step tracker instead of requiring the operator
+to infer the next move from artifacts alone.
+
+The tracker appears on:
+
+- `/admin`
+- `/admin/workflows`
+- `/admin/workflows/[sessionId]`
+- `/admin/current-admin-review`
+
+The step sequence is:
+
+1. `Discover / Batch Ready`
+2. `Run current-admin`
+3. `Operator Review`
+4. `Decision Log Finalized`
+5. `Pre-commit / Apply Readiness`
+6. `Admin Approval / Final Apply`
+7. `Validation / Complete`
+
+Step completion is derived from canonical current-admin state and artifacts. The admin does not
+invent a second workflow state machine.
+
+Canonical signals used by the tracker include:
+
+- `batch.stage`
+- current-admin artifact presence
+- blocker reasons
+- pending review counts
+- existing action permissions
+
+### Tracker Status Meaning
+
+- green dot: step is complete
+- yellow dot: this is the current or next required step
+- red dot: the workflow is blocked at this step
+- gray dot: the step is not available yet
+
+Only one step should feel like the next thing to do.
+
+### What To Click Next
+
+The tracker resolves the next step automatically:
+
+- if review artifacts are missing, it points to `Run current-admin`
+- if review is ready, it points to `/admin/current-admin-review`
+- if decision logging is the next checkpoint, it points to the current-admin review surface so the operator can finalize
+- if pre-commit or dry-run is next, it exposes the existing guarded broker-backed action
+- if the workflow is blocked, it points to the session inspector blocker section
+- if final apply is ready, it exposes the existing confirmed apply path
+
+This is guidance only. It does not auto-run any step or bypass confirmation.
 
 ## Guardrails
 

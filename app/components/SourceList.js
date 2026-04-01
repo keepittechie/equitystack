@@ -10,19 +10,19 @@ export default function SourceList({ sources = [] }) {
       {sources.map((source) => (
         <li
           key={source.id}
-          className="rounded-xl border border-[rgba(120,53,15,0.12)] bg-[rgba(255,252,247,0.78)] p-3"
+          className="rounded-xl border border-[var(--line)] bg-white p-3"
         >
           {source.url ? (
             <a
               href={source.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm font-medium text-[var(--ink)] underline decoration-[rgba(120,53,15,0.28)] underline-offset-4 hover:text-[var(--accent)]"
+              className="text-sm font-medium text-[var(--foreground)] underline decoration-[rgba(37,99,235,0.28)] underline-offset-4 hover:text-[var(--accent)]"
             >
               {source.title}
             </a>
           ) : (
-            <p className="text-sm font-medium text-[var(--ink)]">{source.title}</p>
+            <p className="text-sm font-medium text-[var(--foreground)]">{source.title}</p>
           )}
 
           {(source.publisher || source.source_type) ? (

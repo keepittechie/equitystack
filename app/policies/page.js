@@ -95,7 +95,7 @@ function QuickFilterLink({ href, label }) {
   return (
     <Link
       href={href}
-      className="inline-flex items-center rounded-full border border-[rgba(120,53,15,0.12)] px-3 py-2 text-sm bg-white/75 hover:bg-white"
+      className="public-button-secondary px-3 py-2 text-sm"
     >
       {label}
     </Link>
@@ -214,7 +214,7 @@ export default async function PoliciesPage({ searchParams }) {
       <section className="hero-panel p-8 md:p-10 mb-6">
         <div className="section-intro">
           <p className="eyebrow mb-4">Policy Database</p>
-          <h1 className="text-4xl md:text-5xl font-bold">Policies</h1>
+          <h1 className="page-title">Policies</h1>
           <p className="text-base md:text-lg text-[var(--ink-soft)] mt-4 leading-8 max-w-3xl">
             Browse laws, court cases, executive actions, and major policy decisions in the dataset.
             Use search, filters, and sorting to narrow by title, topic, party, era, category,
@@ -259,7 +259,7 @@ export default async function PoliciesPage({ searchParams }) {
               type="text"
               name="q"
               defaultValue={resolvedSearchParams.q || ""}
-              className="w-full border rounded-xl px-3 py-2"
+              className="public-field"
               placeholder="Search by title, summary, or keyword"
             />
           </div>
@@ -268,7 +268,7 @@ export default async function PoliciesPage({ searchParams }) {
             <select
               name="party"
               defaultValue={resolvedSearchParams.party || ""}
-              className="w-full border rounded-xl px-3 py-2 bg-white/80"
+              className="public-field"
             >
               <option value="">All</option>
               <option value="Democratic Party">Democratic Party</option>
@@ -281,7 +281,7 @@ export default async function PoliciesPage({ searchParams }) {
             <select
               name="era"
               defaultValue={resolvedSearchParams.era || ""}
-              className="w-full border rounded-xl px-3 py-2 bg-white/80"
+              className="public-field"
             >
               <option value="">All</option>
               <option value="Civil War and Reconstruction">Civil War and Reconstruction</option>
@@ -296,7 +296,7 @@ export default async function PoliciesPage({ searchParams }) {
             <select
               name="category"
               defaultValue={resolvedSearchParams.category || ""}
-              className="w-full border rounded-xl px-3 py-2 bg-white/80"
+              className="public-field"
             >
               <option value="">All</option>
               <option value="Voting Rights">Voting Rights</option>
@@ -320,7 +320,7 @@ export default async function PoliciesPage({ searchParams }) {
             <select
               name="impact_direction"
               defaultValue={resolvedSearchParams.impact_direction || ""}
-              className="w-full border rounded-xl px-3 py-2 bg-white/80"
+              className="public-field"
             >
               <option value="">All</option>
               <option value="Positive">Positive</option>
@@ -334,7 +334,7 @@ export default async function PoliciesPage({ searchParams }) {
             <select
               name="sort"
               defaultValue={resolvedSearchParams.sort || (resolvedSearchParams.q ? "relevance" : "year_asc")}
-              className="w-full border rounded-xl px-3 py-2 bg-white/80"
+              className="public-field"
             >
               <option value="relevance">Best Match</option>
               <option value="year_asc">Oldest First</option>
@@ -350,7 +350,7 @@ export default async function PoliciesPage({ searchParams }) {
             <select
               name="page_size"
               defaultValue={resolvedSearchParams.page_size || "20"}
-              className="w-full border rounded-xl px-3 py-2 bg-white/80"
+              className="public-field"
             >
               <option value="20">20</option>
               <option value="40">40</option>
@@ -363,7 +363,7 @@ export default async function PoliciesPage({ searchParams }) {
             <select
               name="direct_black_impact"
               defaultValue={resolvedSearchParams.direct_black_impact || ""}
-              className="w-full border rounded-xl px-3 py-2 bg-white/80"
+              className="public-field"
             >
               <option value="">All</option>
               <option value="true">Yes</option>
@@ -375,7 +375,7 @@ export default async function PoliciesPage({ searchParams }) {
             <select
               name="bipartisan"
               defaultValue={resolvedSearchParams.bipartisan || ""}
-              className="w-full border rounded-lg px-3 py-2 bg-white"
+              className="public-field"
             >
               <option value="">All</option>
               <option value="true">Yes</option>
@@ -408,14 +408,14 @@ export default async function PoliciesPage({ searchParams }) {
           <div className="md:col-span-3 flex gap-3 pt-2">
             <button
               type="submit"
-              className="px-5 py-3 rounded-full bg-[var(--accent)] text-white font-medium shadow-[0_12px_24px_rgba(138,59,18,0.16)]"
+              className="public-button-primary"
             >
               Apply Search & Filters
             </button>
 
             <Link
               href="/policies"
-              className="border rounded-full px-5 py-3 font-medium bg-white/80 border-[var(--line)] hover:bg-white"
+              className="public-button-secondary"
             >
               Reset
             </Link>
@@ -435,7 +435,7 @@ export default async function PoliciesPage({ searchParams }) {
                 <Link
                   key={filter.key}
                   href={buildResetHref(resolvedSearchParams, filter.key)}
-                  className="inline-flex items-center gap-2 border rounded-full px-3 py-1 text-sm bg-[var(--accent-soft)] hover:bg-[rgba(138,59,18,0.14)] transition"
+                  className="inline-flex items-center gap-2 border rounded-full border-[rgba(37,99,235,0.14)] px-3 py-1 text-sm bg-[var(--accent-soft)] hover:bg-[rgba(37,99,235,0.14)] transition"
                 >
                   <span>{filter.label}</span>
                   <span className="text-gray-500">×</span>
@@ -471,7 +471,7 @@ export default async function PoliciesPage({ searchParams }) {
             <div className="mt-4">
               <Link
                 href="/policies"
-                className="inline-flex items-center rounded-full border px-5 py-3 bg-white/80 hover:bg-white transition"
+                className="public-button-secondary"
               >
                 Reset all filters
               </Link>
@@ -517,37 +517,37 @@ export default async function PoliciesPage({ searchParams }) {
                   routeKind="page"
                   entityType="policy"
                   entityKey={String(policy.id)}
-                  className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-3 py-1 text-xs font-medium"
+                  className="public-pill font-medium"
                 >
                   Share Card
                 </TrackedLink>
               </div>
             </div>
 
-            <p className="mt-3 text-gray-800 leading-7">{policy.summary}</p>
+            <p className="mt-3 text-[var(--foreground)] leading-7">{policy.summary}</p>
 
             <div className="mt-4 flex flex-wrap gap-2 text-xs text-[var(--ink-soft)]">
-              <span className="border rounded-full px-3 py-1 bg-[rgba(255,252,247,0.8)]">
+              <span className="public-pill">
                 Direct Black Impact: {policy.direct_black_impact ? "Yes" : "No"}
               </span>
-              <span className="border rounded-full px-3 py-1 bg-[rgba(255,252,247,0.8)]">
+              <span className="public-pill">
                 Bipartisan: {policy.bipartisan ? "Yes" : "No"}
               </span>
-              <span className="border rounded-full px-3 py-1 bg-[rgba(255,252,247,0.8)]">
+              <span className="public-pill">
                 Status: {policy.status}
               </span>
               {(policy.accountability_summary?.related_explainer_count || 0) > 0 ? (
-                <span className="border rounded-full px-3 py-1 bg-[rgba(255,252,247,0.8)]">
+                <span className="public-pill">
                   Explainers: {policy.accountability_summary.related_explainer_count}
                 </span>
               ) : null}
               {(policy.accountability_summary?.related_future_bill_count || 0) > 0 ? (
-                <span className="border rounded-full px-3 py-1 bg-[rgba(255,252,247,0.8)]">
+                <span className="public-pill">
                   Future Bills: {policy.accountability_summary.related_future_bill_count}
                 </span>
               ) : null}
               {(policy.accountability_summary?.linked_legislator_count || 0) > 0 ? (
-                <span className="border rounded-full px-3 py-1 bg-[rgba(255,252,247,0.8)]">
+                <span className="public-pill">
                   Scorecards: {policy.accountability_summary.linked_legislator_count}
                 </span>
               ) : null}
@@ -563,7 +563,7 @@ export default async function PoliciesPage({ searchParams }) {
               {pagination.has_prev ? (
                 <Link
                   href={buildPageHref(resolvedSearchParams, pagination.page - 1)}
-                  className="border rounded-full px-4 py-2 bg-white/80 hover:bg-white transition"
+                  className="public-button-secondary px-4 py-2"
                 >
                   Previous
                 </Link>
@@ -582,7 +582,7 @@ export default async function PoliciesPage({ searchParams }) {
               {pagination.has_next ? (
                 <Link
                   href={buildPageHref(resolvedSearchParams, pagination.page + 1)}
-                  className="border rounded-full px-4 py-2 bg-white/80 hover:bg-white transition"
+                  className="public-button-secondary px-4 py-2"
                 >
                   Next
                 </Link>

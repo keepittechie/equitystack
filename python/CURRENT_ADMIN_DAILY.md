@@ -78,6 +78,44 @@ After `apply --apply --yes`:
 - writes `.import-apply.json`
 - writes `.import-validation.json`
 
+## Guided Admin Workflow
+
+The admin UI now exposes the same current-admin flow as a guided tracker.
+
+You can use it on:
+
+- `/admin`
+- `/admin/workflows`
+- `/admin/workflows/[sessionId]`
+- `/admin/current-admin-review`
+
+Tracked steps:
+
+1. `Discover / Batch Ready`
+2. `Run current-admin`
+3. `Operator Review`
+4. `Decision Log Finalized`
+5. `Pre-commit / Apply Readiness`
+6. `Admin Approval / Final Apply`
+7. `Validation / Complete`
+
+Status meaning:
+
+- green dot: complete
+- yellow dot: current or next required step
+- red dot: blocked
+- gray dot: not yet available
+
+Use the tracker to answer:
+
+- what is already done
+- what is waiting now
+- why the next step is required
+- where to click next
+
+If a step is blocked, use the tracker link to inspect the blocker on the session page instead of
+guessing from the queue or artifact tables.
+
 ## Advanced / Manual Commands
 
 These still work and remain the canonical lower-level path:

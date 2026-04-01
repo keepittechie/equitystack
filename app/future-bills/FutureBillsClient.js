@@ -30,7 +30,7 @@ function SelectField({ label, value, onChange, options }) {
       <select
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="mt-2 w-full border rounded-xl px-3 py-2 bg-[rgba(255,252,247,0.88)]"
+        className="public-field mt-2"
       >
         {options.map((option) => (
           <option key={option.value} value={option.value}>
@@ -187,7 +187,7 @@ export default function FutureBillsClient({ bills, focusId }) {
         <p className="eyebrow mb-4">
           Forward-Looking Policy Ideas
         </p>
-        <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">Future Bills</h1>
+        <h1 className="page-title mb-4">Future Bills</h1>
         <p className="text-[var(--ink-soft)] text-lg max-w-3xl leading-8">
           This page tracks proposed policy ideas, legislative priorities, and reform concepts
           that could address unresolved harms, close equity gaps, or strengthen protections
@@ -240,7 +240,7 @@ export default function FutureBillsClient({ bills, focusId }) {
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Search ideas, linked bills, or topics"
-              className="mt-2 w-full border rounded-xl px-3 py-2 bg-[rgba(255,252,247,0.88)]"
+              className="public-field mt-2"
             />
           </label>
 
@@ -285,13 +285,13 @@ export default function FutureBillsClient({ bills, focusId }) {
 
         <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_15rem] items-end">
           <div className="flex flex-wrap gap-2 text-xs text-[var(--ink-soft)]">
-            <span className="border rounded-full px-3 py-1 bg-[rgba(255,252,247,0.82)]">
+            <span className="public-pill">
               Results: {filteredBills.length}
             </span>
-            <span className="border rounded-full px-3 py-1 bg-[rgba(255,252,247,0.82)]">
+            <span className="public-pill">
               Linked Ideas: {trackedOnlyCount}
             </span>
-            <span className="border rounded-full px-3 py-1 bg-[rgba(255,252,247,0.82)]">
+            <span className="public-pill">
               Needs Tracking: {untrackedCount}
             </span>
           </div>
@@ -344,7 +344,7 @@ export default function FutureBillsClient({ bills, focusId }) {
                       Latest update: {formatDate(bill.latest_tracked_update)}
                     </p>
                   </div>
-                  <span className="border rounded-full px-3 py-1 text-xs font-medium bg-[rgba(255,252,247,0.85)] text-[var(--ink-soft)] border-[var(--line)]">
+                  <span className="public-pill font-medium">
                     Linked Bills: {bill.tracked_bills.length}
                   </span>
                 </div>
@@ -408,19 +408,19 @@ export default function FutureBillsClient({ bills, focusId }) {
                       {bill.target_area || "No target area specified"}
                     </p>
                     <div className="mt-3 flex flex-wrap gap-2 text-xs text-[var(--ink-soft)]">
-                      <span className="border rounded-full px-3 py-1 bg-[rgba(255,252,247,0.8)]">
+                      <span className="public-pill">
                         Linked Bills: {bill.tracked_bills.length}
                       </span>
                       {bill.latest_tracked_update ? (
-                        <span className="border rounded-full px-3 py-1 bg-[rgba(255,252,247,0.8)]">
+                        <span className="public-pill">
                           Latest Bill Update: {formatDate(bill.latest_tracked_update)}
                         </span>
                       ) : null}
-                      <span className="border rounded-full px-3 py-1 bg-[rgba(255,252,247,0.8)]">
+                      <span className="public-pill">
                         Explainers: {bill.related_explainers?.length || 0}
                       </span>
                       {bill.created_at ? (
-                        <span className="border rounded-full px-3 py-1 bg-[rgba(255,252,247,0.8)]">
+                        <span className="public-pill">
                           Added: {formatDate(bill.created_at)}
                         </span>
                       ) : null}
@@ -429,7 +429,7 @@ export default function FutureBillsClient({ bills, focusId }) {
 
                   <div className="flex flex-wrap gap-2">
                     {isFocused && (
-                      <span className="border rounded-full px-3 py-1 text-xs font-medium bg-[var(--accent)] text-white border-[var(--accent)]">
+                      <span className="inline-flex items-center rounded-full border border-[var(--accent)] bg-[var(--accent)] px-3 py-1 text-xs font-medium text-white">
                         Focused
                       </span>
                     )}
@@ -460,7 +460,7 @@ export default function FutureBillsClient({ bills, focusId }) {
                           target_path: buildFutureBillCardHref(bill),
                         })
                       }
-                      className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
+                      className="public-button-secondary"
                     >
                       Share Card
                     </Link>
@@ -476,7 +476,7 @@ export default function FutureBillsClient({ bills, focusId }) {
                           target_path: buildFutureBillDetailHref(bill),
                         })
                       }
-                      className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
+                      className="public-button-secondary"
                     >
                       Open Future Bill
                     </Link>

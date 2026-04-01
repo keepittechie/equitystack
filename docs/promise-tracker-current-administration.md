@@ -10,6 +10,7 @@ The supported operator entrypoints are:
 - `/admin`
 - `/admin/current-admin-review`
 - `/admin/workflows`
+- `/admin/workflows/[sessionId]`
 - `/admin/review-queue`
 - `/admin/artifacts`
 
@@ -62,6 +63,65 @@ What each step means:
 - `status`
   - prints the canonical current-admin state machine and next step
 
+## Guided Workflow Tracker
+
+The admin UI now exposes current-admin as a guided workflow instead of requiring the operator to
+reconstruct the next move from raw artifacts.
+
+The tracker is available on:
+
+- `/admin`
+- `/admin/workflows`
+- `/admin/workflows/[sessionId]`
+- `/admin/current-admin-review`
+
+The current-admin steps are:
+
+1. `Discover / Batch Ready`
+2. `Run current-admin`
+3. `Operator Review`
+4. `Decision Log Finalized`
+5. `Pre-commit / Apply Readiness`
+6. `Admin Approval / Final Apply`
+7. `Validation / Complete`
+
+How completion is determined:
+
+- `Discover / Batch Ready`
+  - complete when the canonical batch is present
+- `Run current-admin`
+  - complete when the review artifact exists
+- `Operator Review`
+  - current while the review artifact exists and review decisions are still pending
+- `Decision Log Finalized`
+  - complete when the decision log and manual review queue exist
+- `Pre-commit / Apply Readiness`
+  - current when the dry-run path is the next valid checkpoint
+  - blocked when pre-commit reports a blocking issue
+- `Admin Approval / Final Apply`
+  - current when the dry-run import exists and explicit apply confirmation is the next checkpoint
+- `Validation / Complete`
+  - complete when the validation report exists
+
+Tracker status meaning:
+
+- green dot: complete
+- yellow dot: current or next required step
+- red dot: blocked
+- gray dot: not yet available
+
+How to use the guided flow:
+
+- look at `Current step`
+- follow `Next step`
+- use the single linked action or page the tracker shows
+- if blocked, use `Inspect blocker`
+- if review is next, go to `/admin/current-admin-review`
+- if final apply is next, use the existing guarded confirmation path
+
+The operator should no longer need to guess which current-admin page comes next. The system derives
+the next valid step automatically from canonical state and artifacts.
+
 ## Canonical Artifacts
 
 The operator backend reflects these artifact types as first-class records:
@@ -89,12 +149,13 @@ Use the operator/admin system as follows:
 - `/admin`
   - daily routine
   - prioritized work buckets
+  - current-admin workflow tracker
   - suggested actions
   - session snapshots
 - `/admin/current-admin-review`
   - canonical human review and finalize checkpoint
 - `/admin/workflows/[sessionId]`
-  - inspect state, blockers, artifacts, and related jobs
+  - inspect state, blockers, artifacts, related jobs, and the full current-admin step tracker
 - `/admin/review-queue`
   - see pending human review or guarded next-step work
 - `/admin/artifacts`

@@ -19,6 +19,7 @@ Work from `python/` for canonical CLI workflows. Use `/admin` for the broker-bac
 - `/admin`
   - Morning operator dashboard
   - Daily routine
+  - Current-admin workflow tracker
   - Suggested actions
   - Session snapshots
 - `/admin/command`
@@ -65,6 +66,46 @@ Notes:
 - `review` still requires explicit operator decisions and decision logs.
 - `apply` still reruns pre-commit and dry-run first.
 - mutating import still requires `--apply --yes`.
+
+### Guided Current-Admin Workflow
+
+The admin UI now exposes current-admin as a guided step flow instead of making the operator infer
+the next move from artifacts alone.
+
+Tracked steps:
+
+1. `Discover / Batch Ready`
+2. `Run current-admin`
+3. `Operator Review`
+4. `Decision Log Finalized`
+5. `Pre-commit / Apply Readiness`
+6. `Admin Approval / Final Apply`
+7. `Validation / Complete`
+
+The tracker appears on:
+
+- `/admin`
+- `/admin/workflows`
+- `/admin/workflows/[sessionId]`
+- `/admin/current-admin-review`
+
+Tracker status meaning:
+
+- green dot: complete
+- yellow dot: current or next required step
+- red dot: blocked
+- gray dot: not yet available
+
+How to use it:
+
+- read `Current step` and `Next step`
+- follow the single next action link or button
+- if blocked, use `Inspect blocker`
+- if review is next, go to `/admin/current-admin-review`
+- if final apply is next, use the existing guarded confirmation path
+
+The tracker is deterministic. It is derived from canonical batch state, artifact presence, review
+counts, blockers, and action permissions. It does not create a second workflow engine.
 
 ## Legislative Daily Flow
 

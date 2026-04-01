@@ -102,6 +102,7 @@ Important:
 - `current-admin apply` always reruns pre-commit and import dry-run before any mutating apply.
 - database writes only happen with `--apply --yes`.
 - `current-admin status` prints the current state machine and next step.
+- `/admin`, `/admin/workflows/[sessionId]`, and `/admin/current-admin-review` now expose the same guided current-admin step tracker.
 - review artifacts stamp requested model, effective model, backend, fallback status, and fallback reason.
 - legacy/manual commands remain available: `discover`, `gen-batch`, `workflow start`, `workflow review`, `workflow finalize`, `pre-commit`, `import`, `validate`, `status`, `workflow resume`.
 

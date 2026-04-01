@@ -12,10 +12,10 @@ function buttonClasses(tone, disabled) {
     "inline-flex items-center justify-center rounded border px-2.5 py-1 text-[12px] font-medium transition";
   const palette =
     tone === "danger"
-      ? "border-red-300 bg-red-50 text-red-900 hover:bg-red-100"
+      ? "border-[#FECACA] bg-[#FEF2F2] text-[#EF4444] hover:bg-[#FEE2E2]"
       : tone === "primary"
-        ? "border-stone-900 bg-stone-900 text-white hover:bg-stone-800"
-        : "border-gray-300 bg-white text-gray-900 hover:bg-gray-50";
+        ? "border-[#3B82F6] bg-[#3B82F6] text-white hover:bg-[#2563EB]"
+        : "border-[#E5EAF0] bg-white text-[#1F2937] hover:bg-[#F9FBFD]";
   const disabledClasses = disabled ? " cursor-not-allowed opacity-60" : "";
   return `${base} ${palette}${disabledClasses}`;
 }
@@ -169,44 +169,44 @@ export default function OperatorActionButton({
         {isPending ? "Starting…" : label}
       </button>
 
-      {helperText ? <p className="max-w-md text-xs text-gray-500">{helperText}</p> : null}
+      {helperText ? <p className="max-w-md text-xs text-[#6B7280]">{helperText}</p> : null}
 
       {error ? (
-        <div className="rounded border border-red-300 bg-red-50 p-2 text-[11px] text-red-950">
+        <div className="rounded border border-[#FECACA] bg-[#FEF2F2] p-2 text-[11px] text-[#EF4444]">
           {error}
         </div>
       ) : null}
 
       {job ? (
-        <div className="rounded border bg-zinc-50 p-2">
+        <div className="rounded border border-[#E5EAF0] bg-[#EEF2F6] p-2">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex flex-wrap items-center gap-2">
               <JobStatusBadge status={job.status} />
-              <span className="font-mono text-[11px] text-gray-600">{job.id}</span>
+              <span className="font-mono text-[11px] text-[#6B7280]">{job.id}</span>
             </div>
-            <Link href={`/admin/jobs/${job.id}`} className="text-[11px] underline">
+            <Link href={`/admin/jobs/${job.id}`} className="text-[11px] text-[#3B82F6] underline">
               Open job
             </Link>
           </div>
-          <p className="mt-2 text-[11px] text-gray-700">{job.summary || `${action.title} queued.`}</p>
+          <p className="mt-2 text-[11px] text-[#4B5563]">{job.summary || `${action.title} queued.`}</p>
           {job.errorJson?.message ? (
-            <p className="mt-2 text-[11px] text-red-900">{job.errorJson.message}</p>
+            <p className="mt-2 text-[11px] text-[#EF4444]">{job.errorJson.message}</p>
           ) : null}
         </div>
       ) : null}
 
       {confirmationOpen ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-950/50 px-4">
-          <div className="w-full max-w-lg rounded border bg-white p-4 shadow-xl">
+          <div className="w-full max-w-lg rounded border border-[#E5EAF0] bg-white p-4 shadow-xl">
             <div className="space-y-2">
-              <p className="text-[12px] text-gray-600">{action.workflowFamily}</p>
-              <h3 className="text-lg font-semibold">{confirmation.title || label}</h3>
-              <p className="text-[12px] text-gray-700">
+              <p className="text-[12px] text-[#6B7280]">{action.workflowFamily}</p>
+              <h3 className="text-lg font-semibold text-[#1F2937]">{confirmation.title || label}</h3>
+              <p className="text-[12px] text-[#4B5563]">
                 {confirmation.description || "This action requires explicit confirmation."}
               </p>
             </div>
 
-            <label className="mt-4 flex items-start gap-3 rounded border p-3 text-[12px]">
+            <label className="mt-4 flex items-start gap-3 rounded border border-[#E5EAF0] bg-[#F9FBFD] p-3 text-[12px] text-[#1F2937]">
               <input
                 type="checkbox"
                 checked={confirmationChecked}
@@ -217,12 +217,12 @@ export default function OperatorActionButton({
 
             {confirmation.requireTypedYes ? (
               <label className="mt-4 block space-y-2">
-                <span className="text-[12px] font-medium">Type YES to continue</span>
+                <span className="text-[12px] font-medium text-[#1F2937]">Type YES to continue</span>
                 <input
                   type="text"
                   value={typedYes}
                   onChange={(event) => setTypedYes(event.target.value)}
-                  className="w-full rounded border px-2 py-1.5 text-[12px]"
+                  className="w-full rounded border border-[#E5EAF0] bg-white px-2 py-1.5 text-[12px] text-[#1F2937] outline-none focus:border-[#3B82F6]"
                   placeholder="YES"
                 />
               </label>
@@ -232,7 +232,7 @@ export default function OperatorActionButton({
               <button
                 type="button"
                 onClick={resetConfirmation}
-                className="rounded border px-3 py-1.5 text-[12px]"
+                className="rounded border border-[#E5EAF0] bg-white px-3 py-1.5 text-[12px] text-[#1F2937]"
               >
                 Cancel
               </button>

@@ -182,7 +182,7 @@ export default function LegislativeWorkflowWorkspace({ workspace }) {
                 );
               }}
               disabled={isPending || !permissions.apply_bundle?.allowed}
-              className="rounded border px-3 py-1.5 bg-black text-[12px] text-white"
+              className="rounded border border-[#3B82F6] bg-[#3B82F6] px-3 py-1.5 text-[12px] text-white"
             >
               Apply Approved Actions
             </button>
@@ -213,7 +213,7 @@ export default function LegislativeWorkflowWorkspace({ workspace }) {
                 );
               }}
               disabled={isPending || !permissions.apply_import?.allowed}
-              className="rounded border px-3 py-1.5 bg-black text-[12px] text-white"
+              className="rounded border border-[#3B82F6] bg-[#3B82F6] px-3 py-1.5 text-[12px] text-white"
             >
               Apply Import
             </button>
