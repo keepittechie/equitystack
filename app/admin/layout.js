@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export default function AdminLayout({ children }) {
   return (
-    <div className="min-h-screen bg-[#F5F7FA] text-[#1F2937] text-[13px] leading-5">
+    <div className="admin-shell min-h-screen bg-[#F5F7FA] text-[#1F2937] text-[13px] leading-5">
       <header className="border-b border-[#E5EAF0] bg-[#EEF2F6]">
         <div className="mx-auto max-w-[1700px] px-4 py-3">
           <div className="flex flex-wrap items-start justify-between gap-4">

@@ -58,10 +58,21 @@ function toTextList(value) {
 
 export default async function AdminWorkflowSessionPage({ params }) {
   const resolved = await params;
-  const detail = await getWorkflowSessionDetail(resolved.sessionId);
-  const sessionActions = getSessionActionDescriptors(detail);
+  const resolvedSessionId = (() => {
+    const raw = normalizeString(resolved?.sessionId);
+    if (!raw) {
+      return "";
+    }
+    try {
+      return decodeURIComponent(raw);
+    } catch {
+      return raw;
+    }
+  })();
 
   try {
+    const detail = await getWorkflowSessionDetail(resolvedSessionId);
+    const sessionActions = getSessionActionDescriptors(detail);
     const session = detail?.session || {};
     const metadata = detail?.metadata || {};
     const sessionSummary = detail?.sessionSummary || {};
@@ -389,7 +400,7 @@ export default async function AdminWorkflowSessionPage({ params }) {
             <Link href="/admin/workflows" className="underline">
               Back to sessions
             </Link>
-            <Link href={`/api/admin/operator/sessions/${encodeURIComponent(resolved.sessionId)}`} className="underline">
+            <Link href={`/api/admin/operator/sessions/${encodeURIComponent(resolvedSessionId)}`} className="underline">
               Open session API
             </Link>
           </div>

@@ -18,6 +18,39 @@ function cloneItems(items) {
   return items.map((item) => ({ ...item, suggested_checks: [...(item.suggested_checks || [])] }));
 }
 
+async function readJsonResponse(response) {
+  const text = await response.text();
+  const contentType = response.headers.get("content-type") || "";
+  const looksLikeJson =
+    contentType.includes("application/json") ||
+    text.trim().startsWith("{") ||
+    text.trim().startsWith("[");
+
+  if (!looksLikeJson) {
+    console.error("Current-admin action returned a non-JSON response.", {
+      status: response.status,
+      contentType,
+      bodyPreview: text.slice(0, 800),
+    });
+    throw new Error(
+      response.ok
+        ? "The server returned a non-JSON response. Check the server logs."
+        : `The server returned an unexpected ${response.status} response instead of JSON.`
+    );
+  }
+
+  try {
+    return text ? JSON.parse(text) : {};
+  } catch (error) {
+    console.error("Failed to parse current-admin action response as JSON.", {
+      status: response.status,
+      contentType,
+      bodyPreview: text.slice(0, 800),
+    });
+    throw new Error("The server returned malformed JSON. Check the server logs.");
+  }
+}
+
 export default function CurrentAdminReviewWorkspace({ workspace }) {
   const router = useRouter();
   const [items, setItems] = useState(cloneItems(workspace.review_items || []));
@@ -53,7 +86,7 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
           },
           body: JSON.stringify(body),
         });
-        const payload = await response.json();
+        const payload = await readJsonResponse(response);
         if (!response.ok) {
           throw new Error(payload.error || "Action failed.");
         }
@@ -72,7 +105,7 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
         reviewPath: batch?.paths?.review,
         decisionItems: items,
       },
-      "Decision file saved. Continue editing or finalize when ready."
+      "Decisions saved but not yet applied to the manual-review queue. Finalize to refresh the decision log and queue approval state."
     );
   }
 
@@ -83,7 +116,7 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
         reviewPath: batch?.paths?.review,
         decisionItems: items,
       },
-      "Decisions finalized. The decision log was refreshed through the canonical Python workflow."
+      "Decisions finalized. The decision log was refreshed and the manual-review queue was synchronized for pre-commit readiness."
     );
   }
 
@@ -113,7 +146,7 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
           <p className="text-[11px] text-gray-600">Review items</p>
           <p className="mt-1 text-base font-semibold">{workspace.counts.total_items}</p>
           <p className="mt-1 text-[11px] text-gray-600">
-            Import-ready decisions: {workspace.counts.approval_style_decisions} • Pending review:{" "}
+            Approval-style decisions: {workspace.counts.approval_style_decisions} • Pending review:{" "}
             {workspace.counts.pending_review} • Held back: {workspace.counts.held_for_followup}
           </p>
         </div>
@@ -147,7 +180,7 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
               type="button"
               onClick={saveDraft}
               disabled={isPending}
-              className="rounded border px-3 py-1.5 bg-white text-[12px]"
+              className="rounded border border-[#CBD5E1] bg-white px-3 py-1.5 text-[12px] font-medium text-[#1F2937] disabled:cursor-not-allowed disabled:bg-[#F3F4F6] disabled:text-[#6B7280]"
             >
               Save Decisions
             </button>
@@ -155,7 +188,7 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
               type="button"
               onClick={finalize}
               disabled={isPending || !finalizePermission.allowed}
-              className="rounded border border-[#3B82F6] bg-[#3B82F6] px-3 py-1.5 text-[12px] text-white"
+              className="rounded border border-[#1D4ED8] bg-[#1D4ED8] px-3 py-1.5 text-[12px] font-medium text-white disabled:cursor-not-allowed disabled:border-[#CBD5E1] disabled:bg-[#CBD5E1] disabled:text-[#334155]"
             >
               Finalize
             </button>

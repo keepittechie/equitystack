@@ -35,7 +35,7 @@ export default function MainLayout({ children }) {
   const pathname = usePathname();
   const isAdminPath = pathname?.startsWith("/admin");
   if (isAdminPath) {
-    return <div className="min-h-screen bg-[#F5F7FA] text-[#1F2937]">{children}</div>;
+    return <div className="admin-shell min-h-screen bg-[#F5F7FA] text-[#1F2937]">{children}</div>;
   }
 
   const navLinks = NAV_LINKS;
