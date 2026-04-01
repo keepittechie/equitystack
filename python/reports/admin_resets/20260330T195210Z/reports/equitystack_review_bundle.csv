@@ -1,2 +1,0 @@
-future_bill_id,future_bill_title,target_area,priority_level,recommended_operator_action,action_id,action_type,target_type,target_id,status,review_state,action_score,action_priority,safe_apply_rows,manual_review_rows,partial_suggestion_rows,discovery_rows,operator_actions,actionable_operator_actions_count,stale_suggestions_count,already_applied_count,suppressed_weak_candidates_count
-7,Redlining Reparations and Homeownership Equity Act,,high,review_operator_actions,create_partial_link:7:21,create_partial_link,tracked_bill,21,pending,actionable,0.485,Low,0,0,2,0,1,1,1,0,0

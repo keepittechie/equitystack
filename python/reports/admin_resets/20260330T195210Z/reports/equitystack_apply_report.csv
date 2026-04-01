@@ -1,2 +1,0 @@
-category,action_id,action_type,future_bill_id,future_bill_link_id,tracked_bill_id,result,message,reason,error,new_link_type,old_link_type,timestamp
-skipped,create_partial_link:7:21,create_partial_link,7,,,skipped,,Action is not both approved=true and status=pending,,,,2026-03-28T17:01:56.072236+00:00

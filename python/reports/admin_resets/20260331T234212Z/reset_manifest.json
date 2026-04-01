@@ -1,0 +1,26 @@
+{
+  "generated_at": "2026-03-31T23:42:12.792835+00:00",
+  "python_dir": "/home/josh/Documents/GitHub/equitystack/python",
+  "archive_dir": "/home/josh/Documents/GitHub/equitystack/python/reports/admin_resets/20260331T234212Z",
+  "reset_scope": "Operational run-state only: admin operator history, recommendation feedback, pipeline reports, current-admin report artifacts, legislative report artifacts, and logs.",
+  "does_not_touch": "Database content, canonical policy data, source files, and non-operational repository content.",
+  "archived_files": [
+    "logs/equitystack-2026-03-30.log",
+    "logs/equitystack-2026-03-31.log",
+    "reports/admin_operator_action_history.json",
+    "reports/current_admin/current-admin-wrapper-test.ai-review.json",
+    "reports/current_admin/current-admin-wrapper-test.decision-template.json",
+    "reports/current_admin/current-admin-wrapper-test.import-dry-run.json",
+    "reports/current_admin/current-admin-wrapper-test.manual-review-queue.json",
+    "reports/current_admin/current-admin-wrapper-test.normalization-report.json",
+    "reports/current_admin/current-admin-wrapper-test.normalized.json",
+    "reports/current_admin/current-admin-wrapper-test.pre-commit-review.json",
+    "reports/current_admin/discovery_report.json",
+    "reports/current_admin/donald-j-trump-2025-discovery-20260331t094529z.ai-review.json",
+    "reports/current_admin/donald-j-trump-2025-discovery-20260331t094529z.manual-review-queue.json",
+    "reports/current_admin/donald-j-trump-2025-discovery-20260331t094529z.normalization-report.json",
+    "reports/current_admin/donald-j-trump-2025-discovery-20260331t094529z.normalized.json",
+    "reports/current_admin/review_decisions/current-admin-wrapper-test.20260331T094424Z.decision-log.json",
+    "reports/current_admin/review_decisions/current-admin-wrapper-test.20260331T094612Z.decision-log.json"
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "generated_at": "2026-03-31T23:42:21.582996+00:00",
+  "started_at": "2026-03-31T23:42:21.494013+00:00",
+  "status": "failed",
+  "requested_model": "qwen3.5:9b",
+  "review_model": "qwen3.5:9b",
+  "verifier_model": "qwen3.5:9b",
+  "fallback_model": "qwen3.5:9b",
+  "timeout_seconds": null,
+  "apply_safe_removals": false,
+  "skip_discovery": false,
+  "only_future_bill_ids": [],
+  "bundle_path": "/home/josh/Documents/GitHub/equitystack/python/reports/equitystack_review_bundle.json",
+  "reports": {
+    "ai_review": "/home/josh/Documents/GitHub/equitystack/python/reports/future_bill_link_ai_review.json",
+    "manual_queue": "/home/josh/Documents/GitHub/equitystack/python/reports/future_bill_link_manual_review_queue.json",
+    "suggestions": "/home/josh/Documents/GitHub/equitystack/python/reports/future_bill_link_partial_suggestions.json",
+    "discovery": "/home/josh/Documents/GitHub/equitystack/python/reports/future_bill_candidate_discovery.json"
+  },
+  "steps": [],
+  "failure": {
+    "command": [
+      "/home/josh/Documents/GitHub/equitystack/python/venv/bin/python3",
+      "update_database.py"
+    ],
+    "returncode": 1
+  }
+}

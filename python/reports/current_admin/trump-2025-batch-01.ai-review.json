@@ -1,0 +1,2830 @@
+{
+  "batch_name": "trump-2025-batch-01",
+  "input_path": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.normalized.json",
+  "model": "qwen3.5:9b",
+  "requested_model": "qwen3.5:9b",
+  "effective_model": "qwen3.5:9b",
+  "resolved_model": "qwen3.5:9b",
+  "review_backend": "ollama",
+  "fallback_used": false,
+  "fallback_reason": null,
+  "model_resolution_status": "exact_requested",
+  "verifier_model": "qwen3.5:9b",
+  "fallback_model": "qwen3.5:9b",
+  "review_mode": "deep",
+  "dry_run": false,
+  "timeout_seconds": 240,
+  "senior_timeout_seconds": 240,
+  "verifier_timeout_seconds": 240,
+  "retry_count": 0,
+  "senior_attempted": true,
+  "senior_retry_attempted": false,
+  "verifier_attempted": false,
+  "verifier_retry_attempted": false,
+  "resolved_output_path": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.ai-review.json",
+  "reviewed_count": 10,
+  "deep_review_count": 10,
+  "fallback_count": 0,
+  "review_priority_counts": {
+    "low": 0,
+    "medium": 5,
+    "high": 5
+  },
+  "items": [
+    {
+      "slug": "trump-2025-election-integrity-proof-citizenship-paper-ballots",
+      "title": "Require proof of citizenship and paper-ballot election safeguards",
+      "requested_model": "qwen3.5:9b",
+      "effective_model": "qwen3.5:9b",
+      "resolved_model": "qwen3.5:9b",
+      "review_mode": "deep",
+      "review_mode_requested": "deep",
+      "review_mode_used": "deep",
+      "review_backend": "ollama",
+      "model_used": "qwen3.5:9b",
+      "verifier_model_requested": "qwen3.5:9b",
+      "verifier_model_used": null,
+      "senior_model_requested": "qwen3.5:9b",
+      "senior_model_used": "qwen3.5:9b",
+      "fallback_model": "qwen3.5:9b",
+      "fallback_used": false,
+      "fallback_reason": null,
+      "model_resolution_status": "exact_requested",
+      "timeout_seconds": 240,
+      "senior_timeout_seconds": 240,
+      "verifier_timeout_seconds": 240,
+      "retry_count": 0,
+      "senior_attempted": true,
+      "senior_retry_attempted": false,
+      "verifier_attempted": false,
+      "verifier_retry_attempted": false,
+      "deep_review_requested": true,
+      "deep_review_ran": true,
+      "deep_review_reason": "operator_requested_with_senior_review",
+      "second_pass_ran": true,
+      "deep_review_recommended": true,
+      "deep_review_recommendation_reason": "Confidence is low enough that a deeper ambiguity check is warranted. The review could not safely resolve whether this record is ready for import. Impact direction remains mixed and may need a deeper pass to explain why.",
+      "deep_review_recommendation_signals": [
+        {
+          "code": "low_confidence",
+          "reason": "Confidence is low enough that a deeper ambiguity check is warranted."
+        },
+        {
+          "code": "manual_review_suggested",
+          "reason": "The review could not safely resolve whether this record is ready for import."
+        },
+        {
+          "code": "mixed_impact_ambiguity",
+          "reason": "Impact direction remains mixed and may need a deeper pass to explain why."
+        },
+        {
+          "code": "ambiguity_notes_present",
+          "reason": "The review notes unresolved ambiguity or fallback handling."
+        }
+      ],
+      "suggestion_conflicts": [],
+      "has_material_conflict": false,
+      "conflict_summary": "Standard and deep review suggestions did not materially diverge.",
+      "conflict_fields": [],
+      "confidence_comparison": {
+        "standard_confidence_score": 0.5,
+        "standard_confidence_level": "Low",
+        "deep_confidence_score": 0.5,
+        "deep_confidence_level": "Low",
+        "final_confidence_score": 0.5,
+        "final_confidence_level": "Low",
+        "score_delta_after_deep_review": 0.0,
+        "level_changed_after_deep_review": false,
+        "summary": "Standard and deep review landed on the same confidence assessment."
+      },
+      "confidence_changed_after_deep_review": false,
+      "review_priority": "high",
+      "review_priority_score": 6,
+      "review_priority_reason": "The final advisory confidence is low. The final suggestion still resolves to manual review. The record already shows signals that justify deeper review.",
+      "review_priority_signals": [
+        {
+          "code": "deep_review_recommended",
+          "weight": 1,
+          "reason": "The record already shows signals that justify deeper review."
+        },
+        {
+          "code": "low_confidence",
+          "weight": 2,
+          "reason": "The final advisory confidence is low."
+        },
+        {
+          "code": "manual_review_suggested",
+          "weight": 2,
+          "reason": "The final suggestion still resolves to manual review."
+        },
+        {
+          "code": "mixed_impact_direction",
+          "weight": 1,
+          "reason": "Impact direction remains mixed and needs careful operator interpretation."
+        }
+      ],
+      "manual_review_severity": "high",
+      "operator_attention_needed": true,
+      "suggested_batch": "high_attention",
+      "suggested_batch_reason": "Material conflict or high review priority makes this a first-pass attention item.",
+      "suggested_batch_tags": [
+        "high_attention",
+        "manual_review_focus"
+      ],
+      "existing_matches": [],
+      "suggestions": {
+        "record_action_suggestion": "manual_review",
+        "status_suggestion": "Partial",
+        "impact_direction_suggestion": "Mixed",
+        "evidence_strength_suggestion": "Moderate",
+        "title_normalized": "Require proof of citizenship and paper-ballot election safeguards",
+        "summary_suggestion": "A March 2025 executive order advanced part of the administration's election-integrity agenda, but full implementation remained incomplete.",
+        "topic_suggestion": "Voting Rights",
+        "impacted_group_suggestion": "Black voters and Black-majority communities affected by voter registration, ballot access, and election administration rules",
+        "confidence_score": 0.5,
+        "confidence_level": "Low",
+        "reasoning_summary": "Operator should review AI output before import.",
+        "source_warnings": [],
+        "missing_source_warnings": [],
+        "caution_flags": [
+          "deep_review_requested"
+        ],
+        "hesitation_reasons": [],
+        "evidence_needed_to_reduce_risk": [],
+        "signal_evidence_strength": "Moderate",
+        "signal_evidence_gaps": [],
+        "signal_ambiguity": "High",
+        "signal_conflicts": [],
+        "applied_penalties": [],
+        "self_check": "Cautious reviewer check not supplied; review the evidence gaps and ambiguity before import.",
+        "suggested_operator_next_action": "manual_review_required",
+        "ambiguity_notes": "Operator should manually verify this advisory suggestion.",
+        "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. The pass recommends manual review instead of a confident import path. Confidence is supported because No source warnings were carried into the normalized suggestion. Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
+        "confidence_signals": [
+          {
+            "code": "low_confidence",
+            "direction": "reduces",
+            "reason": "The normalized confidence score remains low after review."
+          },
+          {
+            "code": "source_coverage_present",
+            "direction": "supports",
+            "reason": "No source warnings were carried into the normalized suggestion."
+          },
+          {
+            "code": "manual_review_required",
+            "direction": "reduces",
+            "reason": "The pass recommends manual review instead of a confident import path."
+          },
+          {
+            "code": "mixed_impact_direction",
+            "direction": "reduces",
+            "reason": "Mixed impact direction makes the downstream interpretation less settled."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      },
+      "standard_pass_suggestions": {
+        "record_action_suggestion": "manual_review",
+        "status_suggestion": "Partial",
+        "impact_direction_suggestion": "Mixed",
+        "evidence_strength_suggestion": "Moderate",
+        "title_normalized": "Require proof of citizenship and paper-ballot election safeguards",
+        "summary_suggestion": "A March 2025 executive order advanced part of the administration's election-integrity agenda, but full implementation remained incomplete.",
+        "topic_suggestion": "Voting Rights",
+        "impacted_group_suggestion": "Black voters and Black-majority communities affected by voter registration, ballot access, and election administration rules",
+        "confidence_score": 0.5,
+        "confidence_level": "Low",
+        "reasoning_summary": "Operator should review AI output before import.",
+        "source_warnings": [],
+        "missing_source_warnings": [],
+        "caution_flags": [],
+        "hesitation_reasons": [],
+        "evidence_needed_to_reduce_risk": [],
+        "signal_evidence_strength": "Moderate",
+        "signal_evidence_gaps": [],
+        "signal_ambiguity": "High",
+        "signal_conflicts": [],
+        "applied_penalties": [],
+        "self_check": "Cautious reviewer check not supplied; review the evidence gaps and ambiguity before import.",
+        "suggested_operator_next_action": "manual_review_required",
+        "ambiguity_notes": "Operator should manually verify this advisory suggestion.",
+        "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. The pass recommends manual review instead of a confident import path. Confidence is supported because No source warnings were carried into the normalized suggestion. Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
+        "confidence_signals": [
+          {
+            "code": "low_confidence",
+            "direction": "reduces",
+            "reason": "The normalized confidence score remains low after review."
+          },
+          {
+            "code": "source_coverage_present",
+            "direction": "supports",
+            "reason": "No source warnings were carried into the normalized suggestion."
+          },
+          {
+            "code": "manual_review_required",
+            "direction": "reduces",
+            "reason": "The pass recommends manual review instead of a confident import path."
+          },
+          {
+            "code": "mixed_impact_direction",
+            "direction": "reduces",
+            "reason": "Mixed impact direction makes the downstream interpretation less settled."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      },
+      "deep_pass_suggestions": {
+        "record_action_suggestion": "manual_review",
+        "status_suggestion": "Partial",
+        "impact_direction_suggestion": "Mixed",
+        "evidence_strength_suggestion": "Moderate",
+        "title_normalized": "Require proof of citizenship and paper-ballot election safeguards",
+        "summary_suggestion": "A March 2025 executive order advanced part of the administration's election-integrity agenda, but full implementation remained incomplete.",
+        "topic_suggestion": "Voting Rights",
+        "impacted_group_suggestion": "Black voters and Black-majority communities affected by voter registration, ballot access, and election administration rules",
+        "confidence_score": 0.5,
+        "confidence_level": "Low",
+        "reasoning_summary": "Operator should review AI output before import.",
+        "source_warnings": [],
+        "missing_source_warnings": [],
+        "caution_flags": [
+          "deep_review_requested"
+        ],
+        "hesitation_reasons": [],
+        "evidence_needed_to_reduce_risk": [],
+        "signal_evidence_strength": "Moderate",
+        "signal_evidence_gaps": [],
+        "signal_ambiguity": "High",
+        "signal_conflicts": [],
+        "applied_penalties": [],
+        "self_check": "Cautious reviewer check not supplied; review the evidence gaps and ambiguity before import.",
+        "suggested_operator_next_action": "manual_review_required",
+        "ambiguity_notes": "Operator should manually verify this advisory suggestion.",
+        "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. The pass recommends manual review instead of a confident import path. Confidence is supported because No source warnings were carried into the normalized suggestion. Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
+        "confidence_signals": [
+          {
+            "code": "low_confidence",
+            "direction": "reduces",
+            "reason": "The normalized confidence score remains low after review."
+          },
+          {
+            "code": "source_coverage_present",
+            "direction": "supports",
+            "reason": "No source warnings were carried into the normalized suggestion."
+          },
+          {
+            "code": "manual_review_required",
+            "direction": "reduces",
+            "reason": "The pass recommends manual review instead of a confident import path."
+          },
+          {
+            "code": "mixed_impact_direction",
+            "direction": "reduces",
+            "reason": "Mixed impact direction makes the downstream interpretation less settled."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      }
+    },
+    {
+      "slug": "trump-2025-end-federal-dei-equity-programs",
+      "title": "End federal DEI and equity-based government programs",
+      "requested_model": "qwen3.5:9b",
+      "effective_model": "qwen3.5:9b",
+      "resolved_model": "qwen3.5:9b",
+      "review_mode": "deep",
+      "review_mode_requested": "deep",
+      "review_mode_used": "deep",
+      "review_backend": "ollama",
+      "model_used": "qwen3.5:9b",
+      "verifier_model_requested": "qwen3.5:9b",
+      "verifier_model_used": null,
+      "senior_model_requested": "qwen3.5:9b",
+      "senior_model_used": "qwen3.5:9b",
+      "fallback_model": "qwen3.5:9b",
+      "fallback_used": false,
+      "fallback_reason": null,
+      "model_resolution_status": "exact_requested",
+      "timeout_seconds": 240,
+      "senior_timeout_seconds": 240,
+      "verifier_timeout_seconds": 240,
+      "retry_count": 0,
+      "senior_attempted": true,
+      "senior_retry_attempted": false,
+      "verifier_attempted": false,
+      "verifier_retry_attempted": false,
+      "deep_review_requested": true,
+      "deep_review_ran": true,
+      "deep_review_reason": "operator_requested_with_senior_review",
+      "second_pass_ran": true,
+      "deep_review_recommended": true,
+      "deep_review_recommendation_reason": "Confidence is low enough that a deeper ambiguity check is warranted. The review could not safely resolve whether this record is ready for import. The review notes unresolved ambiguity or fallback handling.",
+      "deep_review_recommendation_signals": [
+        {
+          "code": "low_confidence",
+          "reason": "Confidence is low enough that a deeper ambiguity check is warranted."
+        },
+        {
+          "code": "manual_review_suggested",
+          "reason": "The review could not safely resolve whether this record is ready for import."
+        },
+        {
+          "code": "ambiguity_notes_present",
+          "reason": "The review notes unresolved ambiguity or fallback handling."
+        }
+      ],
+      "suggestion_conflicts": [],
+      "has_material_conflict": false,
+      "conflict_summary": "Standard and deep review suggestions did not materially diverge.",
+      "conflict_fields": [],
+      "confidence_comparison": {
+        "standard_confidence_score": 0.5,
+        "standard_confidence_level": "Low",
+        "deep_confidence_score": 0.5,
+        "deep_confidence_level": "Low",
+        "final_confidence_score": 0.5,
+        "final_confidence_level": "Low",
+        "score_delta_after_deep_review": 0.0,
+        "level_changed_after_deep_review": false,
+        "summary": "Standard and deep review landed on the same confidence assessment."
+      },
+      "confidence_changed_after_deep_review": false,
+      "review_priority": "medium",
+      "review_priority_score": 5,
+      "review_priority_reason": "The final advisory confidence is low. The final suggestion still resolves to manual review. The record already shows signals that justify deeper review.",
+      "review_priority_signals": [
+        {
+          "code": "deep_review_recommended",
+          "weight": 1,
+          "reason": "The record already shows signals that justify deeper review."
+        },
+        {
+          "code": "low_confidence",
+          "weight": 2,
+          "reason": "The final advisory confidence is low."
+        },
+        {
+          "code": "manual_review_suggested",
+          "weight": 2,
+          "reason": "The final suggestion still resolves to manual review."
+        }
+      ],
+      "manual_review_severity": "medium",
+      "operator_attention_needed": true,
+      "suggested_batch": "manual_review_focus",
+      "suggested_batch_reason": "Manual-review judgment still appears central to the safe handling of this item.",
+      "suggested_batch_tags": [
+        "manual_review_focus"
+      ],
+      "existing_matches": [],
+      "suggestions": {
+        "record_action_suggestion": "manual_review",
+        "status_suggestion": "Partial",
+        "impact_direction_suggestion": "Negative",
+        "evidence_strength_suggestion": "Moderate",
+        "title_normalized": "End federal DEI and equity-based government programs",
+        "summary_suggestion": "The administration ordered the termination of federal DEI and equity structures, but implementation remained an active multi-agency process.",
+        "topic_suggestion": "Economic Opportunity",
+        "impacted_group_suggestion": "Black workers, Black students, and Black communities affected by targeted federal equity initiatives and program design",
+        "confidence_score": 0.5,
+        "confidence_level": "Low",
+        "reasoning_summary": "Operator should review AI output before import.",
+        "source_warnings": [],
+        "missing_source_warnings": [],
+        "caution_flags": [
+          "deep_review_requested"
+        ],
+        "hesitation_reasons": [],
+        "evidence_needed_to_reduce_risk": [],
+        "signal_evidence_strength": "Moderate",
+        "signal_evidence_gaps": [],
+        "signal_ambiguity": "High",
+        "signal_conflicts": [],
+        "applied_penalties": [],
+        "self_check": "Cautious reviewer check not supplied; review the evidence gaps and ambiguity before import.",
+        "suggested_operator_next_action": "manual_review_required",
+        "ambiguity_notes": "Operator should manually verify this advisory suggestion.",
+        "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. The pass recommends manual review instead of a confident import path. Confidence is supported because No source warnings were carried into the normalized suggestion. Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
+        "confidence_signals": [
+          {
+            "code": "low_confidence",
+            "direction": "reduces",
+            "reason": "The normalized confidence score remains low after review."
+          },
+          {
+            "code": "source_coverage_present",
+            "direction": "supports",
+            "reason": "No source warnings were carried into the normalized suggestion."
+          },
+          {
+            "code": "manual_review_required",
+            "direction": "reduces",
+            "reason": "The pass recommends manual review instead of a confident import path."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      },
+      "standard_pass_suggestions": {
+        "record_action_suggestion": "manual_review",
+        "status_suggestion": "Partial",
+        "impact_direction_suggestion": "Negative",
+        "evidence_strength_suggestion": "Moderate",
+        "title_normalized": "End federal DEI and equity-based government programs",
+        "summary_suggestion": "The administration ordered the termination of federal DEI and equity structures, but implementation remained an active multi-agency process.",
+        "topic_suggestion": "Economic Opportunity",
+        "impacted_group_suggestion": "Black workers, Black students, and Black communities affected by targeted federal equity initiatives and program design",
+        "confidence_score": 0.5,
+        "confidence_level": "Low",
+        "reasoning_summary": "Operator should review AI output before import.",
+        "source_warnings": [],
+        "missing_source_warnings": [],
+        "caution_flags": [],
+        "hesitation_reasons": [],
+        "evidence_needed_to_reduce_risk": [],
+        "signal_evidence_strength": "Moderate",
+        "signal_evidence_gaps": [],
+        "signal_ambiguity": "High",
+        "signal_conflicts": [],
+        "applied_penalties": [],
+        "self_check": "Cautious reviewer check not supplied; review the evidence gaps and ambiguity before import.",
+        "suggested_operator_next_action": "manual_review_required",
+        "ambiguity_notes": "Operator should manually verify this advisory suggestion.",
+        "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. The pass recommends manual review instead of a confident import path. Confidence is supported because No source warnings were carried into the normalized suggestion. Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
+        "confidence_signals": [
+          {
+            "code": "low_confidence",
+            "direction": "reduces",
+            "reason": "The normalized confidence score remains low after review."
+          },
+          {
+            "code": "source_coverage_present",
+            "direction": "supports",
+            "reason": "No source warnings were carried into the normalized suggestion."
+          },
+          {
+            "code": "manual_review_required",
+            "direction": "reduces",
+            "reason": "The pass recommends manual review instead of a confident import path."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      },
+      "deep_pass_suggestions": {
+        "record_action_suggestion": "manual_review",
+        "status_suggestion": "Partial",
+        "impact_direction_suggestion": "Negative",
+        "evidence_strength_suggestion": "Moderate",
+        "title_normalized": "End federal DEI and equity-based government programs",
+        "summary_suggestion": "The administration ordered the termination of federal DEI and equity structures, but implementation remained an active multi-agency process.",
+        "topic_suggestion": "Economic Opportunity",
+        "impacted_group_suggestion": "Black workers, Black students, and Black communities affected by targeted federal equity initiatives and program design",
+        "confidence_score": 0.5,
+        "confidence_level": "Low",
+        "reasoning_summary": "Operator should review AI output before import.",
+        "source_warnings": [],
+        "missing_source_warnings": [],
+        "caution_flags": [
+          "deep_review_requested"
+        ],
+        "hesitation_reasons": [],
+        "evidence_needed_to_reduce_risk": [],
+        "signal_evidence_strength": "Moderate",
+        "signal_evidence_gaps": [],
+        "signal_ambiguity": "High",
+        "signal_conflicts": [],
+        "applied_penalties": [],
+        "self_check": "Cautious reviewer check not supplied; review the evidence gaps and ambiguity before import.",
+        "suggested_operator_next_action": "manual_review_required",
+        "ambiguity_notes": "Operator should manually verify this advisory suggestion.",
+        "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. The pass recommends manual review instead of a confident import path. Confidence is supported because No source warnings were carried into the normalized suggestion. Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
+        "confidence_signals": [
+          {
+            "code": "low_confidence",
+            "direction": "reduces",
+            "reason": "The normalized confidence score remains low after review."
+          },
+          {
+            "code": "source_coverage_present",
+            "direction": "supports",
+            "reason": "No source warnings were carried into the normalized suggestion."
+          },
+          {
+            "code": "manual_review_required",
+            "direction": "reduces",
+            "reason": "The pass recommends manual review instead of a confident import path."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      }
+    },
+    {
+      "slug": "trump-2025-strengthen-local-law-enforcement",
+      "title": "Increase federal support for state and local law enforcement",
+      "requested_model": "qwen3.5:9b",
+      "effective_model": "qwen3.5:9b",
+      "resolved_model": "qwen3.5:9b",
+      "review_mode": "deep",
+      "review_mode_requested": "deep",
+      "review_mode_used": "deep",
+      "review_backend": "ollama",
+      "model_used": "qwen3.5:9b",
+      "verifier_model_requested": "qwen3.5:9b",
+      "verifier_model_used": null,
+      "senior_model_requested": "qwen3.5:9b",
+      "senior_model_used": "qwen3.5:9b",
+      "fallback_model": "qwen3.5:9b",
+      "fallback_used": false,
+      "fallback_reason": null,
+      "model_resolution_status": "exact_requested",
+      "timeout_seconds": 240,
+      "senior_timeout_seconds": 240,
+      "verifier_timeout_seconds": 240,
+      "retry_count": 0,
+      "senior_attempted": true,
+      "senior_retry_attempted": false,
+      "verifier_attempted": false,
+      "verifier_retry_attempted": false,
+      "deep_review_requested": true,
+      "deep_review_ran": true,
+      "deep_review_reason": "operator_requested_with_senior_review",
+      "second_pass_ran": true,
+      "deep_review_recommended": true,
+      "deep_review_recommendation_reason": "Confidence is low enough that a deeper ambiguity check is warranted. The review could not safely resolve whether this record is ready for import. Impact direction remains mixed and may need a deeper pass to explain why.",
+      "deep_review_recommendation_signals": [
+        {
+          "code": "low_confidence",
+          "reason": "Confidence is low enough that a deeper ambiguity check is warranted."
+        },
+        {
+          "code": "manual_review_suggested",
+          "reason": "The review could not safely resolve whether this record is ready for import."
+        },
+        {
+          "code": "mixed_impact_ambiguity",
+          "reason": "Impact direction remains mixed and may need a deeper pass to explain why."
+        },
+        {
+          "code": "ambiguity_notes_present",
+          "reason": "The review notes unresolved ambiguity or fallback handling."
+        }
+      ],
+      "suggestion_conflicts": [],
+      "has_material_conflict": false,
+      "conflict_summary": "Standard and deep review suggestions did not materially diverge.",
+      "conflict_fields": [],
+      "confidence_comparison": {
+        "standard_confidence_score": 0.5,
+        "standard_confidence_level": "Low",
+        "deep_confidence_score": 0.5,
+        "deep_confidence_level": "Low",
+        "final_confidence_score": 0.5,
+        "final_confidence_level": "Low",
+        "score_delta_after_deep_review": 0.0,
+        "level_changed_after_deep_review": false,
+        "summary": "Standard and deep review landed on the same confidence assessment."
+      },
+      "confidence_changed_after_deep_review": false,
+      "review_priority": "high",
+      "review_priority_score": 6,
+      "review_priority_reason": "The final advisory confidence is low. The final suggestion still resolves to manual review. The record already shows signals that justify deeper review.",
+      "review_priority_signals": [
+        {
+          "code": "deep_review_recommended",
+          "weight": 1,
+          "reason": "The record already shows signals that justify deeper review."
+        },
+        {
+          "code": "low_confidence",
+          "weight": 2,
+          "reason": "The final advisory confidence is low."
+        },
+        {
+          "code": "manual_review_suggested",
+          "weight": 2,
+          "reason": "The final suggestion still resolves to manual review."
+        },
+        {
+          "code": "mixed_impact_direction",
+          "weight": 1,
+          "reason": "Impact direction remains mixed and needs careful operator interpretation."
+        }
+      ],
+      "manual_review_severity": "high",
+      "operator_attention_needed": true,
+      "suggested_batch": "high_attention",
+      "suggested_batch_reason": "Material conflict or high review priority makes this a first-pass attention item.",
+      "suggested_batch_tags": [
+        "high_attention",
+        "manual_review_focus"
+      ],
+      "existing_matches": [],
+      "suggestions": {
+        "record_action_suggestion": "manual_review",
+        "status_suggestion": "Partial",
+        "impact_direction_suggestion": "Mixed",
+        "evidence_strength_suggestion": "Moderate",
+        "title_normalized": "Increase federal support for state and local law enforcement",
+        "summary_suggestion": "A 2025 executive order expanded federal support and protections for local law enforcement, but downstream local effects remained early.",
+        "topic_suggestion": "Criminal Justice",
+        "impacted_group_suggestion": "Black communities affected by policing, public safety policy, arrest exposure, and federal oversight of local law enforcement",
+        "confidence_score": 0.5,
+        "confidence_level": "Low",
+        "reasoning_summary": "Operator should review AI output before import.",
+        "source_warnings": [],
+        "missing_source_warnings": [],
+        "caution_flags": [
+          "deep_review_requested"
+        ],
+        "hesitation_reasons": [],
+        "evidence_needed_to_reduce_risk": [],
+        "signal_evidence_strength": "Moderate",
+        "signal_evidence_gaps": [],
+        "signal_ambiguity": "High",
+        "signal_conflicts": [],
+        "applied_penalties": [],
+        "self_check": "Cautious reviewer check not supplied; review the evidence gaps and ambiguity before import.",
+        "suggested_operator_next_action": "manual_review_required",
+        "ambiguity_notes": "Operator should manually verify this advisory suggestion.",
+        "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. The pass recommends manual review instead of a confident import path. Confidence is supported because No source warnings were carried into the normalized suggestion. Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
+        "confidence_signals": [
+          {
+            "code": "low_confidence",
+            "direction": "reduces",
+            "reason": "The normalized confidence score remains low after review."
+          },
+          {
+            "code": "source_coverage_present",
+            "direction": "supports",
+            "reason": "No source warnings were carried into the normalized suggestion."
+          },
+          {
+            "code": "manual_review_required",
+            "direction": "reduces",
+            "reason": "The pass recommends manual review instead of a confident import path."
+          },
+          {
+            "code": "mixed_impact_direction",
+            "direction": "reduces",
+            "reason": "Mixed impact direction makes the downstream interpretation less settled."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      },
+      "standard_pass_suggestions": {
+        "record_action_suggestion": "manual_review",
+        "status_suggestion": "Partial",
+        "impact_direction_suggestion": "Mixed",
+        "evidence_strength_suggestion": "Moderate",
+        "title_normalized": "Increase federal support for state and local law enforcement",
+        "summary_suggestion": "A 2025 executive order expanded federal support and protections for local law enforcement, but downstream local effects remained early.",
+        "topic_suggestion": "Criminal Justice",
+        "impacted_group_suggestion": "Black communities affected by policing, public safety policy, arrest exposure, and federal oversight of local law enforcement",
+        "confidence_score": 0.5,
+        "confidence_level": "Low",
+        "reasoning_summary": "Operator should review AI output before import.",
+        "source_warnings": [],
+        "missing_source_warnings": [],
+        "caution_flags": [],
+        "hesitation_reasons": [],
+        "evidence_needed_to_reduce_risk": [],
+        "signal_evidence_strength": "Moderate",
+        "signal_evidence_gaps": [],
+        "signal_ambiguity": "High",
+        "signal_conflicts": [],
+        "applied_penalties": [],
+        "self_check": "Cautious reviewer check not supplied; review the evidence gaps and ambiguity before import.",
+        "suggested_operator_next_action": "manual_review_required",
+        "ambiguity_notes": "Operator should manually verify this advisory suggestion.",
+        "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. The pass recommends manual review instead of a confident import path. Confidence is supported because No source warnings were carried into the normalized suggestion. Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
+        "confidence_signals": [
+          {
+            "code": "low_confidence",
+            "direction": "reduces",
+            "reason": "The normalized confidence score remains low after review."
+          },
+          {
+            "code": "source_coverage_present",
+            "direction": "supports",
+            "reason": "No source warnings were carried into the normalized suggestion."
+          },
+          {
+            "code": "manual_review_required",
+            "direction": "reduces",
+            "reason": "The pass recommends manual review instead of a confident import path."
+          },
+          {
+            "code": "mixed_impact_direction",
+            "direction": "reduces",
+            "reason": "Mixed impact direction makes the downstream interpretation less settled."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      },
+      "deep_pass_suggestions": {
+        "record_action_suggestion": "manual_review",
+        "status_suggestion": "Partial",
+        "impact_direction_suggestion": "Mixed",
+        "evidence_strength_suggestion": "Moderate",
+        "title_normalized": "Increase federal support for state and local law enforcement",
+        "summary_suggestion": "A 2025 executive order expanded federal support and protections for local law enforcement, but downstream local effects remained early.",
+        "topic_suggestion": "Criminal Justice",
+        "impacted_group_suggestion": "Black communities affected by policing, public safety policy, arrest exposure, and federal oversight of local law enforcement",
+        "confidence_score": 0.5,
+        "confidence_level": "Low",
+        "reasoning_summary": "Operator should review AI output before import.",
+        "source_warnings": [],
+        "missing_source_warnings": [],
+        "caution_flags": [
+          "deep_review_requested"
+        ],
+        "hesitation_reasons": [],
+        "evidence_needed_to_reduce_risk": [],
+        "signal_evidence_strength": "Moderate",
+        "signal_evidence_gaps": [],
+        "signal_ambiguity": "High",
+        "signal_conflicts": [],
+        "applied_penalties": [],
+        "self_check": "Cautious reviewer check not supplied; review the evidence gaps and ambiguity before import.",
+        "suggested_operator_next_action": "manual_review_required",
+        "ambiguity_notes": "Operator should manually verify this advisory suggestion.",
+        "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. The pass recommends manual review instead of a confident import path. Confidence is supported because No source warnings were carried into the normalized suggestion. Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
+        "confidence_signals": [
+          {
+            "code": "low_confidence",
+            "direction": "reduces",
+            "reason": "The normalized confidence score remains low after review."
+          },
+          {
+            "code": "source_coverage_present",
+            "direction": "supports",
+            "reason": "No source warnings were carried into the normalized suggestion."
+          },
+          {
+            "code": "manual_review_required",
+            "direction": "reduces",
+            "reason": "The pass recommends manual review instead of a confident import path."
+          },
+          {
+            "code": "mixed_impact_direction",
+            "direction": "reduces",
+            "reason": "Mixed impact direction makes the downstream interpretation less settled."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      }
+    },
+    {
+      "slug": "trump-2025-clear-street-encampments-expand-civil-commitment",
+      "title": "Clear street encampments and expand treatment-oriented street-order responses",
+      "requested_model": "qwen3.5:9b",
+      "effective_model": "qwen3.5:9b",
+      "resolved_model": "qwen3.5:9b",
+      "review_mode": "deep",
+      "review_mode_requested": "deep",
+      "review_mode_used": "deep",
+      "review_backend": "ollama",
+      "model_used": "qwen3.5:9b",
+      "verifier_model_requested": "qwen3.5:9b",
+      "verifier_model_used": null,
+      "senior_model_requested": "qwen3.5:9b",
+      "senior_model_used": "qwen3.5:9b",
+      "fallback_model": "qwen3.5:9b",
+      "fallback_used": false,
+      "fallback_reason": null,
+      "model_resolution_status": "exact_requested",
+      "timeout_seconds": 240,
+      "senior_timeout_seconds": 240,
+      "verifier_timeout_seconds": 240,
+      "retry_count": 0,
+      "senior_attempted": true,
+      "senior_retry_attempted": false,
+      "verifier_attempted": false,
+      "verifier_retry_attempted": false,
+      "deep_review_requested": true,
+      "deep_review_ran": true,
+      "deep_review_reason": "operator_requested_with_senior_review",
+      "second_pass_ran": true,
+      "deep_review_recommended": true,
+      "deep_review_recommendation_reason": "Confidence is low enough that a deeper ambiguity check is warranted. The review could not safely resolve whether this record is ready for import. Impact direction remains mixed and may need a deeper pass to explain why.",
+      "deep_review_recommendation_signals": [
+        {
+          "code": "low_confidence",
+          "reason": "Confidence is low enough that a deeper ambiguity check is warranted."
+        },
+        {
+          "code": "manual_review_suggested",
+          "reason": "The review could not safely resolve whether this record is ready for import."
+        },
+        {
+          "code": "mixed_impact_ambiguity",
+          "reason": "Impact direction remains mixed and may need a deeper pass to explain why."
+        },
+        {
+          "code": "ambiguity_notes_present",
+          "reason": "The review notes unresolved ambiguity or fallback handling."
+        }
+      ],
+      "suggestion_conflicts": [],
+      "has_material_conflict": false,
+      "conflict_summary": "Standard and deep review suggestions did not materially diverge.",
+      "conflict_fields": [],
+      "confidence_comparison": {
+        "standard_confidence_score": 0.5,
+        "standard_confidence_level": "Low",
+        "deep_confidence_score": 0.5,
+        "deep_confidence_level": "Low",
+        "final_confidence_score": 0.5,
+        "final_confidence_level": "Low",
+        "score_delta_after_deep_review": 0.0,
+        "level_changed_after_deep_review": false,
+        "summary": "Standard and deep review landed on the same confidence assessment."
+      },
+      "confidence_changed_after_deep_review": false,
+      "review_priority": "high",
+      "review_priority_score": 6,
+      "review_priority_reason": "The final advisory confidence is low. The final suggestion still resolves to manual review. The record already shows signals that justify deeper review.",
+      "review_priority_signals": [
+        {
+          "code": "deep_review_recommended",
+          "weight": 1,
+          "reason": "The record already shows signals that justify deeper review."
+        },
+        {
+          "code": "low_confidence",
+          "weight": 2,
+          "reason": "The final advisory confidence is low."
+        },
+        {
+          "code": "manual_review_suggested",
+          "weight": 2,
+          "reason": "The final suggestion still resolves to manual review."
+        },
+        {
+          "code": "mixed_impact_direction",
+          "weight": 1,
+          "reason": "Impact direction remains mixed and needs careful operator interpretation."
+        }
+      ],
+      "manual_review_severity": "high",
+      "operator_attention_needed": true,
+      "suggested_batch": "high_attention",
+      "suggested_batch_reason": "Material conflict or high review priority makes this a first-pass attention item.",
+      "suggested_batch_tags": [
+        "high_attention",
+        "manual_review_focus"
+      ],
+      "existing_matches": [],
+      "suggestions": {
+        "record_action_suggestion": "manual_review",
+        "status_suggestion": "Partial",
+        "impact_direction_suggestion": "Mixed",
+        "evidence_strength_suggestion": "Moderate",
+        "title_normalized": "Clear street encampments and expand treatment-oriented street-order responses",
+        "summary_suggestion": "A 2025 order advanced the administration's street-order agenda, but the balance between enforcement and treatment outcomes remained unresolved.",
+        "topic_suggestion": "Housing",
+        "impacted_group_suggestion": "Black unhoused people and Black neighborhoods affected by homelessness policy, encampment enforcement, and access to treatment services",
+        "confidence_score": 0.5,
+        "confidence_level": "Low",
+        "reasoning_summary": "Operator should review AI output before import.",
+        "source_warnings": [],
+        "missing_source_warnings": [],
+        "caution_flags": [
+          "deep_review_requested"
+        ],
+        "hesitation_reasons": [],
+        "evidence_needed_to_reduce_risk": [],
+        "signal_evidence_strength": "Moderate",
+        "signal_evidence_gaps": [],
+        "signal_ambiguity": "High",
+        "signal_conflicts": [],
+        "applied_penalties": [],
+        "self_check": "Cautious reviewer check not supplied; review the evidence gaps and ambiguity before import.",
+        "suggested_operator_next_action": "manual_review_required",
+        "ambiguity_notes": "Operator should manually verify this advisory suggestion.",
+        "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. The pass recommends manual review instead of a confident import path. Confidence is supported because No source warnings were carried into the normalized suggestion. Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
+        "confidence_signals": [
+          {
+            "code": "low_confidence",
+            "direction": "reduces",
+            "reason": "The normalized confidence score remains low after review."
+          },
+          {
+            "code": "source_coverage_present",
+            "direction": "supports",
+            "reason": "No source warnings were carried into the normalized suggestion."
+          },
+          {
+            "code": "manual_review_required",
+            "direction": "reduces",
+            "reason": "The pass recommends manual review instead of a confident import path."
+          },
+          {
+            "code": "mixed_impact_direction",
+            "direction": "reduces",
+            "reason": "Mixed impact direction makes the downstream interpretation less settled."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      },
+      "standard_pass_suggestions": {
+        "record_action_suggestion": "manual_review",
+        "status_suggestion": "Partial",
+        "impact_direction_suggestion": "Mixed",
+        "evidence_strength_suggestion": "Moderate",
+        "title_normalized": "Clear street encampments and expand treatment-oriented street-order responses",
+        "summary_suggestion": "A 2025 order advanced the administration's street-order agenda, but the balance between enforcement and treatment outcomes remained unresolved.",
+        "topic_suggestion": "Housing",
+        "impacted_group_suggestion": "Black unhoused people and Black neighborhoods affected by homelessness policy, encampment enforcement, and access to treatment services",
+        "confidence_score": 0.5,
+        "confidence_level": "Low",
+        "reasoning_summary": "Operator should review AI output before import.",
+        "source_warnings": [],
+        "missing_source_warnings": [],
+        "caution_flags": [],
+        "hesitation_reasons": [],
+        "evidence_needed_to_reduce_risk": [],
+        "signal_evidence_strength": "Moderate",
+        "signal_evidence_gaps": [],
+        "signal_ambiguity": "High",
+        "signal_conflicts": [],
+        "applied_penalties": [],
+        "self_check": "Cautious reviewer check not supplied; review the evidence gaps and ambiguity before import.",
+        "suggested_operator_next_action": "manual_review_required",
+        "ambiguity_notes": "Operator should manually verify this advisory suggestion.",
+        "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. The pass recommends manual review instead of a confident import path. Confidence is supported because No source warnings were carried into the normalized suggestion. Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
+        "confidence_signals": [
+          {
+            "code": "low_confidence",
+            "direction": "reduces",
+            "reason": "The normalized confidence score remains low after review."
+          },
+          {
+            "code": "source_coverage_present",
+            "direction": "supports",
+            "reason": "No source warnings were carried into the normalized suggestion."
+          },
+          {
+            "code": "manual_review_required",
+            "direction": "reduces",
+            "reason": "The pass recommends manual review instead of a confident import path."
+          },
+          {
+            "code": "mixed_impact_direction",
+            "direction": "reduces",
+            "reason": "Mixed impact direction makes the downstream interpretation less settled."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      },
+      "deep_pass_suggestions": {
+        "record_action_suggestion": "manual_review",
+        "status_suggestion": "Partial",
+        "impact_direction_suggestion": "Mixed",
+        "evidence_strength_suggestion": "Moderate",
+        "title_normalized": "Clear street encampments and expand treatment-oriented street-order responses",
+        "summary_suggestion": "A 2025 order advanced the administration's street-order agenda, but the balance between enforcement and treatment outcomes remained unresolved.",
+        "topic_suggestion": "Housing",
+        "impacted_group_suggestion": "Black unhoused people and Black neighborhoods affected by homelessness policy, encampment enforcement, and access to treatment services",
+        "confidence_score": 0.5,
+        "confidence_level": "Low",
+        "reasoning_summary": "Operator should review AI output before import.",
+        "source_warnings": [],
+        "missing_source_warnings": [],
+        "caution_flags": [
+          "deep_review_requested"
+        ],
+        "hesitation_reasons": [],
+        "evidence_needed_to_reduce_risk": [],
+        "signal_evidence_strength": "Moderate",
+        "signal_evidence_gaps": [],
+        "signal_ambiguity": "High",
+        "signal_conflicts": [],
+        "applied_penalties": [],
+        "self_check": "Cautious reviewer check not supplied; review the evidence gaps and ambiguity before import.",
+        "suggested_operator_next_action": "manual_review_required",
+        "ambiguity_notes": "Operator should manually verify this advisory suggestion.",
+        "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. The pass recommends manual review instead of a confident import path. Confidence is supported because No source warnings were carried into the normalized suggestion. Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
+        "confidence_signals": [
+          {
+            "code": "low_confidence",
+            "direction": "reduces",
+            "reason": "The normalized confidence score remains low after review."
+          },
+          {
+            "code": "source_coverage_present",
+            "direction": "supports",
+            "reason": "No source warnings were carried into the normalized suggestion."
+          },
+          {
+            "code": "manual_review_required",
+            "direction": "reduces",
+            "reason": "The pass recommends manual review instead of a confident import path."
+          },
+          {
+            "code": "mixed_impact_direction",
+            "direction": "reduces",
+            "reason": "Mixed impact direction makes the downstream interpretation less settled."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      }
+    },
+    {
+      "slug": "trump-2025-domestic-production-of-critical-medicines",
+      "title": "Expand domestic production of critical medicines",
+      "requested_model": "qwen3.5:9b",
+      "effective_model": "qwen3.5:9b",
+      "resolved_model": "qwen3.5:9b",
+      "review_mode": "deep",
+      "review_mode_requested": "deep",
+      "review_mode_used": "deep",
+      "review_backend": "ollama",
+      "model_used": "qwen3.5:9b",
+      "verifier_model_requested": "qwen3.5:9b",
+      "verifier_model_used": null,
+      "senior_model_requested": "qwen3.5:9b",
+      "senior_model_used": "qwen3.5:9b",
+      "fallback_model": "qwen3.5:9b",
+      "fallback_used": false,
+      "fallback_reason": null,
+      "model_resolution_status": "exact_requested",
+      "timeout_seconds": 240,
+      "senior_timeout_seconds": 240,
+      "verifier_timeout_seconds": 240,
+      "retry_count": 0,
+      "senior_attempted": true,
+      "senior_retry_attempted": false,
+      "verifier_attempted": false,
+      "verifier_retry_attempted": false,
+      "deep_review_requested": true,
+      "deep_review_ran": true,
+      "deep_review_reason": "operator_requested_with_senior_review",
+      "second_pass_ran": true,
+      "deep_review_recommended": true,
+      "deep_review_recommendation_reason": "Confidence is low enough that a deeper ambiguity check is warranted. The review could not safely resolve whether this record is ready for import. The review notes unresolved ambiguity or fallback handling.",
+      "deep_review_recommendation_signals": [
+        {
+          "code": "low_confidence",
+          "reason": "Confidence is low enough that a deeper ambiguity check is warranted."
+        },
+        {
+          "code": "manual_review_suggested",
+          "reason": "The review could not safely resolve whether this record is ready for import."
+        },
+        {
+          "code": "ambiguity_notes_present",
+          "reason": "The review notes unresolved ambiguity or fallback handling."
+        }
+      ],
+      "suggestion_conflicts": [],
+      "has_material_conflict": false,
+      "conflict_summary": "Standard and deep review suggestions did not materially diverge.",
+      "conflict_fields": [],
+      "confidence_comparison": {
+        "standard_confidence_score": 0.5,
+        "standard_confidence_level": "Low",
+        "deep_confidence_score": 0.5,
+        "deep_confidence_level": "Low",
+        "final_confidence_score": 0.5,
+        "final_confidence_level": "Low",
+        "score_delta_after_deep_review": 0.0,
+        "level_changed_after_deep_review": false,
+        "summary": "Standard and deep review landed on the same confidence assessment."
+      },
+      "confidence_changed_after_deep_review": false,
+      "review_priority": "medium",
+      "review_priority_score": 5,
+      "review_priority_reason": "The final advisory confidence is low. The final suggestion still resolves to manual review. The record already shows signals that justify deeper review.",
+      "review_priority_signals": [
+        {
+          "code": "deep_review_recommended",
+          "weight": 1,
+          "reason": "The record already shows signals that justify deeper review."
+        },
+        {
+          "code": "low_confidence",
+          "weight": 2,
+          "reason": "The final advisory confidence is low."
+        },
+        {
+          "code": "manual_review_suggested",
+          "weight": 2,
+          "reason": "The final suggestion still resolves to manual review."
+        }
+      ],
+      "manual_review_severity": "medium",
+      "operator_attention_needed": true,
+      "suggested_batch": "manual_review_focus",
+      "suggested_batch_reason": "Manual-review judgment still appears central to the safe handling of this item.",
+      "suggested_batch_tags": [
+        "manual_review_focus"
+      ],
+      "existing_matches": [],
+      "suggestions": {
+        "record_action_suggestion": "manual_review",
+        "status_suggestion": "Partial",
+        "impact_direction_suggestion": "Positive",
+        "evidence_strength_suggestion": "Moderate",
+        "title_normalized": "Expand domestic production of critical medicines",
+        "summary_suggestion": "A 2025 executive order advanced domestic-medicine production goals, but measurable supply and access outcomes remained early.",
+        "topic_suggestion": "Healthcare",
+        "impacted_group_suggestion": "Black patients and Black communities affected by medicine shortages, chronic-disease treatment continuity, and pharmaceutical supply disruptions",
+        "confidence_score": 0.5,
+        "confidence_level": "Low",
+        "reasoning_summary": "Operator should review AI output before import.",
+        "source_warnings": [],
+        "missing_source_warnings": [],
+        "caution_flags": [
+          "deep_review_requested"
+        ],
+        "hesitation_reasons": [],
+        "evidence_needed_to_reduce_risk": [],
+        "signal_evidence_strength": "Moderate",
+        "signal_evidence_gaps": [],
+        "signal_ambiguity": "High",
+        "signal_conflicts": [],
+        "applied_penalties": [],
+        "self_check": "Cautious reviewer check not supplied; review the evidence gaps and ambiguity before import.",
+        "suggested_operator_next_action": "manual_review_required",
+        "ambiguity_notes": "Operator should manually verify this advisory suggestion.",
+        "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. The pass recommends manual review instead of a confident import path. Confidence is supported because No source warnings were carried into the normalized suggestion. Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
+        "confidence_signals": [
+          {
+            "code": "low_confidence",
+            "direction": "reduces",
+            "reason": "The normalized confidence score remains low after review."
+          },
+          {
+            "code": "source_coverage_present",
+            "direction": "supports",
+            "reason": "No source warnings were carried into the normalized suggestion."
+          },
+          {
+            "code": "manual_review_required",
+            "direction": "reduces",
+            "reason": "The pass recommends manual review instead of a confident import path."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      },
+      "standard_pass_suggestions": {
+        "record_action_suggestion": "manual_review",
+        "status_suggestion": "Partial",
+        "impact_direction_suggestion": "Positive",
+        "evidence_strength_suggestion": "Moderate",
+        "title_normalized": "Expand domestic production of critical medicines",
+        "summary_suggestion": "A 2025 executive order advanced domestic-medicine production goals, but measurable supply and access outcomes remained early.",
+        "topic_suggestion": "Healthcare",
+        "impacted_group_suggestion": "Black patients and Black communities affected by medicine shortages, chronic-disease treatment continuity, and pharmaceutical supply disruptions",
+        "confidence_score": 0.5,
+        "confidence_level": "Low",
+        "reasoning_summary": "Operator should review AI output before import.",
+        "source_warnings": [],
+        "missing_source_warnings": [],
+        "caution_flags": [],
+        "hesitation_reasons": [],
+        "evidence_needed_to_reduce_risk": [],
+        "signal_evidence_strength": "Moderate",
+        "signal_evidence_gaps": [],
+        "signal_ambiguity": "High",
+        "signal_conflicts": [],
+        "applied_penalties": [],
+        "self_check": "Cautious reviewer check not supplied; review the evidence gaps and ambiguity before import.",
+        "suggested_operator_next_action": "manual_review_required",
+        "ambiguity_notes": "Operator should manually verify this advisory suggestion.",
+        "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. The pass recommends manual review instead of a confident import path. Confidence is supported because No source warnings were carried into the normalized suggestion. Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
+        "confidence_signals": [
+          {
+            "code": "low_confidence",
+            "direction": "reduces",
+            "reason": "The normalized confidence score remains low after review."
+          },
+          {
+            "code": "source_coverage_present",
+            "direction": "supports",
+            "reason": "No source warnings were carried into the normalized suggestion."
+          },
+          {
+            "code": "manual_review_required",
+            "direction": "reduces",
+            "reason": "The pass recommends manual review instead of a confident import path."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      },
+      "deep_pass_suggestions": {
+        "record_action_suggestion": "manual_review",
+        "status_suggestion": "Partial",
+        "impact_direction_suggestion": "Positive",
+        "evidence_strength_suggestion": "Moderate",
+        "title_normalized": "Expand domestic production of critical medicines",
+        "summary_suggestion": "A 2025 executive order advanced domestic-medicine production goals, but measurable supply and access outcomes remained early.",
+        "topic_suggestion": "Healthcare",
+        "impacted_group_suggestion": "Black patients and Black communities affected by medicine shortages, chronic-disease treatment continuity, and pharmaceutical supply disruptions",
+        "confidence_score": 0.5,
+        "confidence_level": "Low",
+        "reasoning_summary": "Operator should review AI output before import.",
+        "source_warnings": [],
+        "missing_source_warnings": [],
+        "caution_flags": [
+          "deep_review_requested"
+        ],
+        "hesitation_reasons": [],
+        "evidence_needed_to_reduce_risk": [],
+        "signal_evidence_strength": "Moderate",
+        "signal_evidence_gaps": [],
+        "signal_ambiguity": "High",
+        "signal_conflicts": [],
+        "applied_penalties": [],
+        "self_check": "Cautious reviewer check not supplied; review the evidence gaps and ambiguity before import.",
+        "suggested_operator_next_action": "manual_review_required",
+        "ambiguity_notes": "Operator should manually verify this advisory suggestion.",
+        "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. The pass recommends manual review instead of a confident import path. Confidence is supported because No source warnings were carried into the normalized suggestion. Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
+        "confidence_signals": [
+          {
+            "code": "low_confidence",
+            "direction": "reduces",
+            "reason": "The normalized confidence score remains low after review."
+          },
+          {
+            "code": "source_coverage_present",
+            "direction": "supports",
+            "reason": "No source warnings were carried into the normalized suggestion."
+          },
+          {
+            "code": "manual_review_required",
+            "direction": "reduces",
+            "reason": "The pass recommends manual review instead of a confident import path."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      }
+    },
+    {
+      "slug": "trump-2025-expand-educational-freedom-for-families",
+      "title": "Expand educational freedom and school-choice options for families",
+      "requested_model": "qwen3.5:9b",
+      "effective_model": "qwen3.5:9b",
+      "resolved_model": "qwen3.5:9b",
+      "review_mode": "deep",
+      "review_mode_requested": "deep",
+      "review_mode_used": "deep",
+      "review_backend": "ollama",
+      "model_used": "qwen3.5:9b",
+      "verifier_model_requested": "qwen3.5:9b",
+      "verifier_model_used": null,
+      "senior_model_requested": "qwen3.5:9b",
+      "senior_model_used": "qwen3.5:9b",
+      "fallback_model": "qwen3.5:9b",
+      "fallback_used": false,
+      "fallback_reason": null,
+      "model_resolution_status": "exact_requested",
+      "timeout_seconds": 240,
+      "senior_timeout_seconds": 240,
+      "verifier_timeout_seconds": 240,
+      "retry_count": 0,
+      "senior_attempted": true,
+      "senior_retry_attempted": false,
+      "verifier_attempted": false,
+      "verifier_retry_attempted": false,
+      "deep_review_requested": true,
+      "deep_review_ran": true,
+      "deep_review_reason": "operator_requested_with_senior_review",
+      "second_pass_ran": true,
+      "deep_review_recommended": true,
+      "deep_review_recommendation_reason": "Confidence is low enough that a deeper ambiguity check is warranted. The review could not safely resolve whether this record is ready for import. Impact direction remains mixed and may need a deeper pass to explain why.",
+      "deep_review_recommendation_signals": [
+        {
+          "code": "low_confidence",
+          "reason": "Confidence is low enough that a deeper ambiguity check is warranted."
+        },
+        {
+          "code": "manual_review_suggested",
+          "reason": "The review could not safely resolve whether this record is ready for import."
+        },
+        {
+          "code": "mixed_impact_ambiguity",
+          "reason": "Impact direction remains mixed and may need a deeper pass to explain why."
+        },
+        {
+          "code": "ambiguity_notes_present",
+          "reason": "The review notes unresolved ambiguity or fallback handling."
+        }
+      ],
+      "suggestion_conflicts": [],
+      "has_material_conflict": false,
+      "conflict_summary": "Standard and deep review suggestions did not materially diverge.",
+      "conflict_fields": [],
+      "confidence_comparison": {
+        "standard_confidence_score": 0.5,
+        "standard_confidence_level": "Low",
+        "deep_confidence_score": 0.5,
+        "deep_confidence_level": "Low",
+        "final_confidence_score": 0.5,
+        "final_confidence_level": "Low",
+        "score_delta_after_deep_review": 0.0,
+        "level_changed_after_deep_review": false,
+        "summary": "Standard and deep review landed on the same confidence assessment."
+      },
+      "confidence_changed_after_deep_review": false,
+      "review_priority": "high",
+      "review_priority_score": 6,
+      "review_priority_reason": "The final advisory confidence is low. The final suggestion still resolves to manual review. The record already shows signals that justify deeper review.",
+      "review_priority_signals": [
+        {
+          "code": "deep_review_recommended",
+          "weight": 1,
+          "reason": "The record already shows signals that justify deeper review."
+        },
+        {
+          "code": "low_confidence",
+          "weight": 2,
+          "reason": "The final advisory confidence is low."
+        },
+        {
+          "code": "manual_review_suggested",
+          "weight": 2,
+          "reason": "The final suggestion still resolves to manual review."
+        },
+        {
+          "code": "mixed_impact_direction",
+          "weight": 1,
+          "reason": "Impact direction remains mixed and needs careful operator interpretation."
+        }
+      ],
+      "manual_review_severity": "high",
+      "operator_attention_needed": true,
+      "suggested_batch": "high_attention",
+      "suggested_batch_reason": "Material conflict or high review priority makes this a first-pass attention item.",
+      "suggested_batch_tags": [
+        "high_attention",
+        "manual_review_focus"
+      ],
+      "existing_matches": [],
+      "suggestions": {
+        "record_action_suggestion": "manual_review",
+        "status_suggestion": "Partial",
+        "impact_direction_suggestion": "Mixed",
+        "evidence_strength_suggestion": "Moderate",
+        "title_normalized": "Expand educational freedom and school-choice options for families",
+        "summary_suggestion": "The administration launched a federal school-choice initiative in early 2025, but the effects remained dependent on later state and grant implementation.",
+        "topic_suggestion": "Education",
+        "impacted_group_suggestion": "Black students and Black families affected by school access, public-school quality, transportation, and alternative education options",
+        "confidence_score": 0.5,
+        "confidence_level": "Low",
+        "reasoning_summary": "Operator should review AI output before import.",
+        "source_warnings": [],
+        "missing_source_warnings": [],
+        "caution_flags": [
+          "deep_review_requested"
+        ],
+        "hesitation_reasons": [],
+        "evidence_needed_to_reduce_risk": [],
+        "signal_evidence_strength": "Moderate",
+        "signal_evidence_gaps": [],
+        "signal_ambiguity": "High",
+        "signal_conflicts": [],
+        "applied_penalties": [],
+        "self_check": "Cautious reviewer check not supplied; review the evidence gaps and ambiguity before import.",
+        "suggested_operator_next_action": "manual_review_required",
+        "ambiguity_notes": "Operator should manually verify this advisory suggestion.",
+        "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. The pass recommends manual review instead of a confident import path. Confidence is supported because No source warnings were carried into the normalized suggestion. Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
+        "confidence_signals": [
+          {
+            "code": "low_confidence",
+            "direction": "reduces",
+            "reason": "The normalized confidence score remains low after review."
+          },
+          {
+            "code": "source_coverage_present",
+            "direction": "supports",
+            "reason": "No source warnings were carried into the normalized suggestion."
+          },
+          {
+            "code": "manual_review_required",
+            "direction": "reduces",
+            "reason": "The pass recommends manual review instead of a confident import path."
+          },
+          {
+            "code": "mixed_impact_direction",
+            "direction": "reduces",
+            "reason": "Mixed impact direction makes the downstream interpretation less settled."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      },
+      "standard_pass_suggestions": {
+        "record_action_suggestion": "manual_review",
+        "status_suggestion": "Partial",
+        "impact_direction_suggestion": "Mixed",
+        "evidence_strength_suggestion": "Moderate",
+        "title_normalized": "Expand educational freedom and school-choice options for families",
+        "summary_suggestion": "The administration launched a federal school-choice initiative in early 2025, but the effects remained dependent on later state and grant implementation.",
+        "topic_suggestion": "Education",
+        "impacted_group_suggestion": "Black students and Black families affected by school access, public-school quality, transportation, and alternative education options",
+        "confidence_score": 0.5,
+        "confidence_level": "Low",
+        "reasoning_summary": "Operator should review AI output before import.",
+        "source_warnings": [],
+        "missing_source_warnings": [],
+        "caution_flags": [],
+        "hesitation_reasons": [],
+        "evidence_needed_to_reduce_risk": [],
+        "signal_evidence_strength": "Moderate",
+        "signal_evidence_gaps": [],
+        "signal_ambiguity": "High",
+        "signal_conflicts": [],
+        "applied_penalties": [],
+        "self_check": "Cautious reviewer check not supplied; review the evidence gaps and ambiguity before import.",
+        "suggested_operator_next_action": "manual_review_required",
+        "ambiguity_notes": "Operator should manually verify this advisory suggestion.",
+        "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. The pass recommends manual review instead of a confident import path. Confidence is supported because No source warnings were carried into the normalized suggestion. Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
+        "confidence_signals": [
+          {
+            "code": "low_confidence",
+            "direction": "reduces",
+            "reason": "The normalized confidence score remains low after review."
+          },
+          {
+            "code": "source_coverage_present",
+            "direction": "supports",
+            "reason": "No source warnings were carried into the normalized suggestion."
+          },
+          {
+            "code": "manual_review_required",
+            "direction": "reduces",
+            "reason": "The pass recommends manual review instead of a confident import path."
+          },
+          {
+            "code": "mixed_impact_direction",
+            "direction": "reduces",
+            "reason": "Mixed impact direction makes the downstream interpretation less settled."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      },
+      "deep_pass_suggestions": {
+        "record_action_suggestion": "manual_review",
+        "status_suggestion": "Partial",
+        "impact_direction_suggestion": "Mixed",
+        "evidence_strength_suggestion": "Moderate",
+        "title_normalized": "Expand educational freedom and school-choice options for families",
+        "summary_suggestion": "The administration launched a federal school-choice initiative in early 2025, but the effects remained dependent on later state and grant implementation.",
+        "topic_suggestion": "Education",
+        "impacted_group_suggestion": "Black students and Black families affected by school access, public-school quality, transportation, and alternative education options",
+        "confidence_score": 0.5,
+        "confidence_level": "Low",
+        "reasoning_summary": "Operator should review AI output before import.",
+        "source_warnings": [],
+        "missing_source_warnings": [],
+        "caution_flags": [
+          "deep_review_requested"
+        ],
+        "hesitation_reasons": [],
+        "evidence_needed_to_reduce_risk": [],
+        "signal_evidence_strength": "Moderate",
+        "signal_evidence_gaps": [],
+        "signal_ambiguity": "High",
+        "signal_conflicts": [],
+        "applied_penalties": [],
+        "self_check": "Cautious reviewer check not supplied; review the evidence gaps and ambiguity before import.",
+        "suggested_operator_next_action": "manual_review_required",
+        "ambiguity_notes": "Operator should manually verify this advisory suggestion.",
+        "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. The pass recommends manual review instead of a confident import path. Confidence is supported because No source warnings were carried into the normalized suggestion. Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
+        "confidence_signals": [
+          {
+            "code": "low_confidence",
+            "direction": "reduces",
+            "reason": "The normalized confidence score remains low after review."
+          },
+          {
+            "code": "source_coverage_present",
+            "direction": "supports",
+            "reason": "No source warnings were carried into the normalized suggestion."
+          },
+          {
+            "code": "manual_review_required",
+            "direction": "reduces",
+            "reason": "The pass recommends manual review instead of a confident import path."
+          },
+          {
+            "code": "mixed_impact_direction",
+            "direction": "reduces",
+            "reason": "Mixed impact direction makes the downstream interpretation less settled."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      }
+    },
+    {
+      "slug": "trump-2025-reform-higher-education-accreditation",
+      "title": "Reform higher-education accreditation around student outcomes",
+      "requested_model": "qwen3.5:9b",
+      "effective_model": "qwen3.5:9b",
+      "resolved_model": "qwen3.5:9b",
+      "review_mode": "deep",
+      "review_mode_requested": "deep",
+      "review_mode_used": "deep",
+      "review_backend": "ollama",
+      "model_used": "qwen3.5:9b",
+      "verifier_model_requested": "qwen3.5:9b",
+      "verifier_model_used": null,
+      "senior_model_requested": "qwen3.5:9b",
+      "senior_model_used": "qwen3.5:9b",
+      "fallback_model": "qwen3.5:9b",
+      "fallback_used": false,
+      "fallback_reason": null,
+      "model_resolution_status": "exact_requested",
+      "timeout_seconds": 240,
+      "senior_timeout_seconds": 240,
+      "verifier_timeout_seconds": 240,
+      "retry_count": 0,
+      "senior_attempted": true,
+      "senior_retry_attempted": false,
+      "verifier_attempted": false,
+      "verifier_retry_attempted": false,
+      "deep_review_requested": true,
+      "deep_review_ran": true,
+      "deep_review_reason": "operator_requested_with_senior_review",
+      "second_pass_ran": true,
+      "deep_review_recommended": true,
+      "deep_review_recommendation_reason": "Confidence is low enough that a deeper ambiguity check is warranted. The review could not safely resolve whether this record is ready for import. Impact direction remains mixed and may need a deeper pass to explain why.",
+      "deep_review_recommendation_signals": [
+        {
+          "code": "low_confidence",
+          "reason": "Confidence is low enough that a deeper ambiguity check is warranted."
+        },
+        {
+          "code": "manual_review_suggested",
+          "reason": "The review could not safely resolve whether this record is ready for import."
+        },
+        {
+          "code": "mixed_impact_ambiguity",
+          "reason": "Impact direction remains mixed and may need a deeper pass to explain why."
+        },
+        {
+          "code": "ambiguity_notes_present",
+          "reason": "The review notes unresolved ambiguity or fallback handling."
+        }
+      ],
+      "suggestion_conflicts": [],
+      "has_material_conflict": false,
+      "conflict_summary": "Standard and deep review suggestions did not materially diverge.",
+      "conflict_fields": [],
+      "confidence_comparison": {
+        "standard_confidence_score": 0.5,
+        "standard_confidence_level": "Low",
+        "deep_confidence_score": 0.5,
+        "deep_confidence_level": "Low",
+        "final_confidence_score": 0.5,
+        "final_confidence_level": "Low",
+        "score_delta_after_deep_review": 0.0,
+        "level_changed_after_deep_review": false,
+        "summary": "Standard and deep review landed on the same confidence assessment."
+      },
+      "confidence_changed_after_deep_review": false,
+      "review_priority": "high",
+      "review_priority_score": 6,
+      "review_priority_reason": "The final advisory confidence is low. The final suggestion still resolves to manual review. The record already shows signals that justify deeper review.",
+      "review_priority_signals": [
+        {
+          "code": "deep_review_recommended",
+          "weight": 1,
+          "reason": "The record already shows signals that justify deeper review."
+        },
+        {
+          "code": "low_confidence",
+          "weight": 2,
+          "reason": "The final advisory confidence is low."
+        },
+        {
+          "code": "manual_review_suggested",
+          "weight": 2,
+          "reason": "The final suggestion still resolves to manual review."
+        },
+        {
+          "code": "mixed_impact_direction",
+          "weight": 1,
+          "reason": "Impact direction remains mixed and needs careful operator interpretation."
+        }
+      ],
+      "manual_review_severity": "high",
+      "operator_attention_needed": true,
+      "suggested_batch": "high_attention",
+      "suggested_batch_reason": "Material conflict or high review priority makes this a first-pass attention item.",
+      "suggested_batch_tags": [
+        "high_attention",
+        "manual_review_focus"
+      ],
+      "existing_matches": [],
+      "suggestions": {
+        "record_action_suggestion": "manual_review",
+        "status_suggestion": "In Progress",
+        "impact_direction_suggestion": "Mixed",
+        "evidence_strength_suggestion": "Moderate",
+        "title_normalized": "Reform higher-education accreditation around student outcomes",
+        "summary_suggestion": "The administration launched accreditation reform in 2025, but institutional and student-level effects remained in an early implementation stage.",
+        "topic_suggestion": "Education",
+        "impacted_group_suggestion": "Black college students and institutions serving large Black student populations, including HBCUs and other minority-serving institutions",
+        "confidence_score": 0.5,
+        "confidence_level": "Low",
+        "reasoning_summary": "Operator should review AI output before import.",
+        "source_warnings": [],
+        "missing_source_warnings": [],
+        "caution_flags": [
+          "deep_review_requested"
+        ],
+        "hesitation_reasons": [],
+        "evidence_needed_to_reduce_risk": [],
+        "signal_evidence_strength": "Moderate",
+        "signal_evidence_gaps": [],
+        "signal_ambiguity": "High",
+        "signal_conflicts": [],
+        "applied_penalties": [],
+        "self_check": "Cautious reviewer check not supplied; review the evidence gaps and ambiguity before import.",
+        "suggested_operator_next_action": "manual_review_required",
+        "ambiguity_notes": "Operator should manually verify this advisory suggestion.",
+        "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. The pass recommends manual review instead of a confident import path. Confidence is supported because No source warnings were carried into the normalized suggestion. Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
+        "confidence_signals": [
+          {
+            "code": "low_confidence",
+            "direction": "reduces",
+            "reason": "The normalized confidence score remains low after review."
+          },
+          {
+            "code": "source_coverage_present",
+            "direction": "supports",
+            "reason": "No source warnings were carried into the normalized suggestion."
+          },
+          {
+            "code": "manual_review_required",
+            "direction": "reduces",
+            "reason": "The pass recommends manual review instead of a confident import path."
+          },
+          {
+            "code": "mixed_impact_direction",
+            "direction": "reduces",
+            "reason": "Mixed impact direction makes the downstream interpretation less settled."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      },
+      "standard_pass_suggestions": {
+        "record_action_suggestion": "manual_review",
+        "status_suggestion": "In Progress",
+        "impact_direction_suggestion": "Mixed",
+        "evidence_strength_suggestion": "Moderate",
+        "title_normalized": "Reform higher-education accreditation around student outcomes",
+        "summary_suggestion": "The administration launched accreditation reform in 2025, but institutional and student-level effects remained in an early implementation stage.",
+        "topic_suggestion": "Education",
+        "impacted_group_suggestion": "Black college students and institutions serving large Black student populations, including HBCUs and other minority-serving institutions",
+        "confidence_score": 0.5,
+        "confidence_level": "Low",
+        "reasoning_summary": "Operator should review AI output before import.",
+        "source_warnings": [],
+        "missing_source_warnings": [],
+        "caution_flags": [],
+        "hesitation_reasons": [],
+        "evidence_needed_to_reduce_risk": [],
+        "signal_evidence_strength": "Moderate",
+        "signal_evidence_gaps": [],
+        "signal_ambiguity": "High",
+        "signal_conflicts": [],
+        "applied_penalties": [],
+        "self_check": "Cautious reviewer check not supplied; review the evidence gaps and ambiguity before import.",
+        "suggested_operator_next_action": "manual_review_required",
+        "ambiguity_notes": "Operator should manually verify this advisory suggestion.",
+        "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. The pass recommends manual review instead of a confident import path. Confidence is supported because No source warnings were carried into the normalized suggestion. Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
+        "confidence_signals": [
+          {
+            "code": "low_confidence",
+            "direction": "reduces",
+            "reason": "The normalized confidence score remains low after review."
+          },
+          {
+            "code": "source_coverage_present",
+            "direction": "supports",
+            "reason": "No source warnings were carried into the normalized suggestion."
+          },
+          {
+            "code": "manual_review_required",
+            "direction": "reduces",
+            "reason": "The pass recommends manual review instead of a confident import path."
+          },
+          {
+            "code": "mixed_impact_direction",
+            "direction": "reduces",
+            "reason": "Mixed impact direction makes the downstream interpretation less settled."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      },
+      "deep_pass_suggestions": {
+        "record_action_suggestion": "manual_review",
+        "status_suggestion": "In Progress",
+        "impact_direction_suggestion": "Mixed",
+        "evidence_strength_suggestion": "Moderate",
+        "title_normalized": "Reform higher-education accreditation around student outcomes",
+        "summary_suggestion": "The administration launched accreditation reform in 2025, but institutional and student-level effects remained in an early implementation stage.",
+        "topic_suggestion": "Education",
+        "impacted_group_suggestion": "Black college students and institutions serving large Black student populations, including HBCUs and other minority-serving institutions",
+        "confidence_score": 0.5,
+        "confidence_level": "Low",
+        "reasoning_summary": "Operator should review AI output before import.",
+        "source_warnings": [],
+        "missing_source_warnings": [],
+        "caution_flags": [
+          "deep_review_requested"
+        ],
+        "hesitation_reasons": [],
+        "evidence_needed_to_reduce_risk": [],
+        "signal_evidence_strength": "Moderate",
+        "signal_evidence_gaps": [],
+        "signal_ambiguity": "High",
+        "signal_conflicts": [],
+        "applied_penalties": [],
+        "self_check": "Cautious reviewer check not supplied; review the evidence gaps and ambiguity before import.",
+        "suggested_operator_next_action": "manual_review_required",
+        "ambiguity_notes": "Operator should manually verify this advisory suggestion.",
+        "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. The pass recommends manual review instead of a confident import path. Confidence is supported because No source warnings were carried into the normalized suggestion. Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
+        "confidence_signals": [
+          {
+            "code": "low_confidence",
+            "direction": "reduces",
+            "reason": "The normalized confidence score remains low after review."
+          },
+          {
+            "code": "source_coverage_present",
+            "direction": "supports",
+            "reason": "No source warnings were carried into the normalized suggestion."
+          },
+          {
+            "code": "manual_review_required",
+            "direction": "reduces",
+            "reason": "The pass recommends manual review instead of a confident import path."
+          },
+          {
+            "code": "mixed_impact_direction",
+            "direction": "reduces",
+            "reason": "Mixed impact direction makes the downstream interpretation less settled."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      }
+    },
+    {
+      "slug": "trump-2025-promote-hbcu-excellence-and-innovation",
+      "title": "Promote excellence and innovation at HBCUs",
+      "requested_model": "qwen3.5:9b",
+      "effective_model": "qwen3.5:9b",
+      "resolved_model": "qwen3.5:9b",
+      "review_mode": "deep",
+      "review_mode_requested": "deep",
+      "review_mode_used": "deep",
+      "review_backend": "ollama",
+      "model_used": "qwen3.5:9b",
+      "verifier_model_requested": "qwen3.5:9b",
+      "verifier_model_used": null,
+      "senior_model_requested": "qwen3.5:9b",
+      "senior_model_used": "qwen3.5:9b",
+      "fallback_model": "qwen3.5:9b",
+      "fallback_used": false,
+      "fallback_reason": null,
+      "model_resolution_status": "exact_requested",
+      "timeout_seconds": 240,
+      "senior_timeout_seconds": 240,
+      "verifier_timeout_seconds": 240,
+      "retry_count": 0,
+      "senior_attempted": true,
+      "senior_retry_attempted": false,
+      "verifier_attempted": false,
+      "verifier_retry_attempted": false,
+      "deep_review_requested": true,
+      "deep_review_ran": true,
+      "deep_review_reason": "operator_requested_with_senior_review",
+      "second_pass_ran": true,
+      "deep_review_recommended": true,
+      "deep_review_recommendation_reason": "Confidence is low enough that a deeper ambiguity check is warranted. The review could not safely resolve whether this record is ready for import. The review notes unresolved ambiguity or fallback handling.",
+      "deep_review_recommendation_signals": [
+        {
+          "code": "low_confidence",
+          "reason": "Confidence is low enough that a deeper ambiguity check is warranted."
+        },
+        {
+          "code": "manual_review_suggested",
+          "reason": "The review could not safely resolve whether this record is ready for import."
+        },
+        {
+          "code": "ambiguity_notes_present",
+          "reason": "The review notes unresolved ambiguity or fallback handling."
+        }
+      ],
+      "suggestion_conflicts": [],
+      "has_material_conflict": false,
+      "conflict_summary": "Standard and deep review suggestions did not materially diverge.",
+      "conflict_fields": [],
+      "confidence_comparison": {
+        "standard_confidence_score": 0.5,
+        "standard_confidence_level": "Low",
+        "deep_confidence_score": 0.5,
+        "deep_confidence_level": "Low",
+        "final_confidence_score": 0.5,
+        "final_confidence_level": "Low",
+        "score_delta_after_deep_review": 0.0,
+        "level_changed_after_deep_review": false,
+        "summary": "Standard and deep review landed on the same confidence assessment."
+      },
+      "confidence_changed_after_deep_review": false,
+      "review_priority": "medium",
+      "review_priority_score": 5,
+      "review_priority_reason": "The final advisory confidence is low. The final suggestion still resolves to manual review. The record already shows signals that justify deeper review.",
+      "review_priority_signals": [
+        {
+          "code": "deep_review_recommended",
+          "weight": 1,
+          "reason": "The record already shows signals that justify deeper review."
+        },
+        {
+          "code": "low_confidence",
+          "weight": 2,
+          "reason": "The final advisory confidence is low."
+        },
+        {
+          "code": "manual_review_suggested",
+          "weight": 2,
+          "reason": "The final suggestion still resolves to manual review."
+        }
+      ],
+      "manual_review_severity": "medium",
+      "operator_attention_needed": true,
+      "suggested_batch": "manual_review_focus",
+      "suggested_batch_reason": "Manual-review judgment still appears central to the safe handling of this item.",
+      "suggested_batch_tags": [
+        "manual_review_focus"
+      ],
+      "existing_matches": [],
+      "suggestions": {
+        "record_action_suggestion": "manual_review",
+        "status_suggestion": "Partial",
+        "impact_direction_suggestion": "Positive",
+        "evidence_strength_suggestion": "Moderate",
+        "title_normalized": "Promote excellence and innovation at HBCUs",
+        "summary_suggestion": "The administration reestablished a White House HBCU initiative in 2025, with broader institutional effects still dependent on implementation.",
+        "topic_suggestion": "Education",
+        "impacted_group_suggestion": "Black students, faculty, and institutions at Historically Black Colleges and Universities",
+        "confidence_score": 0.5,
+        "confidence_level": "Low",
+        "reasoning_summary": "Operator should review AI output before import.",
+        "source_warnings": [],
+        "missing_source_warnings": [],
+        "caution_flags": [
+          "deep_review_requested"
+        ],
+        "hesitation_reasons": [],
+        "evidence_needed_to_reduce_risk": [],
+        "signal_evidence_strength": "Moderate",
+        "signal_evidence_gaps": [],
+        "signal_ambiguity": "High",
+        "signal_conflicts": [],
+        "applied_penalties": [],
+        "self_check": "Cautious reviewer check not supplied; review the evidence gaps and ambiguity before import.",
+        "suggested_operator_next_action": "manual_review_required",
+        "ambiguity_notes": "Operator should manually verify this advisory suggestion.",
+        "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. The pass recommends manual review instead of a confident import path. Confidence is supported because No source warnings were carried into the normalized suggestion. Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
+        "confidence_signals": [
+          {
+            "code": "low_confidence",
+            "direction": "reduces",
+            "reason": "The normalized confidence score remains low after review."
+          },
+          {
+            "code": "source_coverage_present",
+            "direction": "supports",
+            "reason": "No source warnings were carried into the normalized suggestion."
+          },
+          {
+            "code": "manual_review_required",
+            "direction": "reduces",
+            "reason": "The pass recommends manual review instead of a confident import path."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      },
+      "standard_pass_suggestions": {
+        "record_action_suggestion": "manual_review",
+        "status_suggestion": "Partial",
+        "impact_direction_suggestion": "Positive",
+        "evidence_strength_suggestion": "Moderate",
+        "title_normalized": "Promote excellence and innovation at HBCUs",
+        "summary_suggestion": "The administration reestablished a White House HBCU initiative in 2025, with broader institutional effects still dependent on implementation.",
+        "topic_suggestion": "Education",
+        "impacted_group_suggestion": "Black students, faculty, and institutions at Historically Black Colleges and Universities",
+        "confidence_score": 0.5,
+        "confidence_level": "Low",
+        "reasoning_summary": "Operator should review AI output before import.",
+        "source_warnings": [],
+        "missing_source_warnings": [],
+        "caution_flags": [],
+        "hesitation_reasons": [],
+        "evidence_needed_to_reduce_risk": [],
+        "signal_evidence_strength": "Moderate",
+        "signal_evidence_gaps": [],
+        "signal_ambiguity": "High",
+        "signal_conflicts": [],
+        "applied_penalties": [],
+        "self_check": "Cautious reviewer check not supplied; review the evidence gaps and ambiguity before import.",
+        "suggested_operator_next_action": "manual_review_required",
+        "ambiguity_notes": "Operator should manually verify this advisory suggestion.",
+        "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. The pass recommends manual review instead of a confident import path. Confidence is supported because No source warnings were carried into the normalized suggestion. Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
+        "confidence_signals": [
+          {
+            "code": "low_confidence",
+            "direction": "reduces",
+            "reason": "The normalized confidence score remains low after review."
+          },
+          {
+            "code": "source_coverage_present",
+            "direction": "supports",
+            "reason": "No source warnings were carried into the normalized suggestion."
+          },
+          {
+            "code": "manual_review_required",
+            "direction": "reduces",
+            "reason": "The pass recommends manual review instead of a confident import path."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      },
+      "deep_pass_suggestions": {
+        "record_action_suggestion": "manual_review",
+        "status_suggestion": "Partial",
+        "impact_direction_suggestion": "Positive",
+        "evidence_strength_suggestion": "Moderate",
+        "title_normalized": "Promote excellence and innovation at HBCUs",
+        "summary_suggestion": "The administration reestablished a White House HBCU initiative in 2025, with broader institutional effects still dependent on implementation.",
+        "topic_suggestion": "Education",
+        "impacted_group_suggestion": "Black students, faculty, and institutions at Historically Black Colleges and Universities",
+        "confidence_score": 0.5,
+        "confidence_level": "Low",
+        "reasoning_summary": "Operator should review AI output before import.",
+        "source_warnings": [],
+        "missing_source_warnings": [],
+        "caution_flags": [
+          "deep_review_requested"
+        ],
+        "hesitation_reasons": [],
+        "evidence_needed_to_reduce_risk": [],
+        "signal_evidence_strength": "Moderate",
+        "signal_evidence_gaps": [],
+        "signal_ambiguity": "High",
+        "signal_conflicts": [],
+        "applied_penalties": [],
+        "self_check": "Cautious reviewer check not supplied; review the evidence gaps and ambiguity before import.",
+        "suggested_operator_next_action": "manual_review_required",
+        "ambiguity_notes": "Operator should manually verify this advisory suggestion.",
+        "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. The pass recommends manual review instead of a confident import path. Confidence is supported because No source warnings were carried into the normalized suggestion. Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
+        "confidence_signals": [
+          {
+            "code": "low_confidence",
+            "direction": "reduces",
+            "reason": "The normalized confidence score remains low after review."
+          },
+          {
+            "code": "source_coverage_present",
+            "direction": "supports",
+            "reason": "No source warnings were carried into the normalized suggestion."
+          },
+          {
+            "code": "manual_review_required",
+            "direction": "reduces",
+            "reason": "The pass recommends manual review instead of a confident import path."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      }
+    },
+    {
+      "slug": "trump-2025-reinstate-school-discipline-policies",
+      "title": "Reinstate school discipline policies without equity-based disparate-impact framing",
+      "requested_model": "qwen3.5:9b",
+      "effective_model": "qwen3.5:9b",
+      "resolved_model": "qwen3.5:9b",
+      "review_mode": "deep",
+      "review_mode_requested": "deep",
+      "review_mode_used": "deep",
+      "review_backend": "ollama",
+      "model_used": "qwen3.5:9b",
+      "verifier_model_requested": "qwen3.5:9b",
+      "verifier_model_used": null,
+      "senior_model_requested": "qwen3.5:9b",
+      "senior_model_used": "qwen3.5:9b",
+      "fallback_model": "qwen3.5:9b",
+      "fallback_used": false,
+      "fallback_reason": null,
+      "model_resolution_status": "exact_requested",
+      "timeout_seconds": 240,
+      "senior_timeout_seconds": 240,
+      "verifier_timeout_seconds": 240,
+      "retry_count": 0,
+      "senior_attempted": true,
+      "senior_retry_attempted": false,
+      "verifier_attempted": false,
+      "verifier_retry_attempted": false,
+      "deep_review_requested": true,
+      "deep_review_ran": true,
+      "deep_review_reason": "operator_requested_with_senior_review",
+      "second_pass_ran": true,
+      "deep_review_recommended": true,
+      "deep_review_recommendation_reason": "Confidence is low enough that a deeper ambiguity check is warranted. The review could not safely resolve whether this record is ready for import. The review notes unresolved ambiguity or fallback handling.",
+      "deep_review_recommendation_signals": [
+        {
+          "code": "low_confidence",
+          "reason": "Confidence is low enough that a deeper ambiguity check is warranted."
+        },
+        {
+          "code": "manual_review_suggested",
+          "reason": "The review could not safely resolve whether this record is ready for import."
+        },
+        {
+          "code": "ambiguity_notes_present",
+          "reason": "The review notes unresolved ambiguity or fallback handling."
+        }
+      ],
+      "suggestion_conflicts": [],
+      "has_material_conflict": false,
+      "conflict_summary": "Standard and deep review suggestions did not materially diverge.",
+      "conflict_fields": [],
+      "confidence_comparison": {
+        "standard_confidence_score": 0.5,
+        "standard_confidence_level": "Low",
+        "deep_confidence_score": 0.5,
+        "deep_confidence_level": "Low",
+        "final_confidence_score": 0.5,
+        "final_confidence_level": "Low",
+        "score_delta_after_deep_review": 0.0,
+        "level_changed_after_deep_review": false,
+        "summary": "Standard and deep review landed on the same confidence assessment."
+      },
+      "confidence_changed_after_deep_review": false,
+      "review_priority": "medium",
+      "review_priority_score": 5,
+      "review_priority_reason": "The final advisory confidence is low. The final suggestion still resolves to manual review. The record already shows signals that justify deeper review.",
+      "review_priority_signals": [
+        {
+          "code": "deep_review_recommended",
+          "weight": 1,
+          "reason": "The record already shows signals that justify deeper review."
+        },
+        {
+          "code": "low_confidence",
+          "weight": 2,
+          "reason": "The final advisory confidence is low."
+        },
+        {
+          "code": "manual_review_suggested",
+          "weight": 2,
+          "reason": "The final suggestion still resolves to manual review."
+        }
+      ],
+      "manual_review_severity": "medium",
+      "operator_attention_needed": true,
+      "suggested_batch": "manual_review_focus",
+      "suggested_batch_reason": "Manual-review judgment still appears central to the safe handling of this item.",
+      "suggested_batch_tags": [
+        "manual_review_focus"
+      ],
+      "existing_matches": [],
+      "suggestions": {
+        "record_action_suggestion": "manual_review",
+        "status_suggestion": "In Progress",
+        "impact_direction_suggestion": "Negative",
+        "evidence_strength_suggestion": "Moderate",
+        "title_normalized": "Reinstate school discipline policies without equity-based disparate-impact framing",
+        "summary_suggestion": "The administration ordered a review and replacement process for federal school-discipline guidance, but school-level effects remained unmeasured.",
+        "topic_suggestion": "Education",
+        "impacted_group_suggestion": "Black students and Black families affected by suspension, expulsion, referral-to-law-enforcement, and school discipline policies",
+        "confidence_score": 0.5,
+        "confidence_level": "Low",
+        "reasoning_summary": "Operator should review AI output before import.",
+        "source_warnings": [],
+        "missing_source_warnings": [],
+        "caution_flags": [
+          "deep_review_requested"
+        ],
+        "hesitation_reasons": [],
+        "evidence_needed_to_reduce_risk": [],
+        "signal_evidence_strength": "Moderate",
+        "signal_evidence_gaps": [],
+        "signal_ambiguity": "High",
+        "signal_conflicts": [],
+        "applied_penalties": [],
+        "self_check": "Cautious reviewer check not supplied; review the evidence gaps and ambiguity before import.",
+        "suggested_operator_next_action": "manual_review_required",
+        "ambiguity_notes": "Operator should manually verify this advisory suggestion.",
+        "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. The pass recommends manual review instead of a confident import path. Confidence is supported because No source warnings were carried into the normalized suggestion. Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
+        "confidence_signals": [
+          {
+            "code": "low_confidence",
+            "direction": "reduces",
+            "reason": "The normalized confidence score remains low after review."
+          },
+          {
+            "code": "source_coverage_present",
+            "direction": "supports",
+            "reason": "No source warnings were carried into the normalized suggestion."
+          },
+          {
+            "code": "manual_review_required",
+            "direction": "reduces",
+            "reason": "The pass recommends manual review instead of a confident import path."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      },
+      "standard_pass_suggestions": {
+        "record_action_suggestion": "manual_review",
+        "status_suggestion": "In Progress",
+        "impact_direction_suggestion": "Negative",
+        "evidence_strength_suggestion": "Moderate",
+        "title_normalized": "Reinstate school discipline policies without equity-based disparate-impact framing",
+        "summary_suggestion": "The administration ordered a review and replacement process for federal school-discipline guidance, but school-level effects remained unmeasured.",
+        "topic_suggestion": "Education",
+        "impacted_group_suggestion": "Black students and Black families affected by suspension, expulsion, referral-to-law-enforcement, and school discipline policies",
+        "confidence_score": 0.5,
+        "confidence_level": "Low",
+        "reasoning_summary": "Operator should review AI output before import.",
+        "source_warnings": [],
+        "missing_source_warnings": [],
+        "caution_flags": [],
+        "hesitation_reasons": [],
+        "evidence_needed_to_reduce_risk": [],
+        "signal_evidence_strength": "Moderate",
+        "signal_evidence_gaps": [],
+        "signal_ambiguity": "High",
+        "signal_conflicts": [],
+        "applied_penalties": [],
+        "self_check": "Cautious reviewer check not supplied; review the evidence gaps and ambiguity before import.",
+        "suggested_operator_next_action": "manual_review_required",
+        "ambiguity_notes": "Operator should manually verify this advisory suggestion.",
+        "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. The pass recommends manual review instead of a confident import path. Confidence is supported because No source warnings were carried into the normalized suggestion. Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
+        "confidence_signals": [
+          {
+            "code": "low_confidence",
+            "direction": "reduces",
+            "reason": "The normalized confidence score remains low after review."
+          },
+          {
+            "code": "source_coverage_present",
+            "direction": "supports",
+            "reason": "No source warnings were carried into the normalized suggestion."
+          },
+          {
+            "code": "manual_review_required",
+            "direction": "reduces",
+            "reason": "The pass recommends manual review instead of a confident import path."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      },
+      "deep_pass_suggestions": {
+        "record_action_suggestion": "manual_review",
+        "status_suggestion": "In Progress",
+        "impact_direction_suggestion": "Negative",
+        "evidence_strength_suggestion": "Moderate",
+        "title_normalized": "Reinstate school discipline policies without equity-based disparate-impact framing",
+        "summary_suggestion": "The administration ordered a review and replacement process for federal school-discipline guidance, but school-level effects remained unmeasured.",
+        "topic_suggestion": "Education",
+        "impacted_group_suggestion": "Black students and Black families affected by suspension, expulsion, referral-to-law-enforcement, and school discipline policies",
+        "confidence_score": 0.5,
+        "confidence_level": "Low",
+        "reasoning_summary": "Operator should review AI output before import.",
+        "source_warnings": [],
+        "missing_source_warnings": [],
+        "caution_flags": [
+          "deep_review_requested"
+        ],
+        "hesitation_reasons": [],
+        "evidence_needed_to_reduce_risk": [],
+        "signal_evidence_strength": "Moderate",
+        "signal_evidence_gaps": [],
+        "signal_ambiguity": "High",
+        "signal_conflicts": [],
+        "applied_penalties": [],
+        "self_check": "Cautious reviewer check not supplied; review the evidence gaps and ambiguity before import.",
+        "suggested_operator_next_action": "manual_review_required",
+        "ambiguity_notes": "Operator should manually verify this advisory suggestion.",
+        "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. The pass recommends manual review instead of a confident import path. Confidence is supported because No source warnings were carried into the normalized suggestion. Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
+        "confidence_signals": [
+          {
+            "code": "low_confidence",
+            "direction": "reduces",
+            "reason": "The normalized confidence score remains low after review."
+          },
+          {
+            "code": "source_coverage_present",
+            "direction": "supports",
+            "reason": "No source warnings were carried into the normalized suggestion."
+          },
+          {
+            "code": "manual_review_required",
+            "direction": "reduces",
+            "reason": "The pass recommends manual review instead of a confident import path."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      }
+    },
+    {
+      "slug": "trump-2025-high-paying-skilled-trade-jobs",
+      "title": "Prepare Americans for high-paying skilled trade jobs",
+      "requested_model": "qwen3.5:9b",
+      "effective_model": "qwen3.5:9b",
+      "resolved_model": "qwen3.5:9b",
+      "review_mode": "deep",
+      "review_mode_requested": "deep",
+      "review_mode_used": "deep",
+      "review_backend": "ollama",
+      "model_used": "qwen3.5:9b",
+      "verifier_model_requested": "qwen3.5:9b",
+      "verifier_model_used": null,
+      "senior_model_requested": "qwen3.5:9b",
+      "senior_model_used": "qwen3.5:9b",
+      "fallback_model": "qwen3.5:9b",
+      "fallback_used": false,
+      "fallback_reason": null,
+      "model_resolution_status": "exact_requested",
+      "timeout_seconds": 240,
+      "senior_timeout_seconds": 240,
+      "verifier_timeout_seconds": 240,
+      "retry_count": 0,
+      "senior_attempted": true,
+      "senior_retry_attempted": false,
+      "verifier_attempted": false,
+      "verifier_retry_attempted": false,
+      "deep_review_requested": true,
+      "deep_review_ran": true,
+      "deep_review_reason": "operator_requested_with_senior_review",
+      "second_pass_ran": true,
+      "deep_review_recommended": true,
+      "deep_review_recommendation_reason": "Confidence is low enough that a deeper ambiguity check is warranted. The review could not safely resolve whether this record is ready for import. The review notes unresolved ambiguity or fallback handling.",
+      "deep_review_recommendation_signals": [
+        {
+          "code": "low_confidence",
+          "reason": "Confidence is low enough that a deeper ambiguity check is warranted."
+        },
+        {
+          "code": "manual_review_suggested",
+          "reason": "The review could not safely resolve whether this record is ready for import."
+        },
+        {
+          "code": "ambiguity_notes_present",
+          "reason": "The review notes unresolved ambiguity or fallback handling."
+        }
+      ],
+      "suggestion_conflicts": [],
+      "has_material_conflict": false,
+      "conflict_summary": "Standard and deep review suggestions did not materially diverge.",
+      "conflict_fields": [],
+      "confidence_comparison": {
+        "standard_confidence_score": 0.5,
+        "standard_confidence_level": "Low",
+        "deep_confidence_score": 0.5,
+        "deep_confidence_level": "Low",
+        "final_confidence_score": 0.5,
+        "final_confidence_level": "Low",
+        "score_delta_after_deep_review": 0.0,
+        "level_changed_after_deep_review": false,
+        "summary": "Standard and deep review landed on the same confidence assessment."
+      },
+      "confidence_changed_after_deep_review": false,
+      "review_priority": "medium",
+      "review_priority_score": 5,
+      "review_priority_reason": "The final advisory confidence is low. The final suggestion still resolves to manual review. The record already shows signals that justify deeper review.",
+      "review_priority_signals": [
+        {
+          "code": "deep_review_recommended",
+          "weight": 1,
+          "reason": "The record already shows signals that justify deeper review."
+        },
+        {
+          "code": "low_confidence",
+          "weight": 2,
+          "reason": "The final advisory confidence is low."
+        },
+        {
+          "code": "manual_review_suggested",
+          "weight": 2,
+          "reason": "The final suggestion still resolves to manual review."
+        }
+      ],
+      "manual_review_severity": "medium",
+      "operator_attention_needed": true,
+      "suggested_batch": "manual_review_focus",
+      "suggested_batch_reason": "Manual-review judgment still appears central to the safe handling of this item.",
+      "suggested_batch_tags": [
+        "manual_review_focus"
+      ],
+      "existing_matches": [],
+      "suggestions": {
+        "record_action_suggestion": "manual_review",
+        "status_suggestion": "In Progress",
+        "impact_direction_suggestion": "Positive",
+        "evidence_strength_suggestion": "Moderate",
+        "title_normalized": "Prepare Americans for high-paying skilled trade jobs",
+        "summary_suggestion": "The administration launched a skilled-trades workforce initiative in 2025, but measurable labor-market effects remained early.",
+        "topic_suggestion": "Economic Opportunity",
+        "impacted_group_suggestion": "Black workers and Black jobseekers affected by access to apprenticeships, workforce programs, and higher-wage skilled trades",
+        "confidence_score": 0.5,
+        "confidence_level": "Low",
+        "reasoning_summary": "Operator should review AI output before import.",
+        "source_warnings": [],
+        "missing_source_warnings": [],
+        "caution_flags": [
+          "deep_review_requested"
+        ],
+        "hesitation_reasons": [],
+        "evidence_needed_to_reduce_risk": [],
+        "signal_evidence_strength": "Moderate",
+        "signal_evidence_gaps": [],
+        "signal_ambiguity": "High",
+        "signal_conflicts": [],
+        "applied_penalties": [],
+        "self_check": "Cautious reviewer check not supplied; review the evidence gaps and ambiguity before import.",
+        "suggested_operator_next_action": "manual_review_required",
+        "ambiguity_notes": "Operator should manually verify this advisory suggestion.",
+        "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. The pass recommends manual review instead of a confident import path. Confidence is supported because No source warnings were carried into the normalized suggestion. Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
+        "confidence_signals": [
+          {
+            "code": "low_confidence",
+            "direction": "reduces",
+            "reason": "The normalized confidence score remains low after review."
+          },
+          {
+            "code": "source_coverage_present",
+            "direction": "supports",
+            "reason": "No source warnings were carried into the normalized suggestion."
+          },
+          {
+            "code": "manual_review_required",
+            "direction": "reduces",
+            "reason": "The pass recommends manual review instead of a confident import path."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      },
+      "standard_pass_suggestions": {
+        "record_action_suggestion": "manual_review",
+        "status_suggestion": "In Progress",
+        "impact_direction_suggestion": "Positive",
+        "evidence_strength_suggestion": "Moderate",
+        "title_normalized": "Prepare Americans for high-paying skilled trade jobs",
+        "summary_suggestion": "The administration launched a skilled-trades workforce initiative in 2025, but measurable labor-market effects remained early.",
+        "topic_suggestion": "Economic Opportunity",
+        "impacted_group_suggestion": "Black workers and Black jobseekers affected by access to apprenticeships, workforce programs, and higher-wage skilled trades",
+        "confidence_score": 0.5,
+        "confidence_level": "Low",
+        "reasoning_summary": "Operator should review AI output before import.",
+        "source_warnings": [],
+        "missing_source_warnings": [],
+        "caution_flags": [],
+        "hesitation_reasons": [],
+        "evidence_needed_to_reduce_risk": [],
+        "signal_evidence_strength": "Moderate",
+        "signal_evidence_gaps": [],
+        "signal_ambiguity": "High",
+        "signal_conflicts": [],
+        "applied_penalties": [],
+        "self_check": "Cautious reviewer check not supplied; review the evidence gaps and ambiguity before import.",
+        "suggested_operator_next_action": "manual_review_required",
+        "ambiguity_notes": "Operator should manually verify this advisory suggestion.",
+        "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. The pass recommends manual review instead of a confident import path. Confidence is supported because No source warnings were carried into the normalized suggestion. Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
+        "confidence_signals": [
+          {
+            "code": "low_confidence",
+            "direction": "reduces",
+            "reason": "The normalized confidence score remains low after review."
+          },
+          {
+            "code": "source_coverage_present",
+            "direction": "supports",
+            "reason": "No source warnings were carried into the normalized suggestion."
+          },
+          {
+            "code": "manual_review_required",
+            "direction": "reduces",
+            "reason": "The pass recommends manual review instead of a confident import path."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      },
+      "deep_pass_suggestions": {
+        "record_action_suggestion": "manual_review",
+        "status_suggestion": "In Progress",
+        "impact_direction_suggestion": "Positive",
+        "evidence_strength_suggestion": "Moderate",
+        "title_normalized": "Prepare Americans for high-paying skilled trade jobs",
+        "summary_suggestion": "The administration launched a skilled-trades workforce initiative in 2025, but measurable labor-market effects remained early.",
+        "topic_suggestion": "Economic Opportunity",
+        "impacted_group_suggestion": "Black workers and Black jobseekers affected by access to apprenticeships, workforce programs, and higher-wage skilled trades",
+        "confidence_score": 0.5,
+        "confidence_level": "Low",
+        "reasoning_summary": "Operator should review AI output before import.",
+        "source_warnings": [],
+        "missing_source_warnings": [],
+        "caution_flags": [
+          "deep_review_requested"
+        ],
+        "hesitation_reasons": [],
+        "evidence_needed_to_reduce_risk": [],
+        "signal_evidence_strength": "Moderate",
+        "signal_evidence_gaps": [],
+        "signal_ambiguity": "High",
+        "signal_conflicts": [],
+        "applied_penalties": [],
+        "self_check": "Cautious reviewer check not supplied; review the evidence gaps and ambiguity before import.",
+        "suggested_operator_next_action": "manual_review_required",
+        "ambiguity_notes": "Operator should manually verify this advisory suggestion.",
+        "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. The pass recommends manual review instead of a confident import path. Confidence is supported because No source warnings were carried into the normalized suggestion. Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
+        "confidence_signals": [
+          {
+            "code": "low_confidence",
+            "direction": "reduces",
+            "reason": "The normalized confidence score remains low after review."
+          },
+          {
+            "code": "source_coverage_present",
+            "direction": "supports",
+            "reason": "No source warnings were carried into the normalized suggestion."
+          },
+          {
+            "code": "manual_review_required",
+            "direction": "reduces",
+            "reason": "The pass recommends manual review instead of a confident import path."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      }
+    }
+  ],
+  "suggested_batches": [
+    {
+      "batch_name": "high_attention",
+      "count": 5,
+      "description": "High-risk items with material conflicts, low confidence, or strong review-priority signals.",
+      "items": [
+        {
+          "index": 1,
+          "slug": "trump-2025-election-integrity-proof-citizenship-paper-ballots",
+          "title": "Require proof of citizenship and paper-ballot election safeguards",
+          "review_priority": "high",
+          "review_priority_score": 6
+        },
+        {
+          "index": 3,
+          "slug": "trump-2025-strengthen-local-law-enforcement",
+          "title": "Increase federal support for state and local law enforcement",
+          "review_priority": "high",
+          "review_priority_score": 6
+        },
+        {
+          "index": 4,
+          "slug": "trump-2025-clear-street-encampments-expand-civil-commitment",
+          "title": "Clear street encampments and expand treatment-oriented street-order responses",
+          "review_priority": "high",
+          "review_priority_score": 6
+        },
+        {
+          "index": 6,
+          "slug": "trump-2025-expand-educational-freedom-for-families",
+          "title": "Expand educational freedom and school-choice options for families",
+          "review_priority": "high",
+          "review_priority_score": 6
+        },
+        {
+          "index": 7,
+          "slug": "trump-2025-reform-higher-education-accreditation",
+          "title": "Reform higher-education accreditation around student outcomes",
+          "review_priority": "high",
+          "review_priority_score": 6
+        }
+      ]
+    },
+    {
+      "batch_name": "manual_review_focus",
+      "count": 5,
+      "description": "Items that still center on manual review judgment or unresolved new-vs-update decisions.",
+      "items": [
+        {
+          "index": 2,
+          "slug": "trump-2025-end-federal-dei-equity-programs",
+          "title": "End federal DEI and equity-based government programs",
+          "review_priority": "medium",
+          "review_priority_score": 5
+        },
+        {
+          "index": 5,
+          "slug": "trump-2025-domestic-production-of-critical-medicines",
+          "title": "Expand domestic production of critical medicines",
+          "review_priority": "medium",
+          "review_priority_score": 5
+        },
+        {
+          "index": 8,
+          "slug": "trump-2025-promote-hbcu-excellence-and-innovation",
+          "title": "Promote excellence and innovation at HBCUs",
+          "review_priority": "medium",
+          "review_priority_score": 5
+        },
+        {
+          "index": 9,
+          "slug": "trump-2025-reinstate-school-discipline-policies",
+          "title": "Reinstate school discipline policies without equity-based disparate-impact framing",
+          "review_priority": "medium",
+          "review_priority_score": 5
+        },
+        {
+          "index": 10,
+          "slug": "trump-2025-high-paying-skilled-trade-jobs",
+          "title": "Prepare Americans for high-paying skilled trade jobs",
+          "review_priority": "medium",
+          "review_priority_score": 5
+        }
+      ]
+    }
+  ],
+  "suggested_batch_counts": {
+    "high_attention": 5,
+    "manual_review_focus": 5
+  }
+}
