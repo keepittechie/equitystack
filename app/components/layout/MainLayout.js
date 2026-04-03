@@ -72,13 +72,13 @@ export default function MainLayout({ children }) {
                   priority
                 />
               </Link>
-              <span className="text-[10px] tracking-[0.2em] text-[var(--ink-muted)] mt-1 pl-1 uppercase">
+              <span className="text-xs tracking-[0.18em] text-[var(--ink-muted)] mt-1 pl-1 uppercase">
                 {isAdminPath ? "Admin • Review • Workflow" : "Policy • History • Impact"}
               </span>
             </div>
             <nav
               aria-label={isAdminPath ? "Admin" : "Primary"}
-              className="hidden md:flex flex-wrap gap-1 text-[12px] font-medium items-center"
+              className="hidden md:flex flex-wrap gap-1 text-[13px] font-medium items-center"
             >
               {navLinks.map((item) => (
                 renderNavItem(item, navClasses(pathname, item.href))
