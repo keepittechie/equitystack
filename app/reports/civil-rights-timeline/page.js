@@ -87,18 +87,18 @@ function TimelineEntry({ item }) {
       }`}
     >
       <div className="absolute left-0 top-6 hidden h-[calc(100%-3rem)] w-px bg-[rgba(120,53,15,0.12)] md:block" />
-      <div className="grid gap-4 md:grid-cols-[128px,minmax(0,1fr)] md:gap-6">
+      <div className="grid gap-4 md:grid-cols-[156px,minmax(0,1fr)] md:gap-6">
         <div className="md:pl-6">
           <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">
             {year || "Timeline"}
           </p>
           <p className="mt-2 text-sm text-[var(--ink-soft)]">{formatTimelineDate(item.promise_date)}</p>
-          <div className="mt-3 flex items-center justify-between gap-3">
+          <div className="mt-3 flex items-start justify-between gap-3">
             <p className="text-sm font-medium">{item.president}</p>
             <PresidentAvatar
               presidentSlug={item.president_slug}
               presidentName={item.president}
-              size={56}
+              size={72}
               shape="rounded"
             />
           </div>

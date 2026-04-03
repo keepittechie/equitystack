@@ -110,7 +110,7 @@ function TimelinePolicyRow({ policy }) {
               <PresidentAvatar
                 presidentSlug={policy.president_slug}
                 presidentName={policy.president}
-                size={122}
+                size={56}
               />
               <ImpactBadge impact={policy.impact_direction} />
             </div>
