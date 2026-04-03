@@ -1,6 +1,16 @@
 #!/bin/bash
 set -e
 
+UNTRACKED_DEPLOY_FILES=$(git ls-files --others --exclude-standard -- app lib docs python public bin package.json package-lock.json deploy.sh 2>/dev/null | grep -v '^python/reports/' || true)
+
+if [ -n "$UNTRACKED_DEPLOY_FILES" ]; then
+  echo "Refusing to deploy with untracked deployable files:"
+  echo "$UNTRACKED_DEPLOY_FILES"
+  echo
+  echo "Add, ignore, or remove these files before running ./deploy.sh so production does not rely on local-only code."
+  exit 1
+fi
+
 BACKUP_DIR="$HOME/Documents/GitHub/backups/equitystack_$(date +%Y%m%d_%H%M%S)"
 mkdir -p "$BACKUP_DIR"
 

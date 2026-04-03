@@ -7,6 +7,11 @@ import {
   buildLegislativeWorkflowTracker,
   listWorkflowSessions,
 } from "@/lib/server/admin-operator/workflowData.js";
+import {
+  getTrustStateTone,
+  toCanonicalAiState,
+  toCanonicalTrustState,
+} from "@/lib/labels";
 import { getCurrentAdministrationOperatorWorkspace } from "@/lib/services/currentAdministrationReviewInsightsService";
 import { getLegislativeWorkflowWorkspace } from "@/lib/services/legislativeWorkflowInsightsService";
 import { formatAdminDateTime } from "@/app/admin/components/adminDateTime";
@@ -79,26 +84,20 @@ function currentAdminSurfaceSummary(workspace, session) {
   const heldBack = Number(importReadiness.queue_pending_manual_review_count || 0);
   const fallbackUsed = Boolean(reviewRuntime?.fallback_used);
   const aiStatus = !reviewRuntime
-    ? "Not started"
+    ? toCanonicalAiState("not_started")
     : fallbackUsed
-      ? normalizeString(reviewRuntime.review_backend) === "heuristic_fallback"
-        ? "AI failed"
-        : "AI partial"
-      : "AI succeeded";
-  const trustTone = !reviewRuntime
-    ? "default"
-    : normalizeString(reviewRuntime.review_backend) === "heuristic_fallback"
-      ? "danger"
-      : fallbackUsed
-        ? "warning"
-        : "success";
+      ? toCanonicalAiState(
+          normalizeString(reviewRuntime.review_backend) === "heuristic_fallback" ? "failed" : "partial"
+        )
+      : toCanonicalAiState("success");
   const trustLabel = !reviewRuntime
-    ? "Pending"
+    ? toCanonicalTrustState("pending")
     : normalizeString(reviewRuntime.review_backend) === "heuristic_fallback"
-      ? "Low"
+      ? toCanonicalTrustState("low")
       : fallbackUsed
-        ? "Guarded"
-        : "High";
+        ? toCanonicalTrustState("guarded")
+        : toCanonicalTrustState("high");
+  const trustTone = getTrustStateTone(trustLabel);
   const action = tracker?.nextStep?.action || tracker?.currentStep?.action || null;
   const actionLabel =
     action?.label ||
@@ -145,20 +144,20 @@ function legislativeSurfaceSummary(workspace, session) {
   const outcome = workspace?.workflow_outcome_summary || null;
   const trustTone =
     outcome?.severity === "critical"
-      ? "danger"
+      ? getTrustStateTone(toCanonicalTrustState("low"))
       : outcome?.severity === "warning"
-        ? "warning"
+        ? getTrustStateTone(toCanonicalTrustState("guarded"))
         : outcome
-          ? "success"
-          : "default";
+          ? getTrustStateTone(toCanonicalTrustState("high"))
+          : getTrustStateTone(toCanonicalTrustState("pending"));
   const trustLabel =
     outcome?.severity === "critical"
-      ? "Low"
+      ? toCanonicalTrustState("low")
       : outcome?.severity === "warning"
-        ? "Guarded"
+        ? toCanonicalTrustState("guarded")
         : outcome
-          ? "High"
-          : "Pending";
+          ? toCanonicalTrustState("high")
+          : toCanonicalTrustState("pending");
   const reviewCount =
     Number(outcome?.manual_review_queue_count || 0) ||
     Number(workspace?.counts?.manual_review_items || 0);
@@ -183,14 +182,7 @@ function legislativeSurfaceSummary(workspace, session) {
           : "No review work pending",
     trustLabel,
     trustTone,
-    aiStatus:
-      outcome?.ai_status?.run_status === "failed"
-        ? "AI failed"
-        : outcome?.ai_status?.run_status === "partial"
-          ? "AI partial"
-          : outcome?.ai_status?.run_status === "success"
-            ? "AI succeeded"
-            : "Not started",
+    aiStatus: toCanonicalAiState(outcome?.ai_status?.run_status || "not_started"),
     updatedAt:
       workspace?.pipeline_report?.generated_at ||
       workspace?.review_bundle?.generated_at ||
@@ -303,7 +295,7 @@ export default async function AdminWorkflowsPage() {
                   </td>
                   <td className="border-b border-[#E5EAF0] px-2 py-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <SurfaceBadge tone={row.trustTone}>{row.trustLabel} trust</SurfaceBadge>
+                      <SurfaceBadge tone={row.trustTone}>{row.trustLabel}</SurfaceBadge>
                       <span className="text-[#4B5563]">{row.aiStatus}</span>
                     </div>
                     <div className="mt-1 text-[10px] text-[#6B7280]">{row.reviewLoad}</div>

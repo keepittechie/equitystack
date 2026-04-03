@@ -5,6 +5,11 @@ import { ImpactBadge } from "@/app/components/policy-badges";
 import { fetchInternalJson } from "@/lib/api";
 import { REPORT_REVALIDATE_SECONDS, withRevalidate } from "@/lib/cache";
 import { getBlackImpactScoreMethodology } from "@/lib/black-impact-score/methodology.js";
+import { EXPLANATION_CONTENT } from "@/lib/content/explanations";
+import {
+  toCanonicalConfidence,
+  toCanonicalImpactDirection,
+} from "@/lib/labels";
 import { aggregatePresidentFromOutcomes } from "@/lib/black-impact-score/presidentAggregation.js";
 import { fetchPromiseTimelineRelationshipMap } from "@/lib/services/promiseService";
 import { aggregatePromiseScoresByPresident } from "@/lib/promise-tracker-scoring";
@@ -385,6 +390,7 @@ function normalizeOutcomeMetadata(metadata) {
     total_outcomes: Number(metadata?.total_outcomes || 0),
     total_loaded_promises: Number(metadata?.total_loaded_promises || 0),
     total_loaded_outcomes: Number(metadata?.total_loaded_outcomes || 0),
+    total_excluded_outcomes: Number(metadata?.total_excluded_outcomes || 0),
     scoring_model:
       typeof metadata?.scoring_model === "string" && metadata.scoring_model.trim()
         ? metadata.scoring_model.trim()
@@ -605,7 +611,20 @@ function getTopAndBottomPresidents(presidents = []) {
 }
 
 function formatImpactDisplayLabel(label) {
-  return label === "Mixed" ? "Mixed Impact" : label;
+  const canonicalLabel = toCanonicalImpactDirection(label);
+  return canonicalLabel === "Mixed" ? "Mixed Impact" : canonicalLabel;
+}
+
+function formatBreakdownLabel(title, label) {
+  if (title.includes("Confidence")) {
+    return toCanonicalConfidence(label);
+  }
+
+  if (title.includes("Impact Direction")) {
+    return formatImpactDisplayLabel(label);
+  }
+
+  return label;
 }
 
 function getPrimaryImpactDirection(promise) {
@@ -635,7 +654,7 @@ function CountBarGroup({ title, counts }) {
           {entries.map(([label, count]) => {
             const numericCount = Number(count || 0);
             const width = max > 0 ? `${(numericCount / max) * 100}%` : "0%";
-            const displayLabel = formatImpactDisplayLabel(label);
+            const displayLabel = formatBreakdownLabel(title, label);
 
             return (
               <div key={label}>
@@ -1149,7 +1168,7 @@ function MethodologySection({ methodology, metadata, usingLegacyModel, isLegacyF
           <h2 className="text-lg font-semibold mb-2">Scoring Details</h2>
           <p className="text-sm text-[var(--ink-soft)] leading-7">
             {usingOutcomeModel
-              ? "Scores are based on documented real-world outcomes, not just promises or enacted laws. Each outcome is classified as positive, negative, mixed, or blocked, then weighted by evidence strength and available source support before president totals are aggregated."
+              ? "Scores are based on documented real-world outcomes, not just promises or enacted laws. Only outcomes with a written summary, impact direction, and at least one linked source are scored numerically. Evidence strength changes the size of positive or negative contributions, while Mixed and Blocked outcomes remain visible but stay neutral in this MVP."
               : isLegacyFallbackActive
                 ? "Scores are currently using the legacy promise-based fallback model. Records are summarized from editorial relevance, impact direction, and current promise status while the outcome-based model is unavailable."
                 : "Scores are currently using the legacy promise-based model. Records are summarized from editorial relevance, impact direction, and current promise status."}
@@ -1174,17 +1193,17 @@ function MethodologySection({ methodology, metadata, usingLegacyModel, isLegacyF
             <ScoreCard
               label="Evidence Weighting"
               value="Active"
-              subtitle="Stronger evidence carries more weight"
+              subtitle="Evidence strength is the only direct numeric multiplier"
             />
             <ScoreCard
               label="Source Support"
-              value="Included"
-              subtitle="Outcome records incorporate source counts"
+              value="Required"
+              subtitle="Linked outcome sources gate scoring eligibility and inform confidence"
             />
             <ScoreCard
               label="Aggregation"
               value="By President"
-              subtitle={`President scores roll up from ${effectiveScoringModel}`}
+              subtitle={`Only scoring-ready outcomes roll up into ${effectiveScoringModel}`}
             />
           </>
         ) : (
@@ -1221,14 +1240,15 @@ function MethodologySection({ methodology, metadata, usingLegacyModel, isLegacyF
 }
 
 function ScoringTransparencySection({ usingLegacyModel, isLegacyFallbackActive }) {
+  const content = EXPLANATION_CONTENT.blackImpactScore;
+
   return (
     <section className="card-surface rounded-[1.6rem] p-5">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="max-w-3xl">
           <h2 className="text-lg font-semibold mb-2">How this was scored</h2>
           <p className="text-sm text-[var(--ink-soft)] leading-7">
-            This report tracks what government actions led to, checks the public evidence behind those outcomes,
-            and rolls the documented results into a president-level score.
+            {content.interpret}
           </p>
         </div>
         <MetaPill>{usingLegacyModel ? "Legacy framing" : "Outcome-based framing"}</MetaPill>
@@ -1252,22 +1272,24 @@ function ScoringTransparencySection({ usingLegacyModel, isLegacyFallbackActive }
         <div className="card-muted rounded-[1.2rem] p-4">
           <h3 className="text-base font-semibold">3. Sources are checked</h3>
           <p className="text-sm text-[var(--ink-soft)] mt-2 leading-7">
-            Source support matters. Stronger public evidence gives an outcome more weight than a
-            weaker or thinly documented record.
+            Outcomes need visible linked sources to be included in numeric scoring. Evidence
+            strength changes the numeric weight, while source support and outcome detail strengthen
+            confidence in the interpretation.
           </p>
         </div>
         <div className="card-muted rounded-[1.2rem] p-4">
           <h3 className="text-base font-semibold">4. Scores are rolled up</h3>
           <p className="text-sm text-[var(--ink-soft)] mt-2 leading-7">
-            Weighted outcomes are combined into a president-level score, so the final number reflects
-            documented results, not campaign language alone.
+            Included outcomes are combined into promise totals and then president totals, so the
+            final number reflects documented results, not campaign language alone.
           </p>
         </div>
       </div>
 
       <p className="text-sm text-[var(--ink-soft)] mt-4 leading-7">
         Positive means helped, Negative means harmed, Mixed means both, and Blocked means the effort
-        did not fully take effect. Only reviewed public records are included here.
+        did not fully take effect. Mixed and Blocked stay visible in the breakdown, but they remain
+        conservative neutral placeholders in this MVP. Only reviewed public records are included here.
         {isLegacyFallbackActive
           ? " This view is temporarily using the legacy fallback model, but the explanation above still describes the intended scoring flow."
           : ""}
@@ -1280,17 +1302,20 @@ function HowThisWasBuiltSection({
   promiseCount,
   outcomeCount,
   sourceReferenceCount,
+  excludedOutcomeCount,
   effectiveScoringModel,
   isScoringReadyFilterActive,
   usingLegacyModel,
 }) {
+  const content = EXPLANATION_CONTENT.blackImpactScore;
+
   return (
     <section className="card-surface rounded-[1.6rem] p-5">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="max-w-3xl">
-          <h2 className="text-lg font-semibold mb-2">How this was built</h2>
+          <h2 className="text-lg font-semibold mb-2">Build</h2>
           <p className="text-sm text-[var(--ink-soft)] leading-7">
-            This public view rolls up curated Promise Tracker records into a president-level report. Records are manually reviewed, outcomes are evidence-backed, and the underlying source trail remains visible on each Promise Tracker page.
+            {content.build}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -1319,6 +1344,9 @@ function HowThisWasBuiltSection({
 
       <p className="text-sm text-[var(--ink-soft)] mt-4 leading-7">
         This report does not include staging items, internal admin review states, or unpublished editorial notes.
+        {!usingLegacyModel && excludedOutcomeCount > 0
+          ? ` ${excludedOutcomeCount} outcome${excludedOutcomeCount === 1 ? "" : "s"} currently remain outside numeric scoring because they are missing a written summary, impact direction, or linked outcome source.`
+          : ""}
       </p>
     </section>
   );
@@ -1364,7 +1392,7 @@ function ScoringReadyFilterSection({
             : "Scoring-ready filtering is only available for outcome-based views."
           : isActive
             ? "The current report is filtered to records with visible scoring-ready evidence."
-            : "This filter is off by default so non-ready records remain visible for context."}
+            : "This filter is off by default so records with thinner evidence remain visible for context even when they are excluded from numeric scoring."}
       </p>
     </section>
   );
@@ -1730,28 +1758,30 @@ function AdvancedReportToolsSection({
 }
 
 function VerificationSection() {
+  const content = EXPLANATION_CONTENT.blackImpactScore;
+
   return (
     <section className="card-surface rounded-[1.6rem] p-5">
-      <h2 className="text-lg font-semibold">How to Verify</h2>
+      <h2 className="text-lg font-semibold">Verify</h2>
       <ul className="mt-3 space-y-2 text-sm text-[var(--ink-soft)] leading-7">
-        <li>Review the linked Promise Tracker record.</li>
-        <li>Check documented outcomes tied to that promise.</li>
-        <li>Review supporting sources.</li>
-        <li>Compare the record against the methodology section.</li>
+        {content.verify.map((item) => (
+          <li key={item}>{item}</li>
+        ))}
       </ul>
     </section>
   );
 }
 
 function ShareVerificationSection() {
+  const content = EXPLANATION_CONTENT.blackImpactScore;
+
   return (
     <section className="card-surface rounded-[1.6rem] p-5">
-      <h2 className="text-lg font-semibold">How to verify this view</h2>
+      <h2 className="text-lg font-semibold">Verify</h2>
       <ul className="mt-3 space-y-2 text-sm text-[var(--ink-soft)] leading-7">
-        <li>Review the linked Promise Tracker record.</li>
-        <li>Check the documented outcomes attached to that record.</li>
-        <li>Review the supporting sources on the record page.</li>
-        <li>Compare the record against the methodology section.</li>
+        {content.verify.map((item) => (
+          <li key={item}>{item}</li>
+        ))}
       </ul>
     </section>
   );
@@ -2910,7 +2940,7 @@ export default async function BlackImpactScorePage({ searchParams }) {
       ? "Legacy fallback is active while outcome-based evidence weighting is unavailable."
       : usingLegacyModel || effectiveScoringModel === "legacy"
         ? "Legacy scoring uses Promise Tracker relevance and impact curation."
-      : "Scores incorporate evidence strength and source-backed outcomes.";
+      : "Evidence strength changes numeric weighting. Linked source-backed outcomes are required for scoring and help inform confidence.";
   const shareViewFlags = new Set([...viewFlags].filter((flag) => flag !== "public" && flag !== "public-share"));
   shareViewFlags.add("public-share");
   const shareUrl = buildReportHref({
@@ -3187,6 +3217,7 @@ export default async function BlackImpactScorePage({ searchParams }) {
         promiseCount={records.length}
         outcomeCount={metadata?.total_outcomes ?? 0}
         sourceReferenceCount={getVisibleSourceReferenceCount(records)}
+        excludedOutcomeCount={metadata?.total_excluded_outcomes ?? 0}
         effectiveScoringModel={effectiveScoringModel}
         isScoringReadyFilterActive={isScoringReadyFilterActive}
         usingLegacyModel={usingLegacyModel}
@@ -3293,6 +3324,32 @@ export default async function BlackImpactScorePage({ searchParams }) {
                   <p className="text-sm text-[var(--ink-soft)] leading-7">{methodology.summary}</p>
                 ) : null}
 
+                {methodology.scope ? (
+                  <div className="card-muted rounded-[1.25rem] p-4">
+                    <h2 className="text-base font-semibold">Scoring Scope</h2>
+                    <div className="mt-3 space-y-2 text-sm text-[var(--ink-soft)]">
+                      {methodology.scope.primary_unit ? (
+                        <p>
+                          <strong className="text-[var(--ink)]">Primary unit:</strong>{" "}
+                          {methodology.scope.primary_unit}
+                        </p>
+                      ) : null}
+                      {methodology.scope.included ? (
+                        <p>
+                          <strong className="text-[var(--ink)]">Included:</strong>{" "}
+                          {methodology.scope.included}
+                        </p>
+                      ) : null}
+                      {methodology.scope.excluded ? (
+                        <p>
+                          <strong className="text-[var(--ink)]">Excluded:</strong>{" "}
+                          {methodology.scope.excluded}
+                        </p>
+                      ) : null}
+                    </div>
+                  </div>
+                ) : null}
+
                 {methodology.outcome_scoring?.evidence_multipliers ? (
                   <div className="card-muted rounded-[1.25rem] p-4">
                     <h2 className="text-base font-semibold">Evidence Weighting</h2>
@@ -3306,13 +3363,24 @@ export default async function BlackImpactScorePage({ searchParams }) {
                   </div>
                 ) : null}
 
+                {methodology.outcome_scoring?.eligibility_requirements?.length ? (
+                  <div className="card-muted rounded-[1.25rem] p-4">
+                    <h2 className="text-base font-semibold">Scoring Eligibility</h2>
+                    <ul className="mt-3 space-y-2 text-sm text-[var(--ink-soft)]">
+                      {methodology.outcome_scoring.eligibility_requirements.map((item) => (
+                        <li key={item}>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
+
                 {methodology.confidence?.levels ? (
                   <div className="card-muted rounded-[1.25rem] p-4">
                     <h2 className="text-base font-semibold">Confidence Levels</h2>
                     <div className="mt-3 space-y-2 text-sm text-[var(--ink-soft)]">
                       {Object.entries(methodology.confidence.levels).map(([label, value]) => (
                         <p key={label}>
-                          <strong className="text-[var(--ink)] capitalize">{label}:</strong> {value}
+                          <strong className="text-[var(--ink)]">{toCanonicalConfidence(label)}:</strong> {value}
                         </p>
                       ))}
                     </div>
@@ -3337,12 +3405,16 @@ export default async function BlackImpactScorePage({ searchParams }) {
           <h2 className="text-xl font-semibold">
             {selectedTopic
               ? `No scored records matched ${selectedTopic.label}.`
-              : "No Black Impact Score data is available yet."}
+              : usingLegacyModel
+                ? "No Black Impact Score data is available yet."
+                : "Insufficient evidence"}
           </h2>
           <p className="text-[var(--ink-soft)] mt-3">
             {selectedTopic
               ? "No scored records matched the selected topic in the current report view."
-              : "President-level score summaries will appear here once Promise Tracker score data is available."}
+              : usingLegacyModel
+                ? "President-level score summaries will appear here once Promise Tracker score data is available."
+                : "No records in this view currently meet the minimum scoring-ready standard of a written outcome summary, impact direction, and at least one linked outcome source."}
           </p>
         </section>
       ) : isTimelineView ? (

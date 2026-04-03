@@ -9,6 +9,8 @@ import { formatPartyLabel } from "@/app/components/policy-formatters";
 import { fetchInternalJson } from "@/lib/api";
 import { PUBLIC_REVALIDATE_SECONDS, withRevalidate } from "@/lib/cache";
 import { computePolicyImpactScore } from "@/lib/analytics/impactAggregator";
+import { EXPLANATION_CONTENT } from "@/lib/content/explanations";
+import { toCanonicalCompletenessLabel } from "@/lib/labels";
 import { buildPageMetadata } from "@/lib/metadata";
 import { buildPolicyJsonLd, serializeJsonLd } from "@/lib/structured-data";
 import { notFound } from "next/navigation";
@@ -149,6 +151,7 @@ export default async function PolicyDetailPage({ params }) {
   const totalScore = policy.scores
     ? computePolicyImpactScore(policy.scores)
     : null;
+  const explanation = EXPLANATION_CONTENT.policyRecord;
 
   const sourceCount = policy.sources?.length || 0;
   const metricCount = policy.metrics?.length || 0;
@@ -198,28 +201,35 @@ export default async function PolicyDetailPage({ params }) {
           </section>
 
           <section className="card-surface-strong rounded-[1.6rem] p-5">
-            <h2 className="text-xl font-semibold mb-2">How to Read This Record</h2>
+            <h2 className="text-xl font-semibold mb-2">Build, Interpret, Verify</h2>
+            <p className="text-sm text-[var(--ink-soft)] leading-7 mb-4">
+              {explanation.build}
+            </p>
             <div className="grid gap-4 md:grid-cols-3">
               <div>
-                <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Impact Reading</p>
+                <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Interpret</p>
                 <p className="text-sm text-[var(--ink-soft)] mt-2">
-                  {interpretImpactScore(totalScore)}
+                  {explanation.interpret} {interpretImpactScore(totalScore)}.
                 </p>
               </div>
               <div>
-                <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Evidence Base</p>
+                <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Evidence</p>
                 <p className="text-sm text-[var(--ink-soft)] mt-2">
                   {policy.evidence_summary?.evidence_strength || "Limited"} evidence
                   {sourceTypes.length ? ` from ${sourceTypes.join(", ")} sources` : ""}.
                 </p>
               </div>
               <div>
-                <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Data Completeness</p>
-                <p className="text-sm text-[var(--ink-soft)] mt-2">
-                  {policy.completeness_summary?.status || "Needs Review"} record with{" "}
-                  {sourceCount} source{sourceCount === 1 ? "" : "s"} and {metricCount} metric
-                  {metricCount === 1 ? "" : "s"}.
-                </p>
+                <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Verify</p>
+                <ul className="space-y-1 text-sm text-[var(--ink-soft)] mt-2">
+                  {explanation.verify.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                  <li>
+                    {toCanonicalCompletenessLabel(policy.completeness_summary?.status || "Needs Review")} record with {sourceCount} source{sourceCount === 1 ? "" : "s"} and {metricCount} metric
+                    {metricCount === 1 ? "" : "s"}.
+                  </li>
+                </ul>
               </div>
             </div>
           </section>

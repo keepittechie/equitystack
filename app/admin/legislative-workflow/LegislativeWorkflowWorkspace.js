@@ -4,6 +4,14 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { readAdminJsonResponse } from "@/app/admin/components/readAdminJsonResponse";
+import {
+  getAiStateTone,
+  getConfidenceTone,
+  getTrustStateTone,
+  toCanonicalAiState,
+  toCanonicalConfidence,
+  toCanonicalTrustState,
+} from "@/lib/labels";
 
 const DECISION_OPTIONS = [
   { value: "pending", label: "Keep pending" },
@@ -51,12 +59,22 @@ function getTrustBannerConfig(summary) {
     return null;
   }
 
+  const trustState =
+    summary.severity === "critical"
+      ? toCanonicalTrustState("low")
+      : summary.severity === "warning"
+        ? toCanonicalTrustState("guarded")
+        : toCanonicalTrustState("high");
+
+  const tone = getTrustStateTone(trustState);
+
   if (summary.severity === "critical") {
     return {
       border: "border-[#FCA5A5]",
       bg: "bg-[#FEF2F2]",
       text: "text-[#991B1B]",
-      label: "Trust warning",
+      label: trustState,
+      tone,
     };
   }
   if (summary.severity === "warning") {
@@ -64,14 +82,16 @@ function getTrustBannerConfig(summary) {
       border: "border-[#FCD34D]",
       bg: "bg-[#FFFBEB]",
       text: "text-[#92400E]",
-      label: "Needs verification",
+      label: trustState,
+      tone,
     };
   }
   return {
     border: "border-[#86EFAC]",
     bg: "bg-[#F0FDF4]",
     text: "text-[#166534]",
-    label: "AI review healthy",
+    label: trustState,
+    tone,
   };
 }
 
@@ -89,6 +109,10 @@ export default function LegislativeWorkflowWorkspace({ workspace }) {
   const manualReviewItems = Array.isArray(workspace.manual_review_queue?.items)
     ? workspace.manual_review_queue.items
     : [];
+  const aiState = toCanonicalAiState(outcomeSummary?.ai_status?.run_status || "not_started");
+  const aiStateTone = getAiStateTone(aiState);
+  const confidenceLabel = toCanonicalConfidence(outcomeSummary?.confidence_level || "unknown");
+  const confidenceTone = getConfidenceTone(confidenceLabel);
 
   function updateAction(actionId, field, value) {
     setActions((current) =>
@@ -160,9 +184,9 @@ export default function LegislativeWorkflowWorkspace({ workspace }) {
               </p>
             </div>
             <div className="rounded border border-white/60 bg-white/70 px-3 py-2 text-[11px] text-[#4B5563]">
-              <div>AI status: <span className="font-semibold text-[#1F2937]">{outcomeSummary.ai_status?.run_status || "unknown"}</span></div>
+              <div>AI status: <span className={`font-semibold ${aiStateTone === "danger" ? "text-[#991B1B]" : aiStateTone === "warning" ? "text-[#92400E]" : aiStateTone === "success" ? "text-[#166534]" : "text-[#1F2937]"}`}>{aiState}</span></div>
               <div>Fallback used: <span className="font-semibold text-[#1F2937]">{outcomeSummary.ai_status?.fallback_used || 0}/{outcomeSummary.ai_status?.total_items || 0}</span></div>
-              <div>Confidence: <span className="font-semibold text-[#1F2937]">{outcomeSummary.confidence_level || "unknown"}</span></div>
+              <div>Confidence: <span className={`font-semibold ${confidenceTone === "danger" ? "text-[#991B1B]" : confidenceTone === "warning" ? "text-[#92400E]" : confidenceTone === "success" ? "text-[#166534]" : "text-[#1F2937]"}`}>{confidenceLabel}</span></div>
             </div>
           </div>
           <div className="mt-3 grid gap-3 md:grid-cols-4 text-[12px]">
@@ -197,7 +221,7 @@ export default function LegislativeWorkflowWorkspace({ workspace }) {
                 {outcomeSummary.ai_status?.ai_failure_reason || "No AI failure recorded"}
               </p>
               <p className="mt-1 text-[11px] text-[#4B5563]">
-                Trust warning: {outcomeSummary.trust_warning ? "Yes" : "No"}
+                Trust state: {trustBanner.label}
               </p>
             </div>
           </div>

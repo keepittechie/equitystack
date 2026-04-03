@@ -1,62 +1,57 @@
-export function EvidenceBadge({ summary }) {
-  if (!summary) return null;
+import {
+  getEvidenceStrengthTone,
+  getImpactDirectionTone,
+  toCanonicalCompletenessLabel,
+  toCanonicalEvidenceStrength,
+  toCanonicalImpactDirection,
+} from "@/lib/labels";
 
-  const label = summary.evidence_strength;
-
+function pillClasses(tone) {
   let className =
     "inline-flex items-center rounded-full px-3 py-1 text-xs font-medium border ";
 
-  if (label === "Strong") {
+  if (tone === "success") {
     className += "bg-[rgba(22,163,74,0.1)] text-[#166534] border-[rgba(22,163,74,0.2)]";
-  } else if (label === "Moderate") {
+  } else if (tone === "warning") {
     className += "bg-[rgba(217,119,6,0.1)] text-[#b45309] border-[rgba(217,119,6,0.2)]";
-  } else {
+  } else if (tone === "danger") {
     className += "bg-[rgba(220,38,38,0.1)] text-[#b91c1c] border-[rgba(220,38,38,0.2)]";
+  } else {
+    className += "bg-slate-100 text-slate-700 border-slate-300";
   }
 
-  return <span className={className}>Evidence: {label}</span>;
+  return className;
+}
+
+export function EvidenceBadge({ summary }) {
+  if (!summary) return null;
+
+  const label = toCanonicalEvidenceStrength(summary.evidence_strength);
+
+  return <span className={pillClasses(getEvidenceStrengthTone(label))}>Evidence: {label}</span>;
 }
 
 export function CompletenessBadge({ summary }) {
   if (!summary) return null;
 
-  const label = summary.status;
+  const label = toCanonicalCompletenessLabel(summary.status);
+  const tone =
+    label === "Complete"
+      ? "success"
+      : label === "Partial"
+        ? "warning"
+        : "danger";
 
-  let className =
-    "inline-flex items-center rounded-full px-3 py-1 text-xs font-medium border ";
-
-  if (label === "Complete") {
-    className += "bg-[rgba(22,163,74,0.1)] text-[#166534] border-[rgba(22,163,74,0.2)]";
-  } else if (label === "Good") {
-    className += "bg-[rgba(37,99,235,0.1)] text-[#1d4ed8] border-[rgba(37,99,235,0.2)]";
-  } else {
-    className += "bg-[rgba(217,119,6,0.1)] text-[#b45309] border-[rgba(217,119,6,0.2)]";
-  }
-
-  return <span className={className}>Data Quality: {label}</span>;
+  return <span className={pillClasses(tone)}>Data Quality: {label}</span>;
 }
 
 export function ImpactBadge({ impact }) {
   if (!impact) return null;
 
-  const label = impact === "Mixed" ? "Mixed Impact" : impact;
+  const canonicalImpact = toCanonicalImpactDirection(impact);
+  const label = canonicalImpact === "Mixed" ? "Mixed Impact" : canonicalImpact;
 
-  let className =
-    "inline-flex items-center rounded-full px-3 py-1 text-xs font-medium border ";
-
-  if (impact === "Positive") {
-    className += "bg-[rgba(22,163,74,0.1)] text-[#166534] border-[rgba(22,163,74,0.2)]";
-  } else if (impact === "Negative") {
-    className += "bg-[rgba(220,38,38,0.1)] text-[#b91c1c] border-[rgba(220,38,38,0.2)]";
-  } else if (impact === "Mixed") {
-    className += "bg-[rgba(217,119,6,0.1)] text-[#b45309] border-[rgba(217,119,6,0.2)]";
-  } else if (impact === "Blocked") {
-    className += "bg-slate-100 text-slate-700 border-slate-300";
-  } else {
-    className += "bg-slate-100 text-slate-700 border-slate-300";
-  }
-
-  return <span className={className}>{label}</span>;
+  return <span className={pillClasses(getImpactDirectionTone(canonicalImpact))}>{label}</span>;
 }
 
 export function PromiseStatusBadge({ status }) {
@@ -102,20 +97,8 @@ export function PromiseRelevanceBadge({ relevance }) {
 export function PromiseImpactDirectionBadge({ impact }) {
   if (!impact) return null;
 
-  const label = impact === "Mixed" ? "Mixed Impact" : impact;
+  const canonicalImpact = toCanonicalImpactDirection(impact);
+  const label = canonicalImpact === "Mixed" ? "Mixed Impact" : canonicalImpact;
 
-  let className =
-    "inline-flex items-center rounded-full px-3 py-1 text-xs font-medium border ";
-
-  if (impact === "Positive") {
-    className += "bg-[rgba(22,163,74,0.1)] text-[#166534] border-[rgba(22,163,74,0.2)]";
-  } else if (impact === "Negative") {
-    className += "bg-[rgba(220,38,38,0.1)] text-[#b91c1c] border-[rgba(220,38,38,0.2)]";
-  } else if (impact === "Blocked/Unrealized") {
-    className += "bg-slate-100 text-slate-700 border-slate-300";
-  } else {
-    className += "bg-[rgba(217,119,6,0.1)] text-[#b45309] border-[rgba(217,119,6,0.2)]";
-  }
-
-  return <span className={className}>{label}</span>;
+  return <span className={pillClasses(getImpactDirectionTone(canonicalImpact))}>{label}</span>;
 }

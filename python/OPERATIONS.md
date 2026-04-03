@@ -60,6 +60,19 @@ They are not allowed to invent data that the canonical artifacts or DB do not co
 - `/admin/tools`
   - Verification, registry inspection, environment checks
 
+## Public Entry Points
+
+The public product should remain easy to navigate from a few stable read-only surfaces:
+
+- `/`
+  - homepage with live previews and entry links
+- `/promises`
+  - Promise Tracker browser
+- `/reports/black-impact-score`
+  - president-level Black Impact Score report
+- `/current-administration`
+  - current-term Promise Tracker view
+
 ## Canonical Review Surfaces
 
 - `/admin/current-admin-review`
@@ -258,6 +271,17 @@ These checks are safe and read-only. They do not enqueue normal workflow jobs.
 - source-gap classification so legacy missing evidence is separated from possible join gaps
 - duplicate-source safety classification so only exact duplicate URL clusters with compatible non-null `policy_id` ownership are auto-merge candidates
 - current-admin provenance completeness so imported DB rows without their artifact chain are surfaced explicitly
+
+## Deploy Hygiene
+
+`./deploy.sh` ships the local working tree to production. It now refuses to run when untracked
+deployable files are present in shipped paths such as `app/`, `lib/`, `docs/`, or `python/`.
+
+Keep these rules in mind:
+
+- generated integrity artifacts under `python/reports/integrity/` stay ignored
+- local code must be added or committed before deploy
+- production should never rely on accidental local-only files
 
 Use it when the UI looks suspiciously empty, duplicated, or incomplete and you need to confirm whether
 the underlying DB state is actually sound.

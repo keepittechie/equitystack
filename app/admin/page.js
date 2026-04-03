@@ -1,5 +1,12 @@
 import Link from "next/link";
 import { getCommandCenterSummary } from "@/lib/server/admin-operator/workflowData.js";
+import {
+  AI_STATES,
+  getAiStateTone,
+  getTrustStateTone,
+  toCanonicalAiState,
+  toCanonicalTrustState,
+} from "@/lib/labels";
 import { formatAdminDateTime } from "./components/adminDateTime";
 import CurrentAdminWorkflowTracker from "./components/CurrentAdminWorkflowTracker";
 import LegislativeWorkflowTracker from "./components/LegislativeWorkflowTracker";
@@ -158,19 +165,7 @@ function humanizeOverallStatus(value) {
 }
 
 function humanizeAiStatus(value) {
-  if (value === "success") {
-    return "AI succeeded";
-  }
-  if (value === "partial") {
-    return "AI partial";
-  }
-  if (value === "failed") {
-    return "AI failed";
-  }
-  if (value === "not_started") {
-    return "Not started";
-  }
-  return humanizeToken(value);
+  return toCanonicalAiState(value);
 }
 
 function summarizeFallbackStatus(outcome) {
@@ -178,35 +173,40 @@ function summarizeFallbackStatus(outcome) {
     return "—";
   }
 
-  if (outcome.aiStatus === "failed") {
-    return `Fallback only (${outcome.fallbackText})`;
+  if (outcome.aiStatus === AI_STATES.FAILED) {
+    return `Fallback Only (${outcome.fallbackText})`;
   }
-  if (outcome.aiStatus === "partial") {
-    return `Partial fallback (${outcome.fallbackText})`;
+  if (outcome.aiStatus === AI_STATES.PARTIAL) {
+    return `Partial Fallback (${outcome.fallbackText})`;
   }
-  if (outcome.aiStatus === "success") {
-    return outcome.fallbackText === "0" ? "No fallback" : `Fallback ${outcome.fallbackText}`;
+  if (outcome.aiStatus === AI_STATES.SUCCEEDED) {
+    return outcome.fallbackText === "0" ? "No Fallback" : `Fallback ${outcome.fallbackText}`;
   }
   return "Pending";
 }
 
 function deriveTrustFromItem(item, workflowOutcome) {
+  let trustLabel = null;
+
   if (workflowOutcome?.trustTone) {
+    trustLabel = toCanonicalTrustState(workflowOutcome.trustLabel);
     return {
-      tone: workflowOutcome.trustTone,
-      label: workflowOutcome.trustLabel,
+      tone: getTrustStateTone(trustLabel),
+      label: trustLabel,
     };
   }
 
   if (item?.kind === "job" && item?.status === "failed") {
-    return { tone: "danger", label: "Low" };
+    trustLabel = toCanonicalTrustState("low");
+    return { tone: getTrustStateTone(trustLabel), label: trustLabel };
   }
 
   if (
     item?.bucketId === "blockedNeedsFix" ||
     item?.metadata?.riskLevel === "high"
   ) {
-    return { tone: "danger", label: "Low" };
+    trustLabel = toCanonicalTrustState("low");
+    return { tone: getTrustStateTone(trustLabel), label: trustLabel };
   }
 
   if (
@@ -214,10 +214,12 @@ function deriveTrustFromItem(item, workflowOutcome) {
     item?.bucketId === "awaitingHumanReview" ||
     item?.status === "ready_for_apply_confirmation"
   ) {
-    return { tone: "warning", label: "Guarded" };
+    trustLabel = toCanonicalTrustState("guarded");
+    return { tone: getTrustStateTone(trustLabel), label: trustLabel };
   }
 
-  return { tone: "default", label: "Medium" };
+  trustLabel = toCanonicalTrustState("medium");
+  return { tone: getTrustStateTone(trustLabel), label: trustLabel };
 }
 
 function reviewQueueTypeLabel(item) {
@@ -245,7 +247,7 @@ function reviewQueueTypeLabel(item) {
 
 function fallbackRunCount(workflowOutcomes) {
   return workflowOutcomes.filter((outcome) =>
-    ["partial", "failed"].includes(outcome.aiStatus)
+    [AI_STATES.PARTIAL, AI_STATES.FAILED].includes(outcome.aiStatus)
   ).length;
 }
 
@@ -279,7 +281,7 @@ function hasActiveLegislativeWorkflow(tracker) {
 
 function buildTrustBannerData(summary, workflowOutcomes) {
   const criticalOutcome = workflowOutcomes.find(
-    (outcome) => outcome.aiStatus === "failed" || outcome.trustTone === "danger"
+    (outcome) => outcome.aiStatus === AI_STATES.FAILED || outcome.trustTone === "danger"
   );
   if (criticalOutcome) {
     return {
@@ -296,7 +298,7 @@ function buildTrustBannerData(summary, workflowOutcomes) {
 
   const warningOutcome = workflowOutcomes.find(
     (outcome) =>
-      outcome.aiStatus === "partial" ||
+      outcome.aiStatus === AI_STATES.PARTIAL ||
       outcome.overallStatus === "review_required" ||
       outcome.trustTone === "warning"
   );
@@ -692,17 +694,29 @@ function deriveCurrentAdminOutcome(session, currentAdminTracker = null) {
     state: session?.canonicalState || "unknown",
     overallStatus,
     overallStatusTone: statusTone(overallStatus),
-    aiStatus,
-    aiStatusTone: aiStatus === "failed" ? "danger" : aiStatus === "partial" ? "warning" : aiStatus === "success" ? "success" : "default",
+    aiStatus: toCanonicalAiState(aiStatus),
+    aiStatusTone: getAiStateTone(toCanonicalAiState(aiStatus)),
     fallbackText: fallbackUsed
       ? itemsProcessed > 0
         ? `${fallbackCount}/${itemsProcessed}`
         : `${fallbackCount}+`
       : "0",
     trustLabel:
-      !reviewRuntime ? "Pending" : aiStatus === "failed" ? "Low" : fallbackUsed ? "Guarded" : "High",
+      !reviewRuntime
+        ? toCanonicalTrustState("pending")
+        : aiStatus === "failed"
+          ? toCanonicalTrustState("low")
+          : fallbackUsed
+            ? toCanonicalTrustState("guarded")
+            : toCanonicalTrustState("high"),
     trustTone:
-      !reviewRuntime ? "default" : aiStatus === "failed" ? "danger" : fallbackUsed ? "warning" : "success",
+      !reviewRuntime
+        ? getTrustStateTone(toCanonicalTrustState("pending"))
+        : aiStatus === "failed"
+          ? getTrustStateTone(toCanonicalTrustState("low"))
+          : fallbackUsed
+            ? getTrustStateTone(toCanonicalTrustState("guarded"))
+            : getTrustStateTone(toCanonicalTrustState("high")),
     attentionCount: pendingReview + manualReviewCount + blockers,
     attentionSummary:
       pendingReview > 0
@@ -761,28 +775,21 @@ function deriveLegislativeOutcome(session) {
       overallStatus,
       overallStatusTone: statusTone(overallStatus),
       outcome: outcome.user_message || session.summary,
-      aiStatus: normalizeString(outcome.ai_status?.run_status) || "unknown",
-      aiStatusTone:
-        normalizeString(outcome.ai_status?.run_status) === "failed"
-          ? "danger"
-          : normalizeString(outcome.ai_status?.run_status) === "partial"
-            ? "warning"
-            : normalizeString(outcome.ai_status?.run_status) === "success"
-              ? "success"
-              : "default",
+      aiStatus: toCanonicalAiState(outcome.ai_status?.run_status || "unknown"),
+      aiStatusTone: getAiStateTone(toCanonicalAiState(outcome.ai_status?.run_status || "unknown")),
       fallbackText: `${outcome.ai_status?.fallback_used || 0}/${outcome.ai_status?.total_items || 0}`,
       trustLabel:
         severity === "critical"
-          ? "Low"
+          ? toCanonicalTrustState("low")
           : severity === "warning"
-            ? "Guarded"
-            : "High",
+            ? toCanonicalTrustState("guarded")
+            : toCanonicalTrustState("high"),
       trustTone:
         severity === "critical"
-          ? "danger"
+          ? getTrustStateTone(toCanonicalTrustState("low"))
           : severity === "warning"
-            ? "warning"
-            : "success",
+            ? getTrustStateTone(toCanonicalTrustState("guarded"))
+            : getTrustStateTone(toCanonicalTrustState("high")),
       attentionCount:
         Number(outcome.manual_review_queue_count || 0) +
         Number(outcome.pending_bundle_approvals || 0) +
@@ -847,11 +854,21 @@ function deriveLegislativeOutcome(session) {
     overallStatus,
     overallStatusTone: statusTone(overallStatus),
     outcome: session.summary,
-    aiStatus,
-    aiStatusTone: aiStatus === "failed" ? "danger" : aiStatus === "partial" ? "warning" : aiStatus === "success" ? "success" : "default",
+    aiStatus: toCanonicalAiState(aiStatus),
+    aiStatusTone: getAiStateTone(toCanonicalAiState(aiStatus)),
     fallbackText: fallbackUsed ? `${fallbackCount}+` : "0",
-    trustLabel: !reviewRuntime ? "Pending" : fallbackUsed ? "Guarded" : "High",
-    trustTone: !reviewRuntime ? "default" : fallbackUsed ? "warning" : "success",
+    trustLabel:
+      !reviewRuntime
+        ? toCanonicalTrustState("pending")
+        : fallbackUsed
+          ? toCanonicalTrustState("guarded")
+          : toCanonicalTrustState("high"),
+    trustTone:
+      !reviewRuntime
+        ? getTrustStateTone(toCanonicalTrustState("pending"))
+        : fallbackUsed
+          ? getTrustStateTone(toCanonicalTrustState("guarded"))
+          : getTrustStateTone(toCanonicalTrustState("high")),
     attentionCount: pendingReview + blockers,
     attentionSummary:
       pendingReview > 0
@@ -1162,7 +1179,7 @@ function WorkflowSummaryBlock({ outcome, fallbackMessage }) {
           <AlertBadge tone={outcome.aiStatusTone}>
             {humanizeAiStatus(outcome.aiStatus)}
           </AlertBadge>
-          <AlertBadge tone={outcome.trustTone}>{outcome.trustLabel} trust</AlertBadge>
+          <AlertBadge tone={outcome.trustTone}>{outcome.trustLabel}</AlertBadge>
         </div>
       </div>
 
@@ -1298,7 +1315,7 @@ function RecentWorkflowRunsTable({ jobs, sessionById, workflowOutcomeMap }) {
                 const fallbackText = reviewRuntime
                   ? reviewRuntime.fallback_used
                     ? `${reviewRuntime.fallback_count || 0}+`
-                    : "No fallback"
+                    : "No Fallback"
                   : workflowOutcome
                     ? summarizeFallbackStatus(workflowOutcome)
                     : "—";
@@ -1357,13 +1374,7 @@ function RecentWorkflowRunsTable({ jobs, sessionById, workflowOutcomeMap }) {
                     <td className="border-b border-[#E5EAF0] px-2 py-1">
                       <AlertBadge
                         tone={
-                          aiResult === "AI failed"
-                            ? "danger"
-                            : aiResult === "AI partial"
-                              ? "warning"
-                              : aiResult === "AI succeeded"
-                                ? "success"
-                                : "default"
+                          getAiStateTone(aiResult)
                         }
                       >
                         {aiResult}
@@ -1647,7 +1658,7 @@ function WorkflowOutcomeTable({ outcomes }) {
                     </div>
                   </td>
                   <td className="border-b border-[#E5EAF0] px-2 py-1">
-                    <AlertBadge tone={outcome.aiStatus === "failed" ? "danger" : outcome.aiStatus === "partial" ? "warning" : outcome.aiStatus === "success" ? "success" : "default"}>
+                    <AlertBadge tone={outcome.aiStatusTone}>
                       {outcome.aiStatus}
                     </AlertBadge>
                   </td>
@@ -1711,7 +1722,7 @@ function RecentEventsTable({ jobs }) {
                 const reviewRuntime = job.metadataJson?.review_runtime || null;
                 const fallbackText = reviewRuntime?.fallback_used
                   ? `${reviewRuntime.review_backend || "fallback"} / ${reviewRuntime.fallback_count || 0}`
-                  : "No fallback";
+                  : "No Fallback";
                 const nextText =
                   job.failure?.nextSafeActionTitle ||
                   job.metadataJson?.command_execution_assist?.nextRecommendedAction ||

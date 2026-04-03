@@ -1,36 +1,41 @@
 import Link from "next/link";
-import { ImpactBadge } from "@/app/components/policy-badges";
-import { fetchInternalJson } from "@/lib/api";
-import { REPORT_REVALIDATE_SECONDS, withRevalidate } from "@/lib/cache";
+import {
+  ImpactBadge,
+  PromiseStatusBadge,
+} from "@/app/components/policy-badges";
+import TrustImpactSummaryCard from "@/app/components/TrustImpactSummaryCard";
+import { EXPLANATION_CONTENT } from "@/lib/content/explanations";
+import {
+  EVIDENCE_STRENGTHS,
+  TRUST_STATES,
+} from "@/lib/labels";
 import { buildPageMetadata } from "@/lib/metadata";
+import { computeOutcomeBasedScores } from "@/lib/services/blackImpactScoreService";
+import {
+  fetchCurrentAdministrationOverview,
+  fetchPromiseList,
+} from "@/lib/services/promiseService";
 import { buildSiteJsonLd, serializeJsonLd } from "@/lib/structured-data";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = buildPageMetadata({
-  title: "EquityStack | Black Policy History and Current Tracking",
+  title: "EquityStack | Track What Policies Actually Did",
   description:
-    "Track how U.S. policy shaped Black communities across history and the present, from live current-administration records to the Black Impact Score.",
+    "Track documented policy outcomes, evidence, and Black community impact across history and the current administration.",
   path: "/",
 });
 
-async function getJson(url) {
-  return fetchInternalJson(url, withRevalidate(REPORT_REVALIDATE_SECONDS));
-}
-
-async function getOptionalJson(url) {
-  return fetchInternalJson(url, {
-    ...withRevalidate(REPORT_REVALIDATE_SECONDS),
-    allow404: true,
-  });
-}
-
-function sumTotals(rows, key = "total") {
-  return rows.reduce((sum, row) => sum + Number(row[key] || 0), 0);
-}
-
 function formatDate(dateString) {
-  if (!dateString) return null;
+  if (!dateString) {
+    return null;
+  }
+
   const date = new Date(dateString);
-  if (Number.isNaN(date.getTime())) return dateString;
+  if (Number.isNaN(date.getTime())) {
+    return dateString;
+  }
+
   return date.toLocaleDateString("en-US", {
     year: "numeric",
     month: "short",
@@ -38,20 +43,21 @@ function formatDate(dateString) {
   });
 }
 
-function CompactStat({ label, value, detail }) {
-  return (
-    <div className="metric-card px-4 py-4">
-      <p className="text-xs uppercase tracking-[0.18em] text-[var(--accent)]">{label}</p>
-      <p className="mt-3 text-2xl font-bold">{value}</p>
-      {detail ? <p className="mt-2 text-sm text-[var(--ink-muted)]">{detail}</p> : null}
-    </div>
-  );
+function formatScore(value) {
+  const numeric = Number(value ?? 0);
+
+  if (!Number.isFinite(numeric)) {
+    return String(value ?? "0");
+  }
+
+  const fixed = numeric.toFixed(2);
+  return numeric > 0 ? `+${fixed}` : fixed;
 }
 
-function SectionIntro({ eyebrow, title, description, href, hrefLabel }) {
+function SectionHeading({ eyebrow, title, description, href, hrefLabel }) {
   return (
     <div className="flex items-start justify-between gap-4 flex-wrap">
-      <div className="section-intro">
+      <div className="section-intro max-w-3xl">
         {eyebrow ? <p className="eyebrow mb-4">{eyebrow}</p> : null}
         <h2 className="section-title">{title}</h2>
         {description ? <p className="body-copy mt-3">{description}</p> : null}
@@ -65,415 +71,550 @@ function SectionIntro({ eyebrow, title, description, href, hrefLabel }) {
   );
 }
 
-function StartHereCard({ eyebrow, title, description, href, linkLabel, meta }) {
+function HeroStat({ label, value, detail }) {
   return (
-    <Link href={href} className="panel-link block rounded-[1.5rem] p-5">
-      <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">{eyebrow}</p>
-      <h3 className="card-title mt-3">{title}</h3>
-      <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{description}</p>
-      {meta ? <p className="mt-4 text-xs uppercase tracking-[0.14em] text-[var(--ink-muted)]">{meta}</p> : null}
-      <span className="accent-link mt-4 inline-block text-sm font-medium">{linkLabel}</span>
-    </Link>
+    <div className="rounded-[1.1rem] border border-[rgba(120,53,15,0.1)] bg-white/80 px-4 py-4">
+      <p className="text-[10px] uppercase tracking-[0.16em] text-[var(--accent)]">{label}</p>
+      <p className="mt-2 text-2xl font-semibold">{value}</p>
+      <p className="mt-2 text-xs text-[var(--ink-soft)]">{detail}</p>
+    </div>
   );
 }
 
-function TrustSignal({ title, description }) {
+function FlowStep({ step, title, description }) {
   return (
-    <div className="card-muted rounded-[1.4rem] p-5">
+    <div className="card-muted rounded-[1.35rem] p-5">
+      <div className="flex items-center gap-3">
+        <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[rgba(120,53,15,0.14)] bg-white text-sm font-semibold text-[var(--accent)]">
+          {step}
+        </span>
+        <h3 className="card-title">{title}</h3>
+      </div>
+      <p className="mt-4 text-sm leading-7 text-[var(--ink-soft)]">{description}</p>
+    </div>
+  );
+}
+
+function TrustPoint({ title, description }) {
+  return (
+    <div className="card-muted rounded-[1.35rem] p-5">
       <h3 className="card-title">{title}</h3>
       <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{description}</p>
     </div>
   );
 }
 
-function ExploreCard({ eyebrow, title, description, href, linkLabel }) {
+function FeatureCard({ eyebrow, title, description, href, linkLabel }) {
   return (
     <Link href={href} className="panel-link block rounded-[1.45rem] p-5">
       <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">{eyebrow}</p>
       <h3 className="card-title mt-3">{title}</h3>
       <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{description}</p>
-      <span className="accent-link mt-4 inline-block text-sm">{linkLabel}</span>
+      <span className="accent-link mt-4 inline-block text-sm font-medium">{linkLabel}</span>
     </Link>
   );
 }
 
-function FeaturedExplainerCard({ explainer }) {
+function PreviewRecordCard({
+  eyebrow,
+  title,
+  description,
+  href,
+  detailLabel,
+  record,
+  date,
+  topic,
+  status,
+  impactDirection,
+}) {
   return (
-    <Link href={`/explainers/${explainer.slug}`} className="panel-link block rounded-[1.25rem] p-4">
-      <div className="mb-3">
-        <span className="public-pill border-transparent bg-[var(--surface-alt)]">
-          {explainer.category || "Explainer"}
-        </span>
+    <article className="panel-link rounded-[1.35rem] p-5">
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">
+            {eyebrow}
+          </p>
+          <h3 className="mt-3 text-base font-semibold leading-6">{title}</h3>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {status ? <PromiseStatusBadge status={status} /> : null}
+          {impactDirection ? <ImpactBadge impact={impactDirection} /> : null}
+        </div>
       </div>
-      <h3 className="font-semibold">{explainer.title}</h3>
-      <p className="mt-2 text-sm leading-6 text-[var(--ink-soft)] line-clamp-3">
-        {explainer.summary}
-      </p>
-    </Link>
-  );
-}
 
-function FeaturedPolicyCard({ policy }) {
-  return (
-    <Link href={`/policies/${policy.id}`} className="panel-link block rounded-[1.25rem] p-4">
-      <h3 className="font-semibold">{policy.title}</h3>
-      <p className="mt-1 text-sm text-[var(--ink-soft)]">
-        {policy.year_enacted} {" • "} {policy.policy_type} {" • "} {policy.primary_party || "Unknown party"}
-      </p>
-      <p className="mt-2 text-sm font-medium text-[var(--accent)]">
-        Score: {policy.total_score}
-      </p>
-    </Link>
-  );
-}
-
-function RecentActivityCard({ item }) {
-  return (
-    <article className="panel-link rounded-[1.3rem] p-5">
-      <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">
-        {item.topic || "Current Administration"}
-      </p>
-      <h3 className="mt-3 text-base font-semibold leading-6">{item.title}</h3>
-      <p className="mt-2 text-sm leading-6 text-[var(--ink-soft)]">
-        {item.latest_action_title || item.summary || "Tracked current-term update"}
-      </p>
-      <div className="mt-4 flex flex-wrap gap-2">
-        {item.latest_action_date ? <span className="public-pill">{formatDate(item.latest_action_date)}</span> : null}
-        {item.latest_impact_direction ? <ImpactBadge impact={item.latest_impact_direction} /> : null}
+      <div className="mt-3 flex flex-wrap gap-2">
+        {topic ? <span className="public-pill">{topic}</span> : null}
+        {date ? <span className="public-pill">{formatDate(date)}</span> : null}
       </div>
-      <Link href={`/promises/${item.slug}`} className="accent-link mt-4 inline-block text-sm">
-        Open promise record
-      </Link>
+
+      <p className="mt-4 text-sm leading-7 text-[var(--ink-soft)]">
+        {description}
+      </p>
+
+      <TrustImpactSummaryCard
+        record={record}
+        detailHref={href}
+        detailLabel={detailLabel}
+      />
     </article>
   );
 }
 
-function AccountabilityCard({ bill }) {
+function MiniPill({ label, tone = "default" }) {
+  const classes =
+    tone === "success"
+      ? "border-[rgba(22,163,74,0.2)] bg-[rgba(22,163,74,0.08)] text-[#166534]"
+      : tone === "warning"
+        ? "border-[rgba(217,119,6,0.2)] bg-[rgba(217,119,6,0.08)] text-[#B45309]"
+        : tone === "danger"
+          ? "border-[rgba(220,38,38,0.2)] bg-[rgba(220,38,38,0.08)] text-[#B91C1C]"
+          : "border-[var(--line)] bg-white text-[var(--ink-soft)]";
+
   return (
-    <Link href="/activity" className="panel-link block rounded-[1.25rem] p-4">
-      <div className="flex items-start justify-between gap-3 flex-wrap">
-        <div>
-          <h3 className="font-semibold">{bill.title}</h3>
-          <p className="mt-1 text-sm text-[var(--ink-soft)]">
-            {[bill.target_area, bill.priority_level].filter(Boolean).join(" • ")}
-          </p>
-        </div>
-        <span className="public-pill">{formatDate(bill.latest_tracked_update)}</span>
-      </div>
-      <div className="mt-3 flex flex-wrap gap-2 text-xs text-[var(--ink-soft)]">
-        <span className="public-pill">Linked Bills: {bill.tracked_bills?.length || 0}</span>
-        <span className="public-pill">Scorecards: {bill.linked_legislators?.length || 0}</span>
-        <span className="public-pill">Explainers: {bill.related_explainers?.length || 0}</span>
-      </div>
-    </Link>
+    <span className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium ${classes}`}>
+      {label}
+    </span>
   );
 }
 
-function GuidedStep({ step, title, description, href, linkLabel }) {
+function ScoreSnapshotCard({ presidents, metadata }) {
+  const highest = presidents[0] || null;
+  const lowest = [...presidents]
+    .reverse()
+    .find((president) => Number(president.raw_score_total || 0) < 0) || null;
+
   return (
-    <div className="panel-link rounded-[1.35rem] p-5">
-      <p className="text-xs uppercase tracking-[0.18em] text-[var(--accent)]">{step}</p>
-      <h3 className="card-title mt-3">{title}</h3>
-      <p className="mt-2 text-sm leading-6 text-[var(--ink-soft)]">{description}</p>
-      <Link href={href} className="accent-link mt-4 inline-block text-sm">
-        {linkLabel}
-      </Link>
+    <section className="card-surface rounded-[1.55rem] p-5">
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div className="max-w-2xl">
+          <p className="eyebrow mb-3">Live Preview</p>
+          <h3 className="card-title">Black Impact Score snapshot</h3>
+          <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+            This is the current public score model using documented, scoring-ready outcomes from Promise Tracker.
+          </p>
+        </div>
+        <Link href="/reports/black-impact-score" className="accent-link text-sm font-medium">
+          Open full score report
+        </Link>
+      </div>
+
+      {presidents.length === 0 ? (
+        <div className="mt-5 rounded-[1.1rem] border border-[rgba(120,53,15,0.1)] bg-white/80 p-4">
+          <p className="text-sm font-medium">Insufficient evidence</p>
+          <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
+            The public score view needs scoring-ready outcomes with written summaries, impact direction, and linked sources.
+          </p>
+        </div>
+      ) : (
+        <>
+          <div className="mt-5 grid gap-4 md:grid-cols-4">
+            <HeroStat
+              label="Presidents Scored"
+              value={presidents.length}
+              detail="Current public score view"
+            />
+            <HeroStat
+              label="Outcomes Scored"
+              value={metadata.total_outcomes}
+              detail="Scoring-ready documented outcomes"
+            />
+            <HeroStat
+              label="Promises Included"
+              value={metadata.total_promises}
+              detail="Records contributing to the score"
+            />
+            <HeroStat
+              label="Excluded Outcomes"
+              value={metadata.total_excluded_outcomes}
+              detail="Visible in records but outside numeric scoring"
+            />
+          </div>
+
+          <div className="mt-5 grid gap-4 lg:grid-cols-2">
+            <div className="rounded-[1.1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 p-4">
+              <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Highest current score</p>
+              {highest ? (
+                <>
+                  <h4 className="mt-3 text-lg font-semibold">{highest.president}</h4>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <MiniPill label={`Normalized ${formatScore(highest.normalized_score_total)}`} tone="success" />
+                    <MiniPill label={`${highest.outcome_count} outcomes`} />
+                  </div>
+                </>
+              ) : (
+                <p className="mt-3 text-sm text-[var(--ink-soft)]">No president summary is available yet.</p>
+              )}
+            </div>
+
+            <div className="rounded-[1.1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 p-4">
+              <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Lowest current score</p>
+              {lowest ? (
+                <>
+                  <h4 className="mt-3 text-lg font-semibold">{lowest.president}</h4>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <MiniPill label={`Normalized ${formatScore(lowest.normalized_score_total)}`} tone="danger" />
+                    <MiniPill label={`${lowest.outcome_count} outcomes`} />
+                  </div>
+                </>
+              ) : (
+                <p className="mt-3 text-sm text-[var(--ink-soft)]">
+                  No negative-scoring president summary is available in the current report.
+                </p>
+              )}
+            </div>
+          </div>
+        </>
+      )}
+    </section>
+  );
+}
+
+function ReadGuideCard({ title, children, href, hrefLabel }) {
+  return (
+    <div className="card-muted rounded-[1.35rem] p-5">
+      <h3 className="card-title">{title}</h3>
+      <div className="mt-4 space-y-3 text-sm leading-7 text-[var(--ink-soft)]">
+        {children}
+      </div>
+      {href && hrefLabel ? (
+        <Link href={href} className="accent-link mt-4 inline-block text-sm font-medium">
+          {hrefLabel}
+        </Link>
+      ) : null}
     </div>
   );
 }
 
 export default async function HomePage() {
-  const [byParty, byEra, futureBills, topPolicies, featuredExplainers, currentAdministration] = await Promise.all([
-    getJson("/api/reports/by-party"),
-    getJson("/api/reports/by-era"),
-    getJson("/api/future-bills"),
-    getJson("/api/reports/top-policies"),
-    getJson("/api/explainers/featured"),
-    getOptionalJson("/api/current-administration"),
+  const [promiseList, currentAdministration, impactScore] = await Promise.all([
+    fetchPromiseList({
+      sort: "promise_date_desc",
+      page: 1,
+      pageSize: 2,
+    }),
+    fetchCurrentAdministrationOverview(),
+    computeOutcomeBasedScores(),
   ]);
 
-  const totalPolicies = sumTotals(byParty);
-  const positivePolicies = byParty
-    .filter((row) => row.impact_direction === "Positive")
-    .reduce((sum, row) => sum + Number(row.total || 0), 0);
-  const blockedPolicies = byParty
-    .filter((row) => row.impact_direction === "Blocked")
-    .reduce((sum, row) => sum + Number(row.total || 0), 0);
-  const negativePolicies = byParty
-    .filter((row) => row.impact_direction === "Negative")
-    .reduce((sum, row) => sum + Number(row.total || 0), 0);
-  const eraCount = new Set(byEra.map((row) => row.era)).size;
-  const recentAccountability = [...futureBills]
-    .filter((bill) => bill.latest_tracked_update)
-    .sort((a, b) => String(b.latest_tracked_update).localeCompare(String(a.latest_tracked_update)))
-    .slice(0, 4);
-  const latestCurrentAdministrationActivity = (currentAdministration?.recent_activity || []).slice(0, 4);
+  const recentPromises = promiseList.items || [];
+  const currentHighlights = (
+    currentAdministration?.featured_records?.length
+      ? currentAdministration.featured_records
+      : currentAdministration?.recent_activity || []
+  ).slice(0, 2);
+  const currentAdministrationName =
+    currentAdministration?.administration_name || "Current Administration";
+  const impactGuide = EXPLANATION_CONTENT.currentAdministration.interpret;
 
   return (
-    <main className="mx-auto max-w-7xl space-y-12 p-6 md:space-y-14">
+    <main className="mx-auto max-w-7xl space-y-10 p-6 md:space-y-12">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(buildSiteJsonLd()) }}
       />
 
       <section className="hero-panel p-8 md:p-10 lg:p-12">
-        <div className="relative z-10 grid gap-8 lg:grid-cols-[minmax(0,1.3fr)_minmax(18rem,0.7fr)] lg:items-end">
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(20rem,0.85fr)] lg:items-end">
           <div className="max-w-4xl">
-            <p className="eyebrow mb-4">EquityStack.org</p>
+            <p className="eyebrow mb-4">EquityStack</p>
             <h1 className="page-title max-w-4xl">
-              A public research platform for tracing how U.S. policy has affected Black communities.
+              Track what policies actually did for Black Americans.
             </h1>
             <p className="mt-5 max-w-3xl text-lg leading-8 text-[var(--ink-soft)]">
-              EquityStack connects historical policy records, present-day tracking, explainers, and
-              accountability views in one place. Use it to move from a public question to the
-              underlying records, sources, and current legislative context.
+              EquityStack follows policy from action to documented outcome, shows the evidence behind that record,
+              and helps you see how those results affected Black communities over time.
             </p>
+
             <div className="mt-7 flex flex-wrap gap-3">
-              <Link href="/reports/black-impact-score" className="public-button-primary">
-                Start With the Impact Score
+              <Link href="/promises" className="public-button-primary">
+                Explore Promises
               </Link>
-              <Link href="/start" className="public-button-secondary">
-                Start Here
-              </Link>
-              <Link href="/methodology" className="public-button-secondary">
-                Review Methodology
+              <Link href="/reports/black-impact-score" className="public-button-secondary">
+                View Black Impact Score
               </Link>
             </div>
-            <div className="mt-6 flex flex-wrap gap-2">
-              <span className="public-pill">Evidence-backed policy records</span>
-              <span className="public-pill">Live current-administration tracking</span>
-              <span className="public-pill">Linked explainers, bills, and scorecards</span>
+
+            <div className="mt-5 flex flex-wrap gap-2">
+              <span className="public-pill">Every record is source-backed and auditable</span>
+              <span className="public-pill">Outcome-based, not promise-only</span>
+              <span className="public-pill">Visible uncertainty and evidence strength</span>
             </div>
           </div>
 
-          <div className="card-muted rounded-[1.4rem] p-5">
-            <p className="text-xs uppercase tracking-[0.18em] text-[var(--accent)]">What You Can Do Here</p>
-            <div className="mt-4 space-y-3 text-sm text-[var(--ink-soft)]">
-              <p>Read a public-facing explainer, then verify it against the underlying policy record.</p>
-              <p>Move from long-run history into the live current administration and future-bill layers.</p>
-              <p>Compare outcomes, timelines, and accountability surfaces without leaving the same research system.</p>
+          <div className="card-muted rounded-[1.45rem] p-5">
+            <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">What you can verify here</p>
+            <div className="mt-4 space-y-3 text-sm leading-7 text-[var(--ink-soft)]">
+              <p>The policy or action itself.</p>
+              <p>What happened next.</p>
+              <p>The source trail behind that result.</p>
             </div>
           </div>
         </div>
-      </section>
 
-      <section className="grid grid-cols-2 gap-4 lg:grid-cols-5">
-        <CompactStat label="Tracked Policies" value={totalPolicies} detail="Structured records in the public dataset" />
-        <CompactStat label="Positive" value={positivePolicies} detail="Documented positive-impact records" />
-        <CompactStat label="Negative" value={negativePolicies} detail="Documented harmful or adverse records" />
-        <CompactStat label="Blocked" value={blockedPolicies} detail="Blocked or unrealized efforts" />
-        <CompactStat label="Historical Eras" value={eraCount} detail="Major periods covered in the research set" />
+        <div className="mt-8 grid gap-4 md:grid-cols-3">
+          <HeroStat
+            label="Recent Promise Records"
+            value={recentPromises.length}
+            detail="Fresh public records on the homepage"
+          />
+          <HeroStat
+            label="Current-Term Records"
+            value={currentAdministration?.total_promises ?? 0}
+            detail="Tracked in the live administration view"
+          />
+          <HeroStat
+            label="Scoring-Ready Outcomes"
+            value={impactScore.metadata?.total_outcomes ?? 0}
+            detail="Currently contributing to BIS"
+          />
+        </div>
       </section>
 
       <section className="card-surface rounded-[1.7rem] p-6 md:p-8">
-        <SectionIntro
-          eyebrow="Start Here"
-          title="Three strong ways to enter the platform"
-          description="If this is your first visit, start with one of these paths. Each one is designed to move from summary to evidence without forcing you to guess where to click next."
+        <SectionHeading
+          eyebrow="Live Preview"
+          title="See the system working with real records"
+          description="Recent Promise Tracker records, current-term highlights, and the live Black Impact Score using the same public data."
         />
+
+        <div className="mt-6 grid gap-6 xl:grid-cols-[1fr_1fr]">
+          <div>
+            <div className="mb-4 flex items-center justify-between gap-4 flex-wrap">
+              <h3 className="card-title">Recent Promise Tracker records</h3>
+              <Link href="/promises" className="accent-link text-sm font-medium">
+                View all promises
+              </Link>
+            </div>
+            <div className="space-y-4">
+              {recentPromises.length === 0 ? (
+                <div className="card-muted rounded-[1.3rem] p-5">
+                  <p className="text-sm text-[var(--ink-soft)]">
+                    No public Promise Tracker records are available yet.
+                  </p>
+                </div>
+              ) : (
+                recentPromises.map((record) => (
+                  <PreviewRecordCard
+                    key={record.id}
+                    eyebrow={record.president || "Promise Tracker"}
+                    title={record.title}
+                    description={
+                      record.summary || "Open the record to inspect actions, outcomes, and linked sources."
+                    }
+                    href={`/promises/${record.slug}`}
+                    detailLabel="View record"
+                    record={record}
+                    date={record.latest_action_date || record.promise_date}
+                    topic={record.topic}
+                    status={record.status}
+                    impactDirection={record.impact_direction_for_curation}
+                  />
+                ))
+              )}
+            </div>
+          </div>
+
+          <div>
+            <div className="mb-4 flex items-center justify-between gap-4 flex-wrap">
+              <h3 className="card-title">{currentAdministrationName} highlights</h3>
+              <Link href="/current-administration" className="accent-link text-sm font-medium">
+                Open current administration
+              </Link>
+            </div>
+            <div className="space-y-4">
+              {currentHighlights.length === 0 ? (
+                <div className="card-muted rounded-[1.3rem] p-5">
+                  <p className="text-sm text-[var(--ink-soft)]">
+                    No current-administration highlights are published yet.
+                  </p>
+                </div>
+              ) : (
+                currentHighlights.map((record) => (
+                  <PreviewRecordCard
+                    key={record.id || record.slug}
+                    eyebrow={currentAdministrationName}
+                    title={record.title}
+                    description={
+                      record.latest_action_title ||
+                      record.summary ||
+                      "Open the record to inspect the latest action and documented outcome."
+                    }
+                    href={`/promises/${record.slug}`}
+                    detailLabel="Open promise record"
+                    record={record}
+                    date={record.latest_action_date || record.promise_date}
+                    topic={record.topic}
+                    status={record.status}
+                    impactDirection={
+                      record.impact_direction_for_curation || record.latest_impact_direction
+                    }
+                  />
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-6">
+          <ScoreSnapshotCard
+            presidents={impactScore.presidents || []}
+            metadata={impactScore.metadata || { total_outcomes: 0, total_promises: 0, total_excluded_outcomes: 0 }}
+          />
+        </div>
+      </section>
+
+      <section className="card-surface rounded-[1.7rem] p-6 md:p-8">
+        <SectionHeading
+          eyebrow="How It Works"
+          title="From policy action to visible impact"
+          description="Follow the record from action to documented outcome to Black-impact interpretation."
+        />
+
         <div className="mt-6 grid gap-4 md:grid-cols-3">
-          <StartHereCard
-            eyebrow="Overview"
-            title="Black Impact Score"
-            description="Start with the highest-level accountability view across presidential policy records and documented outcomes."
+          <FlowStep
+            step="1"
+            title="Policies and actions are tracked"
+            description="Promise Tracker records public commitments, laws, executive actions, and related steps."
+          />
+          <FlowStep
+            step="2"
+            title="Outcomes are documented with sources"
+            description="Outcomes are linked to public sources so the evidence trail stays visible."
+          />
+          <FlowStep
+            step="3"
+            title="Impact on Black Americans is evaluated"
+            description="Black Impact Score summarizes those documented outcomes without hiding mixed or blocked cases."
+          />
+        </div>
+      </section>
+
+      <section className="card-surface rounded-[1.7rem] p-6 md:p-8">
+        <SectionHeading
+          eyebrow="Core Features"
+          title="Three clear ways to enter the platform"
+          description="Start with the layer that matches your question, then drill into the same underlying evidence base."
+        />
+
+        <div className="mt-6 grid gap-4 md:grid-cols-3">
+          <FeatureCard
+            eyebrow="Promise Tracker"
+            title="See what was promised and what actually happened"
+            description="Open records, inspect actions and outcomes, and follow the source trail."
+            href="/promises"
+            linkLabel="Open Promise Tracker"
+          />
+          <FeatureCard
+            eyebrow="Black Impact Score"
+            title="Measure real-world impact across administrations"
+            description="Compare administrations using the same public outcome record."
             href="/reports/black-impact-score"
             linkLabel="Open Black Impact Score"
-            meta="Best first click for most visitors"
           />
-          <StartHereCard
-            eyebrow="Live Tracking"
-            title="Current Administration"
-            description="See what is being tracked in the current presidency term, what changed recently, and which records are already reviewed."
+          <FeatureCard
+            eyebrow="Current Administration"
+            title="Track ongoing policies and outcomes in real time"
+            description="Follow reviewed current-term records, recent actions, and documented outcomes."
             href="/current-administration"
             linkLabel="Open Current Administration"
-            meta="Best for current-term monitoring"
-          />
-          <StartHereCard
-            eyebrow="Evidence"
-            title="Policy Database"
-            description="Search the underlying laws, court cases, executive actions, and policy records by era, topic, party, and impact direction."
-            href="/policies"
-            linkLabel="Open Policy Database"
-            meta="Best for direct record lookup"
           />
         </div>
       </section>
 
       <section className="card-surface rounded-[1.7rem] p-6 md:p-8">
-        <SectionIntro
-          eyebrow="Trust Signals"
-          title="Why the information is structured to be inspectable"
-          description="EquityStack is designed as a public research product, not a feed of unsourced claims. The platform works by linking summaries to records, records to sources, and current tracking to the same underlying evidence model."
+        <SectionHeading
+          eyebrow="How To Read This"
+          title="Three quick cues"
+          description="These three label systems are enough to read the preview cards correctly."
+          href="/reports/black-impact-score"
+          hrefLabel="Open full score methodology"
+        />
+
+        <div className="mt-6 grid gap-4 md:grid-cols-3">
+          <ReadGuideCard title="Impact Direction" href="/current-administration" hrefLabel="See live examples">
+            <p>{impactGuide}</p>
+            <div className="flex flex-wrap gap-2">
+              <ImpactBadge impact="Positive" />
+              <ImpactBadge impact="Negative" />
+              <ImpactBadge impact="Mixed" />
+              <ImpactBadge impact="Blocked" />
+            </div>
+          </ReadGuideCard>
+
+          <ReadGuideCard title="Evidence Strength" href="/methodology" hrefLabel="Read methodology">
+            <p>
+              Strong means stronger visible support. Moderate and Limited mean thinner but still useful
+              support. Missing means the record is not strong enough for confident numeric use.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <MiniPill label={EVIDENCE_STRENGTHS.STRONG} tone="success" />
+              <MiniPill label={EVIDENCE_STRENGTHS.MODERATE} tone="warning" />
+              <MiniPill label={EVIDENCE_STRENGTHS.LIMITED} tone="warning" />
+              <MiniPill label={EVIDENCE_STRENGTHS.MISSING} tone="danger" />
+            </div>
+          </ReadGuideCard>
+
+          <ReadGuideCard title="Trust Labels" href="/reports/black-impact-score" hrefLabel="See score context">
+            <p>
+              Verified means ready to inspect. Guarded means use with visible caveats. Needs Review
+              means not settled. Pending means not ready yet.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <MiniPill label={TRUST_STATES.VERIFIED} tone="success" />
+              <MiniPill label={TRUST_STATES.GUARDED} tone="warning" />
+              <MiniPill label={TRUST_STATES.NEEDS_REVIEW} tone="danger" />
+              <MiniPill label={TRUST_STATES.PENDING} />
+            </div>
+          </ReadGuideCard>
+        </div>
+      </section>
+
+      <section className="card-surface rounded-[1.7rem] p-6 md:p-8">
+        <SectionHeading
+          eyebrow="Trust"
+          title="Why this is built for verification"
+          description="The homepage gives you labels and live records first. The deeper methodology is there when you want to inspect the system."
           href="/methodology"
-          hrefLabel="Read the methodology"
+          hrefLabel="Read methodology"
         />
+
         <div className="mt-6 grid gap-4 md:grid-cols-3">
-          <TrustSignal
-            title="Records before rhetoric"
-            description="Narrative summaries are backed by policy records, dates, and source trails rather than stand-alone commentary."
+          <TrustPoint
+            title="Source-backed records"
+            description="Summaries stay tied to actions, outcomes, and linked sources."
           />
-          <TrustSignal
-            title="Structured accountability"
-            description="Promise tracking, reports, future bills, and scorecards are connected so users can follow a question across layers instead of treating each page as isolated."
+          <TrustPoint
+            title="Visible uncertainty"
+            description="Evidence strength, trust state, and mixed or missing cases stay visible."
           />
-          <TrustSignal
-            title="Reviewed public-facing updates"
-            description="Current-term activity and linked accountability views are surfaced through a structured review flow before they appear on the public site."
+          <TrustPoint
+            title="Human + system review"
+            description="Reviewed public records and transparent methodology keep the data inspectable."
           />
         </div>
       </section>
 
-      <section className="card-surface rounded-[1.7rem] p-6 md:p-8">
-        <SectionIntro
-          eyebrow="Explore"
-          title="What you can explore next"
-          description="The site works best when you move between reports, records, history, and live accountability instead of staying inside one page type."
-        />
-        <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <ExploreCard
-            eyebrow="Reports"
-            title="Reports Hub"
-            description="Open the main report layer for the Impact Score, timeline-driven views, and higher-level pattern analysis."
-            href="/reports"
-            linkLabel="Browse reports"
-          />
-          <ExploreCard
-            eyebrow="Explainers"
-            title="Narrative Explainers"
-            description="Start with a focused public-facing explanation, then follow its linked records, policy pages, and evidence chain."
-            href="/explainers"
-            linkLabel="Browse explainers"
-          />
-          <ExploreCard
-            eyebrow="Current Tracking"
-            title="Future Bills"
-            description="Track reform proposals, linked bills, sponsors, and movement across the live legislative layer."
-            href="/future-bills"
-            linkLabel="Open future bills"
-          />
-          <ExploreCard
-            eyebrow="Accountability"
-            title="Scorecards"
-            description="See which legislators are attached to the tracked reform layer and how those relationships are being summarized."
-            href="/scorecards"
-            linkLabel="Open scorecards"
-          />
-        </div>
-      </section>
-
-      <section className="grid gap-6 lg:grid-cols-2">
-        <section className="card-surface rounded-[1.7rem] p-6">
-          <SectionIntro
-            eyebrow="Featured"
-            title="Featured explainers"
-            description="Good entry points when you want framing first, then linked records."
-            href="/explainers"
-            hrefLabel="View all explainers"
-          />
-          {featuredExplainers.length === 0 ? (
-            <p className="mt-6 text-sm text-[var(--ink-soft)]">No explainers published yet.</p>
-          ) : (
-            <div className="mt-6 space-y-4">
-              {featuredExplainers.slice(0, 4).map((explainer) => (
-                <FeaturedExplainerCard key={explainer.id} explainer={explainer} />
-              ))}
-            </div>
-          )}
-        </section>
-
-        <section className="card-surface rounded-[1.7rem] p-6">
-          <SectionIntro
-            eyebrow="Records"
-            title="Policy records to start with"
-            description="A short list of high-signal records worth opening early if you want to understand the shape of the dataset."
-            href="/reports"
-            hrefLabel="Open reports"
-          />
-          <div className="mt-6 space-y-4">
-            {topPolicies.slice(0, 6).map((policy, index) => (
-              <FeaturedPolicyCard key={`${policy.id}-${index}`} policy={policy} />
-            ))}
+      <section className="hero-panel p-8 md:p-10">
+        <div className="max-w-4xl">
+          <p className="eyebrow mb-4">Start Exploring</p>
+          <h2 className="page-title text-[clamp(2rem,3.8vw,3.1rem)]">
+            Start with the record, then follow the evidence.
+          </h2>
+          <p className="mt-5 max-w-3xl text-base leading-8 text-[var(--ink-soft)] md:text-lg">
+            Start with Promise Tracker. Use Black Impact Score to compare the bigger picture. Use
+            Current Administration to follow what is active now.
+          </p>
+          <div className="mt-7 flex flex-wrap gap-3">
+            <Link href="/promises" className="public-button-primary">
+              Open Promise Tracker
+            </Link>
+            <Link href="/reports/black-impact-score" className="public-button-secondary">
+              Compare with Black Impact Score
+            </Link>
+            <Link href="/current-administration" className="public-button-secondary">
+              Track the Current Administration
+            </Link>
           </div>
-        </section>
-      </section>
-
-      {(latestCurrentAdministrationActivity.length > 0 || recentAccountability.length > 0) ? (
-        <section className="card-surface rounded-[1.7rem] p-6 md:p-8">
-          <SectionIntro
-            eyebrow="Live Context"
-            title="What changed recently"
-            description="Two fast ways to see live movement: reviewed current-administration records and recent accountability activity in the future-bills layer."
-          />
-          <div className="mt-6 grid gap-6 xl:grid-cols-2">
-            <div>
-              <div className="mb-4 flex items-center justify-between gap-4">
-                <h3 className="card-title">Current Administration</h3>
-                <Link href="/current-administration" className="accent-link text-sm">
-                  Open overview
-                </Link>
-              </div>
-              <div className="grid gap-4 md:grid-cols-2">
-                {latestCurrentAdministrationActivity.length === 0 ? (
-                  <p className="text-sm text-[var(--ink-soft)]">No reviewed current-term activity is published yet.</p>
-                ) : (
-                  latestCurrentAdministrationActivity.map((item) => (
-                    <RecentActivityCard key={item.slug} item={item} />
-                  ))
-                )}
-              </div>
-            </div>
-
-            <div>
-              <div className="mb-4 flex items-center justify-between gap-4">
-                <h3 className="card-title">Recent Accountability Activity</h3>
-                <Link href="/activity" className="accent-link text-sm">
-                  Open activity feed
-                </Link>
-              </div>
-              <div className="grid gap-4 md:grid-cols-2">
-                {recentAccountability.length === 0 ? (
-                  <p className="text-sm text-[var(--ink-soft)]">No recent accountability activity is available yet.</p>
-                ) : (
-                  recentAccountability.map((bill) => (
-                    <AccountabilityCard key={bill.id} bill={bill} />
-                  ))
-                )}
-              </div>
-            </div>
-          </div>
-        </section>
-      ) : null}
-
-      <section className="card-surface rounded-[1.7rem] p-6 md:p-8">
-        <SectionIntro
-          eyebrow="How To Use It"
-          title="A practical first visit"
-          description="The clearest first pass is to move from framing, to records, to live accountability. That sequence keeps the site useful without overwhelming you."
-          href="/start"
-          hrefLabel="Open start guide"
-        />
-        <div className="mt-6 grid gap-4 md:grid-cols-3">
-          <GuidedStep
-            step="Step 1"
-            title="Read one explainer"
-            description="Use an explainer to understand the question, then follow its linked records and sources."
-            href="/explainers"
-            linkLabel="Browse explainers"
-          />
-          <GuidedStep
-            step="Step 2"
-            title="Inspect the record"
-            description="Open the linked policy page to see dates, sources, parties, scores, and historical placement."
-            href="/policies"
-            linkLabel="Open policy database"
-          />
-          <GuidedStep
-            step="Step 3"
-            title="Check what is active now"
-            description="Move into current administration, future bills, or scorecards when you want live accountability context."
-            href="/future-bills"
-            linkLabel="Open current tracking"
-          />
         </div>
       </section>
     </main>

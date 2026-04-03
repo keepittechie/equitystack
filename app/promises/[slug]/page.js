@@ -11,6 +11,7 @@ import SourceDisclosure from "@/app/components/SourceDisclosure";
 import TrackedLink from "@/app/components/telemetry/TrackedLink";
 import { fetchInternalJson } from "@/lib/api";
 import { PUBLIC_REVALIDATE_SECONDS, withRevalidate } from "@/lib/cache";
+import { EXPLANATION_CONTENT } from "@/lib/content/explanations";
 import { buildPageMetadata } from "@/lib/metadata";
 import { buildPromiseJsonLd, serializeJsonLd } from "@/lib/structured-data";
 import { buildPromiseCardHref } from "@/lib/shareable-card-links";
@@ -344,6 +345,7 @@ export default async function PromiseDetailPage({ params }) {
   );
   const nextRecord = selectContextNavRecord(promise.related_to_promises, "outgoing");
   const isScoringReady = isScoringReadyPromise(promise);
+  const explanation = EXPLANATION_CONTENT.promiseRecord;
   const visibleSourceLinkCount =
     (promise.source_summary?.action_sources || 0) +
     (promise.source_summary?.outcome_sources || 0);
@@ -619,13 +621,18 @@ export default async function PromiseDetailPage({ params }) {
               />
             </div>
             <p className="text-sm text-[var(--ink-soft)] mt-4 leading-7">
-              Promise Tracker separates the public record into the original promise, the actions that followed, the outcomes that were documented, and the evidence linked to those outcomes.
+              {explanation.build}
             </p>
             <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
               {isScoringReady
-                ? "This record currently has enough visible outcome and source detail to support public scoring."
-                : "This record remains visible even if it is not yet scoring-ready, so readers can inspect the public record before editorial enrichment is complete."}
+                ? explanation.interpretReady
+                : explanation.interpretPending}
             </p>
+            <ul className="mt-3 space-y-1 text-xs text-[var(--ink-soft)]">
+              {explanation.verify.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
             <div className="mt-4 text-xs text-[var(--ink-soft)] space-y-1">
               <p>Action source links: {promise.source_summary?.action_sources || 0}</p>
               <p>Outcome source links: {promise.source_summary?.outcome_sources || 0}</p>

@@ -8,7 +8,7 @@ The report layer exists to help users move from record-level evidence to summary
 
 The intended progression is:
 
-1. `Start Here`
+1. `/` homepage
 2. `Promise Tracker`
 3. `Black Impact Score`
 4. `Timeline` or `Compare` views when deeper analysis is needed
@@ -49,8 +49,8 @@ The report layer should help readers answer three public questions quickly:
 Black Impact Score now exposes that publicly through:
 
 - visible evidence panels that link back to Promise Tracker
-- a plain-language `How this was scored` explanation
-- a `How this was built` section with visible record, outcome, and source-reference totals
+- a plain-language scoring explanation
+- `Build` and `Verify` sections with visible record, outcome, and source-reference totals
 - share links that preserve the current public report state without exposing internal review data
 
 ## Scoring-Ready View

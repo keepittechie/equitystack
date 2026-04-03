@@ -1,8 +1,0 @@
-{
-  "batch_name": "current-admin-wrapper-test",
-  "source_path": "/tmp/current_admin_wrapper_batch.json",
-  "normalized_output_path": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/current-admin-wrapper-test.normalized.json",
-  "record_count": 10,
-  "issue_count": 0,
-  "issues": []
-}

@@ -132,6 +132,21 @@ If a page cannot trace a value back to this chain, treat it as a trust risk.
   - verification and registry inspection
   - canonical data-integrity checks
 
+## Public Entry Points
+
+The public product should stay easy to enter from a few clear surfaces that all read from the same
+Promise Tracker and Black Impact Score services:
+
+- `/`
+  - homepage
+  - explains the mission quickly and previews live records
+- `/promises`
+  - Promise Tracker browser
+- `/reports/black-impact-score`
+  - president-level Black Impact Score report
+- `/current-administration`
+  - current-term Promise Tracker view
+
 ## Canonical Review Surfaces
 
 These remain necessary because they are the actual human checkpoint pages:
@@ -209,6 +224,9 @@ Source cleanup must stay evidence-backed.
 
 Cleanup artifacts live under `python/reports/integrity/` and are surfaced on `/admin/tools`.
 
+These files are generated operator artifacts. They should stay out of git and out of normal deploy
+inputs.
+
 ### Source Curation Surface
 
 `/admin/source-curation` is the manual follow-up surface for unresolved source attribution and unsafe duplicate-source review.
@@ -232,6 +250,17 @@ This surface is human-in-the-loop only.
 It does not auto-save.
 
 Every mutation must be explicit, confirmed, and auditable. Unsafe duplicate clusters are never auto-merged.
+
+## Deploy Hygiene
+
+`./deploy.sh` deploys from the local working tree, so it now fails fast when untracked deployable
+files are present under `app/`, `lib/`, `docs/`, `python/`, or other shipped paths.
+
+The goal is simple:
+
+- production should not depend on accidental local-only files
+- generated integrity and source-curation artifacts should stay ignored
+- the local repo should remain the source of truth before anything is deployed
 
 ## Current-Admin Guided Workflow
 

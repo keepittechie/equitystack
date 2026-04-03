@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ImpactBadge, PromiseStatusBadge } from "@/app/components/policy-badges";
+import TrustImpactSummaryCard from "@/app/components/TrustImpactSummaryCard";
 import TrackedLink from "@/app/components/telemetry/TrackedLink";
 import CopyShareLinkButton from "@/app/reports/black-impact-score/CopyShareLinkButton";
 import { fetchInternalJson } from "@/lib/api";
 import { PUBLIC_REVALIDATE_SECONDS, withRevalidate } from "@/lib/cache";
+import { EXPLANATION_CONTENT } from "@/lib/content/explanations";
 import { buildPageMetadata } from "@/lib/metadata";
 import { buildPromiseCardHref } from "@/lib/shareable-card-links";
 
@@ -151,6 +153,7 @@ export default async function CurrentAdministrationPage() {
 
   const pagePath = "/current-administration";
   const impactPattern = describeImpactPattern(overview.impact_breakdown);
+  const explanation = EXPLANATION_CONTENT.currentAdministration;
   const termLabel = formatTermRange(
     overview?.president?.term_start,
     overview?.president?.term_end
@@ -289,6 +292,12 @@ export default async function CurrentAdministrationPage() {
                 ) : null}
               </div>
 
+              <TrustImpactSummaryCard
+                record={item}
+                detailHref={`/promises/${item.slug}`}
+                detailLabel="View record"
+              />
+
               <div className="mt-5 flex flex-wrap gap-3">
                 <TrackedLink
                   href={`/promises/${item.slug}`}
@@ -356,10 +365,9 @@ export default async function CurrentAdministrationPage() {
         </div>
 
         <section className="card-surface rounded-[1.6rem] p-6">
-          <h2 className="text-2xl font-semibold">How this page works</h2>
+          <h2 className="text-2xl font-semibold">Build, Interpret, Verify</h2>
           <div className="mt-4 space-y-3 text-sm leading-7 text-[var(--ink-soft)]">
-            <p>Records are reviewed before they appear here.</p>
-            <p>Actions and outcomes are tied to public sources, not campaign language alone.</p>
+            <p>{explanation.build}</p>
             <p>
               Black Impact Score uses documented outcomes from these records. It does not score
               promises by themselves.
@@ -367,11 +375,15 @@ export default async function CurrentAdministrationPage() {
           </div>
 
           <div className="mt-5 rounded-[1.2rem] border border-[var(--line)] bg-[var(--surface-alt)] p-4">
-            <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">How to read it</p>
+            <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Interpret</p>
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-              Positive means helped. Negative means harmed. Mixed means both. Blocked means the
-              attempt did not fully take effect.
+              {explanation.interpret}
             </p>
+            <ul className="mt-3 space-y-1 text-sm leading-7 text-[var(--ink-soft)]">
+              {explanation.verify.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
           </div>
         </section>
       </section>
@@ -404,6 +416,13 @@ export default async function CurrentAdministrationPage() {
                   <ImpactBadge impact={record.impact_direction_for_curation} />
                 ) : null}
               </div>
+
+              <TrustImpactSummaryCard
+                record={record}
+                detailHref={`/promises/${record.slug}`}
+                detailLabel="View record"
+              />
+
               <div className="mt-5 flex flex-wrap gap-3">
                 <TrackedLink
                   href={`/promises/${record.slug}`}

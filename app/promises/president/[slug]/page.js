@@ -8,6 +8,7 @@ import {
 import { fetchInternalJson } from "@/lib/api";
 import { PUBLIC_REVALIDATE_SECONDS, withRevalidate } from "@/lib/cache";
 import TrackedLink from "@/app/components/telemetry/TrackedLink";
+import { EXPLANATION_CONTENT } from "@/lib/content/explanations";
 import { buildPageMetadata } from "@/lib/metadata";
 import { buildPromiseCardHref } from "@/lib/shareable-card-links";
 
@@ -123,6 +124,7 @@ export default async function PromisePresidentPage({ params, searchParams }) {
     typeof president.visible_source_count === "number"
       ? president.visible_source_count
       : getVisiblePromiseSourceCount(president);
+  const explanation = EXPLANATION_CONTENT.promisePresident;
 
   return (
     <main className="max-w-7xl mx-auto p-6">
@@ -191,9 +193,9 @@ export default async function PromisePresidentPage({ params, searchParams }) {
       <section className="card-surface rounded-[1.6rem] p-5 mb-8">
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div className="max-w-3xl">
-            <h2 className="text-lg font-semibold mb-2">How this was built</h2>
+            <h2 className="text-lg font-semibold mb-2">Build, Interpret, Verify</h2>
             <p className="text-sm text-[var(--ink-soft)] leading-7">
-              This presidency view groups curated Promise Tracker records by status. It keeps the records visible first, then points into Black Impact Score when you want a score summary built from the same public evidence base.
+              {explanation.build}
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -203,8 +205,13 @@ export default async function PromisePresidentPage({ params, searchParams }) {
           </div>
         </div>
         <p className="text-sm text-[var(--ink-soft)] mt-4 leading-7">
-          Records remain visible here even before they are complete enough for scoring. Open Black Impact Score when you want the summarized score view, then return to these record pages to verify the underlying actions, outcomes, and sources.
+          {explanation.interpret}
         </p>
+        <ul className="mt-4 space-y-1 text-sm text-[var(--ink-soft)] leading-7">
+          {explanation.verify.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
         <div className="mt-4">
           <Link
             href="/reports/black-impact-score"

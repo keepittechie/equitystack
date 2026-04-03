@@ -54,6 +54,7 @@ python/reports/current_admin/current-admin-wrapper-test*.json
 python/reports/current_admin/discovery_report.json
 python/reports/current_admin/donald-j-trump-2025-discovery-*.json
 python/reports/current_admin/review_decisions/
+python/reports/integrity/
 
 # Database dumps
 database/equitystack.sql
