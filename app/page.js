@@ -60,6 +60,25 @@ function CompactStat({ label, value, detail }) {
   );
 }
 
+function MetaPill({ children }) {
+  return <span className="public-pill">{children}</span>;
+}
+
+function SummaryStat({ label, value, tone = "default", detail = null }) {
+  const toneClasses =
+    tone === "accent"
+      ? "border-[rgba(37,99,235,0.16)] bg-[rgba(37,99,235,0.08)]"
+      : "border-[var(--line)] bg-white";
+
+  return (
+    <div className={`rounded-[1.2rem] border px-4 py-4 ${toneClasses}`}>
+      <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">{label}</p>
+      <p className="mt-2 text-2xl font-semibold">{value}</p>
+      {detail ? <p className="mt-2 text-sm text-[var(--ink-soft)]">{detail}</p> : null}
+    </div>
+  );
+}
+
 function SectionIntro({ eyebrow, title, description, href, hrefLabel }) {
   return (
     <div className="flex items-start justify-between gap-4 flex-wrap">
@@ -77,12 +96,15 @@ function SectionIntro({ eyebrow, title, description, href, hrefLabel }) {
   );
 }
 
-function FlagshipViewCard({ eyebrow, title, description, href, linkLabel }) {
+function StartHereCard({ eyebrow, title, description, href, linkLabel, meta }) {
   return (
-    <Link href={href} className="panel-link block rounded-[1.45rem] p-5">
+    <Link href={href} className="panel-link block rounded-[1.4rem] p-5">
       <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">{eyebrow}</p>
       <h3 className="card-title mt-3">{title}</h3>
       <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{description}</p>
+      {meta ? (
+        <p className="mt-4 text-xs uppercase tracking-[0.14em] text-[var(--ink-muted)]">{meta}</p>
+      ) : null}
       <span className="accent-link mt-4 inline-block text-sm font-medium">{linkLabel}</span>
     </Link>
   );
@@ -90,7 +112,7 @@ function FlagshipViewCard({ eyebrow, title, description, href, linkLabel }) {
 
 function TrustSignal({ title, description }) {
   return (
-    <div className="card-muted rounded-[1.35rem] p-5">
+    <div className="card-muted rounded-[1.2rem] p-4">
       <h3 className="card-title">{title}</h3>
       <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{description}</p>
     </div>
@@ -110,7 +132,7 @@ function PreviewRecordCard({
   impactDirection,
 }) {
   return (
-    <article className="panel-link rounded-[1.35rem] p-5">
+    <article className="panel-link rounded-[1.3rem] p-5">
       <div className="flex items-start justify-between gap-3 flex-wrap">
         <div>
           <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">
@@ -145,12 +167,12 @@ function PreviewRecordCard({
 function MiniPill({ label, tone = "default" }) {
   const classes =
     tone === "success"
-      ? "border-[rgba(22,163,74,0.2)] bg-[rgba(22,163,74,0.08)] text-[#166534]"
+      ? "border-[rgba(22,163,74,0.2)] bg-[rgba(22,163,74,0.1)] text-[#166534]"
       : tone === "warning"
-        ? "border-[rgba(217,119,6,0.2)] bg-[rgba(217,119,6,0.08)] text-[#B45309]"
+        ? "border-[rgba(217,119,6,0.2)] bg-[rgba(217,119,6,0.1)] text-[#B45309]"
         : tone === "danger"
-          ? "border-[rgba(220,38,38,0.2)] bg-[rgba(220,38,38,0.08)] text-[#B91C1C]"
-          : "border-[var(--line)] bg-white text-[var(--ink-soft)]";
+          ? "border-[rgba(220,38,38,0.2)] bg-[rgba(220,38,38,0.1)] text-[#B91C1C]"
+          : "border-[var(--line)] bg-[rgba(255,255,255,0.96)] text-[var(--ink-soft)]";
 
   return (
     <span className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium ${classes}`}>
@@ -166,7 +188,7 @@ function ScoreSnapshotCard({ presidents, metadata }) {
     .find((president) => Number(president.raw_score_total || 0) < 0) || null;
 
   return (
-    <section className="card-surface rounded-[1.55rem] p-5">
+    <section className="card-surface rounded-[1.6rem] p-5">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="max-w-2xl">
           <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Live Score</p>
@@ -190,22 +212,23 @@ function ScoreSnapshotCard({ presidents, metadata }) {
       ) : (
         <>
           <div className="mt-5 grid gap-4 md:grid-cols-4">
-            <CompactStat
+            <SummaryStat
               label="Presidents"
               value={presidents.length}
               detail="Visible in this score view"
+              tone="accent"
             />
-            <CompactStat
+            <SummaryStat
               label="Outcomes"
               value={metadata.total_outcomes}
               detail="Scoring-ready outcomes"
             />
-            <CompactStat
+            <SummaryStat
               label="Promises"
               value={metadata.total_promises}
               detail="Records contributing"
             />
-            <CompactStat
+            <SummaryStat
               label="Excluded"
               value={metadata.total_excluded_outcomes}
               detail="Visible but not scored"
@@ -213,7 +236,7 @@ function ScoreSnapshotCard({ presidents, metadata }) {
           </div>
 
           <div className="mt-5 grid gap-4 lg:grid-cols-2">
-            <div className="rounded-[1.1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 p-4">
+            <div className="card-muted rounded-[1.2rem] p-4">
               <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Highest current score</p>
               {highest ? (
                 <>
@@ -228,7 +251,7 @@ function ScoreSnapshotCard({ presidents, metadata }) {
               )}
             </div>
 
-            <div className="rounded-[1.1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 p-4">
+            <div className="card-muted rounded-[1.2rem] p-4">
               <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Lowest current score</p>
               {lowest ? (
                 <>
@@ -253,10 +276,10 @@ function ScoreSnapshotCard({ presidents, metadata }) {
 
 function LabelGuideCard({ impactGuide }) {
   return (
-    <div className="card-muted rounded-[1.35rem] p-5">
+    <div className="card-surface rounded-[1.6rem] p-5">
       <h3 className="card-title">How to read the labels</h3>
       <div className="mt-4 space-y-4 text-sm leading-7 text-[var(--ink-soft)]">
-        <div>
+        <div className="card-muted rounded-[1.2rem] p-4">
           <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Impact</p>
           <p className="mt-2">{impactGuide}</p>
           <div className="mt-3 flex flex-wrap gap-2">
@@ -267,7 +290,7 @@ function LabelGuideCard({ impactGuide }) {
           </div>
         </div>
 
-        <div>
+        <div className="card-muted rounded-[1.2rem] p-4">
           <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Evidence</p>
           <div className="mt-3 flex flex-wrap gap-2">
             <MiniPill label={EVIDENCE_STRENGTHS.STRONG} tone="success" />
@@ -277,7 +300,7 @@ function LabelGuideCard({ impactGuide }) {
           </div>
         </div>
 
-        <div>
+        <div className="card-muted rounded-[1.2rem] p-4">
           <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Trust</p>
           <div className="mt-3 flex flex-wrap gap-2">
             <MiniPill label={TRUST_STATES.VERIFIED} tone="success" />
@@ -344,26 +367,26 @@ export default async function HomePage() {
               <Link href="/promises" className="public-button-primary">
                 Explore Promises
               </Link>
-              <Link href="/reports/black-impact-score" className="public-button-secondary">
-                View Black Impact Score
-              </Link>
-              <Link href="/current-administration" className="public-button-secondary">
-                Track Current Administration
-              </Link>
-            </div>
-            <div className="mt-6 flex flex-wrap gap-2">
-              <span className="public-pill">Source-backed records</span>
-              <span className="public-pill">Outcome-based scoring</span>
-              <span className="public-pill">Visible uncertainty and evidence</span>
-            </div>
+            <Link href="/reports/black-impact-score" className="public-button-secondary">
+              View Black Impact Score
+            </Link>
+            <Link href="/current-administration" className="public-button-secondary">
+              Track Current Administration
+            </Link>
           </div>
+          <div className="mt-6 flex flex-wrap gap-2">
+              <MetaPill>Source-backed records</MetaPill>
+              <MetaPill>Outcome-based scoring</MetaPill>
+              <MetaPill>Visible uncertainty and evidence</MetaPill>
+          </div>
+        </div>
 
           <div className="card-muted rounded-[1.4rem] p-5">
-            <p className="text-xs uppercase tracking-[0.18em] text-[var(--accent)]">Use This Site</p>
+            <p className="text-xs uppercase tracking-[0.18em] text-[var(--accent)]">What You Can Do Here</p>
             <div className="mt-4 space-y-3 text-sm leading-7 text-[var(--ink-soft)]">
-              <p>Start with the record, not the rhetoric.</p>
-              <p>Open the source trail behind each outcome.</p>
-              <p>Use the score as a rollup of the same public evidence.</p>
+              <p>Start with a live record, not a generic summary.</p>
+              <p>Open the source trail behind each documented outcome.</p>
+              <p>Use Black Impact Score as a rollup of the same evidence base.</p>
             </div>
           </div>
         </div>
@@ -373,63 +396,66 @@ export default async function HomePage() {
         <CompactStat
           label="Recent Records"
           value={recentPromises.length}
-          detail="Visible on the homepage"
+          detail="Public records shown below"
         />
         <CompactStat
           label="Current-Term Records"
           value={currentAdministration?.total_promises ?? 0}
-          detail="Tracked in the live view"
+          detail="Reviewed current-term tracking"
         />
         <CompactStat
           label="Presidents Scored"
           value={presidents.length}
-          detail="Current public BIS view"
+          detail="Visible in the current BIS view"
         />
         <CompactStat
           label="Outcomes Scored"
           value={scoreMetadata.total_outcomes}
-          detail="Scoring-ready outcomes"
+          detail="Scoring-ready documented outcomes"
         />
         <CompactStat
           label="Excluded Outcomes"
           value={scoreMetadata.total_excluded_outcomes}
-          detail="Visible but not scored"
+          detail="Visible records outside numeric scoring"
         />
       </section>
 
-      <section className="card-surface rounded-[1.7rem] p-6 md:p-8">
+      <section className="card-surface rounded-[1.6rem] p-6 md:p-8">
         <SectionIntro
-          eyebrow="Flagship Views"
+          eyebrow="Start Here"
           title="Three strong ways to enter the platform"
-          description="Start with promises, outcomes, or the current term. Each path leads back to the same underlying evidence base."
+          description="If this is your first visit, start with one of these paths. Each one is designed to move from summary to evidence without making you guess where to click next."
         />
 
         <div className="mt-6 grid gap-4 md:grid-cols-3">
-          <FlagshipViewCard
-            eyebrow="Intent"
-            title="Promise Tracker"
-            description="See what was promised, what actions followed, and what outcomes were documented."
-            href="/promises"
-            linkLabel="Open Promise Tracker"
-          />
-          <FlagshipViewCard
+          <StartHereCard
             eyebrow="Outcomes"
             title="Black Impact Score"
-            description="Compare administrations using documented outcomes, visible methodology, and public evidence."
+            description="Start with the highest-level accountability view built from documented outcomes and visible methodology."
             href="/reports/black-impact-score"
             linkLabel="Open Black Impact Score"
+            meta="Best for big-picture comparison"
           />
-          <FlagshipViewCard
+          <StartHereCard
+            eyebrow="Evidence"
+            title="Promise Tracker"
+            description="See what was promised, what actions followed, and what outcomes were documented on the record."
+            href="/promises"
+            linkLabel="Open Promise Tracker"
+            meta="Best for record-level inspection"
+          />
+          <StartHereCard
             eyebrow="Live Tracking"
             title="Current Administration"
             description="Follow ongoing current-term records, reviewed updates, and documented outcomes."
             href="/current-administration"
             linkLabel="Open Current Administration"
+            meta="Best for active policy monitoring"
           />
         </div>
       </section>
 
-      <section className="card-surface rounded-[1.7rem] p-6 md:p-8">
+      <section className="card-surface rounded-[1.6rem] p-6 md:p-8">
         <SectionIntro
           eyebrow="Live Preview"
           title="See the system working with real records"
@@ -503,11 +529,11 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="card-surface rounded-[1.7rem] p-6 md:p-8">
+      <section className="card-surface rounded-[1.6rem] p-6 md:p-8">
         <SectionIntro
           eyebrow="Trust Signals"
           title="Built to be inspected, not taken on faith"
-          description="The summaries are useful fast, but the record is still structured so readers can verify what happened and why it was interpreted that way."
+          description="EquityStack is built as a public research product. The summary is fast, but every path still leads back to actions, outcomes, and source-backed records."
           href="/methodology"
           hrefLabel="Read methodology"
         />
