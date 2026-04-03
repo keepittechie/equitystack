@@ -120,6 +120,10 @@ If a page cannot trace a value back to this chain, treat it as a trust risk.
   - session inspector
 - `/admin/review-queue`
   - pending human decisions
+- `/admin/source-curation`
+  - human-in-the-loop source attribution follow-up
+  - loads unresolved source gaps from `source_attribution_manual_review.json`
+  - saves confirmed curation decisions as audit artifacts only
 - `/admin/artifacts`
   - artifact catalog and session linkage
 - `/admin/schedules`
@@ -136,6 +140,14 @@ These remain necessary because they are the actual human checkpoint pages:
 - `/admin/legislative-workflow`
 
 The command center links into them when the next step requires human review.
+
+Additional human review surface:
+
+- `/admin/source-curation`
+  - attach an existing source candidate
+  - draft a new source candidate
+  - mark unresolved source gaps as reviewed
+  - does not mutate canonical source joins directly
 
 ## Operator Mental Model
 
@@ -178,6 +190,48 @@ The deep-integrity scope adds:
 - duplicate-source cluster safety classification
 - current-admin provenance completeness
 - artifact-chain warnings when DB records exist but the canonical current-admin artifacts are missing
+
+### Source Cleanup Rules
+
+Source cleanup must stay evidence-backed.
+
+- auto-merge duplicate source rows only when:
+  - `source_url` matches
+  - `source_title` matches
+  - `source_type` matches
+  - `publisher` matches
+  - `published_date` matches
+  - non-null `policy_id` ownership does not conflict
+- do not merge duplicate source rows across conflicting non-null `policy_id` values
+- do not invent missing sources or guess URLs
+- only backfill missing source joins when a deterministic existing source match is available
+- if a row is ambiguous, export it for manual review instead of mutating the DB
+
+Cleanup artifacts live under `python/reports/integrity/` and are surfaced on `/admin/tools`.
+
+### Source Curation Surface
+
+`/admin/source-curation` is the manual follow-up surface for unresolved source attribution and unsafe duplicate-source review.
+
+- it reads unresolved source-gap scope from `python/reports/integrity/source_attribution_manual_review.json`
+- it reads unsafe duplicate clusters from `python/reports/integrity/source_duplicate_manual_review.json`
+- it may reconstruct row detail from the live DB when the current artifact predates row-level exports
+- it writes confirmed operator decisions to:
+  - `python/reports/integrity/source_curation_decisions.json`
+  - `python/reports/integrity/source_curation_audit_log.jsonl`
+- it also records each confirmed save in operator command history
+
+This surface is human-in-the-loop only.
+
+- `Attach source` updates the canonical source join table for the selected action/outcome after explicit confirmation
+- `Create and attach source` creates a new canonical source row, attaches it immediately, and logs the action
+- `Mark as reviewed` stores a confirmed review note when ambiguity remains
+- `Merge selected` merges an explicitly chosen duplicate subset only after operator confirmation
+- `Mark keep separate` and `Mark reviewed` record duplicate-cluster decisions without mutating source rows
+
+It does not auto-save.
+
+Every mutation must be explicit, confirmed, and auditable. Unsafe duplicate clusters are never auto-merged.
 
 ## Current-Admin Guided Workflow
 
@@ -245,6 +299,27 @@ If DB rows are detected for the active batch but these artifacts are missing, th
 - `provenance_incomplete`
 
 This is a visibility layer only. It does not fabricate missing history.
+
+## Source Backfill Policy
+
+Missing source attribution is split into three categories:
+
+- true missing attribution
+- rows with same-promise source context
+- manual-review-only unresolved rows
+
+Only deterministic rows may be repaired automatically.
+
+Current automatic repair policy:
+
+- missing `promise_action_sources` rows may be backfilled only when the same promise already resolves to exactly one canonical source across promise, action, and outcome source joins
+- missing `promise_outcome_sources` rows remain manual-only unless the same deterministic condition is eventually proven
+
+When cleanup runs, it writes:
+
+- `source_integrity_cleanup_report.json`
+- `source_duplicate_manual_review.json`
+- `source_attribution_manual_review.json`
 
 ### What To Click Next
 

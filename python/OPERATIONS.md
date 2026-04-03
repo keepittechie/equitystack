@@ -50,6 +50,9 @@ They are not allowed to invent data that the canonical artifacts or DB do not co
   - Session inspector for jobs, artifacts, queue items, blockers, runtime metadata
 - `/admin/review-queue`
   - pending human decisions
+- `/admin/source-curation`
+  - unresolved source attribution follow-up
+  - confirmed curation drafts and review notes only
 - `/admin/artifacts`
   - Canonical artifact catalog
 - `/admin/schedules`
@@ -63,6 +66,9 @@ They are not allowed to invent data that the canonical artifacts or DB do not co
   - Current-admin operator review and finalize checkpoint
 - `/admin/legislative-workflow`
   - Legislative bundle review and approval checkpoint
+- `/admin/source-curation`
+  - Manual source-gap curation checkpoint
+  - Existing-source attach proposals, new-source drafts, and reviewed notes only
 
 These stay outside the generic command-center tables because they are the actual human review surfaces.
 
@@ -250,11 +256,58 @@ These checks are safe and read-only. They do not enqueue normal workflow jobs.
 `verify deep-integrity` adds:
 
 - source-gap classification so legacy missing evidence is separated from possible join gaps
-- duplicate-source safety classification so exact duplicate URL clusters are separated from manual-review clusters
+- duplicate-source safety classification so only exact duplicate URL clusters with compatible non-null `policy_id` ownership are auto-merge candidates
 - current-admin provenance completeness so imported DB rows without their artifact chain are surfaced explicitly
 
 Use it when the UI looks suspiciously empty, duplicated, or incomplete and you need to confirm whether
 the underlying DB state is actually sound.
+
+## Source Cleanup Policy
+
+Source cleanup stays conservative.
+
+Auto-merge duplicate sources only when:
+
+- `source_url` matches
+- `source_title` matches
+- `source_type` matches
+- `publisher` matches
+- `published_date` matches
+- non-null `policy_id` ownership does not conflict
+
+Auto-backfill missing source joins only when:
+
+- the missing row already has exactly one canonical same-promise source across existing promise, action, and outcome source joins
+
+Do not:
+
+- invent sources
+- guess URLs
+- merge duplicate sources across conflicting non-null `policy_id` values
+- auto-fix ambiguous rows
+
+Cleanup outputs are written to `python/reports/integrity/` and surfaced on `/admin/tools`.
+
+### Source Curation Workflow
+
+Use `/admin/source-curation` for unresolved source attribution and unsafe duplicate-source review.
+
+- it loads unresolved scope from `python/reports/integrity/source_attribution_manual_review.json`
+- it loads unsafe duplicate clusters from `python/reports/integrity/source_duplicate_manual_review.json`
+- it writes confirmed decisions to:
+  - `python/reports/integrity/source_curation_decisions.json`
+  - `python/reports/integrity/source_curation_audit_log.jsonl`
+- it records the confirmed save in operator command history
+
+Allowed actions there:
+
+- attach an existing source to the selected missing action/outcome
+- create a new source row and attach it immediately
+- mark the gap as reviewed with a note
+- merge a selected compatible duplicate subset after explicit confirmation
+- mark a duplicate cluster keep-separate or reviewed without mutating source rows
+
+Every mutation is explicit, confirmed, and auditable. Unsafe duplicate clusters are never auto-merged.
 
 ## Current-Admin Provenance Guard
 

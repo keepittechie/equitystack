@@ -26,6 +26,9 @@ export default function AdminLayout({ children }) {
               <Link href="/admin/legislative-workflow" className="rounded border border-[#E5EAF0] bg-white px-2 py-1 text-[#4B5563] hover:bg-[#F9FBFD]">
                 legislative surface
               </Link>
+              <Link href="/admin/source-curation" className="rounded border border-[#E5EAF0] bg-white px-2 py-1 text-[#4B5563] hover:bg-[#F9FBFD]">
+                source curation
+              </Link>
               <Link href="/admin/logout" className="rounded border border-[#E5EAF0] bg-white px-2 py-1 text-[#4B5563] hover:bg-[#F9FBFD]">
                 logout
               </Link>

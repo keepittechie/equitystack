@@ -9,6 +9,7 @@ const NAV_ITEMS = [
   { href: "/admin/jobs", label: "Jobs" },
   { href: "/admin/workflows", label: "Sessions" },
   { href: "/admin/review-queue", label: "Review Queue" },
+  { href: "/admin/source-curation", label: "Source Curation" },
   { href: "/admin/artifacts", label: "Artifacts" },
   { href: "/admin/schedules", label: "Schedules" },
   { href: "/admin/tools", label: "Tools" },

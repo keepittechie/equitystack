@@ -288,6 +288,83 @@ def fetch_unresolved_source_groups(cursor, table_kind: str) -> list[dict[str, An
     return grouped
 
 
+def fetch_unresolved_source_rows(cursor, table_kind: str) -> list[dict[str, Any]]:
+    if table_kind == "actions":
+        source_join_table = "promise_action_sources"
+        source_join_field = "promise_action_id"
+        owner_table = "promise_actions"
+        owner_id_field = "id"
+        owner_text_field = "title"
+        owner_detail_field = "description"
+        owner_date_field = "action_date"
+        created_field = "created_at"
+        record_type = "action"
+    else:
+        source_join_table = "promise_outcome_sources"
+        source_join_field = "promise_outcome_id"
+        owner_table = "promise_outcomes"
+        owner_id_field = "id"
+        owner_text_field = "outcome_summary"
+        owner_detail_field = "measurable_impact"
+        owner_date_field = "NULL"
+        created_field = "created_at"
+        record_type = "outcome"
+
+    cursor.execute(
+        f"""
+        SELECT
+          o.{owner_id_field} AS record_id,
+          o.promise_id,
+          o.{owner_text_field} AS record_text,
+          o.{owner_detail_field} AS record_detail,
+          {owner_date_field} AS record_date,
+          o.{created_field} AS created_at,
+          p.slug AS promise_slug,
+          p.title AS promise_title,
+          COALESCE(p.topic, '<untagged>') AS topic,
+          pr.slug AS president_slug,
+          pr.full_name AS president_name
+        FROM {owner_table} o
+        JOIN promises p ON p.id = o.promise_id
+        JOIN presidents pr ON pr.id = p.president_id
+        WHERE NOT EXISTS (
+          SELECT 1
+          FROM {source_join_table} sj
+          WHERE sj.{source_join_field} = o.{owner_id_field}
+        )
+        ORDER BY pr.slug ASC, COALESCE(p.topic, '<untagged>') ASC, p.slug ASC, o.{owner_id_field} ASC
+        """
+    )
+
+    rows = []
+    for row in list(cursor.fetchall() or []):
+        created_at = normalize_nullable_text(row.get("created_at"))
+        record_date = normalize_nullable_text(row.get("record_date"))
+        rows.append(
+            {
+                "review_key": f"{record_type}:{int(row['record_id'])}",
+                "record_type": record_type,
+                "record_id": int(row["record_id"]),
+                "promise_id": int(row["promise_id"]),
+                "promise_slug": normalize_text(row.get("promise_slug")),
+                "promise_title": normalize_text(row.get("promise_title")),
+                "president_slug": normalize_text(row.get("president_slug")),
+                "president_name": normalize_text(row.get("president_name")),
+                "topic": normalize_text(row.get("topic")) or "<untagged>",
+                "record_text": normalize_text(row.get("record_text")),
+                "record_detail": normalize_text(row.get("record_detail")),
+                "record_date": record_date,
+                "created_at": created_at,
+                "likely_import_origin": classify_import_origin(
+                    normalize_text(row.get("president_slug")),
+                    created_at or "",
+                ),
+                "missing_source_flag": True,
+            }
+        )
+    return rows
+
+
 def fetch_missing_source_counts(cursor) -> dict[str, int]:
     cursor.execute(
         """
@@ -508,6 +585,8 @@ def main() -> None:
 
             unresolved_actions = fetch_unresolved_source_groups(cursor, "actions")
             unresolved_outcomes = fetch_unresolved_source_groups(cursor, "outcomes")
+            unresolved_action_rows = fetch_unresolved_source_rows(cursor, "actions")
+            unresolved_outcome_rows = fetch_unresolved_source_rows(cursor, "outcomes")
 
             cleanup_report = {
                 "generated_at": utc_timestamp(),
@@ -565,6 +644,8 @@ def main() -> None:
                 "remaining_missing_outcomes": post_counts["missing_outcomes"],
                 "unresolved_action_groups": unresolved_actions,
                 "unresolved_outcome_groups": unresolved_outcomes,
+                "unresolved_actions": unresolved_action_rows,
+                "unresolved_outcomes": unresolved_outcome_rows,
             }
 
             write_json_file(cleanup_report_path, cleanup_report)

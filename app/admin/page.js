@@ -2378,6 +2378,14 @@ export default async function AdminPage() {
       actionLabel: "Open review queue",
     },
     {
+      title: "Source Curation",
+      href: "/admin/source-curation",
+      description:
+        "Human-in-the-loop source attribution follow-up backed by integrity artifacts and confirmed curation drafts.",
+      signal: "Manual source follow-up surface",
+      actionLabel: "Open source curation",
+    },
+    {
       title: "Jobs",
       href: "/admin/jobs",
       description: "Broker-backed job history, failures, runtime metadata, and reruns.",
