@@ -124,6 +124,31 @@ textarea:focus {
   z-index: 1;
 }
 
+.report-shell {
+  overflow-x: clip;
+}
+
+.report-shell > * {
+  min-width: 0;
+}
+
+.report-shell .grid > * {
+  min-width: 0;
+}
+
+.report-shell .card-surface,
+.report-shell .card-muted,
+.report-shell .panel-link {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.report-scroll-x {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+}
+
 .card-surface {
   background: var(--surface);
   border: 1px solid var(--line);

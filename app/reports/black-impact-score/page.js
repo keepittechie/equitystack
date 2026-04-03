@@ -3119,7 +3119,9 @@ export default async function BlackImpactScorePage({ searchParams }) {
   });
 
   return (
-    <main className={`max-w-7xl mx-auto ${isPublicView ? "px-6 py-10 space-y-10" : "p-6 space-y-8"}`}>
+    <main
+      className={`report-shell max-w-7xl mx-auto ${isPublicView ? "px-6 pt-6 pb-8 space-y-8" : "px-6 pt-4 pb-6 space-y-6"}`}
+    >
       {!isPublicView ? (
         <div className="flex flex-wrap gap-3 print:hidden">
           <Link
@@ -3151,7 +3153,7 @@ export default async function BlackImpactScorePage({ searchParams }) {
 
       {isDebateMode ? <DebateModeHeader /> : null}
 
-      <section className="hero-panel p-8 md:p-10">
+      <section className="hero-panel p-6 md:p-8">
         <p className="eyebrow mb-4">Promise Tracker Report</p>
         <h1 className="text-4xl md:text-5xl font-bold">Black Impact Score</h1>
         <p className="text-base md:text-lg text-[var(--ink-soft)] mt-4 max-w-3xl leading-8">
@@ -3442,7 +3444,7 @@ export default async function BlackImpactScorePage({ searchParams }) {
           selectedPresidentBSlug={requestedPresidentBSlug}
         />
       ) : (
-        <div className="space-y-8">
+        <div className="space-y-6">
           {presidents.map((president) => (
             <section key={president.president_slug} className="card-surface rounded-[1.6rem] p-6">
               <div className="flex items-start justify-between gap-4 flex-wrap">

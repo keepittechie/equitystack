@@ -153,7 +153,7 @@ export default async function CivilRightsTimelinePage() {
   const totalEntries = timeline.items?.length || 0;
 
   return (
-    <main className="max-w-7xl mx-auto p-6 space-y-8">
+    <main className="report-shell max-w-7xl mx-auto px-6 pt-4 pb-6 space-y-6">
       <div className="flex flex-wrap gap-3">
         <Link
           href="/reports"
@@ -169,7 +169,7 @@ export default async function CivilRightsTimelinePage() {
         </Link>
       </div>
 
-      <section className="hero-panel p-8 md:p-10">
+      <section className="hero-panel p-6 md:p-8">
         <p className="eyebrow mb-4">Promise Tracker Report</p>
         <h1 className="text-4xl md:text-5xl font-bold">Civil Rights Timeline</h1>
         <p className="text-base md:text-lg text-[var(--ink-soft)] mt-4 max-w-3xl leading-8">
@@ -226,7 +226,7 @@ export default async function CivilRightsTimelinePage() {
         </div>
       </section>
 
-      <div className="space-y-8">
+      <div className="space-y-6">
         {eras.map((era) => (
           <section key={era.id} id={era.id} className="space-y-4 scroll-mt-24">
             <div className="card-surface rounded-[1.35rem] p-5">

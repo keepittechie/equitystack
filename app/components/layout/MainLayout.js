@@ -27,8 +27,8 @@ function navClasses(pathname, href) {
   const isActive = isActiveNavItem(pathname, href);
 
   return isActive
-    ? "rounded-full bg-[rgba(37,99,235,0.1)] px-4 py-2 text-[var(--accent)] font-semibold"
-    : "rounded-full px-4 py-2 text-[var(--ink-soft)] hover:bg-white hover:text-[var(--accent)]";
+    ? "rounded-full bg-[rgba(37,99,235,0.1)] px-3.5 py-1.5 text-[var(--accent)] font-semibold"
+    : "rounded-full px-3.5 py-1.5 text-[var(--ink-soft)] hover:bg-white hover:text-[var(--accent)]";
 }
 
 export default function MainLayout({ children }) {
@@ -78,7 +78,7 @@ export default function MainLayout({ children }) {
             </div>
             <nav
               aria-label={isAdminPath ? "Admin" : "Primary"}
-              className="hidden md:flex flex-wrap gap-1 text-[13px] font-medium items-center"
+              className="hidden md:flex flex-wrap gap-1 text-[12.75px] font-medium items-center"
             >
               {navLinks.map((item) => (
                 renderNavItem(item, navClasses(pathname, item.href))

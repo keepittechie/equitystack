@@ -105,8 +105,8 @@ export default async function ReportsPage() {
   ]);
 
   return (
-    <main className="max-w-7xl mx-auto p-6">
-      <section className="hero-panel p-8 md:p-10 mb-6">
+    <main className="report-shell max-w-7xl mx-auto px-6 pt-4 pb-6">
+      <section className="hero-panel p-6 md:p-8 mb-5">
         <div className="section-intro">
           <p className="eyebrow mb-4">Reports Hub</p>
           <h1 className="text-4xl md:text-5xl font-bold">Reports</h1>
@@ -118,7 +118,7 @@ export default async function ReportsPage() {
         </div>
       </section>
 
-      <section className="card-surface rounded-[1.6rem] p-5 mb-8">
+      <section className="card-surface rounded-[1.6rem] p-5 mb-6">
         <div className="max-w-3xl mb-5">
           <h2 className="text-lg font-semibold mb-2">Featured Accountability Reports</h2>
           <p className="text-sm text-[var(--ink-soft)] leading-7">
@@ -152,7 +152,7 @@ export default async function ReportsPage() {
         </div>
       </section>
 
-      <section className="card-surface rounded-[1.6rem] p-5 mb-8">
+      <section className="card-surface rounded-[1.6rem] p-5 mb-6">
         <div className="max-w-3xl mb-5">
           <h2 className="text-lg font-semibold mb-2">Start With Black Impact Score</h2>
           <p className="text-sm text-[var(--ink-soft)] leading-7">
@@ -174,7 +174,7 @@ export default async function ReportsPage() {
         </div>
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[1.1fr,0.9fr] mb-8">
+      <section className="grid gap-5 xl:grid-cols-[1.1fr,0.9fr] mb-6">
         <section className="card-surface rounded-[1.6rem] p-5">
           <h2 className="text-lg font-semibold mb-3">Recommended Next Steps</h2>
           <div className="space-y-3 text-sm">
@@ -209,7 +209,7 @@ export default async function ReportsPage() {
         </section>
       </section>
 
-      <section className="card-surface rounded-[1.6rem] p-5 mb-8">
+      <section className="card-surface rounded-[1.6rem] p-5 mb-6">
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div className="max-w-3xl">
             <h2 className="text-lg font-semibold mb-2">More Reports and Tools</h2>
@@ -241,7 +241,7 @@ export default async function ReportsPage() {
         </div>
       </section>
 
-      <section className="card-muted rounded-[1.6rem] p-5 mb-6">
+      <section className="card-muted rounded-[1.6rem] p-5 mb-5">
         <h2 className="text-lg font-semibold mb-2">How to Read the Analytics Layer</h2>
         <p className="text-sm text-[var(--ink-soft)] mb-2">
           These summaries analyze public policies using a structured scoring system across directness,
@@ -253,7 +253,7 @@ export default async function ReportsPage() {
         </p>
       </section>
 
-      <section className="card-surface rounded-[1.6rem] p-5 mb-8">
+      <section className="card-surface rounded-[1.6rem] p-5 mb-6">
         <h2 className="text-lg font-semibold mb-3">Metrics Explained</h2>
         <ul className="text-sm text-[var(--ink-soft)] space-y-2">
           <li>

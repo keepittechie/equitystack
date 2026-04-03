@@ -49,7 +49,7 @@ function ChartShell({
   ready,
 }) {
   return (
-    <section className="space-y-3">
+    <section className="min-w-0 space-y-3">
       <div>
         <h3 className="section-title">{title}</h3>
         {description ? (
@@ -57,8 +57,8 @@ function ChartShell({
         ) : null}
       </div>
 
-      <div className="card-surface rounded-[1.6rem] p-5 overflow-x-auto">
-        <div style={{ minWidth: `${minWidth}px`, height: `${height}px` }}>
+      <div className="report-scroll-x card-surface rounded-[1.6rem] p-5">
+        <div style={{ width: `max(100%, ${minWidth}px)`, height: `${height}px` }}>
           {ready ? children : <div className="w-full h-full" />}
         </div>
       </div>
@@ -89,7 +89,7 @@ function JumpChip({ targetId, label }) {
 
 function FindingCard({ eyebrow, title, body }) {
   return (
-    <div className="card-surface rounded-[1.5rem] p-5">
+    <div className="card-surface min-w-0 rounded-[1.5rem] p-5">
       <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">{eyebrow}</p>
       <h3 className="text-xl font-semibold mt-3">{title}</h3>
       <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">{body}</p>
@@ -99,7 +99,10 @@ function FindingCard({ eyebrow, title, body }) {
 
 function SectionShell({ id, eyebrow, title, description, children }) {
   return (
-    <section id={id} className="card-surface rounded-[1.8rem] p-6 md:p-8 space-y-6 scroll-mt-24">
+    <section
+      id={id}
+      className="card-surface min-w-0 rounded-[1.8rem] p-5 md:p-7 space-y-5 scroll-mt-24"
+    >
       <div className="section-intro">
         <p className="eyebrow mb-4">{eyebrow}</p>
         <h2 className="text-3xl font-semibold">{title}</h2>
@@ -112,7 +115,7 @@ function SectionShell({ id, eyebrow, title, description, children }) {
 
 function RankingList({ title, description, rows, labelKey, valueKey, valueLabel }) {
   return (
-    <section className="space-y-3">
+    <section className="min-w-0 space-y-3">
       <div>
         <h3 className="text-2xl font-semibold">{title}</h3>
         {description ? (
@@ -148,7 +151,7 @@ function PolicyCard({ policy, titleLabel = "Total Score", titleValue }) {
   return (
     <Link
       href={`/policies/${policy.id}`}
-      className="panel-link block rounded-[1.5rem] p-5"
+      className="panel-link block min-w-0 rounded-[1.5rem] p-5"
     >
       <h3 className="text-lg font-semibold">{policy.title}</h3>
       <p className="text-sm text-[var(--ink-soft)] mt-1">
@@ -249,8 +252,8 @@ export default function ReportsDashboard({
     .slice(0, 4);
 
   return (
-    <div className="space-y-10">
-      <section className="card-surface rounded-[1.6rem] p-5 md:p-6 space-y-5">
+    <div className="space-y-8">
+      <section className="card-surface rounded-[1.6rem] p-5 md:p-6 space-y-4">
         <div className="section-intro">
           <h2 className="text-2xl font-semibold">Navigate the Report</h2>
           <p className="text-sm text-[var(--ink-soft)] mt-2">
