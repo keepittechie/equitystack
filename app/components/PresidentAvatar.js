@@ -5,6 +5,7 @@ export default function PresidentAvatar({
   presidentSlug,
   presidentName,
   size = 48,
+  shape = "circle",
   className = "",
 }) {
   const src = resolvePresidentImageSrc({ presidentSlug, presidentName });
@@ -16,7 +17,8 @@ export default function PresidentAvatar({
   return (
     <div
       className={[
-        "relative shrink-0 overflow-hidden rounded-full border border-[rgba(120,53,15,0.14)] bg-[rgba(247,242,234,0.9)] shadow-[0_8px_18px_rgba(120,53,15,0.08)]",
+        "relative shrink-0 overflow-hidden border border-[rgba(120,53,15,0.14)] bg-[rgba(247,242,234,0.9)] shadow-[0_8px_18px_rgba(120,53,15,0.08)]",
+        shape === "rounded" ? "rounded-[0.95rem]" : "rounded-full",
         className,
       ]
         .filter(Boolean)

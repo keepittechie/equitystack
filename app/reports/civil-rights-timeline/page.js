@@ -98,7 +98,8 @@ function TimelineEntry({ item }) {
             <PresidentAvatar
               presidentSlug={item.president_slug}
               presidentName={item.president}
-              size={44}
+              size={56}
+              shape="rounded"
             />
           </div>
           {item.president_party ? (

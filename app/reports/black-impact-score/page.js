@@ -1,5 +1,6 @@
 import Link from "next/link";
 import HelpfulFeedback from "@/app/components/feedback/HelpfulFeedback";
+import PresidentAvatar from "@/app/components/PresidentAvatar";
 import { ImpactBadge, statusPillClasses } from "@/app/components/policy-badges";
 import TrackedLink from "@/app/components/telemetry/TrackedLink";
 import { fetchInternalJson } from "@/lib/api";
@@ -1125,7 +1126,14 @@ function TopSummarySection({ presidents }) {
                 className="rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 p-4"
               >
                 <div className="flex items-start justify-between gap-3 flex-wrap">
-                  <p className="text-base font-semibold">{president.president}</p>
+                  <div className="flex items-center gap-3">
+                    <PresidentAvatar
+                      presidentSlug={president.president_slug}
+                      presidentName={president.president}
+                      size={42}
+                    />
+                    <p className="text-base font-semibold">{president.president}</p>
+                  </div>
                   <MetaPill>{formatNormalizedScore(president.normalized_score)}</MetaPill>
                 </div>
               </div>
@@ -1142,7 +1150,14 @@ function TopSummarySection({ presidents }) {
                 className="rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 p-4"
               >
                 <div className="flex items-start justify-between gap-3 flex-wrap">
-                  <p className="text-base font-semibold">{president.president}</p>
+                  <div className="flex items-center gap-3">
+                    <PresidentAvatar
+                      presidentSlug={president.president_slug}
+                      presidentName={president.president}
+                      size={42}
+                    />
+                    <p className="text-base font-semibold">{president.president}</p>
+                  </div>
                   <MetaPill>{formatNormalizedScore(president.normalized_score)}</MetaPill>
                 </div>
               </div>
@@ -2129,6 +2144,11 @@ function TimelineModeSection({ entries, isPublicView, effectiveScoringModel, sel
                   >
                     {showPresidentDivider ? (
                       <div className="mb-4 flex items-center gap-3 flex-wrap">
+                        <PresidentAvatar
+                          presidentSlug={entry.president_slug}
+                          presidentName={entry.president}
+                          size={40}
+                        />
                         <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">
                           {entry.president || "President not available"}
                         </p>
@@ -2304,7 +2324,14 @@ function TopicComparisonSection({
           <h3 className="text-lg font-semibold">Strongest Positive President</h3>
           {strongestPositive ? (
             <div className="mt-3">
-              <p className="text-base font-semibold">{strongestPositive.president}</p>
+              <div className="flex items-center gap-3">
+                <PresidentAvatar
+                  presidentSlug={strongestPositive.president_slug}
+                  presidentName={strongestPositive.president}
+                  size={42}
+                />
+                <p className="text-base font-semibold">{strongestPositive.president}</p>
+              </div>
               <p className="text-sm text-[var(--ink-soft)] mt-2">
                 Normalized score: {formatNormalizedScore(strongestPositive.normalized_score)}
               </p>
@@ -2318,7 +2345,14 @@ function TopicComparisonSection({
           <h3 className="text-lg font-semibold">Strongest Negative President</h3>
           {strongestNegative ? (
             <div className="mt-3">
-              <p className="text-base font-semibold">{strongestNegative.president}</p>
+              <div className="flex items-center gap-3">
+                <PresidentAvatar
+                  presidentSlug={strongestNegative.president_slug}
+                  presidentName={strongestNegative.president}
+                  size={42}
+                />
+                <p className="text-base font-semibold">{strongestNegative.president}</p>
+              </div>
               <p className="text-sm text-[var(--ink-soft)] mt-2">
                 Normalized score: {formatNormalizedScore(strongestNegative.normalized_score)}
               </p>
@@ -2335,6 +2369,11 @@ function TopicComparisonSection({
             <div className="flex items-start justify-between gap-4 flex-wrap">
               <div className="max-w-3xl">
                 <div className="flex items-center gap-2 flex-wrap">
+                  <PresidentAvatar
+                    presidentSlug={president.president_slug}
+                    presidentName={president.president}
+                    size={42}
+                  />
                   <h3 className="text-lg font-semibold">{president.president}</h3>
                   {president.president_party ? <MetaPill>{president.president_party}</MetaPill> : null}
                 </div>
@@ -2495,6 +2534,11 @@ function PresidentComparisonSection({
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div className="max-w-3xl">
             <div className="flex items-center gap-2 flex-wrap">
+              <PresidentAvatar
+                presidentSlug={president.president_slug}
+                presidentName={president.president}
+                size={44}
+              />
               <h3 className="text-xl font-semibold">{president.president}</h3>
               {president.president_party ? <MetaPill>{president.president_party}</MetaPill> : null}
             </div>
@@ -3283,7 +3327,14 @@ export default async function BlackImpactScorePage({ searchParams }) {
               <div className="flex items-start justify-between gap-4 flex-wrap">
                 <div>
                   <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">President Summary</p>
-                  <h2 className="text-3xl font-semibold mt-2">{president.president}</h2>
+                  <div className="mt-2 flex items-center gap-3 flex-wrap">
+                    <PresidentAvatar
+                      presidentSlug={president.president_slug}
+                      presidentName={president.president}
+                      size={48}
+                    />
+                    <h2 className="text-3xl font-semibold">{president.president}</h2>
+                  </div>
                   <p className="text-sm text-[var(--ink-soft)] mt-2 leading-7 max-w-3xl">
                     {president.explanation}
                   </p>
