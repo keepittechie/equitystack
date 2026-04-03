@@ -58,7 +58,7 @@ function ChartShell({
       </div>
 
       <div className="report-scroll-x card-surface rounded-[1.6rem] p-5">
-        <div style={{ width: `max(100%, ${minWidth}px)`, height: `${height}px` }}>
+        <div style={{ width: "100%", height: `${height}px`, minWidth: 0 }}>
           {ready ? children : <div className="w-full h-full" />}
         </div>
       </div>

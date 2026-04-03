@@ -153,7 +153,7 @@ export default async function CivilRightsTimelinePage() {
   const totalEntries = timeline.items?.length || 0;
 
   return (
-    <main className="report-shell max-w-7xl mx-auto px-6 pt-4 pb-6 space-y-6">
+    <main className="report-shell w-full pt-4 pb-6 space-y-6">
       <div className="flex flex-wrap gap-3">
         <Link
           href="/reports"

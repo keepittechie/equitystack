@@ -1680,8 +1680,8 @@ function AdvancedReportToolsSection({
           Advanced Tools and Sharing
         </summary>
         <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7 max-w-3xl">
-          Open this section for timeline controls, topic or comparison filters, share links, saved
-          states, and print or PDF tools after you have read the main report.
+          Open this section for comparison links, share links, saved states, and print or PDF tools
+          after you have read the main report.
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
           <TrackedLink
@@ -3120,7 +3120,7 @@ export default async function BlackImpactScorePage({ searchParams }) {
 
   return (
     <main
-      className={`report-shell max-w-7xl mx-auto ${isPublicView ? "px-6 pt-6 pb-8 space-y-8" : "px-6 pt-4 pb-6 space-y-6"}`}
+      className={`report-shell w-full ${isPublicView ? "pt-6 pb-8 space-y-8" : "pt-4 pb-6 space-y-6"}`}
     >
       {!isPublicView ? (
         <div className="flex flex-wrap gap-3 print:hidden">
@@ -3198,205 +3198,37 @@ export default async function BlackImpactScorePage({ searchParams }) {
         <TimelineShortcutSection timelineHref={timelineReportHref} />
       ) : null}
 
-      <ScoringTransparencySection
+      <ViewToggleSection
+        standardHref={standardReportHref}
+        timelineHref={timelineReportHref}
+        isTimelineView={isTimelineView}
+      />
+
+      <TopicFilterSection
+        topicOptions={topicOptions}
+        selectedTopic={selectedTopic}
+        allTopicsHref={allTopicsHref}
+        buildTopicHref={buildTopicHref}
+      />
+
+      <ScoringReadyFilterSection
+        filterHref={scoringReadyFilterHref}
+        clearHref={scoringReadyClearHref}
+        isActive={isScoringReadyFilterActive}
+        availableCount={scoringReadyAvailableCount}
+        totalCount={records.length}
         usingLegacyModel={usingLegacyModel}
         isLegacyFallbackActive={isLegacyFallbackActive}
       />
 
-      <CredibilityNote
-        promiseCount={records.length}
-        outcomeCount={usingLegacyModel ? null : metadata?.total_outcomes ?? 0}
-        effectiveScoringModel={effectiveScoringModel}
-        usingLegacyModel={usingLegacyModel}
-        isLegacyFallbackActive={isLegacyFallbackActive}
-      />
-
-      <HowThisWasBuiltSection
-        promiseCount={records.length}
-        outcomeCount={metadata?.total_outcomes ?? 0}
-        sourceReferenceCount={getVisibleSourceReferenceCount(records)}
-        excludedOutcomeCount={metadata?.total_excluded_outcomes ?? 0}
-        effectiveScoringModel={effectiveScoringModel}
-        isScoringReadyFilterActive={isScoringReadyFilterActive}
-        usingLegacyModel={usingLegacyModel}
-      />
-
-      <MethodologySection
-        methodology={methodology}
-        metadata={metadata}
-        usingLegacyModel={usingLegacyModel}
-        isLegacyFallbackActive={isLegacyFallbackActive}
-      />
-
-      <AdvancedReportToolsSection
-        debateHref={debateHref}
-        presidentCompareHref={presidentCompareHref}
-        topicCompareHref={topicCompareHref}
-        shareReportHref={shareUrl}
-        compareHref={compareHref}
-      >
-        <ViewToggleSection
-          standardHref={standardReportHref}
-          timelineHref={timelineReportHref}
-          isTimelineView={isTimelineView}
+      {isPresidentCompareView && selectedTopic ? (
+        <PresidentCompareSelectorSection
+          options={presidentCompareOptions}
+          selectedPresidentASlug={requestedPresidentASlug}
+          selectedPresidentBSlug={requestedPresidentBSlug}
+          buildPresidentCompareHref={buildPresidentCompareHref}
         />
-
-        <TopicFilterSection
-          topicOptions={topicOptions}
-          selectedTopic={selectedTopic}
-          allTopicsHref={allTopicsHref}
-          buildTopicHref={buildTopicHref}
-        />
-
-        <ScoringReadyFilterSection
-          filterHref={scoringReadyFilterHref}
-          clearHref={scoringReadyClearHref}
-          isActive={isScoringReadyFilterActive}
-          availableCount={scoringReadyAvailableCount}
-          totalCount={records.length}
-          usingLegacyModel={usingLegacyModel}
-          isLegacyFallbackActive={isLegacyFallbackActive}
-        />
-
-        {isPresidentCompareView && selectedTopic ? (
-          <PresidentCompareSelectorSection
-            options={presidentCompareOptions}
-            selectedPresidentASlug={requestedPresidentASlug}
-            selectedPresidentBSlug={requestedPresidentBSlug}
-            buildPresidentCompareHref={buildPresidentCompareHref}
-          />
-        ) : null}
-
-        <PermalinkSection permalinkUrl={permalinkUrl} />
-
-        <SnapshotSection
-          snapshotLabel={snapshotLabel}
-          isPublicShareView={isPublicShareView}
-          permalinkUrl={permalinkUrl}
-        />
-
-        <SnapshotLibraryPanel
-          currentSnapshot={{
-            label: snapshotLabel,
-            permalinkUrl,
-            modeSummary: snapshotModeSummary,
-          }}
-        />
-      </AdvancedReportToolsSection>
-
-      {usingOutcomeModel && !isTopicCompareView && !isPresidentCompareView ? (
-        <SystemLevelInsight presidents={presidents} metadata={metadata} />
       ) : null}
-
-      {isDebateMode ? <VerificationSection /> : null}
-
-      {isPublicShareView ? <ShareVerificationSection /> : null}
-
-      {!isPublicView ? (
-        <section className="card-surface rounded-[1.6rem] p-5">
-          <div className="flex items-start justify-between gap-4 flex-wrap">
-            <div className="max-w-3xl">
-              <h2 className="text-lg font-semibold mb-2">Built From Promise Tracker</h2>
-          <p className="text-sm text-[var(--ink-soft)] leading-7">
-            This report summarizes Promise Tracker records into a president-level accountability view.
-            It remains tied to the underlying promise, action, and outcome records rather than operating as a separate product surface.
-              </p>
-            </div>
-            <Link
-              href="/promises"
-              className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
-            >
-              Open Promise Tracker
-            </Link>
-          </div>
-        </section>
-      ) : null}
-
-      <section id="methodology" className="card-surface rounded-[1.6rem] p-5">
-        <details>
-          <summary className="cursor-pointer text-lg font-semibold">View Methodology</summary>
-          <div className="mt-4 space-y-4">
-            {methodology ? (
-              <>
-                {methodology.summary ? (
-                  <p className="text-sm text-[var(--ink-soft)] leading-7">{methodology.summary}</p>
-                ) : null}
-
-                {methodology.scope ? (
-                  <div className="card-muted rounded-[1.25rem] p-4">
-                    <h2 className="text-base font-semibold">Scoring Scope</h2>
-                    <div className="mt-3 space-y-2 text-sm text-[var(--ink-soft)]">
-                      {methodology.scope.primary_unit ? (
-                        <p>
-                          <strong className="text-[var(--ink)]">Primary unit:</strong>{" "}
-                          {methodology.scope.primary_unit}
-                        </p>
-                      ) : null}
-                      {methodology.scope.included ? (
-                        <p>
-                          <strong className="text-[var(--ink)]">Included:</strong>{" "}
-                          {methodology.scope.included}
-                        </p>
-                      ) : null}
-                      {methodology.scope.excluded ? (
-                        <p>
-                          <strong className="text-[var(--ink)]">Excluded:</strong>{" "}
-                          {methodology.scope.excluded}
-                        </p>
-                      ) : null}
-                    </div>
-                  </div>
-                ) : null}
-
-                {methodology.outcome_scoring?.evidence_multipliers ? (
-                  <div className="card-muted rounded-[1.25rem] p-4">
-                    <h2 className="text-base font-semibold">Evidence Weighting</h2>
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      {Object.entries(methodology.outcome_scoring.evidence_multipliers).map(([label, value]) => (
-                        <MetaPill key={label}>
-                          {label} = {value}
-                        </MetaPill>
-                      ))}
-                    </div>
-                  </div>
-                ) : null}
-
-                {methodology.outcome_scoring?.eligibility_requirements?.length ? (
-                  <div className="card-muted rounded-[1.25rem] p-4">
-                    <h2 className="text-base font-semibold">Scoring Eligibility</h2>
-                    <ul className="mt-3 space-y-2 text-sm text-[var(--ink-soft)]">
-                      {methodology.outcome_scoring.eligibility_requirements.map((item) => (
-                        <li key={item}>{item}</li>
-                      ))}
-                    </ul>
-                  </div>
-                ) : null}
-
-                {methodology.confidence?.levels ? (
-                  <div className="card-muted rounded-[1.25rem] p-4">
-                    <h2 className="text-base font-semibold">Confidence Levels</h2>
-                    <div className="mt-3 space-y-2 text-sm text-[var(--ink-soft)]">
-                      {Object.entries(methodology.confidence.levels).map(([label, value]) => (
-                        <p key={label}>
-                          <strong className="text-[var(--ink)]">{toCanonicalConfidence(label)}:</strong> {value}
-                        </p>
-                      ))}
-                    </div>
-                  </div>
-                ) : null}
-
-                <ul className="text-sm text-[var(--ink-soft)] space-y-2">
-                  {(methodology.notes || []).map((note) => (
-                    <li key={note}>{note}</li>
-                  ))}
-                </ul>
-              </>
-            ) : (
-              <p className="text-sm text-[var(--ink-soft)]">Methodology data is not available.</p>
-            )}
-          </div>
-        </details>
-      </section>
 
       {presidents.length === 0 && !isTimelineView && !isTopicCompareView && !isPresidentCompareView ? (
         <section className="card-surface rounded-[1.6rem] p-8 text-center">
@@ -3570,6 +3402,174 @@ export default async function BlackImpactScorePage({ searchParams }) {
           ))}
         </div>
       )}
+
+      {usingOutcomeModel && !isTopicCompareView && !isPresidentCompareView ? (
+        <SystemLevelInsight presidents={presidents} metadata={metadata} />
+      ) : null}
+
+      <ScoringTransparencySection
+        usingLegacyModel={usingLegacyModel}
+        isLegacyFallbackActive={isLegacyFallbackActive}
+      />
+
+      <CredibilityNote
+        promiseCount={records.length}
+        outcomeCount={usingLegacyModel ? null : metadata?.total_outcomes ?? 0}
+        effectiveScoringModel={effectiveScoringModel}
+        usingLegacyModel={usingLegacyModel}
+        isLegacyFallbackActive={isLegacyFallbackActive}
+      />
+
+      <HowThisWasBuiltSection
+        promiseCount={records.length}
+        outcomeCount={metadata?.total_outcomes ?? 0}
+        sourceReferenceCount={getVisibleSourceReferenceCount(records)}
+        excludedOutcomeCount={metadata?.total_excluded_outcomes ?? 0}
+        effectiveScoringModel={effectiveScoringModel}
+        isScoringReadyFilterActive={isScoringReadyFilterActive}
+        usingLegacyModel={usingLegacyModel}
+      />
+
+      <MethodologySection
+        methodology={methodology}
+        metadata={metadata}
+        usingLegacyModel={usingLegacyModel}
+        isLegacyFallbackActive={isLegacyFallbackActive}
+      />
+
+      <AdvancedReportToolsSection
+        debateHref={debateHref}
+        presidentCompareHref={presidentCompareHref}
+        topicCompareHref={topicCompareHref}
+        shareReportHref={shareUrl}
+        compareHref={compareHref}
+      >
+        <PermalinkSection permalinkUrl={permalinkUrl} />
+
+        <SnapshotSection
+          snapshotLabel={snapshotLabel}
+          isPublicShareView={isPublicShareView}
+          permalinkUrl={permalinkUrl}
+        />
+
+        <SnapshotLibraryPanel
+          currentSnapshot={{
+            label: snapshotLabel,
+            permalinkUrl,
+            modeSummary: snapshotModeSummary,
+          }}
+        />
+      </AdvancedReportToolsSection>
+
+      {isDebateMode ? <VerificationSection /> : null}
+
+      {isPublicShareView ? <ShareVerificationSection /> : null}
+
+      {!isPublicView ? (
+        <section className="card-surface rounded-[1.6rem] p-5">
+          <div className="flex items-start justify-between gap-4 flex-wrap">
+            <div className="max-w-3xl">
+              <h2 className="text-lg font-semibold mb-2">Built From Promise Tracker</h2>
+              <p className="text-sm text-[var(--ink-soft)] leading-7">
+                This report summarizes Promise Tracker records into a president-level accountability view.
+                It remains tied to the underlying promise, action, and outcome records rather than operating as a separate product surface.
+              </p>
+            </div>
+            <Link
+              href="/promises"
+              className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
+            >
+              Open Promise Tracker
+            </Link>
+          </div>
+        </section>
+      ) : null}
+
+      <section id="methodology" className="card-surface rounded-[1.6rem] p-5">
+        <details>
+          <summary className="cursor-pointer text-lg font-semibold">View Methodology</summary>
+          <div className="mt-4 space-y-4">
+            {methodology ? (
+              <>
+                {methodology.summary ? (
+                  <p className="text-sm text-[var(--ink-soft)] leading-7">{methodology.summary}</p>
+                ) : null}
+
+                {methodology.scope ? (
+                  <div className="card-muted rounded-[1.25rem] p-4">
+                    <h2 className="text-base font-semibold">Scoring Scope</h2>
+                    <div className="mt-3 space-y-2 text-sm text-[var(--ink-soft)]">
+                      {methodology.scope.primary_unit ? (
+                        <p>
+                          <strong className="text-[var(--ink)]">Primary unit:</strong>{" "}
+                          {methodology.scope.primary_unit}
+                        </p>
+                      ) : null}
+                      {methodology.scope.included ? (
+                        <p>
+                          <strong className="text-[var(--ink)]">Included:</strong>{" "}
+                          {methodology.scope.included}
+                        </p>
+                      ) : null}
+                      {methodology.scope.excluded ? (
+                        <p>
+                          <strong className="text-[var(--ink)]">Excluded:</strong>{" "}
+                          {methodology.scope.excluded}
+                        </p>
+                      ) : null}
+                    </div>
+                  </div>
+                ) : null}
+
+                {methodology.outcome_scoring?.evidence_multipliers ? (
+                  <div className="card-muted rounded-[1.25rem] p-4">
+                    <h2 className="text-base font-semibold">Evidence Weighting</h2>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {Object.entries(methodology.outcome_scoring.evidence_multipliers).map(([label, value]) => (
+                        <MetaPill key={label}>
+                          {label} = {value}
+                        </MetaPill>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+
+                {methodology.outcome_scoring?.eligibility_requirements?.length ? (
+                  <div className="card-muted rounded-[1.25rem] p-4">
+                    <h2 className="text-base font-semibold">Scoring Eligibility</h2>
+                    <ul className="mt-3 space-y-2 text-sm text-[var(--ink-soft)]">
+                      {methodology.outcome_scoring.eligibility_requirements.map((item) => (
+                        <li key={item}>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
+
+                {methodology.confidence?.levels ? (
+                  <div className="card-muted rounded-[1.25rem] p-4">
+                    <h2 className="text-base font-semibold">Confidence Levels</h2>
+                    <div className="mt-3 space-y-2 text-sm text-[var(--ink-soft)]">
+                      {Object.entries(methodology.confidence.levels).map(([label, value]) => (
+                        <p key={label}>
+                          <strong className="text-[var(--ink)]">{toCanonicalConfidence(label)}:</strong> {value}
+                        </p>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+
+                <ul className="text-sm text-[var(--ink-soft)] space-y-2">
+                  {(methodology.notes || []).map((note) => (
+                    <li key={note}>{note}</li>
+                  ))}
+                </ul>
+              </>
+            ) : (
+              <p className="text-sm text-[var(--ink-soft)]">Methodology data is not available.</p>
+            )}
+          </div>
+        </details>
+      </section>
 
       <HelpfulFeedback
         pagePath={permalinkUrl}

@@ -105,7 +105,7 @@ export default async function ReportsPage() {
   ]);
 
   return (
-    <main className="report-shell max-w-7xl mx-auto px-6 pt-4 pb-6">
+    <main className="report-shell w-full pt-4 pb-6">
       <section className="hero-panel p-6 md:p-8 mb-5">
         <div className="section-intro">
           <p className="eyebrow mb-4">Reports Hub</p>
@@ -173,6 +173,29 @@ export default async function ReportsPage() {
           />
         </div>
       </section>
+
+      <section className="card-surface rounded-[1.6rem] p-5 mb-6">
+        <div className="max-w-3xl">
+          <h2 className="text-lg font-semibold mb-2">Analytics Dashboard</h2>
+          <p className="text-sm text-[var(--ink-soft)] leading-7">
+            These quantitative summaries provide broader context across parties, eras, categories,
+            direct Black impact, top policies, and rollback patterns. They support the featured
+            accountability reports rather than replacing them.
+          </p>
+        </div>
+      </section>
+
+      <ReportsDashboard
+        overallSummary={overallSummary}
+        partySummaryRows={partySummaryRows}
+        eraSummaryRows={eraSummaryRows}
+        categorySummaryRows={categorySummaryRows}
+        directImpactByPartyRows={directImpactByPartyRows}
+        directImpactByEraRows={directImpactByEraRows}
+        topPolicies={topPolicies}
+        rollbackRows={rollbackRows}
+        futureBills={futureBills}
+      />
 
       <section className="grid gap-5 xl:grid-cols-[1.1fr,0.9fr] mb-6">
         <section className="card-surface rounded-[1.6rem] p-5">
@@ -272,29 +295,6 @@ export default async function ReportsPage() {
           </li>
         </ul>
       </section>
-
-      <section className="card-surface rounded-[1.6rem] p-5 mb-8">
-        <div className="max-w-3xl">
-          <h2 className="text-lg font-semibold mb-2">Analytics Dashboard</h2>
-          <p className="text-sm text-[var(--ink-soft)] leading-7">
-            These quantitative summaries provide broader context across parties, eras, categories,
-            direct Black impact, top policies, and rollback patterns. They support the featured
-            accountability reports rather than replacing them.
-          </p>
-        </div>
-      </section>
-
-      <ReportsDashboard
-        overallSummary={overallSummary}
-        partySummaryRows={partySummaryRows}
-        eraSummaryRows={eraSummaryRows}
-        categorySummaryRows={categorySummaryRows}
-        directImpactByPartyRows={directImpactByPartyRows}
-        directImpactByEraRows={directImpactByEraRows}
-        topPolicies={topPolicies}
-        rollbackRows={rollbackRows}
-        futureBills={futureBills}
-      />
 
       <p className="text-xs text-[var(--ink-soft)] mt-10">
         This dashboard is a structured analysis of historical policy data. While every effort is made
