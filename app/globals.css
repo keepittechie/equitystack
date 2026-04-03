@@ -253,12 +253,78 @@ textarea:focus {
 .public-pill {
   display: inline-flex;
   align-items: center;
+  gap: 0.35rem;
   border-radius: 9999px;
-  border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.96);
-  padding: 0.25rem 0.75rem;
-  font-size: 0.75rem;
+  border: 1px solid rgba(120, 53, 15, 0.14);
+  background: rgba(255, 252, 247, 0.92);
+  padding: 0.42rem 0.92rem;
+  font-size: 0.74rem;
+  font-weight: 600;
+  line-height: 1;
   color: var(--ink-soft);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: 9999px;
+  border: 1px solid transparent;
+  padding: 0.42rem 0.92rem;
+  font-size: 0.74rem;
+  font-weight: 650;
+  line-height: 1;
+  letter-spacing: 0.01em;
+}
+
+.status-pill--default {
+  border-color: rgba(100, 116, 139, 0.18);
+  background: rgba(100, 116, 139, 0.09);
+  color: #526173;
+}
+
+.status-pill--success {
+  border-color: rgba(22, 163, 74, 0.18);
+  background: rgba(22, 163, 74, 0.1);
+  color: #1f6a3a;
+}
+
+.status-pill--warning {
+  border-color: rgba(217, 119, 6, 0.19);
+  background: rgba(217, 119, 6, 0.1);
+  color: #9a4d17;
+}
+
+.status-pill--danger {
+  border-color: rgba(220, 38, 38, 0.18);
+  background: rgba(220, 38, 38, 0.1);
+  color: #ad2d2d;
+}
+
+.status-pill--info {
+  border-color: rgba(37, 99, 235, 0.18);
+  background: rgba(37, 99, 235, 0.1);
+  color: #2455c7;
+}
+
+.status-pill--cyan {
+  border-color: rgba(8, 145, 178, 0.18);
+  background: rgba(8, 145, 178, 0.1);
+  color: #176f73;
+}
+
+.status-pill--violet {
+  border-color: rgba(124, 58, 237, 0.17);
+  background: rgba(124, 58, 237, 0.09);
+  color: #6d40c3;
+}
+
+.status-pill--accent {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #ffffff;
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.14);
 }
 
 .public-button-primary {

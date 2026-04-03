@@ -19,38 +19,38 @@ function formatDate(dateString) {
 function impactTone(priority) {
   switch (priority) {
     case "Critical":
-      return "bg-red-50 text-red-700 border-red-200";
+      return "status-pill--danger";
     case "High":
-      return "bg-orange-50 text-orange-700 border-orange-200";
+      return "status-pill--warning";
     case "Medium":
-      return "bg-amber-50 text-amber-700 border-amber-200";
+      return "status-pill--warning";
     default:
-      return "bg-stone-100 text-stone-700 border-stone-300";
+      return "status-pill--default";
   }
 }
 
 function chamberTone(chamber) {
   switch (chamber) {
     case "House":
-      return "bg-blue-50 text-blue-700 border-blue-200";
+      return "status-pill--info";
     case "Senate":
-      return "bg-violet-50 text-violet-700 border-violet-200";
+      return "status-pill--violet";
     default:
-      return "bg-stone-100 text-stone-700 border-stone-300";
+      return "status-pill--default";
   }
 }
 
 function statusTone(status) {
   switch (status) {
     case "Enacted":
-      return "bg-emerald-50 text-emerald-700 border-emerald-200";
+      return "status-pill--success";
     case "Passed House":
     case "Passed Senate":
-      return "bg-indigo-50 text-indigo-700 border-indigo-200";
+      return "status-pill--info";
     case "Introduced":
-      return "bg-blue-50 text-blue-700 border-blue-200";
+      return "status-pill--info";
     default:
-      return "bg-stone-100 text-stone-700 border-stone-300";
+      return "status-pill--default";
   }
 }
 
@@ -101,16 +101,16 @@ function ActivityCard({ item }) {
       </div>
 
       <div className="mt-4 flex flex-wrap gap-2 text-xs">
-        <span className={`border rounded-full px-3 py-1 ${impactTone(item.priorityLevel)}`}>
+        <span className={`status-pill ${impactTone(item.priorityLevel)}`}>
           {item.priorityLevel || "Priority Unset"}
         </span>
-        <span className={`border rounded-full px-3 py-1 ${chamberTone(item.chamber)}`}>
+        <span className={`status-pill ${chamberTone(item.chamber)}`}>
           {item.chamber || "Chamber Unclear"}
         </span>
-        <span className={`border rounded-full px-3 py-1 ${statusTone(item.billStatus)}`}>
+        <span className={`status-pill ${statusTone(item.billStatus)}`}>
           {item.billStatus || "Tracked"}
         </span>
-        <span className="border rounded-full px-3 py-1 bg-[rgba(255,252,247,0.82)] text-[var(--ink-soft)]">
+        <span className="public-pill">
           {item.billNumber}
         </span>
       </div>
@@ -134,13 +134,13 @@ function ActivityCard({ item }) {
           </p>
 
           <div className="mt-4 flex flex-wrap gap-2 text-xs text-[var(--ink-soft)]">
-            <span className="border rounded-full px-3 py-1 bg-white/80">
+            <span className="public-pill">
               Sponsors: {item.sponsorCount}
             </span>
-            <span className="border rounded-full px-3 py-1 bg-white/80">
+            <span className="public-pill">
               Scorecards: {item.linkedLegislatorCount}
             </span>
-            <span className="border rounded-full px-3 py-1 bg-white/80">
+            <span className="public-pill">
               Explainers: {item.explainerCount}
             </span>
           </div>

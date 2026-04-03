@@ -116,13 +116,13 @@ function TimelinePolicyRow({ policy }) {
           ) : null}
 
           <div className="mt-3 flex flex-wrap gap-2 text-xs text-[var(--ink-soft)]">
-            <span className="border rounded-full px-3 py-1 bg-[rgba(255,252,247,0.82)]">
+            <span className="public-pill">
               Direct Black Impact: {policy.direct_black_impact ? "Yes" : "No"}
             </span>
-            <span className="border rounded-full px-3 py-1 bg-[rgba(255,252,247,0.82)]">
+            <span className="public-pill">
               Status: {policy.status || "Unknown"}
             </span>
-            <span className="border rounded-full px-3 py-1 bg-[rgba(255,252,247,0.82)]">
+            <span className="public-pill">
               Bipartisan: {policy.bipartisan ? "Yes" : "No"}
             </span>
           </div>

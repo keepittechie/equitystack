@@ -41,11 +41,7 @@ function FilterField({ label, children }) {
 }
 
 function MetaPill({ children }) {
-  return (
-    <span className="inline-flex items-center rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-3 py-1 text-xs text-[var(--ink-soft)]">
-      {children}
-    </span>
-  );
+  return <span className="public-pill">{children}</span>;
 }
 
 function buildPageHref(searchParams, page) {

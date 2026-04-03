@@ -93,10 +93,10 @@ export default async function FutureBillDetailPage({ params }) {
               {bill.summary}
             </p>
             <div className="flex flex-wrap gap-2 mt-4">
-              <span className={`border rounded-full px-3 py-1 text-xs font-medium ${priorityClasses(bill.priority_level)}`}>
+              <span className={`status-pill ${priorityClasses(bill.priority_level)}`}>
                 {bill.priority_level}
               </span>
-              <span className={`border rounded-full px-3 py-1 text-xs font-medium ${statusClasses(bill.status)}`}>
+              <span className={`status-pill ${statusClasses(bill.status)}`}>
                 {bill.status}
               </span>
               <MetaPill>{bill.tracked_bills.length} linked bills</MetaPill>

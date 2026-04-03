@@ -69,7 +69,7 @@ export default function CardPage({ card, backHref, backLabel }) {
         >
           {backLabel}
         </Link>
-        <span className="inline-flex items-center rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-3 py-1 text-xs text-[var(--ink-soft)]">
+        <span className="public-pill">
           Shareable Card
         </span>
       </div>

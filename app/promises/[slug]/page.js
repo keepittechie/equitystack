@@ -58,11 +58,7 @@ function MiniStat({ label, value, subtitle }) {
 }
 
 function MetaPill({ children }) {
-  return (
-    <span className="inline-flex items-center rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-3 py-1 text-xs text-[var(--ink-soft)]">
-      {children}
-    </span>
-  );
+  return <span className="public-pill">{children}</span>;
 }
 
 function formatDate(dateString) {
@@ -126,17 +122,17 @@ function getLatestActionDate(promise) {
 function actionBadgeClasses(type) {
   switch (type) {
     case "Executive Order":
-      return "bg-blue-50 text-blue-700 border-blue-200";
+      return "status-pill--info";
     case "Bill":
-      return "bg-emerald-50 text-emerald-700 border-emerald-200";
+      return "status-pill--success";
     case "Agency Action":
-      return "bg-amber-50 text-amber-700 border-amber-200";
+      return "status-pill--warning";
     case "Court-Related Action":
-      return "bg-violet-50 text-violet-700 border-violet-200";
+      return "status-pill--violet";
     case "Public Reversal":
-      return "bg-red-50 text-red-700 border-red-200";
+      return "status-pill--danger";
     default:
-      return "bg-stone-100 text-stone-700 border-stone-300";
+      return "status-pill--default";
   }
 }
 
@@ -491,7 +487,7 @@ export default async function PromiseDetailPage({ params }) {
                         <h3 className="text-lg font-semibold mt-1">{action.title}</h3>
                       </div>
                       <span
-                        className={`border rounded-full px-3 py-1 text-xs font-medium ${actionBadgeClasses(
+                        className={`status-pill ${actionBadgeClasses(
                           action.action_type
                         )}`}
                       >

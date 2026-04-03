@@ -67,19 +67,19 @@ function StatCard({ title, value, subtitle }) {
 function relationshipBadgeClasses(type) {
   switch (type) {
     case "expands":
-      return "bg-green-50 text-green-700 border-green-200";
+      return "status-pill--success";
     case "enables":
-      return "bg-emerald-50 text-emerald-700 border-emerald-200";
+      return "status-pill--success";
     case "responds_to":
-      return "bg-amber-50 text-amber-700 border-amber-200";
+      return "status-pill--warning";
     case "restricts":
-      return "bg-orange-50 text-orange-700 border-orange-200";
+      return "status-pill--warning";
     case "undermines":
-      return "bg-red-50 text-red-700 border-red-200";
+      return "status-pill--danger";
     case "replaces":
-      return "bg-blue-50 text-blue-700 border-blue-200";
+      return "status-pill--info";
     default:
-      return "bg-stone-100 text-stone-700 border-stone-300";
+      return "status-pill--default";
   }
 }
 
@@ -112,15 +112,15 @@ function interpretImpactScore(score) {
 function priorityClasses(priority) {
   switch (priority) {
     case "Critical":
-      return "bg-red-50 text-red-700 border-red-200";
+      return "status-pill--danger";
     case "High":
-      return "bg-orange-50 text-orange-700 border-orange-200";
+      return "status-pill--warning";
     case "Medium":
-      return "bg-amber-50 text-amber-700 border-amber-200";
+      return "status-pill--warning";
     case "Low":
-      return "bg-stone-100 text-stone-700 border-stone-300";
+      return "status-pill--default";
     default:
-      return "bg-stone-100 text-stone-700 border-stone-300";
+      return "status-pill--default";
   }
 }
 
@@ -129,11 +129,7 @@ function formatImpactMetric(value) {
 }
 
 function PromiseMetaPill({ children }) {
-  return (
-    <span className="inline-flex items-center rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-3 py-1 text-xs text-[var(--ink-soft)]">
-      {children}
-    </span>
-  );
+  return <span className="public-pill">{children}</span>;
 }
 
 export default async function PolicyDetailPage({ params }) {
@@ -248,7 +244,7 @@ export default async function PolicyDetailPage({ params }) {
                 {policy.categories.map((category) => (
                   <span
                     key={category.name}
-                    className="border rounded-full px-3 py-1 text-sm bg-[rgba(255,252,247,0.8)]"
+                    className="public-pill text-sm"
                   >
                     {category.name}
                   </span>
@@ -415,7 +411,7 @@ export default async function PolicyDetailPage({ params }) {
                       </div>
 
                       <span
-                        className={`border rounded-full px-3 py-1 text-xs font-medium ${relationshipBadgeClasses(
+                        className={`status-pill ${relationshipBadgeClasses(
                           relationship.relationship_type
                         )}`}
                       >
@@ -514,7 +510,7 @@ export default async function PolicyDetailPage({ params }) {
                         </p>
                       </div>
                       <span
-                        className={`border rounded-full px-3 py-1 text-xs font-medium ${priorityClasses(
+                        className={`status-pill ${priorityClasses(
                           bill.priority_level
                         )}`}
                       >
@@ -645,7 +641,7 @@ export default async function PolicyDetailPage({ params }) {
                         )}
                       </div>
 
-                      <span className="border rounded-full px-3 py-1 text-xs font-medium">
+                      <span className="public-pill">
                         {source.source_type}
                       </span>
                     </div>

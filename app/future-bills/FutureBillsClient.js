@@ -429,20 +429,20 @@ export default function FutureBillsClient({ bills, focusId }) {
 
                   <div className="flex flex-wrap gap-2">
                     {isFocused && (
-                      <span className="inline-flex items-center rounded-full border border-[var(--accent)] bg-[var(--accent)] px-3 py-1 text-xs font-medium text-white">
+                      <span className="status-pill status-pill--accent">
                         Focused
                       </span>
                     )}
 
                     <span
-                      className={`border rounded-full px-3 py-1 text-xs font-medium ${priorityClasses(
+                      className={`status-pill ${priorityClasses(
                         bill.priority_level
                       )}`}
                     >
                       {bill.priority_level}
                     </span>
                     <span
-                      className={`border rounded-full px-3 py-1 text-xs font-medium ${statusClasses(
+                      className={`status-pill ${statusClasses(
                         bill.status
                       )}`}
                     >

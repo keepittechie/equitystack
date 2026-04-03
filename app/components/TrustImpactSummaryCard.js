@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ImpactBadge } from "@/app/components/policy-badges";
+import { ImpactBadge, statusPillClasses } from "@/app/components/policy-badges";
 import {
   getEvidenceStrengthTone,
   getRecordEvidenceStrengthLabel,
@@ -12,18 +12,12 @@ import {
 } from "@/lib/labels";
 
 function SummaryBadge({ label, tone = "neutral" }) {
-  const classes =
-    tone === "success"
-      ? "border-[rgba(22,163,74,0.2)] bg-[rgba(22,163,74,0.08)] text-[#166534]"
-      : tone === "warning"
-        ? "border-[rgba(217,119,6,0.2)] bg-[rgba(217,119,6,0.08)] text-[#B45309]"
-        : tone === "danger"
-          ? "border-[rgba(220,38,38,0.2)] bg-[rgba(220,38,38,0.08)] text-[#B91C1C]"
-          : "border-[var(--line)] bg-white text-[var(--ink-soft)]";
-
   return (
     <span
-      className={`inline-flex items-center rounded-full border px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] ${classes}`}
+      className={statusPillClasses(
+        tone === "neutral" ? "default" : tone,
+        "px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.12em]"
+      )}
     >
       {label}
     </span>

@@ -2,6 +2,7 @@ import Link from "next/link";
 import {
   ImpactBadge,
   PromiseStatusBadge,
+  statusPillClasses,
 } from "@/app/components/policy-badges";
 import TrustImpactSummaryCard from "@/app/components/TrustImpactSummaryCard";
 import { EXPLANATION_CONTENT } from "@/lib/content/explanations";
@@ -165,17 +166,8 @@ function PreviewRecordCard({
 }
 
 function MiniPill({ label, tone = "default" }) {
-  const classes =
-    tone === "success"
-      ? "border-[rgba(22,163,74,0.2)] bg-[rgba(22,163,74,0.1)] text-[#166534]"
-      : tone === "warning"
-        ? "border-[rgba(217,119,6,0.2)] bg-[rgba(217,119,6,0.1)] text-[#B45309]"
-        : tone === "danger"
-          ? "border-[rgba(220,38,38,0.2)] bg-[rgba(220,38,38,0.1)] text-[#B91C1C]"
-          : "border-[var(--line)] bg-[rgba(255,255,255,0.96)] text-[var(--ink-soft)]";
-
   return (
-    <span className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium ${classes}`}>
+    <span className={statusPillClasses(tone, "text-xs")}>
       {label}
     </span>
   );

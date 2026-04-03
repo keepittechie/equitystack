@@ -59,15 +59,15 @@ function MiniStat({ label, value }) {
 function priorityClasses(priority) {
   switch (priority) {
     case "Critical":
-      return "bg-red-50 text-red-700 border-red-200";
+      return "status-pill--danger";
     case "High":
-      return "bg-orange-50 text-orange-700 border-orange-200";
+      return "status-pill--warning";
     case "Medium":
-      return "bg-amber-50 text-amber-700 border-amber-200";
+      return "status-pill--warning";
     case "Low":
-      return "bg-stone-100 text-stone-700 border-stone-300";
+      return "status-pill--default";
     default:
-      return "bg-stone-100 text-stone-700 border-stone-300";
+      return "status-pill--default";
   }
 }
 
@@ -112,11 +112,7 @@ function formatImpactMetric(value) {
 }
 
 function PromiseMetaPill({ children }) {
-  return (
-    <span className="inline-flex items-center rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-3 py-1 text-xs text-[var(--ink-soft)]">
-      {children}
-    </span>
-  );
+  return <span className="public-pill">{children}</span>;
 }
 
 function getRelatedExplainers(slug) {
@@ -437,7 +433,7 @@ export default async function ExplainerDetailPage({ params }) {
                 <div className="flex items-center justify-between gap-3 flex-wrap">
                   <h3 className="font-semibold">{bill.title}</h3>
                   <span
-                    className={`border rounded-full px-3 py-1 text-xs font-medium ${priorityClasses(
+                    className={`status-pill ${priorityClasses(
                       bill.priority_level
                     )}`}
                   >
@@ -570,7 +566,7 @@ export default async function ExplainerDetailPage({ params }) {
               >
                 <div className="flex items-center justify-between gap-3 flex-wrap">
                   <h3 className="font-semibold">{source.source_title}</h3>
-                  <span className="text-xs border rounded-full px-3 py-1 bg-[rgba(255,252,247,0.8)] text-[var(--ink-soft)]">
+                  <span className="public-pill">
                     {source.source_type}
                   </span>
                 </div>

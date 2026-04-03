@@ -3,48 +3,48 @@ import Link from "next/link";
 export function priorityClasses(priority) {
   switch (priority) {
     case "Critical":
-      return "bg-red-50 text-red-700 border-red-200";
+      return "status-pill--danger";
     case "High":
-      return "bg-orange-50 text-orange-700 border-orange-200";
+      return "status-pill--warning";
     case "Medium":
-      return "bg-amber-50 text-amber-700 border-amber-200";
+      return "status-pill--warning";
     case "Low":
-      return "bg-stone-100 text-stone-700 border-stone-300";
+      return "status-pill--default";
     default:
-      return "bg-stone-100 text-stone-700 border-stone-300";
+      return "status-pill--default";
   }
 }
 
 export function statusClasses(status) {
   switch (status) {
     case "Introduced":
-      return "bg-blue-50 text-blue-700 border-blue-200";
+      return "status-pill--info";
     case "Advocacy":
-      return "bg-purple-50 text-purple-700 border-purple-200";
+      return "status-pill--violet";
     case "Drafting":
-      return "bg-emerald-50 text-emerald-700 border-emerald-200";
+      return "status-pill--success";
     case "Idea":
-      return "bg-stone-100 text-stone-700 border-stone-300";
+      return "status-pill--default";
     default:
-      return "bg-stone-100 text-stone-700 border-stone-300";
+      return "status-pill--default";
   }
 }
 
 export function trackedBillStatusClasses(status) {
   switch (status) {
     case "Introduced":
-      return "bg-blue-50 text-blue-700 border-blue-200";
+      return "status-pill--info";
     case "Passed House":
-      return "bg-indigo-50 text-indigo-700 border-indigo-200";
+      return "status-pill--info";
     case "Passed Senate":
-      return "bg-violet-50 text-violet-700 border-violet-200";
+      return "status-pill--violet";
     case "Enacted":
-      return "bg-green-50 text-green-700 border-green-200";
+      return "status-pill--success";
     case "Failed":
     case "Stalled":
-      return "bg-red-50 text-red-700 border-red-200";
+      return "status-pill--danger";
     default:
-      return "bg-stone-100 text-stone-700 border-stone-300";
+      return "status-pill--default";
   }
 }
 
@@ -260,30 +260,30 @@ export function FutureBillDetailSections({ bill, detailMode = false, sources = [
                   </div>
 
                   <div className="flex flex-wrap gap-2">
-                    <span className="border rounded-full px-3 py-1 text-xs font-medium bg-[rgba(255,252,247,0.85)] text-[var(--ink-soft)] border-[var(--line)]">
+                    <span className="public-pill">
                       {trackedBill.latest_update_label}
                     </span>
 
-                    <span className="border rounded-full px-3 py-1 text-xs font-medium bg-[rgba(255,252,247,0.85)] text-[var(--ink-soft)] border-[var(--line)]">
+                    <span className="public-pill">
                       Sponsors: {trackedBill.sponsor_count}
                     </span>
 
-                    <span className="border rounded-full px-3 py-1 text-xs font-medium bg-[rgba(255,252,247,0.85)] text-[var(--ink-soft)] border-[var(--line)]">
+                    <span className="public-pill">
                       Scorecards: {trackedBill.legislator_count || 0}
                     </span>
 
-                    <span className="border rounded-full px-3 py-1 text-xs font-medium bg-[rgba(255,252,247,0.85)] text-[var(--ink-soft)] border-[var(--line)]">
+                    <span className="public-pill">
                       Actions: {trackedBill.action_count}
                     </span>
 
                     {trackedBill.link_type && (
-                      <span className="border rounded-full px-3 py-1 text-xs font-medium bg-amber-50 text-amber-700 border-amber-200">
+                      <span className="status-pill status-pill--warning">
                         {trackedBill.link_type} Match
                       </span>
                     )}
 
                     <span
-                      className={`border rounded-full px-3 py-1 text-xs font-medium ${trackedBillStatusClasses(
+                      className={`status-pill ${trackedBillStatusClasses(
                         trackedBill.status
                       )}`}
                     >
@@ -387,7 +387,7 @@ export function FutureBillDetailSections({ bill, detailMode = false, sources = [
                   <h4 className="font-semibold">{explainer.title}</h4>
 
                   {explainer.category && (
-                    <span className="border rounded-full px-3 py-1 text-xs font-medium bg-[rgba(255,252,247,0.85)] text-[var(--ink-soft)] border-[var(--line)]">
+                    <span className="public-pill">
                       {explainer.category}
                     </span>
                   )}

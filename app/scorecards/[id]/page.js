@@ -30,11 +30,7 @@ export async function generateMetadata({ params }) {
 }
 
 function Pill({ children }) {
-  return (
-    <span className="border rounded-full px-3 py-1 text-xs bg-[rgba(255,252,247,0.82)] text-[var(--ink-soft)]">
-      {children}
-    </span>
-  );
+  return <span className="public-pill">{children}</span>;
 }
 
 function formatDate(dateString) {
@@ -70,15 +66,15 @@ function priorityLabel(rank) {
 function impactBadgeClasses(impact) {
   switch (impact) {
     case "Positive":
-      return "bg-green-50 text-green-700 border-green-200";
+      return "status-pill--success";
     case "Negative":
-      return "bg-red-50 text-red-700 border-red-200";
+      return "status-pill--danger";
     case "Mixed":
-      return "bg-amber-50 text-amber-700 border-amber-200";
+      return "status-pill--warning";
     case "Blocked":
-      return "bg-stone-100 text-stone-700 border-stone-300";
+      return "status-pill--default";
     default:
-      return "bg-stone-100 text-stone-700 border-stone-300";
+      return "status-pill--default";
   }
 }
 
@@ -392,7 +388,7 @@ export default async function LegislatorScorecardDetailPage({ params }) {
                         </p>
                       </div>
                       <span
-                        className={`border rounded-full px-3 py-1 text-xs font-medium ${impactBadgeClasses(
+                        className={`status-pill ${impactBadgeClasses(
                           policy.impact_direction
                         )}`}
                       >

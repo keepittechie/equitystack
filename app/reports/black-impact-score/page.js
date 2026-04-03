@@ -1,7 +1,7 @@
 import Link from "next/link";
 import HelpfulFeedback from "@/app/components/feedback/HelpfulFeedback";
+import { ImpactBadge, statusPillClasses } from "@/app/components/policy-badges";
 import TrackedLink from "@/app/components/telemetry/TrackedLink";
-import { ImpactBadge } from "@/app/components/policy-badges";
 import { fetchInternalJson } from "@/lib/api";
 import { REPORT_REVALIDATE_SECONDS, withRevalidate } from "@/lib/cache";
 import { getBlackImpactScoreMethodology } from "@/lib/black-impact-score/methodology.js";
@@ -358,18 +358,14 @@ async function getBlackImpactScores(model) {
 }
 
 function MetaPill({ children }) {
-  return (
-    <span className="inline-flex items-center rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-3 py-1 text-xs text-[var(--ink-soft)]">
-      {children}
-    </span>
-  );
+  return <span className="public-pill">{children}</span>;
 }
 
-function TrustBadge({ label, description }) {
+function TrustBadge({ label, description, tone = "info" }) {
   return (
     <span
       title={description}
-      className="inline-flex items-center rounded-full border border-[rgba(120,53,15,0.18)] bg-[rgba(255,252,247,0.92)] px-3 py-1 text-xs font-medium text-[var(--ink)]"
+      className={statusPillClasses(tone)}
     >
       {label}
     </span>

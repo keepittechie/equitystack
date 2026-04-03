@@ -6,21 +6,19 @@ import {
   toCanonicalImpactDirection,
 } from "@/lib/labels";
 
-function pillClasses(tone) {
-  let className =
-    "inline-flex items-center rounded-full px-3 py-1 text-xs font-medium border ";
-
-  if (tone === "success") {
-    className += "bg-[rgba(22,163,74,0.1)] text-[#166534] border-[rgba(22,163,74,0.2)]";
-  } else if (tone === "warning") {
-    className += "bg-[rgba(217,119,6,0.1)] text-[#b45309] border-[rgba(217,119,6,0.2)]";
-  } else if (tone === "danger") {
-    className += "bg-[rgba(220,38,38,0.1)] text-[#b91c1c] border-[rgba(220,38,38,0.2)]";
-  } else {
-    className += "bg-slate-100 text-slate-700 border-slate-300";
-  }
-
-  return className;
+export function statusPillClasses(tone = "default", extraClasses = "") {
+  const toneMap = {
+    success: "status-pill--success",
+    warning: "status-pill--warning",
+    danger: "status-pill--danger",
+    info: "status-pill--info",
+    cyan: "status-pill--cyan",
+    violet: "status-pill--violet",
+    accent: "status-pill--accent",
+    default: "status-pill--default",
+  };
+  const toneClass = toneMap[tone] || toneMap.default;
+  return ["status-pill", toneClass, extraClasses].filter(Boolean).join(" ");
 }
 
 export function EvidenceBadge({ summary }) {
@@ -28,7 +26,7 @@ export function EvidenceBadge({ summary }) {
 
   const label = toCanonicalEvidenceStrength(summary.evidence_strength);
 
-  return <span className={pillClasses(getEvidenceStrengthTone(label))}>Evidence: {label}</span>;
+  return <span className={statusPillClasses(getEvidenceStrengthTone(label))}>Evidence: {label}</span>;
 }
 
 export function CompletenessBadge({ summary }) {
@@ -42,7 +40,7 @@ export function CompletenessBadge({ summary }) {
         ? "warning"
         : "danger";
 
-  return <span className={pillClasses(tone)}>Data Quality: {label}</span>;
+  return <span className={statusPillClasses(tone)}>Data Quality: {label}</span>;
 }
 
 export function ImpactBadge({ impact }) {
@@ -51,47 +49,39 @@ export function ImpactBadge({ impact }) {
   const canonicalImpact = toCanonicalImpactDirection(impact);
   const label = canonicalImpact === "Mixed" ? "Mixed Impact" : canonicalImpact;
 
-  return <span className={pillClasses(getImpactDirectionTone(canonicalImpact))}>{label}</span>;
+  return <span className={statusPillClasses(getImpactDirectionTone(canonicalImpact))}>{label}</span>;
 }
 
 export function PromiseStatusBadge({ status }) {
   if (!status) return null;
 
-  let className =
-    "inline-flex items-center rounded-full px-3 py-1 text-xs font-medium border ";
+  let tone = "default";
 
   if (status === "Delivered") {
-    className += "bg-[rgba(22,163,74,0.1)] text-[#166534] border-[rgba(22,163,74,0.2)]";
+    tone = "success";
   } else if (status === "In Progress") {
-    className += "bg-[rgba(37,99,235,0.1)] text-[#1d4ed8] border-[rgba(37,99,235,0.2)]";
+    tone = "info";
   } else if (status === "Partial") {
-    className += "bg-[rgba(217,119,6,0.1)] text-[#b45309] border-[rgba(217,119,6,0.2)]";
+    tone = "warning";
   } else if (status === "Failed") {
-    className += "bg-[rgba(220,38,38,0.1)] text-[#b91c1c] border-[rgba(220,38,38,0.2)]";
-  } else if (status === "Blocked") {
-    className += "bg-slate-100 text-slate-700 border-slate-300";
-  } else {
-    className += "bg-slate-100 text-slate-700 border-slate-300";
+    tone = "danger";
   }
 
-  return <span className={className}>{status}</span>;
+  return <span className={statusPillClasses(tone)}>{status}</span>;
 }
 
 export function PromiseRelevanceBadge({ relevance }) {
   if (!relevance) return null;
 
-  let className =
-    "inline-flex items-center rounded-full px-3 py-1 text-xs font-medium border ";
+  let tone = "default";
 
   if (relevance === "High") {
-    className += "bg-[rgba(37,99,235,0.1)] text-[#1d4ed8] border-[rgba(37,99,235,0.2)]";
+    tone = "info";
   } else if (relevance === "Medium") {
-    className += "bg-[rgba(6,182,212,0.1)] text-[#0f766e] border-[rgba(6,182,212,0.2)]";
-  } else {
-    className += "bg-slate-100 text-slate-700 border-slate-300";
+    tone = "cyan";
   }
 
-  return <span className={className}>{relevance} relevance</span>;
+  return <span className={statusPillClasses(tone)}>{relevance} relevance</span>;
 }
 
 export function PromiseImpactDirectionBadge({ impact }) {
@@ -100,5 +90,5 @@ export function PromiseImpactDirectionBadge({ impact }) {
   const canonicalImpact = toCanonicalImpactDirection(impact);
   const label = canonicalImpact === "Mixed" ? "Mixed Impact" : canonicalImpact;
 
-  return <span className={pillClasses(getImpactDirectionTone(canonicalImpact))}>{label}</span>;
+  return <span className={statusPillClasses(getImpactDirectionTone(canonicalImpact))}>{label}</span>;
 }

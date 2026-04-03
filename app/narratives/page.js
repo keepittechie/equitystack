@@ -71,14 +71,14 @@ function PolicyCard({ policy, showScore = false }) {
       <p className="mt-3 text-[var(--ink-soft)] leading-7">{policy.summary}</p>
 
       <div className="mt-4 flex flex-wrap gap-2 text-xs text-[var(--ink-soft)]">
-        <span className="border rounded-full px-3 py-1 bg-[rgba(255,252,247,0.8)]">
+        <span className="public-pill">
           Direct Black Impact: {policy.direct_black_impact ? "Yes" : "No"}
         </span>
-        <span className="border rounded-full px-3 py-1 bg-[rgba(255,252,247,0.8)]">
+        <span className="public-pill">
           Bipartisan: {policy.bipartisan ? "Yes" : "No"}
         </span>
         {showScore && (
-          <span className="border rounded-full px-3 py-1 bg-[rgba(255,252,247,0.8)]">
+          <span className="public-pill">
             Score: {policy.total_score}
           </span>
         )}
