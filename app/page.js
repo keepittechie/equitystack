@@ -1,4 +1,5 @@
 import Link from "next/link";
+import PresidentAvatar from "@/app/components/PresidentAvatar";
 import {
   ImpactBadge,
   PromiseStatusBadge,
@@ -131,6 +132,8 @@ function PreviewRecordCard({
   topic,
   status,
   impactDirection,
+  presidentSlug,
+  presidentName,
 }) {
   return (
     <article className="panel-link rounded-[1.3rem] p-5">
@@ -142,6 +145,13 @@ function PreviewRecordCard({
           <h3 className="mt-3 text-base font-semibold leading-6">{title}</h3>
         </div>
         <div className="flex flex-wrap gap-2">
+          {presidentSlug || presidentName ? (
+            <PresidentAvatar
+              presidentSlug={presidentSlug}
+              presidentName={presidentName}
+              size={40}
+            />
+          ) : null}
           {status ? <PromiseStatusBadge status={status} /> : null}
           {impactDirection ? <ImpactBadge impact={impactDirection} /> : null}
         </div>
@@ -232,7 +242,14 @@ function ScoreSnapshotCard({ presidents, metadata }) {
               <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Highest current score</p>
               {highest ? (
                 <>
-                  <h4 className="mt-3 text-lg font-semibold">{highest.president}</h4>
+                  <div className="mt-3 flex items-center gap-3">
+                    <PresidentAvatar
+                      presidentSlug={highest.president_slug}
+                      presidentName={highest.president}
+                      size={40}
+                    />
+                    <h4 className="text-lg font-semibold">{highest.president}</h4>
+                  </div>
                   <div className="mt-3 flex flex-wrap gap-2">
                     <MiniPill label={`Normalized ${formatScore(highest.normalized_score_total)}`} tone="success" />
                     <MiniPill label={`${highest.outcome_count} outcomes`} />
@@ -247,7 +264,14 @@ function ScoreSnapshotCard({ presidents, metadata }) {
               <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Lowest current score</p>
               {lowest ? (
                 <>
-                  <h4 className="mt-3 text-lg font-semibold">{lowest.president}</h4>
+                  <div className="mt-3 flex items-center gap-3">
+                    <PresidentAvatar
+                      presidentSlug={lowest.president_slug}
+                      presidentName={lowest.president}
+                      size={40}
+                    />
+                    <h4 className="text-lg font-semibold">{lowest.president}</h4>
+                  </div>
                   <div className="mt-3 flex flex-wrap gap-2">
                     <MiniPill label={`Normalized ${formatScore(lowest.normalized_score_total)}`} tone="danger" />
                     <MiniPill label={`${lowest.outcome_count} outcomes`} />
@@ -509,6 +533,10 @@ export default async function HomePage() {
                   status={record.status}
                   impactDirection={
                     record.impact_direction_for_curation || record.latest_impact_direction
+                  }
+                  presidentSlug={currentAdministration?.president?.slug}
+                  presidentName={
+                    currentAdministration?.president?.president || currentAdministration?.administration_name
                   }
                 />
               ))}

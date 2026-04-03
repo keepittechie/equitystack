@@ -1,4 +1,5 @@
 import Link from "next/link";
+import PresidentAvatar from "@/app/components/PresidentAvatar";
 import { PromiseRelevanceBadge, PromiseStatusBadge } from "@/app/components/policy-badges";
 import { fetchInternalJson } from "@/lib/api";
 import { PUBLIC_REVALIDATE_SECONDS, withRevalidate } from "@/lib/cache";
@@ -340,6 +341,11 @@ export default async function AllPromisesPage({ searchParams }) {
                   </TrackedLink>
                 </div>
                 <div className="flex flex-wrap gap-2">
+                  <PresidentAvatar
+                    presidentSlug={promise.president_slug}
+                    presidentName={promise.president}
+                    size={40}
+                  />
                   <PromiseRelevanceBadge relevance={promise.relevance} />
                   <PromiseStatusBadge status={promise.status} />
                   <TrackedLink
