@@ -213,8 +213,8 @@ export default async function CurrentAdministrationPage() {
           <PresidentAvatar
             presidentSlug={overview?.president?.slug}
             presidentName={overview?.president?.president || overview?.administration_name}
-            size={64}
-            shape="rounded"
+            size={80}
+            shape="circle"
           />
         </div>
       </section>
