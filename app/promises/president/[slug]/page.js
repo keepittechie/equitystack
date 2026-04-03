@@ -11,6 +11,7 @@ import TrackedLink from "@/app/components/telemetry/TrackedLink";
 import { EXPLANATION_CONTENT } from "@/lib/content/explanations";
 import { buildPageMetadata } from "@/lib/metadata";
 import { buildPromiseCardHref } from "@/lib/shareable-card-links";
+import PresidentAvatar from "@/app/components/PresidentAvatar";
 
 async function getPromisePresident(slug, showAll) {
   const params = new URLSearchParams();
@@ -152,29 +153,36 @@ export default async function PromisePresidentPage({ params, searchParams }) {
       </div>
 
       <section className="hero-panel p-8 md:p-10 mb-6">
-        <div className="max-w-4xl">
-          <p className="eyebrow mb-4">Promise Tracker</p>
-          <h1 className="text-3xl md:text-4xl font-bold">{president.president}</h1>
-          <p className="text-base md:text-lg text-[var(--ink-soft)] mt-4 leading-8">
-            Promise Tracker groups this presidency term&apos;s records by status. The default view prioritizes
-            promises with direct or meaningful downstream Black-community impact while keeping repeated administrations distinct.
-          </p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {president.president_party ? <MetaPill>{president.president_party}</MetaPill> : null}
-            <MetaPill>{formatTermBadgeLabel(president.term_start, president.term_end)}</MetaPill>
-            <MetaPill>{formatTermRange(president.term_start, president.term_end)}</MetaPill>
-            <MetaPill>
-              {showAll ? president.total_tracked_promises : president.visible_promise_count} shown
-            </MetaPill>
+        <div className="flex items-start justify-between gap-6 flex-wrap">
+          <div className="max-w-4xl">
+            <p className="eyebrow mb-4">Promise Tracker</p>
+            <h1 className="text-3xl md:text-4xl font-bold">{president.president}</h1>
+            <p className="text-base md:text-lg text-[var(--ink-soft)] mt-4 leading-8">
+              Promise Tracker groups this presidency term&apos;s records by status. The default view prioritizes
+              promises with direct or meaningful downstream Black-community impact while keeping repeated administrations distinct.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {president.president_party ? <MetaPill>{president.president_party}</MetaPill> : null}
+              <MetaPill>{formatTermBadgeLabel(president.term_start, president.term_end)}</MetaPill>
+              <MetaPill>{formatTermRange(president.term_start, president.term_end)}</MetaPill>
+              <MetaPill>
+                {showAll ? president.total_tracked_promises : president.visible_promise_count} shown
+              </MetaPill>
+            </div>
+            <p className="text-sm text-[var(--ink-soft)] mt-4 leading-7">
+              This page covers the <strong>{formatTermBadgeLabel(president.term_start, president.term_end)}</strong> for {president.president}.
+            </p>
+            <p className="text-sm text-[var(--ink-soft)] mt-4 leading-7">
+              {showAll
+                ? "All tracked promises for this president are visible, including secondary and deprioritized records."
+                : "Low-relevance and overlapping records remain accessible through Show All."}
+            </p>
           </div>
-          <p className="text-sm text-[var(--ink-soft)] mt-4 leading-7">
-            This page covers the <strong>{formatTermBadgeLabel(president.term_start, president.term_end)}</strong> for {president.president}.
-          </p>
-          <p className="text-sm text-[var(--ink-soft)] mt-4 leading-7">
-            {showAll
-              ? "All tracked promises for this president are visible, including secondary and deprioritized records."
-              : "Low-relevance and overlapping records remain accessible through Show All."}
-          </p>
+          <PresidentAvatar
+            presidentSlug={president.slug || slug}
+            presidentName={president.president}
+            size={56}
+          />
         </div>
       </section>
 

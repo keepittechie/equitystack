@@ -2,6 +2,7 @@ import Link from "next/link";
 import { fetchInternalJson } from "@/lib/api";
 import { PUBLIC_REVALIDATE_SECONDS, withRevalidate } from "@/lib/cache";
 import { buildPageMetadata } from "@/lib/metadata";
+import PresidentAvatar from "@/app/components/PresidentAvatar";
 
 export const metadata = buildPageMetadata({
   title: "Promise Tracker",
@@ -74,6 +75,9 @@ export default async function PromisesPage({ searchParams }) {
             Review Promise Tracker by presidency term. This keeps repeated presidents separated by administration,
             while the default view still prioritizes promises with direct or meaningful downstream Black-community impact.
           </p>
+          <p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--ink-soft)]">
+            Select a presidency to explore its full record of promises, actions, and outcomes.
+          </p>
           <div className="mt-5 flex flex-wrap gap-2">
             <MetaPill>{presidents.length} presidents with tracked promises</MetaPill>
             <MetaPill>Chronological overview by term start</MetaPill>
@@ -87,19 +91,19 @@ export default async function PromisesPage({ searchParams }) {
           href={showAll ? "/promises/all?show_all=1" : "/promises/all"}
           className="public-button-secondary"
         >
-          Browse All Promises
+          Open full Promise Tracker
         </Link>
         <Link
           href={showAll ? "/promises" : "/promises?show_all=1"}
           className="public-button-secondary"
         >
-          {showAll ? "Show Prioritized View" : "Show All Promises"}
+          {showAll ? "Return to prioritized Promise Tracker" : "Open all Promise Tracker records"}
         </Link>
         <Link
           href="/reports/black-impact-score"
           className="public-button-secondary"
         >
-          View Black Impact Score
+          Open Black Impact Score
         </Link>
       </section>
 
@@ -116,7 +120,7 @@ export default async function PromisesPage({ searchParams }) {
             href="/reports/black-impact-score"
             className="public-button-secondary"
           >
-            See Black Impact Score
+            Open Black Impact Score
           </Link>
         </div>
       </section>
@@ -143,7 +147,14 @@ export default async function PromisesPage({ searchParams }) {
                   </p>
                   <h2 className="text-2xl font-semibold mt-2">{president.president}</h2>
                 </div>
-                <MetaPill>{president.total_tracked_promises} tracked</MetaPill>
+                <div className="flex items-center gap-3">
+                  <PresidentAvatar
+                    presidentSlug={president.slug}
+                    presidentName={president.president}
+                    size={48}
+                  />
+                  <MetaPill>{president.total_tracked_promises} tracked</MetaPill>
+                </div>
               </div>
 
               <p className="text-sm text-[var(--ink-soft)] mt-3">

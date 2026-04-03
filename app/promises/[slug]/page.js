@@ -15,6 +15,7 @@ import { EXPLANATION_CONTENT } from "@/lib/content/explanations";
 import { buildPageMetadata } from "@/lib/metadata";
 import { buildPromiseJsonLd, serializeJsonLd } from "@/lib/structured-data";
 import { buildPromiseCardHref } from "@/lib/shareable-card-links";
+import PresidentAvatar from "@/app/components/PresidentAvatar";
 
 async function getPromise(slug) {
   return fetchInternalJson(`/api/promises/${slug}`, {
@@ -397,16 +398,23 @@ export default async function PromiseDetailPage({ params }) {
               {promise.is_demo ? <MetaPill>Demo seed data</MetaPill> : null}
             </div>
           </div>
-          <TrackedLink
-            href={buildPromiseCardHref(promise)}
-            eventType="share_card_click"
-            routeKind="detail"
-            entityType="promise"
-            entityKey={promise.slug}
-            className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
-          >
-            Share Card
-          </TrackedLink>
+          <div className="flex flex-col items-end gap-3">
+            <PresidentAvatar
+              presidentSlug={promise.president_slug}
+              presidentName={promise.president}
+              size={56}
+            />
+            <TrackedLink
+              href={buildPromiseCardHref(promise)}
+              eventType="share_card_click"
+              routeKind="detail"
+              entityType="promise"
+              entityKey={promise.slug}
+              className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
+            >
+              Share Card
+            </TrackedLink>
+          </div>
         </div>
       </section>
 

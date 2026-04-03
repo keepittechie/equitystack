@@ -3,6 +3,7 @@ import {
   PromiseImpactDirectionBadge,
   PromiseStatusBadge,
 } from "@/app/components/policy-badges";
+import PresidentAvatar from "@/app/components/PresidentAvatar";
 import { buildPageMetadata } from "@/lib/metadata";
 import { fetchCivilRightsTimeline } from "@/lib/services/promiseService";
 
@@ -92,7 +93,14 @@ function TimelineEntry({ item }) {
             {year || "Timeline"}
           </p>
           <p className="mt-2 text-sm text-[var(--ink-soft)]">{formatTimelineDate(item.promise_date)}</p>
-          <p className="mt-3 text-sm font-medium">{item.president}</p>
+          <div className="mt-3 flex items-center justify-between gap-3">
+            <p className="text-sm font-medium">{item.president}</p>
+            <PresidentAvatar
+              presidentSlug={item.president_slug}
+              presidentName={item.president}
+              size={44}
+            />
+          </div>
           {item.president_party ? (
             <p className="text-xs text-[var(--ink-soft)]">{item.president_party}</p>
           ) : null}

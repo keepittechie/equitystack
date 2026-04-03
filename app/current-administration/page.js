@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ImpactBadge, PromiseStatusBadge } from "@/app/components/policy-badges";
+import PresidentAvatar from "@/app/components/PresidentAvatar";
 import TrustImpactSummaryCard from "@/app/components/TrustImpactSummaryCard";
 import TrackedLink from "@/app/components/telemetry/TrackedLink";
 import CopyShareLinkButton from "@/app/reports/black-impact-score/CopyShareLinkButton";
@@ -166,47 +167,54 @@ export default async function CurrentAdministrationPage() {
   return (
     <main className="max-w-7xl mx-auto p-6 space-y-8">
       <section className="hero-panel p-8 md:p-10">
-        <div className="max-w-4xl">
-          <p className="eyebrow mb-4">Current Administration</p>
-          <h1 className="page-title text-[clamp(2.2rem,4vw,3.5rem)]">
-            {overview.administration_name} ({termLabel})
-          </h1>
-          <p className="mt-5 max-w-3xl text-base leading-8 text-[var(--ink-soft)] md:text-lg">
-            This page tracks the current presidency term through reviewed Promise Tracker records.
-            It shows what has been promised, what actions have happened, and what documented outcomes are in the public record so far.
-          </p>
-          <div className="mt-5 flex flex-wrap gap-2">
-            {overview?.president?.president_party ? (
-              <MetaPill>{overview.president.president_party}</MetaPill>
-            ) : null}
-            <MetaPill>{overview.total_promises} promises tracked</MetaPill>
-            <MetaPill>{overview.total_actions} actions recorded</MetaPill>
-            <MetaPill>{overview.total_outcomes} outcomes documented</MetaPill>
+        <div className="flex items-start justify-between gap-6 flex-wrap">
+          <div className="max-w-4xl">
+            <p className="eyebrow mb-4">Current Administration</p>
+            <h1 className="page-title text-[clamp(2.2rem,4vw,3.5rem)]">
+              {overview.administration_name} ({termLabel})
+            </h1>
+            <p className="mt-5 max-w-3xl text-base leading-8 text-[var(--ink-soft)] md:text-lg">
+              This page tracks the current presidency term through reviewed Promise Tracker records.
+              It shows what has been promised, what actions have happened, and what documented outcomes are in the public record so far.
+            </p>
+            <div className="mt-5 flex flex-wrap gap-2">
+              {overview?.president?.president_party ? (
+                <MetaPill>{overview.president.president_party}</MetaPill>
+              ) : null}
+              <MetaPill>{overview.total_promises} promises tracked</MetaPill>
+              <MetaPill>{overview.total_actions} actions recorded</MetaPill>
+              <MetaPill>{overview.total_outcomes} outcomes documented</MetaPill>
+            </div>
+            <div className="mt-5 flex flex-wrap gap-2">
+              <CopyShareLinkButton
+                path="/current-administration"
+                defaultLabel="Share This Overview"
+                copiedLabel="Copied!"
+                trackPayload={{
+                  route_kind: "current_administration",
+                  entity_type: "presidency",
+                  entity_key: overview.president.slug,
+                }}
+              />
+              <TrackedLink
+                href={`/promises/president/${overview.president.slug}?show_all=1`}
+                pagePath={pagePath}
+                eventType="detail_click"
+                routeKind="current_administration"
+                entityType="presidency"
+                entityKey={overview.president.slug}
+                targetPath={`/promises/president/${overview.president.slug}?show_all=1`}
+                className="public-button-secondary"
+              >
+                Open current-term Promise Tracker
+              </TrackedLink>
+            </div>
           </div>
-          <div className="mt-5 flex flex-wrap gap-2">
-            <CopyShareLinkButton
-              path="/current-administration"
-              defaultLabel="Share This Overview"
-              copiedLabel="Copied!"
-              trackPayload={{
-                route_kind: "current_administration",
-                entity_type: "presidency",
-                entity_key: overview.president.slug,
-              }}
-            />
-            <TrackedLink
-              href={`/promises/president/${overview.president.slug}?show_all=1`}
-              pagePath={pagePath}
-              eventType="detail_click"
-              routeKind="current_administration"
-              entityType="presidency"
-              entityKey={overview.president.slug}
-              targetPath={`/promises/president/${overview.president.slug}?show_all=1`}
-              className="public-button-secondary"
-            >
-              View all current-term promises
-            </TrackedLink>
-          </div>
+          <PresidentAvatar
+            presidentSlug={overview?.president?.slug}
+            presidentName={overview?.president?.president || overview?.administration_name}
+            size={56}
+          />
         </div>
       </section>
 
@@ -260,7 +268,7 @@ export default async function CurrentAdministrationPage() {
             targetPath={`/promises/president/${overview.president.slug}?show_all=1`}
             className="text-sm accent-link"
           >
-            View all current-administration promises
+            Open current-term Promise Tracker
           </TrackedLink>
         </div>
 
@@ -278,7 +286,14 @@ export default async function CurrentAdministrationPage() {
                   </p>
                   <h3 className="mt-3 text-lg font-semibold">{item.title}</h3>
                 </div>
-                <PromiseStatusBadge status={item.status} />
+                <div className="flex items-center gap-3">
+                  <PresidentAvatar
+                    presidentSlug={overview?.president?.slug}
+                    presidentName={overview?.president?.president || overview?.administration_name}
+                    size={42}
+                  />
+                  <PromiseStatusBadge status={item.status} />
+                </div>
               </div>
 
               <p className="mt-3 text-sm text-[var(--ink-soft)] leading-6">
@@ -295,7 +310,7 @@ export default async function CurrentAdministrationPage() {
               <TrustImpactSummaryCard
                 record={item}
                 detailHref={`/promises/${item.slug}`}
-                detailLabel="View record"
+                detailLabel="Open Promise Tracker record"
               />
 
               <div className="mt-5 flex flex-wrap gap-3">
@@ -309,7 +324,7 @@ export default async function CurrentAdministrationPage() {
                   targetPath={`/promises/${item.slug}`}
                   className="public-button-primary px-4 py-2"
                 >
-                  Open record
+                  Open Promise Tracker record
                 </TrackedLink>
                 <TrackedLink
                   href={buildPromiseCardHref(item)}
@@ -403,10 +418,19 @@ export default async function CurrentAdministrationPage() {
             <p className="text-sm text-[var(--ink-soft)]">No featured records are available yet.</p>
           ) : overview.featured_records.map((record) => (
             <article key={record.slug} className="panel-link rounded-[1.35rem] p-5">
-              <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">
-                {record.topic || "No topic"}
-              </p>
-              <h3 className="mt-3 text-lg font-semibold">{record.title}</h3>
+              <div className="flex items-start justify-between gap-4 flex-wrap">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">
+                    {record.topic || "No topic"}
+                  </p>
+                  <h3 className="mt-3 text-lg font-semibold">{record.title}</h3>
+                </div>
+                <PresidentAvatar
+                  presidentSlug={overview?.president?.slug}
+                  presidentName={overview?.president?.president || overview?.administration_name}
+                  size={42}
+                />
+              </div>
               <p className="mt-3 text-sm leading-6 text-[var(--ink-soft)]">
                 {record.summary || "Open the record for actions, outcomes, and sources."}
               </p>
@@ -420,7 +444,7 @@ export default async function CurrentAdministrationPage() {
               <TrustImpactSummaryCard
                 record={record}
                 detailHref={`/promises/${record.slug}`}
-                detailLabel="View record"
+                detailLabel="Open Promise Tracker record"
               />
 
               <div className="mt-5 flex flex-wrap gap-3">
@@ -434,7 +458,7 @@ export default async function CurrentAdministrationPage() {
                   targetPath={`/promises/${record.slug}`}
                   className="text-sm accent-link"
                 >
-                  Open record
+                  Open Promise Tracker record
                 </TrackedLink>
                 <TrackedLink
                   href={buildPromiseCardHref(record)}
@@ -476,7 +500,7 @@ export default async function CurrentAdministrationPage() {
             className="panel-link block rounded-[1.35rem] p-5"
           >
             <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Browse</p>
-            <h3 className="mt-3 text-lg font-semibold">View all current-administration promises</h3>
+            <h3 className="mt-3 text-lg font-semibold">Open current-term Promise Tracker</h3>
             <p className="mt-2 text-sm leading-6 text-[var(--ink-soft)]">
               Open the full presidency-term Promise Tracker view for the current administration.
             </p>

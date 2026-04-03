@@ -71,12 +71,12 @@ function FlagshipReportCard({ eyebrow, title, description, href, linkLabel }) {
   );
 }
 
-function CuratedModeCard({ title, description, href }) {
+function CuratedModeCard({ title, description, href, linkLabel }) {
   return (
     <Link href={href} className="card-muted rounded-[1.25rem] p-4 block">
       <h3 className="text-base font-semibold">{title}</h3>
       <p className="text-sm text-[var(--ink-soft)] mt-2 leading-6">{description}</p>
-      <span className="accent-link text-sm inline-block mt-4">Open view</span>
+      <span className="accent-link text-sm inline-block mt-4">{linkLabel}</span>
     </Link>
   );
 }
@@ -165,11 +165,13 @@ export default async function ReportsPage() {
             title="Standard Report"
             description="Start with the outcome-based president summary view for the clearest accountability overview."
             href="/reports/black-impact-score"
+            linkLabel="Open standard report"
           />
           <CuratedModeCard
             title="Timeline View"
             description="Follow scored records in chronological order to see how presidential actions unfold over time."
             href="/reports/black-impact-score?view=timeline"
+            linkLabel="Open timeline report"
           />
         </div>
       </section>

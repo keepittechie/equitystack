@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import PresidentAvatar from "@/app/components/PresidentAvatar";
 import { ImpactBadge } from "@/app/components/policy-badges";
 
 const DEFAULT_VISIBLE_POLICIES = 4;
@@ -105,8 +106,14 @@ function TimelinePolicyRow({ policy }) {
                 {policy.president || "Unknown president"}
               </p>
             </div>
-
-            <ImpactBadge impact={policy.impact_direction} />
+            <div className="flex items-center gap-3">
+              <PresidentAvatar
+                presidentSlug={policy.president_slug}
+                presidentName={policy.president}
+                size={42}
+              />
+              <ImpactBadge impact={policy.impact_direction} />
+            </div>
           </div>
 
           {policy.summary ? (

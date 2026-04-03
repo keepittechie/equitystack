@@ -749,7 +749,7 @@ function PromiseDriverList({ title, items, emptyMessage, linkToPromises = true }
                 <div className="mt-4">
                   <EvidencePanelTrigger
                     promise={promise}
-                    label="View Evidence"
+                    label="Open underlying evidence"
                     linkToPromises={true}
                   />
                 </div>
@@ -788,7 +788,7 @@ function StrongestDriverCard({ title, promise, linkToPromises = true }) {
           <div className="mt-4">
             <EvidencePanelTrigger
               promise={promise}
-              label="View Evidence"
+              label="Open underlying evidence"
               linkToPromises={true}
             />
           </div>
@@ -854,7 +854,7 @@ function EvidencePanelContent({ promise, linkToPromises = true }) {
   );
 }
 
-function EvidencePanelTrigger({ promise, label = "View Evidence", linkToPromises = true }) {
+function EvidencePanelTrigger({ promise, label = "Open underlying evidence", linkToPromises = true }) {
   return (
     <details className="rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-[rgba(255,252,247,0.92)]">
       <summary className="cursor-pointer list-none px-4 py-3 text-sm font-medium text-[var(--ink)]">
@@ -1105,10 +1105,11 @@ function TopSummarySection({ presidents }) {
     <section className="card-surface rounded-[1.6rem] p-5">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="max-w-3xl">
-          <h2 className="text-lg font-semibold mb-2">Top Summary</h2>
+          <h2 className="text-lg font-semibold mb-2">Highest and Lowest Current Scores</h2>
           <p className="text-sm text-[var(--ink-soft)] leading-7">
-            A quick view of the highest and lowest net scores based on currently tracked records.
-            Scores reflect available data and may change as additional records are added.
+            This section shows the current highest and lowest president-level Black Impact Scores.
+            More positive values indicate stronger documented positive impact on Black communities,
+            while more negative values indicate stronger documented negative impact based on currently scored outcomes.
           </p>
         </div>
         <MetaPill>{presidents.length} presidents included</MetaPill>
@@ -1116,7 +1117,7 @@ function TopSummarySection({ presidents }) {
 
       <div className="grid gap-4 lg:grid-cols-2 mt-5">
         <section className="card-muted rounded-[1.25rem] p-4">
-          <h3 className="text-lg font-semibold">Highest Impact</h3>
+          <h3 className="text-lg font-semibold">Highest Current Score</h3>
           <div className="mt-3 space-y-3">
             {summary.top.map((president) => (
               <div
@@ -1133,7 +1134,7 @@ function TopSummarySection({ presidents }) {
         </section>
 
         <section className="card-muted rounded-[1.25rem] p-4">
-          <h3 className="text-lg font-semibold">Lowest Impact</h3>
+          <h3 className="text-lg font-semibold">Lowest Current Score</h3>
           <div className="mt-3 space-y-3">
             {summary.bottom.map((president) => (
               <div
@@ -2350,7 +2351,7 @@ function TopicComparisonSection({
             </div>
             <div className="mt-4">
               <EvidencePanelGroup
-                title="Evidence Panel"
+                title="Underlying evidence for this score"
                 items={[
                   president.top_positive_promises?.[0] || null,
                   president.top_negative_promises?.[0] || null,
@@ -2526,7 +2527,7 @@ function PresidentComparisonSection({
 
         <div className="mt-4">
           <EvidencePanelGroup
-            title="Evidence Panel"
+            title="Underlying evidence for this score"
             items={[topPositive, topNegative]}
             linkToPromises={true}
             emptyMessage="No driver evidence is available for this president in the current comparison."
@@ -3294,7 +3295,7 @@ export default async function BlackImpactScorePage({ searchParams }) {
                       href={`/promises/president/${president.president_slug}`}
                       className="rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
                     >
-                      See Promise Tracker data
+                      Open this president in Promise Tracker
                     </Link>
                   ) : null}
                 </div>
@@ -3360,7 +3361,7 @@ export default async function BlackImpactScorePage({ searchParams }) {
               />
 
               <EvidencePanelGroup
-                title="Evidence Panel"
+                title="Underlying evidence for this score"
                 items={[
                   president.top_positive_promises?.[0] || null,
                   president.top_negative_promises?.[0] || null,

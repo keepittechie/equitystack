@@ -190,7 +190,7 @@ function ScoreSnapshotCard({ presidents, metadata }) {
           </p>
         </div>
         <Link href="/reports/black-impact-score" className="accent-link text-sm font-medium">
-          Open full score report
+          Open Black Impact Score report
         </Link>
       </div>
 
@@ -304,7 +304,7 @@ function LabelGuideCard({ impactGuide }) {
       </div>
 
       <Link href="/reports/black-impact-score" className="accent-link mt-4 inline-block text-sm font-medium">
-        Open full score methodology
+        Open Black Impact Score methodology
       </Link>
     </div>
   );
@@ -357,10 +357,10 @@ export default async function HomePage() {
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
               <Link href="/promises" className="public-button-primary">
-                Explore Promises
+                Open Promise Tracker
               </Link>
             <Link href="/reports/black-impact-score" className="public-button-secondary">
-              View Black Impact Score
+              Open Black Impact Score
             </Link>
             <Link href="/current-administration" className="public-button-secondary">
               Track Current Administration
@@ -459,7 +459,7 @@ export default async function HomePage() {
             <div className="mb-4 flex items-center justify-between gap-4 flex-wrap">
               <h3 className="card-title">Recent Promise Tracker records</h3>
               <Link href="/promises" className="accent-link text-sm font-medium">
-                View all promises
+                Open Promise Tracker
               </Link>
             </div>
             <div className="space-y-4">
@@ -487,7 +487,7 @@ export default async function HomePage() {
             <div className="mb-4 flex items-center justify-between gap-4 flex-wrap">
               <h3 className="card-title">{currentAdministrationName} highlights</h3>
               <Link href="/current-administration" className="accent-link text-sm font-medium">
-                Open overview
+                Open Current Administration overview
               </Link>
             </div>
             <div className="space-y-4">
