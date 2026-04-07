@@ -925,7 +925,9 @@ def review_row(
                 model_resolution_status = "senior_and_verifier_failed_using_heuristic"
 
     return {
+        "future_bill_id": row.get("future_bill_id"),
         "future_bill_link_id": row["future_bill_link_id"],
+        "tracked_bill_id": row.get("tracked_bill_id"),
         "future_bill_title": row.get("future_bill_title"),
         "bill_number": row.get("bill_number"),
         "tracked_bill_title": row.get("tracked_bill_title"),
@@ -1147,7 +1149,9 @@ def derive_csv_path(csv_arg: str | None, output_path: Path) -> Path | None:
 
 def write_csv_report(path: Path, reviewed_items: list[dict[str, Any]]) -> None:
     fieldnames = [
+        "future_bill_id",
         "future_bill_link_id",
+        "tracked_bill_id",
         "future_bill_title",
         "bill_number",
         "tracked_bill_title",

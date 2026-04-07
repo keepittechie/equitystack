@@ -211,7 +211,9 @@ def determine_next_step(item: dict[str, Any], why_not_auto_applied: list[str]) -
 
 def manual_review_row(item: dict[str, Any], why_not_auto_applied: list[str]) -> dict[str, Any]:
     return {
+        "future_bill_id": item.get("future_bill_id"),
         "future_bill_link_id": item.get("future_bill_link_id"),
+        "tracked_bill_id": item.get("tracked_bill_id"),
         "future_bill_title": item.get("future_bill_title"),
         "bill_number": item.get("bill_number"),
         "tracked_bill_title": item.get("tracked_bill_title"),
@@ -320,7 +322,9 @@ def write_csv(path: Path, rows: list[dict[str, Any]], fieldnames: list[str]) -> 
 
 def action_report_row(item: dict[str, Any], status: str, reasons: list[str], action_taken: str) -> dict[str, Any]:
     return {
+        "future_bill_id": item.get("future_bill_id"),
         "future_bill_link_id": item.get("future_bill_link_id"),
+        "tracked_bill_id": item.get("tracked_bill_id"),
         "future_bill_title": item.get("future_bill_title"),
         "bill_number": item.get("bill_number"),
         "tracked_bill_title": item.get("tracked_bill_title"),
@@ -495,7 +499,9 @@ def main() -> None:
             action_csv_path,
             action_rows,
             [
+                "future_bill_id",
                 "future_bill_link_id",
+                "tracked_bill_id",
                 "future_bill_title",
                 "bill_number",
                 "tracked_bill_title",
@@ -515,7 +521,9 @@ def main() -> None:
             manual_queue_csv,
             manual_queue,
             [
+                "future_bill_id",
                 "future_bill_link_id",
+                "tracked_bill_id",
                 "future_bill_title",
                 "bill_number",
                 "tracked_bill_title",
