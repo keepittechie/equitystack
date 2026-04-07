@@ -1,6 +1,6 @@
 {
   "artifact_version": 1,
-  "generated_at": "2026-04-07T03:21:04+00:00",
+  "generated_at": "2026-04-07T10:34:10+00:00",
   "mode": "dry_run",
   "workflow": "impact_maturation_promotion",
   "source_evaluation": "/home/josh/Documents/GitHub/equitystack/python/reports/impact_maturation_review.json",

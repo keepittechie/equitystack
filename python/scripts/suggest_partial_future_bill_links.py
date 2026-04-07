@@ -491,7 +491,14 @@ def fetch_available_models(ollama_url: str, timeout_seconds: int) -> list[str]:
     return list_available_models(endpoint=ollama_url or None, timeout_seconds=timeout_seconds)
 
 
+def looks_like_openai_model(model_name: str) -> bool:
+    normalized = (model_name or "").strip().lower()
+    return normalized.startswith("gpt-") or normalized.startswith("chatgpt") or normalized.startswith("o")
+
+
 def resolve_model_name(requested_model: str, available_models: list[str]) -> str:
+    if not available_models or looks_like_openai_model(requested_model):
+        return requested_model
     lookup = {name.lower(): name for name in available_models}
     if requested_model.lower() in lookup:
         return lookup[requested_model.lower()]

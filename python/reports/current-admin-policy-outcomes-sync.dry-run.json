@@ -1,0 +1,163 @@
+{
+  "workflow": "current_admin_policy_outcomes_sync",
+  "mode": "dry_run",
+  "generated_at": "2026-04-07T10:34:10+00:00",
+  "scope": {
+    "source_tables": [
+      "promise_outcomes",
+      "promise_outcome_sources",
+      "promises"
+    ],
+    "target_table": "policy_outcomes",
+    "policy_type": "current_admin",
+    "mutation_policy": "insert_only_when_apply_yes_is_explicit"
+  },
+  "summary": {
+    "total_candidate_outcomes": 94,
+    "rows_eligible_to_insert": 94,
+    "rows_skipped_as_duplicates": 0,
+    "rows_skipped_missing_required_fields": 0,
+    "linked_source_count_zero": 64,
+    "rows_inserted": 0
+  },
+  "sample_inserted_mappings": [
+    {
+      "source_promise_outcome_id": 1,
+      "policy_type": "current_admin",
+      "policy_id": 1,
+      "record_key": "obama-crack-sentencing-disparity",
+      "promise_title": "Reduce the federal crack-powder sentencing disparity",
+      "outcome_summary": "Federal law reduced the crack-to-powder cocaine sentencing disparity from 100-to-1 to 18-to-1.",
+      "impact_direction": "Positive",
+      "evidence_strength": "Strong",
+      "source_count": 1,
+      "source_quality": "high",
+      "status": "Complete"
+    },
+    {
+      "source_promise_outcome_id": 2,
+      "policy_type": "current_admin",
+      "policy_id": 2,
+      "record_key": "biden-advance-racial-equity",
+      "promise_title": "Advance racial equity across federal agencies",
+      "outcome_summary": "The federal government created an equity review framework, but implementation remained uneven across agencies and over time.",
+      "impact_direction": "Mixed",
+      "evidence_strength": "Moderate",
+      "source_count": 1,
+      "source_quality": "medium",
+      "status": "Partial"
+    },
+    {
+      "source_promise_outcome_id": 3,
+      "policy_type": "current_admin",
+      "policy_id": 3,
+      "record_key": "biden-voting-rights-restoration",
+      "promise_title": "Restore stronger federal voting-rights protections",
+      "outcome_summary": "No federal voting-rights restoration law was enacted despite high-profile legislative pushes.",
+      "impact_direction": "Blocked",
+      "evidence_strength": "Strong",
+      "source_count": 1,
+      "source_quality": "high",
+      "status": "Blocked"
+    },
+    {
+      "source_promise_outcome_id": 4,
+      "policy_type": "current_admin",
+      "policy_id": 4,
+      "record_key": "trump-black-homeownership-anti-redlining",
+      "promise_title": "Deliver stronger anti-redlining and Black homeownership gains",
+      "outcome_summary": "No durable anti-redlining or Black homeownership enforcement framework matching the public promise was delivered.",
+      "impact_direction": "Negative",
+      "evidence_strength": "Moderate",
+      "source_count": 1,
+      "source_quality": "medium",
+      "status": "Failed"
+    },
+    {
+      "source_promise_outcome_id": 5,
+      "policy_type": "current_admin",
+      "policy_id": 5,
+      "record_key": "biden-policing-accountability",
+      "promise_title": "Increase federal policing accountability standards",
+      "outcome_summary": "Federal policing reform remained active as a national policy priority, but Congress did not complete a durable statutory settlement.",
+      "impact_direction": "Mixed",
+      "evidence_strength": "Moderate",
+      "source_count": 1,
+      "source_quality": "medium",
+      "status": "In Progress"
+    },
+    {
+      "source_promise_outcome_id": 6,
+      "policy_type": "current_admin",
+      "policy_id": 6,
+      "record_key": "obama-close-guantanamo-bay",
+      "promise_title": "Close Guantanamo Bay detention facility",
+      "outcome_summary": "The administration reduced the detainee population and repeatedly pursued closure, but Guantanamo remained open.",
+      "impact_direction": "Mixed",
+      "evidence_strength": "Strong",
+      "source_count": 0,
+      "source_quality": "high",
+      "status": "Failed"
+    },
+    {
+      "source_promise_outcome_id": 7,
+      "policy_type": "current_admin",
+      "policy_id": 7,
+      "record_key": "obama-end-combat-brigade-deployment-iraq",
+      "promise_title": "End combat-brigade deployment in Iraq",
+      "outcome_summary": "Combat brigades were withdrawn and the formal combat mission ended, but the broader conflict and later U.S. re-engagement undercut the full promise frame.",
+      "impact_direction": "Mixed",
+      "evidence_strength": "Strong",
+      "source_count": 0,
+      "source_quality": "high",
+      "status": "Partial"
+    },
+    {
+      "source_promise_outcome_id": 8,
+      "policy_type": "current_admin",
+      "policy_id": 8,
+      "record_key": "obama-repeal-dont-ask-dont-tell",
+      "promise_title": "Repeal Don't Ask, Don't Tell",
+      "outcome_summary": "The policy was repealed and openly gay and lesbian Americans were allowed to serve in the military.",
+      "impact_direction": "Positive",
+      "evidence_strength": "Strong",
+      "source_count": 0,
+      "source_quality": "high",
+      "status": "Complete"
+    },
+    {
+      "source_promise_outcome_id": 9,
+      "policy_type": "current_admin",
+      "policy_id": 9,
+      "record_key": "obama-ban-preexisting-condition-exclusions",
+      "promise_title": "Ban pre-existing-condition exclusions",
+      "outcome_summary": "Federal law established broad insurance protections for people with pre-existing medical conditions.",
+      "impact_direction": "Positive",
+      "evidence_strength": "Strong",
+      "source_count": 0,
+      "source_quality": "high",
+      "status": "Complete"
+    },
+    {
+      "source_promise_outcome_id": 10,
+      "policy_type": "current_admin",
+      "policy_id": 10,
+      "record_key": "obama-credit-card-bill-of-rights",
+      "promise_title": "Enact a credit card bill of rights",
+      "outcome_summary": "Federal law placed new limits on retroactive rate hikes and several abusive billing practices.",
+      "impact_direction": "Positive",
+      "evidence_strength": "Strong",
+      "source_count": 0,
+      "source_quality": "high",
+      "status": "Complete"
+    }
+  ],
+  "inserted_rows": [],
+  "skipped_duplicates": [],
+  "skipped_missing_required_fields": [],
+  "integrity_checks": {
+    "current_admin_policy_id_orphans": 0,
+    "current_admin_source_count_mismatches": 0,
+    "duplicate_unified_outcome_groups": []
+  }
+}

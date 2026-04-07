@@ -1,6 +1,6 @@
 {
   "artifact_version": 1,
-  "generated_at": "2026-04-07T03:20:45+00:00",
+  "generated_at": "2026-04-07T10:34:10+00:00",
   "workflow": "impact_maturation_evaluation",
   "inputs": [
     "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/current-admin-wrapper-test.manual-review-queue.json",
@@ -566,16 +566,16 @@
       "previous_impact_status": "impact_pending",
       "recommended_impact_status": "impact_pending",
       "transition_allowed": true,
-      "confidence_score": 0.4,
-      "source_quality": "medium",
+      "confidence_score": 0.3,
+      "source_quality": "high",
       "outcome_evidence_strength": "medium",
       "has_measurable_outcome": true,
       "source_count": 3,
       "reasoning": [
         "3 linked source reference(s) are available",
         "measurable outcome evidence is present",
-        "source_quality=medium",
-        "confidence_score=0.40",
+        "source_quality=high",
+        "confidence_score=0.30",
         "record remains pending because source/confidence evidence is not review-ready"
       ],
       "approved": false,

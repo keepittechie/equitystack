@@ -1,0 +1,1150 @@
+{
+  "workflow": "source_quality_audit",
+  "mode": "read_only",
+  "generated_at": "2026-04-07T10:34:10+00:00",
+  "scope": {
+    "source_tables": [
+      "sources",
+      "promise_sources",
+      "promise_action_sources",
+      "promise_outcome_sources",
+      "promise_outcomes"
+    ],
+    "mutation_policy": "read_only_no_source_edits_no_duplicate_merges"
+  },
+  "classification_system": {
+    "labels": [
+      "high_authority",
+      "institutional",
+      "secondary",
+      "low_unverified"
+    ],
+    "quality_tiers": {
+      "high_authority": 1.0,
+      "institutional": 0.8,
+      "secondary": 0.55,
+      "low_unverified": 0.25
+    },
+    "classification_inputs": [
+      "source_url_domain",
+      "source_type",
+      "publisher"
+    ]
+  },
+  "summary": {
+    "total_sources": 340,
+    "quality_distribution": {
+      "high_authority": 283,
+      "institutional": 29,
+      "low_unverified": 27,
+      "secondary": 1
+    },
+    "domain_count": 66,
+    "duplicate_source_url_cluster_count": 23,
+    "duplicate_source_row_count": 54,
+    "source_quality_high_authority_count": 283,
+    "source_quality_institutional_count": 29,
+    "source_quality_secondary_count": 1,
+    "source_quality_low_unverified_count": 27
+  },
+  "top_domains": [
+    {
+      "domain": "congress.gov",
+      "source_count": 55,
+      "quality_distribution": {
+        "high_authority": 55
+      }
+    },
+    {
+      "domain": "archives.gov",
+      "source_count": 41,
+      "quality_distribution": {
+        "high_authority": 41
+      }
+    },
+    {
+      "domain": "supreme.justia.com",
+      "source_count": 31,
+      "quality_distribution": {
+        "high_authority": 23,
+        "institutional": 8
+      }
+    },
+    {
+      "domain": "justice.gov",
+      "source_count": 22,
+      "quality_distribution": {
+        "high_authority": 22
+      }
+    },
+    {
+      "domain": "govinfo.gov",
+      "source_count": 20,
+      "quality_distribution": {
+        "high_authority": 20
+      }
+    },
+    {
+      "domain": "whitehouse.gov",
+      "source_count": 12,
+      "quality_distribution": {
+        "high_authority": 12
+      }
+    },
+    {
+      "domain": "oyez.org",
+      "source_count": 10,
+      "quality_distribution": {
+        "high_authority": 2,
+        "institutional": 5,
+        "low_unverified": 3
+      }
+    },
+    {
+      "domain": "history.house.gov",
+      "source_count": 8,
+      "quality_distribution": {
+        "high_authority": 8
+      }
+    },
+    {
+      "domain": "hud.gov",
+      "source_count": 8,
+      "quality_distribution": {
+        "high_authority": 8
+      }
+    },
+    {
+      "domain": "loc.gov",
+      "source_count": 8,
+      "quality_distribution": {
+        "high_authority": 8
+      }
+    },
+    {
+      "domain": "britannica.com",
+      "source_count": 8,
+      "quality_distribution": {
+        "low_unverified": 8
+      }
+    },
+    {
+      "domain": "senate.gov",
+      "source_count": 7,
+      "quality_distribution": {
+        "high_authority": 7
+      }
+    },
+    {
+      "domain": "aspe.hhs.gov",
+      "source_count": 6,
+      "quality_distribution": {
+        "high_authority": 6
+      }
+    },
+    {
+      "domain": "dol.gov",
+      "source_count": 6,
+      "quality_distribution": {
+        "high_authority": 6
+      }
+    },
+    {
+      "domain": "federalreservehistory.org",
+      "source_count": 5,
+      "quality_distribution": {
+        "high_authority": 5
+      }
+    },
+    {
+      "domain": "eeoc.gov",
+      "source_count": 5,
+      "quality_distribution": {
+        "high_authority": 5
+      }
+    },
+    {
+      "domain": "ssa.gov",
+      "source_count": 5,
+      "quality_distribution": {
+        "high_authority": 5
+      }
+    },
+    {
+      "domain": "constitution.congress.gov",
+      "source_count": 4,
+      "quality_distribution": {
+        "high_authority": 4
+      }
+    },
+    {
+      "domain": "nlrb.gov",
+      "source_count": 4,
+      "quality_distribution": {
+        "high_authority": 4
+      }
+    },
+    {
+      "domain": "usda.gov",
+      "source_count": 4,
+      "quality_distribution": {
+        "high_authority": 4
+      }
+    },
+    {
+      "domain": "va.gov",
+      "source_count": 3,
+      "quality_distribution": {
+        "high_authority": 3
+      }
+    },
+    {
+      "domain": "consumerfinance.gov",
+      "source_count": 3,
+      "quality_distribution": {
+        "high_authority": 3
+      }
+    },
+    {
+      "domain": "usccr.gov",
+      "source_count": 3,
+      "quality_distribution": {
+        "high_authority": 3
+      }
+    },
+    {
+      "domain": "brennancenter.org",
+      "source_count": 3,
+      "quality_distribution": {
+        "low_unverified": 3
+      }
+    },
+    {
+      "domain": "brookings.edu",
+      "source_count": 3,
+      "quality_distribution": {
+        "institutional": 3
+      }
+    }
+  ],
+  "source_type_quality_distribution": {
+    "Academic": {
+      "high_authority": 1,
+      "institutional": 9
+    },
+    "Archive": {
+      "high_authority": 18,
+      "institutional": 16
+    },
+    "Government": {
+      "high_authority": 264
+    },
+    "News": {
+      "secondary": 1
+    },
+    "Nonprofit": {
+      "institutional": 3,
+      "low_unverified": 9
+    },
+    "Other": {
+      "institutional": 1,
+      "low_unverified": 18
+    }
+  },
+  "duplicate_source_url_clusters": [
+    {
+      "source_url": "https://www.congress.gov",
+      "duplicate_count": 5,
+      "source_ids": [
+        118,
+        119,
+        127,
+        129,
+        132
+      ],
+      "distinct_titles": [
+        "1994 Crime Bill",
+        "ESSA",
+        "Higher Education Act",
+        "Housing Act of 1949",
+        "Prison Litigation Reform Act"
+      ],
+      "distinct_source_types": [
+        "Government"
+      ],
+      "distinct_publishers": [
+        "<blank>"
+      ],
+      "total_refs": 0
+    },
+    {
+      "source_url": "https://www.archives.gov/education/lessons/brown-v-board/timeline.html",
+      "duplicate_count": 5,
+      "source_ids": [
+        148,
+        196,
+        197,
+        200,
+        250
+      ],
+      "distinct_titles": [
+        "Timeline of Events Leading to Brown v. Board of Education",
+        "Timeline of Events Leading to the Brown v. Board of Education Decision of 1954"
+      ],
+      "distinct_source_types": [
+        "Archive",
+        "Government"
+      ],
+      "distinct_publishers": [
+        "National Archives"
+      ],
+      "total_refs": 0
+    },
+    {
+      "source_url": "https://www.hud.gov/sites/dfiles/gc/documents/legislationchronology2024.pdf",
+      "duplicate_count": 3,
+      "source_ids": [
+        163,
+        167,
+        169
+      ],
+      "distinct_titles": [
+        "Major Housing and Urban Development Legislation Since 1932"
+      ],
+      "distinct_source_types": [
+        "Government"
+      ],
+      "distinct_publishers": [
+        "U.S. Department of Housing and Urban Development"
+      ],
+      "total_refs": 0
+    },
+    {
+      "source_url": "https://www.law.columbia.edu/news/archive/students-fair-admissions-v-harvardunc-resources",
+      "duplicate_count": 3,
+      "source_ids": [
+        206,
+        208,
+        210
+      ],
+      "distinct_titles": [
+        "Students for Fair Admissions v. Harvard/UNC Resources"
+      ],
+      "distinct_source_types": [
+        "Academic"
+      ],
+      "distinct_publishers": [
+        "Columbia Law School"
+      ],
+      "total_refs": 0
+    },
+    {
+      "source_url": "https://www.congress.gov/bill/117th-congress/house-bill/4",
+      "duplicate_count": 2,
+      "source_ids": [
+        20,
+        276
+      ],
+      "distinct_titles": [
+        "H.R.4 - John R. Lewis Voting Rights Advancement Act of 2021",
+        "John Lewis Voting Rights Advancement Act"
+      ],
+      "distinct_source_types": [
+        "Government"
+      ],
+      "distinct_publishers": [
+        "Congress.gov"
+      ],
+      "total_refs": 2
+    },
+    {
+      "source_url": "https://www.congress.gov/bill/111th-congress/senate-bill/1789",
+      "duplicate_count": 2,
+      "source_ids": [
+        18,
+        88
+      ],
+      "distinct_titles": [
+        "Fair Sentencing Act",
+        "Fair Sentencing Act of 2010"
+      ],
+      "distinct_source_types": [
+        "Government"
+      ],
+      "distinct_publishers": [
+        "<blank>",
+        "Congress.gov"
+      ],
+      "total_refs": 1
+    },
+    {
+      "source_url": "https://www.justice.gov/oip/ag_memo_application_statutory_mandatory_sentencing_laws_amended_fair_sentencing_act_2010",
+      "duplicate_count": 2,
+      "source_ids": [
+        159,
+        160
+      ],
+      "distinct_titles": [
+        "Attorney General Memorandum for All Federal Prosecutors Concerning the Application of the Statutory Mandatory Minimum Sentencing Laws for Crack Cocaine Offenses Amended by the Fair Sentencing Act of 2010"
+      ],
+      "distinct_source_types": [
+        "Government"
+      ],
+      "distinct_publishers": [
+        "U.S. Department of Justice"
+      ],
+      "total_refs": 1
+    },
+    {
+      "source_url": "https://www.archives.gov/exhibits/featured-documents/emancipation-proclamation",
+      "duplicate_count": 2,
+      "source_ids": [
+        1,
+        46
+      ],
+      "distinct_titles": [
+        "Emancipation Proclamation",
+        "Emancipation Proclamation Transcript"
+      ],
+      "distinct_source_types": [
+        "Government"
+      ],
+      "distinct_publishers": [
+        "National Archives"
+      ],
+      "total_refs": 0
+    },
+    {
+      "source_url": "https://www.archives.gov/milestone-documents/13th-amendment",
+      "duplicate_count": 2,
+      "source_ids": [
+        2,
+        48
+      ],
+      "distinct_titles": [
+        "13th Amendment Text",
+        "13th Amendment to the U.S. Constitution"
+      ],
+      "distinct_source_types": [
+        "Government"
+      ],
+      "distinct_publishers": [
+        "National Archives"
+      ],
+      "total_refs": 0
+    },
+    {
+      "source_url": "https://www.archives.gov/milestone-documents/14th-amendment",
+      "duplicate_count": 2,
+      "source_ids": [
+        3,
+        50
+      ],
+      "distinct_titles": [
+        "14th Amendment Text",
+        "14th Amendment to the U.S. Constitution"
+      ],
+      "distinct_source_types": [
+        "Government"
+      ],
+      "distinct_publishers": [
+        "National Archives"
+      ],
+      "total_refs": 0
+    },
+    {
+      "source_url": "https://www.archives.gov/milestone-documents/15th-amendment",
+      "duplicate_count": 2,
+      "source_ids": [
+        4,
+        52
+      ],
+      "distinct_titles": [
+        "15th Amendment Text",
+        "15th Amendment to the U.S. Constitution"
+      ],
+      "distinct_source_types": [
+        "Government"
+      ],
+      "distinct_publishers": [
+        "National Archives"
+      ],
+      "total_refs": 0
+    },
+    {
+      "source_url": "https://www.oyez.org/cases/2012/12-96",
+      "duplicate_count": 2,
+      "source_ids": [
+        17,
+        64
+      ],
+      "distinct_titles": [
+        "Shelby County v. Holder"
+      ],
+      "distinct_source_types": [
+        "Archive",
+        "Other"
+      ],
+      "distinct_publishers": [
+        "Oyez"
+      ],
+      "total_refs": 0
+    },
+    {
+      "source_url": "https://www.govinfo.gov",
+      "duplicate_count": 2,
+      "source_ids": [
+        114,
+        131
+      ],
+      "distinct_titles": [
+        "Enforcement Act of 1871",
+        "National Housing Act"
+      ],
+      "distinct_source_types": [
+        "Government"
+      ],
+      "distinct_publishers": [
+        "<blank>"
+      ],
+      "total_refs": 0
+    },
+    {
+      "source_url": "https://www.federalreservehistory.org/essays/community-reinvestment-act",
+      "duplicate_count": 2,
+      "source_ids": [
+        154,
+        177
+      ],
+      "distinct_titles": [
+        "Community Reinvestment Act of 1977"
+      ],
+      "distinct_source_types": [
+        "Government"
+      ],
+      "distinct_publishers": [
+        "Federal Reserve History"
+      ],
+      "total_refs": 0
+    },
+    {
+      "source_url": "https://www.justice.gov/crt/introduction-federal-voting-rights-laws",
+      "duplicate_count": 2,
+      "source_ids": [
+        178,
+        182
+      ],
+      "distinct_titles": [
+        "Introduction To Federal Voting Rights Laws"
+      ],
+      "distinct_source_types": [
+        "Government"
+      ],
+      "distinct_publishers": [
+        "U.S. Department of Justice"
+      ],
+      "total_refs": 0
+    },
+    {
+      "source_url": "https://www.archives.gov/research/african-americans/vote/laws-and-courts",
+      "duplicate_count": 2,
+      "source_ids": [
+        179,
+        192
+      ],
+      "distinct_titles": [
+        "Laws and Court Cases: Black Americans and the Vote"
+      ],
+      "distinct_source_types": [
+        "Archive"
+      ],
+      "distinct_publishers": [
+        "National Archives"
+      ],
+      "total_refs": 0
+    },
+    {
+      "source_url": "https://www.senate.gov/artandhistory/history/common/generic/enforcementacts.htm",
+      "duplicate_count": 2,
+      "source_ids": [
+        180,
+        183
+      ],
+      "distinct_titles": [
+        "The Enforcement Acts of 1870 and 1871"
+      ],
+      "distinct_source_types": [
+        "Government"
+      ],
+      "distinct_publishers": [
+        "U.S. Senate"
+      ],
+      "total_refs": 0
+    },
+    {
+      "source_url": "https://www.civilrightsproject.ucla.edu/research/k-12-education/integration-and-diversity/school-desegregation-and-equal-educational-opportunity",
+      "duplicate_count": 2,
+      "source_ids": [
+        198,
+        204
+      ],
+      "distinct_titles": [
+        "School Desegregation and Equal Educational Opportunity"
+      ],
+      "distinct_source_types": [
+        "Academic"
+      ],
+      "distinct_publishers": [
+        "The Civil Rights Project / UCLA"
+      ],
+      "total_refs": 0
+    },
+    {
+      "source_url": "https://www.brookings.edu/articles/brown-at-70-the-ongoing-struggle-for-school-desegregation",
+      "duplicate_count": 2,
+      "source_ids": [
+        201,
+        203
+      ],
+      "distinct_titles": [
+        "Brown at 70: The Ongoing Struggle for School Desegregation"
+      ],
+      "distinct_source_types": [
+        "Nonprofit"
+      ],
+      "distinct_publishers": [
+        "Brookings Institution"
+      ],
+      "total_refs": 0
+    },
+    {
+      "source_url": "https://aspe.hhs.gov/reports/affordable-care-act-african-americans-0",
+      "duplicate_count": 2,
+      "source_ids": [
+        240,
+        328
+      ],
+      "distinct_titles": [
+        "The Affordable Care Act and African Americans"
+      ],
+      "distinct_source_types": [
+        "Government"
+      ],
+      "distinct_publishers": [
+        "U.S. Department of Health and Human Services"
+      ],
+      "total_refs": 0
+    },
+    {
+      "source_url": "https://aspe.hhs.gov/sites/default/files/documents/4fc0ddbcee8d583d57e399dad6201536/aspe-coverage-access-black-americans-ib.pdf",
+      "duplicate_count": 2,
+      "source_ids": [
+        241,
+        330
+      ],
+      "distinct_titles": [
+        "Health Insurance Coverage and Access to Care Among Black Americans: Recent Trends and Key Challenges"
+      ],
+      "distinct_source_types": [
+        "Government"
+      ],
+      "distinct_publishers": [
+        "U.S. Department of Health and Human Services"
+      ],
+      "total_refs": 0
+    },
+    {
+      "source_url": "https://www.congress.gov/crs-product/r45205",
+      "duplicate_count": 2,
+      "source_ids": [
+        307,
+        309
+      ],
+      "distinct_titles": [
+        "Harry W. Colmery Veterans Educational Assistance Act of 2017 (P.L. 115-48)"
+      ],
+      "distinct_source_types": [
+        "Government"
+      ],
+      "distinct_publishers": [
+        "Congressional Research Service"
+      ],
+      "total_refs": 0
+    },
+    {
+      "source_url": "https://www.kff.org/medicaid/loss-of-the-affordable-care-act-would-widen-racial-disparities-in-health-coverage",
+      "duplicate_count": 2,
+      "source_ids": [
+        324,
+        329
+      ],
+      "distinct_titles": [
+        "Loss of the Affordable Care Act Would Widen Racial Disparities in Health Coverage"
+      ],
+      "distinct_source_types": [
+        "Nonprofit"
+      ],
+      "distinct_publishers": [
+        "KFF"
+      ],
+      "total_refs": 0
+    }
+  ],
+  "outcome_source_quality": {
+    "total_promise_outcomes": 94,
+    "outcomes_with_any_sources": 30,
+    "outcomes_with_high_authority_sources": 30,
+    "pct_sourced_outcomes_with_high_authority_sources": 1.0,
+    "outcomes_by_best_quality": {
+      "high_authority": 30,
+      "no_sources": 64
+    },
+    "samples": [
+      {
+        "promise_outcome_id": 1,
+        "promise_slug": "obama-crack-sentencing-disparity",
+        "source_count": 1,
+        "quality_labels": [
+          "high_authority"
+        ]
+      },
+      {
+        "promise_outcome_id": 2,
+        "promise_slug": "biden-advance-racial-equity",
+        "source_count": 1,
+        "quality_labels": [
+          "high_authority"
+        ]
+      },
+      {
+        "promise_outcome_id": 3,
+        "promise_slug": "biden-voting-rights-restoration",
+        "source_count": 1,
+        "quality_labels": [
+          "high_authority"
+        ]
+      },
+      {
+        "promise_outcome_id": 4,
+        "promise_slug": "trump-black-homeownership-anti-redlining",
+        "source_count": 1,
+        "quality_labels": [
+          "high_authority"
+        ]
+      },
+      {
+        "promise_outcome_id": 5,
+        "promise_slug": "biden-policing-accountability",
+        "source_count": 1,
+        "quality_labels": [
+          "high_authority"
+        ]
+      },
+      {
+        "promise_outcome_id": 61,
+        "promise_slug": "roosevelt-establish-federal-minimum-wage-maximum-hours",
+        "source_count": 2,
+        "quality_labels": [
+          "high_authority"
+        ]
+      },
+      {
+        "promise_outcome_id": 62,
+        "promise_slug": "roosevelt-create-social-security-old-age-unemployment-system",
+        "source_count": 2,
+        "quality_labels": [
+          "high_authority"
+        ]
+      },
+      {
+        "promise_outcome_id": 86,
+        "promise_slug": "plessy-v-ferguson-separate-but-equal",
+        "source_count": 2,
+        "quality_labels": [
+          "high_authority"
+        ]
+      },
+      {
+        "promise_outcome_id": 87,
+        "promise_slug": "williams-v-mississippi-upholds-voting-restrictions",
+        "source_count": 2,
+        "quality_labels": [
+          "high_authority",
+          "institutional"
+        ]
+      },
+      {
+        "promise_outcome_id": 89,
+        "promise_slug": "myers-v-anderson-invalidates-maryland-grandfather-clause-voting-law",
+        "source_count": 2,
+        "quality_labels": [
+          "high_authority"
+        ]
+      },
+      {
+        "promise_outcome_id": 90,
+        "promise_slug": "buchanan-v-warley-invalidates-louisville-residential-segregation-ordinance",
+        "source_count": 2,
+        "quality_labels": [
+          "high_authority"
+        ]
+      },
+      {
+        "promise_outcome_id": 91,
+        "promise_slug": "giles-v-harris-denies-relief-against-alabama-voter-disfranchisement",
+        "source_count": 2,
+        "quality_labels": [
+          "high_authority"
+        ]
+      },
+      {
+        "promise_outcome_id": 92,
+        "promise_slug": "guinn-v-united-states-strikes-down-oklahoma-grandfather-clause",
+        "source_count": 2,
+        "quality_labels": [
+          "high_authority"
+        ]
+      },
+      {
+        "promise_outcome_id": 93,
+        "promise_slug": "corrigan-v-buckley-lets-enforcement-of-racially-restrictive-housing-covenant-stand",
+        "source_count": 1,
+        "quality_labels": [
+          "high_authority"
+        ]
+      },
+      {
+        "promise_outcome_id": 94,
+        "promise_slug": "shelley-v-kraemer-bars-judicial-enforcement-of-racially-restrictive-covenants",
+        "source_count": 2,
+        "quality_labels": [
+          "high_authority"
+        ]
+      },
+      {
+        "promise_outcome_id": 95,
+        "promise_slug": "jones-v-alfred-h-mayer-co-holds-that-42-usc-1982-bars-private-racial-discrimination-in-property-transactions",
+        "source_count": 2,
+        "quality_labels": [
+          "high_authority"
+        ]
+      },
+      {
+        "promise_outcome_id": 96,
+        "promise_slug": "fair-housing-act-of-1968-enacted",
+        "source_count": 2,
+        "quality_labels": [
+          "high_authority"
+        ]
+      },
+      {
+        "promise_outcome_id": 97,
+        "promise_slug": "fair-housing-amendments-act-of-1988-enacted",
+        "source_count": 2,
+        "quality_labels": [
+          "high_authority"
+        ]
+      },
+      {
+        "promise_outcome_id": 98,
+        "promise_slug": "inclusive-communities-project-holds-that-disparate-impact-claims-are-cognizable-under-the-fair-housing-act",
+        "source_count": 2,
+        "quality_labels": [
+          "high_authority",
+          "institutional"
+        ]
+      },
+      {
+        "promise_outcome_id": 99,
+        "promise_slug": "donald-j-trump-2025-paying-our-great-transportation-security-administration-officers-and-employees",
+        "source_count": 1,
+        "quality_labels": [
+          "high_authority"
+        ]
+      }
+    ]
+  },
+  "sample_classified_sources": [
+    {
+      "source_id": 1,
+      "source_title": "Emancipation Proclamation",
+      "source_url": "https://www.archives.gov/exhibits/featured-documents/emancipation-proclamation",
+      "source_type": "Government",
+      "publisher": "National Archives",
+      "source_quality_label": "high_authority",
+      "source_quality_score": 1.0,
+      "domain": "archives.gov",
+      "rationale": "official government/legal source"
+    },
+    {
+      "source_id": 2,
+      "source_title": "13th Amendment to the U.S. Constitution",
+      "source_url": "https://www.archives.gov/milestone-documents/13th-amendment",
+      "source_type": "Government",
+      "publisher": "National Archives",
+      "source_quality_label": "high_authority",
+      "source_quality_score": 1.0,
+      "domain": "archives.gov",
+      "rationale": "official government/legal source"
+    },
+    {
+      "source_id": 3,
+      "source_title": "14th Amendment to the U.S. Constitution",
+      "source_url": "https://www.archives.gov/milestone-documents/14th-amendment",
+      "source_type": "Government",
+      "publisher": "National Archives",
+      "source_quality_label": "high_authority",
+      "source_quality_score": 1.0,
+      "domain": "archives.gov",
+      "rationale": "official government/legal source"
+    },
+    {
+      "source_id": 4,
+      "source_title": "15th Amendment to the U.S. Constitution",
+      "source_url": "https://www.archives.gov/milestone-documents/15th-amendment",
+      "source_type": "Government",
+      "publisher": "National Archives",
+      "source_quality_label": "high_authority",
+      "source_quality_score": 1.0,
+      "domain": "archives.gov",
+      "rationale": "official government/legal source"
+    },
+    {
+      "source_id": 5,
+      "source_title": "Civil Rights Act of 1964",
+      "source_url": "https://history.house.gov/Historical-Highlights/1951-2000/The-Civil-Rights-Act-of-1964/",
+      "source_type": "Government",
+      "publisher": "U.S. House of Representatives",
+      "source_quality_label": "high_authority",
+      "source_quality_score": 1.0,
+      "domain": "history.house.gov",
+      "rationale": "official government/legal source"
+    },
+    {
+      "source_id": 6,
+      "source_title": "Voting Rights Act of 1965",
+      "source_url": "https://www.archives.gov/legislative/features/voting-rights-1965",
+      "source_type": "Government",
+      "publisher": "National Archives",
+      "source_quality_label": "high_authority",
+      "source_quality_score": 1.0,
+      "domain": "archives.gov",
+      "rationale": "official government/legal source"
+    },
+    {
+      "source_id": 7,
+      "source_title": "Fair Housing Act",
+      "source_url": "https://www.hud.gov/program_offices/fair_housing_equal_opp/fair_housing_act_overview",
+      "source_type": "Government",
+      "publisher": "HUD",
+      "source_quality_label": "high_authority",
+      "source_quality_score": 1.0,
+      "domain": "hud.gov",
+      "rationale": "official government/legal source"
+    },
+    {
+      "source_id": 8,
+      "source_title": "President Bush Signs Voting Rights Act Reauthorization",
+      "source_url": "https://georgewbush-whitehouse.archives.gov/news/releases/2006/07/20060727-1.html",
+      "source_type": "Government",
+      "publisher": "White House Archives",
+      "source_quality_label": "high_authority",
+      "source_quality_score": 1.0,
+      "domain": "georgewbush-whitehouse.archives.gov",
+      "rationale": "official government/legal source"
+    },
+    {
+      "source_id": 9,
+      "source_title": "Health Insurance Coverage and Access to Care for Black Americans",
+      "source_url": "https://aspe.hhs.gov/reports/health-insurance-coverage-access-care-black-americans",
+      "source_type": "Government",
+      "publisher": "HHS ASPE",
+      "source_quality_label": "high_authority",
+      "source_quality_score": 1.0,
+      "domain": "aspe.hhs.gov",
+      "rationale": "official government/legal source"
+    },
+    {
+      "source_id": 10,
+      "source_title": "First Step Act Summary",
+      "source_url": "https://www.congress.gov/bill/115th-congress/senate-bill/756",
+      "source_type": "Government",
+      "publisher": "Congress.gov",
+      "source_quality_label": "high_authority",
+      "source_quality_score": 1.0,
+      "domain": "congress.gov",
+      "rationale": "official government/legal source"
+    },
+    {
+      "source_id": 11,
+      "source_title": "FUTURE Act",
+      "source_url": "https://www.congress.gov/bill/116th-congress/house-bill/2486",
+      "source_type": "Government",
+      "publisher": "Congress.gov",
+      "source_quality_label": "high_authority",
+      "source_quality_score": 1.0,
+      "domain": "congress.gov",
+      "rationale": "official government/legal source"
+    },
+    {
+      "source_id": 12,
+      "source_title": "American Rescue Plan Act of 2021",
+      "source_url": "https://www.congress.gov/bill/117th-congress/house-bill/1319",
+      "source_type": "Government",
+      "publisher": "Congress.gov",
+      "source_quality_label": "high_authority",
+      "source_quality_score": 1.0,
+      "domain": "congress.gov",
+      "rationale": "official government/legal source"
+    },
+    {
+      "source_id": 13,
+      "source_title": "Civil Rights Act of 1866",
+      "source_url": "https://www.govinfo.gov/link/statute/14/27",
+      "source_type": "Government",
+      "publisher": "GovInfo",
+      "source_quality_label": "high_authority",
+      "source_quality_score": 1.0,
+      "domain": "govinfo.gov",
+      "rationale": "official government/legal source"
+    },
+    {
+      "source_id": 14,
+      "source_title": "Freedmen's Bureau Act",
+      "source_url": "https://www.loc.gov/rr/program/bib/ourdocs/Freedmen.html",
+      "source_type": "Government",
+      "publisher": "Library of Congress",
+      "source_quality_label": "high_authority",
+      "source_quality_score": 1.0,
+      "domain": "loc.gov",
+      "rationale": "official government/legal source"
+    },
+    {
+      "source_id": 15,
+      "source_title": "Brown v. Board of Education",
+      "source_url": "https://www.archives.gov/milestone-documents/brown-v-board-of-education",
+      "source_type": "Government",
+      "publisher": "National Archives",
+      "source_quality_label": "high_authority",
+      "source_quality_score": 1.0,
+      "domain": "archives.gov",
+      "rationale": "official government/legal source"
+    },
+    {
+      "source_id": 16,
+      "source_title": "Civil Rights Act of 1957",
+      "source_url": "https://www.eisenhowerlibrary.gov/research/online-documents/civil-rights-act-1957",
+      "source_type": "Government",
+      "publisher": "Eisenhower Presidential Library",
+      "source_quality_label": "high_authority",
+      "source_quality_score": 1.0,
+      "domain": "eisenhowerlibrary.gov",
+      "rationale": "official government/legal source"
+    },
+    {
+      "source_id": 17,
+      "source_title": "Shelby County v. Holder",
+      "source_url": "https://www.oyez.org/cases/2012/12-96",
+      "source_type": "Other",
+      "publisher": "Oyez",
+      "source_quality_label": "low_unverified",
+      "source_quality_score": 0.25,
+      "domain": "oyez.org",
+      "rationale": "unverified or uncategorized source authority"
+    },
+    {
+      "source_id": 18,
+      "source_title": "Fair Sentencing Act of 2010",
+      "source_url": "https://www.congress.gov/bill/111th-congress/senate-bill/1789",
+      "source_type": "Government",
+      "publisher": "Congress.gov",
+      "source_quality_label": "high_authority",
+      "source_quality_score": 1.0,
+      "domain": "congress.gov",
+      "rationale": "official government/legal source"
+    },
+    {
+      "source_id": 19,
+      "source_title": "Executive Order on Advancing Racial Equity",
+      "source_url": "https://www.whitehouse.gov/briefing-room/presidential-actions/2021/01/20/executive-order-advancing-racial-equity-and-support-for-underserved-communities-through-the-federal-government/",
+      "source_type": "Government",
+      "publisher": "White House",
+      "source_quality_label": "high_authority",
+      "source_quality_score": 1.0,
+      "domain": "whitehouse.gov",
+      "rationale": "official government/legal source"
+    },
+    {
+      "source_id": 20,
+      "source_title": "John Lewis Voting Rights Advancement Act",
+      "source_url": "https://www.congress.gov/bill/117th-congress/house-bill/4",
+      "source_type": "Government",
+      "publisher": "Congress.gov",
+      "source_quality_label": "high_authority",
+      "source_quality_score": 1.0,
+      "domain": "congress.gov",
+      "rationale": "official government/legal source"
+    },
+    {
+      "source_id": 21,
+      "source_title": "George Floyd Justice in Policing Act",
+      "source_url": "https://www.congress.gov/bill/117th-congress/house-bill/1280",
+      "source_type": "Government",
+      "publisher": "Congress.gov",
+      "source_quality_label": "high_authority",
+      "source_quality_score": 1.0,
+      "domain": "congress.gov",
+      "rationale": "official government/legal source"
+    },
+    {
+      "source_id": 25,
+      "source_title": "The Civil Rights Cases",
+      "source_url": "https://supreme.justia.com/cases/federal/us/109/3/",
+      "source_type": "Government",
+      "publisher": "Supreme Court / Justia",
+      "source_quality_label": "high_authority",
+      "source_quality_score": 1.0,
+      "domain": "supreme.justia.com",
+      "rationale": "official government/legal source"
+    },
+    {
+      "source_id": 26,
+      "source_title": "Plessy v. Ferguson",
+      "source_url": "https://supreme.justia.com/cases/federal/us/163/537/",
+      "source_type": "Government",
+      "publisher": "Supreme Court / Justia",
+      "source_quality_label": "high_authority",
+      "source_quality_score": 1.0,
+      "domain": "supreme.justia.com",
+      "rationale": "official government/legal source"
+    },
+    {
+      "source_id": 27,
+      "source_title": "Guinn v. United States",
+      "source_url": "https://supreme.justia.com/cases/federal/us/238/347/",
+      "source_type": "Government",
+      "publisher": "Supreme Court / Justia",
+      "source_quality_label": "high_authority",
+      "source_quality_score": 1.0,
+      "domain": "supreme.justia.com",
+      "rationale": "official government/legal source"
+    },
+    {
+      "source_id": 28,
+      "source_title": "Smith v. Allwright",
+      "source_url": "https://supreme.justia.com/cases/federal/us/321/649/",
+      "source_type": "Government",
+      "publisher": "Supreme Court / Justia",
+      "source_quality_label": "high_authority",
+      "source_quality_score": 1.0,
+      "domain": "supreme.justia.com",
+      "rationale": "official government/legal source"
+    }
+  ],
+  "future_scoring_recommendations": [
+    "Do not change current score formulas until source quality has been reviewed against false positives.",
+    "Use high_authority_source_count as future debug metadata before turning it into a multiplier.",
+    "Prefer source deduplication/canonicalization before making source_count more influential.",
+    "Treat campaign or uncategorized .com sources as low_unverified unless paired with an official action or outcome source."
+  ]
+}

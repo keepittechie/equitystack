@@ -25,6 +25,19 @@ def repo_root() -> Path:
     return Path(__file__).resolve().parents[2]
 
 
+def load_env_file(path: Path) -> dict[str, str]:
+    values: dict[str, str] = {}
+    if not path.exists():
+        return values
+    for line in path.read_text().splitlines():
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#") or "=" not in stripped:
+            continue
+        key, value = stripped.split("=", 1)
+        values[key.strip()] = value.strip().strip('"').strip("'")
+    return values
+
+
 def utc_timestamp() -> str:
     return datetime.now(UTC).replace(microsecond=0).isoformat()
 
@@ -37,31 +50,41 @@ def load_llm_config(config_path: Path | None = None) -> dict[str, Any]:
         if isinstance(raw, dict):
             payload.update(raw)
 
-    if os.environ.get("EQUITYSTACK_LLM_PROVIDER"):
-        payload["provider"] = os.environ["EQUITYSTACK_LLM_PROVIDER"]
-    if os.environ.get("EQUITYSTACK_LLM_MODEL"):
-        payload["model"] = os.environ["EQUITYSTACK_LLM_MODEL"]
-    elif os.environ.get("EQUITYSTACK_OPENAI_MODEL"):
-        payload["model"] = os.environ["EQUITYSTACK_OPENAI_MODEL"]
-    elif os.environ.get("OPENAI_MODEL"):
-        payload["model"] = os.environ["OPENAI_MODEL"]
-    if os.environ.get("EQUITYSTACK_LLM_ENDPOINT"):
-        payload["endpoint"] = os.environ["EQUITYSTACK_LLM_ENDPOINT"]
-    if os.environ.get("EQUITYSTACK_LLM_MODELS_ENDPOINT"):
-        payload["models_endpoint"] = os.environ["EQUITYSTACK_LLM_MODELS_ENDPOINT"]
-    if os.environ.get("OPENAI_API_KEY"):
-        payload["openai_api_key"] = os.environ["OPENAI_API_KEY"]
-    if os.environ.get("OPENAI_BASE_URL"):
-        payload["openai_base_url"] = os.environ["OPENAI_BASE_URL"]
-    if os.environ.get("EQUITYSTACK_LLM_TIMEOUT"):
-        payload["timeout_seconds"] = int(os.environ["EQUITYSTACK_LLM_TIMEOUT"])
-    if os.environ.get("EQUITYSTACK_LLM_LOG_DIR"):
-        payload["log_dir"] = os.environ["EQUITYSTACK_LLM_LOG_DIR"]
+    env_file_values = load_env_file(repo_root() / ".env.local")
+
+    def env_value(key: str) -> str | None:
+        return os.environ.get(key) or env_file_values.get(key)
+
+    if env_value("EQUITYSTACK_LLM_PROVIDER"):
+        payload["provider"] = env_value("EQUITYSTACK_LLM_PROVIDER")
+    if env_value("EQUITYSTACK_LLM_MODEL"):
+        payload["model"] = env_value("EQUITYSTACK_LLM_MODEL")
+    elif env_value("EQUITYSTACK_OPENAI_MODEL"):
+        payload["model"] = env_value("EQUITYSTACK_OPENAI_MODEL")
+    elif env_value("OPENAI_MODEL"):
+        payload["model"] = env_value("OPENAI_MODEL")
+    if env_value("EQUITYSTACK_LLM_ENDPOINT"):
+        payload["endpoint"] = env_value("EQUITYSTACK_LLM_ENDPOINT")
+    if env_value("EQUITYSTACK_LLM_MODELS_ENDPOINT"):
+        payload["models_endpoint"] = env_value("EQUITYSTACK_LLM_MODELS_ENDPOINT")
+    if env_value("OPENAI_API_KEY"):
+        payload["openai_api_key"] = env_value("OPENAI_API_KEY")
+    if env_value("OPENAI_BASE_URL"):
+        payload["openai_base_url"] = env_value("OPENAI_BASE_URL")
+    if env_value("EQUITYSTACK_LLM_TIMEOUT"):
+        payload["timeout_seconds"] = int(env_value("EQUITYSTACK_LLM_TIMEOUT"))
+    if env_value("EQUITYSTACK_LLM_LOG_DIR"):
+        payload["log_dir"] = env_value("EQUITYSTACK_LLM_LOG_DIR")
     return payload
 
 
 def normalize_model_name(value: Any) -> str:
     return str(value or "").strip()
+
+
+def looks_like_openai_model(value: Any) -> bool:
+    normalized = normalize_model_name(value).lower()
+    return normalized.startswith("gpt-") or normalized.startswith("chatgpt") or normalized.startswith("o")
 
 
 def resolve_openai_compatible_model(requested_model: Any, config: dict[str, Any]) -> str:
@@ -183,6 +206,7 @@ class DefaultLLMProvider(LLMProvider):
             if self.openai_api_key
             else self.requested_model or None
         )
+        self.endpoint_was_explicit = bool(normalize_model_name(endpoint))
         self.endpoint = endpoint or self.config.get("endpoint")
         self.timeout_seconds = int(timeout_seconds or self.config.get("timeout_seconds") or DEFAULT_TIMEOUT_SECONDS)
         self.temperature = temperature
@@ -192,6 +216,8 @@ class DefaultLLMProvider(LLMProvider):
         if not self.openai_api_key:
             return False
         if not self.endpoint:
+            return True
+        if not self.endpoint_was_explicit and looks_like_openai_model(self.model):
             return True
         return "api.openai.com" in self.endpoint or self.endpoint.rstrip("/").endswith("/chat/completions")
 
@@ -257,7 +283,12 @@ class DefaultLLMProvider(LLMProvider):
             raise
 
     def generate_openai_chat(self, prompt: str, system: str = None) -> str:
-        endpoint = self.endpoint or f"{self.openai_base_url}/chat/completions"
+        endpoint = (
+            self.endpoint
+            if self.endpoint
+            and ("api.openai.com" in self.endpoint or self.endpoint.rstrip("/").endswith("/chat/completions"))
+            else f"{self.openai_base_url}/chat/completions"
+        )
         if endpoint.rstrip("/").endswith("/v1"):
             endpoint = f"{endpoint.rstrip('/')}/chat/completions"
         messages: list[dict[str, str]] = []
