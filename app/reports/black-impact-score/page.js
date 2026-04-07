@@ -382,12 +382,30 @@ function getEffectiveScoringModel({ metadata, usingLegacyModel }) {
 }
 
 function normalizeOutcomeMetadata(metadata) {
+  const totalOutcomesAvailable = Number(metadata?.total_outcomes_available || 0);
+  const outcomesIncludedInScore = Number(metadata?.outcomes_included_in_score || 0);
+  const outcomesExcludedFromScore = Number(metadata?.outcomes_excluded_from_score || 0);
+
   return {
     total_promises: Number(metadata?.total_promises || 0),
     total_outcomes: Number(metadata?.total_outcomes || 0),
     total_loaded_promises: Number(metadata?.total_loaded_promises || 0),
     total_loaded_outcomes: Number(metadata?.total_loaded_outcomes || 0),
     total_excluded_outcomes: Number(metadata?.total_excluded_outcomes || 0),
+    total_outcomes_available: totalOutcomesAvailable,
+    outcomes_included_in_score: outcomesIncludedInScore,
+    outcomes_excluded_from_score: outcomesExcludedFromScore,
+    excluded_due_to_missing_sources: Number(metadata?.excluded_due_to_missing_sources || 0),
+    excluded_due_to_missing_direction: Number(metadata?.excluded_due_to_missing_direction || 0),
+    excluded_due_to_missing_summary: Number(metadata?.excluded_due_to_missing_summary || 0),
+    summary_interpretation:
+      typeof metadata?.summary_interpretation === "string" && metadata.summary_interpretation.trim()
+        ? metadata.summary_interpretation.trim()
+        : null,
+    trust: metadata?.trust || null,
+    outcome_confidence: metadata?.outcome_confidence || null,
+    outcome_completeness: metadata?.outcome_completeness || null,
+    source_quality_distribution: metadata?.source_quality_distribution || null,
     scoring_model:
       typeof metadata?.scoring_model === "string" && metadata.scoring_model.trim()
         ? metadata.scoring_model.trim()
@@ -458,6 +476,25 @@ function formatSignedScore(value) {
   return numeric > 0 ? `+${fixed}` : fixed;
 }
 
+function formatPercent(value) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) return null;
+  return `${Math.round(numeric * 100)}%`;
+}
+
+function getTrustPercentage(metadata, key) {
+  const directValue = Number(metadata?.trust?.[key]);
+  if (Number.isFinite(directValue)) return directValue;
+
+  const fallbackValue = Number(
+    key === "incomplete_outcome_percentage"
+      ? metadata?.outcome_completeness?.incomplete_outcome_percentage
+      : metadata?.outcome_confidence?.[key]
+  );
+
+  return Number.isFinite(fallbackValue) ? fallbackValue : null;
+}
+
 function getCoverageSignal({ promiseCount, outcomeCount, usingLegacyModel, isLegacyFallbackActive }) {
   const normalizedPromiseCount = Number(promiseCount || 0);
   const normalizedOutcomeCount = Number(outcomeCount || 0);
@@ -496,13 +533,36 @@ function getCoverageSignal({ promiseCount, outcomeCount, usingLegacyModel, isLeg
   };
 }
 
-function CredibilityNote({ promiseCount, outcomeCount, effectiveScoringModel, usingLegacyModel, isLegacyFallbackActive }) {
+function CredibilityNote({
+  promiseCount,
+  outcomeCount,
+  effectiveScoringModel,
+  usingLegacyModel,
+  isLegacyFallbackActive,
+  metadata,
+  isFilteredView = false,
+}) {
   const coverageSignal = getCoverageSignal({
     promiseCount,
     outcomeCount,
     usingLegacyModel,
     isLegacyFallbackActive,
   });
+  const summaryInterpretation =
+    !usingLegacyModel && !isFilteredView ? metadata?.summary_interpretation : null;
+  const includedCount = Number(metadata?.outcomes_included_in_score);
+  const excludedCount = Number(metadata?.outcomes_excluded_from_score);
+  const availableCount = Number(metadata?.total_outcomes_available);
+  const missingSourceCount = Number(metadata?.excluded_due_to_missing_sources);
+  const highConfidencePct = formatPercent(
+    getTrustPercentage(metadata, "high_confidence_outcome_percentage")
+  );
+  const lowConfidencePct = formatPercent(
+    getTrustPercentage(metadata, "low_confidence_outcome_percentage")
+  );
+  const incompletePct = formatPercent(
+    getTrustPercentage(metadata, "incomplete_outcome_percentage")
+  );
 
   return (
     <section className="card-muted rounded-[1.25rem] p-4">
@@ -518,11 +578,34 @@ function CredibilityNote({ promiseCount, outcomeCount, effectiveScoringModel, us
           <MetaPill>Based on {promiseCount} records</MetaPill>
           {outcomeCount != null ? <MetaPill>Based on {outcomeCount} outcomes</MetaPill> : null}
           <MetaPill>{effectiveScoringModel}</MetaPill>
+          {!usingLegacyModel && Number.isFinite(includedCount) && Number.isFinite(excludedCount) ? (
+            <MetaPill>
+              {availableCount > 0
+                ? `${includedCount} of ${availableCount} included`
+                : `${includedCount} included`}
+            </MetaPill>
+          ) : null}
+          {!usingLegacyModel && Number.isFinite(excludedCount) ? (
+            <MetaPill>{excludedCount} excluded</MetaPill>
+          ) : null}
         </div>
       </div>
       <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
         {coverageSignal.description}
       </p>
+      {summaryInterpretation ? (
+        <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
+          {summaryInterpretation}
+        </p>
+      ) : null}
+      {!usingLegacyModel && !isFilteredView && (highConfidencePct || lowConfidencePct || incompletePct || missingSourceCount > 0) ? (
+        <div className="mt-3 flex flex-wrap gap-2">
+          {highConfidencePct ? <MetaPill>{highConfidencePct} high-confidence</MetaPill> : null}
+          {lowConfidencePct ? <MetaPill>{lowConfidencePct} low-confidence</MetaPill> : null}
+          {incompletePct ? <MetaPill>{incompletePct} incomplete</MetaPill> : null}
+          {missingSourceCount > 0 ? <MetaPill>{missingSourceCount} missing source support</MetaPill> : null}
+        </div>
+      ) : null}
     </section>
   );
 }
@@ -2460,8 +2543,63 @@ function PresidentCompareSelectorSection({
   );
 }
 
+function PresidentCompareCard({ president, primaryImpactArea }) {
+  const topPositive = president.top_positive_promises?.[0] || null;
+  const topNegative = president.top_negative_promises?.[0] || null;
+
+  return (
+    <section className="card-muted rounded-[1.25rem] p-5">
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div className="max-w-3xl">
+          <div className="flex items-center gap-2 flex-wrap">
+            <PresidentAvatar
+              presidentSlug={president.president_slug}
+              presidentName={president.president}
+              size={44}
+            />
+            <h3 className="text-xl font-semibold">{president.president}</h3>
+            {president.president_party ? <MetaPill>{president.president_party}</MetaPill> : null}
+          </div>
+          <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
+            {president.explanation || "No explanation is available for this president in the current topic."}
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <MetaPill>Normalized {formatNormalizedScore(president.normalized_score)}</MetaPill>
+          <MetaPill>Raw {formatRawScore(president.raw_score)}</MetaPill>
+          <MetaPill>{president.promise_count} promises</MetaPill>
+          {president.outcome_count != null ? <MetaPill>{president.outcome_count} outcomes</MetaPill> : null}
+        </div>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-3 mt-5">
+        <div className="rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 p-4">
+          <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Primary Impact Area</p>
+          <p className="text-base font-semibold mt-2">{primaryImpactArea?.topic || "Unavailable"}</p>
+        </div>
+        <div className="rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 p-4">
+          <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Top Positive Driver</p>
+          <p className="text-base font-semibold mt-2">{topPositive?.title || "Unavailable"}</p>
+        </div>
+        <div className="rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 p-4">
+          <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Top Negative Driver</p>
+          <p className="text-base font-semibold mt-2">{topNegative?.title || "Unavailable"}</p>
+        </div>
+      </div>
+
+      <div className="mt-4">
+        <EvidencePanelGroup
+          title="Underlying evidence for this score"
+          items={[topPositive, topNegative]}
+          linkToPromises={true}
+          emptyMessage="No driver evidence is available for this president in the current comparison."
+        />
+      </div>
+    </section>
+  );
+}
+
 function PresidentComparisonSection({
-  presidents,
   selectedTopic,
   effectiveScoringModel,
   usingLegacyModel,
@@ -2524,62 +2662,6 @@ function PresidentComparisonSection({
   const rawDelta = Number(selectedPresidentA.raw_score || 0) - Number(selectedPresidentB.raw_score || 0);
   const primaryImpactAreaA = getPrimaryImpactArea(selectedPresidentA);
   const primaryImpactAreaB = getPrimaryImpactArea(selectedPresidentB);
-
-  function PresidentCompareCard({ president, primaryImpactArea }) {
-    const topPositive = president.top_positive_promises?.[0] || null;
-    const topNegative = president.top_negative_promises?.[0] || null;
-
-    return (
-      <section className="card-muted rounded-[1.25rem] p-5">
-        <div className="flex items-start justify-between gap-4 flex-wrap">
-          <div className="max-w-3xl">
-            <div className="flex items-center gap-2 flex-wrap">
-              <PresidentAvatar
-                presidentSlug={president.president_slug}
-                presidentName={president.president}
-                size={44}
-              />
-              <h3 className="text-xl font-semibold">{president.president}</h3>
-              {president.president_party ? <MetaPill>{president.president_party}</MetaPill> : null}
-            </div>
-            <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
-              {president.explanation || "No explanation is available for this president in the current topic."}
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <MetaPill>Normalized {formatNormalizedScore(president.normalized_score)}</MetaPill>
-            <MetaPill>Raw {formatRawScore(president.raw_score)}</MetaPill>
-            <MetaPill>{president.promise_count} promises</MetaPill>
-            {president.outcome_count != null ? <MetaPill>{president.outcome_count} outcomes</MetaPill> : null}
-          </div>
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-3 mt-5">
-          <div className="rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 p-4">
-            <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Primary Impact Area</p>
-            <p className="text-base font-semibold mt-2">{primaryImpactArea?.topic || "Unavailable"}</p>
-          </div>
-          <div className="rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 p-4">
-            <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Top Positive Driver</p>
-            <p className="text-base font-semibold mt-2">{topPositive?.title || "Unavailable"}</p>
-          </div>
-          <div className="rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 p-4">
-            <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Top Negative Driver</p>
-            <p className="text-base font-semibold mt-2">{topNegative?.title || "Unavailable"}</p>
-          </div>
-        </div>
-
-        <div className="mt-4">
-          <EvidencePanelGroup
-            title="Underlying evidence for this score"
-            items={[topPositive, topNegative]}
-            linkToPromises={true}
-            emptyMessage="No driver evidence is available for this president in the current comparison."
-          />
-        </div>
-      </section>
-    );
-  }
 
   return (
     <section className="card-surface rounded-[1.6rem] p-5">
@@ -3310,7 +3392,6 @@ export default async function BlackImpactScorePage({ searchParams }) {
         />
       ) : isPresidentCompareView ? (
         <PresidentComparisonSection
-          presidents={presidents}
           selectedTopic={selectedTopic}
           effectiveScoringModel={effectiveScoringModel}
           usingLegacyModel={usingLegacyModel}
@@ -3470,6 +3551,15 @@ export default async function BlackImpactScorePage({ searchParams }) {
         effectiveScoringModel={effectiveScoringModel}
         usingLegacyModel={usingLegacyModel}
         isLegacyFallbackActive={isLegacyFallbackActive}
+        metadata={metadata}
+        isFilteredView={Boolean(
+          requestedPresidentSlug ||
+            selectedTopic ||
+            isScoringReadyFilterActive ||
+            isTimelineView ||
+            isTopicCompareView ||
+            isPresidentCompareView
+        )}
       />
 
       <HowThisWasBuiltSection

@@ -17,6 +17,7 @@ import {
   fetchCurrentAdministrationOverview,
   fetchPromiseList,
 } from "@/lib/services/promiseService";
+import { fetchHomepageReadinessSummary } from "@/lib/services/systemReadinessService";
 import { buildSiteJsonLd, serializeJsonLd } from "@/lib/structured-data";
 
 export const dynamic = "force-dynamic";
@@ -50,6 +51,15 @@ function formatScore(value) {
 
   const fixed = numeric.toFixed(2);
   return numeric > 0 ? `+${fixed}` : fixed;
+}
+
+function formatPercent(value) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) {
+    return null;
+  }
+
+  return `${Math.round(numeric * 100)}%`;
 }
 
 function CompactStat({ label, value, detail }) {
@@ -183,11 +193,26 @@ function MiniPill({ label, tone = "default" }) {
   );
 }
 
-function ScoreSnapshotCard({ presidents, metadata }) {
+function getReadinessTone(status) {
+  if (status === "PASS") return "success";
+  if (status === "FAIL") return "danger";
+  return "warning";
+}
+
+function ScoreSnapshotCard({ presidents, metadata, readiness }) {
   const highest = presidents[0] || null;
   const lowest = [...presidents]
     .reverse()
     .find((president) => Number(president.raw_score_total || 0) < 0) || null;
+  const sourceCoverage = formatPercent(readiness?.source_coverage_pct);
+  const intentCoverage = formatPercent(readiness?.intent_coverage_pct);
+  const includedCount = Number(metadata?.outcomes_included_in_score ?? metadata?.total_outcomes ?? 0);
+  const excludedCount = Number(metadata?.outcomes_excluded_from_score ?? metadata?.total_excluded_outcomes ?? 0);
+  const availableCount = Number(metadata?.total_outcomes_available ?? 0);
+  const summaryInterpretation =
+    typeof metadata?.summary_interpretation === "string" && metadata.summary_interpretation.trim()
+      ? metadata.summary_interpretation.trim()
+      : null;
 
   return (
     <section className="card-surface rounded-[1.6rem] p-5">
@@ -198,10 +223,23 @@ function ScoreSnapshotCard({ presidents, metadata }) {
           <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
             The current public score model uses documented, scoring-ready outcomes from Promise Tracker.
           </p>
+          {summaryInterpretation ? (
+            <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
+              {summaryInterpretation}
+            </p>
+          ) : null}
         </div>
-        <Link href="/reports/black-impact-score" className="accent-link text-sm font-medium">
-          Open Black Impact Score report
-        </Link>
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          {readiness?.certification_status ? (
+            <MiniPill
+              label={`Readiness: ${readiness.certification_status}`}
+              tone={getReadinessTone(readiness.certification_status)}
+            />
+          ) : null}
+          <Link href="/reports/black-impact-score" className="accent-link text-sm font-medium">
+            Open Black Impact Score report
+          </Link>
+        </div>
       </div>
 
       {presidents.length === 0 ? (
@@ -223,7 +261,11 @@ function ScoreSnapshotCard({ presidents, metadata }) {
             <SummaryStat
               label="Outcomes"
               value={metadata.total_outcomes}
-              detail="Scoring-ready outcomes"
+              detail={
+                availableCount
+                  ? `${includedCount} of ${availableCount} currently included`
+                  : "Scoring-ready outcomes"
+              }
             />
             <SummaryStat
               label="Promises"
@@ -232,10 +274,24 @@ function ScoreSnapshotCard({ presidents, metadata }) {
             />
             <SummaryStat
               label="Excluded"
-              value={metadata.total_excluded_outcomes}
+              value={excludedCount}
               detail="Visible but not scored"
             />
           </div>
+
+          {readiness?.total_policy_outcomes ? (
+            <div className="mt-4 flex flex-wrap gap-2">
+              <MetaPill>{readiness.total_policy_outcomes} unified outcomes</MetaPill>
+              {readiness.current_admin_outcomes ? (
+                <MetaPill>{readiness.current_admin_outcomes} current-admin</MetaPill>
+              ) : null}
+              {readiness.legislative_outcomes ? (
+                <MetaPill>{readiness.legislative_outcomes} legislative</MetaPill>
+              ) : null}
+              {sourceCoverage ? <MetaPill>{sourceCoverage} sourced</MetaPill> : null}
+              {intentCoverage ? <MetaPill>{intentCoverage} intent classified</MetaPill> : null}
+            </div>
+          ) : null}
 
           <div className="mt-5 grid gap-4 lg:grid-cols-2">
             <div className="card-muted rounded-[1.2rem] p-4">
@@ -335,7 +391,7 @@ function LabelGuideCard({ impactGuide }) {
 }
 
 export default async function HomePage() {
-  const [promiseList, currentAdministration, impactScore] = await Promise.all([
+  const [promiseList, currentAdministration, impactScore, readinessSummary] = await Promise.all([
     fetchPromiseList({
       sort: "promise_date_desc",
       page: 1,
@@ -343,6 +399,7 @@ export default async function HomePage() {
     }),
     fetchCurrentAdministrationOverview(),
     computeOutcomeBasedScores(),
+    fetchHomepageReadinessSummary(),
   ]);
 
   const recentPromises = promiseList.items || [];
@@ -360,6 +417,7 @@ export default async function HomePage() {
     total_promises: 0,
     total_excluded_outcomes: 0,
   };
+  const sourceCoverage = formatPercent(readinessSummary?.source_coverage_pct);
 
   return (
     <main className="mx-auto max-w-7xl space-y-10 p-6 md:space-y-12">
@@ -427,12 +485,16 @@ export default async function HomePage() {
         <CompactStat
           label="Outcomes Scored"
           value={scoreMetadata.total_outcomes}
-          detail="Scoring-ready documented outcomes"
+          detail={
+            scoreMetadata.total_outcomes_available
+              ? `${scoreMetadata.total_outcomes} of ${scoreMetadata.total_outcomes_available} included`
+              : "Scoring-ready documented outcomes"
+          }
         />
         <CompactStat
           label="Excluded Outcomes"
           value={scoreMetadata.total_excluded_outcomes}
-          detail="Visible records outside numeric scoring"
+          detail={sourceCoverage ? `${sourceCoverage} unified outcomes sourced` : "Visible records outside numeric scoring"}
         />
       </section>
 
@@ -545,7 +607,11 @@ export default async function HomePage() {
         </div>
 
         <div className="mt-6">
-          <ScoreSnapshotCard presidents={presidents} metadata={scoreMetadata} />
+          <ScoreSnapshotCard
+            presidents={presidents}
+            metadata={scoreMetadata}
+            readiness={readinessSummary}
+          />
         </div>
       </section>
 

@@ -12,6 +12,8 @@ import TrackedLink from "@/app/components/telemetry/TrackedLink";
 import { fetchInternalJson } from "@/lib/api";
 import { PUBLIC_REVALIDATE_SECONDS, withRevalidate } from "@/lib/cache";
 import { EXPLANATION_CONTENT } from "@/lib/content/explanations";
+import { computeConfidence } from "@/lib/black-impact-score/confidence.js";
+import { computeDataCompleteness } from "@/lib/black-impact-score/completeness.js";
 import { buildPageMetadata } from "@/lib/metadata";
 import { buildPromiseJsonLd, serializeJsonLd } from "@/lib/structured-data";
 import { buildPromiseCardHref } from "@/lib/shareable-card-links";
@@ -73,6 +75,51 @@ function formatDate(dateString) {
     month: "short",
     day: "numeric",
   });
+}
+
+function formatLabel(value) {
+  if (!value) return null;
+
+  return String(value)
+    .replace(/[_-]+/g, " ")
+    .split(" ")
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+function sourceQualityScore(value) {
+  if (value === "high") return 1;
+  if (value === "medium") return 0.8;
+  if (value === "low") return 0.25;
+  return 0;
+}
+
+function getOutcomeTrustMetadata(outcome = {}) {
+  const linkedSourceCount = Array.isArray(outcome.outcome_sources)
+    ? outcome.outcome_sources.length
+    : 0;
+  const sourceCount = Number.isFinite(Number(outcome.unified_source_count))
+    ? Number(outcome.unified_source_count)
+    : linkedSourceCount;
+  const sourceQuality = outcome.source_quality || null;
+  const context = {
+    outcome,
+    source_count: sourceCount,
+    source_quality_label: sourceQuality,
+    source_quality_score: sourceQualityScore(sourceQuality),
+  };
+  const confidence = computeConfidence(context);
+  const completeness = computeDataCompleteness(context);
+
+  return {
+    source_count: sourceCount,
+    source_quality_label: sourceQuality,
+    confidence_score: confidence.confidence_score,
+    confidence_label: confidence.confidence_label,
+    completeness_label: completeness.completeness_label,
+    insufficient_data: completeness.insufficient_data,
+  };
 }
 
 function formatTermBadgeLabel(start, end) {
@@ -545,51 +592,75 @@ export default async function PromiseDetailPage({ params }) {
             </p>
             <div className="space-y-4">
               {promise.outcomes?.length ? (
-                promise.outcomes.map((outcome) => (
-                  <div key={outcome.id} className="card-muted rounded-[1.25rem] p-4">
-                    <div className="flex items-start justify-between gap-4 flex-wrap">
-                      <div>
-                        <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">
-                          {outcome.outcome_type}
-                        </p>
-                        <p className="text-sm text-[var(--ink-soft)] mt-2 leading-7">
-                          {outcome.outcome_summary}
-                        </p>
-                      </div>
-                      <div className="flex flex-wrap gap-2">
-                        <ImpactBadge impact={outcome.impact_direction} />
-                        {outcome.status_override ? (
-                          <PromiseStatusBadge status={outcome.status_override} />
-                        ) : null}
-                      </div>
-                    </div>
+                promise.outcomes.map((outcome) => {
+                  const trustMetadata = getOutcomeTrustMetadata(outcome);
+                  const impactStartDate = formatDate(outcome.impact_start_date);
+                  const impactEndDate = formatDate(outcome.impact_end_date);
 
-                    {outcome.measurable_impact ? (
-                      <p className="mt-4 text-sm text-[var(--ink-soft)]">
-                        <strong>Measured or documented impact:</strong> {outcome.measurable_impact}
-                      </p>
-                    ) : null}
+                  return (
+                    <div key={outcome.id} className="card-muted rounded-[1.25rem] p-4">
+                      <div className="flex items-start justify-between gap-4 flex-wrap">
+                        <div>
+                          <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">
+                            {outcome.outcome_type}
+                          </p>
+                          <p className="text-sm text-[var(--ink-soft)] mt-2 leading-7">
+                            {outcome.outcome_summary}
+                          </p>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          <ImpactBadge impact={outcome.impact_direction} />
+                          {outcome.status_override ? (
+                            <PromiseStatusBadge status={outcome.status_override} />
+                          ) : null}
+                          {outcome.policy_type ? <MetaPill>{formatLabel(outcome.policy_type)}</MetaPill> : null}
+                          <MetaPill>Confidence: {formatLabel(trustMetadata.confidence_label)}</MetaPill>
+                          <MetaPill>Completeness: {formatLabel(trustMetadata.completeness_label)}</MetaPill>
+                          {trustMetadata.insufficient_data ? <MetaPill>Insufficient data</MetaPill> : null}
+                        </div>
+                      </div>
 
-                    {outcome.black_community_impact_note ? (
+                      {outcome.measurable_impact ? (
+                        <p className="mt-4 text-sm text-[var(--ink-soft)]">
+                          <strong>Measured or documented impact:</strong> {outcome.measurable_impact}
+                        </p>
+                      ) : null}
+
+                      {outcome.black_community_impact_note ? (
+                        <p className="mt-3 text-sm text-[var(--ink-soft)]">
+                          <strong>Black community impact:</strong> {outcome.black_community_impact_note}
+                        </p>
+                      ) : null}
+
                       <p className="mt-3 text-sm text-[var(--ink-soft)]">
-                        <strong>Black community impact:</strong> {outcome.black_community_impact_note}
+                        <strong>Evidence strength:</strong> {outcome.evidence_strength}
                       </p>
-                    ) : null}
 
-                    <p className="mt-3 text-sm text-[var(--ink-soft)]">
-                      <strong>Evidence strength:</strong> {outcome.evidence_strength}
-                    </p>
+                      <p className="mt-3 text-sm text-[var(--ink-soft)]">
+                        <strong>Linked sources:</strong> {outcome.outcome_sources?.length || 0}
+                        {trustMetadata.source_quality_label
+                          ? ` • Source quality: ${formatLabel(trustMetadata.source_quality_label)}`
+                          : ""}
+                      </p>
 
-                    <p className="mt-3 text-sm text-[var(--ink-soft)]">
-                      <strong>Linked sources:</strong> {outcome.outcome_sources?.length || 0}
-                    </p>
+                      {impactStartDate || impactEndDate || outcome.impact_duration_estimate ? (
+                        <p className="mt-3 text-sm text-[var(--ink-soft)]">
+                          <strong>Impact timing:</strong>{" "}
+                          {impactStartDate ? `Starts ${impactStartDate}` : "Start date not specified"}
+                          {impactEndDate ? ` • Ends ${impactEndDate}` : ""}
+                          {outcome.impact_duration_estimate
+                            ? ` • Duration: ${formatLabel(outcome.impact_duration_estimate)}`
+                            : ""}
+                        </p>
+                      ) : null}
 
-                    <SourceDisclosure
-                      label="Outcome Sources"
-                      sources={outcome.outcome_sources}
-                    />
-                  </div>
-                ))
+                      <SourceDisclosure
+                        label="Outcome Sources"
+                        sources={outcome.outcome_sources}
+                      />
+                    </div>
+                  );
+                })
               ) : (
                 <p className="text-[var(--ink-soft)]">No outcomes are linked to this record yet.</p>
               )}

@@ -67,6 +67,12 @@ function formatSignedValue(value, digits = 2) {
   return numeric > 0 ? `+${fixed}` : fixed;
 }
 
+function formatPercent(value) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) return null;
+  return `${Math.round(numeric * 100)}%`;
+}
+
 function sortByNumericValue(items, getter, direction = "desc") {
   return [...items].sort((left, right) => {
     const leftValue = Number(getter(left) || 0);
@@ -595,6 +601,13 @@ export default async function PromiseScorePreviewPage() {
   ).slice(0, 8);
 
   const outcomeMetadata = outcome.metadata || null;
+  const trustMetadata = outcomeMetadata?.trust || null;
+  const highConfidencePct = formatPercent(trustMetadata?.high_confidence_outcome_percentage);
+  const lowConfidencePct = formatPercent(trustMetadata?.low_confidence_outcome_percentage);
+  const incompletePct = formatPercent(trustMetadata?.incomplete_outcome_percentage);
+  const outcomesIncludedInScore = Number(outcomeMetadata?.outcomes_included_in_score);
+  const totalOutcomesAvailable = Number(outcomeMetadata?.total_outcomes_available);
+  const outcomesExcludedFromScore = Number(outcomeMetadata?.outcomes_excluded_from_score);
 
   return (
     <main className="max-w-7xl mx-auto p-6">
@@ -821,11 +834,31 @@ export default async function PromiseScorePreviewPage() {
             <div className="card-muted rounded-[1.25rem] p-4">
               <h3 className="text-lg font-semibold">Outcome Metadata</h3>
               {outcomeMetadata ? (
-                <div className="mt-3 flex flex-wrap gap-2">
-                  <MetaPill>Promises {outcomeMetadata.total_promises ?? 0}</MetaPill>
-                  <MetaPill>Outcomes {outcomeMetadata.total_outcomes ?? 0}</MetaPill>
-                  <MetaPill>{outcomeMetadata.scoring_model || "Outcome model"}</MetaPill>
-                </div>
+                <>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <MetaPill>Promises {outcomeMetadata.total_promises ?? 0}</MetaPill>
+                    <MetaPill>Outcomes {outcomeMetadata.total_outcomes ?? 0}</MetaPill>
+                    {Number.isFinite(outcomesIncludedInScore) ? (
+                      <MetaPill>
+                        {totalOutcomesAvailable > 0
+                          ? `${outcomesIncludedInScore} of ${totalOutcomesAvailable} included`
+                          : `${outcomesIncludedInScore} included`}
+                      </MetaPill>
+                    ) : null}
+                    {Number.isFinite(outcomesExcludedFromScore) ? (
+                      <MetaPill>{outcomesExcludedFromScore} excluded</MetaPill>
+                    ) : null}
+                    {highConfidencePct ? <MetaPill>{highConfidencePct} high-confidence</MetaPill> : null}
+                    {lowConfidencePct ? <MetaPill>{lowConfidencePct} low-confidence</MetaPill> : null}
+                    {incompletePct ? <MetaPill>{incompletePct} incomplete</MetaPill> : null}
+                    <MetaPill>{outcomeMetadata.scoring_model || "Outcome model"}</MetaPill>
+                  </div>
+                  {outcomeMetadata.summary_interpretation ? (
+                    <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
+                      {outcomeMetadata.summary_interpretation}
+                    </p>
+                  ) : null}
+                </>
               ) : (
                 <p className="text-sm text-[var(--ink-soft)] mt-3">Outcome metadata is not available.</p>
               )}

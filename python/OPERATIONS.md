@@ -100,6 +100,132 @@ Use these read-only verification commands after imports:
 
 Legislative outcomes are intentionally excluded from president scoring until the data model has a deterministic president-attribution field. Full details are in `../docs/workflow-hardening.md`.
 
+## Weekly And Monthly Operating Loop
+
+The commands in this section assume you are running from the repository root:
+
+```bash
+cd /home/josh/black-policy-site
+```
+
+### Weekly Workflow: 30-60 Minutes
+
+This is the core operating loop.
+
+1. Run the system health check:
+
+```bash
+./python/bin/equitystack impact certify-production-data
+```
+
+Check:
+
+- `certification_status`
+- source coverage percentage
+- intent coverage percentage
+
+You are answering: did anything break or regress?
+
+2. Fix the top source gaps:
+
+```bash
+./python/bin/equitystack impact audit-outcome-source-gaps --limit 10
+```
+
+This returns the highest-impact outcomes that still need sources. Pick 5-10 outcomes and attach verified sources:
+
+```bash
+./python/bin/equitystack impact curate-sources \
+  --only-policy-outcome-id <ID> \
+  --source-title "<Official Title>" \
+  --source-url "<https://...>" \
+  --source-type Government \
+  --apply --yes
+```
+
+Good sources:
+
+- `congress.gov`
+- `archives.gov`
+- `whitehouse.gov` or archived White House pages
+- official court rulings
+- official `.gov` agency sites
+
+Avoid:
+
+- blogs
+- random articles
+- low-authority summaries
+
+3. Classify policy intent:
+
+```bash
+./python/bin/equitystack impact audit-policy-intent-gaps
+```
+
+Pick 3-5 policies and classify only when the intent is supported by documentation:
+
+```bash
+./python/bin/equitystack impact curate-policy-intent \
+  --only-policy-id <ID> \
+  --category equity_expanding \
+  --summary "Short factual description of intent" \
+  --apply --yes
+```
+
+Keep the summary focused on what the policy was trying to do, not the outcome.
+
+4. Sync and validate:
+
+```bash
+./python/bin/equitystack impact evaluate
+./python/bin/equitystack impact promote --dry-run --approve-safe
+./python/bin/equitystack impact report-final-black-impact-score
+```
+
+Check:
+
+- the system still runs cleanly
+- no unexpected scoring jumps
+- no validation failures
+
+### Monthly Workflow: 1-2 Hours
+
+This is the deeper cleanup and expansion pass.
+
+1. Re-run the full audit:
+
+```bash
+./python/bin/equitystack impact certify-production-data
+```
+
+Compare last month to now. The practical question is whether coverage is improving.
+
+2. Clear a larger source-gap batch:
+
+```bash
+./python/bin/equitystack impact audit-outcome-source-gaps --limit 25
+```
+
+Goal: attach verified sources for 10-20 high-impact unsourced outcomes in one session.
+
+3. Handle high-impact intent gaps.
+
+Focus only on historically important policies first:
+
+- civil rights
+- housing
+- education
+- criminal justice
+
+4. Add missing major policies when appropriate:
+
+```bash
+./python/bin/equitystack impact audit-policy-coverage-gaps
+```
+
+Add 1-3 major missing policies per month only after sourcing them properly. This improves historical completeness, credibility, and long-term value without turning ingestion into a bulk unsourced import.
+
 ## Canonical Review Surfaces
 
 - `/admin/current-admin-review`
