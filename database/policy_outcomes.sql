@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS policy_outcomes (
   confidence_score DECIMAL(5,4) NULL,
   source_count INT NOT NULL DEFAULT 0,
   source_quality ENUM('low', 'medium', 'high') NULL,
+  impact_score FLOAT NULL,
   status VARCHAR(64) NULL,
   impact_start_date DATE NULL,
   impact_end_date DATE NULL,

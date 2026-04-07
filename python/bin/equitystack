@@ -2090,6 +2090,10 @@ run_impact_command() {
       run_step "1/1" "Certify Production Data Model and Scoring" "Production data certification audit complete" --output "$EQUITYSTACK_PYTHON_DIR/reports/production-data-model-scoring-certification.json" -- \
         "$VENV_PYTHON" scripts/audit_production_certification.py "$@"
       ;;
+    complete-certification-readiness)
+      run_step "1/1" "Complete Production Certification Readiness" "Production certification readiness completion finished" --output "$EQUITYSTACK_PYTHON_DIR/reports/production-certification-readiness-completion.dry-run.json" -- \
+        "$VENV_PYTHON" scripts/complete_production_certification_readiness.py "$@"
+      ;;
     audit-policy-intent-gaps)
       run_step "1/1" "Audit Policy Intent Gaps" "Policy intent gap operator queue complete" --output "$EQUITYSTACK_PYTHON_DIR/reports/policy-intent-gap-queue.json" -- \
         "$VENV_PYTHON" scripts/audit_policy_intent_gaps.py "$@"
@@ -2704,6 +2708,7 @@ Impact maturation commands:
   report-outcome-time  Report unified policy_outcomes by year, decade, and administration
   report-final-black-impact-score  Compute final Black Impact Score per president
   certify-production-data  End-to-end read-only data model and scoring certification
+  complete-certification-readiness  Apply guarded certification readiness backfills
   backfill-policy-time-intent  Dry-run or apply safe policy time and intent backfills
   curate-policy-intent  Manually classify missing historical policy intent
   curate-sources  Manually attach operator-provided sources to policy outcomes
@@ -2723,6 +2728,7 @@ Examples:
   $(cli_hint) impact report-outcome-time
   $(cli_hint) impact report-final-black-impact-score
   $(cli_hint) impact certify-production-data
+  $(cli_hint) impact complete-certification-readiness
   $(cli_hint) impact backfill-policy-time-intent
   $(cli_hint) impact curate-policy-intent --non-interactive --limit 10
   $(cli_hint) impact curate-sources --non-interactive --limit 10
@@ -2765,6 +2771,8 @@ Commands:
              Read-only final Black Impact Score per president from unified policy_outcomes
   certify-production-data
              End-to-end read-only production data model and scoring certification audit
+  complete-certification-readiness
+             Dry-run or apply guarded production certification readiness backfills
   audit-policy-intent-gaps
              Build a read-only queue of policies missing policy intent classification
   backfill-policy-time-intent
@@ -2793,6 +2801,7 @@ Examples:
   $(cli_hint) impact report-policy-intent
   $(cli_hint) impact report-final-black-impact-score
   $(cli_hint) impact certify-production-data
+  $(cli_hint) impact complete-certification-readiness
   $(cli_hint) impact audit-policy-intent-gaps
   $(cli_hint) impact backfill-policy-time-intent
   $(cli_hint) impact backfill-policy-time-intent --apply --yes

@@ -297,7 +297,8 @@ def fetch_tracked_bills(cursor) -> list[dict[str, Any]]:
 def score_outcome(row: dict[str, Any], has_impact_score: bool) -> dict[str, Any]:
     direction = normalize_direction(row.get("impact_direction"))
     direction_weight = DIRECTION_WEIGHTS.get(direction, 0.0)
-    impact_score = number(row.get("impact_score"), 1.0 if not has_impact_score else 0.0)
+    stored_impact_score = number(row.get("impact_score"), 1.0 if not has_impact_score else 0.0)
+    impact_score = abs(stored_impact_score) if has_impact_score else stored_impact_score
     confidence = confidence_multiplier(row.get("source_count"))
     intent = normalize_intent(row.get("policy_intent_category"))
     intent_modifier = INTENT_MODIFIERS.get(intent, 1.0)
@@ -317,6 +318,7 @@ def score_outcome(row: dict[str, Any], has_impact_score: bool) -> dict[str, Any]
         "outcome_summary": row.get("outcome_summary"),
         "impact_direction": direction,
         "impact_score": round(impact_score, 4),
+        "stored_impact_score": round(stored_impact_score, 4),
         "impact_score_source": "policy_outcomes.impact_score" if has_impact_score else "unit_outcome_magnitude_fallback",
         "direction_weight": direction_weight,
         "confidence_multiplier": confidence,

@@ -196,7 +196,8 @@ def fetch_policy_outcomes(cursor, policy_outcomes_columns: set[str]) -> list[dic
 def contribution_for_row(row: dict[str, Any], has_impact_score: bool) -> dict[str, Any]:
     direction = normalize_direction(row.get("impact_direction"))
     direction_weight = DIRECTION_WEIGHTS.get(direction, 0.0)
-    impact_score = numeric(row.get("impact_score"), 1.0 if not has_impact_score else 0.0)
+    stored_impact_score = numeric(row.get("impact_score"), 1.0 if not has_impact_score else 0.0)
+    impact_score = abs(stored_impact_score) if has_impact_score else stored_impact_score
     impact_score_source = "policy_outcomes.impact_score" if has_impact_score else "unit_outcome_magnitude_fallback"
     confidence = confidence_multiplier(row.get("source_count"))
     intent_category = normalize_intent(row.get("policy_intent_category"))
@@ -217,6 +218,7 @@ def contribution_for_row(row: dict[str, Any], has_impact_score: bool) -> dict[st
         "outcome_summary": row.get("outcome_summary"),
         "impact_direction": direction,
         "impact_score": round(impact_score, 4),
+        "stored_impact_score": round(stored_impact_score, 4),
         "impact_score_source": impact_score_source,
         "direction_weight": direction_weight,
         "adjusted_outcome_score": round(adjusted_outcome_score, 4),
@@ -373,7 +375,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "mode": "read_only",
         "database_mutated": False,
         "formula": {
-            "base_score": "impact_score from policy_outcomes.impact_score when present; otherwise unit outcome magnitude fallback because production schema lacks that column",
+            "base_score": "absolute magnitude from policy_outcomes.impact_score when present; otherwise unit outcome magnitude fallback because production schema lacks that column",
             "direction_weights": DIRECTION_WEIGHTS,
             "confidence_multiplier": {
                 "source_count = 0": 0.6,
@@ -387,7 +389,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
             },
             "policy_type_weights": POLICY_TYPE_WEIGHTS,
             "president_normalization": "SUM(final_outcome_score) / years_in_office",
-            "final_outcome_score": "impact_score * direction_weight * confidence_multiplier * intent_modifier * policy_type_weight",
+            "final_outcome_score": "ABS(impact_score) * direction_weight * confidence_multiplier * intent_modifier * policy_type_weight",
         },
         "join_contract": {
             "current_admin": "policy_outcomes.policy_id -> promises.id -> presidents.id",
