@@ -216,6 +216,28 @@ def build_suppression_entry(record: SessionRecord, reasons: list[str], *, now: d
     }
 
 
+def build_synthetic_suppression_entry(
+    *,
+    workflow_family: str,
+    session_id: str,
+    canonical_session_key: str,
+    now: datetime,
+    archive_reason: str,
+    matched_rules: list[str],
+) -> dict[str, Any]:
+    return {
+        "session_id": session_id,
+        "workflow_family": workflow_family,
+        "canonical_session_key": canonical_session_key,
+        "archived_canonical_state": None,
+        "archived_at": now.isoformat().replace("+00:00", "Z"),
+        "archived_reason": archive_reason,
+        "archived_by": "cleanup_stale_operator_workflows.py",
+        "matched_rules": matched_rules,
+        "active": True,
+    }
+
+
 def existing_archived_cleanup_records(records: list[SessionRecord]) -> list[tuple[SessionRecord, list[str]]]:
     archived: list[tuple[SessionRecord, list[str]]] = []
     for record in records:
@@ -289,6 +311,18 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--older-than-days", type=int, default=3, help="Age threshold for stale blocked sessions.")
     parser.add_argument("--session-id", action="append", default=[], help="Explicit session id to archive. May be repeated.")
+    parser.add_argument(
+        "--workflow-family",
+        action="append",
+        choices=["current-admin", "legislative"],
+        default=[],
+        help="Explicit workflow family to suppress from the operator homepage. May be repeated.",
+    )
+    parser.add_argument(
+        "--current-admin-batch-name",
+        default="",
+        help="Batch name used when explicitly suppressing current-admin by workflow family.",
+    )
     parser.add_argument("--exclude-session", action="append", default=[], help="Session id to keep even if rules match. May be repeated.")
     parser.add_argument("--no-test-sessions", action="store_true", help="Do not auto-select obvious test sessions.")
     parser.add_argument("--no-duplicate-sessions", action="store_true", help="Do not auto-select older active duplicate session ids.")
@@ -338,6 +372,30 @@ def main() -> None:
         build_suppression_entry(record, reasons, now=now, archive_reason=args.reason)
         for record, reasons in suppression_records
     ]
+    for workflow_family in args.workflow_family:
+        if workflow_family == "legislative":
+            suppression_entries.append(
+                build_synthetic_suppression_entry(
+                    workflow_family="legislative",
+                    session_id="legislative:review-bundle",
+                    canonical_session_key="equitystack_review_bundle.json",
+                    now=now,
+                    archive_reason=args.reason,
+                    matched_rules=["explicit_workflow_family"],
+                )
+            )
+        elif workflow_family == "current-admin":
+            batch_name = args.current_admin_batch_name.strip()
+            suppression_entries.append(
+                build_synthetic_suppression_entry(
+                    workflow_family="current-admin",
+                    session_id=f"current-admin:{batch_name}" if batch_name else "",
+                    canonical_session_key=batch_name,
+                    now=now,
+                    archive_reason=args.reason,
+                    matched_rules=["explicit_workflow_family"],
+                )
+            )
     suppressions_payload = update_suppressions_file(suppressions_path, suppression_entries, now=now) if applied else None
     report_output = Path(args.report_output).expanduser() if args.report_output else report_dir / f"stale_workflow_cleanup_{timestamp}.json"
     if not report_output.is_absolute():
@@ -357,6 +415,8 @@ def main() -> None:
             "include_duplicate_sessions": not args.no_duplicate_sessions,
             "include_blocked": not args.no_blocked,
             "explicit_session_ids": args.session_id,
+            "explicit_workflow_families": args.workflow_family,
+            "current_admin_batch_name": args.current_admin_batch_name,
             "excluded_session_ids": args.exclude_session,
         },
         "counts": {
