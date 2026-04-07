@@ -2639,7 +2639,7 @@ Operational maintenance:
 
 Examples:
   $(cli_hint) legislative run
-  $(cli_hint) legislative run --model qwen3.5:9b
+  $(cli_hint) legislative run --model "$DEFAULT_MODEL_REVIEW"
   $(cli_hint) impact evaluate
   $(cli_hint) impact promote --dry-run
   $(cli_hint) current-admin run

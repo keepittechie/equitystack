@@ -14,7 +14,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from lib.llm.provider import generate_text
+from lib.llm.provider import default_model_name, generate_text
 
 from current_admin_common import (
     derive_csv_path,
@@ -30,7 +30,7 @@ from current_admin_common import (
 
 
 DEFAULT_OLLAMA_URL = ""
-DEFAULT_MODEL = "qwen3.5:9b"
+DEFAULT_MODEL = default_model_name()
 DEFAULT_TIMEOUT = 240
 DEFAULT_TEMPERATURE = 0.1
 DEFAULT_PRESIDENT_SLUG = "donald-j-trump-2025"

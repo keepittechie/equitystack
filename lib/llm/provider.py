@@ -13,6 +13,7 @@ DEFAULT_TIMEOUT_SECONDS = 240
 DEFAULT_RESPONSE_LOG_LIMIT = 4000
 DEFAULT_OPENAI_BASE_URL = "https://api.openai.com/v1"
 DEFAULT_OPENAI_MODEL = "gpt-4.1-mini"
+LEGACY_LOCAL_MODEL_NAMES = {"qwen3.5:9b", "rnj-1:latest"}
 
 
 class LLMProvider:
@@ -57,6 +58,28 @@ def load_llm_config(config_path: Path | None = None) -> dict[str, Any]:
     if os.environ.get("EQUITYSTACK_LLM_LOG_DIR"):
         payload["log_dir"] = os.environ["EQUITYSTACK_LLM_LOG_DIR"]
     return payload
+
+
+def normalize_model_name(value: Any) -> str:
+    return str(value or "").strip()
+
+
+def resolve_openai_compatible_model(requested_model: Any, config: dict[str, Any]) -> str:
+    requested = normalize_model_name(requested_model)
+    configured = normalize_model_name(config.get("model"))
+    env_model = (
+        normalize_model_name(os.environ.get("EQUITYSTACK_LLM_MODEL"))
+        or normalize_model_name(os.environ.get("EQUITYSTACK_OPENAI_MODEL"))
+        or normalize_model_name(os.environ.get("OPENAI_MODEL"))
+    )
+    if requested and requested not in LEGACY_LOCAL_MODEL_NAMES:
+        return requested
+    return env_model or configured or DEFAULT_OPENAI_MODEL
+
+
+def default_model_name(config_path: Path | None = None) -> str:
+    config = load_llm_config(config_path)
+    return normalize_model_name(config.get("model")) or DEFAULT_OPENAI_MODEL
 
 
 def resolve_log_dir(config: dict[str, Any]) -> Path:
@@ -154,7 +177,12 @@ class DefaultLLMProvider(LLMProvider):
         self.config = {**(config or {})}
         self.openai_api_key = self.config.get("openai_api_key")
         self.openai_base_url = str(self.config.get("openai_base_url") or DEFAULT_OPENAI_BASE_URL).rstrip("/")
-        self.model = model or self.config.get("model") or (DEFAULT_OPENAI_MODEL if self.openai_api_key else None)
+        self.requested_model = normalize_model_name(model or self.config.get("model"))
+        self.model = (
+            resolve_openai_compatible_model(model or self.config.get("model"), self.config)
+            if self.openai_api_key
+            else self.requested_model or None
+        )
         self.endpoint = endpoint or self.config.get("endpoint")
         self.timeout_seconds = int(timeout_seconds or self.config.get("timeout_seconds") or DEFAULT_TIMEOUT_SECONDS)
         self.temperature = temperature
@@ -192,6 +220,7 @@ class DefaultLLMProvider(LLMProvider):
                 "event": "request",
                 "provider": self.config.get("provider") or "default",
                 "model": self.model,
+                "requested_model": self.requested_model or self.model,
                 "endpoint": self.endpoint,
                 "prompt": truncate_text(prompt),
                 "system": truncate_text(system),
@@ -207,6 +236,7 @@ class DefaultLLMProvider(LLMProvider):
                     "event": "response",
                     "provider": self.config.get("provider") or "default",
                     "model": self.model,
+                    "requested_model": self.requested_model or self.model,
                     "endpoint": self.endpoint,
                     "response": truncate_text(text),
                 },
@@ -219,6 +249,7 @@ class DefaultLLMProvider(LLMProvider):
                     "event": "error",
                     "provider": self.config.get("provider") or "default",
                     "model": self.model,
+                    "requested_model": self.requested_model or self.model,
                     "endpoint": self.endpoint,
                     "error": truncate_text(exc),
                 },
@@ -248,6 +279,7 @@ class DefaultLLMProvider(LLMProvider):
                 "event": "request",
                 "provider": "openai_chat",
                 "model": self.model,
+                "requested_model": self.requested_model or self.model,
                 "endpoint": endpoint,
                 "prompt": truncate_text(prompt),
                 "system": truncate_text(system),
@@ -271,6 +303,7 @@ class DefaultLLMProvider(LLMProvider):
                     "event": "response",
                     "provider": "openai_chat",
                     "model": self.model,
+                    "requested_model": self.requested_model or self.model,
                     "endpoint": endpoint,
                     "response": truncate_text(text),
                 },
@@ -283,6 +316,7 @@ class DefaultLLMProvider(LLMProvider):
                     "event": "error",
                     "provider": "openai_chat",
                     "model": self.model,
+                    "requested_model": self.requested_model or self.model,
                     "endpoint": endpoint,
                     "error": truncate_text(exc),
                 },

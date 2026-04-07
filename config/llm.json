@@ -1,6 +1,6 @@
 {
   "provider": "default",
-  "model": "",
+  "model": "gpt-4.1-mini",
   "endpoint": "",
   "models_endpoint": "",
   "timeout_seconds": 240,

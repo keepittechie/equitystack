@@ -19,7 +19,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from lib.llm.provider import generate_text
+from lib.llm.provider import default_model_name, generate_text
 
 from current_admin_common import (
     derive_csv_path,
@@ -35,10 +35,10 @@ from current_admin_common import (
 
 
 DEFAULT_OLLAMA_URL = ""
-DEFAULT_MODEL = "qwen3.5:9b"
-DEFAULT_MODEL_SENIOR = "qwen3.5:9b"
-DEFAULT_MODEL_VERIFIER = "qwen3.5:9b"
-DEFAULT_MODEL_FALLBACK = "qwen3.5:9b"
+DEFAULT_MODEL = default_model_name()
+DEFAULT_MODEL_SENIOR = DEFAULT_MODEL
+DEFAULT_MODEL_VERIFIER = DEFAULT_MODEL
+DEFAULT_MODEL_FALLBACK = DEFAULT_MODEL
 DEFAULT_SENIOR_TIMEOUT = 240
 DEFAULT_VERIFIER_TIMEOUT = 240
 DEFAULT_TIMEOUT = DEFAULT_SENIOR_TIMEOUT
