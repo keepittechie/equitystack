@@ -45,6 +45,33 @@ function buildOutcomePayload(data) {
     metadata: data?.metadata ?? {
       total_promises: 0,
       total_outcomes: 0,
+      total_outcomes_available: 0,
+      outcomes_included_in_score: 0,
+      outcomes_excluded_from_score: 0,
+      excluded_due_to_missing_sources: 0,
+      excluded_due_to_missing_direction: 0,
+      excluded_due_to_missing_summary: 0,
+      excluded_due_to_low_confidence_or_status: 0,
+      source_quality_distribution: {
+        tier_counts: {
+          high_authority: 0,
+          institutional: 0,
+          secondary: 0,
+          low_unverified: 0,
+        },
+        outcomes_with_any_sources: 0,
+        outcomes_with_high_authority_sources: 0,
+        pct_outcomes_with_high_authority_sources: 0,
+      },
+      outcome_confidence: {
+        average_confidence_score: 0,
+        confidence_distribution: { high: 0, medium: 0, low: 0 },
+        confidence_by_scoring_readiness: {
+          scoring_ready: { count: 0, average_confidence_score: 0 },
+          excluded_from_score: { count: 0, average_confidence_score: 0 },
+        },
+        confidence_vs_impact_score: {},
+      },
       scoring_model: "outcome-based-v1",
     },
   };
@@ -59,6 +86,33 @@ function buildOutcomeErrorPayload() {
     metadata: {
       total_promises: 0,
       total_outcomes: 0,
+      total_outcomes_available: 0,
+      outcomes_included_in_score: 0,
+      outcomes_excluded_from_score: 0,
+      excluded_due_to_missing_sources: 0,
+      excluded_due_to_missing_direction: 0,
+      excluded_due_to_missing_summary: 0,
+      excluded_due_to_low_confidence_or_status: 0,
+      source_quality_distribution: {
+        tier_counts: {
+          high_authority: 0,
+          institutional: 0,
+          secondary: 0,
+          low_unverified: 0,
+        },
+        outcomes_with_any_sources: 0,
+        outcomes_with_high_authority_sources: 0,
+        pct_outcomes_with_high_authority_sources: 0,
+      },
+      outcome_confidence: {
+        average_confidence_score: 0,
+        confidence_distribution: { high: 0, medium: 0, low: 0 },
+        confidence_by_scoring_readiness: {
+          scoring_ready: { count: 0, average_confidence_score: 0 },
+          excluded_from_score: { count: 0, average_confidence_score: 0 },
+        },
+        confidence_vs_impact_score: {},
+      },
       scoring_model: "outcome-based-v1",
     },
   };

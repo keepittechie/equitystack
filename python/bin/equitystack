@@ -2042,6 +2042,26 @@ run_impact_command() {
       run_step "1/1" "Promote Impact Maturation" "Impact maturation promotion complete" --output "$EQUITYSTACK_PYTHON_DIR/reports/impact_maturation_promotion_report.json" -- \
         "$VENV_PYTHON" scripts/evaluate_impact_maturation.py promote "$@"
       ;;
+    backfill-outcome-sources)
+      run_step "1/1" "Audit Promise Outcome Source Backfill" "Promise outcome source backfill audit complete" --output "$EQUITYSTACK_PYTHON_DIR/reports/promise-outcome-source-backfill.dry-run.json" -- \
+        "$VENV_PYTHON" scripts/audit_promise_outcome_source_backfill.py "$@"
+      ;;
+    sync-current-admin-outcomes)
+      run_step "1/1" "Sync Current-Admin Policy Outcomes" "Current-admin policy_outcomes sync complete" --output "$EQUITYSTACK_PYTHON_DIR/reports/current-admin-policy-outcomes-sync.dry-run.json" -- \
+        "$VENV_PYTHON" scripts/sync_current_admin_policy_outcomes.py "$@"
+      ;;
+    audit-historical-duplicates)
+      run_step "1/1" "Audit Historical Policy Duplicates" "Historical policy duplicate audit complete" --output "$EQUITYSTACK_PYTHON_DIR/reports/historical-policy-duplicate-audit.json" -- \
+        "$VENV_PYTHON" scripts/audit_historical_policy_duplicates.py "$@"
+      ;;
+    audit-outcome-temporal-attribution)
+      run_step "1/1" "Audit Outcome Temporal Attribution" "Outcome temporal attribution audit complete" --output "$EQUITYSTACK_PYTHON_DIR/reports/outcome-temporal-attribution.dry-run.json" -- \
+        "$VENV_PYTHON" scripts/audit_outcome_temporal_attribution.py "$@"
+      ;;
+    audit-source-quality)
+      run_step "1/1" "Audit Source Quality" "Source quality audit complete" --output "$EQUITYSTACK_PYTHON_DIR/reports/source-quality-audit.json" -- \
+        "$VENV_PYTHON" scripts/audit_source_quality.py "$@"
+      ;;
     help|-h|--help|"")
       impact_usage
       ;;
@@ -2632,6 +2652,10 @@ Current-admin workflow subcommands:
 Impact maturation commands:
   evaluate   Build a read-only impact maturation review artifact
   promote    Promote approved safe forward impact transitions
+  backfill-outcome-sources  Audit optional safe promise_outcome_sources links
+  sync-current-admin-outcomes  Sync promise_outcomes into policy_outcomes
+  audit-historical-duplicates  Audit likely duplicate/variant historical policies
+  audit-outcome-temporal-attribution  Audit outcome timing signals without changing scoring
 
 Operational maintenance:
   operator cleanup-stale-workflows  Mark stale operator workflow sessions inactive without deleting history
@@ -2642,6 +2666,8 @@ Examples:
   $(cli_hint) legislative run --model "$DEFAULT_MODEL_REVIEW"
   $(cli_hint) impact evaluate
   $(cli_hint) impact promote --dry-run
+  $(cli_hint) impact audit-historical-duplicates
+  $(cli_hint) impact audit-outcome-temporal-attribution
   $(cli_hint) current-admin run
   $(cli_hint) current-admin status
   $(cli_hint) operator cleanup-stale-workflows --dry-run
@@ -2659,6 +2685,16 @@ Usage:
 Commands:
   evaluate   Build reports/impact_maturation_review.json from pending/review-ready artifacts
   promote    Validate and promote approved safe forward transitions
+  backfill-outcome-sources
+             Audit and optionally insert safe promise_outcome_sources links
+  sync-current-admin-outcomes
+             Dry-run or apply current-admin promise_outcomes into policy_outcomes
+  audit-historical-duplicates
+             Read-only audit for likely duplicate/variant historical policies
+  audit-outcome-temporal-attribution
+             Audit outcome timing signals and optional backfill readiness
+  audit-source-quality
+             Audit source authority tiers, domains, duplicates, and outcome coverage
 
 Examples:
   $(cli_hint) impact evaluate
@@ -2666,12 +2702,27 @@ Examples:
   $(cli_hint) impact promote --dry-run
   $(cli_hint) impact promote --apply --yes
   $(cli_hint) impact promote --apply --yes --approve-safe
+  $(cli_hint) impact backfill-outcome-sources
+  $(cli_hint) impact backfill-outcome-sources --apply --yes
+  $(cli_hint) impact sync-current-admin-outcomes
+  $(cli_hint) impact sync-current-admin-outcomes --apply --yes
+  $(cli_hint) impact audit-historical-duplicates
+  $(cli_hint) impact audit-outcome-temporal-attribution
+  $(cli_hint) impact audit-source-quality
 
 Safety:
   Allowed transitions are impact_pending -> impact_review_ready,
   impact_review_ready -> impact_scored, and impact_scored -> impact_verified.
   Backward movement is blocked. Outcomes are inserted only for impact_scored
   or impact_verified transitions, and existing outcome rows are preserved.
+  Outcome-source backfill is dry-run by default and only inserts
+  safe_auto_link candidates when --apply --yes is explicit.
+  Current-admin policy outcome sync is insert-only and preserves existing
+  unified policy_outcomes rows.
+  Historical duplicate audit is read-only and never merges or deletes policies.
+  Outcome temporal attribution audit is dry-run by default and will not write
+  dates unless suitable date/provenance columns exist and --apply --yes is explicit.
+  Source quality audit is read-only and never edits source rows or joins.
 EOF
 }
 
