@@ -24,6 +24,294 @@ VALID_INTENT_CATEGORIES = {
 
 TIME_DURATION_LABEL = "action_date_only"
 
+# These anchors resolve current-admin outcomes that have multiple structured
+# action dates. Each date is an existing promise_actions.action_date anchor,
+# not a newly inferred precise impact date.
+TIME_ANCHOR_SEEDS = {
+    "biden-advance-racial-equity": {
+        "impact_start_date": "2021-01-20",
+        "impact_duration_estimate": "action_date_only",
+        "temporal_confidence": "medium",
+        "rationale": "The outcome concerns creation of a federal equity framework; the structured action date for the executive order signing is the earliest direct implementation anchor.",
+    },
+    "biden-voting-rights-restoration": {
+        "impact_start_date": "2021-07-01",
+        "impact_duration_estimate": "action_date_only",
+        "temporal_confidence": "medium",
+        "rationale": "The linked sourced outcome cites Brnovich; the structured court-action date is the clearest available anchor for the blocked/rollback context.",
+    },
+    "biden-policing-accountability": {
+        "impact_start_date": "2021-03-03",
+        "impact_duration_estimate": "action_date_only",
+        "temporal_confidence": "medium",
+        "rationale": "The first structured congressional action is the clearest available anchor for the federal policing-reform effort; no durable enactment date exists.",
+    },
+    "obama-close-guantanamo-bay": {
+        "impact_start_date": "2009-01-22",
+        "impact_duration_estimate": "action_date_only",
+        "temporal_confidence": "medium",
+        "rationale": "The structured executive-order date is the direct action anchor for the closure effort; later restrictions show the long-running failure context.",
+    },
+    "obama-end-combat-brigade-deployment-iraq": {
+        "impact_start_date": "2010-08-31",
+        "impact_duration_estimate": "action_date_only",
+        "temporal_confidence": "medium",
+        "rationale": "The administration declaration ending the combat mission is the clearest structured anchor for the outcome described.",
+    },
+    "trump-build-border-wall-mexico-pay": {
+        "impact_start_date": "2017-01-25",
+        "impact_duration_estimate": "action_date_only",
+        "temporal_confidence": "medium",
+        "rationale": "The executive-order date is the direct action anchor for wall planning; the later funding action is follow-through rather than the first policy anchor.",
+    },
+    "trump-withdraw-paris-climate-accord": {
+        "impact_start_date": "2017-06-01",
+        "impact_duration_estimate": "action_date_only",
+        "temporal_confidence": "medium",
+        "rationale": "The announcement date is the direct policy anchor for the withdrawal outcome; formal withdrawal processing occurred later.",
+    },
+    "trump-move-embassy-jerusalem": {
+        "impact_start_date": "2018-05-14",
+        "impact_duration_estimate": "action_date_only",
+        "temporal_confidence": "medium",
+        "rationale": "The embassy opening is the structured action date when the central promised outcome was implemented.",
+    },
+    "trump-appoint-conservative-supreme-court-justices": {
+        "impact_start_date": "2017-01-31",
+        "impact_duration_estimate": "estimated_range",
+        "temporal_confidence": "medium",
+        "rationale": "The first Supreme Court nomination starts a multi-appointment outcome; the row should be treated as a range beginning at the first appointment action.",
+    },
+    "biden-forgive-public-college-student-debt": {
+        "impact_start_date": "2022-08-24",
+        "impact_duration_estimate": "action_date_only",
+        "temporal_confidence": "medium",
+        "rationale": "The debt-relief plan announcement is the first direct action anchor; later court action explains why the outcome remained partial.",
+    },
+    "biden-advance-racial-equity-federal-government": {
+        "impact_start_date": "2021-01-20",
+        "impact_duration_estimate": "action_date_only",
+        "temporal_confidence": "medium",
+        "rationale": "The executive-order signing is the direct federal equity-framework action anchor.",
+    },
+    "biden-strengthen-federal-labor-protections": {
+        "impact_start_date": "2021-07-28",
+        "impact_duration_estimate": "action_date_only",
+        "temporal_confidence": "medium",
+        "rationale": "The NLRB leadership action is the first structured administrative policy anchor, while the earlier worker-organizing statement is contextual.",
+    },
+    "obama-homeowner-foreclosure-prevention-fund": {
+        "impact_start_date": "2009-02-18",
+        "impact_duration_estimate": "action_date_only",
+        "temporal_confidence": "medium",
+        "rationale": "The Homeowner Affordability and Stability Plan announcement is the first direct foreclosure-relief framework anchor.",
+    },
+    "obama-voter-intimidation-deceptive-practices-act": {
+        "impact_start_date": "2009-06-12",
+        "impact_duration_estimate": "action_date_only",
+        "temporal_confidence": "medium",
+        "rationale": "The subcommittee referral/stall date is the clearest structured anchor for the blocked legislative outcome.",
+    },
+    "trump-ensure-long-term-hbcu-funding": {
+        "impact_start_date": "2019-12-19",
+        "impact_duration_estimate": "action_date_only",
+        "temporal_confidence": "medium",
+        "rationale": "The FUTURE Act signing is the direct long-term funding implementation anchor for the outcome.",
+    },
+    "biden-increase-access-affordable-housing": {
+        "impact_start_date": "2021-03-11",
+        "impact_duration_estimate": "action_date_only",
+        "temporal_confidence": "medium",
+        "rationale": "The American Rescue Plan housing-assistance action is the earliest direct fiscal-policy anchor; later supply planning is follow-through.",
+    },
+    "biden-hbcu-msi-affordability": {
+        "impact_start_date": "2021-03-11",
+        "impact_duration_estimate": "estimated_range",
+        "temporal_confidence": "medium",
+        "rationale": "The American Rescue Plan institutional support date starts a multi-action HBCU/MSI support outcome; later debt relief and support totals extend the range.",
+    },
+    "biden-restore-voting-rights-after-felony-sentences": {
+        "impact_start_date": "2021-06-22",
+        "impact_duration_estimate": "action_date_only",
+        "temporal_confidence": "medium",
+        "rationale": "The Senate block date is the clearest structured anchor for the blocked federal voting-rights outcome.",
+    },
+    "obama-sign-employee-free-choice-act": {
+        "impact_start_date": "2010-12-22",
+        "impact_duration_estimate": "action_date_only",
+        "temporal_confidence": "medium",
+        "rationale": "The failure-to-enact date is the structured anchor for the blocked labor-law reform outcome.",
+    },
+    "trump-make-no-cuts-medicaid": {
+        "impact_start_date": "2017-05-04",
+        "impact_duration_estimate": "estimated_range",
+        "temporal_confidence": "medium",
+        "rationale": "The House ACA repeal vote is the first direct Medicaid-risk action anchor; later statements and budgets continue the same risk pattern.",
+    },
+    "biden-offer-public-option-health-plan": {
+        "impact_start_date": "2021-08-10",
+        "impact_duration_estimate": "action_date_only",
+        "temporal_confidence": "medium",
+        "rationale": "The later action captures continued ACA expansion without enactment of a public option, the clearest structured anchor for the failed outcome.",
+    },
+    "biden-end-private-prisons-detention-centers": {
+        "impact_start_date": "2021-01-26",
+        "impact_duration_estimate": "estimated_range",
+        "temporal_confidence": "medium",
+        "rationale": "The executive order is the direct policy anchor; later detention-center facts show the partial long-running outcome.",
+    },
+    "biden-eliminate-cash-bail": {
+        "impact_start_date": "2024-12-31",
+        "impact_duration_estimate": "action_date_only",
+        "temporal_confidence": "medium",
+        "rationale": "The no-enactment marker is the structured anchor for the failed federal cash-bail outcome; earlier campaign/no-action markers are contextual.",
+    },
+    "biden-justice40-disadvantaged-communities": {
+        "impact_start_date": "2021-01-27",
+        "impact_duration_estimate": "estimated_range",
+        "temporal_confidence": "medium",
+        "rationale": "The climate/equity order launches Justice40; later infrastructure and IRA investments extend the implementation range.",
+    },
+    "grant-protect-black-voting-rights-from-ku-klux-klan-terror": {
+        "impact_start_date": "1871-10-17",
+        "impact_duration_estimate": "action_date_only",
+        "temporal_confidence": "medium",
+        "rationale": "The federal enforcement action in South Carolina is the direct protection/enforcement anchor for the outcome.",
+    },
+    "johnson-pass-voting-rights-act-after-selma": {
+        "impact_start_date": "1965-08-06",
+        "impact_duration_estimate": "action_date_only",
+        "temporal_confidence": "medium",
+        "rationale": "The Voting Rights Act signing is the direct enactment anchor for the delivered outcome.",
+    },
+    "johnson-pass-fair-housing-act": {
+        "impact_start_date": "1968-04-11",
+        "impact_duration_estimate": "action_date_only",
+        "temporal_confidence": "medium",
+        "rationale": "The Fair Housing Act signing is the direct enactment anchor for the delivered outcome.",
+    },
+    "obama-ban-racial-profiling-federal-law-enforcement": {
+        "impact_start_date": "2014-12-08",
+        "impact_duration_estimate": "estimated_range",
+        "temporal_confidence": "medium",
+        "rationale": "The Justice Department guidance revision is the first direct administrative implementation anchor for the partial outcome.",
+    },
+    "biden-eliminate-federal-death-penalty": {
+        "impact_start_date": "2021-07-01",
+        "impact_duration_estimate": "estimated_range",
+        "temporal_confidence": "medium",
+        "rationale": "The federal-execution pause is the first governing action anchor; the later commutations continue the partial outcome.",
+    },
+    "johnson-appoint-thurgood-marshall-supreme-court": {
+        "impact_start_date": "1967-08-30",
+        "impact_duration_estimate": "action_date_only",
+        "temporal_confidence": "medium",
+        "rationale": "Senate confirmation is the direct appointment-completion anchor for the delivered outcome.",
+    },
+    "nixon-expand-affirmative-action-federal-contracting": {
+        "impact_start_date": "1969-09-23",
+        "impact_duration_estimate": "action_date_only",
+        "temporal_confidence": "medium",
+        "rationale": "The revised Philadelphia Plan requirements are the direct implementation anchor for the affirmative-action contracting outcome.",
+    },
+    "biden-expand-child-tax-credit": {
+        "impact_start_date": "2021-03-11",
+        "impact_duration_estimate": "estimated_range",
+        "temporal_confidence": "medium",
+        "rationale": "The American Rescue Plan temporary Child Tax Credit expansion is the direct implementation anchor; expiration explains the partial outcome.",
+    },
+    "roosevelt-establish-federal-minimum-wage-maximum-hours": {
+        "impact_start_date": "1938-06-25",
+        "impact_duration_estimate": "action_date_only",
+        "temporal_confidence": "medium",
+        "rationale": "The Fair Labor Standards Act signing is the direct enactment anchor for wage and hour standards.",
+    },
+    "roosevelt-create-social-security-old-age-unemployment-system": {
+        "impact_start_date": "1935-08-14",
+        "impact_duration_estimate": "action_date_only",
+        "temporal_confidence": "medium",
+        "rationale": "The Social Security Act signing is the direct enactment anchor for the social-insurance outcome.",
+    },
+    "grant-sign-civil-rights-act-1875": {
+        "impact_start_date": "1875-03-01",
+        "impact_duration_estimate": "action_date_only",
+        "temporal_confidence": "medium",
+        "rationale": "The Civil Rights Act signing is the direct enactment anchor for the delivered outcome.",
+    },
+    "johnson-sign-civil-rights-act-1964": {
+        "impact_start_date": "1964-07-02",
+        "impact_duration_estimate": "action_date_only",
+        "temporal_confidence": "medium",
+        "rationale": "The Civil Rights Act signing is the direct enactment anchor for the delivered outcome.",
+    },
+    "johnson-executive-order-11246-federal-contracting": {
+        "impact_start_date": "1965-09-24",
+        "impact_duration_estimate": "action_date_only",
+        "temporal_confidence": "medium",
+        "rationale": "The executive-order issuance is the direct policy anchor for contractor nondiscrimination enforcement.",
+    },
+    "eisenhower-enforce-little-rock-school-desegregation": {
+        "impact_start_date": "1957-09-25",
+        "impact_duration_estimate": "action_date_only",
+        "temporal_confidence": "medium",
+        "rationale": "Federal troop escort is the direct enforcement anchor for the Little Rock desegregation outcome.",
+    },
+    "eisenhower-sign-civil-rights-act-1957": {
+        "impact_start_date": "1957-09-09",
+        "impact_duration_estimate": "action_date_only",
+        "temporal_confidence": "medium",
+        "rationale": "The Civil Rights Act signing is the direct enactment anchor for the delivered outcome.",
+    },
+    "bush-sign-voting-rights-act-reauthorization-2006": {
+        "impact_start_date": "2006-07-27",
+        "impact_duration_estimate": "action_date_only",
+        "temporal_confidence": "medium",
+        "rationale": "The reauthorization signing is the direct enactment anchor for the delivered outcome.",
+    },
+    "truman-desegregate-armed-forces": {
+        "impact_start_date": "1948-07-26",
+        "impact_duration_estimate": "action_date_only",
+        "temporal_confidence": "medium",
+        "rationale": "The executive-order date is the direct policy anchor for military desegregation.",
+    },
+    "kennedy-executive-order-10925-equal-employment": {
+        "impact_start_date": "1961-03-06",
+        "impact_duration_estimate": "action_date_only",
+        "temporal_confidence": "medium",
+        "rationale": "The executive-order date is the direct policy anchor for the equal-employment framework.",
+    },
+    "carter-sign-community-reinvestment-act": {
+        "impact_start_date": "1977-10-12",
+        "impact_duration_estimate": "action_date_only",
+        "temporal_confidence": "medium",
+        "rationale": "The Community Reinvestment Act signing is the direct enactment anchor for the delivered anti-redlining framework.",
+    },
+    "hayes-withdraw-federal-troops-compromise-1877": {
+        "impact_start_date": "1877-04-24",
+        "impact_duration_estimate": "estimated_range",
+        "temporal_confidence": "medium",
+        "rationale": "The federal troop withdrawal date is the direct action anchor for the negative Reconstruction-protection outcome.",
+    },
+    "grant-federal-enforcement-weakens-after-cruikshank": {
+        "impact_start_date": "1876-03-27",
+        "impact_duration_estimate": "estimated_range",
+        "temporal_confidence": "medium",
+        "rationale": "The Cruikshank decision date is the direct legal anchor for the weakened federal enforcement outcome.",
+    },
+    "arthur-retreat-from-civil-rights-enforcement": {
+        "impact_start_date": "1883-10-15",
+        "impact_duration_estimate": "estimated_range",
+        "temporal_confidence": "medium",
+        "rationale": "The Civil Rights Cases decision date is the direct legal anchor for the narrowed enforcement outcome.",
+    },
+    "harrison-fail-lodge-elections-bill-federal-voting-protection": {
+        "impact_start_date": "1891-01-22",
+        "impact_duration_estimate": "action_date_only",
+        "temporal_confidence": "medium",
+        "rationale": "The Senate failure date is the structured anchor for the failed federal voting-protection outcome.",
+    },
+}
+
 # These are intentionally conservative exact-title mappings. They only apply
 # when the production row exists and has at least one already-linked source.
 INTENT_SEEDS = [
@@ -148,6 +436,391 @@ INTENT_SEEDS = [
             "Provided permanent mandatory funding support for HBCUs and other minority-serving institutions."
         ),
         "rationale": "Existing Congress source documents the minority-serving institution funding purpose.",
+    },
+    {
+        "title": "Shelby County v. Holder",
+        "policy_intent_category": "equity_restricting",
+        "policy_intent_summary": (
+            "Held the Voting Rights Act preclearance coverage formula unconstitutional, limiting federal preclearance "
+            "requirements until Congress adopted a new formula."
+        ),
+        "rationale": "Existing legal and historical source links document the preclearance coverage-formula holding.",
+    },
+    {
+        "title": "South Carolina v. Katzenbach",
+        "policy_intent_category": "equity_expanding",
+        "policy_intent_summary": "Upheld major Voting Rights Act enforcement provisions, including federal preclearance authority.",
+        "rationale": "Existing Supreme Court source link documents the Voting Rights Act enforcement holding.",
+    },
+    {
+        "title": "Loving v. Virginia",
+        "policy_intent_category": "equity_expanding",
+        "policy_intent_summary": "Held state bans on interracial marriage unconstitutional under due process and equal protection.",
+        "rationale": "Existing Supreme Court source link documents the anti-miscegenation holding.",
+    },
+    {
+        "title": "Swann v. Charlotte-Mecklenburg Board of Education",
+        "policy_intent_category": "equity_expanding",
+        "policy_intent_summary": (
+            "Approved broad equitable remedies for dismantling dual school systems after unconstitutional segregation."
+        ),
+        "rationale": "Existing GovInfo, Supreme Court, and archive source links document the desegregation remedy holding.",
+    },
+    {
+        "title": "First Reconstruction Act",
+        "policy_intent_category": "equity_expanding",
+        "policy_intent_summary": (
+            "Set federal Reconstruction requirements for former Confederate states, including new constitutions and "
+            "Black male suffrage conditions for readmission."
+        ),
+        "rationale": "Existing House historical source links document the Reconstruction readmission and suffrage requirements.",
+    },
+    {
+        "title": "Executive Order 11246",
+        "policy_intent_category": "equity_expanding",
+        "policy_intent_summary": (
+            "Required equal employment opportunity and affirmative-action obligations for federal contractors."
+        ),
+        "rationale": "Existing National Archives and Labor Department source links document the contractor EEO purpose.",
+    },
+    {
+        "title": "Equal Employment Opportunity Act of 1972",
+        "policy_intent_category": "equity_expanding",
+        "policy_intent_summary": "Strengthened federal employment-discrimination enforcement authority through the EEOC.",
+        "rationale": "Existing EEOC historical source link documents the enforcement-expansion purpose.",
+    },
+    {
+        "title": "Alexander v. Holmes County Board of Education",
+        "policy_intent_category": "equity_expanding",
+        "policy_intent_summary": "Required school districts to end dual school systems immediately rather than after further delay.",
+        "rationale": "Existing Supreme Court and school desegregation source links document the immediate-desegregation holding.",
+    },
+    {
+        "title": "24th Amendment",
+        "policy_intent_category": "equity_expanding",
+        "policy_intent_summary": "Prohibited poll taxes in federal elections.",
+        "rationale": "Existing National Archives and Constitution Annotated source links document the poll-tax prohibition.",
+    },
+    {
+        "title": "Griggs v. Duke Power Company",
+        "policy_intent_category": "equity_expanding",
+        "policy_intent_summary": (
+            "Recognized disparate-impact employment discrimination under Title VII when practices are not job-related."
+        ),
+        "rationale": "Existing legal source links document the Title VII disparate-impact holding.",
+    },
+    {
+        "title": "Patient Protection and Affordable Care Act",
+        "policy_intent_category": "neutral_administrative",
+        "policy_intent_summary": (
+            "Expanded health-insurance coverage, consumer protections, and health-system reforms through Medicaid, "
+            "marketplaces, and coverage rules."
+        ),
+        "rationale": "Existing Congress and HHS source links document the coverage and health-system reform purpose.",
+    },
+    {
+        "title": "Affordable Care Act",
+        "policy_intent_category": "neutral_administrative",
+        "policy_intent_summary": (
+            "Expanded health-insurance coverage, consumer protections, and health-system reforms through Medicaid, "
+            "marketplaces, and coverage rules."
+        ),
+        "rationale": "Existing HHS source links document the coverage and health-system reform purpose.",
+    },
+    {
+        "title": "Freedmen's Bureau",
+        "policy_intent_category": "equity_expanding",
+        "policy_intent_summary": (
+            "Established federal assistance for formerly enslaved people and refugees, including relief, education, "
+            "labor support, and legal protections."
+        ),
+        "rationale": "Existing National Archives source links document the bureau's post-emancipation assistance role.",
+    },
+    {
+        "title": "Jones v. Alfred H. Mayer Co.",
+        "policy_intent_category": "equity_expanding",
+        "policy_intent_summary": (
+            "Held that federal civil-rights law bars private racial discrimination in property sales."
+        ),
+        "rationale": "Existing Supreme Court source link documents the private housing-discrimination holding.",
+    },
+    {
+        "title": "Texas Department of Housing and Community Affairs v. Inclusive Communities Project, Inc.",
+        "policy_intent_category": "equity_expanding",
+        "policy_intent_summary": "Confirmed that disparate-impact claims are cognizable under the Fair Housing Act.",
+        "rationale": "Existing Supreme Court source link documents the Fair Housing Act disparate-impact holding.",
+    },
+    {
+        "title": "Reconstruction Acts",
+        "policy_intent_category": "equity_expanding",
+        "policy_intent_summary": (
+            "Set federal Reconstruction conditions for former Confederate states, including new governments and "
+            "Black male suffrage requirements."
+        ),
+        "rationale": "Existing Library of Congress and historical source links document the Reconstruction framework.",
+    },
+    {
+        "title": "Community Reinvestment Act of 1977",
+        "policy_intent_category": "equity_expanding",
+        "policy_intent_summary": (
+            "Encouraged insured depository institutions to help meet credit needs in the communities they serve, "
+            "including low- and moderate-income neighborhoods."
+        ),
+        "rationale": "Existing GovInfo and Federal Reserve source links document the community credit purpose.",
+    },
+    {
+        "title": "Executive Order 9981",
+        "policy_intent_category": "equity_expanding",
+        "policy_intent_summary": "Established equality of treatment and opportunity in the United States armed services.",
+        "rationale": "Existing National Archives and Truman Library source links document the military desegregation purpose.",
+    },
+    {
+        "title": "Nixon v. Herndon",
+        "policy_intent_category": "equity_expanding",
+        "policy_intent_summary": "Held that excluding Black voters from a primary election violated equal protection.",
+        "rationale": "Existing Supreme Court source link documents the white-primary holding.",
+    },
+    {
+        "title": "Higher Education Act",
+        "policy_intent_category": "neutral_administrative",
+        "policy_intent_summary": "Expanded federal higher-education assistance, student aid, and institutional support programs.",
+        "rationale": "Existing Congress source link documents the higher-education assistance framework.",
+    },
+    {
+        "title": "Civil Rights Restoration Act of 1987",
+        "policy_intent_category": "equity_expanding",
+        "policy_intent_summary": (
+            "Restored broad institution-wide coverage for federal civil-rights requirements in federally assisted programs."
+        ),
+        "rationale": "Existing GovInfo source link documents the civil-rights coverage restoration purpose.",
+    },
+    {
+        "title": "Fair Housing Amendments Act of 1988",
+        "policy_intent_category": "equity_expanding",
+        "policy_intent_summary": (
+            "Expanded fair-housing protections and strengthened administrative enforcement under federal housing law."
+        ),
+        "rationale": "Existing GovInfo source link documents the fair-housing amendment and enforcement provisions.",
+    },
+    {
+        "title": "Equal Credit Opportunity Act",
+        "policy_intent_category": "equity_expanding",
+        "policy_intent_summary": "Prohibited discrimination in credit transactions and supported federal fair-lending enforcement.",
+        "rationale": "Existing DOJ and consumer-finance source links document the fair-lending anti-discrimination purpose.",
+    },
+    {
+        "title": "Home Mortgage Disclosure Act",
+        "policy_intent_category": "equity_expanding",
+        "policy_intent_summary": (
+            "Required mortgage-lending data disclosure to support fair-lending oversight and community credit analysis."
+        ),
+        "rationale": "Existing CFPB and FFIEC source links document the mortgage-disclosure and fair-lending oversight purpose.",
+    },
+    {
+        "title": "Missouri ex rel. Gaines v. Canada",
+        "policy_intent_category": "equity_expanding",
+        "policy_intent_summary": (
+            "Required a state providing legal education to provide substantially equal in-state legal education to Black students."
+        ),
+        "rationale": "Existing Supreme Court and archive source links document the equal legal-education holding.",
+    },
+    {
+        "title": "Executive Order 11063",
+        "policy_intent_category": "equity_expanding",
+        "policy_intent_summary": "Prohibited discrimination in federally assisted housing and related property transactions.",
+        "rationale": "Existing National Archives source links document the equal-opportunity housing purpose.",
+    },
+    {
+        "title": "Food Stamp Act of 1964",
+        "policy_intent_category": "neutral_administrative",
+        "policy_intent_summary": "Established a permanent food-stamp program to improve nutrition support for eligible households.",
+        "rationale": "Existing Congress and USDA source links document the nutrition-assistance program purpose.",
+    },
+    {
+        "title": "Anti-Drug Abuse Act of 1986",
+        "policy_intent_category": "neutral_administrative",
+        "policy_intent_summary": "Expanded federal drug-control, enforcement, and penalty policy as part of national anti-drug legislation.",
+        "rationale": "Existing congressional source links document the federal drug-control legislative purpose.",
+    },
+    {
+        "title": "Anti-Drug Abuse Act of 1988",
+        "policy_intent_category": "neutral_administrative",
+        "policy_intent_summary": "Expanded federal drug-control, enforcement, and penalty policy as part of national anti-drug legislation.",
+        "rationale": "Existing Congress source link documents the federal drug-control legislative purpose.",
+    },
+    {
+        "title": "Social Security Act of 1935",
+        "policy_intent_category": "neutral_administrative",
+        "policy_intent_summary": "Created federal social-insurance and public-assistance programs for old age, unemployment, and related welfare needs.",
+        "rationale": "Existing Social Security Administration and GovInfo source links document the social-insurance framework.",
+    },
+    {
+        "title": "Executive Order 8802",
+        "policy_intent_category": "equity_expanding",
+        "policy_intent_summary": "Prohibited racial discrimination in the national defense industry and created fair-employment enforcement machinery.",
+        "rationale": "Existing National Archives source links document the defense-industry nondiscrimination purpose.",
+    },
+    {
+        "title": "Grovey v. Townsend",
+        "policy_intent_category": "equity_restricting",
+        "policy_intent_summary": "Upheld a party rule excluding Black voters from Democratic primary participation.",
+        "rationale": "Existing Supreme Court source link documents the white-primary holding.",
+    },
+    {
+        "title": "Civil Rights Act of 1960",
+        "policy_intent_category": "equity_expanding",
+        "policy_intent_summary": "Strengthened federal voting-rights record preservation, inspection, and enforcement tools.",
+        "rationale": "Existing Congress, DOJ, and archive source links document the voting-rights enforcement purpose.",
+    },
+    {
+        "title": "Civil Rights Act of 1957",
+        "policy_intent_category": "equity_expanding",
+        "policy_intent_summary": "Created federal civil-rights enforcement capacity and voting-rights enforcement tools.",
+        "rationale": "Existing Eisenhower Library and DOJ source links document the civil-rights enforcement purpose.",
+    },
+    {
+        "title": "United States Housing Act of 1937",
+        "policy_intent_category": "neutral_administrative",
+        "policy_intent_summary": "Created federal support for low-rent public housing and slum-clearance related housing programs.",
+        "rationale": "Existing GovInfo source links document the public-housing and low-rent housing program purpose.",
+    },
+    {
+        "title": "Hospital Survey and Construction Act",
+        "policy_intent_category": "neutral_administrative",
+        "policy_intent_summary": "Created federal support for hospital construction and modernization through the Hill-Burton program.",
+        "rationale": "Existing HRSA and historical medical source links document the hospital construction program purpose.",
+    },
+    {
+        "title": "HUD Affirmatively Furthering Fair Housing Final Rule",
+        "policy_intent_category": "equity_expanding",
+        "policy_intent_summary": "Implemented planning and assessment requirements for affirmatively furthering fair housing.",
+        "rationale": "Existing HUD source link documents the fair-housing planning rule purpose.",
+    },
+    {
+        "title": "HUD Termination of the 2015 AFFH Rule",
+        "policy_intent_category": "neutral_administrative",
+        "policy_intent_summary": "Terminated the 2015 AFFH planning rule and replaced it with a less prescriptive fair-housing certification approach.",
+        "rationale": "Existing HUD source link documents the administrative rule termination and replacement purpose.",
+    },
+    {
+        "title": "National Labor Relations Act",
+        "policy_intent_category": "neutral_administrative",
+        "policy_intent_summary": "Established federal labor-relations rights and collective-bargaining protections for covered workers.",
+        "rationale": "Existing NLRB source links document the labor-relations framework.",
+    },
+    {
+        "title": "Fair Labor Standards Act",
+        "policy_intent_category": "neutral_administrative",
+        "policy_intent_summary": "Established federal minimum-wage, overtime, child-labor, and covered-workplace labor standards.",
+        "rationale": "Existing Labor Department and congressional source links document the labor-standards purpose.",
+    },
+    {
+        "title": "First Step Act",
+        "policy_intent_category": "equity_expanding",
+        "policy_intent_summary": "Reformed federal sentencing and prison programming, including sentence-credit and recidivism-reduction provisions.",
+        "rationale": "Existing Congress and DOJ source links document the sentencing and prison-program reform purpose.",
+    },
+    {
+        "title": "Brnovich v. Democratic National Committee",
+        "policy_intent_category": "equity_restricting",
+        "policy_intent_summary": "Upheld challenged voting rules and set guideposts that narrowed vote-denial claims under Section 2 of the Voting Rights Act.",
+        "rationale": "Existing Supreme Court source link documents the Voting Rights Act Section 2 holding.",
+    },
+    {
+        "title": "National Housing Act of 1934 (FHA Creation)",
+        "policy_intent_category": "neutral_administrative",
+        "policy_intent_summary": "Created federal mortgage insurance and housing-finance support through the Federal Housing Administration.",
+        "rationale": "Existing housing and federal source links document the FHA mortgage-insurance purpose.",
+    },
+    {
+        "title": "Housing Act of 1949",
+        "policy_intent_category": "neutral_administrative",
+        "policy_intent_summary": "Expanded federal housing, urban redevelopment, slum-clearance, and public-housing policy.",
+        "rationale": "Existing housing source links document the housing and redevelopment program purpose.",
+    },
+    {
+        "title": "Voting Rights Act Reauthorization of 2006",
+        "policy_intent_category": "equity_expanding",
+        "policy_intent_summary": "Reauthorized expiring Voting Rights Act provisions to continue federal voting-rights protections.",
+        "rationale": "Existing source link documents the Voting Rights Act reauthorization purpose.",
+    },
+    {
+        "title": "George White Anti-Lynching Bill (H.R. 6963)",
+        "policy_intent_category": "equity_expanding",
+        "policy_intent_summary": "Proposed federal anti-lynching protections and penalties for racial terror violence.",
+        "rationale": "Existing House historical source links document the anti-lynching legislative purpose.",
+    },
+    {
+        "title": "Dyer Anti-Lynching Bill",
+        "policy_intent_category": "equity_expanding",
+        "policy_intent_summary": "Proposed federal anti-lynching enforcement and penalties.",
+        "rationale": "Existing House historical source link documents the anti-lynching legislative purpose.",
+    },
+    {
+        "title": "Costigan-Wagner Anti-Lynching Bill",
+        "policy_intent_category": "equity_expanding",
+        "policy_intent_summary": "Proposed federal anti-lynching enforcement and penalties.",
+        "rationale": "Existing Senate historical source link documents the anti-lynching legislative purpose.",
+    },
+    {
+        "title": "Gavagan Anti-Lynching Bill (H.R. 1507)",
+        "policy_intent_category": "equity_expanding",
+        "policy_intent_summary": "Proposed federal anti-lynching enforcement and penalties.",
+        "rationale": "Existing House historical source links document the anti-lynching legislative purpose.",
+    },
+    {
+        "title": "Commission to Study Reparation Proposals for African Americans Act",
+        "policy_intent_category": "equity_expanding",
+        "policy_intent_summary": "Proposed a federal commission to study and recommend reparations proposals for African Americans.",
+        "rationale": "Existing Congress source link documents the reparations-study commission purpose.",
+    },
+    {
+        "title": "Commission to Study and Develop Reparation Proposals for African Americans Act",
+        "policy_intent_category": "equity_expanding",
+        "policy_intent_summary": "Proposed a federal commission to study and develop reparations proposals for African Americans.",
+        "rationale": "Existing Congress source link documents the reparations-study and development purpose.",
+    },
+    {
+        "title": "Black Farmer Fairness Act of 2001",
+        "policy_intent_category": "equity_expanding",
+        "policy_intent_summary": "Proposed remedies and oversight related to discrimination against Black farmers in federal agricultural programs.",
+        "rationale": "Existing Congress and Congressional Record source links document the Black farmer fairness purpose.",
+    },
+    {
+        "title": "Justice for Black Farmers Act of 2023",
+        "policy_intent_category": "equity_expanding",
+        "policy_intent_summary": "Proposed agricultural equity, land access, and discrimination-remedy measures for Black farmers.",
+        "rationale": "Existing source links document the Black farmer equity and land-access purpose.",
+    },
+    {
+        "title": "Emmett Till Antilynching Act",
+        "policy_intent_category": "equity_expanding",
+        "policy_intent_summary": "Proposed federal criminal-law treatment for lynching and related civil-rights violence.",
+        "rationale": "Existing Congress source link documents the anti-lynching legislative purpose.",
+    },
+    {
+        "title": "John Lewis Voting Rights Advancement Act",
+        "policy_intent_category": "equity_expanding",
+        "policy_intent_summary": "Proposed restoring and updating Voting Rights Act preclearance protections.",
+        "rationale": "Existing Congress source link documents the voting-rights restoration purpose.",
+    },
+    {
+        "title": "John R. Lewis Voting Rights Advancement Act of 2021",
+        "policy_intent_category": "equity_expanding",
+        "policy_intent_summary": "Proposed restoring and updating Voting Rights Act preclearance protections.",
+        "rationale": "Existing Congress source links document the voting-rights restoration purpose.",
+    },
+    {
+        "title": "Ending Qualified Immunity Act",
+        "policy_intent_category": "equity_expanding",
+        "policy_intent_summary": "Proposed limiting or ending qualified-immunity defenses in civil actions against government officials.",
+        "rationale": "Existing Congress source link documents the qualified-immunity reform purpose.",
+    },
+    {
+        "title": "CROWN Act of 2022",
+        "policy_intent_category": "equity_expanding",
+        "policy_intent_summary": "Proposed prohibiting discrimination based on hair texture and protective hairstyles associated with race.",
+        "rationale": "Existing Congress source links document the race-linked hair-discrimination purpose.",
     },
 ]
 
@@ -399,8 +1072,16 @@ def classify_time_candidate(row: dict[str, Any]) -> dict[str, Any]:
     existing_duration = normalize_nullable_text(row.get("impact_duration_estimate"))
     distinct_action_dates = int(row.get("distinct_action_date_count") or 0)
     candidate_date = row.get("candidate_action_date")
+    action_references = row.get("action_references") or ""
+    time_seed = TIME_ANCHOR_SEEDS.get(str(row.get("record_key") or ""))
 
     status = "safe_auto_update"
+    recommended_duration = TIME_DURATION_LABEL
+    temporal_confidence = "medium"
+    rationale = (
+        "The linked promise has exactly one distinct structured action_date; this is recorded as an action-date "
+        "temporal anchor, not a precise outcome event date."
+    )
     if existing_start:
         status = "already_populated"
         notes.append("impact_start_date_already_present")
@@ -408,8 +1089,26 @@ def classify_time_candidate(row: dict[str, Any]) -> dict[str, Any]:
         status = "no_temporal_signal"
         notes.append("no_promise_action_date")
     elif distinct_action_dates > 1:
-        status = "operator_review_required"
-        notes.append("multiple_promise_action_dates")
+        if time_seed:
+            seeded_date = str(time_seed["impact_start_date"])
+            if seeded_date in action_references:
+                status = "safe_auto_update"
+                candidate_date = seeded_date
+                recommended_duration = time_seed.get("impact_duration_estimate", TIME_DURATION_LABEL)
+                temporal_confidence = time_seed.get("temporal_confidence", "medium")
+                rationale = time_seed["rationale"]
+                notes.append("curated_multi_action_anchor")
+            else:
+                status = "operator_review_required"
+                notes.append("curated_anchor_date_not_found_in_action_references")
+        else:
+            status = "operator_review_required"
+            notes.append("multiple_promise_action_dates")
+    else:
+        notes.append("single_action_date_anchor")
+
+    if status in {"operator_review_required", "no_temporal_signal"}:
+        rationale = "No safe single action-date temporal anchor is available."
 
     return {
         "status": status,
@@ -423,19 +1122,14 @@ def classify_time_candidate(row: dict[str, Any]) -> dict[str, Any]:
         "existing_impact_duration_estimate": existing_duration,
         "recommended_impact_start_date": str(candidate_date) if candidate_date else None,
         "recommended_impact_end_date": None,
-        "recommended_impact_duration_estimate": TIME_DURATION_LABEL,
+        "recommended_impact_duration_estimate": recommended_duration,
         "candidate_date_type": "action_date",
-        "temporal_confidence": "medium",
-        "rationale": (
-            "The linked promise has exactly one distinct structured action_date; this is recorded as an action-date "
-            "temporal anchor, not a precise outcome event date."
-        )
-        if status == "safe_auto_update"
-        else "No safe single action-date temporal anchor is available.",
+        "temporal_confidence": temporal_confidence,
+        "rationale": rationale,
         "traceability": {
             "source_basis": "promise_actions.action_date",
             "action_count": int(row.get("action_count") or 0),
-            "action_references": row.get("action_references"),
+            "action_references": action_references,
         },
         "notes": notes,
     }

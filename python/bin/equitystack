@@ -2005,6 +2005,10 @@ run_legislative_command() {
           "$(cli_hint) legislative review"
       fi
       ;;
+    materialize-outcomes)
+      run_step "1/1" "Materialize Legislative Outcomes" "Legislative policy_outcomes materialization complete" --output "$EQUITYSTACK_PYTHON_DIR/reports/legislative-policy-outcomes-materialize.dry-run.json" -- \
+        "$VENV_PYTHON" scripts/materialize_legislative_policy_outcomes.py "$@"
+      ;;
     feedback)
       [ "$#" -eq 0 ] || { echo "equitystack legislative feedback does not accept extra arguments" >&2; exit 1; }
       run_step "1/2" "Analyze Feedback" "Feedback analysis refreshed" -- \
@@ -2054,6 +2058,10 @@ run_impact_command() {
       run_step "1/1" "Audit Historical Policy Duplicates" "Historical policy duplicate audit complete" --output "$EQUITYSTACK_PYTHON_DIR/reports/historical-policy-duplicate-audit.json" -- \
         "$VENV_PYTHON" scripts/audit_historical_policy_duplicates.py "$@"
       ;;
+    audit-policy-coverage-gaps)
+      run_step "1/1" "Audit Historical Policy Coverage Gaps" "Missing Policy Report complete" --output "$EQUITYSTACK_PYTHON_DIR/reports/historical-policy-coverage-gap-report.json" -- \
+        "$VENV_PYTHON" scripts/audit_historical_policy_coverage_gaps.py "$@"
+      ;;
     audit-outcome-temporal-attribution)
       run_step "1/1" "Audit Outcome Temporal Attribution" "Outcome temporal attribution audit complete" --output "$EQUITYSTACK_PYTHON_DIR/reports/outcome-temporal-attribution.dry-run.json" -- \
         "$VENV_PYTHON" scripts/audit_outcome_temporal_attribution.py "$@"
@@ -2061,6 +2069,10 @@ run_impact_command() {
     audit-source-quality)
       run_step "1/1" "Audit Source Quality" "Source quality audit complete" --output "$EQUITYSTACK_PYTHON_DIR/reports/source-quality-audit.json" -- \
         "$VENV_PYTHON" scripts/audit_source_quality.py "$@"
+      ;;
+    audit-outcome-source-gaps)
+      run_step "1/1" "Audit Policy Outcome Source Gaps" "Policy outcome source-gap audit complete" --output "$EQUITYSTACK_PYTHON_DIR/reports/policy-outcome-source-gaps-report.json" -- \
+        "$VENV_PYTHON" scripts/audit_policy_outcome_source_gaps.py "$@"
       ;;
     report-outcome-time)
       run_step "1/1" "Report Policy Outcome Time Dimension" "Policy outcome time report complete" --output "$EQUITYSTACK_PYTHON_DIR/reports/policy-outcome-time-dimension-report.json" -- \
@@ -2070,9 +2082,29 @@ run_impact_command() {
       run_step "1/1" "Report Policy Intent Alignment" "Policy intent alignment report complete" --output "$EQUITYSTACK_PYTHON_DIR/reports/policy-intent-alignment-report.json" -- \
         "$VENV_PYTHON" scripts/report_policy_intent_alignment.py "$@"
       ;;
+    report-final-black-impact-score)
+      run_step "1/1" "Report Final Black Impact Score" "Final Black Impact Score report complete" --output "$EQUITYSTACK_PYTHON_DIR/reports/final-black-impact-score-by-president.json" -- \
+        "$VENV_PYTHON" scripts/report_final_black_impact_score.py "$@"
+      ;;
+    certify-production-data)
+      run_step "1/1" "Certify Production Data Model and Scoring" "Production data certification audit complete" --output "$EQUITYSTACK_PYTHON_DIR/reports/production-data-model-scoring-certification.json" -- \
+        "$VENV_PYTHON" scripts/audit_production_certification.py "$@"
+      ;;
+    audit-policy-intent-gaps)
+      run_step "1/1" "Audit Policy Intent Gaps" "Policy intent gap operator queue complete" --output "$EQUITYSTACK_PYTHON_DIR/reports/policy-intent-gap-queue.json" -- \
+        "$VENV_PYTHON" scripts/audit_policy_intent_gaps.py "$@"
+      ;;
     backfill-policy-time-intent)
       run_step "1/1" "Backfill Policy Time and Intent" "Policy time and intent backfill complete" --output "$EQUITYSTACK_PYTHON_DIR/reports/policy-time-intent-backfill-report.json" -- \
         "$VENV_PYTHON" scripts/backfill_policy_time_and_intent.py "$@"
+      ;;
+    curate-policy-intent)
+      run_step "1/1" "Curate Policy Intent" "Policy intent curation complete" --output "$EQUITYSTACK_PYTHON_DIR/reports/policy-intent-curation.dry-run.json" -- \
+        "$VENV_PYTHON" scripts/curate_policy_intent.py "$@"
+      ;;
+    curate-sources)
+      run_step "1/1" "Curate Policy Outcome Sources" "Policy outcome source curation complete" --output "$EQUITYSTACK_PYTHON_DIR/reports/policy-outcome-source-curation.dry-run.json" -- \
+        "$VENV_PYTHON" scripts/curate_policy_outcome_sources.py "$@"
       ;;
     help|-h|--help|"")
       impact_usage
@@ -2667,9 +2699,14 @@ Impact maturation commands:
   backfill-outcome-sources  Audit optional safe promise_outcome_sources links
   sync-current-admin-outcomes  Sync promise_outcomes into policy_outcomes
   audit-historical-duplicates  Audit likely duplicate/variant historical policies
+  audit-policy-coverage-gaps  Generate Missing Policy Report by decade/category
   audit-outcome-temporal-attribution  Audit outcome timing signals without changing scoring
   report-outcome-time  Report unified policy_outcomes by year, decade, and administration
+  report-final-black-impact-score  Compute final Black Impact Score per president
+  certify-production-data  End-to-end read-only data model and scoring certification
   backfill-policy-time-intent  Dry-run or apply safe policy time and intent backfills
+  curate-policy-intent  Manually classify missing historical policy intent
+  curate-sources  Manually attach operator-provided sources to policy outcomes
 
 Operational maintenance:
   operator cleanup-stale-workflows  Mark stale operator workflow sessions inactive without deleting history
@@ -2681,9 +2718,14 @@ Examples:
   $(cli_hint) impact evaluate
   $(cli_hint) impact promote --dry-run
   $(cli_hint) impact audit-historical-duplicates
+  $(cli_hint) impact audit-policy-coverage-gaps
   $(cli_hint) impact audit-outcome-temporal-attribution
   $(cli_hint) impact report-outcome-time
+  $(cli_hint) impact report-final-black-impact-score
+  $(cli_hint) impact certify-production-data
   $(cli_hint) impact backfill-policy-time-intent
+  $(cli_hint) impact curate-policy-intent --non-interactive --limit 10
+  $(cli_hint) impact curate-sources --non-interactive --limit 10
   $(cli_hint) current-admin run
   $(cli_hint) current-admin status
   $(cli_hint) operator cleanup-stale-workflows --dry-run
@@ -2707,16 +2749,30 @@ Commands:
              Dry-run or apply current-admin promise_outcomes into policy_outcomes
   audit-historical-duplicates
              Read-only audit for likely duplicate/variant historical policies
+  audit-policy-coverage-gaps
+             Read-only Missing Policy Report by decade and major historical policy category
   audit-outcome-temporal-attribution
              Audit outcome timing signals and optional backfill readiness
   audit-source-quality
              Audit source authority tiers, domains, duplicates, and outcome coverage
+  audit-outcome-source-gaps
+             Prioritize policy_outcomes missing sources for manual curation
   report-outcome-time
              Read-only report for policy_outcomes time dimension and date validation
   report-policy-intent
              Read-only report for policy intent vs outcome alignment
+  report-final-black-impact-score
+             Read-only final Black Impact Score per president from unified policy_outcomes
+  certify-production-data
+             End-to-end read-only production data model and scoring certification audit
+  audit-policy-intent-gaps
+             Build a read-only queue of policies missing policy intent classification
   backfill-policy-time-intent
              Dry-run or apply high-confidence policy time and intent backfills
+  curate-policy-intent
+             Manually classify missing historical policy intent without overwriting existing values
+  curate-sources
+             Manually attach operator-provided sources to current-admin policy outcomes
 
 Examples:
   $(cli_hint) impact evaluate
@@ -2729,12 +2785,21 @@ Examples:
   $(cli_hint) impact sync-current-admin-outcomes
   $(cli_hint) impact sync-current-admin-outcomes --apply --yes
   $(cli_hint) impact audit-historical-duplicates
+  $(cli_hint) impact audit-policy-coverage-gaps
   $(cli_hint) impact audit-outcome-temporal-attribution
   $(cli_hint) impact audit-source-quality
+  $(cli_hint) impact audit-outcome-source-gaps
   $(cli_hint) impact report-outcome-time
   $(cli_hint) impact report-policy-intent
+  $(cli_hint) impact report-final-black-impact-score
+  $(cli_hint) impact certify-production-data
+  $(cli_hint) impact audit-policy-intent-gaps
   $(cli_hint) impact backfill-policy-time-intent
   $(cli_hint) impact backfill-policy-time-intent --apply --yes
+  $(cli_hint) impact curate-policy-intent --non-interactive --limit 10
+  $(cli_hint) impact curate-policy-intent --only-policy-id 157 --category equity_expanding --summary "..." --source-reference "..." --apply --yes
+  $(cli_hint) impact curate-sources --non-interactive --limit 10
+  $(cli_hint) impact curate-sources --only-policy-outcome-id 6 --source-title "..." --source-url "https://..." --apply --yes
 
 Safety:
   Allowed transitions are impact_pending -> impact_review_ready,
@@ -2753,6 +2818,11 @@ Safety:
   Policy intent reporting is read-only and never infers missing intent.
   Policy time/intent backfill is dry-run by default, updates only NULL
   fields, preserves existing values, and requires --apply --yes.
+  Manual policy-intent curation is dry-run by default, targets only
+  policies with NULL policy_intent_category, and requires --apply --yes.
+  Manual source curation never auto-discovers sources. It only attaches
+  operator-provided URLs, avoids duplicate URL creation, rejects low/unverified
+  source quality, and requires --apply --yes for writes.
 EOF
 }
 
@@ -2812,6 +2882,8 @@ Commands:
   review     Open the legislative review CLI
   apply      Dry-run or apply approved legislative actions
   import     Dry-run or apply approved tracked-bill seed rows
+  materialize-outcomes
+             Dry-run or apply safe tracked_bills into unified policy_outcomes
   feedback   Refresh feedback analysis and rebuild the bundle
 
 Run options:
@@ -2832,6 +2904,8 @@ Apply / import options:
   legislative apply --apply --yes
   legislative import --dry-run
   legislative import --apply --yes
+  legislative materialize-outcomes
+  legislative materialize-outcomes --apply --yes
 EOF
 }
 
