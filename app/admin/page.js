@@ -1,6 +1,10 @@
 import Link from "next/link";
 import { getCommandCenterSummary } from "@/lib/server/admin-operator/workflowData.js";
 import {
+  getOperatorActionDefinition,
+  serializeOperatorAction,
+} from "@/lib/server/admin-operator/actionRegistry.js";
+import {
   AI_STATES,
   getAiStateTone,
   getTrustStateTone,
@@ -1261,6 +1265,53 @@ function WorkflowSummarySection({ currentAdminOutcome, legislativeOutcome }) {
   );
 }
 
+function OperatorMaintenanceSection({ cleanupAction }) {
+  if (!cleanupAction) {
+    return null;
+  }
+
+  return (
+    <section id="operator-maintenance" className="rounded border border-[#E5EAF0] bg-white px-3 py-3">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="max-w-3xl space-y-1">
+          <p className="font-mono text-[11px] uppercase tracking-wide text-[#6B7280]">
+            Operator Maintenance
+          </p>
+          <h2 className="text-sm font-semibold text-[#1F2937]">Stale workflow cleanup</h2>
+          <p className="text-[11px] text-[#6B7280]">
+            Preview or archive old unfinished operator sessions. This marks matching session artifacts inactive and
+            keeps audit files in place.
+          </p>
+        </div>
+        <div className="flex flex-wrap items-start gap-3">
+          <OperatorActionButton
+            action={cleanupAction}
+            label="Preview cleanup"
+            input={{ apply: false }}
+            context={{ triggerSource: "admin_operator_maintenance", maintenanceAction: "stale_workflow_cleanup" }}
+            helperText="Dry-run only. Shows matching stale sessions without changing files."
+          />
+          <OperatorActionButton
+            action={cleanupAction}
+            label="Archive stale sessions"
+            input={{ apply: true, yes: true }}
+            context={{ triggerSource: "admin_operator_maintenance", maintenanceAction: "stale_workflow_cleanup" }}
+            tone="danger"
+            helperText="Marks matching stale sessions inactive. It does not delete session files."
+            confirmation={{
+              title: "Archive stale operator workflow sessions",
+              description:
+                "This will mark matching stale workflow sessions inactive. Audit files remain on disk and the cleanup report is preserved.",
+              checkboxLabel: "I understand this archives stale session visibility without deleting audit history.",
+              requireTypedYes: true,
+            }}
+          />
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function RecentWorkflowRunsTable({ jobs, sessionById, workflowOutcomeMap }) {
   const rows = (jobs || [])
     .filter((job) => ["current-admin", "legislative"].includes(job.workflowFamily))
@@ -2373,6 +2424,8 @@ export default async function AdminPage() {
   const fallbackAffectedRuns = fallbackRunCount(workflowOutcomes);
   const showCurrentAdminTracker = hasActiveCurrentAdminWorkflow(summary.currentAdminWorkflowTracker);
   const showLegislativeTracker = hasActiveLegislativeWorkflow(summary.legislativeWorkflowTracker);
+  const cleanupActionDefinition = getOperatorActionDefinition("operator.cleanupStaleWorkflows");
+  const cleanupAction = cleanupActionDefinition ? serializeOperatorAction(cleanupActionDefinition) : null;
   const operationalLinks = [
     {
       title: "Workflows",
@@ -2490,6 +2543,8 @@ export default async function AdminPage() {
           description="One canonical step is active at a time. Use this to continue the legislative workflow without reconstructing the pipeline state."
         />
       ) : null}
+
+      <OperatorMaintenanceSection cleanupAction={cleanupAction} />
 
       <RecentWorkflowRunsTable
         jobs={summary.recentJobs || []}

@@ -134,6 +134,15 @@ python3 scripts/import_approved_tracked_bills.py --apply --yes --link-imported-b
 
 The server wrapper command is `~/bin/equitystack`, which runs the same Python workflow from the deployed environment. For current-admin commands, its path flags accept both python-rooted paths like `data/current_admin_batches/...` and repo-rooted paths like `python/data/current_admin_batches/...`.
 
+Operator maintenance helpers are also available through the wrapper. For example,
+stale unfinished workflow sessions can be previewed and archived without deleting
+their audit files:
+
+```bash
+~/bin/equitystack operator cleanup-stale-workflows --dry-run
+~/bin/equitystack operator cleanup-stale-workflows --apply --yes
+```
+
 Pipeline details, supporting scripts, and the full operator runbook are documented in [`python/README.md`](python/README.md).
 
 For current-administration Promise Tracker work, the canonical workflow is the Python artifact pipeline under [`python/`](python/). The dashboard is a read-only analytics and admin surface on top of those artifacts; it is not a second review-generation or import pipeline.

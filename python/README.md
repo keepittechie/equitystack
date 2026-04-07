@@ -122,6 +122,38 @@ Important:
 - the daily review path now uses a 240 second Ollama timeout.
 - `legislative import` is dry-run unless `--apply --yes` is passed to the underlying script directly.
 
+## Operator Maintenance
+
+Stale workflow sessions can be hidden from the operator console without deleting
+their audit history:
+
+```bash
+./bin/equitystack operator cleanup-stale-workflows --dry-run
+./bin/equitystack operator cleanup-stale-workflows --apply --yes
+```
+
+The cleanup command marks selected workflow session artifacts inactive and adds
+`archivedAt`, `archivedReason`, `archivedBy`, and `cleanupMetadata`. It never
+deletes session files.
+
+Default cleanup candidates are:
+
+- obvious test sessions
+- older duplicate active sessions with the same workflow id
+- older blocked or failed sessions
+
+Use explicit targeting when you want to archive one known session:
+
+```bash
+./bin/equitystack operator cleanup-stale-workflows \
+  --session-id current-admin:current-admin-wrapper-test \
+  --apply --yes
+```
+
+Use `--exclude-session <id>` to keep a session even if it matches a default
+cleanup rule. Run `--dry-run` first in production and confirm the candidate list
+before applying.
+
 ## Directory Notes
 
 - `bin/equitystack`: main operator entrypoint

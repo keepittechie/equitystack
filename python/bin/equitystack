@@ -2053,6 +2053,26 @@ run_impact_command() {
   esac
 }
 
+run_operator_command() {
+  local command="${1:-}"
+  shift || true
+
+  case "$command" in
+    cleanup-stale-workflows)
+      run_step "1/1" "Cleanup Stale Operator Workflows" "Stale operator workflow cleanup complete" -- \
+        "$VENV_PYTHON" scripts/cleanup_stale_operator_workflows.py "$@"
+      ;;
+    help|-h|--help|"")
+      operator_usage
+      ;;
+    *)
+      echo "Unknown operator command: $command" >&2
+      operator_usage
+      exit 1
+      ;;
+  esac
+}
+
 run_current_admin_command() {
   local command="${1:-}"
   shift || true
@@ -2568,6 +2588,7 @@ Usage:
   equitystack legislative <command> [args]
   equitystack current-admin <command> [args]
   equitystack impact <command> [args]
+  equitystack operator <command> [args]
   equitystack admin-reset-operational-state [--dry-run | --apply --yes]
 
 Shared runtime defaults:
@@ -2613,6 +2634,7 @@ Impact maturation commands:
   promote    Promote approved safe forward impact transitions
 
 Operational maintenance:
+  operator cleanup-stale-workflows  Mark stale operator workflow sessions inactive without deleting history
   admin-reset-operational-state   Archive non-canonical run-state artifacts for a fresh walkthrough
 
 Examples:
@@ -2622,6 +2644,7 @@ Examples:
   $(cli_hint) impact promote --dry-run
   $(cli_hint) current-admin run
   $(cli_hint) current-admin status
+  $(cli_hint) operator cleanup-stale-workflows --dry-run
   $(cli_hint) admin-reset-operational-state --dry-run
   $(cli_hint) current-admin workflow start --input data/current_admin_batches/<batch-file>.json
   $(cli_hint) current-admin review --input reports/current_admin/<batch-name>.ai-review.json
@@ -2649,6 +2672,27 @@ Safety:
   impact_review_ready -> impact_scored, and impact_scored -> impact_verified.
   Backward movement is blocked. Outcomes are inserted only for impact_scored
   or impact_verified transitions, and existing outcome rows are preserved.
+EOF
+}
+
+operator_usage() {
+  cat <<EOF
+Usage:
+  equitystack operator <command> [args]
+
+Commands:
+  cleanup-stale-workflows   Mark stale operator workflow sessions inactive without deleting history
+
+Cleanup examples:
+  $(cli_hint) operator cleanup-stale-workflows --dry-run
+  $(cli_hint) operator cleanup-stale-workflows --apply --yes
+  $(cli_hint) operator cleanup-stale-workflows --session-id current-admin:current-admin-wrapper-test --apply --yes
+
+Safety:
+  Cleanup never deletes workflow session files. It marks selected active sessions
+  inactive and adds archivedAt, archivedReason, archivedBy, and cleanupMetadata.
+  Default selection includes obvious test sessions, older duplicate active sessions,
+  and older blocked sessions. Use --exclude-session to keep a matching session.
 EOF
 }
 
@@ -3063,6 +3107,10 @@ case "${1:-}" in
   impact)
     shift
     run_impact_command "${1:-help}" "${@:2}"
+    ;;
+  operator)
+    shift
+    run_operator_command "${1:-help}" "${@:2}"
     ;;
   current-admin)
     shift

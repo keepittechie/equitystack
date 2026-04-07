@@ -2,34 +2,15 @@
   "batch_name": "trump-2025-batch-01",
   "president_slug": "donald-j-trump-2025",
   "source_batch_path": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.normalized.json",
-  "source_review_path": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.evidence-pack-vs-baseline-01.enriched.ai-review.json",
+  "source_review_path": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.ai-review.json",
   "prefill_suggestions": false,
-  "input_mode": "manual_review_queue",
-  "promotion_state": {
-    "promoted": true,
-    "promotion_mode": "impact_pending_import",
-    "promoted_at": "2026-04-07T03:02:21.571127+00:00",
-    "source_review_path": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.evidence-pack-vs-baseline-01.enriched.ai-review.json",
-    "source_batch_path": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.normalized.json",
-    "decision_template_path": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.decision-template.json",
-    "decision_log_path": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/review_decisions/trump-2025-batch-01.20260407T030221Z.promotion.decision-log.json",
-    "approved_item_count": 10,
-    "pending_impact_item_count": 10,
-    "non_promoted_item_count": 0,
-    "impact_status": "impact_pending",
-    "recommended_action": "import_with_pending_impact",
-    "impact_outcomes_deferred": true,
-    "previous_queue_backup_path": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.manual-review-queue.before-promotion-20260407T030221Z.queue.json",
-    "previous_decision_template_backup_path": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.decision-template.before-promotion-20260407T030221Z.decision-template.json"
-  },
   "items": [
     {
       "slug": "trump-2025-election-integrity-proof-citizenship-paper-ballots",
       "impact_status": "impact_pending",
-      "approved": true,
-      "operator_status": "approved",
-      "operator_action": "approve_as_is",
-      "operator_notes": "Auto-approved for importing verified policy/action facts with impact outcome scoring deferred.",
+      "approved": false,
+      "operator_status": "pending",
+      "operator_notes": null,
       "original_record": {
         "slug": "trump-2025-election-integrity-proof-citizenship-paper-ballots",
         "title": "Require proof of citizenship and paper-ballot election safeguards",
@@ -235,38 +216,34 @@
           "impact_status_reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review.",
           "confidence_score": 0.4,
           "confidence_level": "Low",
-          "reasoning_summary": "A March 2025 executive order advanced stricter federal election-integrity rules, including proof of citizenship and paper ballots, but implementation was incomplete and the direct impact on Black voters remains insufficiently evidenced.",
+          "reasoning_summary": "The promise and partial executive action aimed to require proof of citizenship and paper-ballot safeguards for federal elections. While the order was issued, implementation was incomplete and the direct impact on Black voters is not clearly documented in the provided evidence.",
           "hesitation_reasons": [
-            "The record documents the issuance of an executive order and partial implementation.",
-            "Evidence notes that documentary-proof and ballot-processing changes can affect registration and voting access in Black communities, but does not provide direct or measurable outcomes.",
-            "Implementation is incomplete and impact is described as indirect and variable.",
-            "No independent or non-government sources are included; all sources are official/government.",
-            "Evidence strength is described as moderate, but outcome evidence is limited to administrative directives, not measurable effects."
+            "The record documents a campaign promise and a subsequent executive order, but implementation is described as partial and incomplete.",
+            "The evidence notes that such measures can affect Black communities, but does not provide direct, measurable outcomes or clear documentation of positive or negative effects.",
+            "The outcome summary and impact note are cautious and do not specify concrete results for Black Americans.",
+            "Evidence strength is described as 'moderate' and the impact direction as 'mixed', but without detailed supporting data."
           ],
           "evidence_needed_to_reduce_risk": [
-            "Direct, measurable impact on Black voters or Black-majority communities",
-            "Independent or non-governmental analysis of effects",
-            "Complete implementation status and downstream outcomes"
+            "Direct evidence of measurable impact on Black voter registration, turnout, or ballot acceptance.",
+            "Details on how federal agencies implemented the directive and the specific effects in Black-majority jurisdictions.",
+            "Clear documentation of positive or negative outcomes for Black Americans."
           ],
           "suggested_operator_next_action": "manual_review_required",
           "caution_flags": [
-            "implementation_incomplete",
-            "indirect_impact_evidence",
             "manual_review_required",
-            "no_independent/non_government_sources",
+            "no_independent_or_third_party_analysis_of_impact.",
+            "sources_are_official_and_primary_but_lack_detailed_outcome_data.",
             "weak_evidence"
           ],
           "source_warnings": [
-            "implementation_incomplete",
-            "indirect_impact_evidence",
-            "no_independent/non_government_sources"
+            "no_independent_or_third_party_analysis_of_impact.",
+            "sources_are_official_and_primary_but_lack_detailed_outcome_data."
           ],
           "missing_source_warnings": [
-            "implementation_incomplete",
-            "indirect_impact_evidence",
-            "no_independent/non_government_sources"
+            "no_independent_or_third_party_analysis_of_impact.",
+            "sources_are_official_and_primary_but_lack_detailed_outcome_data."
           ],
-          "ambiguity_notes": "The record documents the issuance of an executive order and partial implementation. Evidence notes that documentary-proof and ballot-processing changes can affect registration and voting access in Black communities, but does not provide direct or measurable outcomes. Implementation is incomplete and impact is described as indirect and variable.",
+          "ambiguity_notes": "The record documents a campaign promise and a subsequent executive order, but implementation is described as partial and incomplete. The evidence notes that such measures can affect Black communities, but does not provide direct, measurable outcomes or clear documentation of positive or negative effects. The outcome summary and impact note are cautious and do not specify concrete results for Black Americans.",
           "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. Source warnings remain and reduce trust in the suggestion. Confidence is supported because Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
           "confidence_signals": [
             {
@@ -321,38 +298,34 @@
           "impact_status_reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review.",
           "confidence_score": 0.4,
           "confidence_level": "Low",
-          "reasoning_summary": "A March 2025 executive order advanced stricter federal election-integrity rules, including proof of citizenship and paper ballots, but implementation was incomplete and the direct impact on Black voters remains insufficiently evidenced.",
+          "reasoning_summary": "The promise and partial executive action aimed to require proof of citizenship and paper-ballot safeguards for federal elections. While the order was issued, implementation was incomplete and the direct impact on Black voters is not clearly documented in the provided evidence.",
           "hesitation_reasons": [
-            "The record documents the issuance of an executive order and partial implementation.",
-            "Evidence notes that documentary-proof and ballot-processing changes can affect registration and voting access in Black communities, but does not provide direct or measurable outcomes.",
-            "Implementation is incomplete and impact is described as indirect and variable.",
-            "No independent or non-government sources are included; all sources are official/government.",
-            "Evidence strength is described as moderate, but outcome evidence is limited to administrative directives, not measurable effects."
+            "The record documents a campaign promise and a subsequent executive order, but implementation is described as partial and incomplete.",
+            "The evidence notes that such measures can affect Black communities, but does not provide direct, measurable outcomes or clear documentation of positive or negative effects.",
+            "The outcome summary and impact note are cautious and do not specify concrete results for Black Americans.",
+            "Evidence strength is described as 'moderate' and the impact direction as 'mixed', but without detailed supporting data."
           ],
           "evidence_needed_to_reduce_risk": [
-            "Direct, measurable impact on Black voters or Black-majority communities",
-            "Independent or non-governmental analysis of effects",
-            "Complete implementation status and downstream outcomes"
+            "Direct evidence of measurable impact on Black voter registration, turnout, or ballot acceptance.",
+            "Details on how federal agencies implemented the directive and the specific effects in Black-majority jurisdictions.",
+            "Clear documentation of positive or negative outcomes for Black Americans."
           ],
           "suggested_operator_next_action": "manual_review_required",
           "caution_flags": [
-            "implementation_incomplete",
-            "indirect_impact_evidence",
             "manual_review_required",
-            "no_independent/non_government_sources",
+            "no_independent_or_third_party_analysis_of_impact.",
+            "sources_are_official_and_primary_but_lack_detailed_outcome_data.",
             "weak_evidence"
           ],
           "source_warnings": [
-            "implementation_incomplete",
-            "indirect_impact_evidence",
-            "no_independent/non_government_sources"
+            "no_independent_or_third_party_analysis_of_impact.",
+            "sources_are_official_and_primary_but_lack_detailed_outcome_data."
           ],
           "missing_source_warnings": [
-            "implementation_incomplete",
-            "indirect_impact_evidence",
-            "no_independent/non_government_sources"
+            "no_independent_or_third_party_analysis_of_impact.",
+            "sources_are_official_and_primary_but_lack_detailed_outcome_data."
           ],
-          "ambiguity_notes": "The record documents the issuance of an executive order and partial implementation. Evidence notes that documentary-proof and ballot-processing changes can affect registration and voting access in Black communities, but does not provide direct or measurable outcomes. Implementation is incomplete and impact is described as indirect and variable.",
+          "ambiguity_notes": "The record documents a campaign promise and a subsequent executive order, but implementation is described as partial and incomplete. The evidence notes that such measures can affect Black communities, but does not provide direct, measurable outcomes or clear documentation of positive or negative effects. The outcome summary and impact note are cautious and do not specify concrete results for Black Americans.",
           "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. Source warnings remain and reduce trust in the suggestion. Confidence is supported because Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
           "confidence_signals": [
             {
@@ -398,10 +371,9 @@
         "confidence_score": 0.4,
         "source_quality": "medium",
         "caution_flags": [
-          "implementation_incomplete",
-          "indirect_impact_evidence",
           "manual_review_required",
-          "no_independent/non_government_sources",
+          "no_independent_or_third_party_analysis_of_impact.",
+          "sources_are_official_and_primary_but_lack_detailed_outcome_data.",
           "weak_evidence"
         ]
       },
@@ -468,16 +440,14 @@
         ],
         "impact_status": "impact_pending",
         "impact_pending_reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review."
-      },
-      "promotion_reason": "Auto-approved for importing verified policy/action facts with impact outcome scoring deferred."
+      }
     },
     {
       "slug": "trump-2025-end-federal-dei-equity-programs",
       "impact_status": "impact_pending",
-      "approved": true,
-      "operator_status": "approved",
-      "operator_action": "approve_as_is",
-      "operator_notes": "Auto-approved for importing verified policy/action facts with impact outcome scoring deferred.",
+      "approved": false,
+      "operator_status": "pending",
+      "operator_notes": null,
       "original_record": {
         "slug": "trump-2025-end-federal-dei-equity-programs",
         "title": "End federal DEI and equity-based government programs",
@@ -674,37 +644,38 @@
           "impact_status_reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review.",
           "confidence_score": 0.5,
           "confidence_level": "Low",
-          "reasoning_summary": "The administration ordered the termination of federal DEI and equity structures, but implementation is incomplete and evidence is limited to a single official source. The downstream effects on Black communities are not fully documented.",
+          "reasoning_summary": "The promise and executive order directed the termination of federal DEI and equity-based programs, which are described as addressing disparities affecting Black communities. The evidence indicates a negative direction of impact, but the actual downstream effects and full implementation outcomes are not fully documented.",
           "hesitation_reasons": [
-            "The promise and action to end federal DEI and equity programs are documented by a single official source.",
-            "Implementation is ongoing and incomplete, so the full impact on Black communities is not established.",
-            "Evidence of negative impact is plausible but indirect and not fully substantiated by measurable outcomes.",
-            "No independent or non-government sources are provided to corroborate or expand on the official record."
+            "The executive order explicitly targets the removal of DEI and equity-focused offices, grants, and policies.",
+            "The record notes that these programs were previously used to address disparities affecting Black communities.",
+            "The outcome summary and black community impact note both indicate that eliminating these structures can reduce federal attention to disparities in employment, education, contracting, and service access.",
+            "Evidence strength is described as 'moderate' and implementation is ongoing, with only partial status reported.",
+            "There is insufficient detail on the full measurable impact or specific downstream effects."
           ],
           "evidence_needed_to_reduce_risk": [
-            "Independent or non-governmental analysis of the impact on Black communities",
-            "Comprehensive documentation of downstream effects and measurable outcomes",
-            "Evidence of actual changes in rights, access, or outcomes for Black Americans"
+            "Detailed agency-level implementation outcomes",
+            "Specific measurable impacts on Black communities",
+            "Evidence of actual program terminations and their effects"
           ],
           "suggested_operator_next_action": "manual_review_required",
           "caution_flags": [
-            "implementation_incomplete",
+            "lack_of_granular_data_on_affected_programs_or_communities",
             "manual_review_required",
-            "no_independent_verification",
-            "single_source_official_record",
+            "no_independent_or_third_party_verification_of_outcomes",
+            "single_source_reliance_(white_house_order)",
             "weak_evidence"
           ],
           "source_warnings": [
-            "implementation_incomplete",
-            "no_independent_verification",
-            "single_source_official_record"
+            "lack_of_granular_data_on_affected_programs_or_communities",
+            "no_independent_or_third_party_verification_of_outcomes",
+            "single_source_reliance_(white_house_order)"
           ],
           "missing_source_warnings": [
-            "implementation_incomplete",
-            "no_independent_verification",
-            "single_source_official_record"
+            "lack_of_granular_data_on_affected_programs_or_communities",
+            "no_independent_or_third_party_verification_of_outcomes",
+            "single_source_reliance_(white_house_order)"
           ],
-          "ambiguity_notes": "The promise and action to end federal DEI and equity programs are documented by a single official source. Implementation is ongoing and incomplete, so the full impact on Black communities is not established. Evidence of negative impact is plausible but indirect and not fully substantiated by measurable outcomes.",
+          "ambiguity_notes": "The executive order explicitly targets the removal of DEI and equity-focused offices, grants, and policies. The record notes that these programs were previously used to address disparities affecting Black communities. The outcome summary and black community impact note both indicate that eliminating these structures can reduce federal attention to disparities in employment, education, contracting, and service access.",
           "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. Source warnings remain and reduce trust in the suggestion. Confidence is supported because Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
           "confidence_signals": [
             {
@@ -754,37 +725,38 @@
           "impact_status_reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review.",
           "confidence_score": 0.5,
           "confidence_level": "Low",
-          "reasoning_summary": "The administration ordered the termination of federal DEI and equity structures, but implementation is incomplete and evidence is limited to a single official source. The downstream effects on Black communities are not fully documented.",
+          "reasoning_summary": "The promise and executive order directed the termination of federal DEI and equity-based programs, which are described as addressing disparities affecting Black communities. The evidence indicates a negative direction of impact, but the actual downstream effects and full implementation outcomes are not fully documented.",
           "hesitation_reasons": [
-            "The promise and action to end federal DEI and equity programs are documented by a single official source.",
-            "Implementation is ongoing and incomplete, so the full impact on Black communities is not established.",
-            "Evidence of negative impact is plausible but indirect and not fully substantiated by measurable outcomes.",
-            "No independent or non-government sources are provided to corroborate or expand on the official record."
+            "The executive order explicitly targets the removal of DEI and equity-focused offices, grants, and policies.",
+            "The record notes that these programs were previously used to address disparities affecting Black communities.",
+            "The outcome summary and black community impact note both indicate that eliminating these structures can reduce federal attention to disparities in employment, education, contracting, and service access.",
+            "Evidence strength is described as 'moderate' and implementation is ongoing, with only partial status reported.",
+            "There is insufficient detail on the full measurable impact or specific downstream effects."
           ],
           "evidence_needed_to_reduce_risk": [
-            "Independent or non-governmental analysis of the impact on Black communities",
-            "Comprehensive documentation of downstream effects and measurable outcomes",
-            "Evidence of actual changes in rights, access, or outcomes for Black Americans"
+            "Detailed agency-level implementation outcomes",
+            "Specific measurable impacts on Black communities",
+            "Evidence of actual program terminations and their effects"
           ],
           "suggested_operator_next_action": "manual_review_required",
           "caution_flags": [
-            "implementation_incomplete",
+            "lack_of_granular_data_on_affected_programs_or_communities",
             "manual_review_required",
-            "no_independent_verification",
-            "single_source_official_record",
+            "no_independent_or_third_party_verification_of_outcomes",
+            "single_source_reliance_(white_house_order)",
             "weak_evidence"
           ],
           "source_warnings": [
-            "implementation_incomplete",
-            "no_independent_verification",
-            "single_source_official_record"
+            "lack_of_granular_data_on_affected_programs_or_communities",
+            "no_independent_or_third_party_verification_of_outcomes",
+            "single_source_reliance_(white_house_order)"
           ],
           "missing_source_warnings": [
-            "implementation_incomplete",
-            "no_independent_verification",
-            "single_source_official_record"
+            "lack_of_granular_data_on_affected_programs_or_communities",
+            "no_independent_or_third_party_verification_of_outcomes",
+            "single_source_reliance_(white_house_order)"
           ],
-          "ambiguity_notes": "The promise and action to end federal DEI and equity programs are documented by a single official source. Implementation is ongoing and incomplete, so the full impact on Black communities is not established. Evidence of negative impact is plausible but indirect and not fully substantiated by measurable outcomes.",
+          "ambiguity_notes": "The executive order explicitly targets the removal of DEI and equity-focused offices, grants, and policies. The record notes that these programs were previously used to address disparities affecting Black communities. The outcome summary and black community impact note both indicate that eliminating these structures can reduce federal attention to disparities in employment, education, contracting, and service access.",
           "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. Source warnings remain and reduce trust in the suggestion. Confidence is supported because Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
           "confidence_signals": [
             {
@@ -825,10 +797,10 @@
         "confidence_score": 0.5,
         "source_quality": "medium",
         "caution_flags": [
-          "implementation_incomplete",
+          "lack_of_granular_data_on_affected_programs_or_communities",
           "manual_review_required",
-          "no_independent_verification",
-          "single_source_official_record",
+          "no_independent_or_third_party_verification_of_outcomes",
+          "single_source_reliance_(white_house_order)",
           "weak_evidence"
         ]
       },
@@ -895,16 +867,14 @@
         ],
         "impact_status": "impact_pending",
         "impact_pending_reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review."
-      },
-      "promotion_reason": "Auto-approved for importing verified policy/action facts with impact outcome scoring deferred."
+      }
     },
     {
       "slug": "trump-2025-strengthen-local-law-enforcement",
       "impact_status": "impact_pending",
-      "approved": true,
-      "operator_status": "approved",
-      "operator_action": "approve_as_is",
-      "operator_notes": "Auto-approved for importing verified policy/action facts with impact outcome scoring deferred.",
+      "approved": false,
+      "operator_status": "pending",
+      "operator_notes": null,
       "original_record": {
         "slug": "trump-2025-strengthen-local-law-enforcement",
         "title": "Increase federal support for state and local law enforcement",
@@ -1110,37 +1080,35 @@
           "impact_status_reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review.",
           "confidence_score": 0.4,
           "confidence_level": "Low",
-          "reasoning_summary": "A 2025 executive order expanded federal support and protections for local law enforcement, but the downstream effects on Black communities are not yet clear due to incomplete implementation and indirect evidence of impact.",
+          "reasoning_summary": "The promise and subsequent executive order expanded federal support and protections for local law enforcement, but the evidence does not clearly establish whether this had a positive, negative, or mixed impact on Black communities. The sources confirm the policy actions but do not provide direct, measurable outcomes for Black Americans.",
           "hesitation_reasons": [
-            "The record documents the executive order and its intent to expand support for law enforcement.",
-            "Evidence notes that changes in law enforcement policy can materially affect Black communities, but does not provide direct or measurable outcomes specific to those communities.",
-            "Implementation is incomplete and the impact path is indirect, with effects depending on future DOJ and local agency actions.",
-            "The evidence is moderate for action and outcome, but not strong or direct enough to classify the impact as positive, negative, or mixed."
+            "The record documents the promise and executive order to expand support for law enforcement.",
+            "The summary and outcome notes acknowledge that effects on Black communities could be both positive (public safety) and negative (increased arrest exposure, reduced oversight), but do not provide direct evidence of outcomes.",
+            "The evidence is described as 'moderate' and 'incomplete,' with downstream effects dependent on later implementation.",
+            "No direct data or clear outcomes for Black Americans are provided in the sources."
           ],
           "evidence_needed_to_reduce_risk": [
             "Direct evidence of impact on Black communities",
-            "Completed implementation outcomes",
-            "Community-level data on changes in policing, arrest exposure, or accountability"
+            "Measurable outcomes (positive or negative) for Black Americans",
+            "Community-level implementation details",
+            "Independent or third-party analysis of effects"
           ],
           "suggested_operator_next_action": "manual_review_required",
           "caution_flags": [
-            "implementation_incomplete",
-            "indirect_impact_evidence",
             "manual_review_required",
-            "no_direct_measurement_of_black_community_outcomes",
+            "no_direct_measurement_of_impact_on_black_communities",
+            "primary_sources_are_official_government_and_campaign_statements,_lacking_independent_verification",
             "weak_evidence"
           ],
           "source_warnings": [
-            "implementation_incomplete",
-            "indirect_impact_evidence",
-            "no_direct_measurement_of_black_community_outcomes"
+            "no_direct_measurement_of_impact_on_black_communities",
+            "primary_sources_are_official_government_and_campaign_statements,_lacking_independent_verification"
           ],
           "missing_source_warnings": [
-            "implementation_incomplete",
-            "indirect_impact_evidence",
-            "no_direct_measurement_of_black_community_outcomes"
+            "no_direct_measurement_of_impact_on_black_communities",
+            "primary_sources_are_official_government_and_campaign_statements,_lacking_independent_verification"
           ],
-          "ambiguity_notes": "The record documents the executive order and its intent to expand support for law enforcement. Evidence notes that changes in law enforcement policy can materially affect Black communities, but does not provide direct or measurable outcomes specific to those communities. Implementation is incomplete and the impact path is indirect, with effects depending on future DOJ and local agency actions.",
+          "ambiguity_notes": "The record documents the promise and executive order to expand support for law enforcement. The summary and outcome notes acknowledge that effects on Black communities could be both positive (public safety) and negative (increased arrest exposure, reduced oversight), but do not provide direct evidence of outcomes. The evidence is described as 'moderate' and 'incomplete,' with downstream effects dependent on later implementation.",
           "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. Source warnings remain and reduce trust in the suggestion. Confidence is supported because Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
           "confidence_signals": [
             {
@@ -1195,37 +1163,35 @@
           "impact_status_reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review.",
           "confidence_score": 0.4,
           "confidence_level": "Low",
-          "reasoning_summary": "A 2025 executive order expanded federal support and protections for local law enforcement, but the downstream effects on Black communities are not yet clear due to incomplete implementation and indirect evidence of impact.",
+          "reasoning_summary": "The promise and subsequent executive order expanded federal support and protections for local law enforcement, but the evidence does not clearly establish whether this had a positive, negative, or mixed impact on Black communities. The sources confirm the policy actions but do not provide direct, measurable outcomes for Black Americans.",
           "hesitation_reasons": [
-            "The record documents the executive order and its intent to expand support for law enforcement.",
-            "Evidence notes that changes in law enforcement policy can materially affect Black communities, but does not provide direct or measurable outcomes specific to those communities.",
-            "Implementation is incomplete and the impact path is indirect, with effects depending on future DOJ and local agency actions.",
-            "The evidence is moderate for action and outcome, but not strong or direct enough to classify the impact as positive, negative, or mixed."
+            "The record documents the promise and executive order to expand support for law enforcement.",
+            "The summary and outcome notes acknowledge that effects on Black communities could be both positive (public safety) and negative (increased arrest exposure, reduced oversight), but do not provide direct evidence of outcomes.",
+            "The evidence is described as 'moderate' and 'incomplete,' with downstream effects dependent on later implementation.",
+            "No direct data or clear outcomes for Black Americans are provided in the sources."
           ],
           "evidence_needed_to_reduce_risk": [
             "Direct evidence of impact on Black communities",
-            "Completed implementation outcomes",
-            "Community-level data on changes in policing, arrest exposure, or accountability"
+            "Measurable outcomes (positive or negative) for Black Americans",
+            "Community-level implementation details",
+            "Independent or third-party analysis of effects"
           ],
           "suggested_operator_next_action": "manual_review_required",
           "caution_flags": [
-            "implementation_incomplete",
-            "indirect_impact_evidence",
             "manual_review_required",
-            "no_direct_measurement_of_black_community_outcomes",
+            "no_direct_measurement_of_impact_on_black_communities",
+            "primary_sources_are_official_government_and_campaign_statements,_lacking_independent_verification",
             "weak_evidence"
           ],
           "source_warnings": [
-            "implementation_incomplete",
-            "indirect_impact_evidence",
-            "no_direct_measurement_of_black_community_outcomes"
+            "no_direct_measurement_of_impact_on_black_communities",
+            "primary_sources_are_official_government_and_campaign_statements,_lacking_independent_verification"
           ],
           "missing_source_warnings": [
-            "implementation_incomplete",
-            "indirect_impact_evidence",
-            "no_direct_measurement_of_black_community_outcomes"
+            "no_direct_measurement_of_impact_on_black_communities",
+            "primary_sources_are_official_government_and_campaign_statements,_lacking_independent_verification"
           ],
-          "ambiguity_notes": "The record documents the executive order and its intent to expand support for law enforcement. Evidence notes that changes in law enforcement policy can materially affect Black communities, but does not provide direct or measurable outcomes specific to those communities. Implementation is incomplete and the impact path is indirect, with effects depending on future DOJ and local agency actions.",
+          "ambiguity_notes": "The record documents the promise and executive order to expand support for law enforcement. The summary and outcome notes acknowledge that effects on Black communities could be both positive (public safety) and negative (increased arrest exposure, reduced oversight), but do not provide direct evidence of outcomes. The evidence is described as 'moderate' and 'incomplete,' with downstream effects dependent on later implementation.",
           "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. Source warnings remain and reduce trust in the suggestion. Confidence is supported because Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
           "confidence_signals": [
             {
@@ -1271,10 +1237,9 @@
         "confidence_score": 0.4,
         "source_quality": "medium",
         "caution_flags": [
-          "implementation_incomplete",
-          "indirect_impact_evidence",
           "manual_review_required",
-          "no_direct_measurement_of_black_community_outcomes",
+          "no_direct_measurement_of_impact_on_black_communities",
+          "primary_sources_are_official_government_and_campaign_statements,_lacking_independent_verification",
           "weak_evidence"
         ]
       },
@@ -1341,16 +1306,14 @@
         ],
         "impact_status": "impact_pending",
         "impact_pending_reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review."
-      },
-      "promotion_reason": "Auto-approved for importing verified policy/action facts with impact outcome scoring deferred."
+      }
     },
     {
       "slug": "trump-2025-clear-street-encampments-expand-civil-commitment",
       "impact_status": "impact_pending",
-      "approved": true,
-      "operator_status": "approved",
-      "operator_action": "approve_as_is",
-      "operator_notes": "Auto-approved for importing verified policy/action facts with impact outcome scoring deferred.",
+      "approved": false,
+      "operator_status": "pending",
+      "operator_notes": null,
       "original_record": {
         "slug": "trump-2025-clear-street-encampments-expand-civil-commitment",
         "title": "Clear street encampments and expand treatment-oriented street-order responses",
@@ -1556,39 +1519,34 @@
           "impact_status_reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review.",
           "confidence_score": 0.4,
           "confidence_level": "Low",
-          "reasoning_summary": "The promise and subsequent policy action prioritized anti-encampment enforcement and treatment-linked street-order policies, with potential impacts on Black unhoused people through displacement, arrest exposure, and treatment access. However, the balance between enforcement and treatment outcomes remains unresolved, and implementation is incomplete, making the net impact on Black Americans unclear.",
+          "reasoning_summary": "The promise and subsequent action focused on clearing street encampments and expanding civil commitment and treatment-oriented responses. The evidence shows a shift in federal priorities toward stricter anti-camping enforcement and treatment-linked policies, but the balance of enforcement versus treatment outcomes and the specific measurable effects on Black Americans remain unresolved and insufficiently documented.",
           "hesitation_reasons": [
-            "Evidence documents policy intent and partial implementation.",
-            "Outcomes for Black Americans are described as possible but not measured.",
-            "The balance between enforcement (potentially negative) and treatment (potentially positive) is unresolved.",
-            "Implementation is incomplete and downstream effects depend on state/local follow-through.",
-            "Evidence is moderate but indirect, with no clear net positive or negative outcome established."
+            "The sources confirm the policy shift and its focus on enforcement and treatment.",
+            "The impact direction is described as 'Mixed' and the evidence strength as 'Moderate', but there is no clear, direct evidence of positive or negative outcomes for Black Americans.",
+            "The summary and notes highlight unresolved questions about implementation and measurable effects, especially for Black unhoused people.",
+            "The policy could plausibly have both positive (treatment access) and negative (displacement, arrest exposure) effects, but the evidence does not quantify or clearly describe these outcomes."
           ],
           "evidence_needed_to_reduce_risk": [
-            "Direct measurement of impact on Black Americans.",
-            "Data on displacement, arrest, or treatment access outcomes.",
-            "Evidence of implementation completeness or follow-through at state/local level.",
-            "Clear resolution of enforcement vs. treatment balance."
+            "Direct, measurable outcomes for Black Americans affected by the policy",
+            "Data on the balance between enforcement and treatment in practice",
+            "Evidence of actual changes in housing, health, or safety outcomes for Black unhoused people"
           ],
           "suggested_operator_next_action": "manual_review_required",
           "caution_flags": [
-            "implementation_incomplete",
-            "indirect_impact_evidence",
+            "evidence_is_policy_focused_rather_than_outcome_focused",
             "manual_review_required",
-            "no_independent_evaluation_of_outcomes",
+            "sources_are_official_and_primary_but_lack_independent_evaluation_or_outcome_data",
             "weak_evidence"
           ],
           "source_warnings": [
-            "implementation_incomplete",
-            "indirect_impact_evidence",
-            "no_independent_evaluation_of_outcomes"
+            "evidence_is_policy_focused_rather_than_outcome_focused",
+            "sources_are_official_and_primary_but_lack_independent_evaluation_or_outcome_data"
           ],
           "missing_source_warnings": [
-            "implementation_incomplete",
-            "indirect_impact_evidence",
-            "no_independent_evaluation_of_outcomes"
+            "evidence_is_policy_focused_rather_than_outcome_focused",
+            "sources_are_official_and_primary_but_lack_independent_evaluation_or_outcome_data"
           ],
-          "ambiguity_notes": "Evidence documents policy intent and partial implementation. Outcomes for Black Americans are described as possible but not measured. The balance between enforcement (potentially negative) and treatment (potentially positive) is unresolved.",
+          "ambiguity_notes": "The sources confirm the policy shift and its focus on enforcement and treatment. The impact direction is described as 'Mixed' and the evidence strength as 'Moderate', but there is no clear, direct evidence of positive or negative outcomes for Black Americans. The summary and notes highlight unresolved questions about implementation and measurable effects, especially for Black unhoused people.",
           "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. Source warnings remain and reduce trust in the suggestion. Confidence is supported because Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
           "confidence_signals": [
             {
@@ -1643,39 +1601,34 @@
           "impact_status_reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review.",
           "confidence_score": 0.4,
           "confidence_level": "Low",
-          "reasoning_summary": "The promise and subsequent policy action prioritized anti-encampment enforcement and treatment-linked street-order policies, with potential impacts on Black unhoused people through displacement, arrest exposure, and treatment access. However, the balance between enforcement and treatment outcomes remains unresolved, and implementation is incomplete, making the net impact on Black Americans unclear.",
+          "reasoning_summary": "The promise and subsequent action focused on clearing street encampments and expanding civil commitment and treatment-oriented responses. The evidence shows a shift in federal priorities toward stricter anti-camping enforcement and treatment-linked policies, but the balance of enforcement versus treatment outcomes and the specific measurable effects on Black Americans remain unresolved and insufficiently documented.",
           "hesitation_reasons": [
-            "Evidence documents policy intent and partial implementation.",
-            "Outcomes for Black Americans are described as possible but not measured.",
-            "The balance between enforcement (potentially negative) and treatment (potentially positive) is unresolved.",
-            "Implementation is incomplete and downstream effects depend on state/local follow-through.",
-            "Evidence is moderate but indirect, with no clear net positive or negative outcome established."
+            "The sources confirm the policy shift and its focus on enforcement and treatment.",
+            "The impact direction is described as 'Mixed' and the evidence strength as 'Moderate', but there is no clear, direct evidence of positive or negative outcomes for Black Americans.",
+            "The summary and notes highlight unresolved questions about implementation and measurable effects, especially for Black unhoused people.",
+            "The policy could plausibly have both positive (treatment access) and negative (displacement, arrest exposure) effects, but the evidence does not quantify or clearly describe these outcomes."
           ],
           "evidence_needed_to_reduce_risk": [
-            "Direct measurement of impact on Black Americans.",
-            "Data on displacement, arrest, or treatment access outcomes.",
-            "Evidence of implementation completeness or follow-through at state/local level.",
-            "Clear resolution of enforcement vs. treatment balance."
+            "Direct, measurable outcomes for Black Americans affected by the policy",
+            "Data on the balance between enforcement and treatment in practice",
+            "Evidence of actual changes in housing, health, or safety outcomes for Black unhoused people"
           ],
           "suggested_operator_next_action": "manual_review_required",
           "caution_flags": [
-            "implementation_incomplete",
-            "indirect_impact_evidence",
+            "evidence_is_policy_focused_rather_than_outcome_focused",
             "manual_review_required",
-            "no_independent_evaluation_of_outcomes",
+            "sources_are_official_and_primary_but_lack_independent_evaluation_or_outcome_data",
             "weak_evidence"
           ],
           "source_warnings": [
-            "implementation_incomplete",
-            "indirect_impact_evidence",
-            "no_independent_evaluation_of_outcomes"
+            "evidence_is_policy_focused_rather_than_outcome_focused",
+            "sources_are_official_and_primary_but_lack_independent_evaluation_or_outcome_data"
           ],
           "missing_source_warnings": [
-            "implementation_incomplete",
-            "indirect_impact_evidence",
-            "no_independent_evaluation_of_outcomes"
+            "evidence_is_policy_focused_rather_than_outcome_focused",
+            "sources_are_official_and_primary_but_lack_independent_evaluation_or_outcome_data"
           ],
-          "ambiguity_notes": "Evidence documents policy intent and partial implementation. Outcomes for Black Americans are described as possible but not measured. The balance between enforcement (potentially negative) and treatment (potentially positive) is unresolved.",
+          "ambiguity_notes": "The sources confirm the policy shift and its focus on enforcement and treatment. The impact direction is described as 'Mixed' and the evidence strength as 'Moderate', but there is no clear, direct evidence of positive or negative outcomes for Black Americans. The summary and notes highlight unresolved questions about implementation and measurable effects, especially for Black unhoused people.",
           "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. Source warnings remain and reduce trust in the suggestion. Confidence is supported because Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
           "confidence_signals": [
             {
@@ -1721,10 +1674,9 @@
         "confidence_score": 0.4,
         "source_quality": "medium",
         "caution_flags": [
-          "implementation_incomplete",
-          "indirect_impact_evidence",
+          "evidence_is_policy_focused_rather_than_outcome_focused",
           "manual_review_required",
-          "no_independent_evaluation_of_outcomes",
+          "sources_are_official_and_primary_but_lack_independent_evaluation_or_outcome_data",
           "weak_evidence"
         ]
       },
@@ -1791,16 +1743,14 @@
         ],
         "impact_status": "impact_pending",
         "impact_pending_reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review."
-      },
-      "promotion_reason": "Auto-approved for importing verified policy/action facts with impact outcome scoring deferred."
+      }
     },
     {
       "slug": "trump-2025-domestic-production-of-critical-medicines",
       "impact_status": "impact_pending",
-      "approved": true,
-      "operator_status": "approved",
-      "operator_action": "approve_as_is",
-      "operator_notes": "Auto-approved for importing verified policy/action facts with impact outcome scoring deferred.",
+      "approved": false,
+      "operator_status": "pending",
+      "operator_notes": null,
       "original_record": {
         "slug": "trump-2025-domestic-production-of-critical-medicines",
         "title": "Expand domestic production of critical medicines",
@@ -1997,37 +1947,33 @@
           "impact_status_reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review.",
           "confidence_score": 0.4,
           "confidence_level": "Low",
-          "reasoning_summary": "A 2025 executive order advanced domestic-medicine production goals, but there is insufficient direct evidence of measurable supply or access outcomes for Black Americans. The impact path is indirect and implementation is incomplete.",
+          "reasoning_summary": "The promise and subsequent executive order aimed to expand domestic production of critical medicines, with the intention of reducing supply-chain vulnerabilities. While regulatory changes were initiated, there is insufficient direct evidence of measurable outcomes or specific positive impacts for Black Americans at this stage.",
           "hesitation_reasons": [
-            "The executive order and regulatory changes are documented, but direct, measurable outcomes for Black communities are not yet available.",
-            "Evidence notes that the impact on Black patients is possible but not measured.",
-            "The evidence pack highlights incomplete implementation and indirect impact.",
-            "Sources are official and multi-sourced, but outcome evidence is moderate and not community-specific."
+            "The executive order and regulatory changes are documented, but outcomes are described as early and not yet measured at the community or patient level.",
+            "The potential for positive impact on Black communities is noted, but not substantiated with direct evidence.",
+            "Evidence is described as moderate, but lacks concrete data on improved access or reduced shortages for Black Americans."
           ],
           "evidence_needed_to_reduce_risk": [
-            "Direct measurement of supply or access improvements for Black Americans",
-            "Community-level outcome data",
-            "Evidence of reduced medicine shortages or improved continuity of care for Black patients"
+            "Direct evidence of improved medicine access or reduced shortages for Black Americans.",
+            "Measurable patient-level or community-level outcomes.",
+            "Independent or third-party evaluation of the policy's effects."
           ],
           "suggested_operator_next_action": "manual_review_required",
           "caution_flags": [
-            "impact_path_is_indirect",
-            "implementation_incomplete",
             "manual_review_required",
-            "no_direct_measurement_of_impact_on_black_communities",
+            "no_direct_measurement_of_impact_on_black_communities.",
+            "sources_are_primarily_official_and_campaign_statements,_lacking_independent_verification.",
             "weak_evidence"
           ],
           "source_warnings": [
-            "impact_path_is_indirect",
-            "implementation_incomplete",
-            "no_direct_measurement_of_impact_on_black_communities"
+            "no_direct_measurement_of_impact_on_black_communities.",
+            "sources_are_primarily_official_and_campaign_statements,_lacking_independent_verification."
           ],
           "missing_source_warnings": [
-            "impact_path_is_indirect",
-            "implementation_incomplete",
-            "no_direct_measurement_of_impact_on_black_communities"
+            "no_direct_measurement_of_impact_on_black_communities.",
+            "sources_are_primarily_official_and_campaign_statements,_lacking_independent_verification."
           ],
-          "ambiguity_notes": "The executive order and regulatory changes are documented, but direct, measurable outcomes for Black communities are not yet available. Evidence notes that the impact on Black patients is possible but not measured. The evidence pack highlights incomplete implementation and indirect impact.",
+          "ambiguity_notes": "The executive order and regulatory changes are documented, but outcomes are described as early and not yet measured at the community or patient level. The potential for positive impact on Black communities is noted, but not substantiated with direct evidence. Evidence is described as moderate, but lacks concrete data on improved access or reduced shortages for Black Americans.",
           "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. Source warnings remain and reduce trust in the suggestion. Confidence is supported because Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
           "confidence_signals": [
             {
@@ -2077,37 +2023,33 @@
           "impact_status_reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review.",
           "confidence_score": 0.4,
           "confidence_level": "Low",
-          "reasoning_summary": "A 2025 executive order advanced domestic-medicine production goals, but there is insufficient direct evidence of measurable supply or access outcomes for Black Americans. The impact path is indirect and implementation is incomplete.",
+          "reasoning_summary": "The promise and subsequent executive order aimed to expand domestic production of critical medicines, with the intention of reducing supply-chain vulnerabilities. While regulatory changes were initiated, there is insufficient direct evidence of measurable outcomes or specific positive impacts for Black Americans at this stage.",
           "hesitation_reasons": [
-            "The executive order and regulatory changes are documented, but direct, measurable outcomes for Black communities are not yet available.",
-            "Evidence notes that the impact on Black patients is possible but not measured.",
-            "The evidence pack highlights incomplete implementation and indirect impact.",
-            "Sources are official and multi-sourced, but outcome evidence is moderate and not community-specific."
+            "The executive order and regulatory changes are documented, but outcomes are described as early and not yet measured at the community or patient level.",
+            "The potential for positive impact on Black communities is noted, but not substantiated with direct evidence.",
+            "Evidence is described as moderate, but lacks concrete data on improved access or reduced shortages for Black Americans."
           ],
           "evidence_needed_to_reduce_risk": [
-            "Direct measurement of supply or access improvements for Black Americans",
-            "Community-level outcome data",
-            "Evidence of reduced medicine shortages or improved continuity of care for Black patients"
+            "Direct evidence of improved medicine access or reduced shortages for Black Americans.",
+            "Measurable patient-level or community-level outcomes.",
+            "Independent or third-party evaluation of the policy's effects."
           ],
           "suggested_operator_next_action": "manual_review_required",
           "caution_flags": [
-            "impact_path_is_indirect",
-            "implementation_incomplete",
             "manual_review_required",
-            "no_direct_measurement_of_impact_on_black_communities",
+            "no_direct_measurement_of_impact_on_black_communities.",
+            "sources_are_primarily_official_and_campaign_statements,_lacking_independent_verification.",
             "weak_evidence"
           ],
           "source_warnings": [
-            "impact_path_is_indirect",
-            "implementation_incomplete",
-            "no_direct_measurement_of_impact_on_black_communities"
+            "no_direct_measurement_of_impact_on_black_communities.",
+            "sources_are_primarily_official_and_campaign_statements,_lacking_independent_verification."
           ],
           "missing_source_warnings": [
-            "impact_path_is_indirect",
-            "implementation_incomplete",
-            "no_direct_measurement_of_impact_on_black_communities"
+            "no_direct_measurement_of_impact_on_black_communities.",
+            "sources_are_primarily_official_and_campaign_statements,_lacking_independent_verification."
           ],
-          "ambiguity_notes": "The executive order and regulatory changes are documented, but direct, measurable outcomes for Black communities are not yet available. Evidence notes that the impact on Black patients is possible but not measured. The evidence pack highlights incomplete implementation and indirect impact.",
+          "ambiguity_notes": "The executive order and regulatory changes are documented, but outcomes are described as early and not yet measured at the community or patient level. The potential for positive impact on Black communities is noted, but not substantiated with direct evidence. Evidence is described as moderate, but lacks concrete data on improved access or reduced shortages for Black Americans.",
           "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. Source warnings remain and reduce trust in the suggestion. Confidence is supported because Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
           "confidence_signals": [
             {
@@ -2148,10 +2090,9 @@
         "confidence_score": 0.4,
         "source_quality": "medium",
         "caution_flags": [
-          "impact_path_is_indirect",
-          "implementation_incomplete",
           "manual_review_required",
-          "no_direct_measurement_of_impact_on_black_communities",
+          "no_direct_measurement_of_impact_on_black_communities.",
+          "sources_are_primarily_official_and_campaign_statements,_lacking_independent_verification.",
           "weak_evidence"
         ]
       },
@@ -2218,16 +2159,14 @@
         ],
         "impact_status": "impact_pending",
         "impact_pending_reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review."
-      },
-      "promotion_reason": "Auto-approved for importing verified policy/action facts with impact outcome scoring deferred."
+      }
     },
     {
       "slug": "trump-2025-expand-educational-freedom-for-families",
       "impact_status": "impact_pending",
-      "approved": true,
-      "operator_status": "approved",
-      "operator_action": "approve_as_is",
-      "operator_notes": "Auto-approved for importing verified policy/action facts with impact outcome scoring deferred.",
+      "approved": false,
+      "operator_status": "pending",
+      "operator_notes": null,
       "original_record": {
         "slug": "trump-2025-expand-educational-freedom-for-families",
         "title": "Expand educational freedom and school-choice options for families",
@@ -2433,42 +2372,37 @@
           "impact_status_reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review.",
           "confidence_score": 0.4,
           "confidence_level": "Low",
-          "reasoning_summary": "The administration issued an executive order to expand educational freedom and school-choice options, but the evidence is limited to a single official source, implementation is incomplete, and the impact on Black families is indirect and dependent on future state and agency actions.",
+          "reasoning_summary": "The administration issued an executive order to expand educational freedom and school-choice options, but the evidence does not clearly establish the direct impact\u2014positive or negative\u2014on Black families, as outcomes depend on later state and agency implementation.",
           "hesitation_reasons": [
-            "Only a single official government source is provided; no independent or non-government sources.",
-            "Implementation is incomplete and effects are dependent on future state and agency actions.",
-            "The impact on Black families is described as possible and indirect, with outcomes varying by state and program design.",
-            "Evidence is moderate for action and outcome, but not strong enough to determine clear positive, negative, or mixed impact.",
-            "The record itself notes evidence gaps and indirect impact."
+            "The policy framework was established, but actual effects depend on subsequent state and agency actions.",
+            "The evidence notes that school-choice expansion can have mixed impacts on Black families, affecting access, transportation, and resource distribution.",
+            "No direct, measurable outcomes for Black Americans are documented in the provided evidence.",
+            "The evidence is described as moderate and incomplete, with outcomes differing by state and program design."
           ],
           "evidence_needed_to_reduce_risk": [
-            "Independent or non-governmental evaluation of impact.",
-            "Direct evidence of measurable outcomes for Black families.",
-            "Details on state and agency implementation.",
-            "Data on actual changes in access, funding, or educational quality for Black families."
+            "Specific measurable outcomes for Black students and families",
+            "Details on state and agency implementation",
+            "Evidence of direct positive or negative effects on Black Americans"
           ],
           "suggested_operator_next_action": "manual_review_required",
           "caution_flags": [
-            "impact_path_indirect",
-            "implementation_incomplete",
+            "lacks_independent_or_community_based_evaluation",
             "manual_review_required",
-            "no_independent_verification",
-            "single_source_official_record",
+            "no_outcome_data_beyond_administrative_actions",
+            "relies_on_a_single_government_source",
             "weak_evidence"
           ],
           "source_warnings": [
-            "impact_path_indirect",
-            "implementation_incomplete",
-            "no_independent_verification",
-            "single_source_official_record"
+            "lacks_independent_or_community_based_evaluation",
+            "no_outcome_data_beyond_administrative_actions",
+            "relies_on_a_single_government_source"
           ],
           "missing_source_warnings": [
-            "impact_path_indirect",
-            "implementation_incomplete",
-            "no_independent_verification",
-            "single_source_official_record"
+            "lacks_independent_or_community_based_evaluation",
+            "no_outcome_data_beyond_administrative_actions",
+            "relies_on_a_single_government_source"
           ],
-          "ambiguity_notes": "Only a single official government source is provided; no independent or non-government sources. Implementation is incomplete and effects are dependent on future state and agency actions. The impact on Black families is described as possible and indirect, with outcomes varying by state and program design.",
+          "ambiguity_notes": "The policy framework was established, but actual effects depend on subsequent state and agency actions. The evidence notes that school-choice expansion can have mixed impacts on Black families, affecting access, transportation, and resource distribution. No direct, measurable outcomes for Black Americans are documented in the provided evidence.",
           "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. Source warnings remain and reduce trust in the suggestion. Confidence is supported because Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
           "confidence_signals": [
             {
@@ -2523,42 +2457,37 @@
           "impact_status_reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review.",
           "confidence_score": 0.4,
           "confidence_level": "Low",
-          "reasoning_summary": "The administration issued an executive order to expand educational freedom and school-choice options, but the evidence is limited to a single official source, implementation is incomplete, and the impact on Black families is indirect and dependent on future state and agency actions.",
+          "reasoning_summary": "The administration issued an executive order to expand educational freedom and school-choice options, but the evidence does not clearly establish the direct impact\u2014positive or negative\u2014on Black families, as outcomes depend on later state and agency implementation.",
           "hesitation_reasons": [
-            "Only a single official government source is provided; no independent or non-government sources.",
-            "Implementation is incomplete and effects are dependent on future state and agency actions.",
-            "The impact on Black families is described as possible and indirect, with outcomes varying by state and program design.",
-            "Evidence is moderate for action and outcome, but not strong enough to determine clear positive, negative, or mixed impact.",
-            "The record itself notes evidence gaps and indirect impact."
+            "The policy framework was established, but actual effects depend on subsequent state and agency actions.",
+            "The evidence notes that school-choice expansion can have mixed impacts on Black families, affecting access, transportation, and resource distribution.",
+            "No direct, measurable outcomes for Black Americans are documented in the provided evidence.",
+            "The evidence is described as moderate and incomplete, with outcomes differing by state and program design."
           ],
           "evidence_needed_to_reduce_risk": [
-            "Independent or non-governmental evaluation of impact.",
-            "Direct evidence of measurable outcomes for Black families.",
-            "Details on state and agency implementation.",
-            "Data on actual changes in access, funding, or educational quality for Black families."
+            "Specific measurable outcomes for Black students and families",
+            "Details on state and agency implementation",
+            "Evidence of direct positive or negative effects on Black Americans"
           ],
           "suggested_operator_next_action": "manual_review_required",
           "caution_flags": [
-            "impact_path_indirect",
-            "implementation_incomplete",
+            "lacks_independent_or_community_based_evaluation",
             "manual_review_required",
-            "no_independent_verification",
-            "single_source_official_record",
+            "no_outcome_data_beyond_administrative_actions",
+            "relies_on_a_single_government_source",
             "weak_evidence"
           ],
           "source_warnings": [
-            "impact_path_indirect",
-            "implementation_incomplete",
-            "no_independent_verification",
-            "single_source_official_record"
+            "lacks_independent_or_community_based_evaluation",
+            "no_outcome_data_beyond_administrative_actions",
+            "relies_on_a_single_government_source"
           ],
           "missing_source_warnings": [
-            "impact_path_indirect",
-            "implementation_incomplete",
-            "no_independent_verification",
-            "single_source_official_record"
+            "lacks_independent_or_community_based_evaluation",
+            "no_outcome_data_beyond_administrative_actions",
+            "relies_on_a_single_government_source"
           ],
-          "ambiguity_notes": "Only a single official government source is provided; no independent or non-government sources. Implementation is incomplete and effects are dependent on future state and agency actions. The impact on Black families is described as possible and indirect, with outcomes varying by state and program design.",
+          "ambiguity_notes": "The policy framework was established, but actual effects depend on subsequent state and agency actions. The evidence notes that school-choice expansion can have mixed impacts on Black families, affecting access, transportation, and resource distribution. No direct, measurable outcomes for Black Americans are documented in the provided evidence.",
           "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. Source warnings remain and reduce trust in the suggestion. Confidence is supported because Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
           "confidence_signals": [
             {
@@ -2604,11 +2533,10 @@
         "confidence_score": 0.4,
         "source_quality": "medium",
         "caution_flags": [
-          "impact_path_indirect",
-          "implementation_incomplete",
+          "lacks_independent_or_community_based_evaluation",
           "manual_review_required",
-          "no_independent_verification",
-          "single_source_official_record",
+          "no_outcome_data_beyond_administrative_actions",
+          "relies_on_a_single_government_source",
           "weak_evidence"
         ]
       },
@@ -2675,16 +2603,14 @@
         ],
         "impact_status": "impact_pending",
         "impact_pending_reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review."
-      },
-      "promotion_reason": "Auto-approved for importing verified policy/action facts with impact outcome scoring deferred."
+      }
     },
     {
       "slug": "trump-2025-reform-higher-education-accreditation",
       "impact_status": "impact_pending",
-      "approved": true,
-      "operator_status": "approved",
-      "operator_action": "approve_as_is",
-      "operator_notes": "Auto-approved for importing verified policy/action facts with impact outcome scoring deferred.",
+      "approved": false,
+      "operator_status": "pending",
+      "operator_notes": null,
       "original_record": {
         "slug": "trump-2025-reform-higher-education-accreditation",
         "title": "Reform higher-education accreditation around student outcomes",
@@ -2813,11 +2739,11 @@
         "conflict_summary": "OpenAI Batch review currently runs a single conservative pass.",
         "conflict_fields": [],
         "confidence_comparison": {
-          "standard_confidence_score": 0.4,
+          "standard_confidence_score": 0.3,
           "standard_confidence_level": "Low",
           "deep_confidence_score": null,
           "deep_confidence_level": null,
-          "final_confidence_score": 0.4,
+          "final_confidence_score": 0.3,
           "final_confidence_level": "Low",
           "score_delta_after_deep_review": null,
           "level_changed_after_deep_review": false,
@@ -2882,49 +2808,42 @@
           "impacted_group_suggestion": "Black college students and institutions serving large Black student populations, including HBCUs and other minority-serving institutions",
           "status_suggestion": "In Progress",
           "impact_direction_suggestion": "Mixed",
-          "evidence_strength_suggestion": "Moderate",
+          "evidence_strength_suggestion": "Strong",
           "record_action_suggestion": "manual_review",
           "recommended_action": "import_with_pending_impact",
           "classifier_recommended_action": "needs_manual_review",
           "impact_status": "impact_pending",
           "impact_status_reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review.",
-          "confidence_score": 0.4,
+          "confidence_score": 0.3,
           "confidence_level": "Low",
-          "reasoning_summary": "The administration initiated a process to reform higher-education accreditation with a focus on student outcomes, legal compliance, and competition among accreditors. However, measurable effects on Black students or institutions serving large Black student populations have not yet been established, and the evidence is limited to a single official source with incomplete implementation.",
+          "reasoning_summary": "The administration initiated a process to reform higher-education accreditation with a focus on student outcomes, competition, and legal compliance, but there is insufficient evidence of direct or measurable effects\u2014positive or negative\u2014on Black students or institutions at this stage.",
           "hesitation_reasons": [
-            "The policy action is documented as an executive order, but implementation is incomplete and downstream effects are not established.",
-            "Evidence is based solely on a single official government source, with no independent or non-governmental corroboration.",
-            "The impact on Black students and institutions is described as possible or indirect, not as a demonstrated outcome.",
-            "The evidence pack notes moderate action and outcome evidence, but also highlights evidence gaps and indirect impact."
+            "The promise and executive order initiated a reform process but did not produce immediate, measurable campus-level outcomes.",
+            "The only evidence provided is the official government source describing the order and its intended focus.",
+            "The summary and outcome notes explicitly state that measurable downstream effects for Black students or institutions are not yet established.",
+            "The evidence is moderate for process initiation but weak for actual impact."
           ],
           "evidence_needed_to_reduce_risk": [
-            "Independent or non-governmental analysis of the policy's effects",
-            "Direct, measurable outcomes for Black students or institutions",
-            "Details on how the reforms have affected federal-aid eligibility, institutional oversight, or compliance at HBCUs or other minority-serving institutions",
-            "Any negative or positive downstream effects since implementation"
+            "Direct evidence of impact on Black students or institutions",
+            "Details on how the reforms have affected federal-aid eligibility, oversight, or compliance at HBCUs or other minority-serving institutions",
+            "Any measurable outcomes or data post-implementation"
           ],
           "suggested_operator_next_action": "manual_review_required",
           "caution_flags": [
-            "impact_path_indirect",
-            "implementation_incomplete",
             "manual_review_required",
-            "no_independent/non_governmental_sources",
-            "single_source_official_record_only",
+            "no_independent_or_third_party_analysis",
+            "no_outcome_data_beyond_administrative_process_initiation",
             "weak_evidence"
           ],
           "source_warnings": [
-            "impact_path_indirect",
-            "implementation_incomplete",
-            "no_independent/non_governmental_sources",
-            "single_source_official_record_only"
+            "no_independent_or_third_party_analysis",
+            "no_outcome_data_beyond_administrative_process_initiation"
           ],
           "missing_source_warnings": [
-            "impact_path_indirect",
-            "implementation_incomplete",
-            "no_independent/non_governmental_sources",
-            "single_source_official_record_only"
+            "no_independent_or_third_party_analysis",
+            "no_outcome_data_beyond_administrative_process_initiation"
           ],
-          "ambiguity_notes": "The policy action is documented as an executive order, but implementation is incomplete and downstream effects are not established. Evidence is based solely on a single official government source, with no independent or non-governmental corroboration. The impact on Black students and institutions is described as possible or indirect, not as a demonstrated outcome.",
+          "ambiguity_notes": "The promise and executive order initiated a reform process but did not produce immediate, measurable campus-level outcomes. The only evidence provided is the official government source describing the order and its intended focus. The summary and outcome notes explicitly state that measurable downstream effects for Black students or institutions are not yet established.",
           "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. Source warnings remain and reduce trust in the suggestion. Confidence is supported because Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
           "confidence_signals": [
             {
@@ -2971,49 +2890,42 @@
           "impacted_group_suggestion": "Black college students and institutions serving large Black student populations, including HBCUs and other minority-serving institutions",
           "status_suggestion": "In Progress",
           "impact_direction_suggestion": "Mixed",
-          "evidence_strength_suggestion": "Moderate",
+          "evidence_strength_suggestion": "Strong",
           "record_action_suggestion": "manual_review",
           "recommended_action": "import_with_pending_impact",
           "classifier_recommended_action": "needs_manual_review",
           "impact_status": "impact_pending",
           "impact_status_reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review.",
-          "confidence_score": 0.4,
+          "confidence_score": 0.3,
           "confidence_level": "Low",
-          "reasoning_summary": "The administration initiated a process to reform higher-education accreditation with a focus on student outcomes, legal compliance, and competition among accreditors. However, measurable effects on Black students or institutions serving large Black student populations have not yet been established, and the evidence is limited to a single official source with incomplete implementation.",
+          "reasoning_summary": "The administration initiated a process to reform higher-education accreditation with a focus on student outcomes, competition, and legal compliance, but there is insufficient evidence of direct or measurable effects\u2014positive or negative\u2014on Black students or institutions at this stage.",
           "hesitation_reasons": [
-            "The policy action is documented as an executive order, but implementation is incomplete and downstream effects are not established.",
-            "Evidence is based solely on a single official government source, with no independent or non-governmental corroboration.",
-            "The impact on Black students and institutions is described as possible or indirect, not as a demonstrated outcome.",
-            "The evidence pack notes moderate action and outcome evidence, but also highlights evidence gaps and indirect impact."
+            "The promise and executive order initiated a reform process but did not produce immediate, measurable campus-level outcomes.",
+            "The only evidence provided is the official government source describing the order and its intended focus.",
+            "The summary and outcome notes explicitly state that measurable downstream effects for Black students or institutions are not yet established.",
+            "The evidence is moderate for process initiation but weak for actual impact."
           ],
           "evidence_needed_to_reduce_risk": [
-            "Independent or non-governmental analysis of the policy's effects",
-            "Direct, measurable outcomes for Black students or institutions",
-            "Details on how the reforms have affected federal-aid eligibility, institutional oversight, or compliance at HBCUs or other minority-serving institutions",
-            "Any negative or positive downstream effects since implementation"
+            "Direct evidence of impact on Black students or institutions",
+            "Details on how the reforms have affected federal-aid eligibility, oversight, or compliance at HBCUs or other minority-serving institutions",
+            "Any measurable outcomes or data post-implementation"
           ],
           "suggested_operator_next_action": "manual_review_required",
           "caution_flags": [
-            "impact_path_indirect",
-            "implementation_incomplete",
             "manual_review_required",
-            "no_independent/non_governmental_sources",
-            "single_source_official_record_only",
+            "no_independent_or_third_party_analysis",
+            "no_outcome_data_beyond_administrative_process_initiation",
             "weak_evidence"
           ],
           "source_warnings": [
-            "impact_path_indirect",
-            "implementation_incomplete",
-            "no_independent/non_governmental_sources",
-            "single_source_official_record_only"
+            "no_independent_or_third_party_analysis",
+            "no_outcome_data_beyond_administrative_process_initiation"
           ],
           "missing_source_warnings": [
-            "impact_path_indirect",
-            "implementation_incomplete",
-            "no_independent/non_governmental_sources",
-            "single_source_official_record_only"
+            "no_independent_or_third_party_analysis",
+            "no_outcome_data_beyond_administrative_process_initiation"
           ],
-          "ambiguity_notes": "The policy action is documented as an executive order, but implementation is incomplete and downstream effects are not established. Evidence is based solely on a single official government source, with no independent or non-governmental corroboration. The impact on Black students and institutions is described as possible or indirect, not as a demonstrated outcome.",
+          "ambiguity_notes": "The promise and executive order initiated a reform process but did not produce immediate, measurable campus-level outcomes. The only evidence provided is the official government source describing the order and its intended focus. The summary and outcome notes explicitly state that measurable downstream effects for Black students or institutions are not yet established.",
           "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. Source warnings remain and reduce trust in the suggestion. Confidence is supported because Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
           "confidence_signals": [
             {
@@ -3056,14 +2968,12 @@
         "deep_pass_suggestions": null,
         "weak_evidence": true,
         "confidence": "low",
-        "confidence_score": 0.4,
-        "source_quality": "medium",
+        "confidence_score": 0.3,
+        "source_quality": "high",
         "caution_flags": [
-          "impact_path_indirect",
-          "implementation_incomplete",
           "manual_review_required",
-          "no_independent/non_governmental_sources",
-          "single_source_official_record_only",
+          "no_independent_or_third_party_analysis",
+          "no_outcome_data_beyond_administrative_process_initiation",
           "weak_evidence"
         ]
       },
@@ -3130,16 +3040,14 @@
         ],
         "impact_status": "impact_pending",
         "impact_pending_reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review."
-      },
-      "promotion_reason": "Auto-approved for importing verified policy/action facts with impact outcome scoring deferred."
+      }
     },
     {
       "slug": "trump-2025-promote-hbcu-excellence-and-innovation",
       "impact_status": "impact_pending",
-      "approved": true,
-      "operator_status": "approved",
-      "operator_action": "approve_as_is",
-      "operator_notes": "Auto-approved for importing verified policy/action facts with impact outcome scoring deferred.",
+      "approved": false,
+      "operator_status": "pending",
+      "operator_notes": null,
       "original_record": {
         "slug": "trump-2025-promote-hbcu-excellence-and-innovation",
         "title": "Promote excellence and innovation at HBCUs",
@@ -3336,41 +3244,34 @@
           "impact_status_reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review.",
           "confidence_score": 0.5,
           "confidence_level": "Low",
-          "reasoning_summary": "The administration reestablished a White House HBCU initiative and advisory structure in 2025, but evidence is limited to a single official source and broader institutional or student impacts are not yet documented.",
+          "reasoning_summary": "The administration established a White House HBCU initiative and advisory structure intended to support HBCUs, but evidence of concrete outcomes or measurable benefits for Black Americans is incomplete.",
           "hesitation_reasons": [
-            "The action of reestablishing the initiative is documented by a single official government source.",
-            "There is moderate evidence that the initiative and advisory structure were created.",
-            "There is no direct evidence of measurable positive outcomes for Black Americans beyond the establishment of the structure.",
-            "Longer-term impacts on funding, student outcomes, or institutional development are not documented.",
-            "Evidence is incomplete and relies on a single official source, with no independent verification."
+            "The record documents the creation of a White House HBCU initiative and advisory structure.",
+            "The evidence is limited to administrative actions and intent, with no direct evidence of measurable outcomes or impacts for Black Americans.",
+            "The source is a government fact sheet, which is official but only describes the establishment of the initiative, not its results.",
+            "The summary and notes acknowledge that longer-term funding and student outcomes still require follow-through."
           ],
           "evidence_needed_to_reduce_risk": [
-            "Independent or non-governmental confirmation of the initiative's implementation or impact.",
-            "Evidence of actual improvements in HBCU funding, student outcomes, or institutional development.",
-            "Details on follow-through, execution, or measurable results beyond the creation of the initiative."
+            "Evidence of actual improvements in rights, access, protections, or measurable outcomes for Black Americans",
+            "Details on implementation, funding, or realized benefits",
+            "Independent or third-party evaluation of impact"
           ],
           "suggested_operator_next_action": "manual_review_required",
           "caution_flags": [
-            "impact_path_indirect",
-            "implementation_incomplete",
             "manual_review_required",
-            "no_independent/non_governmental_sources",
-            "single_source_official_record_only",
+            "no_independent_verification_or_outcome_data",
+            "single_source_government_fact_sheet",
             "weak_evidence"
           ],
           "source_warnings": [
-            "impact_path_indirect",
-            "implementation_incomplete",
-            "no_independent/non_governmental_sources",
-            "single_source_official_record_only"
+            "no_independent_verification_or_outcome_data",
+            "single_source_government_fact_sheet"
           ],
           "missing_source_warnings": [
-            "impact_path_indirect",
-            "implementation_incomplete",
-            "no_independent/non_governmental_sources",
-            "single_source_official_record_only"
+            "no_independent_verification_or_outcome_data",
+            "single_source_government_fact_sheet"
           ],
-          "ambiguity_notes": "The action of reestablishing the initiative is documented by a single official government source. There is moderate evidence that the initiative and advisory structure were created. There is no direct evidence of measurable positive outcomes for Black Americans beyond the establishment of the structure.",
+          "ambiguity_notes": "The record documents the creation of a White House HBCU initiative and advisory structure. The evidence is limited to administrative actions and intent, with no direct evidence of measurable outcomes or impacts for Black Americans. The source is a government fact sheet, which is official but only describes the establishment of the initiative, not its results.",
           "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. Source warnings remain and reduce trust in the suggestion. Confidence is supported because Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
           "confidence_signals": [
             {
@@ -3420,41 +3321,34 @@
           "impact_status_reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review.",
           "confidence_score": 0.5,
           "confidence_level": "Low",
-          "reasoning_summary": "The administration reestablished a White House HBCU initiative and advisory structure in 2025, but evidence is limited to a single official source and broader institutional or student impacts are not yet documented.",
+          "reasoning_summary": "The administration established a White House HBCU initiative and advisory structure intended to support HBCUs, but evidence of concrete outcomes or measurable benefits for Black Americans is incomplete.",
           "hesitation_reasons": [
-            "The action of reestablishing the initiative is documented by a single official government source.",
-            "There is moderate evidence that the initiative and advisory structure were created.",
-            "There is no direct evidence of measurable positive outcomes for Black Americans beyond the establishment of the structure.",
-            "Longer-term impacts on funding, student outcomes, or institutional development are not documented.",
-            "Evidence is incomplete and relies on a single official source, with no independent verification."
+            "The record documents the creation of a White House HBCU initiative and advisory structure.",
+            "The evidence is limited to administrative actions and intent, with no direct evidence of measurable outcomes or impacts for Black Americans.",
+            "The source is a government fact sheet, which is official but only describes the establishment of the initiative, not its results.",
+            "The summary and notes acknowledge that longer-term funding and student outcomes still require follow-through."
           ],
           "evidence_needed_to_reduce_risk": [
-            "Independent or non-governmental confirmation of the initiative's implementation or impact.",
-            "Evidence of actual improvements in HBCU funding, student outcomes, or institutional development.",
-            "Details on follow-through, execution, or measurable results beyond the creation of the initiative."
+            "Evidence of actual improvements in rights, access, protections, or measurable outcomes for Black Americans",
+            "Details on implementation, funding, or realized benefits",
+            "Independent or third-party evaluation of impact"
           ],
           "suggested_operator_next_action": "manual_review_required",
           "caution_flags": [
-            "impact_path_indirect",
-            "implementation_incomplete",
             "manual_review_required",
-            "no_independent/non_governmental_sources",
-            "single_source_official_record_only",
+            "no_independent_verification_or_outcome_data",
+            "single_source_government_fact_sheet",
             "weak_evidence"
           ],
           "source_warnings": [
-            "impact_path_indirect",
-            "implementation_incomplete",
-            "no_independent/non_governmental_sources",
-            "single_source_official_record_only"
+            "no_independent_verification_or_outcome_data",
+            "single_source_government_fact_sheet"
           ],
           "missing_source_warnings": [
-            "impact_path_indirect",
-            "implementation_incomplete",
-            "no_independent/non_governmental_sources",
-            "single_source_official_record_only"
+            "no_independent_verification_or_outcome_data",
+            "single_source_government_fact_sheet"
           ],
-          "ambiguity_notes": "The action of reestablishing the initiative is documented by a single official government source. There is moderate evidence that the initiative and advisory structure were created. There is no direct evidence of measurable positive outcomes for Black Americans beyond the establishment of the structure.",
+          "ambiguity_notes": "The record documents the creation of a White House HBCU initiative and advisory structure. The evidence is limited to administrative actions and intent, with no direct evidence of measurable outcomes or impacts for Black Americans. The source is a government fact sheet, which is official but only describes the establishment of the initiative, not its results.",
           "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. Source warnings remain and reduce trust in the suggestion. Confidence is supported because Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
           "confidence_signals": [
             {
@@ -3495,11 +3389,9 @@
         "confidence_score": 0.5,
         "source_quality": "medium",
         "caution_flags": [
-          "impact_path_indirect",
-          "implementation_incomplete",
           "manual_review_required",
-          "no_independent/non_governmental_sources",
-          "single_source_official_record_only",
+          "no_independent_verification_or_outcome_data",
+          "single_source_government_fact_sheet",
           "weak_evidence"
         ]
       },
@@ -3566,16 +3458,14 @@
         ],
         "impact_status": "impact_pending",
         "impact_pending_reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review."
-      },
-      "promotion_reason": "Auto-approved for importing verified policy/action facts with impact outcome scoring deferred."
+      }
     },
     {
       "slug": "trump-2025-reinstate-school-discipline-policies",
       "impact_status": "impact_pending",
-      "approved": true,
-      "operator_status": "approved",
-      "operator_action": "approve_as_is",
-      "operator_notes": "Auto-approved for importing verified policy/action facts with impact outcome scoring deferred.",
+      "approved": false,
+      "operator_status": "pending",
+      "operator_notes": null,
       "original_record": {
         "slug": "trump-2025-reinstate-school-discipline-policies",
         "title": "Reinstate school discipline policies without equity-based disparate-impact framing",
@@ -3772,42 +3662,37 @@
           "impact_status_reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review.",
           "confidence_score": 0.4,
           "confidence_level": "Low",
-          "reasoning_summary": "The administration ordered a review and replacement of federal school-discipline guidance, removing equity-based disparate-impact analysis, but there is no direct evidence of measurable outcomes or effects on Black students. The evidence is based on a single official source, and the implementation is incomplete.",
+          "reasoning_summary": "The administration ordered a review and replacement of federal school-discipline guidance, removing equity-based disparate-impact analysis, but there is no direct evidence of measurable outcomes or effects on Black students at the school level.",
           "hesitation_reasons": [
-            "The policy action is documented, but its implementation is incomplete.",
-            "There is no direct measurement of school-level or student-level outcomes.",
-            "The evidence is based solely on a single official government source.",
-            "The impact on Black students is described as possible or indirect, not demonstrated.",
-            "Evidence gaps are noted, including lack of independent sources and unmeasured effects."
+            "The record documents an official promise and executive order to replace equity-based school discipline guidance.",
+            "The evidence provided does not include measurable outcomes or direct effects on Black students.",
+            "The impact direction is noted as 'Negative' in the outcome summary, but this is not supported by direct data or outcomes.",
+            "The process is still 'In Progress' and effects remain unmeasured."
           ],
           "evidence_needed_to_reduce_risk": [
-            "Direct evidence of impact on Black students or families",
-            "Independent or non-governmental sources",
-            "Measured outcomes following policy implementation",
-            "Details on the replacement discipline framework"
+            "Direct evidence of changes in suspension, expulsion, or referral-to-law-enforcement rates for Black students.",
+            "Details of the replacement discipline framework.",
+            "Any measured outcomes or data post-policy change."
           ],
           "suggested_operator_next_action": "manual_review_required",
           "caution_flags": [
-            "impact_path_indirect",
-            "implementation_incomplete",
             "manual_review_required",
-            "no_independent/non_government_sources",
-            "single_source_official_record_only",
+            "no_independent_or_third_party_analysis.",
+            "no_outcome_data_included.",
+            "only_government_sources_provided.",
             "weak_evidence"
           ],
           "source_warnings": [
-            "impact_path_indirect",
-            "implementation_incomplete",
-            "no_independent/non_government_sources",
-            "single_source_official_record_only"
+            "no_independent_or_third_party_analysis.",
+            "no_outcome_data_included.",
+            "only_government_sources_provided."
           ],
           "missing_source_warnings": [
-            "impact_path_indirect",
-            "implementation_incomplete",
-            "no_independent/non_government_sources",
-            "single_source_official_record_only"
+            "no_independent_or_third_party_analysis.",
+            "no_outcome_data_included.",
+            "only_government_sources_provided."
           ],
-          "ambiguity_notes": "The policy action is documented, but its implementation is incomplete. There is no direct measurement of school-level or student-level outcomes. The evidence is based solely on a single official government source.",
+          "ambiguity_notes": "The record documents an official promise and executive order to replace equity-based school discipline guidance. The evidence provided does not include measurable outcomes or direct effects on Black students. The impact direction is noted as 'Negative' in the outcome summary, but this is not supported by direct data or outcomes.",
           "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. Source warnings remain and reduce trust in the suggestion. Confidence is supported because Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
           "confidence_signals": [
             {
@@ -3857,42 +3742,37 @@
           "impact_status_reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review.",
           "confidence_score": 0.4,
           "confidence_level": "Low",
-          "reasoning_summary": "The administration ordered a review and replacement of federal school-discipline guidance, removing equity-based disparate-impact analysis, but there is no direct evidence of measurable outcomes or effects on Black students. The evidence is based on a single official source, and the implementation is incomplete.",
+          "reasoning_summary": "The administration ordered a review and replacement of federal school-discipline guidance, removing equity-based disparate-impact analysis, but there is no direct evidence of measurable outcomes or effects on Black students at the school level.",
           "hesitation_reasons": [
-            "The policy action is documented, but its implementation is incomplete.",
-            "There is no direct measurement of school-level or student-level outcomes.",
-            "The evidence is based solely on a single official government source.",
-            "The impact on Black students is described as possible or indirect, not demonstrated.",
-            "Evidence gaps are noted, including lack of independent sources and unmeasured effects."
+            "The record documents an official promise and executive order to replace equity-based school discipline guidance.",
+            "The evidence provided does not include measurable outcomes or direct effects on Black students.",
+            "The impact direction is noted as 'Negative' in the outcome summary, but this is not supported by direct data or outcomes.",
+            "The process is still 'In Progress' and effects remain unmeasured."
           ],
           "evidence_needed_to_reduce_risk": [
-            "Direct evidence of impact on Black students or families",
-            "Independent or non-governmental sources",
-            "Measured outcomes following policy implementation",
-            "Details on the replacement discipline framework"
+            "Direct evidence of changes in suspension, expulsion, or referral-to-law-enforcement rates for Black students.",
+            "Details of the replacement discipline framework.",
+            "Any measured outcomes or data post-policy change."
           ],
           "suggested_operator_next_action": "manual_review_required",
           "caution_flags": [
-            "impact_path_indirect",
-            "implementation_incomplete",
             "manual_review_required",
-            "no_independent/non_government_sources",
-            "single_source_official_record_only",
+            "no_independent_or_third_party_analysis.",
+            "no_outcome_data_included.",
+            "only_government_sources_provided.",
             "weak_evidence"
           ],
           "source_warnings": [
-            "impact_path_indirect",
-            "implementation_incomplete",
-            "no_independent/non_government_sources",
-            "single_source_official_record_only"
+            "no_independent_or_third_party_analysis.",
+            "no_outcome_data_included.",
+            "only_government_sources_provided."
           ],
           "missing_source_warnings": [
-            "impact_path_indirect",
-            "implementation_incomplete",
-            "no_independent/non_government_sources",
-            "single_source_official_record_only"
+            "no_independent_or_third_party_analysis.",
+            "no_outcome_data_included.",
+            "only_government_sources_provided."
           ],
-          "ambiguity_notes": "The policy action is documented, but its implementation is incomplete. There is no direct measurement of school-level or student-level outcomes. The evidence is based solely on a single official government source.",
+          "ambiguity_notes": "The record documents an official promise and executive order to replace equity-based school discipline guidance. The evidence provided does not include measurable outcomes or direct effects on Black students. The impact direction is noted as 'Negative' in the outcome summary, but this is not supported by direct data or outcomes.",
           "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. Source warnings remain and reduce trust in the suggestion. Confidence is supported because Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
           "confidence_signals": [
             {
@@ -3933,11 +3813,10 @@
         "confidence_score": 0.4,
         "source_quality": "medium",
         "caution_flags": [
-          "impact_path_indirect",
-          "implementation_incomplete",
           "manual_review_required",
-          "no_independent/non_government_sources",
-          "single_source_official_record_only",
+          "no_independent_or_third_party_analysis.",
+          "no_outcome_data_included.",
+          "only_government_sources_provided.",
           "weak_evidence"
         ]
       },
@@ -4004,16 +3883,14 @@
         ],
         "impact_status": "impact_pending",
         "impact_pending_reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review."
-      },
-      "promotion_reason": "Auto-approved for importing verified policy/action facts with impact outcome scoring deferred."
+      }
     },
     {
       "slug": "trump-2025-high-paying-skilled-trade-jobs",
       "impact_status": "impact_pending",
-      "approved": true,
-      "operator_status": "approved",
-      "operator_action": "approve_as_is",
-      "operator_notes": "Auto-approved for importing verified policy/action facts with impact outcome scoring deferred.",
+      "approved": false,
+      "operator_status": "pending",
+      "operator_notes": null,
       "original_record": {
         "slug": "trump-2025-high-paying-skilled-trade-jobs",
         "title": "Prepare Americans for high-paying skilled trade jobs",
@@ -4210,41 +4087,35 @@
           "impact_status_reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review.",
           "confidence_score": 0.4,
           "confidence_level": "Low",
-          "reasoning_summary": "The administration issued an executive order to align federal workforce policy with skilled trades and apprenticeships, with potential positive effects for Black workers if implemented equitably. However, evidence is limited to a single official source, implementation is incomplete, and measurable labor-market outcomes are not yet documented.",
+          "reasoning_summary": "The administration issued an executive order to align federal workforce policy with skilled trades and apprenticeships, aiming to expand access and streamline programs. However, the evidence provided is limited to the announcement and direction-setting, with no documented measurable outcomes or demonstrated impact on Black workers at this stage.",
           "hesitation_reasons": [
-            "Evidence is based on a single official government source.",
-            "The action (executive order) is documented, but implementation is incomplete.",
-            "No independent or non-government sources are provided.",
-            "Measurable outcomes for Black workers are not yet available.",
-            "The impact path is indirect and contingent on future implementation."
+            "The record documents a federal initiative and executive order focused on skilled trades and apprenticeships.",
+            "The evidence is limited to policy direction and intent, not completed outcomes.",
+            "There is no direct evidence of measurable impact on Black workers or clear demonstration of expanded access or improved outcomes.",
+            "The record itself notes that measurable labor-market effects remain early and evidence is incomplete."
           ],
           "evidence_needed_to_reduce_risk": [
-            "Independent or non-governmental evaluation of implementation or outcomes.",
-            "Data on actual participation or benefit for Black workers.",
-            "Evidence of equitable expansion or measurable labor-market effects."
+            "Data on actual participation rates or outcomes for Black workers",
+            "Evidence of implementation beyond policy direction",
+            "Any measurable labor-market effects or economic outcomes",
+            "Details on whether access was expanded equitably"
           ],
           "suggested_operator_next_action": "manual_review_required",
           "caution_flags": [
-            "impact_indirect_and_not_yet_measured",
-            "implementation_incomplete",
             "manual_review_required",
-            "no_independent_verification",
-            "single_source_official_record",
+            "no_independent_or_outcome_based_verification",
+            "sole_reliance_on_government_announcement",
             "weak_evidence"
           ],
           "source_warnings": [
-            "impact_indirect_and_not_yet_measured",
-            "implementation_incomplete",
-            "no_independent_verification",
-            "single_source_official_record"
+            "no_independent_or_outcome_based_verification",
+            "sole_reliance_on_government_announcement"
           ],
           "missing_source_warnings": [
-            "impact_indirect_and_not_yet_measured",
-            "implementation_incomplete",
-            "no_independent_verification",
-            "single_source_official_record"
+            "no_independent_or_outcome_based_verification",
+            "sole_reliance_on_government_announcement"
           ],
-          "ambiguity_notes": "Evidence is based on a single official government source. The action (executive order) is documented, but implementation is incomplete. No independent or non-government sources are provided.",
+          "ambiguity_notes": "The record documents a federal initiative and executive order focused on skilled trades and apprenticeships. The evidence is limited to policy direction and intent, not completed outcomes. There is no direct evidence of measurable impact on Black workers or clear demonstration of expanded access or improved outcomes.",
           "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. Source warnings remain and reduce trust in the suggestion. Confidence is supported because Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
           "confidence_signals": [
             {
@@ -4294,41 +4165,35 @@
           "impact_status_reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review.",
           "confidence_score": 0.4,
           "confidence_level": "Low",
-          "reasoning_summary": "The administration issued an executive order to align federal workforce policy with skilled trades and apprenticeships, with potential positive effects for Black workers if implemented equitably. However, evidence is limited to a single official source, implementation is incomplete, and measurable labor-market outcomes are not yet documented.",
+          "reasoning_summary": "The administration issued an executive order to align federal workforce policy with skilled trades and apprenticeships, aiming to expand access and streamline programs. However, the evidence provided is limited to the announcement and direction-setting, with no documented measurable outcomes or demonstrated impact on Black workers at this stage.",
           "hesitation_reasons": [
-            "Evidence is based on a single official government source.",
-            "The action (executive order) is documented, but implementation is incomplete.",
-            "No independent or non-government sources are provided.",
-            "Measurable outcomes for Black workers are not yet available.",
-            "The impact path is indirect and contingent on future implementation."
+            "The record documents a federal initiative and executive order focused on skilled trades and apprenticeships.",
+            "The evidence is limited to policy direction and intent, not completed outcomes.",
+            "There is no direct evidence of measurable impact on Black workers or clear demonstration of expanded access or improved outcomes.",
+            "The record itself notes that measurable labor-market effects remain early and evidence is incomplete."
           ],
           "evidence_needed_to_reduce_risk": [
-            "Independent or non-governmental evaluation of implementation or outcomes.",
-            "Data on actual participation or benefit for Black workers.",
-            "Evidence of equitable expansion or measurable labor-market effects."
+            "Data on actual participation rates or outcomes for Black workers",
+            "Evidence of implementation beyond policy direction",
+            "Any measurable labor-market effects or economic outcomes",
+            "Details on whether access was expanded equitably"
           ],
           "suggested_operator_next_action": "manual_review_required",
           "caution_flags": [
-            "impact_indirect_and_not_yet_measured",
-            "implementation_incomplete",
             "manual_review_required",
-            "no_independent_verification",
-            "single_source_official_record",
+            "no_independent_or_outcome_based_verification",
+            "sole_reliance_on_government_announcement",
             "weak_evidence"
           ],
           "source_warnings": [
-            "impact_indirect_and_not_yet_measured",
-            "implementation_incomplete",
-            "no_independent_verification",
-            "single_source_official_record"
+            "no_independent_or_outcome_based_verification",
+            "sole_reliance_on_government_announcement"
           ],
           "missing_source_warnings": [
-            "impact_indirect_and_not_yet_measured",
-            "implementation_incomplete",
-            "no_independent_verification",
-            "single_source_official_record"
+            "no_independent_or_outcome_based_verification",
+            "sole_reliance_on_government_announcement"
           ],
-          "ambiguity_notes": "Evidence is based on a single official government source. The action (executive order) is documented, but implementation is incomplete. No independent or non-government sources are provided.",
+          "ambiguity_notes": "The record documents a federal initiative and executive order focused on skilled trades and apprenticeships. The evidence is limited to policy direction and intent, not completed outcomes. There is no direct evidence of measurable impact on Black workers or clear demonstration of expanded access or improved outcomes.",
           "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. Source warnings remain and reduce trust in the suggestion. Confidence is supported because Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
           "confidence_signals": [
             {
@@ -4369,11 +4234,9 @@
         "confidence_score": 0.4,
         "source_quality": "medium",
         "caution_flags": [
-          "impact_indirect_and_not_yet_measured",
-          "implementation_incomplete",
           "manual_review_required",
-          "no_independent_verification",
-          "single_source_official_record",
+          "no_independent_or_outcome_based_verification",
+          "sole_reliance_on_government_announcement",
           "weak_evidence"
         ]
       },
@@ -4440,8 +4303,7 @@
         ],
         "impact_status": "impact_pending",
         "impact_pending_reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review."
-      },
-      "promotion_reason": "Auto-approved for importing verified policy/action facts with impact outcome scoring deferred."
+      }
     }
   ]
 }
