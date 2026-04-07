@@ -1875,7 +1875,7 @@ run_legislative_command() {
     review)
       [ "$#" -eq 0 ] || { echo "equitystack legislative review does not accept extra arguments" >&2; exit 1; }
       run_step "1/1" "Review Bundle Actions" "Legislative review session complete" -- \
-        "$VENV_PYTHON" scripts/review_bundle_actions.py
+        "$VENV_PYTHON" scripts/review_bundle_actions.py --non-interactive-summary
       ;;
     apply)
       local dry_run="false"
