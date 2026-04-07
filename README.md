@@ -47,6 +47,7 @@ Active Promise Tracker and operator reference docs now live in:
 - [`docs/promise-tracker-current-administration.md`](docs/promise-tracker-current-administration.md) for current-admin workflow notes
 - [`docs/admin-operator-system.md`](docs/admin-operator-system.md) for the live operator/admin system
 - [`docs/mcp.md`](docs/mcp.md) for the MCP control-layer wrapper over existing CLI/API workflows
+- [`docs/workflow-hardening.md`](docs/workflow-hardening.md) for unified outcome write-time invariants, scoring validation gates, and future data consistency rules
 
 ## Black Impact Score in Plain Language
 
@@ -72,6 +73,7 @@ For more detail, see:
 - [`docs/reports.md`](docs/reports.md)
 - [`docs/architecture.md`](docs/architecture.md)
 - [`docs/sharing.md`](docs/sharing.md)
+- [`docs/workflow-hardening.md`](docs/workflow-hardening.md)
 
 Run the website locally with:
 

@@ -49,6 +49,10 @@ Practical examples:
   - pipeline report / AI review / manual-review queue / review bundle / apply / import artifacts
   - canonical DB updates for future-bill links, tracked-bill link state, and downstream report data
   - admin workflow surfaces and public legislative/report pages read from those artifacts and DB-backed records
+- unified outcomes:
+  - current-admin sync, legislative materialization, and impact maturation write into `policy_outcomes`
+  - each canonical writer must populate `impact_score` at insert time
+  - each writer validates impact score, direction, source count, policy type, and duplicate groups before reporting success
 
 If a page cannot trace a value back to this chain, treat it as a trust risk.
 
@@ -198,6 +202,7 @@ The data-integrity scope checks canonical promise, source, relationship, and fut
 - duplicate future-bill links
 - duplicate source URLs
 - missing source attribution on actions and outcomes
+- invalid unified outcome rows, including missing `impact_score`, invalid `impact_direction`, negative `source_count`, invalid `policy_type`, and duplicate `(policy_type, policy_id, outcome_summary_hash)` groups
 
 The deep-integrity scope adds:
 
@@ -205,6 +210,22 @@ The deep-integrity scope adds:
 - duplicate-source cluster safety classification
 - current-admin provenance completeness
 - artifact-chain warnings when DB records exist but the canonical current-admin artifacts are missing
+
+## Unified Outcome Guardrails
+
+The canonical unified-outcome workflows are:
+
+```bash
+./python/bin/equitystack impact sync-current-admin-outcomes
+./python/bin/equitystack legislative materialize-outcomes
+./python/bin/equitystack impact promote
+```
+
+They are not interchangeable with manual SQL. Use them so the validation gates run.
+
+Legislative outcomes are present in `policy_outcomes`, but final president scoring explicitly excludes them until a deterministic attribution field exists. This is intentional and prevents assigning bill status outcomes to the wrong administration.
+
+The full write contract is documented in [`workflow-hardening.md`](workflow-hardening.md).
 
 ### Source Cleanup Rules
 

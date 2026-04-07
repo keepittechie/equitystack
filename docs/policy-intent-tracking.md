@@ -64,3 +64,29 @@ The report includes:
 - sample rows per classification
 
 This report does not mutate data.
+
+## Final Score Integration
+
+Policy intent affects the final Black Impact Score only when it is deterministic.
+
+For current-admin outcomes, the final report follows:
+
+```text
+policy_outcomes -> promises -> promise_actions.related_policy_id -> policies.policy_intent_category
+```
+
+The intent modifier is applied only when all related classified historical policies resolve to one category:
+
+```text
+equity_expanding     -> 1.1
+equity_restricting   -> 0.9
+neutral/unknown      -> 1.0
+```
+
+If no related classified policy exists, or if multiple related intent categories conflict, the modifier remains `1.0`.
+
+Intent is never inferred during scoring. Use the manual curation workflow for new classifications:
+
+```bash
+./python/bin/equitystack impact curate-policy-intent
+```

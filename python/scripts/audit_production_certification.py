@@ -215,6 +215,10 @@ def fetch_policy_outcomes(cursor, columns: set[str]) -> list[dict[str, Any]]:
             WHEN po.policy_type = 'current_admin' THEN pr.term_end
             ELSE NULL
           END AS term_end,
+          CASE
+            WHEN po.policy_type = 'current_admin' THEN related_intent.policy_intent_category
+            ELSE NULL
+          END AS policy_intent_category,
           tb.bill_status,
           tb.last_action,
           tb.bill_number
@@ -226,6 +230,21 @@ def fetch_policy_outcomes(cursor, columns: set[str]) -> list[dict[str, Any]]:
         LEFT JOIN tracked_bills tb
           ON po.policy_type = 'legislative'
          AND tb.id = po.policy_id
+        LEFT JOIN (
+          SELECT
+            pa.promise_id,
+            CASE
+              WHEN COUNT(DISTINCT pol.policy_intent_category) = 1 THEN MAX(pol.policy_intent_category)
+              ELSE NULL
+            END AS policy_intent_category
+          FROM promise_actions pa
+          JOIN policies pol
+            ON pol.id = pa.related_policy_id
+           AND pol.policy_intent_category IS NOT NULL
+          GROUP BY pa.promise_id
+        ) related_intent
+          ON po.policy_type = 'current_admin'
+         AND related_intent.promise_id = po.policy_id
         ORDER BY po.policy_type, po.policy_id, po.id
         """
     )
@@ -304,6 +323,7 @@ def score_outcome(row: dict[str, Any], has_impact_score: bool) -> dict[str, Any]
     intent_modifier = INTENT_MODIFIERS.get(intent, 1.0)
     policy_type = normalize_nullable_text(row.get("policy_type"))
     policy_type_weight = POLICY_TYPE_WEIGHTS.get(policy_type, 1.0)
+    excluded_from_president_score = row.get("president_id") is None
     final_score = impact_score * direction_weight * confidence * intent_modifier * policy_type_weight
     return {
         "policy_outcome_id": int(row["policy_outcome_id"]),
@@ -313,6 +333,12 @@ def score_outcome(row: dict[str, Any], has_impact_score: bool) -> dict[str, Any]
         "president_id": int(row["president_id"]) if row.get("president_id") is not None else None,
         "president_name": row.get("president_name"),
         "president_slug": row.get("president_slug"),
+        "excluded_from_president_score": excluded_from_president_score,
+        "president_score_exclusion_reason": (
+            "legislative_outcome_has_no_deterministic_president_attribution"
+            if excluded_from_president_score and policy_type == "legislative"
+            else "missing_president_attribution" if excluded_from_president_score else None
+        ),
         "term_start": iso_date(row.get("term_start")),
         "term_end": iso_date(row.get("term_end")),
         "outcome_summary": row.get("outcome_summary"),
@@ -322,6 +348,7 @@ def score_outcome(row: dict[str, Any], has_impact_score: bool) -> dict[str, Any]
         "impact_score_source": "policy_outcomes.impact_score" if has_impact_score else "unit_outcome_magnitude_fallback",
         "direction_weight": direction_weight,
         "confidence_multiplier": confidence,
+        "policy_intent_category": intent,
         "intent_modifier": intent_modifier,
         "policy_type_weight": policy_type_weight,
         "final_outcome_score": round(final_score, 4),

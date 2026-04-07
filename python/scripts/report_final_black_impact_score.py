@@ -169,7 +169,18 @@ def build_policy_outcomes_sql(has_impact_score: bool, has_source_quality: bool) 
             WHEN po.policy_type = 'legislative' THEN tb.title
             ELSE NULL
           END AS policy_title,
-          NULL AS policy_intent_category
+          CASE
+            WHEN po.policy_type = 'current_admin' THEN related_intent.policy_intent_category
+            ELSE NULL
+          END AS policy_intent_category,
+          CASE
+            WHEN po.policy_type = 'current_admin' THEN related_intent.related_policy_intent_policy_count
+            ELSE 0
+          END AS related_policy_intent_policy_count,
+          CASE
+            WHEN po.policy_type = 'current_admin' THEN related_intent.related_policy_intent_category_count
+            ELSE 0
+          END AS related_policy_intent_category_count
         FROM policy_outcomes po
         LEFT JOIN promises p
           ON po.policy_type = 'current_admin'
@@ -179,6 +190,23 @@ def build_policy_outcomes_sql(has_impact_score: bool, has_source_quality: bool) 
         LEFT JOIN tracked_bills tb
           ON po.policy_type = 'legislative'
          AND tb.id = po.policy_id
+        LEFT JOIN (
+          SELECT
+            pa.promise_id,
+            CASE
+              WHEN COUNT(DISTINCT pol.policy_intent_category) = 1 THEN MAX(pol.policy_intent_category)
+              ELSE NULL
+            END AS policy_intent_category,
+            COUNT(DISTINCT pol.id) AS related_policy_intent_policy_count,
+            COUNT(DISTINCT pol.policy_intent_category) AS related_policy_intent_category_count
+          FROM promise_actions pa
+          JOIN policies pol
+            ON pol.id = pa.related_policy_id
+           AND pol.policy_intent_category IS NOT NULL
+          GROUP BY pa.promise_id
+        ) related_intent
+          ON po.policy_type = 'current_admin'
+         AND related_intent.promise_id = po.policy_id
         ORDER BY pr.term_start ASC, pr.id ASC, po.id ASC
     """
 
@@ -204,6 +232,14 @@ def contribution_for_row(row: dict[str, Any], has_impact_score: bool) -> dict[st
     intent_modifier = INTENT_MODIFIERS.get(intent_category, 1.0)
     policy_type = normalize_nullable_text(row.get("policy_type"))
     policy_type_weight = POLICY_TYPE_WEIGHTS.get(policy_type, 1.0)
+    excluded_from_president_score = row.get("president_id") is None
+    exclusion_reason = None
+    if excluded_from_president_score:
+        exclusion_reason = (
+            "legislative_outcome_has_no_deterministic_president_attribution"
+            if policy_type == "legislative"
+            else "missing_president_attribution"
+        )
     adjusted_outcome_score = impact_score * direction_weight
     confidence_adjusted_score = adjusted_outcome_score * confidence
     intent_adjusted_score = confidence_adjusted_score * intent_modifier
@@ -228,11 +264,15 @@ def contribution_for_row(row: dict[str, Any], has_impact_score: bool) -> dict[st
         "confidence_adjusted_score": round(confidence_adjusted_score, 4),
         "policy_intent_category": intent_category,
         "intent_modifier": intent_modifier,
+        "related_policy_intent_policy_count": int(numeric(row.get("related_policy_intent_policy_count"), 0)),
+        "related_policy_intent_category_count": int(numeric(row.get("related_policy_intent_category_count"), 0)),
         "policy_type_weight": policy_type_weight,
         "final_outcome_score": round(final_outcome_score, 4),
         "president_id": int(row["president_id"]) if row.get("president_id") is not None else None,
         "president_name": row.get("president_name"),
         "president_slug": row.get("president_slug"),
+        "excluded_from_president_score": excluded_from_president_score,
+        "president_score_exclusion_reason": exclusion_reason,
         "term_start": iso_date(row.get("term_start")),
         "term_end": iso_date(row.get("term_end")),
         "years_in_office": years_between(row.get("term_start"), row.get("term_end")),
@@ -259,6 +299,7 @@ def empty_president_bucket(row: dict[str, Any]) -> dict[str, Any]:
         "confidence_total": 0.0,
         "source_quality_counts": Counter(),
         "policy_type_counts": Counter(),
+        "intent_modifier_counts": Counter(),
         "contributions": [],
     }
 
@@ -291,6 +332,7 @@ def aggregate_scores(contributions: list[dict[str, Any]]) -> tuple[list[dict[str
         bucket["confidence_total"] += contribution["confidence_multiplier"]
         bucket["source_quality_counts"][contribution.get("source_quality") or "unknown"] += 1
         bucket["policy_type_counts"][contribution.get("policy_type") or "unknown"] += 1
+        bucket["intent_modifier_counts"][contribution.get("policy_intent_category") or "unknown"] += 1
         bucket["contributions"].append(contribution)
 
     president_rows = []
@@ -321,6 +363,7 @@ def aggregate_scores(contributions: list[dict[str, Any]]) -> tuple[list[dict[str
                 "confidence_avg": round(bucket["confidence_total"] / total_outcomes, 4) if total_outcomes else 0,
                 "source_quality_counts": dict(sorted(bucket["source_quality_counts"].items())),
                 "policy_type_counts": dict(sorted(bucket["policy_type_counts"].items())),
+                "intent_modifier_counts": dict(sorted(bucket["intent_modifier_counts"].items())),
                 "confidence_flag": "low confidence" if total_outcomes < LOW_CONFIDENCE_OUTCOME_THRESHOLD else "standard",
             }
         )
@@ -357,6 +400,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     president_scores, unassigned = aggregate_scores(contributions)
     duplicate_ids = duplicate_outcome_ids(contributions)
     policy_type_counts = Counter(row.get("policy_type") or "unknown" for row in contributions)
+    intent_modifier_counts = Counter(row.get("policy_intent_category") or "unknown" for row in contributions)
     warnings = []
     if not has_impact_score:
         warnings.append(
@@ -365,6 +409,11 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     if unassigned:
         warnings.append(
             f"{len(unassigned)} policy_outcome row(s) were not assigned to a president and are excluded from president totals."
+        )
+    legislative_unassigned = [row for row in unassigned if row.get("policy_type") == "legislative"]
+    if legislative_unassigned:
+        warnings.append(
+            f"{len(legislative_unassigned)} legislative policy_outcome row(s) are explicitly excluded from president scoring because no deterministic president attribution exists in the current schema."
         )
     if duplicate_ids:
         warnings.append(f"Duplicate policy_outcome ids detected in query output: {duplicate_ids}")
@@ -393,7 +442,8 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         },
         "join_contract": {
             "current_admin": "policy_outcomes.policy_id -> promises.id -> presidents.id",
-            "legislative": "policy_outcomes.policy_id -> tracked_bills.id; no president attribution is available in current schema, so rows are excluded until attribution exists",
+            "intent_modifier": "current_admin promise actions may point to historical policies through promise_actions.related_policy_id; intent modifier is applied only when all related historical policies with intent have one deterministic category",
+            "legislative": "policy_outcomes.policy_id -> tracked_bills.id; no president attribution is available in current schema, so rows are explicitly excluded with excluded_from_president_score=true until attribution exists",
             "historical_policies": "Historical policies are not stored as policy_outcomes rows in production, so they are not counted in this unified-outcome report.",
         },
         "summary": {
@@ -402,6 +452,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
             "unassigned_outcomes_excluded": len(unassigned),
             "duplicate_outcome_id_count": len(duplicate_ids),
             "policy_type_counts": dict(sorted(policy_type_counts.items())),
+            "intent_modifier_counts": dict(sorted(intent_modifier_counts.items())),
             "impact_score_column_present": has_impact_score,
             "low_confidence_president_count": sum(
                 1 for row in president_scores if row["confidence_flag"] == "low confidence"

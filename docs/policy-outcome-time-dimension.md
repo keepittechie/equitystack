@@ -74,3 +74,17 @@ If the migration has not been applied yet, the report still runs and marks the m
 
 This does not change score values. Time should first be used for transparency, filtering, and trend views.
 Only after enough outcome dates are sourced should time weighting or period-specific scoring be considered.
+
+## Workflow Validation
+
+The unified-outcome writers validate date ranges after policy outcomes are created. If both `impact_start_date` and `impact_end_date` are present, `impact_end_date` must be greater than or equal to `impact_start_date`.
+
+Current canonical writers:
+
+```bash
+./python/bin/equitystack impact sync-current-admin-outcomes
+./python/bin/equitystack legislative materialize-outcomes
+./python/bin/equitystack impact promote
+```
+
+These workflows preserve the time dimension while enforcing the broader `policy_outcomes` integrity rules documented in [`workflow-hardening.md`](workflow-hardening.md).

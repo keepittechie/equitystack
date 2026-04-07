@@ -73,6 +73,33 @@ The public product should remain easy to navigate from a few stable read-only su
 - `/current-administration`
   - current-term Promise Tracker view
 
+## Unified Outcome Hardening
+
+Canonical workflows that write `policy_outcomes` now enforce the corrected production baseline:
+
+```bash
+./bin/equitystack impact sync-current-admin-outcomes
+./bin/equitystack legislative materialize-outcomes
+./bin/equitystack impact promote
+```
+
+Required post-write invariants:
+
+- `impact_score` is present and bounded
+- `impact_direction` is one of `Positive`, `Negative`, `Mixed`, `Blocked`
+- `source_count` is non-negative
+- `policy_type` is one of `current_admin`, `legislative`
+- duplicate `(policy_type, policy_id, outcome_summary_hash)` groups are absent
+
+Use these read-only verification commands after imports:
+
+```bash
+./bin/equitystack impact report-final-black-impact-score
+./bin/equitystack impact certify-production-data
+```
+
+Legislative outcomes are intentionally excluded from president scoring until the data model has a deterministic president-attribution field. Full details are in `../docs/workflow-hardening.md`.
+
 ## Canonical Review Surfaces
 
 - `/admin/current-admin-review`

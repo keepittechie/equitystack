@@ -17,6 +17,13 @@ from current_admin_common import (
 
 POLICY_TYPE = "current_admin"
 VALID_IMPACT_DIRECTIONS = {"Positive", "Negative", "Mixed", "Blocked"}
+DIRECTION_FALLBACK_IMPACT_SCORE = {
+    "Positive": 1.0,
+    "Mixed": 0.5,
+    "Negative": -1.0,
+    "Blocked": 0.0,
+}
+SOURCE_QUALITY_RANK = {None: 0, "low": 1, "medium": 2, "high": 3}
 
 
 def parse_args() -> argparse.Namespace:
@@ -48,6 +55,30 @@ def normalize_impact_direction(value: Any) -> str | None:
         if text.lower() == direction.lower():
             return direction
     return None
+
+
+def impact_score_for_direction(direction: str | None) -> float | None:
+    return DIRECTION_FALLBACK_IMPACT_SCORE.get(direction)
+
+
+def numeric_score(value: Any) -> float | None:
+    if value in (None, ""):
+        return None
+    try:
+        score = float(value)
+    except (TypeError, ValueError):
+        return None
+    if score < -100 or score > 100:
+        return None
+    return score
+
+
+def resolved_impact_score(direction: str | None, existing_score: Any = None) -> tuple[float | None, str]:
+    score = numeric_score(existing_score)
+    if score is not None and direction in {"Positive", "Negative"}:
+        return (abs(score) if direction == "Positive" else -abs(score)), "related_historical_policy_score"
+    fallback = impact_score_for_direction(direction)
+    return fallback, "direction_fallback"
 
 
 def normalize_evidence_strength(value: Any) -> str | None:
@@ -82,6 +113,12 @@ def source_quality_from_evidence(value: Any, source_count: int) -> str | None:
     return None
 
 
+def stronger_source_quality(left: Any, right: Any) -> str | None:
+    current = normalize_nullable_text(left)
+    incoming = normalize_nullable_text(right)
+    return incoming if SOURCE_QUALITY_RANK.get(incoming, 0) > SOURCE_QUALITY_RANK.get(current, 0) else current
+
+
 def normalize_status(value: Any) -> str | None:
     text = normalize_nullable_text(value)
     if text is None:
@@ -100,6 +137,9 @@ def ensure_policy_outcomes_table_exists(cursor) -> None:
     cursor.execute("SHOW TABLES LIKE 'policy_outcomes'")
     if cursor.fetchone() is None:
         raise RuntimeError("policy_outcomes table is missing. Apply the schema before syncing unified outcomes.")
+    cursor.execute("SHOW COLUMNS FROM policy_outcomes LIKE 'impact_score'")
+    if cursor.fetchone() is None:
+        raise RuntimeError("policy_outcomes.impact_score is missing. Apply the impact-score migration before syncing.")
 
 
 def fetch_candidate_outcomes(cursor, only_ids: list[int] | None, limit: int | None) -> list[dict[str, Any]]:
@@ -128,7 +168,23 @@ def fetch_candidate_outcomes(cursor, only_ids: list[int] | None, limit: int | No
             SELECT COUNT(DISTINCT pos.source_id)
             FROM promise_outcome_sources pos
             WHERE pos.promise_outcome_id = po.id
-          ) AS source_count
+          ) AS source_count,
+          (
+            SELECT CASE
+              WHEN COUNT(DISTINCT pa.related_policy_id) = 1 THEN MAX(
+                COALESCE(ps.directness_score, 0) * 2
+                + COALESCE(ps.material_impact_score, 0) * 2
+                + COALESCE(ps.evidence_score, 0)
+                + COALESCE(ps.durability_score, 0)
+                + COALESCE(ps.equity_score, 0) * 2
+                - COALESCE(ps.harm_offset_score, 0)
+              )
+              ELSE NULL
+            END
+            FROM promise_actions pa
+            JOIN policy_scores ps ON ps.policy_id = pa.related_policy_id
+            WHERE pa.promise_id = po.promise_id
+          ) AS related_historical_policy_score
         FROM promise_outcomes po
         JOIN promises p ON p.id = po.promise_id
         {where}
@@ -149,6 +205,12 @@ def build_payload(row: dict[str, Any]) -> tuple[dict[str, Any] | None, str | Non
     impact_direction = normalize_impact_direction(row.get("impact_direction"))
     if impact_direction is None:
         return None, "missing_or_invalid_impact_direction"
+    impact_score, impact_score_source = resolved_impact_score(
+        impact_direction,
+        row.get("related_historical_policy_score"),
+    )
+    if impact_score is None:
+        return None, "missing_impact_score"
 
     promise_id = row.get("promise_id")
     if promise_id is None:
@@ -165,6 +227,8 @@ def build_payload(row: dict[str, Any]) -> tuple[dict[str, Any] | None, str | Non
         "outcome_type": normalize_nullable_text(row.get("outcome_type")),
         "measurable_impact": normalize_nullable_text(row.get("measurable_impact")),
         "impact_direction": impact_direction,
+        "impact_score": impact_score,
+        "impact_score_source": impact_score_source,
         "evidence_strength": evidence_strength,
         "confidence_score": None,
         "source_count": source_count,
@@ -207,6 +271,7 @@ def insert_policy_outcome(cursor, payload: dict[str, Any]) -> int:
           outcome_type,
           measurable_impact,
           impact_direction,
+          impact_score,
           evidence_strength,
           confidence_score,
           source_count,
@@ -214,7 +279,7 @@ def insert_policy_outcome(cursor, payload: dict[str, Any]) -> int:
           status,
           black_community_impact_note
         )
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """,
         (
             payload["policy_type"],
@@ -225,6 +290,7 @@ def insert_policy_outcome(cursor, payload: dict[str, Any]) -> int:
             payload["outcome_type"],
             payload["measurable_impact"],
             payload["impact_direction"],
+            payload["impact_score"],
             payload["evidence_strength"],
             payload["confidence_score"],
             payload["source_count"],
@@ -236,6 +302,35 @@ def insert_policy_outcome(cursor, payload: dict[str, Any]) -> int:
     return int(cursor.lastrowid)
 
 
+def sync_existing_source_metadata(cursor, existing: dict[str, Any], payload: dict[str, Any]) -> dict[str, Any] | None:
+    existing_count = int(existing.get("source_count") or 0)
+    incoming_count = int(payload.get("source_count") or 0)
+    existing_quality = normalize_nullable_text(existing.get("source_quality"))
+    incoming_quality = normalize_nullable_text(payload.get("source_quality"))
+    next_count = max(existing_count, incoming_count)
+    next_quality = stronger_source_quality(existing_quality, incoming_quality)
+    if next_count == existing_count and next_quality == existing_quality:
+        return None
+    cursor.execute(
+        """
+        UPDATE policy_outcomes
+        SET source_count = %s,
+            source_quality = %s
+        WHERE id = %s
+          AND policy_type = 'current_admin'
+        """,
+        (next_count, next_quality, existing["id"]),
+    )
+    return {
+        "policy_outcome_id": int(existing["id"]),
+        "previous_source_count": existing_count,
+        "new_source_count": next_count,
+        "previous_source_quality": existing_quality,
+        "new_source_quality": next_quality,
+        "reason": "refreshed_current_admin_source_metadata_without_downgrading",
+    }
+
+
 def sanitize_mapping(payload: dict[str, Any]) -> dict[str, Any]:
     return {
         "source_promise_outcome_id": payload["source_promise_outcome_id"],
@@ -245,6 +340,8 @@ def sanitize_mapping(payload: dict[str, Any]) -> dict[str, Any]:
         "promise_title": payload["promise_title"],
         "outcome_summary": payload["outcome_summary"],
         "impact_direction": payload["impact_direction"],
+        "impact_score": payload["impact_score"],
+        "impact_score_source": payload["impact_score_source"],
         "evidence_strength": payload["evidence_strength"],
         "source_count": payload["source_count"],
         "source_quality": payload["source_quality"],
@@ -294,6 +391,23 @@ def integrity_checks(cursor) -> dict[str, Any]:
     )
     duplicates = list(cursor.fetchall() or [])
 
+    cursor.execute(
+        """
+        SELECT COUNT(*) AS total
+        FROM policy_outcomes
+        WHERE policy_type = 'current_admin'
+          AND (
+            impact_score IS NULL
+            OR impact_score < -100
+            OR impact_score > 100
+            OR impact_direction NOT IN ('Positive', 'Negative', 'Mixed', 'Blocked')
+            OR source_count < 0
+            OR policy_type NOT IN ('current_admin', 'legislative')
+          )
+        """
+    )
+    validation_error_count = int((cursor.fetchone() or {}).get("total") or 0)
+
     return {
         "current_admin_policy_id_orphans": orphan_count,
         "current_admin_source_count_mismatches": source_count_mismatch_count,
@@ -306,6 +420,19 @@ def integrity_checks(cursor) -> dict[str, Any]:
             }
             for row in duplicates
         ],
+        "post_workflow_validation": {
+            "ok": validation_error_count == 0 and orphan_count == 0 and source_count_mismatch_count == 0 and not duplicates,
+            "invalid_current_admin_policy_outcome_count": validation_error_count,
+            "checks": [
+                "impact_score_present_and_bounded",
+                "impact_direction_valid",
+                "source_count_non_negative",
+                "policy_type_valid",
+                "no_duplicate_current_admin_outcomes",
+                "no_current_admin_policy_id_orphans",
+                "source_count_matches_promise_outcome_sources",
+            ],
+        },
     }
 
 
@@ -319,6 +446,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
             skipped_missing = []
             skipped_duplicates = []
             inserted = []
+            source_metadata_updates = []
 
             for row in rows:
                 payload, missing_reason = build_payload(row)
@@ -334,6 +462,10 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
 
                 existing = find_existing_policy_outcome(cursor, payload)
                 if existing:
+                    if args.apply:
+                        metadata_update = sync_existing_source_metadata(cursor, existing, payload)
+                        if metadata_update:
+                            source_metadata_updates.append(metadata_update)
                     skipped_duplicates.append(
                         {
                             **sanitize_mapping(payload),
@@ -348,12 +480,15 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
                     inserted_id = insert_policy_outcome(cursor, payload)
                     inserted.append({**sanitize_mapping(payload), "policy_outcome_id": inserted_id})
 
+            checks = integrity_checks(cursor)
             if args.apply:
+                if not checks["post_workflow_validation"]["ok"]:
+                    connection.rollback()
+                    raise RuntimeError(f"post-workflow validation failed: {checks['post_workflow_validation']}")
                 connection.commit()
             else:
                 connection.rollback()
 
-            checks = integrity_checks(cursor)
             return {
                 "workflow": "current_admin_policy_outcomes_sync",
                 "mode": "apply" if args.apply else "dry_run",
@@ -362,7 +497,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
                     "source_tables": ["promise_outcomes", "promise_outcome_sources", "promises"],
                     "target_table": "policy_outcomes",
                     "policy_type": POLICY_TYPE,
-                    "mutation_policy": "insert_only_when_apply_yes_is_explicit",
+                    "mutation_policy": "insert_only_for_new_outcomes; existing current-admin source metadata may be refreshed only when the linked source signal is stronger",
                 },
                 "summary": {
                     "total_candidate_outcomes": len(rows),
@@ -371,9 +506,11 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
                     "rows_skipped_missing_required_fields": len(skipped_missing),
                     "linked_source_count_zero": sum(1 for payload in eligible if payload["source_count"] == 0),
                     "rows_inserted": len(inserted),
+                    "source_metadata_rows_updated": len(source_metadata_updates),
                 },
                 "sample_inserted_mappings": [sanitize_mapping(payload) for payload in eligible[:10]],
                 "inserted_rows": inserted,
+                "source_metadata_updates": source_metadata_updates,
                 "skipped_duplicates": skipped_duplicates[:50],
                 "skipped_missing_required_fields": skipped_missing[:50],
                 "integrity_checks": checks,

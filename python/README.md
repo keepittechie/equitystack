@@ -76,6 +76,7 @@ Read these next:
 - `OPERATIONS.md`
 - `RNJ1_EXECUTOR_GUARDRAILS.md`
 - `../docs/admin-operator-system.md`
+- `../docs/workflow-hardening.md`
 
 ## Current-Admin Safe Path
 
@@ -121,6 +122,33 @@ Important:
 - `legislative run` executes verifier-assisted suggestion/discovery with `qwen3.5:9b`, senior audit review with `qwen3.5:9b`, auto-triages safe bundle actions, then rebuilds the review bundle.
 - the daily review path now uses a 240 second Ollama timeout.
 - `legislative import` is dry-run unless `--apply --yes` is passed to the underlying script directly.
+
+## Unified Outcome Integrity
+
+The workflows that write unified `policy_outcomes` are hardened to preserve the production scoring baseline:
+
+```bash
+./bin/equitystack impact sync-current-admin-outcomes
+./bin/equitystack legislative materialize-outcomes
+./bin/equitystack impact promote
+```
+
+They must populate `impact_score` at insert time and validate:
+
+- valid `impact_direction`
+- bounded non-null `impact_score`
+- non-negative `source_count`
+- valid `policy_type`
+- no duplicate `(policy_type, policy_id, outcome_summary_hash)` rows
+
+Use these read-only checks after new imports or deployments:
+
+```bash
+./bin/equitystack impact report-final-black-impact-score
+./bin/equitystack impact certify-production-data
+```
+
+Legislative outcomes are materialized into `policy_outcomes`, but are explicitly excluded from president scoring until a deterministic president attribution model exists. See `../docs/workflow-hardening.md`.
 
 ## Operator Maintenance
 

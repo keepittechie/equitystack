@@ -27,6 +27,12 @@ ALLOWED_TRANSITIONS = {
 }
 SCORING_READY_STATES = {"impact_scored", "impact_verified"}
 VALID_IMPACT_DIRECTIONS = {"Positive", "Negative", "Mixed", "Blocked"}
+DIRECTION_FALLBACK_IMPACT_SCORE = {
+    "Positive": 1.0,
+    "Mixed": 0.5,
+    "Negative": -1.0,
+    "Blocked": 0.0,
+}
 
 
 def utc_timestamp() -> str:
@@ -91,6 +97,30 @@ def normalize_impact_direction(value: Any) -> str | None:
         if text.lower() == direction.lower():
             return direction
     return None
+
+
+def impact_score_for_direction(direction: str | None) -> float | None:
+    return DIRECTION_FALLBACK_IMPACT_SCORE.get(direction)
+
+
+def numeric_score(value: Any) -> float | None:
+    if value in (None, ""):
+        return None
+    try:
+        score = float(value)
+    except (TypeError, ValueError):
+        return None
+    if score < -100 or score > 100:
+        return None
+    return score
+
+
+def resolved_impact_score(direction: str | None, existing_score: Any = None) -> tuple[float | None, str]:
+    score = numeric_score(existing_score)
+    if score is not None and direction in {"Positive", "Negative"}:
+        return (abs(score) if direction == "Positive" else -abs(score)), "source_artifact_impact_score"
+    fallback = impact_score_for_direction(direction)
+    return fallback, "direction_fallback"
 
 
 def normalize_outcome_status(value: Any) -> str | None:
@@ -562,6 +592,14 @@ def policy_outcome_payload(item: dict[str, Any], outcome: dict[str, Any], target
     summary = normalize_nullable_text(outcome.get("outcome_summary"))
     if summary is None:
         return None
+    impact_direction = normalize_impact_direction(outcome.get("impact_direction"))
+    record = item.get("record") if isinstance(item.get("record"), dict) else {}
+    impact_score, impact_score_source = resolved_impact_score(
+        impact_direction,
+        outcome.get("impact_score") or record.get("impact_score"),
+    )
+    if impact_direction is None or impact_score is None:
+        return None
     confidence_score = normalize_confidence_score(
         item.get("confidence_score") or (item.get("record") or {}).get("confidence_score") or (item.get("record") or {}).get("confidence")
     )
@@ -578,7 +616,9 @@ def policy_outcome_payload(item: dict[str, Any], outcome: dict[str, Any], target
         "outcome_summary_hash": outcome_summary_hash(summary),
         "outcome_type": normalize_nullable_text(outcome.get("outcome_type")),
         "measurable_impact": normalize_nullable_text(outcome.get("measurable_impact")),
-        "impact_direction": normalize_impact_direction(outcome.get("impact_direction")),
+        "impact_direction": impact_direction,
+        "impact_score": impact_score,
+        "impact_score_source": impact_score_source,
         "evidence_strength": normalize_unified_evidence_strength(outcome.get("evidence_strength") or item.get("source_quality")),
         "confidence_score": confidence_score,
         "source_count": source_total,
@@ -620,6 +660,7 @@ def insert_policy_outcome(cursor, payload: dict[str, Any]) -> int:
           outcome_type,
           measurable_impact,
           impact_direction,
+          impact_score,
           evidence_strength,
           confidence_score,
           source_count,
@@ -627,7 +668,7 @@ def insert_policy_outcome(cursor, payload: dict[str, Any]) -> int:
           status,
           black_community_impact_note
         )
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """,
         (
             payload["policy_type"],
@@ -638,6 +679,7 @@ def insert_policy_outcome(cursor, payload: dict[str, Any]) -> int:
             payload["outcome_type"],
             payload["measurable_impact"],
             payload["impact_direction"],
+            payload["impact_score"],
             payload["evidence_strength"],
             payload["confidence_score"],
             payload["source_count"],
@@ -647,6 +689,46 @@ def insert_policy_outcome(cursor, payload: dict[str, Any]) -> int:
         ),
     )
     return int(cursor.lastrowid)
+
+
+def policy_outcomes_post_workflow_validation(cursor) -> dict[str, Any]:
+    cursor.execute(
+        """
+        SELECT COUNT(*) AS total
+        FROM policy_outcomes
+        WHERE impact_score IS NULL
+           OR impact_score < -100
+           OR impact_score > 100
+           OR impact_direction NOT IN ('Positive', 'Negative', 'Mixed', 'Blocked')
+           OR source_count < 0
+           OR policy_type NOT IN ('current_admin', 'legislative')
+        """
+    )
+    invalid_count = int((cursor.fetchone() or {}).get("total") or 0)
+    cursor.execute(
+        """
+        SELECT COUNT(*) AS total
+        FROM (
+          SELECT policy_type, policy_id, outcome_summary_hash, COUNT(*) AS duplicate_count
+          FROM policy_outcomes
+          GROUP BY policy_type, policy_id, outcome_summary_hash
+          HAVING COUNT(*) > 1
+        ) duplicates
+        """
+    )
+    duplicate_count = int((cursor.fetchone() or {}).get("total") or 0)
+    return {
+        "ok": invalid_count == 0 and duplicate_count == 0,
+        "invalid_policy_outcome_count": invalid_count,
+        "duplicate_policy_outcome_group_count": duplicate_count,
+        "checks": [
+            "impact_score_present_and_bounded",
+            "impact_direction_valid",
+            "source_count_non_negative",
+            "policy_type_valid",
+            "no_duplicate_outcomes",
+        ],
+    }
 
 
 def preserve_policy_outcome(report: dict[str, Any], item: dict[str, Any], existing: dict[str, Any], reason: str) -> None:
@@ -677,6 +759,13 @@ def insert_unified_policy_outcomes(cursor, item: dict[str, Any], report: dict[st
     for outcome in outcome_list(item.get("record") or {}):
         payload = policy_outcome_payload(item, outcome, target)
         if payload is None:
+            report["impact_skipped_count"] += 1
+            report["skipped_items"].append(
+                {
+                    "record_key": item.get("record_key"),
+                    "reason": "missing_or_invalid_policy_outcome_payload_for_unified_insert",
+                }
+            )
             continue
         existing = find_existing_policy_outcome(cursor, payload)
         if existing:
@@ -691,6 +780,8 @@ def insert_unified_policy_outcomes(cursor, item: dict[str, Any], report: dict[st
                 "policy_type": payload["policy_type"],
                 "policy_id": payload["policy_id"],
                 "policy_outcome_id": policy_outcome_id,
+                "impact_score": payload["impact_score"],
+                "impact_score_source": payload["impact_score_source"],
                 "reason": "created unified policy_outcomes row",
             }
         )
@@ -856,6 +947,7 @@ def run_promote(args: argparse.Namespace) -> None:
         "existing_outcomes_preserved": 0,
         "policy_outcomes_created": 0,
         "policy_outcomes_preserved": 0,
+        "policy_outcomes_validation": None,
         "promotion_events": [],
         "preservation_events": [],
         "skipped_items": [],
@@ -927,6 +1019,22 @@ def run_promote(args: argparse.Namespace) -> None:
                 update_ledger(ledger, item, output_path=input_path)
 
         if connection:
+            if cursor is not None:
+                report["policy_outcomes_validation"] = policy_outcomes_post_workflow_validation(cursor)
+                if not report["policy_outcomes_validation"]["ok"]:
+                    connection.rollback()
+                    report["precommit"]["readiness_status"] = "blocked"
+                    report["precommit"]["blocking_issue_count"] += 1
+                    report["precommit"]["blocked_items"].append(
+                        {
+                            "record_key": "__policy_outcomes_validation__",
+                            "reason": "post-workflow policy_outcomes validation failed",
+                            "validation": report["policy_outcomes_validation"],
+                        }
+                    )
+                    write_json_file(args.output.resolve(), report)
+                    print_json(report)
+                    raise SystemExit(1)
             connection.commit()
     except Exception:
         if connection:
