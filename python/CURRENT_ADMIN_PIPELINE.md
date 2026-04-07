@@ -152,11 +152,11 @@ Wrapper defaults:
 - `current-admin workflow start`: verifier `qwen3.5:9b`, senior `qwen3.5:9b`
 - `current-admin workflow finalize`: verifier `qwen3.5:9b`, senior `qwen3.5:9b`
 - senior-review fallback model: `qwen3.5:9b`
-- default Ollama timeout: `240` seconds
+- default LLM timeout: `240` seconds
 
-Remote Ollama:
+LLM provider endpoint:
 
-- `http://10.10.0.60:11434`
+- `config/llm.json` or `EQUITYSTACK_LLM_ENDPOINT`
 
 The review artifact stores requested model, effective model, backend, fallback status, fallback reason, and timeout metadata in the generated `.ai-review.json`.
 

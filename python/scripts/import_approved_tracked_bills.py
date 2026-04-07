@@ -35,6 +35,16 @@ CHAMBER_TO_BILL_TYPE = {
     "senate": "s",
 }
 
+IMPACT_PENDING_STATUS = "impact_pending"
+IMPORT_WITH_PENDING_IMPACT_ACTION = "import_with_pending_impact"
+VALID_IMPACT_STATUSES = {
+    "impact_scored",
+    "impact_pending",
+    "insufficient_evidence",
+    "needs_manual_review",
+}
+VALID_SOURCE_QUALITIES = {"low", "medium", "high"}
+
 
 def python_dir() -> Path:
     return Path(__file__).resolve().parents[1]
@@ -106,6 +116,81 @@ def nested_get(value: Any, *keys: str) -> Any:
             return None
         current = current.get(key)
     return current
+
+
+def normalize_review_text(value: Any) -> str | None:
+    if value in (None, ""):
+        return None
+    return str(value).strip().lower().replace(" ", "_").replace("-", "_")
+
+
+def normalize_impact_status(value: Any) -> str | None:
+    normalized = normalize_review_text(value)
+    return normalized if normalized in VALID_IMPACT_STATUSES else None
+
+
+def normalize_recommended_action(value: Any) -> str | None:
+    normalized = normalize_review_text(value)
+    if normalized in {"manual_review_required", "manual_review"}:
+        return "needs_manual_review"
+    if normalized in {"import_pending_impact", "import_with_pending_impact"}:
+        return IMPORT_WITH_PENDING_IMPACT_ACTION
+    return normalized
+
+
+def normalize_source_quality(value: Any) -> str | None:
+    normalized = normalize_review_text(value)
+    mapping = {
+        "weak": "low",
+        "moderate": "medium",
+        "strong": "high",
+    }
+    normalized = mapping.get(normalized or "", normalized)
+    return normalized if normalized in VALID_SOURCE_QUALITIES else None
+
+
+def normalize_confidence(value: Any) -> str | float | None:
+    if value in (None, ""):
+        return None
+    if isinstance(value, (int, float)):
+        return float(value)
+    normalized = normalize_review_text(value)
+    if normalized in {"low", "medium", "high"}:
+        return normalized
+    try:
+        return float(str(value).strip())
+    except (TypeError, ValueError):
+        return str(value).strip()
+
+
+def review_context_from_seed(seed: dict[str, Any], payload: dict[str, Any], raw_data: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "impact_status": normalize_impact_status(
+            first_present(seed.get("impact_status"), payload.get("impact_status"), raw_data.get("impact_status"))
+        ),
+        "recommended_action": normalize_recommended_action(
+            first_present(seed.get("recommended_action"), payload.get("recommended_action"), raw_data.get("recommended_action"))
+        ),
+        "confidence": normalize_confidence(
+            first_present(seed.get("confidence"), payload.get("confidence"), raw_data.get("confidence"), seed.get("match_confidence"), payload.get("match_confidence"))
+        ),
+        "source_quality": normalize_source_quality(
+            first_present(seed.get("source_quality"), payload.get("source_quality"), raw_data.get("source_quality"))
+        ),
+    }
+
+
+def is_impact_pending_import(row: dict[str, Any]) -> bool:
+    return (
+        row.get("impact_status") == IMPACT_PENDING_STATUS
+        and row.get("recommended_action") == IMPORT_WITH_PENDING_IMPACT_ACTION
+    )
+
+
+def values_conflict(current: Any, incoming: Any) -> bool:
+    if current in (None, "") or incoming in (None, ""):
+        return False
+    return str(current).strip() != str(incoming).strip()
 
 
 def normalize_filter_bill_number(raw: str) -> str:
@@ -278,6 +363,8 @@ def resolve_seed_metadata(seed: dict[str, Any], *, enrich_metadata: bool, api_ke
     if not resolved_title:
         resolved_title = display_bill_number or (str(raw_bill_number).strip() if raw_bill_number not in (None, "") else None)
 
+    review_context = review_context_from_seed(seed, payload, raw_data)
+
     return {
         "future_bill_id": int(future_bill_id) if future_bill_id not in (None, "") else None,
         "bill_number_raw": raw_bill_number,
@@ -304,6 +391,7 @@ def resolve_seed_metadata(seed: dict[str, Any], *, enrich_metadata: bool, api_ke
         "latest_action_date": first_present(seed.get("latest_action_date"), payload.get("latest_action_date"), raw_data.get("latest_action_date"), fetched.get("latest_action_date")),
         "bill_url": first_present(seed.get("bill_url"), payload.get("bill_url"), raw_data.get("bill_url"), fetched.get("bill_url")),
         "metadata_source": metadata_source,
+        **review_context,
         "raw_seed": seed,
     }
 
@@ -387,6 +475,10 @@ def build_tracked_bill_row(seed: dict[str, Any]) -> dict[str, Any]:
         "latest_action_date": seed.get("latest_action_date"),
         "active": 1 if seed.get("active", True) else 0,
         "match_confidence": seed.get("resolved_match_confidence") or "Medium",
+        "impact_status": seed.get("impact_status"),
+        "recommended_action": seed.get("recommended_action"),
+        "confidence": seed.get("confidence"),
+        "source_quality": seed.get("source_quality"),
     }
 
 
@@ -406,6 +498,10 @@ def fetch_existing_tracked_bill(cursor, row: dict[str, Any]) -> dict[str, Any] |
           official_summary,
           bill_url,
           source_system,
+          bill_status,
+          last_action,
+          introduced_date,
+          latest_action_date,
           active,
           match_confidence
         FROM tracked_bills
@@ -435,6 +531,10 @@ def fetch_existing_tracked_bill(cursor, row: dict[str, Any]) -> dict[str, Any] |
           official_summary,
           bill_url,
           source_system,
+          bill_status,
+          last_action,
+          introduced_date,
+          latest_action_date,
           active,
           match_confidence
         FROM tracked_bills
@@ -453,51 +553,135 @@ def fetch_existing_tracked_bill(cursor, row: dict[str, Any]) -> dict[str, Any] |
     return None
 
 
-def maybe_update_existing_tracked_bill(cursor, tracked_bill_id: int, existing: dict[str, Any], row: dict[str, Any]) -> bool:
+def maybe_update_existing_tracked_bill(
+    cursor,
+    tracked_bill_id: int,
+    existing: dict[str, Any],
+    row: dict[str, Any],
+    *,
+    apply_updates: bool = True,
+) -> dict[str, Any]:
     assignments = []
     values: list[Any] = []
-    for field in ("chamber", "source_system", "sponsor_name", "sponsor_party", "sponsor_state", "bill_url"):
+    updated_fields: list[str] = []
+    preserved_existing_fields: list[dict[str, Any]] = []
+
+    def maybe_fill(field: str) -> None:
         incoming = row.get(field)
         current = existing.get(field)
         if incoming and not current:
             assignments.append(f"{field} = %s")
             values.append(incoming)
+            updated_fields.append(field)
+        elif values_conflict(current, incoming):
+            preserved_existing_fields.append(
+                {
+                    "field": field,
+                    "existing_value": current,
+                    "incoming_value": incoming,
+                    "reason": "preserved populated existing tracked_bills field",
+                }
+            )
+
+    for field in (
+        "chamber",
+        "source_system",
+        "sponsor_name",
+        "sponsor_party",
+        "sponsor_state",
+        "bill_url",
+        "bill_status",
+        "last_action",
+        "introduced_date",
+        "latest_action_date",
+    ):
+        maybe_fill(field)
 
     existing_title = existing.get("title")
     if row.get("title") and (not existing_title or is_placeholder_title(existing_title, row.get("bill_number"))):
         if not is_placeholder_title(row.get("title"), row.get("bill_number")):
             assignments.append("title = %s")
             values.append(row["title"])
+            updated_fields.append("title")
+    elif values_conflict(existing_title, row.get("title")):
+        preserved_existing_fields.append(
+            {
+                "field": "title",
+                "existing_value": existing_title,
+                "incoming_value": row.get("title"),
+                "reason": "preserved populated existing tracked_bills field",
+            }
+        )
 
     if row.get("official_summary") and not existing.get("official_summary"):
         assignments.append("official_summary = %s")
         values.append(row["official_summary"])
+        updated_fields.append("official_summary")
+    elif values_conflict(existing.get("official_summary"), row.get("official_summary")):
+        preserved_existing_fields.append(
+            {
+                "field": "official_summary",
+                "existing_value": existing.get("official_summary"),
+                "incoming_value": row.get("official_summary"),
+                "reason": "preserved populated existing tracked_bills field",
+            }
+        )
 
     if row.get("session_label") and not existing.get("session_label"):
         assignments.append("session_label = %s")
         values.append(row["session_label"])
+        updated_fields.append("session_label")
+    elif values_conflict(existing.get("session_label"), row.get("session_label")):
+        preserved_existing_fields.append(
+            {
+                "field": "session_label",
+                "existing_value": existing.get("session_label"),
+                "incoming_value": row.get("session_label"),
+                "reason": "preserved populated existing tracked_bills field",
+            }
+        )
 
     if existing.get("active") in (0, False) and row.get("active") in (1, True):
         assignments.append("active = %s")
         values.append(row["active"])
+        updated_fields.append("active")
 
     if not existing.get("match_confidence") and row.get("match_confidence"):
         assignments.append("match_confidence = %s")
         values.append(row["match_confidence"])
+        updated_fields.append("match_confidence")
+    elif values_conflict(existing.get("match_confidence"), row.get("match_confidence")):
+        preserved_existing_fields.append(
+            {
+                "field": "match_confidence",
+                "existing_value": existing.get("match_confidence"),
+                "incoming_value": row.get("match_confidence"),
+                "reason": "preserved populated existing tracked_bills field",
+            }
+        )
 
     if not assignments:
-        return False
+        return {
+            "updated": False,
+            "updated_fields": [],
+            "preserved_existing_fields": preserved_existing_fields,
+        }
 
-    values.append(tracked_bill_id)
-    cursor.execute(
-        f"""
-        UPDATE tracked_bills
-        SET {", ".join(assignments)}
-        WHERE id = %s
-        """,
-        tuple(values),
-    )
-    return True
+    if apply_updates:
+        values.append(tracked_bill_id)
+        cursor.execute(
+            f"""
+            UPDATE tracked_bills
+            SET {", ".join(assignments)}
+            WHERE id = %s
+            """,
+            tuple(values),
+        )
+    return {
+        "updated": True,
+        "updated_fields": updated_fields,
+        "preserved_existing_fields": preserved_existing_fields,
+    }
 
 
 def insert_tracked_bill(cursor, row: dict[str, Any]) -> int:
@@ -650,6 +834,13 @@ def main() -> None:
     placeholder_titles_replaced = 0
     summaries_filled = 0
     fetch_enrichment_used_count = 0
+    impact_pending_records = 0
+    impact_pending_outcomes_deferred = 0
+    impact_pending_existing_outcomes_preserved = 0
+    existing_legislation_enriched = 0
+    existing_actions_enriched = 0
+    preserved_existing_fields = 0
+    conflicts_detected = 0
 
     try:
         conn = get_db_connection()
@@ -675,8 +866,25 @@ def main() -> None:
                     "title_used": seed.get("resolved_title"),
                     "session_label_used": seed.get("session_label"),
                     "metadata_source": seed.get("metadata_source") or "seed_only",
+                    "impact_status": seed.get("impact_status"),
+                    "recommended_action": seed.get("recommended_action"),
+                    "confidence": seed.get("confidence"),
+                    "source_quality": seed.get("source_quality"),
+                    "impact_pending": False,
+                    "impact_pending_note": None,
+                    "enriched_fields": [],
+                    "preserved_existing_fields": [],
                     "reason": None,
                 }
+                impact_pending = is_impact_pending_import(seed)
+                if impact_pending:
+                    impact_pending_records += 1
+                    impact_pending_outcomes_deferred += 1
+                    row_result["impact_pending"] = True
+                    row_result["impact_pending_note"] = (
+                        "Legislative record may import as verified policy/action metadata; "
+                        "impact outcome scoring is deferred until measurable evidence exists."
+                    )
 
                 valid, validation_error = validate_seed_row(seed)
                 if not valid:
@@ -697,15 +905,34 @@ def main() -> None:
                         row_result["tracked_bill_id"] = tracked_bill_id
                         row_result["title_before"] = existing.get("title")
                         row_result["summary_before"] = existing.get("official_summary")
+                        update_plan = maybe_update_existing_tracked_bill(
+                            cursor,
+                            tracked_bill_id,
+                            existing,
+                            tracked_bill_row,
+                            apply_updates=args.apply,
+                        )
+                        row_result["enriched_fields"] = update_plan["updated_fields"]
+                        row_result["preserved_existing_fields"] = update_plan["preserved_existing_fields"]
+                        preserved_existing_fields += len(update_plan["preserved_existing_fields"])
+                        conflicts_detected += len(update_plan["preserved_existing_fields"])
+                        if update_plan["updated"]:
+                            existing_legislation_enriched += 1
                         if args.apply:
-                            updated = maybe_update_existing_tracked_bill(cursor, tracked_bill_id, existing, tracked_bill_row)
-                            row_result["reason"] = "matched existing tracked bill; updated low-risk metadata" if updated else "matched existing tracked bill"
-                            row_result["tracked_bill_result"] = "matched_existing"
-                            if not updated:
-                                row_result["metadata_source"] = "unchanged_existing"
+                            row_result["reason"] = (
+                                "matched existing tracked bill; updated low-risk metadata"
+                                if update_plan["updated"]
+                                else "matched existing tracked bill"
+                            )
                         else:
-                            row_result["reason"] = "would match existing tracked bill"
-                            row_result["tracked_bill_result"] = "matched_existing"
+                            row_result["reason"] = (
+                                "would match existing tracked bill; would fill missing metadata"
+                                if update_plan["updated"]
+                                else "would match existing tracked bill"
+                            )
+                        row_result["tracked_bill_result"] = "matched_existing"
+                        if not update_plan["updated"]:
+                            row_result["metadata_source"] = "unchanged_existing"
                         matched_existing_tracked_bills += 1
                     else:
                         row_result["title_before"] = None
@@ -748,6 +975,8 @@ def main() -> None:
                                     linked_future_bills += 1
                                 elif link_result == "linked_existing":
                                     existing_future_bill_links += 1
+                                    if link_reason.startswith("updated existing"):
+                                        existing_actions_enriched += 1
                             except Exception as exc:
                                 row_result["link_result"] = "link_skipped_db_constraint"
                                 row_result["reason"] = f"{row_result['reason']}; {exc}" if row_result["reason"] else str(exc)
@@ -801,6 +1030,17 @@ def main() -> None:
         "placeholder_titles_replaced": placeholder_titles_replaced,
         "summaries_filled": summaries_filled,
         "fetch_enrichment_used_count": fetch_enrichment_used_count,
+        "impact_pending_records": impact_pending_records,
+        "impact_pending_outcomes_deferred": impact_pending_outcomes_deferred,
+        "impact_pending_existing_outcomes_preserved": impact_pending_existing_outcomes_preserved,
+        "existing_legislation_enriched": existing_legislation_enriched,
+        "existing_actions_enriched": existing_actions_enriched,
+        "preserved_existing_fields": preserved_existing_fields,
+        "conflicts_detected": conflicts_detected,
+        "impact_pending_note": (
+            "Legislative tracked-bill import does not write finalized impact outcomes; "
+            "impact_status=impact_pending records are imported as policy/action metadata only."
+        ),
         "skipped_rows": len(skipped_rows),
         "errors": errors,
         "processed_rows": report_rows,
@@ -819,6 +1059,13 @@ def main() -> None:
     print(f"Placeholder titles replaced: {placeholder_titles_replaced}")
     print(f"Summaries filled: {summaries_filled}")
     print(f"Fetch enrichment used: {fetch_enrichment_used_count}")
+    print(f"Impact-pending records: {impact_pending_records}")
+    print(f"Impact-pending outcomes deferred: {impact_pending_outcomes_deferred}")
+    print(f"Impact-pending existing outcomes preserved: {impact_pending_existing_outcomes_preserved}")
+    print(f"Existing legislation enriched: {existing_legislation_enriched}")
+    print(f"Existing actions enriched: {existing_actions_enriched}")
+    print(f"Preserved existing fields: {preserved_existing_fields}")
+    print(f"Conflicts detected: {conflicts_detected}")
     print(f"Skipped: {len(skipped_rows)}")
     print(f"Errors: {len(errors)}")
     for row in report_rows:
@@ -841,6 +1088,14 @@ def main() -> None:
             "title_used",
             "session_label_used",
             "metadata_source",
+            "impact_status",
+            "recommended_action",
+            "confidence",
+            "source_quality",
+            "impact_pending",
+            "impact_pending_note",
+            "enriched_fields",
+            "preserved_existing_fields",
             "reason",
         ]
         with csv_path.open("w", newline="") as handle:

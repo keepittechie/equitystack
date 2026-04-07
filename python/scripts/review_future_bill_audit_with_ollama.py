@@ -11,8 +11,14 @@ from typing import Any
 
 import requests
 
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
-DEFAULT_OLLAMA_URL = "http://10.10.0.60:11434"
+from lib.llm.provider import generate_text, list_available_models
+
+
+DEFAULT_OLLAMA_URL = ""
 DEFAULT_MODEL = "qwen3.5:9b"
 DEFAULT_MODEL_VERIFIER = "qwen3.5:9b"
 DEFAULT_MODEL_FALLBACK = "qwen3.5:9b"
@@ -156,18 +162,7 @@ def load_audit_report(path: Path) -> dict[str, Any]:
 
 
 def fetch_available_models(ollama_url: str, timeout_seconds: int) -> list[str]:
-    response = requests.get(
-        f"{ollama_url.rstrip('/')}/api/tags",
-        timeout=timeout_seconds,
-    )
-    response.raise_for_status()
-    payload = response.json()
-    models = []
-    for model in payload.get("models") or []:
-        name = model.get("name")
-        if isinstance(name, str) and name.strip():
-            models.append(name.strip())
-    return models
+    return list_available_models(endpoint=ollama_url or None, timeout_seconds=timeout_seconds)
 
 
 def select_rows(payload: dict[str, Any], include_medium: bool, only_link_id: int | None, max_items: int | None) -> list[dict[str, Any]]:
@@ -523,35 +518,16 @@ def build_prompt(row: dict[str, Any], heuristics: HeuristicContext) -> str:
 
 
 def call_ollama(prompt: str, model: str, ollama_url: str, timeout_seconds: int, temperature: float) -> str:
-    response = requests.post(
-        f"{ollama_url.rstrip('/')}/api/generate",
-        json={
-            "model": model,
-            "prompt": prompt,
-            "stream": False,
-            "format": "json",
-            "options": {
-                "temperature": temperature,
-                "seed": DEFAULT_SEED,
-            },
-        },
-        timeout=timeout_seconds,
+    body = generate_text(
+        prompt,
+        model=model,
+        endpoint=ollama_url or None,
+        timeout_seconds=timeout_seconds,
+        temperature=temperature,
+        response_format="json",
     )
-    try:
-        response.raise_for_status()
-    except requests.HTTPError as error:
-        body = response.text.strip()
-        if len(body) > 500:
-            body = body[:500] + "..."
-        raise requests.HTTPError(
-            f"{error}. Response body: {body}",
-            response=response,
-            request=response.request,
-        ) from error
-    payload = response.json()
-    body = payload.get("response")
     if not isinstance(body, str) or not body.strip():
-        raise ValueError("Ollama response did not contain a non-empty JSON string")
+        raise ValueError("LLM response did not contain a non-empty JSON string")
     return body
 
 
@@ -570,7 +546,7 @@ def call_ollama_with_retry(
             raw_text = call_ollama(prompt, model, ollama_url, timeout_seconds, temperature)
             raw_payload = parse_json_response(raw_text)
             return raw_payload, attempts, errors
-        except (json.JSONDecodeError, requests.RequestException, ValueError) as error:
+        except (json.JSONDecodeError, requests.RequestException, RuntimeError, ValueError) as error:
             errors.append(str(error))
     return None, attempts, errors
 

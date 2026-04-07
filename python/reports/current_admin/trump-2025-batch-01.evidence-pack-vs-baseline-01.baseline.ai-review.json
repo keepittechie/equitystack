@@ -1,0 +1,3095 @@
+{
+  "batch_name": "trump-2025-batch-01",
+  "input_path": "data/current_admin_batches/trump_2025_batch_01.json",
+  "model": "gpt-4.1",
+  "requested_model": "gpt-4.1",
+  "effective_model": "gpt-4.1",
+  "resolved_model": "gpt-4.1",
+  "review_backend": "openai_batch",
+  "fallback_used": false,
+  "fallback_reason": null,
+  "model_resolution_status": "exact_requested",
+  "verifier_model": "gpt-4.1",
+  "fallback_model": "gpt-4.1",
+  "review_mode": "deep",
+  "dry_run": false,
+  "timeout_seconds": null,
+  "senior_timeout_seconds": 240,
+  "verifier_timeout_seconds": 240,
+  "resolved_output_path": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.evidence-pack-vs-baseline-01.baseline.ai-review.json",
+  "reviewed_count": 10,
+  "deep_review_count": 0,
+  "fallback_count": 0,
+  "review_priority_counts": {
+    "low": 0,
+    "medium": 0,
+    "high": 10
+  },
+  "items": [
+    {
+      "slug": "trump-2025-election-integrity-proof-citizenship-paper-ballots",
+      "title": "Require proof of citizenship and paper-ballot election safeguards",
+      "impact_status": "impact_pending",
+      "recommended_action": "import_with_pending_impact",
+      "requested_model": "gpt-4.1",
+      "effective_model": "gpt-4.1",
+      "resolved_model": "gpt-4.1",
+      "review_mode": "deep",
+      "review_mode_requested": "deep",
+      "review_mode_used": "standard",
+      "review_backend": "openai_batch",
+      "model_used": "gpt-4.1",
+      "verifier_model_requested": "gpt-4.1",
+      "verifier_model_used": null,
+      "senior_model_requested": "gpt-4.1",
+      "senior_model_used": "gpt-4.1",
+      "fallback_model": "gpt-4.1",
+      "fallback_used": false,
+      "fallback_reason": null,
+      "model_resolution_status": "exact_requested",
+      "timeout_seconds": null,
+      "senior_timeout_seconds": 240,
+      "verifier_timeout_seconds": 240,
+      "retry_count": 0,
+      "senior_attempted": true,
+      "senior_retry_attempted": false,
+      "verifier_attempted": false,
+      "verifier_retry_attempted": false,
+      "deep_review_requested": true,
+      "deep_review_ran": false,
+      "deep_review_reason": "single_pass_conservative_classifier",
+      "second_pass_ran": false,
+      "deep_review_recommended": true,
+      "deep_review_recommendation_reason": "Confidence is low enough that a deeper ambiguity check is warranted. Source coverage is missing or thin for at least part of the record. The review surfaced multiple hesitation reasons that should be reconciled.",
+      "deep_review_recommendation_signals": [
+        {
+          "code": "low_confidence",
+          "reason": "Confidence is low enough that a deeper ambiguity check is warranted."
+        },
+        {
+          "code": "weak_source_coverage",
+          "reason": "Source coverage is missing or thin for at least part of the record."
+        },
+        {
+          "code": "multiple_hesitation_reasons",
+          "reason": "The review surfaced multiple hesitation reasons that should be reconciled."
+        },
+        {
+          "code": "manual_review_suggested",
+          "reason": "The review could not safely resolve whether this record is ready for import."
+        },
+        {
+          "code": "mixed_impact_ambiguity",
+          "reason": "Impact direction remains mixed and may need a deeper pass to explain why."
+        },
+        {
+          "code": "evidence_gaps",
+          "reason": "The review identified evidence that would make the record safer to import."
+        }
+      ],
+      "suggestion_conflicts": [],
+      "has_material_conflict": false,
+      "conflict_summary": "OpenAI Batch review currently runs a single conservative pass.",
+      "conflict_fields": [],
+      "confidence_comparison": {
+        "standard_confidence_score": 0.4,
+        "standard_confidence_level": "Low",
+        "deep_confidence_score": null,
+        "deep_confidence_level": null,
+        "final_confidence_score": 0.4,
+        "final_confidence_level": "Low",
+        "score_delta_after_deep_review": null,
+        "level_changed_after_deep_review": false,
+        "summary": "Only one conservative classifier pass is available, so there is no cross-pass comparison."
+      },
+      "confidence_changed_after_deep_review": false,
+      "review_priority": "high",
+      "review_priority_score": 10,
+      "review_priority_reason": "The final advisory confidence is low. The final suggestion still resolves to manual review. Source warnings remain on the final suggestion.",
+      "review_priority_signals": [
+        {
+          "code": "deep_review_recommended",
+          "weight": 1,
+          "reason": "The record already shows signals that justify deeper review."
+        },
+        {
+          "code": "low_confidence",
+          "weight": 2,
+          "reason": "The final advisory confidence is low."
+        },
+        {
+          "code": "source_warnings",
+          "weight": 2,
+          "reason": "Source warnings remain on the final suggestion."
+        },
+        {
+          "code": "evidence_gaps",
+          "weight": 1,
+          "reason": "The final suggestion still names evidence gaps before import."
+        },
+        {
+          "code": "multiple_hesitation_reasons",
+          "weight": 1,
+          "reason": "The review surfaced multiple hesitation reasons."
+        },
+        {
+          "code": "manual_review_suggested",
+          "weight": 2,
+          "reason": "The final suggestion still resolves to manual review."
+        },
+        {
+          "code": "mixed_impact_direction",
+          "weight": 1,
+          "reason": "Impact direction remains mixed and needs careful operator interpretation."
+        }
+      ],
+      "manual_review_severity": "high",
+      "operator_attention_needed": true,
+      "suggested_batch": "high_attention",
+      "suggested_batch_reason": "Material conflict or high review priority makes this a first-pass attention item.",
+      "suggested_batch_tags": [
+        "high_attention",
+        "manual_review_focus",
+        "deep_review_candidates",
+        "source_check_needed"
+      ],
+      "existing_matches": [],
+      "suggestions": {
+        "title_normalized": "Require proof of citizenship and paper-ballot election safeguards",
+        "summary_suggestion": "A March 2025 executive order advanced part of the administration's election-integrity agenda, but full implementation remained incomplete.",
+        "topic_suggestion": "Voting Rights",
+        "impacted_group_suggestion": "Black voters and Black-majority communities affected by voter registration, ballot access, and election administration rules",
+        "status_suggestion": "Partial",
+        "impact_direction_suggestion": "Mixed",
+        "evidence_strength_suggestion": "Moderate",
+        "record_action_suggestion": "manual_review",
+        "recommended_action": "import_with_pending_impact",
+        "classifier_recommended_action": "needs_manual_review",
+        "impact_status": "impact_pending",
+        "impact_status_reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review.",
+        "confidence_score": 0.4,
+        "confidence_level": "Low",
+        "reasoning_summary": "The promise and partial executive action aimed to require proof of citizenship and paper-ballot safeguards for federal elections. While the order was issued, implementation was incomplete and the direct impact on Black voters is not clearly documented in the provided evidence.",
+        "hesitation_reasons": [
+          "The record documents a campaign promise and a subsequent executive order, but implementation is described as partial and incomplete.",
+          "The evidence notes that such measures can affect Black communities, but does not provide direct, measurable outcomes or clear documentation of positive or negative effects.",
+          "The outcome summary and impact note are cautious and do not specify concrete results for Black Americans.",
+          "Evidence strength is described as 'moderate' and the impact direction as 'mixed', but without detailed supporting data."
+        ],
+        "evidence_needed_to_reduce_risk": [
+          "Direct evidence of measurable impact on Black voter registration, turnout, or ballot acceptance.",
+          "Details on how federal agencies implemented the directive and the specific effects in Black-majority jurisdictions.",
+          "Clear documentation of positive or negative outcomes for Black Americans."
+        ],
+        "suggested_operator_next_action": "manual_review_required",
+        "caution_flags": [
+          "manual_review_required",
+          "no_independent_or_third_party_analysis_of_impact.",
+          "sources_are_official_and_primary_but_lack_detailed_outcome_data.",
+          "weak_evidence"
+        ],
+        "source_warnings": [
+          "no_independent_or_third_party_analysis_of_impact.",
+          "sources_are_official_and_primary_but_lack_detailed_outcome_data."
+        ],
+        "missing_source_warnings": [
+          "no_independent_or_third_party_analysis_of_impact.",
+          "sources_are_official_and_primary_but_lack_detailed_outcome_data."
+        ],
+        "ambiguity_notes": "The record documents a campaign promise and a subsequent executive order, but implementation is described as partial and incomplete. The evidence notes that such measures can affect Black communities, but does not provide direct, measurable outcomes or clear documentation of positive or negative effects. The outcome summary and impact note are cautious and do not specify concrete results for Black Americans.",
+        "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. Source warnings remain and reduce trust in the suggestion. Confidence is supported because Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
+        "confidence_signals": [
+          {
+            "code": "low_confidence",
+            "direction": "reduces",
+            "reason": "The normalized confidence score remains low after review."
+          },
+          {
+            "code": "source_warnings_present",
+            "direction": "reduces",
+            "reason": "Source warnings remain and reduce trust in the suggestion."
+          },
+          {
+            "code": "manual_review_required",
+            "direction": "reduces",
+            "reason": "The pass recommends manual review instead of a confident import path."
+          },
+          {
+            "code": "mixed_impact_direction",
+            "direction": "reduces",
+            "reason": "Mixed impact direction makes the downstream interpretation less settled."
+          },
+          {
+            "code": "evidence_gaps_present",
+            "direction": "reduces",
+            "reason": "The pass identified evidence gaps that should be closed before import."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      },
+      "standard_pass_suggestions": {
+        "title_normalized": "Require proof of citizenship and paper-ballot election safeguards",
+        "summary_suggestion": "A March 2025 executive order advanced part of the administration's election-integrity agenda, but full implementation remained incomplete.",
+        "topic_suggestion": "Voting Rights",
+        "impacted_group_suggestion": "Black voters and Black-majority communities affected by voter registration, ballot access, and election administration rules",
+        "status_suggestion": "Partial",
+        "impact_direction_suggestion": "Mixed",
+        "evidence_strength_suggestion": "Moderate",
+        "record_action_suggestion": "manual_review",
+        "recommended_action": "import_with_pending_impact",
+        "classifier_recommended_action": "needs_manual_review",
+        "impact_status": "impact_pending",
+        "impact_status_reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review.",
+        "confidence_score": 0.4,
+        "confidence_level": "Low",
+        "reasoning_summary": "The promise and partial executive action aimed to require proof of citizenship and paper-ballot safeguards for federal elections. While the order was issued, implementation was incomplete and the direct impact on Black voters is not clearly documented in the provided evidence.",
+        "hesitation_reasons": [
+          "The record documents a campaign promise and a subsequent executive order, but implementation is described as partial and incomplete.",
+          "The evidence notes that such measures can affect Black communities, but does not provide direct, measurable outcomes or clear documentation of positive or negative effects.",
+          "The outcome summary and impact note are cautious and do not specify concrete results for Black Americans.",
+          "Evidence strength is described as 'moderate' and the impact direction as 'mixed', but without detailed supporting data."
+        ],
+        "evidence_needed_to_reduce_risk": [
+          "Direct evidence of measurable impact on Black voter registration, turnout, or ballot acceptance.",
+          "Details on how federal agencies implemented the directive and the specific effects in Black-majority jurisdictions.",
+          "Clear documentation of positive or negative outcomes for Black Americans."
+        ],
+        "suggested_operator_next_action": "manual_review_required",
+        "caution_flags": [
+          "manual_review_required",
+          "no_independent_or_third_party_analysis_of_impact.",
+          "sources_are_official_and_primary_but_lack_detailed_outcome_data.",
+          "weak_evidence"
+        ],
+        "source_warnings": [
+          "no_independent_or_third_party_analysis_of_impact.",
+          "sources_are_official_and_primary_but_lack_detailed_outcome_data."
+        ],
+        "missing_source_warnings": [
+          "no_independent_or_third_party_analysis_of_impact.",
+          "sources_are_official_and_primary_but_lack_detailed_outcome_data."
+        ],
+        "ambiguity_notes": "The record documents a campaign promise and a subsequent executive order, but implementation is described as partial and incomplete. The evidence notes that such measures can affect Black communities, but does not provide direct, measurable outcomes or clear documentation of positive or negative effects. The outcome summary and impact note are cautious and do not specify concrete results for Black Americans.",
+        "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. Source warnings remain and reduce trust in the suggestion. Confidence is supported because Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
+        "confidence_signals": [
+          {
+            "code": "low_confidence",
+            "direction": "reduces",
+            "reason": "The normalized confidence score remains low after review."
+          },
+          {
+            "code": "source_warnings_present",
+            "direction": "reduces",
+            "reason": "Source warnings remain and reduce trust in the suggestion."
+          },
+          {
+            "code": "manual_review_required",
+            "direction": "reduces",
+            "reason": "The pass recommends manual review instead of a confident import path."
+          },
+          {
+            "code": "mixed_impact_direction",
+            "direction": "reduces",
+            "reason": "Mixed impact direction makes the downstream interpretation less settled."
+          },
+          {
+            "code": "evidence_gaps_present",
+            "direction": "reduces",
+            "reason": "The pass identified evidence gaps that should be closed before import."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      },
+      "deep_pass_suggestions": null,
+      "weak_evidence": true,
+      "confidence": "low",
+      "confidence_score": 0.4,
+      "source_quality": "medium",
+      "caution_flags": [
+        "manual_review_required",
+        "no_independent_or_third_party_analysis_of_impact.",
+        "sources_are_official_and_primary_but_lack_detailed_outcome_data.",
+        "weak_evidence"
+      ]
+    },
+    {
+      "slug": "trump-2025-end-federal-dei-equity-programs",
+      "title": "End federal DEI and equity-based government programs",
+      "impact_status": "impact_pending",
+      "recommended_action": "import_with_pending_impact",
+      "requested_model": "gpt-4.1",
+      "effective_model": "gpt-4.1",
+      "resolved_model": "gpt-4.1",
+      "review_mode": "deep",
+      "review_mode_requested": "deep",
+      "review_mode_used": "standard",
+      "review_backend": "openai_batch",
+      "model_used": "gpt-4.1",
+      "verifier_model_requested": "gpt-4.1",
+      "verifier_model_used": null,
+      "senior_model_requested": "gpt-4.1",
+      "senior_model_used": "gpt-4.1",
+      "fallback_model": "gpt-4.1",
+      "fallback_used": false,
+      "fallback_reason": null,
+      "model_resolution_status": "exact_requested",
+      "timeout_seconds": null,
+      "senior_timeout_seconds": 240,
+      "verifier_timeout_seconds": 240,
+      "retry_count": 0,
+      "senior_attempted": true,
+      "senior_retry_attempted": false,
+      "verifier_attempted": false,
+      "verifier_retry_attempted": false,
+      "deep_review_requested": true,
+      "deep_review_ran": false,
+      "deep_review_reason": "single_pass_conservative_classifier",
+      "second_pass_ran": false,
+      "deep_review_recommended": true,
+      "deep_review_recommendation_reason": "Confidence is low enough that a deeper ambiguity check is warranted. Source coverage is missing or thin for at least part of the record. The review surfaced multiple hesitation reasons that should be reconciled.",
+      "deep_review_recommendation_signals": [
+        {
+          "code": "low_confidence",
+          "reason": "Confidence is low enough that a deeper ambiguity check is warranted."
+        },
+        {
+          "code": "weak_source_coverage",
+          "reason": "Source coverage is missing or thin for at least part of the record."
+        },
+        {
+          "code": "multiple_hesitation_reasons",
+          "reason": "The review surfaced multiple hesitation reasons that should be reconciled."
+        },
+        {
+          "code": "manual_review_suggested",
+          "reason": "The review could not safely resolve whether this record is ready for import."
+        },
+        {
+          "code": "evidence_gaps",
+          "reason": "The review identified evidence that would make the record safer to import."
+        }
+      ],
+      "suggestion_conflicts": [],
+      "has_material_conflict": false,
+      "conflict_summary": "OpenAI Batch review currently runs a single conservative pass.",
+      "conflict_fields": [],
+      "confidence_comparison": {
+        "standard_confidence_score": 0.5,
+        "standard_confidence_level": "Low",
+        "deep_confidence_score": null,
+        "deep_confidence_level": null,
+        "final_confidence_score": 0.5,
+        "final_confidence_level": "Low",
+        "score_delta_after_deep_review": null,
+        "level_changed_after_deep_review": false,
+        "summary": "Only one conservative classifier pass is available, so there is no cross-pass comparison."
+      },
+      "confidence_changed_after_deep_review": false,
+      "review_priority": "high",
+      "review_priority_score": 9,
+      "review_priority_reason": "The final advisory confidence is low. The final suggestion still resolves to manual review. Source warnings remain on the final suggestion.",
+      "review_priority_signals": [
+        {
+          "code": "deep_review_recommended",
+          "weight": 1,
+          "reason": "The record already shows signals that justify deeper review."
+        },
+        {
+          "code": "low_confidence",
+          "weight": 2,
+          "reason": "The final advisory confidence is low."
+        },
+        {
+          "code": "source_warnings",
+          "weight": 2,
+          "reason": "Source warnings remain on the final suggestion."
+        },
+        {
+          "code": "evidence_gaps",
+          "weight": 1,
+          "reason": "The final suggestion still names evidence gaps before import."
+        },
+        {
+          "code": "multiple_hesitation_reasons",
+          "weight": 1,
+          "reason": "The review surfaced multiple hesitation reasons."
+        },
+        {
+          "code": "manual_review_suggested",
+          "weight": 2,
+          "reason": "The final suggestion still resolves to manual review."
+        }
+      ],
+      "manual_review_severity": "high",
+      "operator_attention_needed": true,
+      "suggested_batch": "high_attention",
+      "suggested_batch_reason": "Material conflict or high review priority makes this a first-pass attention item.",
+      "suggested_batch_tags": [
+        "high_attention",
+        "manual_review_focus",
+        "deep_review_candidates",
+        "source_check_needed"
+      ],
+      "existing_matches": [],
+      "suggestions": {
+        "title_normalized": "End federal DEI and equity-based government programs",
+        "summary_suggestion": "The administration ordered the termination of federal DEI and equity structures, but implementation remained an active multi-agency process.",
+        "topic_suggestion": "Economic Opportunity",
+        "impacted_group_suggestion": "Black workers, Black students, and Black communities affected by targeted federal equity initiatives and program design",
+        "status_suggestion": "Partial",
+        "impact_direction_suggestion": "Negative",
+        "evidence_strength_suggestion": "Moderate",
+        "record_action_suggestion": "manual_review",
+        "recommended_action": "import_with_pending_impact",
+        "classifier_recommended_action": "needs_manual_review",
+        "impact_status": "impact_pending",
+        "impact_status_reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review.",
+        "confidence_score": 0.5,
+        "confidence_level": "Low",
+        "reasoning_summary": "The promise and executive order directed the termination of federal DEI and equity-based programs, which are described as addressing disparities affecting Black communities. The evidence indicates a negative direction of impact, but the actual downstream effects and full implementation outcomes are not fully documented.",
+        "hesitation_reasons": [
+          "The executive order explicitly targets the removal of DEI and equity-focused offices, grants, and policies.",
+          "The record notes that these programs were previously used to address disparities affecting Black communities.",
+          "The outcome summary and black community impact note both indicate that eliminating these structures can reduce federal attention to disparities in employment, education, contracting, and service access.",
+          "Evidence strength is described as 'moderate' and implementation is ongoing, with only partial status reported.",
+          "There is insufficient detail on the full measurable impact or specific downstream effects."
+        ],
+        "evidence_needed_to_reduce_risk": [
+          "Detailed agency-level implementation outcomes",
+          "Specific measurable impacts on Black communities",
+          "Evidence of actual program terminations and their effects"
+        ],
+        "suggested_operator_next_action": "manual_review_required",
+        "caution_flags": [
+          "lack_of_granular_data_on_affected_programs_or_communities",
+          "manual_review_required",
+          "no_independent_or_third_party_verification_of_outcomes",
+          "single_source_reliance_(white_house_order)",
+          "weak_evidence"
+        ],
+        "source_warnings": [
+          "lack_of_granular_data_on_affected_programs_or_communities",
+          "no_independent_or_third_party_verification_of_outcomes",
+          "single_source_reliance_(white_house_order)"
+        ],
+        "missing_source_warnings": [
+          "lack_of_granular_data_on_affected_programs_or_communities",
+          "no_independent_or_third_party_verification_of_outcomes",
+          "single_source_reliance_(white_house_order)"
+        ],
+        "ambiguity_notes": "The executive order explicitly targets the removal of DEI and equity-focused offices, grants, and policies. The record notes that these programs were previously used to address disparities affecting Black communities. The outcome summary and black community impact note both indicate that eliminating these structures can reduce federal attention to disparities in employment, education, contracting, and service access.",
+        "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. Source warnings remain and reduce trust in the suggestion. Confidence is supported because Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
+        "confidence_signals": [
+          {
+            "code": "low_confidence",
+            "direction": "reduces",
+            "reason": "The normalized confidence score remains low after review."
+          },
+          {
+            "code": "source_warnings_present",
+            "direction": "reduces",
+            "reason": "Source warnings remain and reduce trust in the suggestion."
+          },
+          {
+            "code": "manual_review_required",
+            "direction": "reduces",
+            "reason": "The pass recommends manual review instead of a confident import path."
+          },
+          {
+            "code": "evidence_gaps_present",
+            "direction": "reduces",
+            "reason": "The pass identified evidence gaps that should be closed before import."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      },
+      "standard_pass_suggestions": {
+        "title_normalized": "End federal DEI and equity-based government programs",
+        "summary_suggestion": "The administration ordered the termination of federal DEI and equity structures, but implementation remained an active multi-agency process.",
+        "topic_suggestion": "Economic Opportunity",
+        "impacted_group_suggestion": "Black workers, Black students, and Black communities affected by targeted federal equity initiatives and program design",
+        "status_suggestion": "Partial",
+        "impact_direction_suggestion": "Negative",
+        "evidence_strength_suggestion": "Moderate",
+        "record_action_suggestion": "manual_review",
+        "recommended_action": "import_with_pending_impact",
+        "classifier_recommended_action": "needs_manual_review",
+        "impact_status": "impact_pending",
+        "impact_status_reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review.",
+        "confidence_score": 0.5,
+        "confidence_level": "Low",
+        "reasoning_summary": "The promise and executive order directed the termination of federal DEI and equity-based programs, which are described as addressing disparities affecting Black communities. The evidence indicates a negative direction of impact, but the actual downstream effects and full implementation outcomes are not fully documented.",
+        "hesitation_reasons": [
+          "The executive order explicitly targets the removal of DEI and equity-focused offices, grants, and policies.",
+          "The record notes that these programs were previously used to address disparities affecting Black communities.",
+          "The outcome summary and black community impact note both indicate that eliminating these structures can reduce federal attention to disparities in employment, education, contracting, and service access.",
+          "Evidence strength is described as 'moderate' and implementation is ongoing, with only partial status reported.",
+          "There is insufficient detail on the full measurable impact or specific downstream effects."
+        ],
+        "evidence_needed_to_reduce_risk": [
+          "Detailed agency-level implementation outcomes",
+          "Specific measurable impacts on Black communities",
+          "Evidence of actual program terminations and their effects"
+        ],
+        "suggested_operator_next_action": "manual_review_required",
+        "caution_flags": [
+          "lack_of_granular_data_on_affected_programs_or_communities",
+          "manual_review_required",
+          "no_independent_or_third_party_verification_of_outcomes",
+          "single_source_reliance_(white_house_order)",
+          "weak_evidence"
+        ],
+        "source_warnings": [
+          "lack_of_granular_data_on_affected_programs_or_communities",
+          "no_independent_or_third_party_verification_of_outcomes",
+          "single_source_reliance_(white_house_order)"
+        ],
+        "missing_source_warnings": [
+          "lack_of_granular_data_on_affected_programs_or_communities",
+          "no_independent_or_third_party_verification_of_outcomes",
+          "single_source_reliance_(white_house_order)"
+        ],
+        "ambiguity_notes": "The executive order explicitly targets the removal of DEI and equity-focused offices, grants, and policies. The record notes that these programs were previously used to address disparities affecting Black communities. The outcome summary and black community impact note both indicate that eliminating these structures can reduce federal attention to disparities in employment, education, contracting, and service access.",
+        "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. Source warnings remain and reduce trust in the suggestion. Confidence is supported because Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
+        "confidence_signals": [
+          {
+            "code": "low_confidence",
+            "direction": "reduces",
+            "reason": "The normalized confidence score remains low after review."
+          },
+          {
+            "code": "source_warnings_present",
+            "direction": "reduces",
+            "reason": "Source warnings remain and reduce trust in the suggestion."
+          },
+          {
+            "code": "manual_review_required",
+            "direction": "reduces",
+            "reason": "The pass recommends manual review instead of a confident import path."
+          },
+          {
+            "code": "evidence_gaps_present",
+            "direction": "reduces",
+            "reason": "The pass identified evidence gaps that should be closed before import."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      },
+      "deep_pass_suggestions": null,
+      "weak_evidence": true,
+      "confidence": "low",
+      "confidence_score": 0.5,
+      "source_quality": "medium",
+      "caution_flags": [
+        "lack_of_granular_data_on_affected_programs_or_communities",
+        "manual_review_required",
+        "no_independent_or_third_party_verification_of_outcomes",
+        "single_source_reliance_(white_house_order)",
+        "weak_evidence"
+      ]
+    },
+    {
+      "slug": "trump-2025-strengthen-local-law-enforcement",
+      "title": "Increase federal support for state and local law enforcement",
+      "impact_status": "impact_pending",
+      "recommended_action": "import_with_pending_impact",
+      "requested_model": "gpt-4.1",
+      "effective_model": "gpt-4.1",
+      "resolved_model": "gpt-4.1",
+      "review_mode": "deep",
+      "review_mode_requested": "deep",
+      "review_mode_used": "standard",
+      "review_backend": "openai_batch",
+      "model_used": "gpt-4.1",
+      "verifier_model_requested": "gpt-4.1",
+      "verifier_model_used": null,
+      "senior_model_requested": "gpt-4.1",
+      "senior_model_used": "gpt-4.1",
+      "fallback_model": "gpt-4.1",
+      "fallback_used": false,
+      "fallback_reason": null,
+      "model_resolution_status": "exact_requested",
+      "timeout_seconds": null,
+      "senior_timeout_seconds": 240,
+      "verifier_timeout_seconds": 240,
+      "retry_count": 0,
+      "senior_attempted": true,
+      "senior_retry_attempted": false,
+      "verifier_attempted": false,
+      "verifier_retry_attempted": false,
+      "deep_review_requested": true,
+      "deep_review_ran": false,
+      "deep_review_reason": "single_pass_conservative_classifier",
+      "second_pass_ran": false,
+      "deep_review_recommended": true,
+      "deep_review_recommendation_reason": "Confidence is low enough that a deeper ambiguity check is warranted. Source coverage is missing or thin for at least part of the record. The review surfaced multiple hesitation reasons that should be reconciled.",
+      "deep_review_recommendation_signals": [
+        {
+          "code": "low_confidence",
+          "reason": "Confidence is low enough that a deeper ambiguity check is warranted."
+        },
+        {
+          "code": "weak_source_coverage",
+          "reason": "Source coverage is missing or thin for at least part of the record."
+        },
+        {
+          "code": "multiple_hesitation_reasons",
+          "reason": "The review surfaced multiple hesitation reasons that should be reconciled."
+        },
+        {
+          "code": "manual_review_suggested",
+          "reason": "The review could not safely resolve whether this record is ready for import."
+        },
+        {
+          "code": "mixed_impact_ambiguity",
+          "reason": "Impact direction remains mixed and may need a deeper pass to explain why."
+        },
+        {
+          "code": "evidence_gaps",
+          "reason": "The review identified evidence that would make the record safer to import."
+        }
+      ],
+      "suggestion_conflicts": [],
+      "has_material_conflict": false,
+      "conflict_summary": "OpenAI Batch review currently runs a single conservative pass.",
+      "conflict_fields": [],
+      "confidence_comparison": {
+        "standard_confidence_score": 0.4,
+        "standard_confidence_level": "Low",
+        "deep_confidence_score": null,
+        "deep_confidence_level": null,
+        "final_confidence_score": 0.4,
+        "final_confidence_level": "Low",
+        "score_delta_after_deep_review": null,
+        "level_changed_after_deep_review": false,
+        "summary": "Only one conservative classifier pass is available, so there is no cross-pass comparison."
+      },
+      "confidence_changed_after_deep_review": false,
+      "review_priority": "high",
+      "review_priority_score": 10,
+      "review_priority_reason": "The final advisory confidence is low. The final suggestion still resolves to manual review. Source warnings remain on the final suggestion.",
+      "review_priority_signals": [
+        {
+          "code": "deep_review_recommended",
+          "weight": 1,
+          "reason": "The record already shows signals that justify deeper review."
+        },
+        {
+          "code": "low_confidence",
+          "weight": 2,
+          "reason": "The final advisory confidence is low."
+        },
+        {
+          "code": "source_warnings",
+          "weight": 2,
+          "reason": "Source warnings remain on the final suggestion."
+        },
+        {
+          "code": "evidence_gaps",
+          "weight": 1,
+          "reason": "The final suggestion still names evidence gaps before import."
+        },
+        {
+          "code": "multiple_hesitation_reasons",
+          "weight": 1,
+          "reason": "The review surfaced multiple hesitation reasons."
+        },
+        {
+          "code": "manual_review_suggested",
+          "weight": 2,
+          "reason": "The final suggestion still resolves to manual review."
+        },
+        {
+          "code": "mixed_impact_direction",
+          "weight": 1,
+          "reason": "Impact direction remains mixed and needs careful operator interpretation."
+        }
+      ],
+      "manual_review_severity": "high",
+      "operator_attention_needed": true,
+      "suggested_batch": "high_attention",
+      "suggested_batch_reason": "Material conflict or high review priority makes this a first-pass attention item.",
+      "suggested_batch_tags": [
+        "high_attention",
+        "manual_review_focus",
+        "deep_review_candidates",
+        "source_check_needed"
+      ],
+      "existing_matches": [],
+      "suggestions": {
+        "title_normalized": "Increase federal support for state and local law enforcement",
+        "summary_suggestion": "A 2025 executive order expanded federal support and protections for local law enforcement, but downstream local effects remained early.",
+        "topic_suggestion": "Criminal Justice",
+        "impacted_group_suggestion": "Black communities affected by policing, public safety policy, arrest exposure, and federal oversight of local law enforcement",
+        "status_suggestion": "Partial",
+        "impact_direction_suggestion": "Mixed",
+        "evidence_strength_suggestion": "Moderate",
+        "record_action_suggestion": "manual_review",
+        "recommended_action": "import_with_pending_impact",
+        "classifier_recommended_action": "needs_manual_review",
+        "impact_status": "impact_pending",
+        "impact_status_reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review.",
+        "confidence_score": 0.4,
+        "confidence_level": "Low",
+        "reasoning_summary": "The promise and subsequent executive order expanded federal support and protections for local law enforcement, but the evidence does not clearly establish whether this had a positive, negative, or mixed impact on Black communities. The sources confirm the policy actions but do not provide direct, measurable outcomes for Black Americans.",
+        "hesitation_reasons": [
+          "The record documents the promise and executive order to expand support for law enforcement.",
+          "The summary and outcome notes acknowledge that effects on Black communities could be both positive (public safety) and negative (increased arrest exposure, reduced oversight), but do not provide direct evidence of outcomes.",
+          "The evidence is described as 'moderate' and 'incomplete,' with downstream effects dependent on later implementation.",
+          "No direct data or clear outcomes for Black Americans are provided in the sources."
+        ],
+        "evidence_needed_to_reduce_risk": [
+          "Direct evidence of impact on Black communities",
+          "Measurable outcomes (positive or negative) for Black Americans",
+          "Community-level implementation details",
+          "Independent or third-party analysis of effects"
+        ],
+        "suggested_operator_next_action": "manual_review_required",
+        "caution_flags": [
+          "manual_review_required",
+          "no_direct_measurement_of_impact_on_black_communities",
+          "primary_sources_are_official_government_and_campaign_statements,_lacking_independent_verification",
+          "weak_evidence"
+        ],
+        "source_warnings": [
+          "no_direct_measurement_of_impact_on_black_communities",
+          "primary_sources_are_official_government_and_campaign_statements,_lacking_independent_verification"
+        ],
+        "missing_source_warnings": [
+          "no_direct_measurement_of_impact_on_black_communities",
+          "primary_sources_are_official_government_and_campaign_statements,_lacking_independent_verification"
+        ],
+        "ambiguity_notes": "The record documents the promise and executive order to expand support for law enforcement. The summary and outcome notes acknowledge that effects on Black communities could be both positive (public safety) and negative (increased arrest exposure, reduced oversight), but do not provide direct evidence of outcomes. The evidence is described as 'moderate' and 'incomplete,' with downstream effects dependent on later implementation.",
+        "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. Source warnings remain and reduce trust in the suggestion. Confidence is supported because Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
+        "confidence_signals": [
+          {
+            "code": "low_confidence",
+            "direction": "reduces",
+            "reason": "The normalized confidence score remains low after review."
+          },
+          {
+            "code": "source_warnings_present",
+            "direction": "reduces",
+            "reason": "Source warnings remain and reduce trust in the suggestion."
+          },
+          {
+            "code": "manual_review_required",
+            "direction": "reduces",
+            "reason": "The pass recommends manual review instead of a confident import path."
+          },
+          {
+            "code": "mixed_impact_direction",
+            "direction": "reduces",
+            "reason": "Mixed impact direction makes the downstream interpretation less settled."
+          },
+          {
+            "code": "evidence_gaps_present",
+            "direction": "reduces",
+            "reason": "The pass identified evidence gaps that should be closed before import."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      },
+      "standard_pass_suggestions": {
+        "title_normalized": "Increase federal support for state and local law enforcement",
+        "summary_suggestion": "A 2025 executive order expanded federal support and protections for local law enforcement, but downstream local effects remained early.",
+        "topic_suggestion": "Criminal Justice",
+        "impacted_group_suggestion": "Black communities affected by policing, public safety policy, arrest exposure, and federal oversight of local law enforcement",
+        "status_suggestion": "Partial",
+        "impact_direction_suggestion": "Mixed",
+        "evidence_strength_suggestion": "Moderate",
+        "record_action_suggestion": "manual_review",
+        "recommended_action": "import_with_pending_impact",
+        "classifier_recommended_action": "needs_manual_review",
+        "impact_status": "impact_pending",
+        "impact_status_reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review.",
+        "confidence_score": 0.4,
+        "confidence_level": "Low",
+        "reasoning_summary": "The promise and subsequent executive order expanded federal support and protections for local law enforcement, but the evidence does not clearly establish whether this had a positive, negative, or mixed impact on Black communities. The sources confirm the policy actions but do not provide direct, measurable outcomes for Black Americans.",
+        "hesitation_reasons": [
+          "The record documents the promise and executive order to expand support for law enforcement.",
+          "The summary and outcome notes acknowledge that effects on Black communities could be both positive (public safety) and negative (increased arrest exposure, reduced oversight), but do not provide direct evidence of outcomes.",
+          "The evidence is described as 'moderate' and 'incomplete,' with downstream effects dependent on later implementation.",
+          "No direct data or clear outcomes for Black Americans are provided in the sources."
+        ],
+        "evidence_needed_to_reduce_risk": [
+          "Direct evidence of impact on Black communities",
+          "Measurable outcomes (positive or negative) for Black Americans",
+          "Community-level implementation details",
+          "Independent or third-party analysis of effects"
+        ],
+        "suggested_operator_next_action": "manual_review_required",
+        "caution_flags": [
+          "manual_review_required",
+          "no_direct_measurement_of_impact_on_black_communities",
+          "primary_sources_are_official_government_and_campaign_statements,_lacking_independent_verification",
+          "weak_evidence"
+        ],
+        "source_warnings": [
+          "no_direct_measurement_of_impact_on_black_communities",
+          "primary_sources_are_official_government_and_campaign_statements,_lacking_independent_verification"
+        ],
+        "missing_source_warnings": [
+          "no_direct_measurement_of_impact_on_black_communities",
+          "primary_sources_are_official_government_and_campaign_statements,_lacking_independent_verification"
+        ],
+        "ambiguity_notes": "The record documents the promise and executive order to expand support for law enforcement. The summary and outcome notes acknowledge that effects on Black communities could be both positive (public safety) and negative (increased arrest exposure, reduced oversight), but do not provide direct evidence of outcomes. The evidence is described as 'moderate' and 'incomplete,' with downstream effects dependent on later implementation.",
+        "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. Source warnings remain and reduce trust in the suggestion. Confidence is supported because Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
+        "confidence_signals": [
+          {
+            "code": "low_confidence",
+            "direction": "reduces",
+            "reason": "The normalized confidence score remains low after review."
+          },
+          {
+            "code": "source_warnings_present",
+            "direction": "reduces",
+            "reason": "Source warnings remain and reduce trust in the suggestion."
+          },
+          {
+            "code": "manual_review_required",
+            "direction": "reduces",
+            "reason": "The pass recommends manual review instead of a confident import path."
+          },
+          {
+            "code": "mixed_impact_direction",
+            "direction": "reduces",
+            "reason": "Mixed impact direction makes the downstream interpretation less settled."
+          },
+          {
+            "code": "evidence_gaps_present",
+            "direction": "reduces",
+            "reason": "The pass identified evidence gaps that should be closed before import."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      },
+      "deep_pass_suggestions": null,
+      "weak_evidence": true,
+      "confidence": "low",
+      "confidence_score": 0.4,
+      "source_quality": "medium",
+      "caution_flags": [
+        "manual_review_required",
+        "no_direct_measurement_of_impact_on_black_communities",
+        "primary_sources_are_official_government_and_campaign_statements,_lacking_independent_verification",
+        "weak_evidence"
+      ]
+    },
+    {
+      "slug": "trump-2025-clear-street-encampments-expand-civil-commitment",
+      "title": "Clear street encampments and expand treatment-oriented street-order responses",
+      "impact_status": "impact_pending",
+      "recommended_action": "import_with_pending_impact",
+      "requested_model": "gpt-4.1",
+      "effective_model": "gpt-4.1",
+      "resolved_model": "gpt-4.1",
+      "review_mode": "deep",
+      "review_mode_requested": "deep",
+      "review_mode_used": "standard",
+      "review_backend": "openai_batch",
+      "model_used": "gpt-4.1",
+      "verifier_model_requested": "gpt-4.1",
+      "verifier_model_used": null,
+      "senior_model_requested": "gpt-4.1",
+      "senior_model_used": "gpt-4.1",
+      "fallback_model": "gpt-4.1",
+      "fallback_used": false,
+      "fallback_reason": null,
+      "model_resolution_status": "exact_requested",
+      "timeout_seconds": null,
+      "senior_timeout_seconds": 240,
+      "verifier_timeout_seconds": 240,
+      "retry_count": 0,
+      "senior_attempted": true,
+      "senior_retry_attempted": false,
+      "verifier_attempted": false,
+      "verifier_retry_attempted": false,
+      "deep_review_requested": true,
+      "deep_review_ran": false,
+      "deep_review_reason": "single_pass_conservative_classifier",
+      "second_pass_ran": false,
+      "deep_review_recommended": true,
+      "deep_review_recommendation_reason": "Confidence is low enough that a deeper ambiguity check is warranted. Source coverage is missing or thin for at least part of the record. The review surfaced multiple hesitation reasons that should be reconciled.",
+      "deep_review_recommendation_signals": [
+        {
+          "code": "low_confidence",
+          "reason": "Confidence is low enough that a deeper ambiguity check is warranted."
+        },
+        {
+          "code": "weak_source_coverage",
+          "reason": "Source coverage is missing or thin for at least part of the record."
+        },
+        {
+          "code": "multiple_hesitation_reasons",
+          "reason": "The review surfaced multiple hesitation reasons that should be reconciled."
+        },
+        {
+          "code": "manual_review_suggested",
+          "reason": "The review could not safely resolve whether this record is ready for import."
+        },
+        {
+          "code": "mixed_impact_ambiguity",
+          "reason": "Impact direction remains mixed and may need a deeper pass to explain why."
+        },
+        {
+          "code": "evidence_gaps",
+          "reason": "The review identified evidence that would make the record safer to import."
+        }
+      ],
+      "suggestion_conflicts": [],
+      "has_material_conflict": false,
+      "conflict_summary": "OpenAI Batch review currently runs a single conservative pass.",
+      "conflict_fields": [],
+      "confidence_comparison": {
+        "standard_confidence_score": 0.5,
+        "standard_confidence_level": "Low",
+        "deep_confidence_score": null,
+        "deep_confidence_level": null,
+        "final_confidence_score": 0.5,
+        "final_confidence_level": "Low",
+        "score_delta_after_deep_review": null,
+        "level_changed_after_deep_review": false,
+        "summary": "Only one conservative classifier pass is available, so there is no cross-pass comparison."
+      },
+      "confidence_changed_after_deep_review": false,
+      "review_priority": "high",
+      "review_priority_score": 10,
+      "review_priority_reason": "The final advisory confidence is low. The final suggestion still resolves to manual review. Source warnings remain on the final suggestion.",
+      "review_priority_signals": [
+        {
+          "code": "deep_review_recommended",
+          "weight": 1,
+          "reason": "The record already shows signals that justify deeper review."
+        },
+        {
+          "code": "low_confidence",
+          "weight": 2,
+          "reason": "The final advisory confidence is low."
+        },
+        {
+          "code": "source_warnings",
+          "weight": 2,
+          "reason": "Source warnings remain on the final suggestion."
+        },
+        {
+          "code": "evidence_gaps",
+          "weight": 1,
+          "reason": "The final suggestion still names evidence gaps before import."
+        },
+        {
+          "code": "multiple_hesitation_reasons",
+          "weight": 1,
+          "reason": "The review surfaced multiple hesitation reasons."
+        },
+        {
+          "code": "manual_review_suggested",
+          "weight": 2,
+          "reason": "The final suggestion still resolves to manual review."
+        },
+        {
+          "code": "mixed_impact_direction",
+          "weight": 1,
+          "reason": "Impact direction remains mixed and needs careful operator interpretation."
+        }
+      ],
+      "manual_review_severity": "high",
+      "operator_attention_needed": true,
+      "suggested_batch": "high_attention",
+      "suggested_batch_reason": "Material conflict or high review priority makes this a first-pass attention item.",
+      "suggested_batch_tags": [
+        "high_attention",
+        "manual_review_focus",
+        "deep_review_candidates",
+        "source_check_needed"
+      ],
+      "existing_matches": [],
+      "suggestions": {
+        "title_normalized": "Clear street encampments and expand treatment-oriented street-order responses",
+        "summary_suggestion": "A 2025 order advanced the administration's street-order agenda, but the balance between enforcement and treatment outcomes remained unresolved.",
+        "topic_suggestion": "Housing",
+        "impacted_group_suggestion": "Black unhoused people and Black neighborhoods affected by homelessness policy, encampment enforcement, and access to treatment services",
+        "status_suggestion": "Partial",
+        "impact_direction_suggestion": "Mixed",
+        "evidence_strength_suggestion": "Moderate",
+        "record_action_suggestion": "manual_review",
+        "recommended_action": "import_with_pending_impact",
+        "classifier_recommended_action": "needs_manual_review",
+        "impact_status": "impact_pending",
+        "impact_status_reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review.",
+        "confidence_score": 0.5,
+        "confidence_level": "Low",
+        "reasoning_summary": "The promise and subsequent action prioritized clearing street encampments and expanding treatment-oriented and civil-commitment responses. The evidence indicates both enforcement (potentially increasing displacement and arrest exposure for Black unhoused people) and expanded treatment access, but the balance and measurable outcomes remain unresolved.",
+        "hesitation_reasons": [
+          "The policy includes both enforcement (anti-encampment, civil commitment) and treatment/rehabilitation components.",
+          "Black Americans are overrepresented among the unhoused, making the policy materially relevant.",
+          "The outcome summary and impact note indicate both potential harms (displacement, arrest exposure) and potential benefits (treatment access, shelter/housing continuity).",
+          "Evidence is described as 'moderate' and 'incomplete' due to unresolved balance between enforcement and treatment, and dependence on state/local implementation.",
+          "No direct, measurable outcomes for Black Americans are provided."
+        ],
+        "evidence_needed_to_reduce_risk": [
+          "Direct data on measurable outcomes for Black Americans",
+          "Details on the scale and effectiveness of treatment access versus enforcement harms",
+          "State and local implementation details",
+          "Long-term impact assessment"
+        ],
+        "suggested_operator_next_action": "manual_review_required",
+        "caution_flags": [
+          "manual_review_required",
+          "no_third_party_or_community_based_outcome_data",
+          "primary_sources_are_campaign_and_government_statements,_not_independent_analysis",
+          "weak_evidence"
+        ],
+        "source_warnings": [
+          "no_third_party_or_community_based_outcome_data",
+          "primary_sources_are_campaign_and_government_statements,_not_independent_analysis"
+        ],
+        "missing_source_warnings": [
+          "no_third_party_or_community_based_outcome_data",
+          "primary_sources_are_campaign_and_government_statements,_not_independent_analysis"
+        ],
+        "ambiguity_notes": "The policy includes both enforcement (anti-encampment, civil commitment) and treatment/rehabilitation components. Black Americans are overrepresented among the unhoused, making the policy materially relevant. The outcome summary and impact note indicate both potential harms (displacement, arrest exposure) and potential benefits (treatment access, shelter/housing continuity).",
+        "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. Source warnings remain and reduce trust in the suggestion. Confidence is supported because Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
+        "confidence_signals": [
+          {
+            "code": "low_confidence",
+            "direction": "reduces",
+            "reason": "The normalized confidence score remains low after review."
+          },
+          {
+            "code": "source_warnings_present",
+            "direction": "reduces",
+            "reason": "Source warnings remain and reduce trust in the suggestion."
+          },
+          {
+            "code": "manual_review_required",
+            "direction": "reduces",
+            "reason": "The pass recommends manual review instead of a confident import path."
+          },
+          {
+            "code": "mixed_impact_direction",
+            "direction": "reduces",
+            "reason": "Mixed impact direction makes the downstream interpretation less settled."
+          },
+          {
+            "code": "evidence_gaps_present",
+            "direction": "reduces",
+            "reason": "The pass identified evidence gaps that should be closed before import."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      },
+      "standard_pass_suggestions": {
+        "title_normalized": "Clear street encampments and expand treatment-oriented street-order responses",
+        "summary_suggestion": "A 2025 order advanced the administration's street-order agenda, but the balance between enforcement and treatment outcomes remained unresolved.",
+        "topic_suggestion": "Housing",
+        "impacted_group_suggestion": "Black unhoused people and Black neighborhoods affected by homelessness policy, encampment enforcement, and access to treatment services",
+        "status_suggestion": "Partial",
+        "impact_direction_suggestion": "Mixed",
+        "evidence_strength_suggestion": "Moderate",
+        "record_action_suggestion": "manual_review",
+        "recommended_action": "import_with_pending_impact",
+        "classifier_recommended_action": "needs_manual_review",
+        "impact_status": "impact_pending",
+        "impact_status_reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review.",
+        "confidence_score": 0.5,
+        "confidence_level": "Low",
+        "reasoning_summary": "The promise and subsequent action prioritized clearing street encampments and expanding treatment-oriented and civil-commitment responses. The evidence indicates both enforcement (potentially increasing displacement and arrest exposure for Black unhoused people) and expanded treatment access, but the balance and measurable outcomes remain unresolved.",
+        "hesitation_reasons": [
+          "The policy includes both enforcement (anti-encampment, civil commitment) and treatment/rehabilitation components.",
+          "Black Americans are overrepresented among the unhoused, making the policy materially relevant.",
+          "The outcome summary and impact note indicate both potential harms (displacement, arrest exposure) and potential benefits (treatment access, shelter/housing continuity).",
+          "Evidence is described as 'moderate' and 'incomplete' due to unresolved balance between enforcement and treatment, and dependence on state/local implementation.",
+          "No direct, measurable outcomes for Black Americans are provided."
+        ],
+        "evidence_needed_to_reduce_risk": [
+          "Direct data on measurable outcomes for Black Americans",
+          "Details on the scale and effectiveness of treatment access versus enforcement harms",
+          "State and local implementation details",
+          "Long-term impact assessment"
+        ],
+        "suggested_operator_next_action": "manual_review_required",
+        "caution_flags": [
+          "manual_review_required",
+          "no_third_party_or_community_based_outcome_data",
+          "primary_sources_are_campaign_and_government_statements,_not_independent_analysis",
+          "weak_evidence"
+        ],
+        "source_warnings": [
+          "no_third_party_or_community_based_outcome_data",
+          "primary_sources_are_campaign_and_government_statements,_not_independent_analysis"
+        ],
+        "missing_source_warnings": [
+          "no_third_party_or_community_based_outcome_data",
+          "primary_sources_are_campaign_and_government_statements,_not_independent_analysis"
+        ],
+        "ambiguity_notes": "The policy includes both enforcement (anti-encampment, civil commitment) and treatment/rehabilitation components. Black Americans are overrepresented among the unhoused, making the policy materially relevant. The outcome summary and impact note indicate both potential harms (displacement, arrest exposure) and potential benefits (treatment access, shelter/housing continuity).",
+        "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. Source warnings remain and reduce trust in the suggestion. Confidence is supported because Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
+        "confidence_signals": [
+          {
+            "code": "low_confidence",
+            "direction": "reduces",
+            "reason": "The normalized confidence score remains low after review."
+          },
+          {
+            "code": "source_warnings_present",
+            "direction": "reduces",
+            "reason": "Source warnings remain and reduce trust in the suggestion."
+          },
+          {
+            "code": "manual_review_required",
+            "direction": "reduces",
+            "reason": "The pass recommends manual review instead of a confident import path."
+          },
+          {
+            "code": "mixed_impact_direction",
+            "direction": "reduces",
+            "reason": "Mixed impact direction makes the downstream interpretation less settled."
+          },
+          {
+            "code": "evidence_gaps_present",
+            "direction": "reduces",
+            "reason": "The pass identified evidence gaps that should be closed before import."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      },
+      "deep_pass_suggestions": null,
+      "weak_evidence": true,
+      "confidence": "low",
+      "confidence_score": 0.5,
+      "source_quality": "medium",
+      "caution_flags": [
+        "manual_review_required",
+        "no_third_party_or_community_based_outcome_data",
+        "primary_sources_are_campaign_and_government_statements,_not_independent_analysis",
+        "weak_evidence"
+      ]
+    },
+    {
+      "slug": "trump-2025-domestic-production-of-critical-medicines",
+      "title": "Expand domestic production of critical medicines",
+      "impact_status": "impact_pending",
+      "recommended_action": "import_with_pending_impact",
+      "requested_model": "gpt-4.1",
+      "effective_model": "gpt-4.1",
+      "resolved_model": "gpt-4.1",
+      "review_mode": "deep",
+      "review_mode_requested": "deep",
+      "review_mode_used": "standard",
+      "review_backend": "openai_batch",
+      "model_used": "gpt-4.1",
+      "verifier_model_requested": "gpt-4.1",
+      "verifier_model_used": null,
+      "senior_model_requested": "gpt-4.1",
+      "senior_model_used": "gpt-4.1",
+      "fallback_model": "gpt-4.1",
+      "fallback_used": false,
+      "fallback_reason": null,
+      "model_resolution_status": "exact_requested",
+      "timeout_seconds": null,
+      "senior_timeout_seconds": 240,
+      "verifier_timeout_seconds": 240,
+      "retry_count": 0,
+      "senior_attempted": true,
+      "senior_retry_attempted": false,
+      "verifier_attempted": false,
+      "verifier_retry_attempted": false,
+      "deep_review_requested": true,
+      "deep_review_ran": false,
+      "deep_review_reason": "single_pass_conservative_classifier",
+      "second_pass_ran": false,
+      "deep_review_recommended": true,
+      "deep_review_recommendation_reason": "Confidence is low enough that a deeper ambiguity check is warranted. Source coverage is missing or thin for at least part of the record. The review surfaced multiple hesitation reasons that should be reconciled.",
+      "deep_review_recommendation_signals": [
+        {
+          "code": "low_confidence",
+          "reason": "Confidence is low enough that a deeper ambiguity check is warranted."
+        },
+        {
+          "code": "weak_source_coverage",
+          "reason": "Source coverage is missing or thin for at least part of the record."
+        },
+        {
+          "code": "multiple_hesitation_reasons",
+          "reason": "The review surfaced multiple hesitation reasons that should be reconciled."
+        },
+        {
+          "code": "manual_review_suggested",
+          "reason": "The review could not safely resolve whether this record is ready for import."
+        },
+        {
+          "code": "evidence_gaps",
+          "reason": "The review identified evidence that would make the record safer to import."
+        }
+      ],
+      "suggestion_conflicts": [],
+      "has_material_conflict": false,
+      "conflict_summary": "OpenAI Batch review currently runs a single conservative pass.",
+      "conflict_fields": [],
+      "confidence_comparison": {
+        "standard_confidence_score": 0.4,
+        "standard_confidence_level": "Low",
+        "deep_confidence_score": null,
+        "deep_confidence_level": null,
+        "final_confidence_score": 0.4,
+        "final_confidence_level": "Low",
+        "score_delta_after_deep_review": null,
+        "level_changed_after_deep_review": false,
+        "summary": "Only one conservative classifier pass is available, so there is no cross-pass comparison."
+      },
+      "confidence_changed_after_deep_review": false,
+      "review_priority": "high",
+      "review_priority_score": 9,
+      "review_priority_reason": "The final advisory confidence is low. The final suggestion still resolves to manual review. Source warnings remain on the final suggestion.",
+      "review_priority_signals": [
+        {
+          "code": "deep_review_recommended",
+          "weight": 1,
+          "reason": "The record already shows signals that justify deeper review."
+        },
+        {
+          "code": "low_confidence",
+          "weight": 2,
+          "reason": "The final advisory confidence is low."
+        },
+        {
+          "code": "source_warnings",
+          "weight": 2,
+          "reason": "Source warnings remain on the final suggestion."
+        },
+        {
+          "code": "evidence_gaps",
+          "weight": 1,
+          "reason": "The final suggestion still names evidence gaps before import."
+        },
+        {
+          "code": "multiple_hesitation_reasons",
+          "weight": 1,
+          "reason": "The review surfaced multiple hesitation reasons."
+        },
+        {
+          "code": "manual_review_suggested",
+          "weight": 2,
+          "reason": "The final suggestion still resolves to manual review."
+        }
+      ],
+      "manual_review_severity": "high",
+      "operator_attention_needed": true,
+      "suggested_batch": "high_attention",
+      "suggested_batch_reason": "Material conflict or high review priority makes this a first-pass attention item.",
+      "suggested_batch_tags": [
+        "high_attention",
+        "manual_review_focus",
+        "deep_review_candidates",
+        "source_check_needed"
+      ],
+      "existing_matches": [],
+      "suggestions": {
+        "title_normalized": "Expand domestic production of critical medicines",
+        "summary_suggestion": "A 2025 executive order advanced domestic-medicine production goals, but measurable supply and access outcomes remained early.",
+        "topic_suggestion": "Healthcare",
+        "impacted_group_suggestion": "Black patients and Black communities affected by medicine shortages, chronic-disease treatment continuity, and pharmaceutical supply disruptions",
+        "status_suggestion": "Partial",
+        "impact_direction_suggestion": "Positive",
+        "evidence_strength_suggestion": "Moderate",
+        "record_action_suggestion": "manual_review",
+        "recommended_action": "import_with_pending_impact",
+        "classifier_recommended_action": "needs_manual_review",
+        "impact_status": "impact_pending",
+        "impact_status_reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review.",
+        "confidence_score": 0.4,
+        "confidence_level": "Low",
+        "reasoning_summary": "The promise and subsequent executive order aimed to expand domestic production of critical medicines, with the intention of reducing supply-chain vulnerabilities. While regulatory changes were initiated, there is insufficient direct evidence of measurable outcomes or specific positive impacts for Black Americans at this stage.",
+        "hesitation_reasons": [
+          "The executive order and regulatory changes are documented, but outcomes are described as early and not yet measured at the community or patient level.",
+          "The potential for positive impact on Black communities is noted, but not substantiated with direct evidence.",
+          "Evidence is described as moderate, but lacks concrete data on improved access or reduced shortages for Black Americans."
+        ],
+        "evidence_needed_to_reduce_risk": [
+          "Direct evidence of improved medicine access or reduced shortages for Black Americans.",
+          "Measurable patient-level or community-level outcomes.",
+          "Independent or third-party evaluation of the policy's effects."
+        ],
+        "suggested_operator_next_action": "manual_review_required",
+        "caution_flags": [
+          "manual_review_required",
+          "no_direct_measurement_of_impact_on_black_communities.",
+          "sources_are_primarily_official_and_campaign_statements,_lacking_independent_verification.",
+          "weak_evidence"
+        ],
+        "source_warnings": [
+          "no_direct_measurement_of_impact_on_black_communities.",
+          "sources_are_primarily_official_and_campaign_statements,_lacking_independent_verification."
+        ],
+        "missing_source_warnings": [
+          "no_direct_measurement_of_impact_on_black_communities.",
+          "sources_are_primarily_official_and_campaign_statements,_lacking_independent_verification."
+        ],
+        "ambiguity_notes": "The executive order and regulatory changes are documented, but outcomes are described as early and not yet measured at the community or patient level. The potential for positive impact on Black communities is noted, but not substantiated with direct evidence. Evidence is described as moderate, but lacks concrete data on improved access or reduced shortages for Black Americans.",
+        "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. Source warnings remain and reduce trust in the suggestion. Confidence is supported because Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
+        "confidence_signals": [
+          {
+            "code": "low_confidence",
+            "direction": "reduces",
+            "reason": "The normalized confidence score remains low after review."
+          },
+          {
+            "code": "source_warnings_present",
+            "direction": "reduces",
+            "reason": "Source warnings remain and reduce trust in the suggestion."
+          },
+          {
+            "code": "manual_review_required",
+            "direction": "reduces",
+            "reason": "The pass recommends manual review instead of a confident import path."
+          },
+          {
+            "code": "evidence_gaps_present",
+            "direction": "reduces",
+            "reason": "The pass identified evidence gaps that should be closed before import."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      },
+      "standard_pass_suggestions": {
+        "title_normalized": "Expand domestic production of critical medicines",
+        "summary_suggestion": "A 2025 executive order advanced domestic-medicine production goals, but measurable supply and access outcomes remained early.",
+        "topic_suggestion": "Healthcare",
+        "impacted_group_suggestion": "Black patients and Black communities affected by medicine shortages, chronic-disease treatment continuity, and pharmaceutical supply disruptions",
+        "status_suggestion": "Partial",
+        "impact_direction_suggestion": "Positive",
+        "evidence_strength_suggestion": "Moderate",
+        "record_action_suggestion": "manual_review",
+        "recommended_action": "import_with_pending_impact",
+        "classifier_recommended_action": "needs_manual_review",
+        "impact_status": "impact_pending",
+        "impact_status_reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review.",
+        "confidence_score": 0.4,
+        "confidence_level": "Low",
+        "reasoning_summary": "The promise and subsequent executive order aimed to expand domestic production of critical medicines, with the intention of reducing supply-chain vulnerabilities. While regulatory changes were initiated, there is insufficient direct evidence of measurable outcomes or specific positive impacts for Black Americans at this stage.",
+        "hesitation_reasons": [
+          "The executive order and regulatory changes are documented, but outcomes are described as early and not yet measured at the community or patient level.",
+          "The potential for positive impact on Black communities is noted, but not substantiated with direct evidence.",
+          "Evidence is described as moderate, but lacks concrete data on improved access or reduced shortages for Black Americans."
+        ],
+        "evidence_needed_to_reduce_risk": [
+          "Direct evidence of improved medicine access or reduced shortages for Black Americans.",
+          "Measurable patient-level or community-level outcomes.",
+          "Independent or third-party evaluation of the policy's effects."
+        ],
+        "suggested_operator_next_action": "manual_review_required",
+        "caution_flags": [
+          "manual_review_required",
+          "no_direct_measurement_of_impact_on_black_communities.",
+          "sources_are_primarily_official_and_campaign_statements,_lacking_independent_verification.",
+          "weak_evidence"
+        ],
+        "source_warnings": [
+          "no_direct_measurement_of_impact_on_black_communities.",
+          "sources_are_primarily_official_and_campaign_statements,_lacking_independent_verification."
+        ],
+        "missing_source_warnings": [
+          "no_direct_measurement_of_impact_on_black_communities.",
+          "sources_are_primarily_official_and_campaign_statements,_lacking_independent_verification."
+        ],
+        "ambiguity_notes": "The executive order and regulatory changes are documented, but outcomes are described as early and not yet measured at the community or patient level. The potential for positive impact on Black communities is noted, but not substantiated with direct evidence. Evidence is described as moderate, but lacks concrete data on improved access or reduced shortages for Black Americans.",
+        "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. Source warnings remain and reduce trust in the suggestion. Confidence is supported because Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
+        "confidence_signals": [
+          {
+            "code": "low_confidence",
+            "direction": "reduces",
+            "reason": "The normalized confidence score remains low after review."
+          },
+          {
+            "code": "source_warnings_present",
+            "direction": "reduces",
+            "reason": "Source warnings remain and reduce trust in the suggestion."
+          },
+          {
+            "code": "manual_review_required",
+            "direction": "reduces",
+            "reason": "The pass recommends manual review instead of a confident import path."
+          },
+          {
+            "code": "evidence_gaps_present",
+            "direction": "reduces",
+            "reason": "The pass identified evidence gaps that should be closed before import."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      },
+      "deep_pass_suggestions": null,
+      "weak_evidence": true,
+      "confidence": "low",
+      "confidence_score": 0.4,
+      "source_quality": "medium",
+      "caution_flags": [
+        "manual_review_required",
+        "no_direct_measurement_of_impact_on_black_communities.",
+        "sources_are_primarily_official_and_campaign_statements,_lacking_independent_verification.",
+        "weak_evidence"
+      ]
+    },
+    {
+      "slug": "trump-2025-expand-educational-freedom-for-families",
+      "title": "Expand educational freedom and school-choice options for families",
+      "impact_status": "impact_pending",
+      "recommended_action": "import_with_pending_impact",
+      "requested_model": "gpt-4.1",
+      "effective_model": "gpt-4.1",
+      "resolved_model": "gpt-4.1",
+      "review_mode": "deep",
+      "review_mode_requested": "deep",
+      "review_mode_used": "standard",
+      "review_backend": "openai_batch",
+      "model_used": "gpt-4.1",
+      "verifier_model_requested": "gpt-4.1",
+      "verifier_model_used": null,
+      "senior_model_requested": "gpt-4.1",
+      "senior_model_used": "gpt-4.1",
+      "fallback_model": "gpt-4.1",
+      "fallback_used": false,
+      "fallback_reason": null,
+      "model_resolution_status": "exact_requested",
+      "timeout_seconds": null,
+      "senior_timeout_seconds": 240,
+      "verifier_timeout_seconds": 240,
+      "retry_count": 0,
+      "senior_attempted": true,
+      "senior_retry_attempted": false,
+      "verifier_attempted": false,
+      "verifier_retry_attempted": false,
+      "deep_review_requested": true,
+      "deep_review_ran": false,
+      "deep_review_reason": "single_pass_conservative_classifier",
+      "second_pass_ran": false,
+      "deep_review_recommended": true,
+      "deep_review_recommendation_reason": "Confidence is low enough that a deeper ambiguity check is warranted. Source coverage is missing or thin for at least part of the record. The review surfaced multiple hesitation reasons that should be reconciled.",
+      "deep_review_recommendation_signals": [
+        {
+          "code": "low_confidence",
+          "reason": "Confidence is low enough that a deeper ambiguity check is warranted."
+        },
+        {
+          "code": "weak_source_coverage",
+          "reason": "Source coverage is missing or thin for at least part of the record."
+        },
+        {
+          "code": "multiple_hesitation_reasons",
+          "reason": "The review surfaced multiple hesitation reasons that should be reconciled."
+        },
+        {
+          "code": "manual_review_suggested",
+          "reason": "The review could not safely resolve whether this record is ready for import."
+        },
+        {
+          "code": "mixed_impact_ambiguity",
+          "reason": "Impact direction remains mixed and may need a deeper pass to explain why."
+        },
+        {
+          "code": "evidence_gaps",
+          "reason": "The review identified evidence that would make the record safer to import."
+        }
+      ],
+      "suggestion_conflicts": [],
+      "has_material_conflict": false,
+      "conflict_summary": "OpenAI Batch review currently runs a single conservative pass.",
+      "conflict_fields": [],
+      "confidence_comparison": {
+        "standard_confidence_score": 0.4,
+        "standard_confidence_level": "Low",
+        "deep_confidence_score": null,
+        "deep_confidence_level": null,
+        "final_confidence_score": 0.4,
+        "final_confidence_level": "Low",
+        "score_delta_after_deep_review": null,
+        "level_changed_after_deep_review": false,
+        "summary": "Only one conservative classifier pass is available, so there is no cross-pass comparison."
+      },
+      "confidence_changed_after_deep_review": false,
+      "review_priority": "high",
+      "review_priority_score": 10,
+      "review_priority_reason": "The final advisory confidence is low. The final suggestion still resolves to manual review. Source warnings remain on the final suggestion.",
+      "review_priority_signals": [
+        {
+          "code": "deep_review_recommended",
+          "weight": 1,
+          "reason": "The record already shows signals that justify deeper review."
+        },
+        {
+          "code": "low_confidence",
+          "weight": 2,
+          "reason": "The final advisory confidence is low."
+        },
+        {
+          "code": "source_warnings",
+          "weight": 2,
+          "reason": "Source warnings remain on the final suggestion."
+        },
+        {
+          "code": "evidence_gaps",
+          "weight": 1,
+          "reason": "The final suggestion still names evidence gaps before import."
+        },
+        {
+          "code": "multiple_hesitation_reasons",
+          "weight": 1,
+          "reason": "The review surfaced multiple hesitation reasons."
+        },
+        {
+          "code": "manual_review_suggested",
+          "weight": 2,
+          "reason": "The final suggestion still resolves to manual review."
+        },
+        {
+          "code": "mixed_impact_direction",
+          "weight": 1,
+          "reason": "Impact direction remains mixed and needs careful operator interpretation."
+        }
+      ],
+      "manual_review_severity": "high",
+      "operator_attention_needed": true,
+      "suggested_batch": "high_attention",
+      "suggested_batch_reason": "Material conflict or high review priority makes this a first-pass attention item.",
+      "suggested_batch_tags": [
+        "high_attention",
+        "manual_review_focus",
+        "deep_review_candidates",
+        "source_check_needed"
+      ],
+      "existing_matches": [],
+      "suggestions": {
+        "title_normalized": "Expand educational freedom and school-choice options for families",
+        "summary_suggestion": "The administration launched a federal school-choice initiative in early 2025, but the effects remained dependent on later state and grant implementation.",
+        "topic_suggestion": "Education",
+        "impacted_group_suggestion": "Black students and Black families affected by school access, public-school quality, transportation, and alternative education options",
+        "status_suggestion": "Partial",
+        "impact_direction_suggestion": "Mixed",
+        "evidence_strength_suggestion": "Moderate",
+        "record_action_suggestion": "manual_review",
+        "recommended_action": "import_with_pending_impact",
+        "classifier_recommended_action": "needs_manual_review",
+        "impact_status": "impact_pending",
+        "impact_status_reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review.",
+        "confidence_score": 0.4,
+        "confidence_level": "Low",
+        "reasoning_summary": "The administration issued an executive order to expand educational freedom and school-choice options, but the evidence is incomplete regarding the direct impact on Black families. The effects depend on later agency guidance and state implementation, with mixed potential outcomes noted.",
+        "hesitation_reasons": [
+          "The record documents the issuance of a federal policy framework for school choice.",
+          "The evidence notes that outcomes for Black families may be mixed and depend on state and program design.",
+          "There is no direct evidence of measurable positive or negative impact for Black Americans provided in the sources.",
+          "The evidence is described as moderate and incomplete, with implementation and effects pending."
+        ],
+        "evidence_needed_to_reduce_risk": [
+          "Direct evidence of impact on Black families or students",
+          "Details on state uptake and specific program implementation",
+          "Measurable outcomes or data on access, quality, or resource distribution"
+        ],
+        "suggested_operator_next_action": "manual_review_required",
+        "caution_flags": [
+          "manual_review_required",
+          "no_independent_or_outcome_based_evidence_provided",
+          "relies_on_a_single_government_source",
+          "weak_evidence"
+        ],
+        "source_warnings": [
+          "no_independent_or_outcome_based_evidence_provided",
+          "relies_on_a_single_government_source"
+        ],
+        "missing_source_warnings": [
+          "no_independent_or_outcome_based_evidence_provided",
+          "relies_on_a_single_government_source"
+        ],
+        "ambiguity_notes": "The record documents the issuance of a federal policy framework for school choice. The evidence notes that outcomes for Black families may be mixed and depend on state and program design. There is no direct evidence of measurable positive or negative impact for Black Americans provided in the sources.",
+        "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. Source warnings remain and reduce trust in the suggestion. Confidence is supported because Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
+        "confidence_signals": [
+          {
+            "code": "low_confidence",
+            "direction": "reduces",
+            "reason": "The normalized confidence score remains low after review."
+          },
+          {
+            "code": "source_warnings_present",
+            "direction": "reduces",
+            "reason": "Source warnings remain and reduce trust in the suggestion."
+          },
+          {
+            "code": "manual_review_required",
+            "direction": "reduces",
+            "reason": "The pass recommends manual review instead of a confident import path."
+          },
+          {
+            "code": "mixed_impact_direction",
+            "direction": "reduces",
+            "reason": "Mixed impact direction makes the downstream interpretation less settled."
+          },
+          {
+            "code": "evidence_gaps_present",
+            "direction": "reduces",
+            "reason": "The pass identified evidence gaps that should be closed before import."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      },
+      "standard_pass_suggestions": {
+        "title_normalized": "Expand educational freedom and school-choice options for families",
+        "summary_suggestion": "The administration launched a federal school-choice initiative in early 2025, but the effects remained dependent on later state and grant implementation.",
+        "topic_suggestion": "Education",
+        "impacted_group_suggestion": "Black students and Black families affected by school access, public-school quality, transportation, and alternative education options",
+        "status_suggestion": "Partial",
+        "impact_direction_suggestion": "Mixed",
+        "evidence_strength_suggestion": "Moderate",
+        "record_action_suggestion": "manual_review",
+        "recommended_action": "import_with_pending_impact",
+        "classifier_recommended_action": "needs_manual_review",
+        "impact_status": "impact_pending",
+        "impact_status_reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review.",
+        "confidence_score": 0.4,
+        "confidence_level": "Low",
+        "reasoning_summary": "The administration issued an executive order to expand educational freedom and school-choice options, but the evidence is incomplete regarding the direct impact on Black families. The effects depend on later agency guidance and state implementation, with mixed potential outcomes noted.",
+        "hesitation_reasons": [
+          "The record documents the issuance of a federal policy framework for school choice.",
+          "The evidence notes that outcomes for Black families may be mixed and depend on state and program design.",
+          "There is no direct evidence of measurable positive or negative impact for Black Americans provided in the sources.",
+          "The evidence is described as moderate and incomplete, with implementation and effects pending."
+        ],
+        "evidence_needed_to_reduce_risk": [
+          "Direct evidence of impact on Black families or students",
+          "Details on state uptake and specific program implementation",
+          "Measurable outcomes or data on access, quality, or resource distribution"
+        ],
+        "suggested_operator_next_action": "manual_review_required",
+        "caution_flags": [
+          "manual_review_required",
+          "no_independent_or_outcome_based_evidence_provided",
+          "relies_on_a_single_government_source",
+          "weak_evidence"
+        ],
+        "source_warnings": [
+          "no_independent_or_outcome_based_evidence_provided",
+          "relies_on_a_single_government_source"
+        ],
+        "missing_source_warnings": [
+          "no_independent_or_outcome_based_evidence_provided",
+          "relies_on_a_single_government_source"
+        ],
+        "ambiguity_notes": "The record documents the issuance of a federal policy framework for school choice. The evidence notes that outcomes for Black families may be mixed and depend on state and program design. There is no direct evidence of measurable positive or negative impact for Black Americans provided in the sources.",
+        "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. Source warnings remain and reduce trust in the suggestion. Confidence is supported because Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
+        "confidence_signals": [
+          {
+            "code": "low_confidence",
+            "direction": "reduces",
+            "reason": "The normalized confidence score remains low after review."
+          },
+          {
+            "code": "source_warnings_present",
+            "direction": "reduces",
+            "reason": "Source warnings remain and reduce trust in the suggestion."
+          },
+          {
+            "code": "manual_review_required",
+            "direction": "reduces",
+            "reason": "The pass recommends manual review instead of a confident import path."
+          },
+          {
+            "code": "mixed_impact_direction",
+            "direction": "reduces",
+            "reason": "Mixed impact direction makes the downstream interpretation less settled."
+          },
+          {
+            "code": "evidence_gaps_present",
+            "direction": "reduces",
+            "reason": "The pass identified evidence gaps that should be closed before import."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      },
+      "deep_pass_suggestions": null,
+      "weak_evidence": true,
+      "confidence": "low",
+      "confidence_score": 0.4,
+      "source_quality": "medium",
+      "caution_flags": [
+        "manual_review_required",
+        "no_independent_or_outcome_based_evidence_provided",
+        "relies_on_a_single_government_source",
+        "weak_evidence"
+      ]
+    },
+    {
+      "slug": "trump-2025-reform-higher-education-accreditation",
+      "title": "Reform higher-education accreditation around student outcomes",
+      "impact_status": "impact_pending",
+      "recommended_action": "import_with_pending_impact",
+      "requested_model": "gpt-4.1",
+      "effective_model": "gpt-4.1",
+      "resolved_model": "gpt-4.1",
+      "review_mode": "deep",
+      "review_mode_requested": "deep",
+      "review_mode_used": "standard",
+      "review_backend": "openai_batch",
+      "model_used": "gpt-4.1",
+      "verifier_model_requested": "gpt-4.1",
+      "verifier_model_used": null,
+      "senior_model_requested": "gpt-4.1",
+      "senior_model_used": "gpt-4.1",
+      "fallback_model": "gpt-4.1",
+      "fallback_used": false,
+      "fallback_reason": null,
+      "model_resolution_status": "exact_requested",
+      "timeout_seconds": null,
+      "senior_timeout_seconds": 240,
+      "verifier_timeout_seconds": 240,
+      "retry_count": 0,
+      "senior_attempted": true,
+      "senior_retry_attempted": false,
+      "verifier_attempted": false,
+      "verifier_retry_attempted": false,
+      "deep_review_requested": true,
+      "deep_review_ran": false,
+      "deep_review_reason": "single_pass_conservative_classifier",
+      "second_pass_ran": false,
+      "deep_review_recommended": true,
+      "deep_review_recommendation_reason": "Confidence is low enough that a deeper ambiguity check is warranted. Source coverage is missing or thin for at least part of the record. The review surfaced multiple hesitation reasons that should be reconciled.",
+      "deep_review_recommendation_signals": [
+        {
+          "code": "low_confidence",
+          "reason": "Confidence is low enough that a deeper ambiguity check is warranted."
+        },
+        {
+          "code": "weak_source_coverage",
+          "reason": "Source coverage is missing or thin for at least part of the record."
+        },
+        {
+          "code": "multiple_hesitation_reasons",
+          "reason": "The review surfaced multiple hesitation reasons that should be reconciled."
+        },
+        {
+          "code": "manual_review_suggested",
+          "reason": "The review could not safely resolve whether this record is ready for import."
+        },
+        {
+          "code": "mixed_impact_ambiguity",
+          "reason": "Impact direction remains mixed and may need a deeper pass to explain why."
+        },
+        {
+          "code": "evidence_gaps",
+          "reason": "The review identified evidence that would make the record safer to import."
+        }
+      ],
+      "suggestion_conflicts": [],
+      "has_material_conflict": false,
+      "conflict_summary": "OpenAI Batch review currently runs a single conservative pass.",
+      "conflict_fields": [],
+      "confidence_comparison": {
+        "standard_confidence_score": 0.3,
+        "standard_confidence_level": "Low",
+        "deep_confidence_score": null,
+        "deep_confidence_level": null,
+        "final_confidence_score": 0.3,
+        "final_confidence_level": "Low",
+        "score_delta_after_deep_review": null,
+        "level_changed_after_deep_review": false,
+        "summary": "Only one conservative classifier pass is available, so there is no cross-pass comparison."
+      },
+      "confidence_changed_after_deep_review": false,
+      "review_priority": "high",
+      "review_priority_score": 10,
+      "review_priority_reason": "The final advisory confidence is low. The final suggestion still resolves to manual review. Source warnings remain on the final suggestion.",
+      "review_priority_signals": [
+        {
+          "code": "deep_review_recommended",
+          "weight": 1,
+          "reason": "The record already shows signals that justify deeper review."
+        },
+        {
+          "code": "low_confidence",
+          "weight": 2,
+          "reason": "The final advisory confidence is low."
+        },
+        {
+          "code": "source_warnings",
+          "weight": 2,
+          "reason": "Source warnings remain on the final suggestion."
+        },
+        {
+          "code": "evidence_gaps",
+          "weight": 1,
+          "reason": "The final suggestion still names evidence gaps before import."
+        },
+        {
+          "code": "multiple_hesitation_reasons",
+          "weight": 1,
+          "reason": "The review surfaced multiple hesitation reasons."
+        },
+        {
+          "code": "manual_review_suggested",
+          "weight": 2,
+          "reason": "The final suggestion still resolves to manual review."
+        },
+        {
+          "code": "mixed_impact_direction",
+          "weight": 1,
+          "reason": "Impact direction remains mixed and needs careful operator interpretation."
+        }
+      ],
+      "manual_review_severity": "high",
+      "operator_attention_needed": true,
+      "suggested_batch": "high_attention",
+      "suggested_batch_reason": "Material conflict or high review priority makes this a first-pass attention item.",
+      "suggested_batch_tags": [
+        "high_attention",
+        "manual_review_focus",
+        "deep_review_candidates",
+        "source_check_needed"
+      ],
+      "existing_matches": [],
+      "suggestions": {
+        "title_normalized": "Reform higher-education accreditation around student outcomes",
+        "summary_suggestion": "The administration launched accreditation reform in 2025, but institutional and student-level effects remained in an early implementation stage.",
+        "topic_suggestion": "Education",
+        "impacted_group_suggestion": "Black college students and institutions serving large Black student populations, including HBCUs and other minority-serving institutions",
+        "status_suggestion": "In Progress",
+        "impact_direction_suggestion": "Mixed",
+        "evidence_strength_suggestion": "Strong",
+        "record_action_suggestion": "manual_review",
+        "recommended_action": "import_with_pending_impact",
+        "classifier_recommended_action": "needs_manual_review",
+        "impact_status": "impact_pending",
+        "impact_status_reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review.",
+        "confidence_score": 0.3,
+        "confidence_level": "Low",
+        "reasoning_summary": "The administration initiated a process to reform higher-education accreditation with a focus on student outcomes, competition, and legal compliance, but there is insufficient evidence of direct or measurable effects\u2014positive or negative\u2014on Black students or institutions at this stage.",
+        "hesitation_reasons": [
+          "The promise and executive order initiated a reform process but did not produce immediate, measurable campus-level outcomes.",
+          "The only evidence provided is the official government source describing the order and its intended focus.",
+          "The summary and outcome notes explicitly state that measurable downstream effects for Black students or institutions are not yet established.",
+          "The evidence is moderate for process initiation but weak for actual impact."
+        ],
+        "evidence_needed_to_reduce_risk": [
+          "Direct evidence of impact on Black students or institutions",
+          "Details on how the reforms have affected federal-aid eligibility, oversight, or compliance at HBCUs or other minority-serving institutions",
+          "Any measurable outcomes or data post-implementation"
+        ],
+        "suggested_operator_next_action": "manual_review_required",
+        "caution_flags": [
+          "manual_review_required",
+          "no_independent_or_third_party_analysis",
+          "no_outcome_data_beyond_administrative_process_initiation",
+          "weak_evidence"
+        ],
+        "source_warnings": [
+          "no_independent_or_third_party_analysis",
+          "no_outcome_data_beyond_administrative_process_initiation"
+        ],
+        "missing_source_warnings": [
+          "no_independent_or_third_party_analysis",
+          "no_outcome_data_beyond_administrative_process_initiation"
+        ],
+        "ambiguity_notes": "The promise and executive order initiated a reform process but did not produce immediate, measurable campus-level outcomes. The only evidence provided is the official government source describing the order and its intended focus. The summary and outcome notes explicitly state that measurable downstream effects for Black students or institutions are not yet established.",
+        "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. Source warnings remain and reduce trust in the suggestion. Confidence is supported because Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
+        "confidence_signals": [
+          {
+            "code": "low_confidence",
+            "direction": "reduces",
+            "reason": "The normalized confidence score remains low after review."
+          },
+          {
+            "code": "source_warnings_present",
+            "direction": "reduces",
+            "reason": "Source warnings remain and reduce trust in the suggestion."
+          },
+          {
+            "code": "manual_review_required",
+            "direction": "reduces",
+            "reason": "The pass recommends manual review instead of a confident import path."
+          },
+          {
+            "code": "mixed_impact_direction",
+            "direction": "reduces",
+            "reason": "Mixed impact direction makes the downstream interpretation less settled."
+          },
+          {
+            "code": "evidence_gaps_present",
+            "direction": "reduces",
+            "reason": "The pass identified evidence gaps that should be closed before import."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      },
+      "standard_pass_suggestions": {
+        "title_normalized": "Reform higher-education accreditation around student outcomes",
+        "summary_suggestion": "The administration launched accreditation reform in 2025, but institutional and student-level effects remained in an early implementation stage.",
+        "topic_suggestion": "Education",
+        "impacted_group_suggestion": "Black college students and institutions serving large Black student populations, including HBCUs and other minority-serving institutions",
+        "status_suggestion": "In Progress",
+        "impact_direction_suggestion": "Mixed",
+        "evidence_strength_suggestion": "Strong",
+        "record_action_suggestion": "manual_review",
+        "recommended_action": "import_with_pending_impact",
+        "classifier_recommended_action": "needs_manual_review",
+        "impact_status": "impact_pending",
+        "impact_status_reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review.",
+        "confidence_score": 0.3,
+        "confidence_level": "Low",
+        "reasoning_summary": "The administration initiated a process to reform higher-education accreditation with a focus on student outcomes, competition, and legal compliance, but there is insufficient evidence of direct or measurable effects\u2014positive or negative\u2014on Black students or institutions at this stage.",
+        "hesitation_reasons": [
+          "The promise and executive order initiated a reform process but did not produce immediate, measurable campus-level outcomes.",
+          "The only evidence provided is the official government source describing the order and its intended focus.",
+          "The summary and outcome notes explicitly state that measurable downstream effects for Black students or institutions are not yet established.",
+          "The evidence is moderate for process initiation but weak for actual impact."
+        ],
+        "evidence_needed_to_reduce_risk": [
+          "Direct evidence of impact on Black students or institutions",
+          "Details on how the reforms have affected federal-aid eligibility, oversight, or compliance at HBCUs or other minority-serving institutions",
+          "Any measurable outcomes or data post-implementation"
+        ],
+        "suggested_operator_next_action": "manual_review_required",
+        "caution_flags": [
+          "manual_review_required",
+          "no_independent_or_third_party_analysis",
+          "no_outcome_data_beyond_administrative_process_initiation",
+          "weak_evidence"
+        ],
+        "source_warnings": [
+          "no_independent_or_third_party_analysis",
+          "no_outcome_data_beyond_administrative_process_initiation"
+        ],
+        "missing_source_warnings": [
+          "no_independent_or_third_party_analysis",
+          "no_outcome_data_beyond_administrative_process_initiation"
+        ],
+        "ambiguity_notes": "The promise and executive order initiated a reform process but did not produce immediate, measurable campus-level outcomes. The only evidence provided is the official government source describing the order and its intended focus. The summary and outcome notes explicitly state that measurable downstream effects for Black students or institutions are not yet established.",
+        "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. Source warnings remain and reduce trust in the suggestion. Confidence is supported because Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
+        "confidence_signals": [
+          {
+            "code": "low_confidence",
+            "direction": "reduces",
+            "reason": "The normalized confidence score remains low after review."
+          },
+          {
+            "code": "source_warnings_present",
+            "direction": "reduces",
+            "reason": "Source warnings remain and reduce trust in the suggestion."
+          },
+          {
+            "code": "manual_review_required",
+            "direction": "reduces",
+            "reason": "The pass recommends manual review instead of a confident import path."
+          },
+          {
+            "code": "mixed_impact_direction",
+            "direction": "reduces",
+            "reason": "Mixed impact direction makes the downstream interpretation less settled."
+          },
+          {
+            "code": "evidence_gaps_present",
+            "direction": "reduces",
+            "reason": "The pass identified evidence gaps that should be closed before import."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      },
+      "deep_pass_suggestions": null,
+      "weak_evidence": true,
+      "confidence": "low",
+      "confidence_score": 0.3,
+      "source_quality": "high",
+      "caution_flags": [
+        "manual_review_required",
+        "no_independent_or_third_party_analysis",
+        "no_outcome_data_beyond_administrative_process_initiation",
+        "weak_evidence"
+      ]
+    },
+    {
+      "slug": "trump-2025-promote-hbcu-excellence-and-innovation",
+      "title": "Promote excellence and innovation at HBCUs",
+      "impact_status": "impact_pending",
+      "recommended_action": "import_with_pending_impact",
+      "requested_model": "gpt-4.1",
+      "effective_model": "gpt-4.1",
+      "resolved_model": "gpt-4.1",
+      "review_mode": "deep",
+      "review_mode_requested": "deep",
+      "review_mode_used": "standard",
+      "review_backend": "openai_batch",
+      "model_used": "gpt-4.1",
+      "verifier_model_requested": "gpt-4.1",
+      "verifier_model_used": null,
+      "senior_model_requested": "gpt-4.1",
+      "senior_model_used": "gpt-4.1",
+      "fallback_model": "gpt-4.1",
+      "fallback_used": false,
+      "fallback_reason": null,
+      "model_resolution_status": "exact_requested",
+      "timeout_seconds": null,
+      "senior_timeout_seconds": 240,
+      "verifier_timeout_seconds": 240,
+      "retry_count": 0,
+      "senior_attempted": true,
+      "senior_retry_attempted": false,
+      "verifier_attempted": false,
+      "verifier_retry_attempted": false,
+      "deep_review_requested": true,
+      "deep_review_ran": false,
+      "deep_review_reason": "single_pass_conservative_classifier",
+      "second_pass_ran": false,
+      "deep_review_recommended": true,
+      "deep_review_recommendation_reason": "Confidence is low enough that a deeper ambiguity check is warranted. Source coverage is missing or thin for at least part of the record. The review surfaced multiple hesitation reasons that should be reconciled.",
+      "deep_review_recommendation_signals": [
+        {
+          "code": "low_confidence",
+          "reason": "Confidence is low enough that a deeper ambiguity check is warranted."
+        },
+        {
+          "code": "weak_source_coverage",
+          "reason": "Source coverage is missing or thin for at least part of the record."
+        },
+        {
+          "code": "multiple_hesitation_reasons",
+          "reason": "The review surfaced multiple hesitation reasons that should be reconciled."
+        },
+        {
+          "code": "manual_review_suggested",
+          "reason": "The review could not safely resolve whether this record is ready for import."
+        },
+        {
+          "code": "evidence_gaps",
+          "reason": "The review identified evidence that would make the record safer to import."
+        }
+      ],
+      "suggestion_conflicts": [],
+      "has_material_conflict": false,
+      "conflict_summary": "OpenAI Batch review currently runs a single conservative pass.",
+      "conflict_fields": [],
+      "confidence_comparison": {
+        "standard_confidence_score": 0.5,
+        "standard_confidence_level": "Low",
+        "deep_confidence_score": null,
+        "deep_confidence_level": null,
+        "final_confidence_score": 0.5,
+        "final_confidence_level": "Low",
+        "score_delta_after_deep_review": null,
+        "level_changed_after_deep_review": false,
+        "summary": "Only one conservative classifier pass is available, so there is no cross-pass comparison."
+      },
+      "confidence_changed_after_deep_review": false,
+      "review_priority": "high",
+      "review_priority_score": 9,
+      "review_priority_reason": "The final advisory confidence is low. The final suggestion still resolves to manual review. Source warnings remain on the final suggestion.",
+      "review_priority_signals": [
+        {
+          "code": "deep_review_recommended",
+          "weight": 1,
+          "reason": "The record already shows signals that justify deeper review."
+        },
+        {
+          "code": "low_confidence",
+          "weight": 2,
+          "reason": "The final advisory confidence is low."
+        },
+        {
+          "code": "source_warnings",
+          "weight": 2,
+          "reason": "Source warnings remain on the final suggestion."
+        },
+        {
+          "code": "evidence_gaps",
+          "weight": 1,
+          "reason": "The final suggestion still names evidence gaps before import."
+        },
+        {
+          "code": "multiple_hesitation_reasons",
+          "weight": 1,
+          "reason": "The review surfaced multiple hesitation reasons."
+        },
+        {
+          "code": "manual_review_suggested",
+          "weight": 2,
+          "reason": "The final suggestion still resolves to manual review."
+        }
+      ],
+      "manual_review_severity": "high",
+      "operator_attention_needed": true,
+      "suggested_batch": "high_attention",
+      "suggested_batch_reason": "Material conflict or high review priority makes this a first-pass attention item.",
+      "suggested_batch_tags": [
+        "high_attention",
+        "manual_review_focus",
+        "deep_review_candidates",
+        "source_check_needed"
+      ],
+      "existing_matches": [],
+      "suggestions": {
+        "title_normalized": "Promote excellence and innovation at HBCUs",
+        "summary_suggestion": "The administration reestablished a White House HBCU initiative in 2025, with broader institutional effects still dependent on implementation.",
+        "topic_suggestion": "Education",
+        "impacted_group_suggestion": "Black students, faculty, and institutions at Historically Black Colleges and Universities",
+        "status_suggestion": "Partial",
+        "impact_direction_suggestion": "Positive",
+        "evidence_strength_suggestion": "Moderate",
+        "record_action_suggestion": "manual_review",
+        "recommended_action": "import_with_pending_impact",
+        "classifier_recommended_action": "needs_manual_review",
+        "impact_status": "impact_pending",
+        "impact_status_reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review.",
+        "confidence_score": 0.5,
+        "confidence_level": "Low",
+        "reasoning_summary": "The administration established a White House HBCU initiative and advisory structure intended to improve institutional development and opportunity pathways for HBCUs, but evidence of concrete outcomes or measurable impact for Black Americans is incomplete.",
+        "hesitation_reasons": [
+          "The record documents the creation of a White House HBCU initiative and advisory structure.",
+          "The evidence is limited to the establishment of administrative structures, with no direct evidence of improved outcomes for Black students or institutions.",
+          "The source is a government fact sheet, which is primary but only describes intent and administrative action, not results.",
+          "The summary and notes acknowledge that longer-term funding and student outcomes still require follow-through.",
+          "The evidence strength is described as 'moderate' and the status as 'partial', indicating incomplete implementation or impact."
+        ],
+        "evidence_needed_to_reduce_risk": [
+          "Evidence of actual improvements in rights, access, protections, or measurable outcomes for Black Americans",
+          "Details on funding, implementation, or realized benefits for HBCUs or Black students",
+          "Independent or third-party verification of impact"
+        ],
+        "suggested_operator_next_action": "manual_review_required",
+        "caution_flags": [
+          "manual_review_required",
+          "no_independent_or_outcome_based_evidence",
+          "single_source_government_fact_sheet",
+          "weak_evidence"
+        ],
+        "source_warnings": [
+          "no_independent_or_outcome_based_evidence",
+          "single_source_government_fact_sheet"
+        ],
+        "missing_source_warnings": [
+          "no_independent_or_outcome_based_evidence",
+          "single_source_government_fact_sheet"
+        ],
+        "ambiguity_notes": "The record documents the creation of a White House HBCU initiative and advisory structure. The evidence is limited to the establishment of administrative structures, with no direct evidence of improved outcomes for Black students or institutions. The source is a government fact sheet, which is primary but only describes intent and administrative action, not results.",
+        "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. Source warnings remain and reduce trust in the suggestion. Confidence is supported because Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
+        "confidence_signals": [
+          {
+            "code": "low_confidence",
+            "direction": "reduces",
+            "reason": "The normalized confidence score remains low after review."
+          },
+          {
+            "code": "source_warnings_present",
+            "direction": "reduces",
+            "reason": "Source warnings remain and reduce trust in the suggestion."
+          },
+          {
+            "code": "manual_review_required",
+            "direction": "reduces",
+            "reason": "The pass recommends manual review instead of a confident import path."
+          },
+          {
+            "code": "evidence_gaps_present",
+            "direction": "reduces",
+            "reason": "The pass identified evidence gaps that should be closed before import."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      },
+      "standard_pass_suggestions": {
+        "title_normalized": "Promote excellence and innovation at HBCUs",
+        "summary_suggestion": "The administration reestablished a White House HBCU initiative in 2025, with broader institutional effects still dependent on implementation.",
+        "topic_suggestion": "Education",
+        "impacted_group_suggestion": "Black students, faculty, and institutions at Historically Black Colleges and Universities",
+        "status_suggestion": "Partial",
+        "impact_direction_suggestion": "Positive",
+        "evidence_strength_suggestion": "Moderate",
+        "record_action_suggestion": "manual_review",
+        "recommended_action": "import_with_pending_impact",
+        "classifier_recommended_action": "needs_manual_review",
+        "impact_status": "impact_pending",
+        "impact_status_reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review.",
+        "confidence_score": 0.5,
+        "confidence_level": "Low",
+        "reasoning_summary": "The administration established a White House HBCU initiative and advisory structure intended to improve institutional development and opportunity pathways for HBCUs, but evidence of concrete outcomes or measurable impact for Black Americans is incomplete.",
+        "hesitation_reasons": [
+          "The record documents the creation of a White House HBCU initiative and advisory structure.",
+          "The evidence is limited to the establishment of administrative structures, with no direct evidence of improved outcomes for Black students or institutions.",
+          "The source is a government fact sheet, which is primary but only describes intent and administrative action, not results.",
+          "The summary and notes acknowledge that longer-term funding and student outcomes still require follow-through.",
+          "The evidence strength is described as 'moderate' and the status as 'partial', indicating incomplete implementation or impact."
+        ],
+        "evidence_needed_to_reduce_risk": [
+          "Evidence of actual improvements in rights, access, protections, or measurable outcomes for Black Americans",
+          "Details on funding, implementation, or realized benefits for HBCUs or Black students",
+          "Independent or third-party verification of impact"
+        ],
+        "suggested_operator_next_action": "manual_review_required",
+        "caution_flags": [
+          "manual_review_required",
+          "no_independent_or_outcome_based_evidence",
+          "single_source_government_fact_sheet",
+          "weak_evidence"
+        ],
+        "source_warnings": [
+          "no_independent_or_outcome_based_evidence",
+          "single_source_government_fact_sheet"
+        ],
+        "missing_source_warnings": [
+          "no_independent_or_outcome_based_evidence",
+          "single_source_government_fact_sheet"
+        ],
+        "ambiguity_notes": "The record documents the creation of a White House HBCU initiative and advisory structure. The evidence is limited to the establishment of administrative structures, with no direct evidence of improved outcomes for Black students or institutions. The source is a government fact sheet, which is primary but only describes intent and administrative action, not results.",
+        "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. Source warnings remain and reduce trust in the suggestion. Confidence is supported because Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
+        "confidence_signals": [
+          {
+            "code": "low_confidence",
+            "direction": "reduces",
+            "reason": "The normalized confidence score remains low after review."
+          },
+          {
+            "code": "source_warnings_present",
+            "direction": "reduces",
+            "reason": "Source warnings remain and reduce trust in the suggestion."
+          },
+          {
+            "code": "manual_review_required",
+            "direction": "reduces",
+            "reason": "The pass recommends manual review instead of a confident import path."
+          },
+          {
+            "code": "evidence_gaps_present",
+            "direction": "reduces",
+            "reason": "The pass identified evidence gaps that should be closed before import."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      },
+      "deep_pass_suggestions": null,
+      "weak_evidence": true,
+      "confidence": "low",
+      "confidence_score": 0.5,
+      "source_quality": "medium",
+      "caution_flags": [
+        "manual_review_required",
+        "no_independent_or_outcome_based_evidence",
+        "single_source_government_fact_sheet",
+        "weak_evidence"
+      ]
+    },
+    {
+      "slug": "trump-2025-reinstate-school-discipline-policies",
+      "title": "Reinstate school discipline policies without equity-based disparate-impact framing",
+      "impact_status": "impact_pending",
+      "recommended_action": "import_with_pending_impact",
+      "requested_model": "gpt-4.1",
+      "effective_model": "gpt-4.1",
+      "resolved_model": "gpt-4.1",
+      "review_mode": "deep",
+      "review_mode_requested": "deep",
+      "review_mode_used": "standard",
+      "review_backend": "openai_batch",
+      "model_used": "gpt-4.1",
+      "verifier_model_requested": "gpt-4.1",
+      "verifier_model_used": null,
+      "senior_model_requested": "gpt-4.1",
+      "senior_model_used": "gpt-4.1",
+      "fallback_model": "gpt-4.1",
+      "fallback_used": false,
+      "fallback_reason": null,
+      "model_resolution_status": "exact_requested",
+      "timeout_seconds": null,
+      "senior_timeout_seconds": 240,
+      "verifier_timeout_seconds": 240,
+      "retry_count": 0,
+      "senior_attempted": true,
+      "senior_retry_attempted": false,
+      "verifier_attempted": false,
+      "verifier_retry_attempted": false,
+      "deep_review_requested": true,
+      "deep_review_ran": false,
+      "deep_review_reason": "single_pass_conservative_classifier",
+      "second_pass_ran": false,
+      "deep_review_recommended": true,
+      "deep_review_recommendation_reason": "Confidence is low enough that a deeper ambiguity check is warranted. Source coverage is missing or thin for at least part of the record. The review surfaced multiple hesitation reasons that should be reconciled.",
+      "deep_review_recommendation_signals": [
+        {
+          "code": "low_confidence",
+          "reason": "Confidence is low enough that a deeper ambiguity check is warranted."
+        },
+        {
+          "code": "weak_source_coverage",
+          "reason": "Source coverage is missing or thin for at least part of the record."
+        },
+        {
+          "code": "multiple_hesitation_reasons",
+          "reason": "The review surfaced multiple hesitation reasons that should be reconciled."
+        },
+        {
+          "code": "manual_review_suggested",
+          "reason": "The review could not safely resolve whether this record is ready for import."
+        },
+        {
+          "code": "evidence_gaps",
+          "reason": "The review identified evidence that would make the record safer to import."
+        }
+      ],
+      "suggestion_conflicts": [],
+      "has_material_conflict": false,
+      "conflict_summary": "OpenAI Batch review currently runs a single conservative pass.",
+      "conflict_fields": [],
+      "confidence_comparison": {
+        "standard_confidence_score": 0.4,
+        "standard_confidence_level": "Low",
+        "deep_confidence_score": null,
+        "deep_confidence_level": null,
+        "final_confidence_score": 0.4,
+        "final_confidence_level": "Low",
+        "score_delta_after_deep_review": null,
+        "level_changed_after_deep_review": false,
+        "summary": "Only one conservative classifier pass is available, so there is no cross-pass comparison."
+      },
+      "confidence_changed_after_deep_review": false,
+      "review_priority": "high",
+      "review_priority_score": 9,
+      "review_priority_reason": "The final advisory confidence is low. The final suggestion still resolves to manual review. Source warnings remain on the final suggestion.",
+      "review_priority_signals": [
+        {
+          "code": "deep_review_recommended",
+          "weight": 1,
+          "reason": "The record already shows signals that justify deeper review."
+        },
+        {
+          "code": "low_confidence",
+          "weight": 2,
+          "reason": "The final advisory confidence is low."
+        },
+        {
+          "code": "source_warnings",
+          "weight": 2,
+          "reason": "Source warnings remain on the final suggestion."
+        },
+        {
+          "code": "evidence_gaps",
+          "weight": 1,
+          "reason": "The final suggestion still names evidence gaps before import."
+        },
+        {
+          "code": "multiple_hesitation_reasons",
+          "weight": 1,
+          "reason": "The review surfaced multiple hesitation reasons."
+        },
+        {
+          "code": "manual_review_suggested",
+          "weight": 2,
+          "reason": "The final suggestion still resolves to manual review."
+        }
+      ],
+      "manual_review_severity": "high",
+      "operator_attention_needed": true,
+      "suggested_batch": "high_attention",
+      "suggested_batch_reason": "Material conflict or high review priority makes this a first-pass attention item.",
+      "suggested_batch_tags": [
+        "high_attention",
+        "manual_review_focus",
+        "deep_review_candidates",
+        "source_check_needed"
+      ],
+      "existing_matches": [],
+      "suggestions": {
+        "title_normalized": "Reinstate school discipline policies without equity-based disparate-impact framing",
+        "summary_suggestion": "The administration ordered a review and replacement process for federal school-discipline guidance, but school-level effects remained unmeasured.",
+        "topic_suggestion": "Education",
+        "impacted_group_suggestion": "Black students and Black families affected by suspension, expulsion, referral-to-law-enforcement, and school discipline policies",
+        "status_suggestion": "In Progress",
+        "impact_direction_suggestion": "Negative",
+        "evidence_strength_suggestion": "Moderate",
+        "record_action_suggestion": "manual_review",
+        "recommended_action": "import_with_pending_impact",
+        "classifier_recommended_action": "needs_manual_review",
+        "impact_status": "impact_pending",
+        "impact_status_reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review.",
+        "confidence_score": 0.4,
+        "confidence_level": "Low",
+        "reasoning_summary": "The administration ordered a review and replacement of federal school-discipline guidance, removing equity-based disparate-impact analysis, but there is no direct evidence of measurable outcomes or effects on Black students at the school level.",
+        "hesitation_reasons": [
+          "The record documents an official promise and executive order to replace equity-based school discipline guidance.",
+          "The evidence provided does not include measurable outcomes or direct effects on Black students.",
+          "The impact direction is noted as 'Negative' in the outcome summary, but this is not supported by direct data or outcomes.",
+          "The process is still 'In Progress' and effects remain unmeasured."
+        ],
+        "evidence_needed_to_reduce_risk": [
+          "Direct evidence of changes in suspension, expulsion, or referral-to-law-enforcement rates for Black students.",
+          "Details of the replacement discipline framework.",
+          "Any measured outcomes or data post-policy change."
+        ],
+        "suggested_operator_next_action": "manual_review_required",
+        "caution_flags": [
+          "manual_review_required",
+          "no_independent_or_third_party_analysis.",
+          "no_outcome_data_included.",
+          "only_government_sources_provided.",
+          "weak_evidence"
+        ],
+        "source_warnings": [
+          "no_independent_or_third_party_analysis.",
+          "no_outcome_data_included.",
+          "only_government_sources_provided."
+        ],
+        "missing_source_warnings": [
+          "no_independent_or_third_party_analysis.",
+          "no_outcome_data_included.",
+          "only_government_sources_provided."
+        ],
+        "ambiguity_notes": "The record documents an official promise and executive order to replace equity-based school discipline guidance. The evidence provided does not include measurable outcomes or direct effects on Black students. The impact direction is noted as 'Negative' in the outcome summary, but this is not supported by direct data or outcomes.",
+        "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. Source warnings remain and reduce trust in the suggestion. Confidence is supported because Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
+        "confidence_signals": [
+          {
+            "code": "low_confidence",
+            "direction": "reduces",
+            "reason": "The normalized confidence score remains low after review."
+          },
+          {
+            "code": "source_warnings_present",
+            "direction": "reduces",
+            "reason": "Source warnings remain and reduce trust in the suggestion."
+          },
+          {
+            "code": "manual_review_required",
+            "direction": "reduces",
+            "reason": "The pass recommends manual review instead of a confident import path."
+          },
+          {
+            "code": "evidence_gaps_present",
+            "direction": "reduces",
+            "reason": "The pass identified evidence gaps that should be closed before import."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      },
+      "standard_pass_suggestions": {
+        "title_normalized": "Reinstate school discipline policies without equity-based disparate-impact framing",
+        "summary_suggestion": "The administration ordered a review and replacement process for federal school-discipline guidance, but school-level effects remained unmeasured.",
+        "topic_suggestion": "Education",
+        "impacted_group_suggestion": "Black students and Black families affected by suspension, expulsion, referral-to-law-enforcement, and school discipline policies",
+        "status_suggestion": "In Progress",
+        "impact_direction_suggestion": "Negative",
+        "evidence_strength_suggestion": "Moderate",
+        "record_action_suggestion": "manual_review",
+        "recommended_action": "import_with_pending_impact",
+        "classifier_recommended_action": "needs_manual_review",
+        "impact_status": "impact_pending",
+        "impact_status_reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review.",
+        "confidence_score": 0.4,
+        "confidence_level": "Low",
+        "reasoning_summary": "The administration ordered a review and replacement of federal school-discipline guidance, removing equity-based disparate-impact analysis, but there is no direct evidence of measurable outcomes or effects on Black students at the school level.",
+        "hesitation_reasons": [
+          "The record documents an official promise and executive order to replace equity-based school discipline guidance.",
+          "The evidence provided does not include measurable outcomes or direct effects on Black students.",
+          "The impact direction is noted as 'Negative' in the outcome summary, but this is not supported by direct data or outcomes.",
+          "The process is still 'In Progress' and effects remain unmeasured."
+        ],
+        "evidence_needed_to_reduce_risk": [
+          "Direct evidence of changes in suspension, expulsion, or referral-to-law-enforcement rates for Black students.",
+          "Details of the replacement discipline framework.",
+          "Any measured outcomes or data post-policy change."
+        ],
+        "suggested_operator_next_action": "manual_review_required",
+        "caution_flags": [
+          "manual_review_required",
+          "no_independent_or_third_party_analysis.",
+          "no_outcome_data_included.",
+          "only_government_sources_provided.",
+          "weak_evidence"
+        ],
+        "source_warnings": [
+          "no_independent_or_third_party_analysis.",
+          "no_outcome_data_included.",
+          "only_government_sources_provided."
+        ],
+        "missing_source_warnings": [
+          "no_independent_or_third_party_analysis.",
+          "no_outcome_data_included.",
+          "only_government_sources_provided."
+        ],
+        "ambiguity_notes": "The record documents an official promise and executive order to replace equity-based school discipline guidance. The evidence provided does not include measurable outcomes or direct effects on Black students. The impact direction is noted as 'Negative' in the outcome summary, but this is not supported by direct data or outcomes.",
+        "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. Source warnings remain and reduce trust in the suggestion. Confidence is supported because Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
+        "confidence_signals": [
+          {
+            "code": "low_confidence",
+            "direction": "reduces",
+            "reason": "The normalized confidence score remains low after review."
+          },
+          {
+            "code": "source_warnings_present",
+            "direction": "reduces",
+            "reason": "Source warnings remain and reduce trust in the suggestion."
+          },
+          {
+            "code": "manual_review_required",
+            "direction": "reduces",
+            "reason": "The pass recommends manual review instead of a confident import path."
+          },
+          {
+            "code": "evidence_gaps_present",
+            "direction": "reduces",
+            "reason": "The pass identified evidence gaps that should be closed before import."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      },
+      "deep_pass_suggestions": null,
+      "weak_evidence": true,
+      "confidence": "low",
+      "confidence_score": 0.4,
+      "source_quality": "medium",
+      "caution_flags": [
+        "manual_review_required",
+        "no_independent_or_third_party_analysis.",
+        "no_outcome_data_included.",
+        "only_government_sources_provided.",
+        "weak_evidence"
+      ]
+    },
+    {
+      "slug": "trump-2025-high-paying-skilled-trade-jobs",
+      "title": "Prepare Americans for high-paying skilled trade jobs",
+      "impact_status": "impact_pending",
+      "recommended_action": "import_with_pending_impact",
+      "requested_model": "gpt-4.1",
+      "effective_model": "gpt-4.1",
+      "resolved_model": "gpt-4.1",
+      "review_mode": "deep",
+      "review_mode_requested": "deep",
+      "review_mode_used": "standard",
+      "review_backend": "openai_batch",
+      "model_used": "gpt-4.1",
+      "verifier_model_requested": "gpt-4.1",
+      "verifier_model_used": null,
+      "senior_model_requested": "gpt-4.1",
+      "senior_model_used": "gpt-4.1",
+      "fallback_model": "gpt-4.1",
+      "fallback_used": false,
+      "fallback_reason": null,
+      "model_resolution_status": "exact_requested",
+      "timeout_seconds": null,
+      "senior_timeout_seconds": 240,
+      "verifier_timeout_seconds": 240,
+      "retry_count": 0,
+      "senior_attempted": true,
+      "senior_retry_attempted": false,
+      "verifier_attempted": false,
+      "verifier_retry_attempted": false,
+      "deep_review_requested": true,
+      "deep_review_ran": false,
+      "deep_review_reason": "single_pass_conservative_classifier",
+      "second_pass_ran": false,
+      "deep_review_recommended": true,
+      "deep_review_recommendation_reason": "Confidence is low enough that a deeper ambiguity check is warranted. Source coverage is missing or thin for at least part of the record. The review surfaced multiple hesitation reasons that should be reconciled.",
+      "deep_review_recommendation_signals": [
+        {
+          "code": "low_confidence",
+          "reason": "Confidence is low enough that a deeper ambiguity check is warranted."
+        },
+        {
+          "code": "weak_source_coverage",
+          "reason": "Source coverage is missing or thin for at least part of the record."
+        },
+        {
+          "code": "multiple_hesitation_reasons",
+          "reason": "The review surfaced multiple hesitation reasons that should be reconciled."
+        },
+        {
+          "code": "manual_review_suggested",
+          "reason": "The review could not safely resolve whether this record is ready for import."
+        },
+        {
+          "code": "evidence_gaps",
+          "reason": "The review identified evidence that would make the record safer to import."
+        }
+      ],
+      "suggestion_conflicts": [],
+      "has_material_conflict": false,
+      "conflict_summary": "OpenAI Batch review currently runs a single conservative pass.",
+      "conflict_fields": [],
+      "confidence_comparison": {
+        "standard_confidence_score": 0.4,
+        "standard_confidence_level": "Low",
+        "deep_confidence_score": null,
+        "deep_confidence_level": null,
+        "final_confidence_score": 0.4,
+        "final_confidence_level": "Low",
+        "score_delta_after_deep_review": null,
+        "level_changed_after_deep_review": false,
+        "summary": "Only one conservative classifier pass is available, so there is no cross-pass comparison."
+      },
+      "confidence_changed_after_deep_review": false,
+      "review_priority": "high",
+      "review_priority_score": 9,
+      "review_priority_reason": "The final advisory confidence is low. The final suggestion still resolves to manual review. Source warnings remain on the final suggestion.",
+      "review_priority_signals": [
+        {
+          "code": "deep_review_recommended",
+          "weight": 1,
+          "reason": "The record already shows signals that justify deeper review."
+        },
+        {
+          "code": "low_confidence",
+          "weight": 2,
+          "reason": "The final advisory confidence is low."
+        },
+        {
+          "code": "source_warnings",
+          "weight": 2,
+          "reason": "Source warnings remain on the final suggestion."
+        },
+        {
+          "code": "evidence_gaps",
+          "weight": 1,
+          "reason": "The final suggestion still names evidence gaps before import."
+        },
+        {
+          "code": "multiple_hesitation_reasons",
+          "weight": 1,
+          "reason": "The review surfaced multiple hesitation reasons."
+        },
+        {
+          "code": "manual_review_suggested",
+          "weight": 2,
+          "reason": "The final suggestion still resolves to manual review."
+        }
+      ],
+      "manual_review_severity": "high",
+      "operator_attention_needed": true,
+      "suggested_batch": "high_attention",
+      "suggested_batch_reason": "Material conflict or high review priority makes this a first-pass attention item.",
+      "suggested_batch_tags": [
+        "high_attention",
+        "manual_review_focus",
+        "deep_review_candidates",
+        "source_check_needed"
+      ],
+      "existing_matches": [],
+      "suggestions": {
+        "title_normalized": "Prepare Americans for high-paying skilled trade jobs",
+        "summary_suggestion": "The administration launched a skilled-trades workforce initiative in 2025, but measurable labor-market effects remained early.",
+        "topic_suggestion": "Economic Opportunity",
+        "impacted_group_suggestion": "Black workers and Black jobseekers affected by access to apprenticeships, workforce programs, and higher-wage skilled trades",
+        "status_suggestion": "In Progress",
+        "impact_direction_suggestion": "Positive",
+        "evidence_strength_suggestion": "Strong",
+        "record_action_suggestion": "manual_review",
+        "recommended_action": "import_with_pending_impact",
+        "classifier_recommended_action": "needs_manual_review",
+        "impact_status": "impact_pending",
+        "impact_status_reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review.",
+        "confidence_score": 0.4,
+        "confidence_level": "Low",
+        "reasoning_summary": "The administration issued an executive order to align federal workforce policy with skilled trades and apprenticeships, aiming to expand access and streamline programs. However, the evidence provided does not document measurable labor-market outcomes or specific impacts for Black Americans at this stage.",
+        "hesitation_reasons": [
+          "The policy is in progress and primarily sets direction and targets, not completed outcomes.",
+          "Evidence of direct, measurable impact on Black Americans is not provided.",
+          "The sources are official and directly related to the promise, but only describe intent and early-stage actions.",
+          "The summary and notes acknowledge incomplete evidence and lack of documented labor-market effects."
+        ],
+        "evidence_needed_to_reduce_risk": [
+          "Measurable labor-market outcomes for Black Americans",
+          "Data on participation rates or economic mobility for Black workers",
+          "Evidence of equitable implementation or specific benefits realized"
+        ],
+        "suggested_operator_next_action": "manual_review_required",
+        "caution_flags": [
+          "lack_of_outcome_data",
+          "manual_review_required",
+          "no_independent_or_third_party_evaluation",
+          "weak_evidence"
+        ],
+        "source_warnings": [
+          "lack_of_outcome_data",
+          "no_independent_or_third_party_evaluation"
+        ],
+        "missing_source_warnings": [
+          "lack_of_outcome_data",
+          "no_independent_or_third_party_evaluation"
+        ],
+        "ambiguity_notes": "The policy is in progress and primarily sets direction and targets, not completed outcomes. Evidence of direct, measurable impact on Black Americans is not provided. The sources are official and directly related to the promise, but only describe intent and early-stage actions.",
+        "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. Source warnings remain and reduce trust in the suggestion. Confidence is supported because Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
+        "confidence_signals": [
+          {
+            "code": "low_confidence",
+            "direction": "reduces",
+            "reason": "The normalized confidence score remains low after review."
+          },
+          {
+            "code": "source_warnings_present",
+            "direction": "reduces",
+            "reason": "Source warnings remain and reduce trust in the suggestion."
+          },
+          {
+            "code": "manual_review_required",
+            "direction": "reduces",
+            "reason": "The pass recommends manual review instead of a confident import path."
+          },
+          {
+            "code": "evidence_gaps_present",
+            "direction": "reduces",
+            "reason": "The pass identified evidence gaps that should be closed before import."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      },
+      "standard_pass_suggestions": {
+        "title_normalized": "Prepare Americans for high-paying skilled trade jobs",
+        "summary_suggestion": "The administration launched a skilled-trades workforce initiative in 2025, but measurable labor-market effects remained early.",
+        "topic_suggestion": "Economic Opportunity",
+        "impacted_group_suggestion": "Black workers and Black jobseekers affected by access to apprenticeships, workforce programs, and higher-wage skilled trades",
+        "status_suggestion": "In Progress",
+        "impact_direction_suggestion": "Positive",
+        "evidence_strength_suggestion": "Strong",
+        "record_action_suggestion": "manual_review",
+        "recommended_action": "import_with_pending_impact",
+        "classifier_recommended_action": "needs_manual_review",
+        "impact_status": "impact_pending",
+        "impact_status_reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review.",
+        "confidence_score": 0.4,
+        "confidence_level": "Low",
+        "reasoning_summary": "The administration issued an executive order to align federal workforce policy with skilled trades and apprenticeships, aiming to expand access and streamline programs. However, the evidence provided does not document measurable labor-market outcomes or specific impacts for Black Americans at this stage.",
+        "hesitation_reasons": [
+          "The policy is in progress and primarily sets direction and targets, not completed outcomes.",
+          "Evidence of direct, measurable impact on Black Americans is not provided.",
+          "The sources are official and directly related to the promise, but only describe intent and early-stage actions.",
+          "The summary and notes acknowledge incomplete evidence and lack of documented labor-market effects."
+        ],
+        "evidence_needed_to_reduce_risk": [
+          "Measurable labor-market outcomes for Black Americans",
+          "Data on participation rates or economic mobility for Black workers",
+          "Evidence of equitable implementation or specific benefits realized"
+        ],
+        "suggested_operator_next_action": "manual_review_required",
+        "caution_flags": [
+          "lack_of_outcome_data",
+          "manual_review_required",
+          "no_independent_or_third_party_evaluation",
+          "weak_evidence"
+        ],
+        "source_warnings": [
+          "lack_of_outcome_data",
+          "no_independent_or_third_party_evaluation"
+        ],
+        "missing_source_warnings": [
+          "lack_of_outcome_data",
+          "no_independent_or_third_party_evaluation"
+        ],
+        "ambiguity_notes": "The policy is in progress and primarily sets direction and targets, not completed outcomes. Evidence of direct, measurable impact on Black Americans is not provided. The sources are official and directly related to the promise, but only describe intent and early-stage actions.",
+        "confidence_reasoning": "Confidence is reduced because The normalized confidence score remains low after review. Source warnings remain and reduce trust in the suggestion. Confidence is supported because Core suggestion fields are populated for operator review. Context that still needs operator judgment: Implementation is still in progress, which limits certainty about downstream effects.",
+        "confidence_signals": [
+          {
+            "code": "low_confidence",
+            "direction": "reduces",
+            "reason": "The normalized confidence score remains low after review."
+          },
+          {
+            "code": "source_warnings_present",
+            "direction": "reduces",
+            "reason": "Source warnings remain and reduce trust in the suggestion."
+          },
+          {
+            "code": "manual_review_required",
+            "direction": "reduces",
+            "reason": "The pass recommends manual review instead of a confident import path."
+          },
+          {
+            "code": "evidence_gaps_present",
+            "direction": "reduces",
+            "reason": "The pass identified evidence gaps that should be closed before import."
+          },
+          {
+            "code": "implementation_in_progress",
+            "direction": "mixed",
+            "reason": "Implementation is still in progress, which limits certainty about downstream effects."
+          },
+          {
+            "code": "core_fields_present",
+            "direction": "supports",
+            "reason": "Core suggestion fields are populated for operator review."
+          }
+        ]
+      },
+      "deep_pass_suggestions": null,
+      "weak_evidence": true,
+      "confidence": "low",
+      "confidence_score": 0.4,
+      "source_quality": "high",
+      "caution_flags": [
+        "lack_of_outcome_data",
+        "manual_review_required",
+        "no_independent_or_third_party_evaluation",
+        "weak_evidence"
+      ]
+    }
+  ],
+  "suggested_batches": [
+    {
+      "batch_name": "high_attention",
+      "count": 10,
+      "description": "High-risk items with material conflicts, low confidence, or strong review-priority signals.",
+      "items": [
+        {
+          "index": 1,
+          "slug": "trump-2025-election-integrity-proof-citizenship-paper-ballots",
+          "title": "Require proof of citizenship and paper-ballot election safeguards",
+          "review_priority": "high",
+          "review_priority_score": 10
+        },
+        {
+          "index": 2,
+          "slug": "trump-2025-end-federal-dei-equity-programs",
+          "title": "End federal DEI and equity-based government programs",
+          "review_priority": "high",
+          "review_priority_score": 9
+        },
+        {
+          "index": 3,
+          "slug": "trump-2025-strengthen-local-law-enforcement",
+          "title": "Increase federal support for state and local law enforcement",
+          "review_priority": "high",
+          "review_priority_score": 10
+        },
+        {
+          "index": 4,
+          "slug": "trump-2025-clear-street-encampments-expand-civil-commitment",
+          "title": "Clear street encampments and expand treatment-oriented street-order responses",
+          "review_priority": "high",
+          "review_priority_score": 10
+        },
+        {
+          "index": 5,
+          "slug": "trump-2025-domestic-production-of-critical-medicines",
+          "title": "Expand domestic production of critical medicines",
+          "review_priority": "high",
+          "review_priority_score": 9
+        },
+        {
+          "index": 6,
+          "slug": "trump-2025-expand-educational-freedom-for-families",
+          "title": "Expand educational freedom and school-choice options for families",
+          "review_priority": "high",
+          "review_priority_score": 10
+        },
+        {
+          "index": 7,
+          "slug": "trump-2025-reform-higher-education-accreditation",
+          "title": "Reform higher-education accreditation around student outcomes",
+          "review_priority": "high",
+          "review_priority_score": 10
+        },
+        {
+          "index": 8,
+          "slug": "trump-2025-promote-hbcu-excellence-and-innovation",
+          "title": "Promote excellence and innovation at HBCUs",
+          "review_priority": "high",
+          "review_priority_score": 9
+        },
+        {
+          "index": 9,
+          "slug": "trump-2025-reinstate-school-discipline-policies",
+          "title": "Reinstate school discipline policies without equity-based disparate-impact framing",
+          "review_priority": "high",
+          "review_priority_score": 9
+        },
+        {
+          "index": 10,
+          "slug": "trump-2025-high-paying-skilled-trade-jobs",
+          "title": "Prepare Americans for high-paying skilled trade jobs",
+          "review_priority": "high",
+          "review_priority_score": 9
+        }
+      ]
+    }
+  ],
+  "suggested_batch_counts": {
+    "high_attention": 10
+  },
+  "batch_runtime": {
+    "batch_id": "batch_69d44b28df388190bb75e30016bc5f3f",
+    "status": "completed",
+    "input_file_id": "file-ASy4dBvQLzhhrRXMAsuCQH",
+    "output_file_id": "file-PvwuEA4tNbQWJk7XbqYrzY",
+    "error_file_id": null,
+    "request_counts": {
+      "total": 10,
+      "completed": 10,
+      "failed": 0
+    },
+    "base_url": "https://api.openai.com/v1",
+    "error_by_slug": {},
+    "metadata_path": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.evidence-pack-vs-baseline-01.baseline.openai-batch.meta.json",
+    "resumed": true
+  }
+}

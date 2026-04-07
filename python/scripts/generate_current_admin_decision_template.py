@@ -152,10 +152,92 @@ def build_selection_filters(args: argparse.Namespace) -> dict[str, Any]:
     }
 
 
+def normalize_string_list(value: Any) -> list[str]:
+    if not isinstance(value, list):
+        return []
+    return [str(item).strip() for item in value if str(item or "").strip()]
+
+
+def decision_support_reason_labels(item: dict[str, Any], suggestion: dict[str, Any]) -> list[str]:
+    labels: list[str] = []
+    caution_flags = set(normalize_string_list(suggestion.get("caution_flags")))
+    confidence = float(suggestion.get("confidence_score") or 0.0)
+    classification = str(suggestion.get("impact_direction_suggestion") or "").lower()
+    if item.get("has_material_conflict") or "conflicting_sources" in caution_flags:
+        labels.append("conflicting sources")
+    if (
+        "weak_evidence" in caution_flags
+        or suggestion.get("evidence_strength_suggestion") in {"Limited", "Weak"}
+        or suggestion.get("source_warnings")
+        or suggestion.get("missing_source_warnings")
+        or suggestion.get("evidence_needed_to_reduce_risk")
+    ):
+        labels.append("weak evidence")
+    if classification not in {"positive", "negative", "mixed", "blocked"}:
+        labels.append("unclear classification")
+    if confidence < 0.75:
+        labels.append("low confidence")
+    if suggestion.get("record_action_suggestion") == "manual_review":
+        labels.append("manual review requested by model")
+    if "ambiguous_subject" in caution_flags or str(suggestion.get("signal_ambiguity") or "").lower() == "high":
+        labels.append("ambiguous subject")
+    if "date_uncertain" in caution_flags:
+        labels.append("date uncertain")
+    priority = {
+        "conflicting sources": 2,
+        "weak evidence": 3,
+        "unclear classification": 4,
+        "low confidence": 5,
+        "manual review requested by model": 6,
+        "ambiguous subject": 7,
+        "date uncertain": 8,
+    }
+    return sorted(set(labels), key=lambda label: priority.get(label, 99))
+
+
+def decision_support_checklist(reason_labels: list[str]) -> list[str]:
+    checklist: list[str] = []
+    if "conflicting sources" in reason_labels:
+        checklist.append("review conflicting sources")
+    if "weak evidence" in reason_labels:
+        checklist.append("verify source grounding")
+    if "unclear classification" in reason_labels:
+        checklist.append("confirm whether evidence supports any non-unclear classification")
+    if "low confidence" in reason_labels:
+        checklist.append("verify source grounding")
+    if "manual review requested by model" in reason_labels:
+        checklist.append("confirm implementation status")
+        checklist.append("confirm whether impact is direct or too indirect")
+    if "ambiguous subject" in reason_labels:
+        checklist.append("confirm subject identity/scope")
+    if "date uncertain" in reason_labels:
+        checklist.append("inspect dates and implementation timing")
+    return list(dict.fromkeys(checklist))
+
+
+def decision_readiness_label(reason_labels: list[str], suggestion: dict[str, Any]) -> str:
+    if {"conflicting sources", "weak evidence", "date uncertain"} & set(reason_labels):
+        return "needs evidence verification"
+    if {"unclear classification", "low confidence", "manual review requested by model", "ambiguous subject"} & set(reason_labels):
+        return "needs operator judgment"
+    if suggestion.get("reasoning_summary") and reason_labels:
+        return "ready for operator decision"
+    return "needs operator judgment"
+
+
 def build_template_item(item: dict[str, Any], index: int) -> dict[str, Any]:
     suggestion = item.get("suggestions") or {}
     attention_bits: list[str] = []
     suggested_checks: list[str] = []
+    reason_labels = decision_support_reason_labels(item, suggestion)
+    primary_reason = reason_labels[0] if reason_labels else None
+    checklist = decision_support_checklist(reason_labels)
+    readiness_label = decision_readiness_label(reason_labels, suggestion)
+    confidence = float(suggestion.get("confidence_score") or 0.0)
+    support_summary = (
+        f"{readiness_label}: primary issue is {primary_reason or 'none'}; "
+        f"confidence={confidence:.2f}. Next check: {checklist[0] if checklist else 'inspect evidence before deciding'}."
+    )
 
     review_priority = item.get("review_priority")
     review_priority_score = item.get("review_priority_score")
@@ -171,6 +253,9 @@ def build_template_item(item: dict[str, Any], index: int) -> dict[str, Any]:
         suggested_checks.append("Consider deep review if the record still feels ambiguous.")
     if item.get("operator_attention_needed"):
         attention_bits.append("attention needed")
+    if suggestion.get("impact_status") == "impact_pending":
+        attention_bits.append("impact pending")
+        suggested_checks.append("Import may proceed only with impact outcome scoring deferred.")
     if suggestion.get("source_warnings") or suggestion.get("missing_source_warnings"):
         suggested_checks.append("Check the sources and make sure the evidence still supports the record.")
     if suggestion.get("evidence_needed_to_reduce_risk"):
@@ -189,8 +274,20 @@ def build_template_item(item: dict[str, Any], index: int) -> dict[str, Any]:
         "deep_review_recommended": item.get("deep_review_recommended"),
         "manual_review_severity": item.get("manual_review_severity"),
         "ai_record_action_suggestion": suggestion.get("record_action_suggestion"),
+        "ai_recommended_action": suggestion.get("recommended_action"),
+        "impact_status": suggestion.get("impact_status"),
         "attention_summary": "; ".join(attention_bits) or "standard review item",
         "suggested_checks": suggested_checks,
+        "decision_support": {
+            "primary_reason_label": primary_reason,
+            "reason_labels": reason_labels,
+            "confidence": confidence,
+            "decision_readiness_label": readiness_label,
+            "decision_checklist": checklist,
+            "checklist_summary": "; ".join(checklist[:3]),
+            "decision_support_summary": support_summary,
+            "unresolved": True,
+        },
         "operator_action": "",
         "operator_notes": "",
         "final_decision_summary": "",

@@ -1,0 +1,328 @@
+{
+  "mode": "dry-run",
+  "batch_name": "trump-2025-batch-01",
+  "president_slug": "donald-j-trump-2025",
+  "source_input_path": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.manual-review-queue.json",
+  "provenance_guard": {
+    "status": "passed",
+    "input_mode": "manual_review_queue",
+    "source_batch_path": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.normalized.json",
+    "source_review_path": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.evidence-pack-vs-baseline-01.enriched.ai-review.json",
+    "source_precommit_path": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.pre-commit-review.json",
+    "source_decision_log_path": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/review_decisions/trump-2025-batch-01.20260407T014841Z.promotion.decision-log.json",
+    "precommit_readiness_status": "ready_with_warnings",
+    "openai_batch_safety": {
+      "review_path": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.evidence-pack-vs-baseline-01.enriched.ai-review.json",
+      "metadata_path": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.evidence-pack-vs-baseline-01.enriched.openai-batch.meta.json",
+      "validation_path": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.evidence-pack-vs-baseline-01.enriched.openai-batch.validation.json",
+      "metadata_present": true,
+      "validation_present": true,
+      "blocking_issues": [],
+      "warnings": [],
+      "safe_to_finalize": true,
+      "safe_to_apply": true,
+      "validation_counts": {
+        "total_items": 10,
+        "valid_items": 10,
+        "malformed_items": 0,
+        "enum_errors": 0,
+        "missing_field_errors": 0,
+        "low_confidence_items": 10,
+        "unclear_classifications": 10,
+        "needs_manual_review_items": 10,
+        "insert_safe_items": 0
+      },
+      "provider": "openai",
+      "model": "gpt-4.1",
+      "batch_id": "batch_69d44b856ba48190ab0d76d84755a9ee",
+      "status": "completed",
+      "submitted_at": "2026-04-07T00:10:45.689393+00:00",
+      "completed_at": "2026-04-07T00:12:02+00:00",
+      "last_polled_at": "2026-04-07T01:14:12.251052+00:00",
+      "output_file_id": "file-3APJvoSquNQFnvnyMvo1Hc",
+      "error_file_id": null,
+      "request_counts": {
+        "total": 10,
+        "completed": 10,
+        "failed": 0
+      },
+      "input_artifact": "data/current_admin_batches/trump_2025_batch_01.json",
+      "review_artifact": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.evidence-pack-vs-baseline-01.enriched.ai-review.json",
+      "review_artifact_rebuilt_at": "2026-04-07T01:14:12.265947+00:00",
+      "local_output_path": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.evidence-pack-vs-baseline-01.enriched.openai-batch.output.jsonl",
+      "local_error_path": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.evidence-pack-vs-baseline-01.enriched.openai-batch.errors.jsonl",
+      "output_ready": true,
+      "error_file_present": false,
+      "review_artifact_ready": true,
+      "review_artifact_rebuilt": true
+    }
+  },
+  "promises_created": 0,
+  "promises_updated": 0,
+  "existing_promises_enriched": 0,
+  "actions_created": 0,
+  "actions_updated": 0,
+  "existing_actions_enriched": 0,
+  "outcomes_created": 0,
+  "impact_pending_records": 10,
+  "impact_pending_outcomes_deferred": 10,
+  "impact_pending_existing_outcomes_preserved": 10,
+  "impact_pending_items": [
+    {
+      "slug": "trump-2025-election-integrity-proof-citizenship-paper-ballots",
+      "title": "Require proof of citizenship and paper-ballot election safeguards",
+      "reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review."
+    },
+    {
+      "slug": "trump-2025-end-federal-dei-equity-programs",
+      "title": "End federal DEI and equity-based government programs",
+      "reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review."
+    },
+    {
+      "slug": "trump-2025-strengthen-local-law-enforcement",
+      "title": "Increase federal support for state and local law enforcement",
+      "reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review."
+    },
+    {
+      "slug": "trump-2025-clear-street-encampments-expand-civil-commitment",
+      "title": "Clear street encampments and expand treatment-oriented street-order responses",
+      "reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review."
+    },
+    {
+      "slug": "trump-2025-domestic-production-of-critical-medicines",
+      "title": "Expand domestic production of critical medicines",
+      "reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review."
+    },
+    {
+      "slug": "trump-2025-expand-educational-freedom-for-families",
+      "title": "Expand educational freedom and school-choice options for families",
+      "reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review."
+    },
+    {
+      "slug": "trump-2025-reform-higher-education-accreditation",
+      "title": "Reform higher-education accreditation around student outcomes",
+      "reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review."
+    },
+    {
+      "slug": "trump-2025-promote-hbcu-excellence-and-innovation",
+      "title": "Promote excellence and innovation at HBCUs",
+      "reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review."
+    },
+    {
+      "slug": "trump-2025-reinstate-school-discipline-policies",
+      "title": "Reinstate school discipline policies without equity-based disparate-impact framing",
+      "reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review."
+    },
+    {
+      "slug": "trump-2025-high-paying-skilled-trade-jobs",
+      "title": "Prepare Americans for high-paying skilled trade jobs",
+      "reason": "Weak-evidence and low-confidence signals require pending impact handling, but source quality is sufficient for record import review."
+    }
+  ],
+  "sources_created": 0,
+  "sources_reused": 20,
+  "skipped_duplicates": [
+    {
+      "type": "promise",
+      "match": "slug",
+      "promise_id": 110,
+      "slug": "trump-2025-election-integrity-proof-citizenship-paper-ballots"
+    },
+    {
+      "type": "action",
+      "promise_id": 110,
+      "action_id": 218,
+      "title": "Preserving and Protecting the Integrity of American Elections"
+    },
+    {
+      "type": "outcome",
+      "promise_id": 110,
+      "outcome_id": 110,
+      "impact_direction": "Mixed",
+      "reason": "existing_finalized_outcome_preserved_for_impact_pending_record"
+    },
+    {
+      "type": "promise",
+      "match": "slug",
+      "promise_id": 111,
+      "slug": "trump-2025-end-federal-dei-equity-programs"
+    },
+    {
+      "type": "action",
+      "promise_id": 111,
+      "action_id": 219,
+      "title": "Ending Radical And Wasteful Government DEI Programs And Preferencing"
+    },
+    {
+      "type": "outcome",
+      "promise_id": 111,
+      "outcome_id": 111,
+      "impact_direction": "Negative",
+      "reason": "existing_finalized_outcome_preserved_for_impact_pending_record"
+    },
+    {
+      "type": "promise",
+      "match": "slug",
+      "promise_id": 112,
+      "slug": "trump-2025-strengthen-local-law-enforcement"
+    },
+    {
+      "type": "action",
+      "promise_id": 112,
+      "action_id": 220,
+      "title": "Strengthening and Unleashing America's Law Enforcement to Pursue Criminals and Protect Innocent Citizens"
+    },
+    {
+      "type": "outcome",
+      "promise_id": 112,
+      "outcome_id": 112,
+      "impact_direction": "Mixed",
+      "reason": "existing_finalized_outcome_preserved_for_impact_pending_record"
+    },
+    {
+      "type": "promise",
+      "match": "slug",
+      "promise_id": 113,
+      "slug": "trump-2025-clear-street-encampments-expand-civil-commitment"
+    },
+    {
+      "type": "action",
+      "promise_id": 113,
+      "action_id": 221,
+      "title": "President Donald J. Trump Takes Action to End Crime and Disorder on America's Streets"
+    },
+    {
+      "type": "outcome",
+      "promise_id": 113,
+      "outcome_id": 113,
+      "impact_direction": "Mixed",
+      "reason": "existing_finalized_outcome_preserved_for_impact_pending_record"
+    },
+    {
+      "type": "promise",
+      "match": "slug",
+      "promise_id": 114,
+      "slug": "trump-2025-domestic-production-of-critical-medicines"
+    },
+    {
+      "type": "action",
+      "promise_id": 114,
+      "action_id": 222,
+      "title": "Regulatory Relief to Promote Domestic Production of Critical Medicines"
+    },
+    {
+      "type": "outcome",
+      "promise_id": 114,
+      "outcome_id": 114,
+      "impact_direction": "Positive",
+      "reason": "existing_finalized_outcome_preserved_for_impact_pending_record"
+    },
+    {
+      "type": "promise",
+      "match": "slug",
+      "promise_id": 115,
+      "slug": "trump-2025-expand-educational-freedom-for-families"
+    },
+    {
+      "type": "action",
+      "promise_id": 115,
+      "action_id": 223,
+      "title": "Expanding Educational Freedom and Opportunity for Families"
+    },
+    {
+      "type": "outcome",
+      "promise_id": 115,
+      "outcome_id": 115,
+      "impact_direction": "Mixed",
+      "reason": "existing_finalized_outcome_preserved_for_impact_pending_record"
+    },
+    {
+      "type": "promise",
+      "match": "slug",
+      "promise_id": 116,
+      "slug": "trump-2025-reform-higher-education-accreditation"
+    },
+    {
+      "type": "action",
+      "promise_id": 116,
+      "action_id": 224,
+      "title": "Reforming Accreditation to Strengthen Higher Education"
+    },
+    {
+      "type": "outcome",
+      "promise_id": 116,
+      "outcome_id": 116,
+      "impact_direction": "Mixed",
+      "reason": "existing_finalized_outcome_preserved_for_impact_pending_record"
+    },
+    {
+      "type": "promise",
+      "match": "slug",
+      "promise_id": 117,
+      "slug": "trump-2025-promote-hbcu-excellence-and-innovation"
+    },
+    {
+      "type": "action",
+      "promise_id": 117,
+      "action_id": 225,
+      "title": "White House Initiative to Promote Excellence and Innovation at Historically Black Colleges and Universities"
+    },
+    {
+      "type": "outcome",
+      "promise_id": 117,
+      "outcome_id": 117,
+      "impact_direction": "Positive",
+      "reason": "existing_finalized_outcome_preserved_for_impact_pending_record"
+    },
+    {
+      "type": "promise",
+      "match": "slug",
+      "promise_id": 118,
+      "slug": "trump-2025-reinstate-school-discipline-policies"
+    },
+    {
+      "type": "action",
+      "promise_id": 118,
+      "action_id": 226,
+      "title": "Reinstating Common Sense School Discipline Policies"
+    },
+    {
+      "type": "outcome",
+      "promise_id": 118,
+      "outcome_id": 118,
+      "impact_direction": "Negative",
+      "reason": "existing_finalized_outcome_preserved_for_impact_pending_record"
+    },
+    {
+      "type": "promise",
+      "match": "slug",
+      "promise_id": 119,
+      "slug": "trump-2025-high-paying-skilled-trade-jobs"
+    },
+    {
+      "type": "action",
+      "promise_id": 119,
+      "action_id": 227,
+      "title": "Preparing Americans for High-Paying Skilled Trade Jobs of the Future"
+    },
+    {
+      "type": "outcome",
+      "promise_id": 119,
+      "outcome_id": 119,
+      "impact_direction": "Positive",
+      "reason": "existing_finalized_outcome_preserved_for_impact_pending_record"
+    }
+  ],
+  "conflicts": [],
+  "notes": [
+    "The live schema links outcomes to promise_id rather than action_id, so outcome dedupe and inserts are performed at the promise level.",
+    "Records with impact_status=impact_pending may import promise/action/source facts, but outcome rows are deferred so they are not treated as finalized impact scores.",
+    "Existing promise/action records are enriched additively: missing fields and new linked sources/actions may be added, while conflicting populated fields are preserved and reported."
+  ],
+  "validation": {
+    "promises_missing_actions": [],
+    "promises_missing_sources": [],
+    "orphan_actions": 0,
+    "orphan_outcomes": 0
+  }
+}

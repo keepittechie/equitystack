@@ -3,14 +3,19 @@ import argparse
 import csv
 import json
 import re
+import sys
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-import requests
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
-DEFAULT_OLLAMA_URL = "http://10.10.0.60:11434"
+from lib.llm.provider import generate_text, list_available_models
+
+DEFAULT_OLLAMA_URL = ""
 DEFAULT_MODEL = "qwen3.5:9b"
 DEFAULT_TIMEOUT = 300
 DEFAULT_TEMPERATURE = 0.1
@@ -483,10 +488,7 @@ def derive_csv_path(csv_arg: str | None, output_path: Path) -> Path | None:
 
 
 def fetch_available_models(ollama_url: str, timeout_seconds: int) -> list[str]:
-    response = requests.get(f"{ollama_url.rstrip('/')}/api/tags", timeout=timeout_seconds)
-    response.raise_for_status()
-    payload = response.json()
-    return [model["name"] for model in payload.get("models") or [] if isinstance(model.get("name"), str)]
+    return list_available_models(endpoint=ollama_url or None, timeout_seconds=timeout_seconds)
 
 
 def resolve_model_name(requested_model: str, available_models: list[str]) -> str:
@@ -506,23 +508,14 @@ def resolve_model_name(requested_model: str, available_models: list[str]) -> str
 
 
 def call_ollama(prompt: str, model: str, ollama_url: str, timeout_seconds: int, temperature: float) -> dict[str, Any]:
-    response = requests.post(
-        f"{ollama_url.rstrip('/')}/api/generate",
-        json={
-            "model": model,
-            "prompt": prompt,
-            "stream": False,
-            "format": "json",
-            "options": {
-                "temperature": temperature,
-                "seed": DEFAULT_SEED,
-            },
-        },
-        timeout=timeout_seconds,
+    body = generate_text(
+        prompt,
+        model=model,
+        endpoint=ollama_url or None,
+        timeout_seconds=timeout_seconds,
+        temperature=temperature,
+        response_format="json",
     )
-    response.raise_for_status()
-    payload = response.json()
-    body = payload.get("response", "")
     start = body.find("{")
     end = body.rfind("}")
     if start == -1 or end == -1 or end <= start:

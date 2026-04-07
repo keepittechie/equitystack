@@ -1,0 +1,92 @@
+{
+  "artifact_version": 1,
+  "experiment_name": "evidence-pack-vs-baseline-01",
+  "source_batch_name": "trump-2025-batch-01",
+  "source_input_artifact": "data/current_admin_batches/trump_2025_batch_01.json",
+  "created_at": "2026-04-07T00:09:11+00:00",
+  "updated_at": "2026-04-07T01:14:12+00:00",
+  "packing_versions": {
+    "baseline": "baseline-thin-v1",
+    "enriched": "current-admin-evidence-pack-v1"
+  },
+  "prompt_input_modes": {
+    "baseline": "baseline",
+    "enriched": "enriched"
+  },
+  "artifacts": {
+    "baseline": {
+      "review": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.evidence-pack-vs-baseline-01.baseline.ai-review.json",
+      "openai_batch_metadata": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.evidence-pack-vs-baseline-01.baseline.openai-batch.meta.json",
+      "openai_batch_output": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.evidence-pack-vs-baseline-01.baseline.openai-batch.output.jsonl",
+      "openai_batch_error": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.evidence-pack-vs-baseline-01.baseline.openai-batch.errors.jsonl",
+      "validation": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.evidence-pack-vs-baseline-01.baseline.openai-batch.validation.json",
+      "evidence_pack": null
+    },
+    "enriched": {
+      "review": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.evidence-pack-vs-baseline-01.enriched.ai-review.json",
+      "openai_batch_metadata": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.evidence-pack-vs-baseline-01.enriched.openai-batch.meta.json",
+      "openai_batch_output": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.evidence-pack-vs-baseline-01.enriched.openai-batch.output.jsonl",
+      "openai_batch_error": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.evidence-pack-vs-baseline-01.enriched.openai-batch.errors.jsonl",
+      "validation": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.evidence-pack-vs-baseline-01.enriched.openai-batch.validation.json",
+      "evidence_pack": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.evidence-pack-vs-baseline-01.enriched.evidence-pack.json"
+    },
+    "comparison": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.evidence-pack-vs-baseline-01.comparison.json",
+    "metadata": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.evidence-pack-vs-baseline-01.paired-eval.meta.json"
+  },
+  "status": {
+    "baseline": {
+      "side": "baseline",
+      "prompt_input_mode": "baseline",
+      "review_exists": true,
+      "review_artifact": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.evidence-pack-vs-baseline-01.baseline.ai-review.json",
+      "batch_status": "completed",
+      "batch_id": "batch_69d44b28df388190bb75e30016bc5f3f",
+      "model": "gpt-4.1",
+      "metadata_present": true,
+      "metadata_artifact": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.evidence-pack-vs-baseline-01.baseline.openai-batch.meta.json",
+      "validation_present": true,
+      "validation_artifact": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.evidence-pack-vs-baseline-01.baseline.openai-batch.validation.json",
+      "output_ready": true,
+      "output_artifact": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.evidence-pack-vs-baseline-01.baseline.openai-batch.output.jsonl",
+      "error_file_present": false,
+      "error_artifact": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.evidence-pack-vs-baseline-01.baseline.openai-batch.errors.jsonl",
+      "evidence_pack_present": false,
+      "evidence_pack_artifact": null,
+      "review_artifact_rebuilt": true,
+      "reviewed_count": 10,
+      "ready_for_comparison": true
+    },
+    "enriched": {
+      "side": "enriched",
+      "prompt_input_mode": "enriched",
+      "review_exists": true,
+      "review_artifact": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.evidence-pack-vs-baseline-01.enriched.ai-review.json",
+      "batch_status": "completed",
+      "batch_id": "batch_69d44b856ba48190ab0d76d84755a9ee",
+      "model": "gpt-4.1",
+      "metadata_present": true,
+      "metadata_artifact": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.evidence-pack-vs-baseline-01.enriched.openai-batch.meta.json",
+      "validation_present": true,
+      "validation_artifact": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.evidence-pack-vs-baseline-01.enriched.openai-batch.validation.json",
+      "output_ready": true,
+      "output_artifact": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.evidence-pack-vs-baseline-01.enriched.openai-batch.output.jsonl",
+      "error_file_present": false,
+      "error_artifact": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.evidence-pack-vs-baseline-01.enriched.openai-batch.errors.jsonl",
+      "evidence_pack_present": true,
+      "evidence_pack_artifact": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.evidence-pack-vs-baseline-01.enriched.evidence-pack.json",
+      "review_artifact_rebuilt": true,
+      "reviewed_count": 10,
+      "ready_for_comparison": true
+    },
+    "comparison_ready": true,
+    "comparison_artifact": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.evidence-pack-vs-baseline-01.comparison.json",
+    "recommendation": "both runs ready; inspect comparison"
+  },
+  "last_action": "resume",
+  "comparison": {
+    "status": "comparison-ready",
+    "comparison_available": true,
+    "matched_item_count": 10,
+    "unmatched_item_count": 0
+  }
+}

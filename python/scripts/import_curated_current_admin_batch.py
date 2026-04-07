@@ -20,6 +20,9 @@ from current_admin_common import (
     write_csv_rows,
     write_json_file,
 )
+from current_admin_openai_batch_guardrails import require_review_batch_safe
+
+IMPACT_PENDING_STATUS = "impact_pending"
 
 
 def parse_args() -> argparse.Namespace:
@@ -69,6 +72,10 @@ def read_import_input(path: Path) -> dict[str, Any]:
     if not isinstance(records, list):
         raise ValueError("Import input did not resolve to a records list")
     return payload
+
+
+def impact_status_for_record(record: dict[str, Any]) -> str:
+    return normalize_nullable_text(record.get("impact_status")) or "impact_scored"
 
 
 def resolve_lineage_path(raw_value: Any, reference_path: Path) -> Path | None:
@@ -125,6 +132,7 @@ def validate_queue_import_lineage(input_path: Path, payload: dict[str, Any]) -> 
         raise ValueError(
             "Queue provenance is incomplete: the AI review artifact is missing. Restore the canonical review artifact before import."
         )
+    openai_batch_safety = require_review_batch_safe(source_review_path, "import")
 
     precommit_path = get_current_admin_reports_dir() / f"{batch_name}.pre-commit-review.json"
     if not precommit_path.exists():
@@ -176,6 +184,7 @@ def validate_queue_import_lineage(input_path: Path, payload: dict[str, Any]) -> 
         "source_precommit_path": str(precommit_path),
         "source_decision_log_path": str(decision_log_path),
         "precommit_readiness_status": readiness_status,
+        "openai_batch_safety": openai_batch_safety,
     }
 
 
@@ -260,6 +269,46 @@ def apply_promise_update(cursor, promise_id: int, updates: dict[str, Any]) -> bo
     sql = ", ".join(f"{field} = %s" for field in fields)
     params = [updates[field] for field in fields] + [promise_id]
     cursor.execute(f"UPDATE promises SET {sql} WHERE id = %s", params)
+    return True
+
+
+def collect_action_updates(existing: dict[str, Any], incoming: dict[str, Any], report: dict[str, Any]) -> dict[str, Any]:
+    updates: dict[str, Any] = {}
+    fields = [
+        ("action_type", incoming.get("action_type")),
+        ("action_date", normalize_date(incoming.get("action_date"))),
+        ("title", incoming.get("title")),
+        ("description", incoming.get("description")),
+    ]
+
+    for field, value in fields:
+        existing_value = existing.get(field)
+        has_existing = normalize_nullable_text(existing_value) is not None
+        has_incoming = normalize_nullable_text(value) is not None
+
+        if not has_existing and has_incoming:
+            updates[field] = value
+        elif has_existing and has_incoming and normalize_nullable_text(existing_value) != normalize_nullable_text(value):
+            report["conflicts"].append(
+                {
+                    "type": "preserved_existing_action_field",
+                    "action_id": int(existing["id"]),
+                    "field": field,
+                    "existing": existing_value,
+                    "incoming": value,
+                }
+            )
+
+    return updates
+
+
+def apply_action_update(cursor, action_id: int, updates: dict[str, Any]) -> bool:
+    if not updates:
+        return False
+    fields = list(updates.keys())
+    sql = ", ".join(f"{field} = %s" for field in fields)
+    params = [updates[field] for field in fields] + [action_id]
+    cursor.execute(f"UPDATE promise_actions SET {sql} WHERE id = %s", params)
     return True
 
 
@@ -452,14 +501,23 @@ def main() -> None:
         "provenance_guard": provenance_guard,
         "promises_created": 0,
         "promises_updated": 0,
+        "existing_promises_enriched": 0,
         "actions_created": 0,
+        "actions_updated": 0,
+        "existing_actions_enriched": 0,
         "outcomes_created": 0,
+        "impact_pending_records": 0,
+        "impact_pending_outcomes_deferred": 0,
+        "impact_pending_existing_outcomes_preserved": 0,
+        "impact_pending_items": [],
         "sources_created": 0,
         "sources_reused": 0,
         "skipped_duplicates": [],
         "conflicts": [],
         "notes": [
-            "The live schema links outcomes to promise_id rather than action_id, so outcome dedupe and inserts are performed at the promise level."
+            "The live schema links outcomes to promise_id rather than action_id, so outcome dedupe and inserts are performed at the promise level.",
+            "Records with impact_status=impact_pending may import promise/action/source facts, but outcome rows are deferred so they are not treated as finalized impact scores.",
+            "Existing promise/action records are enriched additively: missing fields and new linked sources/actions may be added, while conflicting populated fields are preserved and reported.",
         ],
     }
 
@@ -473,6 +531,17 @@ def main() -> None:
             president = get_president(cursor, payload.get("president_slug"))
 
             for record in payload.get("records") or []:
+                impact_status = impact_status_for_record(record)
+                impact_pending = impact_status == IMPACT_PENDING_STATUS
+                if impact_pending:
+                    report["impact_pending_records"] += 1
+                    report["impact_pending_items"].append(
+                        {
+                            "slug": record.get("slug"),
+                            "title": record.get("title"),
+                            "reason": record.get("impact_pending_reason"),
+                        }
+                    )
                 match_type, existing_promise = find_promise(cursor, int(president["id"]), record)
                 if existing_promise is None:
                     cursor.execute(
@@ -522,6 +591,7 @@ def main() -> None:
                     )
                     if apply_promise_update(cursor, promise_id, updates):
                         report["promises_updated"] += 1
+                        report["existing_promises_enriched"] += 1
                     report["skipped_duplicates"].append(
                         {
                             "type": "promise",
@@ -541,6 +611,10 @@ def main() -> None:
                     existing_action = find_existing_action(cursor, promise_id, action)
                     if existing_action:
                         action_id = int(existing_action["id"])
+                        action_updates = collect_action_updates(existing_action, action, report)
+                        if apply_action_update(cursor, action_id, action_updates):
+                            report["actions_updated"] += 1
+                            report["existing_actions_enriched"] += 1
                         report["skipped_duplicates"].append(
                             {
                                 "type": "action",
@@ -577,6 +651,22 @@ def main() -> None:
                         link_join_table(cursor, "promise_action_sources", "promise_action_id", action_id, source_id)
 
                     for outcome in action.get("outcomes") or []:
+                        if impact_pending:
+                            report["impact_pending_outcomes_deferred"] += 1
+                            if existing_promise is not None:
+                                existing_outcome = find_existing_outcome(cursor, promise_id, outcome)
+                                if existing_outcome:
+                                    report["impact_pending_existing_outcomes_preserved"] += 1
+                                    report["skipped_duplicates"].append(
+                                        {
+                                            "type": "outcome",
+                                            "promise_id": promise_id,
+                                            "outcome_id": int(existing_outcome["id"]),
+                                            "impact_direction": existing_outcome.get("impact_direction"),
+                                            "reason": "existing_finalized_outcome_preserved_for_impact_pending_record",
+                                        }
+                                    )
+                            continue
                         existing_outcome = find_existing_outcome(cursor, promise_id, outcome)
                         if existing_outcome:
                             outcome_id = int(existing_outcome["id"])
@@ -626,6 +716,7 @@ def main() -> None:
                         "slug": record.get("slug"),
                         "title": record.get("title"),
                         "status": record.get("status"),
+                        "impact_status": impact_status,
                     }
                 )
 

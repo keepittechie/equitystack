@@ -1,0 +1,9 @@
+{
+  "provider": "default",
+  "model": "",
+  "endpoint": "",
+  "models_endpoint": "",
+  "timeout_seconds": 240,
+  "response_format": "json",
+  "log_dir": "python/logs/llm"
+}

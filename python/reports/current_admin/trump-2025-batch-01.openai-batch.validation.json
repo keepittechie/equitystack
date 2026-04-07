@@ -1,0 +1,118 @@
+{
+  "artifact_version": 1,
+  "generated_at": "2026-04-07T02:59:53.018571+00:00",
+  "total_items": 10,
+  "valid_items": 10,
+  "malformed_items": 0,
+  "enum_errors": 0,
+  "missing_field_errors": 0,
+  "low_confidence_items": 9,
+  "unclear_classifications": 9,
+  "needs_manual_review_items": 10,
+  "insert_safe_items": 0,
+  "finalize_safe": true,
+  "apply_safe": true,
+  "human_summary": "10/10 classifier result(s) are structurally valid; 0 malformed, 0 enum/type error(s), 0 missing-field error(s).",
+  "per_item_validation": {
+    "trump-2025-election-integrity-proof-citizenship-paper-ballots": {
+      "item_id": "trump-2025-election-integrity-proof-citizenship-paper-ballots",
+      "valid": true,
+      "malformed": false,
+      "enum_errors": [],
+      "missing_field_errors": [],
+      "notes": [
+        "Valid structured classifier result."
+      ]
+    },
+    "trump-2025-end-federal-dei-equity-programs": {
+      "item_id": "trump-2025-end-federal-dei-equity-programs",
+      "valid": true,
+      "malformed": false,
+      "enum_errors": [],
+      "missing_field_errors": [],
+      "notes": [
+        "Valid structured classifier result."
+      ]
+    },
+    "trump-2025-strengthen-local-law-enforcement": {
+      "item_id": "trump-2025-strengthen-local-law-enforcement",
+      "valid": true,
+      "malformed": false,
+      "enum_errors": [],
+      "missing_field_errors": [],
+      "notes": [
+        "Valid structured classifier result."
+      ]
+    },
+    "trump-2025-clear-street-encampments-expand-civil-commitment": {
+      "item_id": "trump-2025-clear-street-encampments-expand-civil-commitment",
+      "valid": true,
+      "malformed": false,
+      "enum_errors": [],
+      "missing_field_errors": [],
+      "notes": [
+        "Valid structured classifier result."
+      ]
+    },
+    "trump-2025-domestic-production-of-critical-medicines": {
+      "item_id": "trump-2025-domestic-production-of-critical-medicines",
+      "valid": true,
+      "malformed": false,
+      "enum_errors": [],
+      "missing_field_errors": [],
+      "notes": [
+        "Valid structured classifier result."
+      ]
+    },
+    "trump-2025-expand-educational-freedom-for-families": {
+      "item_id": "trump-2025-expand-educational-freedom-for-families",
+      "valid": true,
+      "malformed": false,
+      "enum_errors": [],
+      "missing_field_errors": [],
+      "notes": [
+        "Valid structured classifier result."
+      ]
+    },
+    "trump-2025-reform-higher-education-accreditation": {
+      "item_id": "trump-2025-reform-higher-education-accreditation",
+      "valid": true,
+      "malformed": false,
+      "enum_errors": [],
+      "missing_field_errors": [],
+      "notes": [
+        "Valid structured classifier result."
+      ]
+    },
+    "trump-2025-promote-hbcu-excellence-and-innovation": {
+      "item_id": "trump-2025-promote-hbcu-excellence-and-innovation",
+      "valid": true,
+      "malformed": false,
+      "enum_errors": [],
+      "missing_field_errors": [],
+      "notes": [
+        "Valid structured classifier result."
+      ]
+    },
+    "trump-2025-reinstate-school-discipline-policies": {
+      "item_id": "trump-2025-reinstate-school-discipline-policies",
+      "valid": true,
+      "malformed": false,
+      "enum_errors": [],
+      "missing_field_errors": [],
+      "notes": [
+        "Valid structured classifier result."
+      ]
+    },
+    "trump-2025-high-paying-skilled-trade-jobs": {
+      "item_id": "trump-2025-high-paying-skilled-trade-jobs",
+      "valid": true,
+      "malformed": false,
+      "enum_errors": [],
+      "missing_field_errors": [],
+      "notes": [
+        "Valid structured classifier result."
+      ]
+    }
+  }
+}

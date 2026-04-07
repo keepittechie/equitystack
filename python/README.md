@@ -46,10 +46,10 @@ python3 -m venv --clear venv
 ## Verified Environment Rules
 
 - The CLI is self-locating. It resolves the Python workspace from `python/bin/equitystack`.
-- Production Ollama is remote: `http://10.10.0.60:11434`.
+- LLM execution uses the configured provider endpoint from `config/llm.json` or `EQUITYSTACK_LLM_ENDPOINT`.
 - Senior review and decision steps should use `qwen3.5:9b`.
 - Verifier, draft, and fallback review steps should use `qwen3.5:9b`.
-- Scheduled Ollama review stages now default to a 240 second timeout.
+- Scheduled LLM review stages now default to a 240 second timeout.
 - `rnj-1:latest` is the executor model for preprocessing, summaries, and approved command execution.
 - DB-backed scripts read `.env.local`, but legislative helpers now also honor runtime env overrides such as `DB_HOST=10.10.0.13`.
 - `python/venv` is the preferred local-dev interpreter after bootstrap.

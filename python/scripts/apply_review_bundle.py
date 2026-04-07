@@ -88,6 +88,16 @@ def write_csv_rows(path: Path, rows: list[dict[str, Any]]) -> None:
             writer.writerow(row)
 
 
+def first_present(*values: Any) -> Any:
+    for value in values:
+        if isinstance(value, str):
+            if value.strip():
+                return value.strip()
+        elif value not in (None, ""):
+            return value
+    return None
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Safely apply only approved operator_actions from an EquityStack review bundle.")
     parser.add_argument("--input", type=Path, default=default_input_path(), help="Path to reports/equitystack_review_bundle.json")
@@ -320,6 +330,14 @@ def approved_seed_row(action: dict[str, Any]) -> dict[str, Any]:
     payload.setdefault("official_summary", raw_data.get("official_summary") or raw_data.get("summary"))
     payload.setdefault("bill_url", raw_data.get("url"))
     payload.setdefault("raw_data", raw_data or None)
+    if not payload.get("impact_status"):
+        payload["impact_status"] = first_present(action.get("impact_status"), raw_data.get("impact_status"))
+    if not payload.get("recommended_action"):
+        payload["recommended_action"] = first_present(action.get("recommended_action"), raw_data.get("recommended_action"))
+    if not payload.get("confidence"):
+        payload["confidence"] = first_present(action.get("confidence"), raw_data.get("confidence"))
+    if not payload.get("source_quality"):
+        payload["source_quality"] = first_present(action.get("source_quality"), raw_data.get("source_quality"))
     return payload
 
 
@@ -668,6 +686,16 @@ def main() -> None:
             if row.get("future_bill_link_id") is not None
         }
     )
+    impact_pending_seed_rows = [
+        row
+        for row in approved_seed_rows
+        if str(row.get("impact_status") or "").strip().lower() == "impact_pending"
+    ]
+    import_with_pending_impact_seed_rows = [
+        row
+        for row in impact_pending_seed_rows
+        if str(row.get("recommended_action") or "").strip().lower() == "import_with_pending_impact"
+    ]
 
     report = {
         "generated_at": datetime.now(UTC).isoformat(),
@@ -681,6 +709,12 @@ def main() -> None:
         "applied_actions": applied_actions,
         "skipped_actions": skipped_actions,
         "errors": errors,
+        "impact_pending_seed_rows": len(impact_pending_seed_rows),
+        "import_with_pending_impact_seed_rows": len(import_with_pending_impact_seed_rows),
+        "impact_pending_note": (
+            "Impact-pending legislative seed rows remain importable as tracked-bill metadata; "
+            "impact scoring is deferred to the import/scoring path."
+        ),
     }
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(json.dumps(report, indent=2, default=str))
@@ -700,6 +734,8 @@ def main() -> None:
     print(f"Total applied: {len(applied_actions)}")
     print(f"Total skipped: {len(skipped_actions)}")
     print(f"Total errors: {len(errors)}")
+    print(f"Impact-pending seed rows: {len(impact_pending_seed_rows)}")
+    print(f"Import-with-pending-impact seed rows: {len(import_with_pending_impact_seed_rows)}")
     print(f"Wrote apply report to {output_path}")
     if csv_path:
         print(f"Wrote CSV summary to {csv_path}")

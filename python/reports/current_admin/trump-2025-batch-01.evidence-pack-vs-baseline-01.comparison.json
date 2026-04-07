@@ -1,0 +1,256 @@
+{
+  "generated_at": "2026-04-07T01:14:12.326239+00:00",
+  "artifact_version": 1,
+  "comparison_available": true,
+  "status": "comparison-ready",
+  "filters": {
+    "batch_name": null,
+    "baseline": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.evidence-pack-vs-baseline-01.baseline.ai-review.json",
+    "enriched": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.evidence-pack-vs-baseline-01.enriched.ai-review.json",
+    "include_item_deltas": false
+  },
+  "comparison": {
+    "compared_batch_name": "trump-2025-batch-01",
+    "identification_mode": "explicit artifact paths",
+    "baseline": {
+      "artifact_path": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.evidence-pack-vs-baseline-01.baseline.ai-review.json",
+      "batch_name": "trump-2025-batch-01",
+      "model": "gpt-4.1",
+      "review_backend": "openai_batch",
+      "reviewed_count": 10,
+      "matched_context_count": 10,
+      "manual_review_count": 10,
+      "finalize_safe_count": 0,
+      "apply_safe_count": 0,
+      "weak_evidence_count": 10,
+      "low_confidence_count": 10,
+      "unclear_count": 0,
+      "confidence_distribution": {
+        "min": 0.3,
+        "max": 0.5,
+        "average": 0.42,
+        "median": 0.4
+      },
+      "confidence_bucket_counts": {
+        "0.00-0.59": 10,
+        "0.60-0.74": 0,
+        "0.75-0.84": 0,
+        "0.85+": 0
+      },
+      "classification_counts": {
+        "positive": 3,
+        "negative": 2,
+        "mixed": 5,
+        "blocked": 0,
+        "unclear": 0
+      },
+      "recommended_action_counts": {
+        "approve": 0,
+        "reject": 0,
+        "needs_manual_review": 10
+      },
+      "source_quality_counts": {
+        "high": 2,
+        "medium": 8,
+        "low": 0
+      },
+      "reason_label_counts": {
+        "low confidence": 10,
+        "manual review requested by model": 10,
+        "weak evidence": 10
+      },
+      "decision_readiness_label_counts": {
+        "needs evidence verification": 10
+      },
+      "validation": {
+        "present": true,
+        "total_items": 10,
+        "valid_items": 10,
+        "malformed_items": 0,
+        "enum_errors": 0,
+        "missing_field_errors": 0
+      },
+      "evidence_pack": {
+        "present": false,
+        "artifact_path": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.evidence-pack-vs-baseline-01.baseline.evidence-pack.json",
+        "packing_version": null,
+        "summary": {}
+      }
+    },
+    "enriched": {
+      "artifact_path": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.evidence-pack-vs-baseline-01.enriched.ai-review.json",
+      "batch_name": "trump-2025-batch-01",
+      "model": "gpt-4.1",
+      "review_backend": "openai_batch",
+      "reviewed_count": 10,
+      "matched_context_count": 10,
+      "manual_review_count": 10,
+      "finalize_safe_count": 0,
+      "apply_safe_count": 0,
+      "weak_evidence_count": 10,
+      "low_confidence_count": 10,
+      "unclear_count": 0,
+      "confidence_distribution": {
+        "min": 0.4,
+        "max": 0.5,
+        "average": 0.42,
+        "median": 0.4
+      },
+      "confidence_bucket_counts": {
+        "0.00-0.59": 10,
+        "0.60-0.74": 0,
+        "0.75-0.84": 0,
+        "0.85+": 0
+      },
+      "classification_counts": {
+        "positive": 3,
+        "negative": 2,
+        "mixed": 5,
+        "blocked": 0,
+        "unclear": 0
+      },
+      "recommended_action_counts": {
+        "approve": 0,
+        "reject": 0,
+        "needs_manual_review": 10
+      },
+      "source_quality_counts": {
+        "high": 0,
+        "medium": 10,
+        "low": 0
+      },
+      "reason_label_counts": {
+        "low confidence": 10,
+        "manual review requested by model": 10,
+        "weak evidence": 10
+      },
+      "decision_readiness_label_counts": {
+        "needs evidence verification": 10
+      },
+      "validation": {
+        "present": true,
+        "total_items": 10,
+        "valid_items": 10,
+        "malformed_items": 0,
+        "enum_errors": 0,
+        "missing_field_errors": 0
+      },
+      "evidence_pack": {
+        "present": true,
+        "artifact_path": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.evidence-pack-vs-baseline-01.enriched.evidence-pack.json",
+        "packing_version": "current-admin-evidence-pack-v1",
+        "summary": {
+          "item_count": 10,
+          "single_source_official_count": 6,
+          "outcome_evidence_present_count": 10,
+          "policy_intent_only_count": 0,
+          "weak_outcome_evidence_count": 0,
+          "source_grounding_label_counts": {
+            "implementation evidence present": 10,
+            "multi-source grounding present": 4,
+            "outcome evidence present": 10,
+            "single-source official record": 6
+          },
+          "evidence_strength_label_counts": {
+            "moderate action evidence": 10,
+            "moderate outcome evidence": 10
+          },
+          "evidence_quality_diagnostic_counts": {
+            "action documented, but implementation incomplete": 10,
+            "impact path appears indirect": 10,
+            "multi-source grounding present": 4,
+            "single-source official record only": 6
+          },
+          "impact_directness_hint_counts": {
+            "indirect possible impact": 10
+          },
+          "implementation_completeness_hint_counts": {
+            "action documented, implementation incomplete": 10
+          }
+        }
+      }
+    },
+    "matched_item_count": 10,
+    "unmatched_item_count": 0,
+    "unmatched_item_ids": [],
+    "review_completion_summary": {
+      "baseline_reviewed_count": 10,
+      "enriched_reviewed_count": 10,
+      "matched_item_count": 10
+    },
+    "structural_validation_summary": {
+      "baseline": {
+        "present": true,
+        "total_items": 10,
+        "valid_items": 10,
+        "malformed_items": 0,
+        "enum_errors": 0,
+        "missing_field_errors": 0
+      },
+      "enriched": {
+        "present": true,
+        "total_items": 10,
+        "valid_items": 10,
+        "malformed_items": 0,
+        "enum_errors": 0,
+        "missing_field_errors": 0
+      }
+    },
+    "aggregate_deltas": {
+      "confidence_average_delta": 0.0,
+      "confidence_median_delta": 0.0,
+      "confidence_bucket_movement_counts": {
+        "0.00-0.59 -> 0.00-0.59": 10
+      },
+      "classification_change_counts": {},
+      "recommended_action_change_counts": {},
+      "manual_review_count_before": 10,
+      "manual_review_count_after": 10,
+      "manual_review_delta": 0,
+      "finalize_safe_count_before": 0,
+      "finalize_safe_count_after": 0,
+      "finalize_safe_delta": 0,
+      "apply_safe_count_before": 0,
+      "apply_safe_count_after": 0,
+      "apply_safe_delta": 0,
+      "weak_evidence_count_before": 10,
+      "weak_evidence_count_after": 10,
+      "weak_evidence_delta": 0,
+      "low_confidence_count_before": 10,
+      "low_confidence_count_after": 10,
+      "low_confidence_delta": 0,
+      "unclear_count_before": 0,
+      "unclear_count_after": 0,
+      "unclear_delta": 0,
+      "decision_readiness_label_counts_before": {
+        "needs evidence verification": 10
+      },
+      "decision_readiness_label_counts_after": {
+        "needs evidence verification": 10
+      },
+      "source_quality_counts_before": {
+        "high": 2,
+        "medium": 8,
+        "low": 0
+      },
+      "source_quality_counts_after": {
+        "high": 0,
+        "medium": 10,
+        "low": 0
+      },
+      "manual_review_reduced_items": 0,
+      "finalize_safety_improved_items": 0,
+      "evidence_related_blockers_reduced_items": 0
+    },
+    "item_deltas": [],
+    "rule_based_interpretations": [
+      "evidence-pack had limited effect on review outcomes",
+      "evidence-pack had limited effect because indirect-impact items still lack measurable outcomes"
+    ],
+    "advisory_recommendations": [
+      "prioritize stronger outcome evidence for indirect-impact items",
+      "do not loosen thresholds yet; evidence-pack helped but weak evidence remains dominant",
+      "focus future packaging on implementation and measurable outcome summaries"
+    ]
+  }
+}

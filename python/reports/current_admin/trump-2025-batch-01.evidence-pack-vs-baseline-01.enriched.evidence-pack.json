@@ -1,0 +1,634 @@
+{
+  "artifact_version": 1,
+  "packing_version": "current-admin-evidence-pack-v1",
+  "generated_at": "2026-04-07T01:14:12.253260+00:00",
+  "batch_name": "trump-2025-batch-01",
+  "input_artifact": "data/current_admin_batches/trump_2025_batch_01.json",
+  "review_artifact": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.evidence-pack-vs-baseline-01.enriched.ai-review.json",
+  "model_facing_item_count": 10,
+  "summary": {
+    "item_count": 10,
+    "single_source_official_count": 6,
+    "outcome_evidence_present_count": 10,
+    "policy_intent_only_count": 0,
+    "weak_outcome_evidence_count": 0,
+    "source_grounding_label_counts": {
+      "implementation evidence present": 10,
+      "multi-source grounding present": 4,
+      "outcome evidence present": 10,
+      "single-source official record": 6
+    },
+    "evidence_strength_label_counts": {
+      "moderate action evidence": 10,
+      "moderate outcome evidence": 10
+    },
+    "evidence_quality_diagnostic_counts": {
+      "action documented, but implementation incomplete": 10,
+      "impact path appears indirect": 10,
+      "multi-source grounding present": 4,
+      "single-source official record only": 6
+    },
+    "impact_directness_hint_counts": {
+      "indirect possible impact": 10
+    },
+    "implementation_completeness_hint_counts": {
+      "action documented, implementation incomplete": 10
+    }
+  },
+  "operator_interpretations": [
+    "some items rely on a single official source",
+    "outcome evidence is present for at least half of the reviewed items"
+  ],
+  "items": [
+    {
+      "packing_version": "current-admin-evidence-pack-v1",
+      "item_id": "trump-2025-election-integrity-proof-citizenship-paper-ballots",
+      "title": "Require proof of citizenship and paper-ballot election safeguards",
+      "promise_text": "Trump and the 2024 Republican platform supported stricter federal election-integrity rules, including documentary proof of citizenship, voter identification, paper ballots, and tighter mail-ballot rules.",
+      "promise_date": "2024-07-08",
+      "promise_type": "Campaign Promise",
+      "topic": "Voting Rights",
+      "impacted_group": "Black voters and Black-majority communities affected by voter registration, ballot access, and election administration rules",
+      "current_status": "Partial",
+      "concise_record_summary": "A March 2025 executive order advanced part of the administration's election-integrity agenda, but full implementation remained incomplete.",
+      "concise_record_notes": "Included because federal election-administration changes can alter access, verification burdens, and ballot-processing rules in jurisdictions with large Black voter populations. Evidence is still incomplete because implementation depends on agency action and election-system adoption beyond the order itself.",
+      "source_inventory_summary": "1 promise source(s), 1 action source(s), 1 outcome source(s), 2 government source(s), 0 independent/non-government source(s).",
+      "action_inventory_summary": "Executive Order; 2025-03-25; Preserving and Protecting the Integrity of American Elections",
+      "outcome_inventory_summary": "The administration created a formal federal election-integrity directive, but nationwide implementation was not complete.",
+      "black_community_impact_summary": "Documentary-proof and ballot-processing changes can affect registration and voting access in Black communities where administrative barriers already shape turnout and ballot acceptance.",
+      "implementation_status_summary": "action documented, implementation incomplete",
+      "measurable_outcome_indicators": [
+        "Federal agencies were directed to change election-related procedures, but implementation varied and remained incomplete."
+      ],
+      "source_diversity_summary": "2 unique source(s); 3 official source instance(s); 0 independent/non-government source instance(s).",
+      "source_quality_preview": "medium",
+      "evidence_gaps_summary": "action documented, but implementation incomplete; multi-source grounding present; impact path appears indirect",
+      "impact_directness_hint": "indirect possible impact",
+      "implementation_completeness_hint": "action documented, implementation incomplete",
+      "source_grounding": {
+        "promise_source_count": 1,
+        "action_source_count": 1,
+        "outcome_source_count": 1,
+        "total_source_count": 3,
+        "unique_source_count": 2,
+        "government_source_count": 2,
+        "independent_non_government_source_count": 0,
+        "official_source_count": 3,
+        "relies_on_single_official_source": false,
+        "has_downstream_outcome_source": true,
+        "has_measurable_evidence": true,
+        "has_policy_intent_evidence_only": false,
+        "labels": [
+          "implementation evidence present",
+          "outcome evidence present",
+          "multi-source grounding present"
+        ]
+      },
+      "source_grounding_labels": [
+        "implementation evidence present",
+        "outcome evidence present",
+        "multi-source grounding present"
+      ],
+      "evidence_strength_labels": [
+        "moderate action evidence",
+        "moderate outcome evidence"
+      ],
+      "evidence_quality_diagnostics": [
+        "action documented, but implementation incomplete",
+        "multi-source grounding present",
+        "impact path appears indirect"
+      ]
+    },
+    {
+      "packing_version": "current-admin-evidence-pack-v1",
+      "item_id": "trump-2025-end-federal-dei-equity-programs",
+      "title": "End federal DEI and equity-based government programs",
+      "promise_text": "Trump committed the administration to ending federal DEI, DEIA, and equity-program structures across the executive branch.",
+      "promise_date": "2025-01-20",
+      "promise_type": "Official Promise",
+      "topic": "Economic Opportunity",
+      "impacted_group": "Black workers, Black students, and Black communities affected by targeted federal equity initiatives and program design",
+      "current_status": "Partial",
+      "concise_record_summary": "The administration ordered the termination of federal DEI and equity structures, but implementation remained an active multi-agency process.",
+      "concise_record_notes": "Included because the order directly targeted federal programs and offices previously used to address documented disparities affecting Black communities. Evidence is incomplete because downstream program, grant, and enforcement effects require agency-level follow-through.",
+      "source_inventory_summary": "1 promise source(s), 1 action source(s), 1 outcome source(s), 3 government source(s), 0 independent/non-government source(s).",
+      "action_inventory_summary": "Executive Order; 2025-01-20; Ending Radical And Wasteful Government DEI Programs And Preferencing",
+      "outcome_inventory_summary": "The administration initiated the removal of federal DEI and equity structures across agencies.",
+      "black_community_impact_summary": "Eliminating equity-focused federal offices, plans, and grant structures can reduce targeted federal attention to disparities in employment, education, contracting, and service access that affect Black communities.",
+      "implementation_status_summary": "action documented, implementation incomplete",
+      "measurable_outcome_indicators": [
+        "Agencies were directed to identify and terminate covered offices, policies, grants, and related activities."
+      ],
+      "source_diversity_summary": "1 unique source(s); 3 official source instance(s); 0 independent/non-government source instance(s).",
+      "source_quality_preview": "medium",
+      "evidence_gaps_summary": "single-source official record only; action documented, but implementation incomplete; impact path appears indirect",
+      "impact_directness_hint": "indirect possible impact",
+      "implementation_completeness_hint": "action documented, implementation incomplete",
+      "source_grounding": {
+        "promise_source_count": 1,
+        "action_source_count": 1,
+        "outcome_source_count": 1,
+        "total_source_count": 3,
+        "unique_source_count": 1,
+        "government_source_count": 3,
+        "independent_non_government_source_count": 0,
+        "official_source_count": 3,
+        "relies_on_single_official_source": true,
+        "has_downstream_outcome_source": true,
+        "has_measurable_evidence": true,
+        "has_policy_intent_evidence_only": false,
+        "labels": [
+          "implementation evidence present",
+          "outcome evidence present",
+          "single-source official record"
+        ]
+      },
+      "source_grounding_labels": [
+        "implementation evidence present",
+        "outcome evidence present",
+        "single-source official record"
+      ],
+      "evidence_strength_labels": [
+        "moderate action evidence",
+        "moderate outcome evidence"
+      ],
+      "evidence_quality_diagnostics": [
+        "single-source official record only",
+        "action documented, but implementation incomplete",
+        "impact path appears indirect"
+      ]
+    },
+    {
+      "packing_version": "current-admin-evidence-pack-v1",
+      "item_id": "trump-2025-strengthen-local-law-enforcement",
+      "title": "Increase federal support for state and local law enforcement",
+      "promise_text": "Trump's public law-and-order agenda called for more police hiring, training, legal protection, and operational support for state and local law enforcement.",
+      "promise_date": "2023-02-20",
+      "promise_type": "Campaign Promise",
+      "topic": "Criminal Justice",
+      "impacted_group": "Black communities affected by policing, public safety policy, arrest exposure, and federal oversight of local law enforcement",
+      "current_status": "Partial",
+      "concise_record_summary": "A 2025 executive order expanded federal support and protections for local law enforcement, but downstream local effects remained early.",
+      "concise_record_notes": "Included because changes in law-enforcement funding, training, and oversight can materially affect Black communities through both public-safety outcomes and police-contact patterns. Evidence is incomplete because community-level effects depend on later implementation by DOJ and local agencies.",
+      "source_inventory_summary": "1 promise source(s), 1 action source(s), 1 outcome source(s), 2 government source(s), 1 independent/non-government source(s).",
+      "action_inventory_summary": "Executive Order; 2025-04-28; Strengthening and Unleashing America's Law Enforcement to Pursue Criminals and Protect Innocent Citizens",
+      "outcome_inventory_summary": "The administration formally expanded federal support for local law enforcement agencies through a 2025 executive order.",
+      "black_community_impact_summary": "Expanded policing support and reduced federal constraints can affect Black communities through changes in violent-crime response, arrest exposure, police-accountability oversight, and use-of-force monitoring.",
+      "implementation_status_summary": "action documented, implementation incomplete",
+      "measurable_outcome_indicators": [
+        "The order directed DOJ and related agencies to expand training, support, legal assistance, and review of consent decrees."
+      ],
+      "source_diversity_summary": "2 unique source(s); 2 official source instance(s); 1 independent/non-government source instance(s).",
+      "source_quality_preview": "medium",
+      "evidence_gaps_summary": "action documented, but implementation incomplete; multi-source grounding present; impact path appears indirect",
+      "impact_directness_hint": "indirect possible impact",
+      "implementation_completeness_hint": "action documented, implementation incomplete",
+      "source_grounding": {
+        "promise_source_count": 1,
+        "action_source_count": 1,
+        "outcome_source_count": 1,
+        "total_source_count": 3,
+        "unique_source_count": 2,
+        "government_source_count": 2,
+        "independent_non_government_source_count": 1,
+        "official_source_count": 2,
+        "relies_on_single_official_source": false,
+        "has_downstream_outcome_source": true,
+        "has_measurable_evidence": true,
+        "has_policy_intent_evidence_only": false,
+        "labels": [
+          "implementation evidence present",
+          "outcome evidence present",
+          "multi-source grounding present"
+        ]
+      },
+      "source_grounding_labels": [
+        "implementation evidence present",
+        "outcome evidence present",
+        "multi-source grounding present"
+      ],
+      "evidence_strength_labels": [
+        "moderate action evidence",
+        "moderate outcome evidence"
+      ],
+      "evidence_quality_diagnostics": [
+        "action documented, but implementation incomplete",
+        "multi-source grounding present",
+        "impact path appears indirect"
+      ]
+    },
+    {
+      "packing_version": "current-admin-evidence-pack-v1",
+      "item_id": "trump-2025-clear-street-encampments-expand-civil-commitment",
+      "title": "Clear street encampments and expand treatment-oriented street-order responses",
+      "promise_text": "Trump's homelessness agenda called for removing street encampments, expanding treatment and rehabilitation responses, and increasing use of civil commitment and related enforcement tools.",
+      "promise_date": "2023-04-18",
+      "promise_type": "Campaign Promise",
+      "topic": "Housing",
+      "impacted_group": "Black unhoused people and Black neighborhoods affected by homelessness policy, encampment enforcement, and access to treatment services",
+      "current_status": "Partial",
+      "concise_record_summary": "A 2025 order advanced the administration's street-order agenda, but the balance between enforcement and treatment outcomes remained unresolved.",
+      "concise_record_notes": "Included because Black Americans are overrepresented in homelessness counts in many jurisdictions, making federal street-order and treatment policy materially relevant. Evidence is incomplete because implementation and measurable effects will depend on state and local follow-through.",
+      "source_inventory_summary": "1 promise source(s), 1 action source(s), 1 outcome source(s), 2 government source(s), 1 independent/non-government source(s).",
+      "action_inventory_summary": "Policy; 2025-07-24; President Donald J. Trump Takes Action to End Crime and Disorder on America's Streets",
+      "outcome_inventory_summary": "The administration formally prioritized anti-encampment enforcement and treatment-linked street-order policies.",
+      "black_community_impact_summary": "Encampment enforcement and civil-commitment policy can affect Black unhoused people through displacement, arrest exposure, treatment access, and continuity of shelter or housing placement.",
+      "implementation_status_summary": "action documented, implementation incomplete",
+      "measurable_outcome_indicators": [
+        "Federal grant and enforcement priorities were redirected toward jurisdictions using stricter anti-camping and related street-order policies."
+      ],
+      "source_diversity_summary": "2 unique source(s); 2 official source instance(s); 1 independent/non-government source instance(s).",
+      "source_quality_preview": "medium",
+      "evidence_gaps_summary": "action documented, but implementation incomplete; multi-source grounding present; impact path appears indirect",
+      "impact_directness_hint": "indirect possible impact",
+      "implementation_completeness_hint": "action documented, implementation incomplete",
+      "source_grounding": {
+        "promise_source_count": 1,
+        "action_source_count": 1,
+        "outcome_source_count": 1,
+        "total_source_count": 3,
+        "unique_source_count": 2,
+        "government_source_count": 2,
+        "independent_non_government_source_count": 1,
+        "official_source_count": 2,
+        "relies_on_single_official_source": false,
+        "has_downstream_outcome_source": true,
+        "has_measurable_evidence": true,
+        "has_policy_intent_evidence_only": false,
+        "labels": [
+          "implementation evidence present",
+          "outcome evidence present",
+          "multi-source grounding present"
+        ]
+      },
+      "source_grounding_labels": [
+        "implementation evidence present",
+        "outcome evidence present",
+        "multi-source grounding present"
+      ],
+      "evidence_strength_labels": [
+        "moderate action evidence",
+        "moderate outcome evidence"
+      ],
+      "evidence_quality_diagnostics": [
+        "action documented, but implementation incomplete",
+        "multi-source grounding present",
+        "impact path appears indirect"
+      ]
+    },
+    {
+      "packing_version": "current-admin-evidence-pack-v1",
+      "item_id": "trump-2025-domestic-production-of-critical-medicines",
+      "title": "Expand domestic production of critical medicines",
+      "promise_text": "Trump pledged to restore domestic production capacity for essential medicines and reduce supply-chain vulnerability and shortages.",
+      "promise_date": "2023-08-29",
+      "promise_type": "Campaign Promise",
+      "topic": "Healthcare",
+      "impacted_group": "Black patients and Black communities affected by medicine shortages, chronic-disease treatment continuity, and pharmaceutical supply disruptions",
+      "current_status": "Partial",
+      "concise_record_summary": "A 2025 executive order advanced domestic-medicine production goals, but measurable supply and access outcomes remained early.",
+      "concise_record_notes": "Included because pharmaceutical shortages and supply instability can affect continuity of care in conditions that disproportionately burden Black patients. Evidence is incomplete because the order primarily changed regulatory and production incentives rather than producing immediate patient-level outcomes.",
+      "source_inventory_summary": "1 promise source(s), 1 action source(s), 1 outcome source(s), 2 government source(s), 1 independent/non-government source(s).",
+      "action_inventory_summary": "Executive Order; 2025-05-05; Regulatory Relief to Promote Domestic Production of Critical Medicines",
+      "outcome_inventory_summary": "The administration initiated federal regulatory changes intended to support domestic pharmaceutical manufacturing.",
+      "black_community_impact_summary": "More stable medicine supply chains can affect Black patients by reducing treatment disruption risks in high-burden chronic conditions, but direct community-level effects are not yet measured.",
+      "implementation_status_summary": "action documented, implementation incomplete",
+      "measurable_outcome_indicators": [
+        "FDA and EPA were directed to streamline parts of domestic manufacturing review and permitting."
+      ],
+      "source_diversity_summary": "2 unique source(s); 2 official source instance(s); 1 independent/non-government source instance(s).",
+      "source_quality_preview": "medium",
+      "evidence_gaps_summary": "action documented, but implementation incomplete; multi-source grounding present; impact path appears indirect",
+      "impact_directness_hint": "indirect possible impact",
+      "implementation_completeness_hint": "action documented, implementation incomplete",
+      "source_grounding": {
+        "promise_source_count": 1,
+        "action_source_count": 1,
+        "outcome_source_count": 1,
+        "total_source_count": 3,
+        "unique_source_count": 2,
+        "government_source_count": 2,
+        "independent_non_government_source_count": 1,
+        "official_source_count": 2,
+        "relies_on_single_official_source": false,
+        "has_downstream_outcome_source": true,
+        "has_measurable_evidence": true,
+        "has_policy_intent_evidence_only": false,
+        "labels": [
+          "implementation evidence present",
+          "outcome evidence present",
+          "multi-source grounding present"
+        ]
+      },
+      "source_grounding_labels": [
+        "implementation evidence present",
+        "outcome evidence present",
+        "multi-source grounding present"
+      ],
+      "evidence_strength_labels": [
+        "moderate action evidence",
+        "moderate outcome evidence"
+      ],
+      "evidence_quality_diagnostics": [
+        "action documented, but implementation incomplete",
+        "multi-source grounding present",
+        "impact path appears indirect"
+      ]
+    },
+    {
+      "packing_version": "current-admin-evidence-pack-v1",
+      "item_id": "trump-2025-expand-educational-freedom-for-families",
+      "title": "Expand educational freedom and school-choice options for families",
+      "promise_text": "The administration committed to expanding education-freedom policies and supporting state and federal pathways for family-directed school choice.",
+      "promise_date": "2025-01-29",
+      "promise_type": "Official Promise",
+      "topic": "Education",
+      "impacted_group": "Black students and Black families affected by school access, public-school quality, transportation, and alternative education options",
+      "current_status": "Partial",
+      "concise_record_summary": "The administration launched a federal school-choice initiative in early 2025, but the effects remained dependent on later state and grant implementation.",
+      "concise_record_notes": "Included because school-choice policy can affect access to schooling options, funding flows, and local education quality for Black families. Evidence is incomplete because the order relied on later agency guidance and state uptake rather than immediate nationwide change.",
+      "source_inventory_summary": "1 promise source(s), 1 action source(s), 1 outcome source(s), 3 government source(s), 0 independent/non-government source(s).",
+      "action_inventory_summary": "Executive Order; 2025-01-29; Expanding Educational Freedom and Opportunity for Families",
+      "outcome_inventory_summary": "The administration established a federal policy framework to support education-freedom initiatives.",
+      "black_community_impact_summary": "School-choice expansion can affect Black families through changes in access to alternative schools, transportation burdens, and public-school resource distribution, with outcomes differing by state and program design.",
+      "implementation_status_summary": "action documented, implementation incomplete",
+      "measurable_outcome_indicators": [
+        "Multiple agencies were directed to issue guidance and use discretionary programs to expand educational-choice options."
+      ],
+      "source_diversity_summary": "1 unique source(s); 3 official source instance(s); 0 independent/non-government source instance(s).",
+      "source_quality_preview": "medium",
+      "evidence_gaps_summary": "single-source official record only; action documented, but implementation incomplete; impact path appears indirect",
+      "impact_directness_hint": "indirect possible impact",
+      "implementation_completeness_hint": "action documented, implementation incomplete",
+      "source_grounding": {
+        "promise_source_count": 1,
+        "action_source_count": 1,
+        "outcome_source_count": 1,
+        "total_source_count": 3,
+        "unique_source_count": 1,
+        "government_source_count": 3,
+        "independent_non_government_source_count": 0,
+        "official_source_count": 3,
+        "relies_on_single_official_source": true,
+        "has_downstream_outcome_source": true,
+        "has_measurable_evidence": true,
+        "has_policy_intent_evidence_only": false,
+        "labels": [
+          "implementation evidence present",
+          "outcome evidence present",
+          "single-source official record"
+        ]
+      },
+      "source_grounding_labels": [
+        "implementation evidence present",
+        "outcome evidence present",
+        "single-source official record"
+      ],
+      "evidence_strength_labels": [
+        "moderate action evidence",
+        "moderate outcome evidence"
+      ],
+      "evidence_quality_diagnostics": [
+        "single-source official record only",
+        "action documented, but implementation incomplete",
+        "impact path appears indirect"
+      ]
+    },
+    {
+      "packing_version": "current-admin-evidence-pack-v1",
+      "item_id": "trump-2025-reform-higher-education-accreditation",
+      "title": "Reform higher-education accreditation around student outcomes",
+      "promise_text": "The administration committed to reforming accreditation rules to emphasize student outcomes, legal compliance, and competition among accreditors.",
+      "promise_date": "2025-04-23",
+      "promise_type": "Official Promise",
+      "topic": "Education",
+      "impacted_group": "Black college students and institutions serving large Black student populations, including HBCUs and other minority-serving institutions",
+      "current_status": "In Progress",
+      "concise_record_summary": "The administration launched accreditation reform in 2025, but institutional and student-level effects remained in an early implementation stage.",
+      "concise_record_notes": "Included because accreditation policy can affect federal-aid eligibility, institutional oversight, and compliance expectations at colleges enrolling large numbers of Black students. Evidence is incomplete because the order set a reform process but did not itself produce immediate campus-level outcomes.",
+      "source_inventory_summary": "1 promise source(s), 1 action source(s), 1 outcome source(s), 3 government source(s), 0 independent/non-government source(s).",
+      "action_inventory_summary": "Executive Order; 2025-04-23; Reforming Accreditation to Strengthen Higher Education",
+      "outcome_inventory_summary": "The administration initiated an accreditation-reform process centered on student outcomes and federal oversight.",
+      "black_community_impact_summary": "Accreditation changes can affect institutional oversight, program continuity, and federal-aid access at colleges serving substantial numbers of Black students, but measurable downstream effects were not yet established.",
+      "implementation_status_summary": "action documented, implementation incomplete",
+      "measurable_outcome_indicators": [
+        "The order directed Education Department review and future action on recognition standards, accreditor accountability, and accreditation pathways."
+      ],
+      "source_diversity_summary": "1 unique source(s); 3 official source instance(s); 0 independent/non-government source instance(s).",
+      "source_quality_preview": "medium",
+      "evidence_gaps_summary": "single-source official record only; action documented, but implementation incomplete; impact path appears indirect",
+      "impact_directness_hint": "indirect possible impact",
+      "implementation_completeness_hint": "action documented, implementation incomplete",
+      "source_grounding": {
+        "promise_source_count": 1,
+        "action_source_count": 1,
+        "outcome_source_count": 1,
+        "total_source_count": 3,
+        "unique_source_count": 1,
+        "government_source_count": 3,
+        "independent_non_government_source_count": 0,
+        "official_source_count": 3,
+        "relies_on_single_official_source": true,
+        "has_downstream_outcome_source": true,
+        "has_measurable_evidence": true,
+        "has_policy_intent_evidence_only": false,
+        "labels": [
+          "implementation evidence present",
+          "outcome evidence present",
+          "single-source official record"
+        ]
+      },
+      "source_grounding_labels": [
+        "implementation evidence present",
+        "outcome evidence present",
+        "single-source official record"
+      ],
+      "evidence_strength_labels": [
+        "moderate action evidence",
+        "moderate outcome evidence"
+      ],
+      "evidence_quality_diagnostics": [
+        "single-source official record only",
+        "action documented, but implementation incomplete",
+        "impact path appears indirect"
+      ]
+    },
+    {
+      "packing_version": "current-admin-evidence-pack-v1",
+      "item_id": "trump-2025-promote-hbcu-excellence-and-innovation",
+      "title": "Promote excellence and innovation at HBCUs",
+      "promise_text": "The administration committed to restoring a White House HBCU initiative and improving HBCU access to partnerships, affordability support, and research opportunities.",
+      "promise_date": "2025-04-23",
+      "promise_type": "Official Promise",
+      "topic": "Education",
+      "impacted_group": "Black students, faculty, and institutions at Historically Black Colleges and Universities",
+      "current_status": "Partial",
+      "concise_record_summary": "The administration reestablished a White House HBCU initiative in 2025, with broader institutional effects still dependent on implementation.",
+      "concise_record_notes": "Included because HBCUs directly serve Black students and are central to Black educational attainment, research capacity, and professional mobility. Evidence is incomplete because the order created an initiative and coordination structure but longer-term funding and student outcomes still require follow-through.",
+      "source_inventory_summary": "1 promise source(s), 1 action source(s), 1 outcome source(s), 3 government source(s), 0 independent/non-government source(s).",
+      "action_inventory_summary": "Policy; 2025-04-23; White House Initiative to Promote Excellence and Innovation at Historically Black Colleges and Universities",
+      "outcome_inventory_summary": "The administration formally created a White House HBCU initiative and related advisory structure.",
+      "black_community_impact_summary": "Federal coordination and support for HBCUs can affect affordability, retention, research capacity, and workforce pipelines at institutions that disproportionately serve Black students.",
+      "implementation_status_summary": "action documented, implementation incomplete",
+      "measurable_outcome_indicators": [
+        "A White House HBCU initiative and board structure were established to support partnerships, research access, and institutional development."
+      ],
+      "source_diversity_summary": "1 unique source(s); 3 official source instance(s); 0 independent/non-government source instance(s).",
+      "source_quality_preview": "medium",
+      "evidence_gaps_summary": "single-source official record only; action documented, but implementation incomplete; impact path appears indirect",
+      "impact_directness_hint": "indirect possible impact",
+      "implementation_completeness_hint": "action documented, implementation incomplete",
+      "source_grounding": {
+        "promise_source_count": 1,
+        "action_source_count": 1,
+        "outcome_source_count": 1,
+        "total_source_count": 3,
+        "unique_source_count": 1,
+        "government_source_count": 3,
+        "independent_non_government_source_count": 0,
+        "official_source_count": 3,
+        "relies_on_single_official_source": true,
+        "has_downstream_outcome_source": true,
+        "has_measurable_evidence": true,
+        "has_policy_intent_evidence_only": false,
+        "labels": [
+          "implementation evidence present",
+          "outcome evidence present",
+          "single-source official record"
+        ]
+      },
+      "source_grounding_labels": [
+        "implementation evidence present",
+        "outcome evidence present",
+        "single-source official record"
+      ],
+      "evidence_strength_labels": [
+        "moderate action evidence",
+        "moderate outcome evidence"
+      ],
+      "evidence_quality_diagnostics": [
+        "single-source official record only",
+        "action documented, but implementation incomplete",
+        "impact path appears indirect"
+      ]
+    },
+    {
+      "packing_version": "current-admin-evidence-pack-v1",
+      "item_id": "trump-2025-reinstate-school-discipline-policies",
+      "title": "Reinstate school discipline policies without equity-based disparate-impact framing",
+      "promise_text": "The administration committed to replacing school-discipline guidance tied to equity-based disparate-impact analysis with a different federal discipline framework.",
+      "promise_date": "2025-04-23",
+      "promise_type": "Official Promise",
+      "topic": "Education",
+      "impacted_group": "Black students and Black families affected by suspension, expulsion, referral-to-law-enforcement, and school discipline policies",
+      "current_status": "In Progress",
+      "concise_record_summary": "The administration ordered a review and replacement process for federal school-discipline guidance, but school-level effects remained unmeasured.",
+      "concise_record_notes": "Included because federal school-discipline guidance is directly relevant to racial disparities in exclusionary discipline affecting Black students. Evidence is incomplete because the order initiated a policy process rather than producing immediate nationwide discipline outcomes.",
+      "source_inventory_summary": "1 promise source(s), 1 action source(s), 1 outcome source(s), 3 government source(s), 0 independent/non-government source(s).",
+      "action_inventory_summary": "Executive Order; 2025-04-23; Reinstating Common Sense School Discipline Policies",
+      "outcome_inventory_summary": "The administration began replacing prior federal school-discipline guidance with a different disciplinary framework.",
+      "black_community_impact_summary": "Reducing attention to racially disparate discipline patterns can affect Black students through suspension, expulsion, and referral-to-law-enforcement rates that have historically fallen disproportionately on them.",
+      "implementation_status_summary": "action documented, implementation incomplete",
+      "measurable_outcome_indicators": [
+        "Federal agencies were directed to review existing guidance and propose replacement discipline policies."
+      ],
+      "source_diversity_summary": "1 unique source(s); 3 official source instance(s); 0 independent/non-government source instance(s).",
+      "source_quality_preview": "medium",
+      "evidence_gaps_summary": "single-source official record only; action documented, but implementation incomplete; impact path appears indirect",
+      "impact_directness_hint": "indirect possible impact",
+      "implementation_completeness_hint": "action documented, implementation incomplete",
+      "source_grounding": {
+        "promise_source_count": 1,
+        "action_source_count": 1,
+        "outcome_source_count": 1,
+        "total_source_count": 3,
+        "unique_source_count": 1,
+        "government_source_count": 3,
+        "independent_non_government_source_count": 0,
+        "official_source_count": 3,
+        "relies_on_single_official_source": true,
+        "has_downstream_outcome_source": true,
+        "has_measurable_evidence": true,
+        "has_policy_intent_evidence_only": false,
+        "labels": [
+          "implementation evidence present",
+          "outcome evidence present",
+          "single-source official record"
+        ]
+      },
+      "source_grounding_labels": [
+        "implementation evidence present",
+        "outcome evidence present",
+        "single-source official record"
+      ],
+      "evidence_strength_labels": [
+        "moderate action evidence",
+        "moderate outcome evidence"
+      ],
+      "evidence_quality_diagnostics": [
+        "single-source official record only",
+        "action documented, but implementation incomplete",
+        "impact path appears indirect"
+      ]
+    },
+    {
+      "packing_version": "current-admin-evidence-pack-v1",
+      "item_id": "trump-2025-high-paying-skilled-trade-jobs",
+      "title": "Prepare Americans for high-paying skilled trade jobs",
+      "promise_text": "The administration committed to aligning federal workforce policy with skilled trades, apprenticeships, and reindustrialization needs.",
+      "promise_date": "2025-04-23",
+      "promise_type": "Official Promise",
+      "topic": "Economic Opportunity",
+      "impacted_group": "Black workers and Black jobseekers affected by access to apprenticeships, workforce programs, and higher-wage skilled trades",
+      "current_status": "In Progress",
+      "concise_record_summary": "The administration launched a skilled-trades workforce initiative in 2025, but measurable labor-market effects remained early.",
+      "concise_record_notes": "Included because apprenticeship and skilled-trade access can affect income mobility and labor-market opportunity for Black workers. Evidence is incomplete because the order primarily set federal direction and targets rather than documenting completed labor-market outcomes.",
+      "source_inventory_summary": "1 promise source(s), 1 action source(s), 1 outcome source(s), 3 government source(s), 0 independent/non-government source(s).",
+      "action_inventory_summary": "Executive Order; 2025-04-23; Preparing Americans for High-Paying Skilled Trade Jobs of the Future",
+      "outcome_inventory_summary": "The administration began a federal workforce-policy effort centered on apprenticeships and skilled trades.",
+      "black_community_impact_summary": "Expanded apprenticeship and skills pathways can affect Black workers through access to higher-wage trades, credential completion, and workforce entry if implementation expands participation equitably.",
+      "implementation_status_summary": "action documented, implementation incomplete",
+      "measurable_outcome_indicators": [
+        "Agencies were directed to streamline workforce investments and expand apprenticeship-focused policy coordination."
+      ],
+      "source_diversity_summary": "1 unique source(s); 3 official source instance(s); 0 independent/non-government source instance(s).",
+      "source_quality_preview": "medium",
+      "evidence_gaps_summary": "single-source official record only; action documented, but implementation incomplete; impact path appears indirect",
+      "impact_directness_hint": "indirect possible impact",
+      "implementation_completeness_hint": "action documented, implementation incomplete",
+      "source_grounding": {
+        "promise_source_count": 1,
+        "action_source_count": 1,
+        "outcome_source_count": 1,
+        "total_source_count": 3,
+        "unique_source_count": 1,
+        "government_source_count": 3,
+        "independent_non_government_source_count": 0,
+        "official_source_count": 3,
+        "relies_on_single_official_source": true,
+        "has_downstream_outcome_source": true,
+        "has_measurable_evidence": true,
+        "has_policy_intent_evidence_only": false,
+        "labels": [
+          "implementation evidence present",
+          "outcome evidence present",
+          "single-source official record"
+        ]
+      },
+      "source_grounding_labels": [
+        "implementation evidence present",
+        "outcome evidence present",
+        "single-source official record"
+      ],
+      "evidence_strength_labels": [
+        "moderate action evidence",
+        "moderate outcome evidence"
+      ],
+      "evidence_quality_diagnostics": [
+        "single-source official record only",
+        "action documented, but implementation incomplete",
+        "impact path appears indirect"
+      ]
+    }
+  ]
+}

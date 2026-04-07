@@ -14,6 +14,7 @@ from current_admin_common import (
     write_csv_rows,
     write_json_file,
 )
+from current_admin_openai_batch_guardrails import evaluate_review_batch_safety
 
 
 APPROVAL_ACTIONS = {"approve_as_is", "approve_with_changes"}
@@ -152,6 +153,14 @@ def read_batch_name_from_review_path(path: str | None) -> str | None:
     return name.removesuffix(".ai-review.json")
 
 
+def read_batch_name_from_review_payload_or_path(payload: dict[str, Any] | None, path: str | None) -> str | None:
+    if isinstance(payload, dict):
+        batch_name = payload.get("batch_name")
+        if isinstance(batch_name, str) and batch_name.strip():
+            return batch_name.strip()
+    return read_batch_name_from_review_path(path)
+
+
 def normalize_list(value: Any) -> list[str]:
     if not isinstance(value, list):
         return []
@@ -244,8 +253,15 @@ def summarize_item(queue_item: dict[str, Any], decision_item: dict[str, Any] | N
         warnings.append("high_attention_item")
     confidence_score = suggestions.get("confidence_score")
     record_action_suggestion = suggestions.get("record_action_suggestion")
+    impact_status = (
+        queue_item.get("impact_status")
+        or (queue_item.get("final_record") or {}).get("impact_status")
+        or suggestions.get("impact_status")
+    )
     if isinstance(confidence_score, (float, int)) and confidence_score < 0.55:
         warnings.append("low_confidence")
+    if impact_status == "impact_pending":
+        warnings.append("impact_pending")
     if ai_review.get("deep_review_recommended"):
         warnings.append("deep_review_recommended")
     if decision_alignment == "mismatch":
@@ -278,6 +294,7 @@ def summarize_item(queue_item: dict[str, Any], decision_item: dict[str, Any] | N
         "confidence_level": suggestions.get("confidence_level"),
         "confidence_score": confidence_score,
         "record_action_suggestion": record_action_suggestion,
+        "impact_status": impact_status,
         "import_readiness": readiness,
         "blocking_issues": blockers,
         "warning_signals": warnings,
@@ -295,6 +312,7 @@ def determine_overall_readiness(items: list[dict[str, Any]]) -> tuple[str, list[
         "source_or_evidence_gaps": sum("source_or_evidence_gaps" in item["warning_signals"] for item in selected),
         "high_attention_item": sum("high_attention_item" in item["warning_signals"] for item in selected),
         "low_confidence": sum("low_confidence" in item["warning_signals"] for item in selected),
+        "impact_pending": sum("impact_pending" in item["warning_signals"] for item in selected),
         "deep_review_recommended": sum("deep_review_recommended" in item["warning_signals"] for item in selected),
         "decision_mismatch": sum("decision_mismatch" in item["warning_signals"] for item in selected),
     }
@@ -780,9 +798,14 @@ def main() -> None:
     if not isinstance(batch_name, str) or not batch_name.strip():
         raise ValueError("Queue input is missing batch_name.")
     source_review_path = queue_payload.get("source_review_path")
-    source_review_batch = read_batch_name_from_review_path(source_review_path)
     source_review_resolved = Path(source_review_path).resolve() if isinstance(source_review_path, str) and source_review_path else None
     source_review_payload = load_optional_payload(source_review_resolved, "Review artifact") if source_review_resolved and source_review_resolved.exists() else None
+    source_review_batch = read_batch_name_from_review_payload_or_path(source_review_payload, source_review_path)
+    openai_batch_safety = (
+        evaluate_review_batch_safety(source_review_resolved)
+        if source_review_resolved and source_review_resolved.exists()
+        else None
+    )
 
     decision_template_path = queue_path.parent / f"{batch_name}.decision-template.json"
     decision_template_payload = load_optional_payload(decision_template_path, "Decision template") if decision_template_path.exists() else None
@@ -802,7 +825,11 @@ def main() -> None:
         if not isinstance(decision_payload, dict):
             raise ValueError("Decision log must be a JSON object.")
         decision_log_source_review = decision_payload.get("source_review_file")
-        decision_log_source_batch = read_batch_name_from_review_path(decision_log_source_review)
+        decision_log_source_batch = (
+            source_review_batch
+            if decision_log_source_review == source_review_path
+            else read_batch_name_from_review_path(decision_log_source_review)
+        )
 
     items = [
         summarize_item(queue_item, decisions_by_slug.get(queue_item.get("slug")))
@@ -842,6 +869,27 @@ def main() -> None:
                 "Run workflow finalize against the matching review artifact before import.",
             )
         )
+    if openai_batch_safety and openai_batch_safety.get("blocking_issues"):
+        for issue in openai_batch_safety["blocking_issues"]:
+            linkage_blockers.append(
+                build_issue(
+                    issue.get("type") or "openai_batch_not_ready",
+                    issue.get("message") or "OpenAI Batch review sidecars are not ready.",
+                    "Pre-commit must use a completed, fetched, validated Batch review artifact before import.",
+                    issue.get("fix") or "Run current-admin ai-review with --batch-resume, then rerun pre-commit.",
+                )
+            )
+    if openai_batch_safety:
+        for issue in openai_batch_safety.get("warnings") or []:
+            linkage_warnings.append(
+                build_issue(
+                    issue.get("type") or "openai_batch_warning",
+                    issue.get("message") or "OpenAI Batch sidecar warning.",
+                    "This warning does not block legacy or dry-run review artifacts.",
+                    "If this should be an OpenAI Batch artifact, run current-admin ai-review --batch-inspect.",
+                    severity="warning",
+                )
+            )
 
     if linkage_blockers:
         blocking_issues.extend(linkage_blockers)
@@ -898,6 +946,7 @@ def main() -> None:
             else "none"
         ),
         "artifact_linkage": linkage,
+        "openai_batch_safety": openai_batch_safety,
         "total_item_count": len(items),
         "selected_for_import_count": len(selected),
         "decision_covered_count": sum(1 for item in selected if item["operator_action"]),

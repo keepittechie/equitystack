@@ -12,7 +12,14 @@ import argparse
 from datetime import datetime, timezone
 import json
 from pathlib import Path
+import sys
 from typing import Any
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+from lib.llm.provider import generate_text
 
 from current_admin_common import (
     derive_csv_path,
@@ -27,7 +34,7 @@ from current_admin_common import (
 )
 
 
-DEFAULT_OLLAMA_URL = "http://10.10.0.60:11434"
+DEFAULT_OLLAMA_URL = ""
 DEFAULT_MODEL = "qwen3.5:9b"
 DEFAULT_MODEL_SENIOR = "qwen3.5:9b"
 DEFAULT_MODEL_VERIFIER = "qwen3.5:9b"
@@ -256,24 +263,15 @@ def heuristic_review(record: dict[str, Any], existing_matches: list[dict[str, An
 
 
 def call_ollama(prompt: str, *, model: str, ollama_url: str, timeout: int, temperature: float) -> dict[str, Any]:
-    import requests
-
-    response = requests.post(
-        f"{ollama_url.rstrip('/')}/api/generate",
-        json={
-            "model": model,
-            "prompt": prompt,
-            "stream": False,
-            "format": "json",
-            "options": {
-                "temperature": temperature,
-            },
-        },
-        timeout=timeout,
+    raw_text = generate_text(
+        prompt,
+        model=model,
+        endpoint=ollama_url or None,
+        timeout_seconds=timeout,
+        temperature=temperature,
+        response_format="json",
     )
-    response.raise_for_status()
-    payload = response.json()
-    return json.loads(payload.get("response") or "{}")
+    return json.loads(raw_text or "{}")
 
 
 def append_fallback_reason(base_note: str | None, reason: str) -> str:

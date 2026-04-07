@@ -370,6 +370,37 @@ detect_current_admin_state() {
     return 0
   fi
 
+  local batch_safety_status="safe"
+  batch_safety_status="$(
+    EQUITYSTACK_PYTHON_DIR="$EQUITYSTACK_PYTHON_DIR" CURRENT_ADMIN_REVIEW_PATH="$CURRENT_ADMIN_REVIEW_PATH" "$VENV_PYTHON" - <<'PY'
+import os
+import sys
+from pathlib import Path
+
+review_path = Path(os.environ["CURRENT_ADMIN_REVIEW_PATH"])
+sys.path.insert(0, str(Path(os.environ["EQUITYSTACK_PYTHON_DIR"]) / "scripts"))
+from current_admin_openai_batch_guardrails import evaluate_review_batch_safety
+
+if not review_path.exists():
+    print("safe")
+    raise SystemExit(0)
+safety = evaluate_review_batch_safety(review_path)
+if not safety.get("metadata_present"):
+    print("safe")
+elif safety.get("blocking_issues"):
+    print("blocked")
+else:
+    print("safe")
+PY
+  )"
+  if [ "$batch_safety_status" = "blocked" ]; then
+    CURRENT_ADMIN_STATE="BATCH_REVIEW_INCOMPLETE"
+    CURRENT_ADMIN_NEXT_STEP="Resume the OpenAI Batch review until output is fetched, validated, and the canonical review artifact is rebuilt"
+    CURRENT_ADMIN_NEXT_COMMAND="$(cli_hint) current-admin ai-review --input $(repo_relative_path "$CURRENT_ADMIN_REVIEW_PATH") --batch-resume"
+    CURRENT_ADMIN_BLOCKING_ISSUES=("OpenAI Batch review sidecars are incomplete or invalid")
+    return 0
+  fi
+
   if [ -f "$CURRENT_ADMIN_QUEUE_PATH" ]; then
     queue_approved_count="$(
       CURRENT_ADMIN_QUEUE_PATH="$CURRENT_ADMIN_QUEUE_PATH" "$VENV_PYTHON" - <<'PY'
@@ -431,8 +462,204 @@ PY
 print_current_admin_status() {
   local input_path="${1:-}"
   local batch_name="${2:-}"
+  local output_json="${3:-false}"
+  local focus="${4:-all}"
+  local reason="${5:-}"
+  local confidence_bucket="${6:-}"
+  local unresolved_only="${7:-false}"
+  local readiness="${8:-}"
+  local schema_blocked_only="${9:-false}"
+  local judgment_required_only="${10:-false}"
+  local quality_focus="${11:-all}"
+  local manual_review_only="${12:-false}"
+  local calibration_all_batches="${13:-false}"
+  local simulation_preset="${14:-slightly-relaxed}"
+  local simulation_focus="${15:-all}"
+  local include_deltas="${16:-false}"
+  local confidence_auto_approve_threshold="${17:-}"
+  local confidence_manual_review_floor="${18:-}"
+  local allow_high_confidence_flagged_items_to_stay_blocked="${19:-}"
+  local treat_unclear_as_always_manual_review="${20:-}"
+  local treat_weak_evidence_as_always_manual_review="${21:-}"
+  local treat_conflicting_sources_as_always_manual_review="${22:-}"
+  local treat_date_uncertain_as_always_manual_review="${23:-}"
+  local treat_ambiguous_subject_as_always_manual_review="${24:-}"
+  local treat_model_manual_review_as_always_manual_review="${25:-}"
+  local evidence_focus="${26:-all}"
+  local evidence_quality_label="${27:-}"
+  local source_grounding_label="${28:-}"
+  local impact_directness_hint="${29:-}"
+  local evidence_item_id="${30:-}"
+  local include_items="${31:-false}"
+  local comparison_baseline="${32:-}"
+  local comparison_enriched="${33:-}"
+  local paired_experiment_name="${34:-}"
+
+  if [ "$focus" = "evidence-pack" ]; then
+    local -a evidence_args=(--evidence-focus "$evidence_focus" --pretty)
+    if [ -n "$batch_name" ]; then
+      evidence_args+=(--batch-name "$batch_name")
+    elif [ "$calibration_all_batches" != "true" ]; then
+      resolve_current_admin_context "$input_path" "$batch_name"
+      evidence_args+=(--batch-name "$CURRENT_ADMIN_BATCH_NAME")
+    fi
+    if [ -n "$evidence_quality_label" ]; then
+      evidence_args+=(--evidence-quality-label "$evidence_quality_label")
+    fi
+    if [ -n "$source_grounding_label" ]; then
+      evidence_args+=(--source-grounding-label "$source_grounding_label")
+    fi
+    if [ -n "$impact_directness_hint" ]; then
+      evidence_args+=(--impact-directness-hint "$impact_directness_hint")
+    fi
+    if [ -n "$evidence_item_id" ]; then
+      evidence_args+=(--item-id "$evidence_item_id")
+    fi
+    if [ "$include_items" = "true" ]; then
+      evidence_args+=(--include-items)
+    fi
+    "$VENV_PYTHON" scripts/current_admin_evidence_pack.py "${evidence_args[@]}"
+    return 0
+  fi
+
+  if [ "$focus" = "comparison" ]; then
+    local -a comparison_args=(--pretty)
+    if [ -n "$comparison_baseline" ]; then
+      comparison_args+=(--baseline "$comparison_baseline")
+    fi
+    if [ -n "$comparison_enriched" ]; then
+      comparison_args+=(--enriched "$comparison_enriched")
+    fi
+    if [ -n "$batch_name" ]; then
+      comparison_args+=(--batch-name "$batch_name")
+    elif [ -z "$comparison_baseline" ] && [ -z "$comparison_enriched" ]; then
+      resolve_current_admin_context "$input_path" "$batch_name"
+      comparison_args+=(--batch-name "$CURRENT_ADMIN_BATCH_NAME")
+    fi
+    if [ "$include_deltas" = "true" ]; then
+      comparison_args+=(--include-item-deltas)
+    fi
+    "$VENV_PYTHON" scripts/current_admin_review_comparison_read_model.py "${comparison_args[@]}"
+    return 0
+  fi
+
+  if [ "$focus" = "paired-experiment" ]; then
+    local -a paired_args=(--status --pretty)
+    if [ -n "$paired_experiment_name" ]; then
+      paired_args+=(--experiment-name "$paired_experiment_name")
+    fi
+    if [ -n "$batch_name" ]; then
+      paired_args+=(--batch-name "$batch_name")
+    else
+      resolve_current_admin_context "$input_path" "$batch_name"
+      paired_args+=(--batch-name "$CURRENT_ADMIN_BATCH_NAME")
+    fi
+    "$VENV_PYTHON" scripts/current_admin_paired_evaluation.py "${paired_args[@]}"
+    return 0
+  fi
+
+  if [ "$focus" = "simulation" ]; then
+    local -a simulation_args=(--preset "$simulation_preset" --simulation-focus "$simulation_focus" --pretty)
+    if [ -n "$batch_name" ]; then
+      simulation_args+=(--batch-name "$batch_name")
+    elif [ "$calibration_all_batches" != "true" ]; then
+      resolve_current_admin_context "$input_path" "$batch_name"
+      simulation_args+=(--batch-name "$CURRENT_ADMIN_BATCH_NAME")
+    fi
+    if [ "$include_deltas" = "true" ]; then
+      simulation_args+=(--include-deltas)
+    fi
+    if [ "$manual_review_only" = "true" ]; then
+      simulation_args+=(--manual-review-only)
+    fi
+    if [ -n "$confidence_auto_approve_threshold" ]; then
+      simulation_args+=(--confidence-auto-approve-threshold "$confidence_auto_approve_threshold")
+    fi
+    if [ -n "$confidence_manual_review_floor" ]; then
+      simulation_args+=(--confidence-manual-review-floor "$confidence_manual_review_floor")
+    fi
+    if [ -n "$allow_high_confidence_flagged_items_to_stay_blocked" ]; then
+      simulation_args+=(--allow-high-confidence-flagged-items-to-stay-blocked "$allow_high_confidence_flagged_items_to_stay_blocked")
+    fi
+    if [ -n "$treat_unclear_as_always_manual_review" ]; then
+      simulation_args+=(--treat-unclear-as-always-manual-review "$treat_unclear_as_always_manual_review")
+    fi
+    if [ -n "$treat_weak_evidence_as_always_manual_review" ]; then
+      simulation_args+=(--treat-weak-evidence-as-always-manual-review "$treat_weak_evidence_as_always_manual_review")
+    fi
+    if [ -n "$treat_conflicting_sources_as_always_manual_review" ]; then
+      simulation_args+=(--treat-conflicting-sources-as-always-manual-review "$treat_conflicting_sources_as_always_manual_review")
+    fi
+    if [ -n "$treat_date_uncertain_as_always_manual_review" ]; then
+      simulation_args+=(--treat-date-uncertain-as-always-manual-review "$treat_date_uncertain_as_always_manual_review")
+    fi
+    if [ -n "$treat_ambiguous_subject_as_always_manual_review" ]; then
+      simulation_args+=(--treat-ambiguous-subject-as-always-manual-review "$treat_ambiguous_subject_as_always_manual_review")
+    fi
+    if [ -n "$treat_model_manual_review_as_always_manual_review" ]; then
+      simulation_args+=(--treat-model-manual-review-as-always-manual-review "$treat_model_manual_review_as_always_manual_review")
+    fi
+    "$VENV_PYTHON" scripts/current_admin_threshold_simulation_read_model.py "${simulation_args[@]}"
+    return 0
+  fi
+
+  if [ "$focus" = "calibration" ] && [ "$calibration_all_batches" = "true" ]; then
+    local -a all_calibration_args=(--quality-focus "$quality_focus" --pretty)
+    if [ "$manual_review_only" = "true" ]; then
+      all_calibration_args+=(--manual-review-only)
+    fi
+    if [ "$unresolved_only" = "true" ]; then
+      all_calibration_args+=(--unresolved-only)
+    fi
+    "$VENV_PYTHON" scripts/current_admin_calibration_read_model.py "${all_calibration_args[@]}"
+    return 0
+  fi
 
   resolve_current_admin_context "$input_path" "$batch_name"
+
+  if [ "$focus" = "calibration" ]; then
+    local -a calibration_args=(--batch-name "$CURRENT_ADMIN_BATCH_NAME" --quality-focus "$quality_focus" --pretty)
+    if [ "$manual_review_only" = "true" ]; then
+      calibration_args+=(--manual-review-only)
+    fi
+    if [ "$unresolved_only" = "true" ]; then
+      calibration_args+=(--unresolved-only)
+    fi
+    "$VENV_PYTHON" scripts/current_admin_calibration_read_model.py "${calibration_args[@]}"
+    return 0
+  fi
+
+  if [ "$focus" = "manual-review" ]; then
+    local -a manual_review_args=(--batch-name "$CURRENT_ADMIN_BATCH_NAME" --pretty)
+    if [ -n "$reason" ]; then
+      manual_review_args+=(--reason "$reason")
+    fi
+    if [ -n "$confidence_bucket" ]; then
+      manual_review_args+=(--confidence-bucket "$confidence_bucket")
+    fi
+    if [ "$unresolved_only" = "true" ]; then
+      manual_review_args+=(--unresolved-only)
+    fi
+    if [ -n "$readiness" ]; then
+      manual_review_args+=(--readiness "$readiness")
+    fi
+    if [ "$schema_blocked_only" = "true" ]; then
+      manual_review_args+=(--schema-blocked-only)
+    fi
+    if [ "$judgment_required_only" = "true" ]; then
+      manual_review_args+=(--judgment-required-only)
+    fi
+    "$VENV_PYTHON" scripts/current_admin_manual_review_read_model.py "${manual_review_args[@]}"
+    return 0
+  fi
+
+  if [ "$output_json" = "true" ]; then
+    "$VENV_PYTHON" scripts/current_admin_batch_read_model.py \
+      --batch-name "$CURRENT_ADMIN_BATCH_NAME" \
+      --focus "$focus" \
+      --pretty
+    return 0
+  fi
 
   local precommit_status="missing"
   precommit_status="$(read_precommit_status "$CURRENT_ADMIN_PRECOMMIT_PATH")"
@@ -443,12 +670,40 @@ print_current_admin_status() {
   printf 'ARTIFACTS:\n'
   printf '  %-18s %s\n' "Normalized:" "$(artifact_status_text "$CURRENT_ADMIN_NORMALIZED_PATH")"
   printf '  %-18s %s\n' "AI review:" "$(artifact_status_text "$CURRENT_ADMIN_REVIEW_PATH")"
+  local batch_meta_path="${CURRENT_ADMIN_REVIEW_PATH%.ai-review.json}.openai-batch.meta.json"
+  local batch_validation_path="${CURRENT_ADMIN_REVIEW_PATH%.ai-review.json}.openai-batch.validation.json"
+  printf '  %-18s %s\n' "Batch metadata:" "$(artifact_status_text "$batch_meta_path")"
+  printf '  %-18s %s\n' "Batch validation:" "$(artifact_status_text "$batch_validation_path")"
   printf '  %-18s %s\n' "Manual queue:" "$(artifact_status_text "$CURRENT_ADMIN_QUEUE_PATH")"
   printf '  %-18s %s\n' "Pre-commit:" "$(artifact_status_text "$CURRENT_ADMIN_PRECOMMIT_PATH")"
   printf '  %-18s %s\n' "Pre-commit state:" "$precommit_status"
   printf '  %-18s %s\n' "Import dry-run:" "$(artifact_status_text "$CURRENT_ADMIN_IMPORT_DRY_RUN_PATH")"
   printf '  %-18s %s\n' "Import apply:" "$(artifact_status_text "$CURRENT_ADMIN_IMPORT_APPLY_PATH")"
   printf '  %-18s %s\n' "Validation:" "$(artifact_status_text "$CURRENT_ADMIN_VALIDATION_PATH")"
+
+  if [ -f "$batch_meta_path" ] || [ -f "$batch_validation_path" ]; then
+    EQUITYSTACK_PYTHON_DIR="$EQUITYSTACK_PYTHON_DIR" CURRENT_ADMIN_REVIEW_PATH="$CURRENT_ADMIN_REVIEW_PATH" "$VENV_PYTHON" - <<'PY'
+import json
+import os
+import sys
+from pathlib import Path
+
+python_dir = Path(os.environ["EQUITYSTACK_PYTHON_DIR"])
+sys.path.insert(0, str(python_dir / "scripts"))
+from current_admin_openai_batch_guardrails import evaluate_review_batch_safety
+
+safety = evaluate_review_batch_safety(Path(os.environ["CURRENT_ADMIN_REVIEW_PATH"]))
+counts = safety.get("validation_counts") or {}
+print("OPENAI BATCH:")
+print(f"  status: {safety.get('status') or 'unknown'}")
+print(f"  batch_id: {safety.get('batch_id') or 'n/a'}")
+print(f"  model: {safety.get('model') or 'n/a'}")
+print(f"  output_ready: {'yes' if safety.get('output_ready') else 'no'}")
+print(f"  validation_valid_items: {counts.get('valid_items', 'unknown')}")
+print(f"  validation_malformed_items: {counts.get('malformed_items', 'unknown')}")
+print(f"  finalize_apply_safe: {'yes' if safety.get('safe_to_apply') else 'no'}")
+PY
+  fi
 
   local -a detail_lines=()
   if [ "${#CURRENT_ADMIN_MISSING_ARTIFACTS[@]}" -gt 0 ]; then
@@ -567,15 +822,15 @@ run_current_admin_workflow_finalize() {
 
   local review_model="$REVIEW_ARTIFACT_MODEL"
   if [ -z "$review_model" ]; then
-    review_model="$DEFAULT_MODEL_REVIEW"
+    review_model="$DEFAULT_CURRENT_ADMIN_REVIEW_MODEL"
   fi
   local verifier_model="$REVIEW_ARTIFACT_VERIFIER_MODEL"
   if [ -z "$verifier_model" ]; then
-    verifier_model="$DEFAULT_MODEL_VERIFIER"
+    verifier_model="$DEFAULT_CURRENT_ADMIN_VERIFIER_MODEL"
   fi
   local fallback_model="$REVIEW_ARTIFACT_FALLBACK_MODEL"
   if [ -z "$fallback_model" ]; then
-    fallback_model="$DEFAULT_MODEL_FALLBACK"
+    fallback_model="$DEFAULT_CURRENT_ADMIN_FALLBACK_MODEL"
   fi
   local senior_timeout="$REVIEW_ARTIFACT_TIMEOUT"
   if [ -z "$senior_timeout" ]; then
@@ -592,15 +847,14 @@ run_current_admin_workflow_finalize() {
 
   local -a finalize_args=(
     "$VENV_PYTHON"
-    scripts/review_current_admin_batch_with_ollama.py
-    --input "$REVIEW_ARTIFACT_NORMALIZED_PATH"
+    scripts/review_current_admin_batch_with_openai_batch.py
+    --input "$REVIEW_ARTIFACT_PATH"
     --decision-file "$decision_file"
     --summary
     --model "$review_model"
     --verifier-model "$verifier_model"
     --fallback-model "$fallback_model"
     --review-mode "$REVIEW_ARTIFACT_MODE"
-    --ollama-url "$DEFAULT_OLLAMA_URL"
     --senior-timeout "$senior_timeout"
     --verifier-timeout "$verifier_timeout"
   )
@@ -827,13 +1081,13 @@ run_current_admin_workflow_start() {
   fi
 
   if [ -z "$review_model" ]; then
-    review_model="$DEFAULT_MODEL_REVIEW"
+    review_model="$DEFAULT_CURRENT_ADMIN_REVIEW_MODEL"
   fi
   if [ -z "$verifier_model" ]; then
-    verifier_model="$DEFAULT_MODEL_VERIFIER"
+    verifier_model="$DEFAULT_CURRENT_ADMIN_VERIFIER_MODEL"
   fi
   if [ -z "$fallback_model" ]; then
-    fallback_model="$DEFAULT_MODEL_FALLBACK"
+    fallback_model="$DEFAULT_CURRENT_ADMIN_FALLBACK_MODEL"
   fi
   if [ -z "$review_mode" ]; then
     review_mode="deep"
@@ -850,12 +1104,11 @@ run_current_admin_workflow_start() {
 
   local -a review_args=(
     "$VENV_PYTHON"
-    scripts/review_current_admin_batch_with_ollama.py
+    scripts/review_current_admin_batch_with_openai_batch.py
     --input "$CURRENT_ADMIN_NORMALIZED_PATH"
     --model "$review_model"
     --verifier-model "$verifier_model"
     --fallback-model "$fallback_model"
-    --ollama-url "$ollama_url"
     --senior-timeout "$senior_timeout"
     --verifier-timeout "$verifier_timeout"
     --review-mode "$review_mode"
@@ -888,12 +1141,10 @@ run_current_admin_workflow_start() {
     "Generate a decision template or inspect batch status" \
     "$(cli_hint) current-admin workflow review --input $(repo_relative_path "$CURRENT_ADMIN_REVIEW_PATH") --output /tmp/${CURRENT_ADMIN_BATCH_NAME}.decision-template.json" \
     "BATCH: $CURRENT_ADMIN_BATCH_NAME" \
-    "SENIOR MODEL: $review_model" \
+    "OPENAI MODEL: $review_model" \
     "VERIFIER MODEL: $verifier_model" \
     "FALLBACK MODEL: $fallback_model" \
-    "SENIOR TIMEOUT: ${senior_timeout}s" \
-    "VERIFIER TIMEOUT: ${verifier_timeout}s" \
-    "OLLAMA URL: $ollama_url"
+    "OPENAI BASE URL: $DEFAULT_CURRENT_ADMIN_OPENAI_BASE_URL"
 }
 
 run_current_admin_review_command() {
@@ -907,6 +1158,7 @@ run_current_admin_review_command() {
   local has_senior_timeout="false"
   local has_verifier_timeout="false"
   local has_review_mode="false"
+  local has_paired_experiment="false"
 
   normalize_current_admin_path_args normalized_args "$@"
   set -- "${normalized_args[@]}"
@@ -914,7 +1166,7 @@ run_current_admin_review_command() {
   while [ "$#" -gt 0 ]; do
     case "$1" in
       -h|--help)
-        current_admin_subcommand_usage review
+        current_admin_subcommand_usage ai-review
         exit 0
         ;;
       --model|--model=*)
@@ -1005,6 +1257,11 @@ run_current_admin_review_command() {
           shift
         fi
         ;;
+      --paired-experiment)
+        has_paired_experiment="true"
+        passthrough+=("$1")
+        shift
+        ;;
       *)
         passthrough+=("$1")
         shift
@@ -1013,16 +1270,13 @@ run_current_admin_review_command() {
   done
 
   if [ "$has_model" = "false" ]; then
-    passthrough+=(--model "$DEFAULT_MODEL_REVIEW")
+    passthrough+=(--model "$DEFAULT_CURRENT_ADMIN_REVIEW_MODEL")
   fi
   if [ "$has_verifier_model" = "false" ]; then
-    passthrough+=(--verifier-model "$DEFAULT_MODEL_VERIFIER")
+    passthrough+=(--verifier-model "$DEFAULT_CURRENT_ADMIN_VERIFIER_MODEL")
   fi
   if [ "$has_fallback_model" = "false" ]; then
-    passthrough+=(--fallback-model "$DEFAULT_MODEL_FALLBACK")
-  fi
-  if [ "$has_ollama_url" = "false" ]; then
-    passthrough+=(--ollama-url "$DEFAULT_OLLAMA_URL")
+    passthrough+=(--fallback-model "$DEFAULT_CURRENT_ADMIN_FALLBACK_MODEL")
   fi
   if [ "$has_timeout" = "true" ]; then
     :
@@ -1038,8 +1292,17 @@ run_current_admin_review_command() {
     passthrough+=(--review-mode deep)
   fi
 
-  run_step "1/1" "AI Review" "AI review command complete" -- \
-    "$VENV_PYTHON" scripts/review_current_admin_batch_with_ollama.py "${passthrough[@]}"
+  local review_script="scripts/review_current_admin_batch_with_openai_batch.py"
+  local review_step_label="AI Review"
+  local review_step_complete="AI review command complete"
+  if [ "$has_paired_experiment" = "true" ]; then
+    review_script="scripts/current_admin_paired_evaluation.py"
+    review_step_label="Paired Review Evaluation"
+    review_step_complete="Paired review evaluation command complete"
+  fi
+
+  run_step "1/1" "$review_step_label" "$review_step_complete" -- \
+    "$VENV_PYTHON" "$review_script" "${passthrough[@]}"
 }
 
 run_current_admin_discover_command() {
@@ -1766,6 +2029,30 @@ run_legislative_command() {
   esac
 }
 
+run_impact_command() {
+  local command="${1:-}"
+  shift || true
+
+  case "$command" in
+    evaluate)
+      run_step "1/1" "Evaluate Impact Maturation" "Impact maturation review artifact generated" --output "$EQUITYSTACK_PYTHON_DIR/reports/impact_maturation_review.json" -- \
+        "$VENV_PYTHON" scripts/evaluate_impact_maturation.py evaluate "$@"
+      ;;
+    promote)
+      run_step "1/1" "Promote Impact Maturation" "Impact maturation promotion complete" --output "$EQUITYSTACK_PYTHON_DIR/reports/impact_maturation_promotion_report.json" -- \
+        "$VENV_PYTHON" scripts/evaluate_impact_maturation.py promote "$@"
+      ;;
+    help|-h|--help|"")
+      impact_usage
+      ;;
+    *)
+      echo "Unknown impact command: $command" >&2
+      impact_usage
+      exit 1
+      ;;
+  esac
+}
+
 run_current_admin_command() {
   local command="${1:-}"
   shift || true
@@ -1813,6 +2100,16 @@ run_current_admin_command() {
       run_step "1/1" "Build Manual Queue" "Manual review queue build complete" -- \
         "$VENV_PYTHON" scripts/apply_current_admin_ai_review.py "${queue_args[@]}"
       ;;
+    promote-review)
+      if [ "${1:-}" = "--help" ] || [ "${1:-}" = "-h" ]; then
+        current_admin_subcommand_usage promote-review
+        exit 0
+      fi
+      local -a promote_args=()
+      normalize_current_admin_path_args promote_args "$@"
+      run_step "1/1" "Promote Review To Queue" "Current-admin review promotion complete" -- \
+        "$VENV_PYTHON" scripts/promote_current_admin_review_to_queue.py "${promote_args[@]}"
+      ;;
     pre-commit)
       if [ "${1:-}" = "--help" ] || [ "${1:-}" = "-h" ]; then
         current_admin_subcommand_usage pre-commit
@@ -1832,6 +2129,39 @@ run_current_admin_command() {
     status)
       local input_path=""
       local batch_name=""
+      local output_json="false"
+      local focus="all"
+      local focus_requested="false"
+      local reason=""
+      local confidence_bucket=""
+      local unresolved_only="false"
+      local readiness=""
+      local schema_blocked_only="false"
+      local judgment_required_only="false"
+      local quality_focus="all"
+      local manual_review_only="false"
+      local calibration_all_batches="false"
+      local simulation_preset="slightly-relaxed"
+      local simulation_focus="all"
+      local include_deltas="false"
+      local confidence_auto_approve_threshold=""
+      local confidence_manual_review_floor=""
+      local allow_high_confidence_flagged_items_to_stay_blocked=""
+      local treat_unclear_as_always_manual_review=""
+      local treat_weak_evidence_as_always_manual_review=""
+      local treat_conflicting_sources_as_always_manual_review=""
+      local treat_date_uncertain_as_always_manual_review=""
+      local treat_ambiguous_subject_as_always_manual_review=""
+      local treat_model_manual_review_as_always_manual_review=""
+      local evidence_focus="all"
+      local evidence_quality_label=""
+      local source_grounding_label=""
+      local impact_directness_hint=""
+      local evidence_item_id=""
+      local include_items="false"
+      local comparison_baseline=""
+      local comparison_enriched=""
+      local paired_experiment_name=""
       while [ "$#" -gt 0 ]; do
         case "$1" in
           --input)
@@ -1843,6 +2173,341 @@ run_current_admin_command() {
             batch_name="${2:-}"
             [ -n "$batch_name" ] || { echo "--batch-name requires a value" >&2; exit 1; }
             shift 2
+            ;;
+          --json)
+            output_json="true"
+            shift
+            ;;
+          --focus)
+            focus="${2:-}"
+            [ -n "$focus" ] || { echo "--focus requires a value" >&2; exit 1; }
+            case "$focus" in
+              all|blocked|incomplete|finalize-safe|apply-safe|manual-review|calibration|simulation|evidence-pack|comparison|paired-experiment) ;;
+              *)
+                echo "--focus must be one of: all, blocked, incomplete, finalize-safe, apply-safe, manual-review, calibration, simulation, evidence-pack, comparison, paired-experiment" >&2
+                exit 1
+                ;;
+            esac
+            focus_requested="true"
+            shift 2
+            ;;
+          --paired-experiment)
+            focus="paired-experiment"
+            focus_requested="true"
+            shift
+            ;;
+          --experiment-name)
+            paired_experiment_name="${2:-}"
+            [ -n "$paired_experiment_name" ] || { echo "--experiment-name requires a value" >&2; exit 1; }
+            focus="paired-experiment"
+            focus_requested="true"
+            shift 2
+            ;;
+          --simulation)
+            focus="simulation"
+            focus_requested="true"
+            shift
+            ;;
+          --evidence-pack)
+            focus="evidence-pack"
+            focus_requested="true"
+            shift
+            ;;
+          --compare-review-runs)
+            focus="comparison"
+            focus_requested="true"
+            shift
+            ;;
+          --baseline)
+            comparison_baseline="${2:-}"
+            [ -n "$comparison_baseline" ] || { echo "--baseline requires a value" >&2; exit 1; }
+            comparison_baseline="$(normalize_python_workspace_path "$comparison_baseline")"
+            focus="comparison"
+            focus_requested="true"
+            shift 2
+            ;;
+          --enriched)
+            comparison_enriched="${2:-}"
+            [ -n "$comparison_enriched" ] || { echo "--enriched requires a value" >&2; exit 1; }
+            comparison_enriched="$(normalize_python_workspace_path "$comparison_enriched")"
+            focus="comparison"
+            focus_requested="true"
+            shift 2
+            ;;
+          --evidence-focus)
+            evidence_focus="${2:-}"
+            [ -n "$evidence_focus" ] || { echo "--evidence-focus requires a value" >&2; exit 1; }
+            case "$evidence_focus" in
+              all|single-source-official|outcome-evidence-present|policy-intent-only|weak-outcome-evidence|multi-source-grounding) ;;
+              *)
+                echo "--evidence-focus must be one of: all, single-source-official, outcome-evidence-present, policy-intent-only, weak-outcome-evidence, multi-source-grounding" >&2
+                exit 1
+                ;;
+            esac
+            focus="evidence-pack"
+            focus_requested="true"
+            shift 2
+            ;;
+          --evidence-quality-label)
+            evidence_quality_label="${2:-}"
+            [ -n "$evidence_quality_label" ] || { echo "--evidence-quality-label requires a value" >&2; exit 1; }
+            focus="evidence-pack"
+            focus_requested="true"
+            shift 2
+            ;;
+          --source-grounding-label)
+            source_grounding_label="${2:-}"
+            [ -n "$source_grounding_label" ] || { echo "--source-grounding-label requires a value" >&2; exit 1; }
+            focus="evidence-pack"
+            focus_requested="true"
+            shift 2
+            ;;
+          --impact-directness-hint)
+            impact_directness_hint="${2:-}"
+            [ -n "$impact_directness_hint" ] || { echo "--impact-directness-hint requires a value" >&2; exit 1; }
+            focus="evidence-pack"
+            focus_requested="true"
+            shift 2
+            ;;
+          --item-id)
+            evidence_item_id="${2:-}"
+            [ -n "$evidence_item_id" ] || { echo "--item-id requires a value" >&2; exit 1; }
+            focus="evidence-pack"
+            focus_requested="true"
+            shift 2
+            ;;
+          --include-items)
+            include_items="true"
+            focus="evidence-pack"
+            focus_requested="true"
+            shift
+            ;;
+          --preset)
+            simulation_preset="${2:-}"
+            [ -n "$simulation_preset" ] || { echo "--preset requires a value" >&2; exit 1; }
+            case "$simulation_preset" in
+              strict-current|slightly-relaxed|moderate-relaxed|confidence-only-test) ;;
+              *)
+                echo "--preset must be one of: strict-current, slightly-relaxed, moderate-relaxed, confidence-only-test" >&2
+                exit 1
+                ;;
+            esac
+            focus="simulation"
+            focus_requested="true"
+            shift 2
+            ;;
+          --simulation-focus)
+            simulation_focus="${2:-}"
+            [ -n "$simulation_focus" ] || { echo "--simulation-focus requires a value" >&2; exit 1; }
+            case "$simulation_focus" in
+              all|threshold-sensitive|evidence-blocked|flag-blocked|threshold-only-promotions) ;;
+              *)
+                echo "--simulation-focus must be one of: all, threshold-sensitive, evidence-blocked, flag-blocked, threshold-only-promotions" >&2
+                exit 1
+                ;;
+            esac
+            focus="simulation"
+            focus_requested="true"
+            shift 2
+            ;;
+          --include-deltas)
+            include_deltas="true"
+            if [ "$focus" != "comparison" ]; then
+              focus="simulation"
+            fi
+            focus_requested="true"
+            shift
+            ;;
+          --include-item-deltas)
+            include_deltas="true"
+            focus="comparison"
+            focus_requested="true"
+            shift
+            ;;
+          --confidence-auto-approve-threshold)
+            confidence_auto_approve_threshold="${2:-}"
+            [ -n "$confidence_auto_approve_threshold" ] || { echo "--confidence-auto-approve-threshold requires a value" >&2; exit 1; }
+            focus="simulation"
+            focus_requested="true"
+            shift 2
+            ;;
+          --confidence-manual-review-floor)
+            confidence_manual_review_floor="${2:-}"
+            [ -n "$confidence_manual_review_floor" ] || { echo "--confidence-manual-review-floor requires a value" >&2; exit 1; }
+            focus="simulation"
+            focus_requested="true"
+            shift 2
+            ;;
+          --allow-high-confidence-flagged-items-to-stay-blocked)
+            allow_high_confidence_flagged_items_to_stay_blocked="${2:-}"
+            [ -n "$allow_high_confidence_flagged_items_to_stay_blocked" ] || { echo "--allow-high-confidence-flagged-items-to-stay-blocked requires a value" >&2; exit 1; }
+            focus="simulation"
+            focus_requested="true"
+            shift 2
+            ;;
+          --treat-unclear-as-always-manual-review)
+            treat_unclear_as_always_manual_review="${2:-}"
+            [ -n "$treat_unclear_as_always_manual_review" ] || { echo "--treat-unclear-as-always-manual-review requires a value" >&2; exit 1; }
+            focus="simulation"
+            focus_requested="true"
+            shift 2
+            ;;
+          --treat-weak-evidence-as-always-manual-review)
+            treat_weak_evidence_as_always_manual_review="${2:-}"
+            [ -n "$treat_weak_evidence_as_always_manual_review" ] || { echo "--treat-weak-evidence-as-always-manual-review requires a value" >&2; exit 1; }
+            focus="simulation"
+            focus_requested="true"
+            shift 2
+            ;;
+          --treat-conflicting-sources-as-always-manual-review)
+            treat_conflicting_sources_as_always_manual_review="${2:-}"
+            [ -n "$treat_conflicting_sources_as_always_manual_review" ] || { echo "--treat-conflicting-sources-as-always-manual-review requires a value" >&2; exit 1; }
+            focus="simulation"
+            focus_requested="true"
+            shift 2
+            ;;
+          --treat-date-uncertain-as-always-manual-review)
+            treat_date_uncertain_as_always_manual_review="${2:-}"
+            [ -n "$treat_date_uncertain_as_always_manual_review" ] || { echo "--treat-date-uncertain-as-always-manual-review requires a value" >&2; exit 1; }
+            focus="simulation"
+            focus_requested="true"
+            shift 2
+            ;;
+          --treat-ambiguous-subject-as-always-manual-review)
+            treat_ambiguous_subject_as_always_manual_review="${2:-}"
+            [ -n "$treat_ambiguous_subject_as_always_manual_review" ] || { echo "--treat-ambiguous-subject-as-always-manual-review requires a value" >&2; exit 1; }
+            focus="simulation"
+            focus_requested="true"
+            shift 2
+            ;;
+          --treat-model-manual-review-as-always-manual-review)
+            treat_model_manual_review_as_always_manual_review="${2:-}"
+            [ -n "$treat_model_manual_review_as_always_manual_review" ] || { echo "--treat-model-manual-review-as-always-manual-review requires a value" >&2; exit 1; }
+            focus="simulation"
+            focus_requested="true"
+            shift 2
+            ;;
+          --calibration)
+            focus="calibration"
+            focus_requested="true"
+            shift
+            ;;
+          --quality-focus)
+            quality_focus="${2:-}"
+            [ -n "$quality_focus" ] || { echo "--quality-focus requires a value" >&2; exit 1; }
+            case "$quality_focus" in
+              all|low-confidence-heavy|weak-evidence-heavy|unclear-heavy|high-manual-review|structurally-valid-but-decision-thin) ;;
+              *)
+                echo "--quality-focus must be one of: all, low-confidence-heavy, weak-evidence-heavy, unclear-heavy, high-manual-review, structurally-valid-but-decision-thin" >&2
+                exit 1
+                ;;
+            esac
+            focus="calibration"
+            focus_requested="true"
+            shift 2
+            ;;
+          --manual-review-only)
+            manual_review_only="true"
+            if [ "$focus" != "simulation" ]; then
+              focus="calibration"
+            fi
+            focus_requested="true"
+            shift
+            ;;
+          --all-batches)
+            calibration_all_batches="true"
+            if [ "$focus" != "simulation" ] && [ "$focus" != "evidence-pack" ] && [ "$focus" != "comparison" ] && [ "$focus" != "paired-experiment" ]; then
+              focus="calibration"
+            fi
+            focus_requested="true"
+            shift
+            ;;
+          --manual-review)
+            focus="manual-review"
+            focus_requested="true"
+            shift
+            ;;
+          --blocked)
+            focus="blocked"
+            focus_requested="true"
+            shift
+            ;;
+          --incomplete)
+            focus="incomplete"
+            focus_requested="true"
+            shift
+            ;;
+          --finalize-safe)
+            focus="finalize-safe"
+            focus_requested="true"
+            shift
+            ;;
+          --apply-safe)
+            focus="apply-safe"
+            focus_requested="true"
+            shift
+            ;;
+          --reason)
+            reason="${2:-}"
+            [ -n "$reason" ] || { echo "--reason requires a value" >&2; exit 1; }
+            case "$reason" in
+              schema|conflicting-sources|weak-evidence|unclear|low-confidence|manual-review-requested|ambiguous-subject|date-uncertain) ;;
+              *)
+                echo "--reason must be one of: schema, conflicting-sources, weak-evidence, unclear, low-confidence, manual-review-requested, ambiguous-subject, date-uncertain" >&2
+                exit 1
+                ;;
+            esac
+            focus="manual-review"
+            focus_requested="true"
+            shift 2
+            ;;
+          --confidence-bucket)
+            confidence_bucket="${2:-}"
+            [ -n "$confidence_bucket" ] || { echo "--confidence-bucket requires a value" >&2; exit 1; }
+            case "$confidence_bucket" in
+              0.00-0.59|0.60-0.74|0.75-0.84|0.85+) ;;
+              *)
+                echo "--confidence-bucket must be one of: 0.00-0.59, 0.60-0.74, 0.75-0.84, 0.85+" >&2
+                exit 1
+                ;;
+            esac
+            focus="manual-review"
+            focus_requested="true"
+            shift 2
+            ;;
+          --unresolved-only)
+            unresolved_only="true"
+            if [ "$focus" != "calibration" ]; then
+              focus="manual-review"
+            fi
+            focus_requested="true"
+            shift
+            ;;
+          --readiness)
+            readiness="${2:-}"
+            [ -n "$readiness" ] || { echo "--readiness requires a value" >&2; exit 1; }
+            case "$readiness" in
+              needs-artifact-repair|needs-evidence-verification|needs-operator-judgment|ready-for-operator-decision) ;;
+              *)
+                echo "--readiness must be one of: needs-artifact-repair, needs-evidence-verification, needs-operator-judgment, ready-for-operator-decision" >&2
+                exit 1
+                ;;
+            esac
+            focus="manual-review"
+            focus_requested="true"
+            shift 2
+            ;;
+          --schema-blocked-only)
+            schema_blocked_only="true"
+            focus="manual-review"
+            focus_requested="true"
+            shift
+            ;;
+          --judgment-required-only)
+            judgment_required_only="true"
+            focus="manual-review"
+            focus_requested="true"
+            shift
             ;;
           -h|--help)
             current_admin_subcommand_usage status
@@ -1858,7 +2523,10 @@ run_current_admin_command() {
       if [ -n "$input_path" ]; then
         input_path="$(normalize_python_workspace_path "$input_path")"
       fi
-      print_current_admin_status "$input_path" "$batch_name"
+      if [ "$focus_requested" = "true" ]; then
+        output_json="true"
+      fi
+      print_current_admin_status "$input_path" "$batch_name" "$output_json" "$focus" "$reason" "$confidence_bucket" "$unresolved_only" "$readiness" "$schema_blocked_only" "$judgment_required_only" "$quality_focus" "$manual_review_only" "$calibration_all_batches" "$simulation_preset" "$simulation_focus" "$include_deltas" "$confidence_auto_approve_threshold" "$confidence_manual_review_floor" "$allow_high_confidence_flagged_items_to_stay_blocked" "$treat_unclear_as_always_manual_review" "$treat_weak_evidence_as_always_manual_review" "$treat_conflicting_sources_as_always_manual_review" "$treat_date_uncertain_as_always_manual_review" "$treat_ambiguous_subject_as_always_manual_review" "$treat_model_manual_review_as_always_manual_review" "$evidence_focus" "$evidence_quality_label" "$source_grounding_label" "$impact_directness_hint" "$evidence_item_id" "$include_items" "$comparison_baseline" "$comparison_enriched" "$paired_experiment_name"
       ;;
     workflow)
       run_current_admin_workflow_command "${1:-help}" "${@:2}"
@@ -1899,6 +2567,7 @@ main_usage() {
 Usage:
   equitystack legislative <command> [args]
   equitystack current-admin <command> [args]
+  equitystack impact <command> [args]
   equitystack admin-reset-operational-state [--dry-run | --apply --yes]
 
 Shared runtime defaults:
@@ -1906,7 +2575,7 @@ Shared runtime defaults:
   review AI:        $DEFAULT_MODEL_REVIEW
   fallback AI:      $DEFAULT_MODEL_FALLBACK
   executor model:   $DEFAULT_MODEL_EXECUTOR
-  Ollama server:    $DEFAULT_OLLAMA_URL
+  LLM endpoint:     $DEFAULT_OLLAMA_URL
   senior timeout:   ${DEFAULT_OLLAMA_TIMEOUT_SENIOR}s
   verifier timeout: ${DEFAULT_OLLAMA_TIMEOUT_VERIFIER}s
 
@@ -1922,7 +2591,7 @@ Current-admin commands:
   gen-batch  Generate a canonical current-admin batch from discovery candidates
   export     Export selected discovery suggestions into a draft batch
   normalize  Normalize a curated batch file
-  ai-review  Run advisory Ollama review on a normalized batch
+  ai-review  Run conservative OpenAI Batch review on a normalized batch
   queue      Build the manual review queue from normalized batch plus AI review
   run        Discover and generate the next batch by default, then normalize, review, and queue it
   review     Generate or finalize operator decisions for a review artifact
@@ -1939,17 +2608,47 @@ Current-admin workflow subcommands:
   workflow finalize     Log explicit operator decisions against a canonical review artifact
   workflow resume       Show the latest current-admin session and recommended next step
 
+Impact maturation commands:
+  evaluate   Build a read-only impact maturation review artifact
+  promote    Promote approved safe forward impact transitions
+
 Operational maintenance:
   admin-reset-operational-state   Archive non-canonical run-state artifacts for a fresh walkthrough
 
 Examples:
   $(cli_hint) legislative run
   $(cli_hint) legislative run --model qwen3.5:9b
+  $(cli_hint) impact evaluate
+  $(cli_hint) impact promote --dry-run
   $(cli_hint) current-admin run
   $(cli_hint) current-admin status
   $(cli_hint) admin-reset-operational-state --dry-run
   $(cli_hint) current-admin workflow start --input data/current_admin_batches/<batch-file>.json
   $(cli_hint) current-admin review --input reports/current_admin/<batch-name>.ai-review.json
+EOF
+}
+
+impact_usage() {
+  cat <<EOF
+Usage:
+  equitystack impact <command> [args]
+
+Commands:
+  evaluate   Build reports/impact_maturation_review.json from pending/review-ready artifacts
+  promote    Validate and promote approved safe forward transitions
+
+Examples:
+  $(cli_hint) impact evaluate
+  $(cli_hint) impact evaluate --input reports/current_admin/<batch>.manual-review-queue.json
+  $(cli_hint) impact promote --dry-run
+  $(cli_hint) impact promote --apply --yes
+  $(cli_hint) impact promote --apply --yes --approve-safe
+
+Safety:
+  Allowed transitions are impact_pending -> impact_review_ready,
+  impact_review_ready -> impact_scored, and impact_scored -> impact_verified.
+  Backward movement is blocked. Outcomes are inserted only for impact_scored
+  or impact_verified transitions, and existing outcome rows are preserved.
 EOF
 }
 
@@ -2021,8 +2720,10 @@ Commands:
   gen-batch  Wrapper for scripts/generate_current_admin_batch_from_discovery.py
   export     Wrapper for scripts/export_current_admin_discovery_candidates.py
   normalize  Wrapper for scripts/normalize_current_admin_batch.py
-  ai-review  Wrapper for scripts/review_current_admin_batch_with_ollama.py
+  ai-review  Wrapper for scripts/review_current_admin_batch_with_openai_batch.py
   queue      Wrapper for scripts/apply_current_admin_ai_review.py
+  promote-review
+             Promote an enriched review artifact into the canonical queue
   run        Discover and generate the next batch by default, then normalize, review, and queue it
   review     Generate or finalize operator decisions for a review artifact
   apply      Run pre-commit, import dry-run, optional apply, and validation
@@ -2034,22 +2735,28 @@ Commands:
 
 Defaults:
   current-admin ai-review, current-admin run, and workflow decision steps default to:
-    senior-model   $DEFAULT_MODEL_REVIEW
-    verifier-model $DEFAULT_MODEL_VERIFIER
-    fallback-model $DEFAULT_MODEL_FALLBACK
-    senior-timeout ${DEFAULT_OLLAMA_TIMEOUT_SENIOR}s
-    verifier-timeout ${DEFAULT_OLLAMA_TIMEOUT_VERIFIER}s
-    ollama-url     $DEFAULT_OLLAMA_URL
+    openai-model   $DEFAULT_CURRENT_ADMIN_REVIEW_MODEL
+    verifier-model $DEFAULT_CURRENT_ADMIN_VERIFIER_MODEL
+    fallback-model $DEFAULT_CURRENT_ADMIN_FALLBACK_MODEL
+    openai-base-url $DEFAULT_CURRENT_ADMIN_OPENAI_BASE_URL
 
   current-admin discovery defaults to:
     model       $DEFAULT_MODEL_VERIFIER
     timeout     ${DEFAULT_OLLAMA_TIMEOUT_VERIFIER}s
-    ollama-url  $DEFAULT_OLLAMA_URL
+    llm endpoint $DEFAULT_OLLAMA_URL
 
 Path handling:
   Current-admin path flags accept python-rooted paths like data/... or reports/... .
   The installed ~/bin/equitystack wrapper also accepts repo-rooted paths like
   python/data/... or python/reports/... and normalizes them automatically.
+
+OpenAI Batch lifecycle:
+  Use current-admin ai-review --input <normalized-or-ai-review.json> with:
+    --batch-status   show local metadata plus remote status when available
+    --batch-poll     poll an existing batch without resubmitting
+    --batch-fetch    fetch output/error files without resubmitting
+    --batch-inspect  show local readiness and validation counts
+    --batch-resume   poll, fetch, and rebuild the canonical review artifact when ready
 EOF
 }
 
@@ -2072,7 +2779,7 @@ current_admin_workflow_subcommand_usage() {
     start)
       cat <<EOF
 Usage:
-  equitystack current-admin workflow start [--input <batch-file> | --batch-name <batch-name>] [--review-dry-run] [--prefill-suggestions] [--model <senior-name>] [--verifier-model <name>] [--fallback-model <name>] [--timeout <seconds>] [--senior-timeout <seconds>] [--verifier-timeout <seconds>] [--ollama-url <url>] [--deep-review | --review-mode <standard|deep>]
+  equitystack current-admin workflow start [--input <batch-file> | --batch-name <batch-name>] [--review-dry-run] [--prefill-suggestions] [--model <openai-model>] [--verifier-model <name>] [--fallback-model <name>] [--timeout <seconds>] [--senior-timeout <seconds>] [--verifier-timeout <seconds>] [--ollama-url <url>] [--deep-review | --review-mode <standard|deep>]
 
 Runs the existing safe pre-import workflow:
   normalize -> review -> queue
@@ -2098,7 +2805,7 @@ EOF
 Usage:
   equitystack current-admin workflow finalize --review <ai-review.json> --decision-file <decisions.json> --log-decisions [path] [--feedback-summary]
 
-Replays the canonical review settings from the source AI review artifact and writes a decision log.
+Reuses the canonical AI review artifact and writes a decision log.
 This does not import records or write to the database.
 
 Relative --review and --decision-file paths may be given as reports/... or python/reports/...
@@ -2132,7 +2839,7 @@ Runs:
 Wrapper defaults:
   --model $DEFAULT_MODEL_VERIFIER
   --timeout $DEFAULT_OLLAMA_TIMEOUT_VERIFIER
-  --ollama-url $DEFAULT_OLLAMA_URL
+  --ollama-url $DEFAULT_OLLAMA_URL  (legacy alias for the configured LLM endpoint)
 EOF
       ;;
     export)
@@ -2179,16 +2886,33 @@ Usage:
   equitystack current-admin ai-review [args]
 
 Runs:
-  python3 scripts/review_current_admin_batch_with_ollama.py [args]
+  python3 scripts/review_current_admin_batch_with_openai_batch.py [args]
 
 Wrapper defaults:
-  --model $DEFAULT_MODEL_REVIEW
-  --verifier-model $DEFAULT_MODEL_VERIFIER
-  --fallback-model $DEFAULT_MODEL_FALLBACK
+  --model $DEFAULT_CURRENT_ADMIN_REVIEW_MODEL
+  --verifier-model $DEFAULT_CURRENT_ADMIN_VERIFIER_MODEL
+  --fallback-model $DEFAULT_CURRENT_ADMIN_FALLBACK_MODEL
   --senior-timeout $DEFAULT_OLLAMA_TIMEOUT_SENIOR
   --verifier-timeout $DEFAULT_OLLAMA_TIMEOUT_VERIFIER
   --review-mode deep
-  --ollama-url $DEFAULT_OLLAMA_URL
+  --openai-base-url $DEFAULT_CURRENT_ADMIN_OPENAI_BASE_URL
+
+Lifecycle flags:
+  --batch-status   Show local Batch metadata and remote status when possible; no resubmit.
+  --batch-poll     Poll the existing batch from local metadata; no resubmit.
+  --batch-fetch    Download available output/error JSONL files; no resubmit.
+  --batch-inspect  Show concise readiness and validation counts.
+  --batch-resume   Poll/fetch/rebuild the canonical .ai-review.json when possible; no resubmit.
+
+Evidence packaging:
+  --evidence-preview  Build and print the model-facing .evidence-pack.json sidecar without submitting review.
+
+Paired evaluation:
+  --paired-experiment        Route to the paired baseline/enriched experiment runner.
+  --experiment-name <name>   Stable local experiment name for artifact naming.
+  --prep-only                Prepare .paired-eval.meta.json without submitting.
+  --poll|--fetch|--resume    Continue both sides without duplicate submission.
+  --compare                 Run comparison when both review artifacts are available.
 EOF
       ;;
     queue)
@@ -2198,6 +2922,17 @@ Usage:
 
 Runs:
   python3 scripts/apply_current_admin_ai_review.py [args]
+EOF
+      ;;
+    promote-review)
+      cat <<EOF
+Usage:
+  equitystack current-admin promote-review --input <enriched.ai-review.json> [--dry-run]
+  equitystack current-admin promote-review --batch-name <batch-name> [--dry-run]
+
+Regenerates the canonical manual-review queue from an enriched review artifact and
+auto-approves only impact_pending/import_with_pending_impact items. It also writes
+matching promotion decision metadata so pre-commit/import lineage checks remain intact.
 EOF
       ;;
     run)
@@ -2226,9 +2961,40 @@ EOF
     status)
       cat <<EOF
 Usage:
-  equitystack current-admin status [--input <batch-file> | --batch-name <batch-name>]
+  equitystack current-admin status [--input <batch-file> | --batch-name <batch-name>] [--json] [--focus <all|blocked|incomplete|finalize-safe|apply-safe|manual-review|calibration|simulation|evidence-pack|comparison|paired-experiment>]
 
 Shows artifact presence, current workflow state, blocking issues, and the recommended next command.
+Use --json for the sidecar-derived OpenAI Batch read model. --focus and the aliases
+--blocked, --incomplete, --finalize-safe, and --apply-safe imply JSON output.
+Use --manual-review or --focus manual-review for the manual-review read model. Manual-review
+filters: --reason <schema|conflicting-sources|weak-evidence|unclear|low-confidence|manual-review-requested|ambiguous-subject|date-uncertain>,
+--confidence-bucket <0.00-0.59|0.60-0.74|0.75-0.84|0.85+>, --unresolved-only,
+--readiness <needs-artifact-repair|needs-evidence-verification|needs-operator-judgment|ready-for-operator-decision>,
+--schema-blocked-only, --judgment-required-only.
+Use --calibration or --focus calibration for rule-based calibration diagnostics.
+Calibration filters: --quality-focus <all|low-confidence-heavy|weak-evidence-heavy|unclear-heavy|high-manual-review|structurally-valid-but-decision-thin>,
+--manual-review-only, --unresolved-only, --all-batches.
+Use --simulation or --focus simulation for read-only threshold simulations.
+Simulation filters: --preset <strict-current|slightly-relaxed|moderate-relaxed|confidence-only-test>,
+--simulation-focus <all|threshold-sensitive|evidence-blocked|flag-blocked|threshold-only-promotions>,
+--include-deltas, --manual-review-only, --all-batches.
+Simulation overrides: --confidence-auto-approve-threshold <float>, --confidence-manual-review-floor <float>,
+--allow-high-confidence-flagged-items-to-stay-blocked <true|false>,
+--treat-unclear-as-always-manual-review <true|false>,
+--treat-weak-evidence-as-always-manual-review <true|false>,
+--treat-conflicting-sources-as-always-manual-review <true|false>,
+--treat-date-uncertain-as-always-manual-review <true|false>,
+--treat-ambiguous-subject-as-always-manual-review <true|false>,
+--treat-model-manual-review-as-always-manual-review <true|false>.
+Use --evidence-pack or --focus evidence-pack for evidence-pack/source-grounding diagnostics.
+Evidence-pack filters: --evidence-focus <all|single-source-official|outcome-evidence-present|policy-intent-only|weak-outcome-evidence|multi-source-grounding>,
+--evidence-quality-label <label>, --source-grounding-label <label>,
+--impact-directness-hint <hint>, --item-id <stable-item-id>, --include-items, --all-batches.
+Use --compare-review-runs or --focus comparison for baseline-vs-enriched review quality comparison.
+Comparison inputs: --baseline <ai-review.json> --enriched <ai-review.json>.
+Comparison filters: --batch-name <name>, --include-item-deltas.
+Use --paired-experiment or --focus paired-experiment for paired evaluation tracking.
+Paired-experiment filters: --batch-name <name>, --experiment-name <name>.
 
 Relative --input paths may be given as data/... or python/data/...
 EOF
@@ -2293,6 +3059,10 @@ case "${1:-}" in
   legislative)
     shift
     run_legislative_command "${1:-help}" "${@:2}"
+    ;;
+  impact)
+    shift
+    run_impact_command "${1:-help}" "${@:2}"
     ;;
   current-admin)
     shift

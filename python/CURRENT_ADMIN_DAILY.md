@@ -137,8 +137,8 @@ These still work and remain the canonical lower-level path:
 - Verifier review defaults to `qwen3.5:9b`.
 - Senior review and decision stages default to `qwen3.5:9b`.
 - Senior-review fallback defaults to `qwen3.5:9b`.
-- Ollama review timeout defaults to `240` seconds.
-- Production Ollama is remote: `http://10.10.0.60:11434`.
+- LLM review timeout defaults to `240` seconds.
+- LLM execution uses the configured provider endpoint from `config/llm.json` or `EQUITYSTACK_LLM_ENDPOINT`.
 - `current-admin status` is the fastest way to see the current state and next command.
 - `pre-commit` is read-only.
 - `import` is dry-run by default.

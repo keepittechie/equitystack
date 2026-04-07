@@ -38,6 +38,11 @@ def parse_args() -> argparse.Namespace:
 
 def merge_record_with_suggestions(record: dict[str, Any], suggestions: dict[str, Any], prefill: bool) -> dict[str, Any]:
     merged = dict(record)
+    impact_status = normalize_nullable_text(suggestions.get("impact_status"))
+    if impact_status:
+        merged["impact_status"] = impact_status
+        if impact_status == "impact_pending":
+            merged["impact_pending_reason"] = normalize_nullable_text(suggestions.get("impact_status_reason"))
     if not prefill:
         return merged
 
@@ -81,6 +86,7 @@ def main() -> None:
         suggestions = ai_item.get("suggestions") or {}
         queue_item = {
             "slug": record.get("slug"),
+            "impact_status": suggestions.get("impact_status"),
             "approved": False,
             "operator_status": "pending",
             "operator_notes": None,
@@ -96,6 +102,7 @@ def main() -> None:
                 "approved": queue_item["approved"],
                 "operator_status": queue_item["operator_status"],
                 "record_action_suggestion": suggestions.get("record_action_suggestion"),
+                "impact_status": suggestions.get("impact_status"),
                 "status_suggestion": suggestions.get("status_suggestion"),
             }
         )

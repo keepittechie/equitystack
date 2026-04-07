@@ -100,7 +100,7 @@ Use these only when needed:
 
 ## Environment Notes
 
-- Production Ollama is `http://10.10.0.60:11434`.
+- LLM execution uses the configured provider endpoint from `config/llm.json` or `EQUITYSTACK_LLM_ENDPOINT`.
 - DB-backed legislative helpers now honor runtime env overrides such as `DB_HOST=10.10.0.13`.
 - `import_tracked_bills.py` also honors `CONGRESS_API_KEY` from the runtime environment.
 - Preferred local path: rebuild `python/venv` with `./bin/bootstrap-python-env`.

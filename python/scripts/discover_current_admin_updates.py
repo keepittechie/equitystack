@@ -2,12 +2,19 @@
 import argparse
 import json
 import re
+import sys
 import xml.etree.ElementTree as ET
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
 import requests
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+from lib.llm.provider import generate_text
 
 from current_admin_common import (
     derive_csv_path,
@@ -22,7 +29,7 @@ from current_admin_common import (
 )
 
 
-DEFAULT_OLLAMA_URL = "http://10.10.0.60:11434"
+DEFAULT_OLLAMA_URL = ""
 DEFAULT_MODEL = "qwen3.5:9b"
 DEFAULT_TIMEOUT = 240
 DEFAULT_TEMPERATURE = 0.1
@@ -141,20 +148,15 @@ def estimate_evidence_strength(source_url: Any) -> str:
 
 
 def call_ollama(prompt: str, *, model: str, ollama_url: str, timeout: int, temperature: float) -> dict[str, Any]:
-    response = requests.post(
-        f"{ollama_url.rstrip('/')}/api/generate",
-        json={
-            "model": model,
-            "prompt": prompt,
-            "stream": False,
-            "format": "json",
-            "options": {"temperature": temperature},
-        },
-        timeout=timeout,
+    raw_text = generate_text(
+        prompt,
+        model=model,
+        endpoint=ollama_url or None,
+        timeout_seconds=timeout,
+        temperature=temperature,
+        response_format="json",
     )
-    response.raise_for_status()
-    payload = response.json()
-    return json.loads(payload.get("response") or "{}")
+    return json.loads(raw_text or "{}")
 
 
 def fetch_promises(president_slug: str, max_promises: int | None) -> list[dict[str, Any]]:

@@ -1,0 +1,590 @@
+{
+  "batch_name": "trump-2025-batch-01",
+  "generated_at": "2026-04-07T02:00:26.967587+00:00",
+  "source_queue_file": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.manual-review-queue.json",
+  "source_review_file": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.evidence-pack-vs-baseline-01.enriched.ai-review.json",
+  "source_decision_template": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.decision-template.json",
+  "source_decision_log": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/review_decisions/trump-2025-batch-01.20260407T014841Z.promotion.decision-log.json",
+  "decision_template_source_review_file": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.evidence-pack-vs-baseline-01.enriched.ai-review.json",
+  "decision_log_source_review_file": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.evidence-pack-vs-baseline-01.enriched.ai-review.json",
+  "reviewed_item_count": 10,
+  "decision_log_resolution": "auto",
+  "artifact_linkage": {
+    "queue_to_review": "ok",
+    "decision_template_to_review": "ok",
+    "decision_log_to_review": "ok"
+  },
+  "openai_batch_safety": {
+    "review_path": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.evidence-pack-vs-baseline-01.enriched.ai-review.json",
+    "metadata_path": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.evidence-pack-vs-baseline-01.enriched.openai-batch.meta.json",
+    "validation_path": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.evidence-pack-vs-baseline-01.enriched.openai-batch.validation.json",
+    "metadata_present": true,
+    "validation_present": true,
+    "blocking_issues": [],
+    "warnings": [],
+    "safe_to_finalize": true,
+    "safe_to_apply": true,
+    "validation_counts": {
+      "total_items": 10,
+      "valid_items": 10,
+      "malformed_items": 0,
+      "enum_errors": 0,
+      "missing_field_errors": 0,
+      "low_confidence_items": 10,
+      "unclear_classifications": 10,
+      "needs_manual_review_items": 10,
+      "insert_safe_items": 0
+    },
+    "provider": "openai",
+    "model": "gpt-4.1",
+    "batch_id": "batch_69d44b856ba48190ab0d76d84755a9ee",
+    "status": "completed",
+    "submitted_at": "2026-04-07T00:10:45.689393+00:00",
+    "completed_at": "2026-04-07T00:12:02+00:00",
+    "last_polled_at": "2026-04-07T01:14:12.251052+00:00",
+    "output_file_id": "file-3APJvoSquNQFnvnyMvo1Hc",
+    "error_file_id": null,
+    "request_counts": {
+      "total": 10,
+      "completed": 10,
+      "failed": 0
+    },
+    "input_artifact": "data/current_admin_batches/trump_2025_batch_01.json",
+    "review_artifact": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.evidence-pack-vs-baseline-01.enriched.ai-review.json",
+    "review_artifact_rebuilt_at": "2026-04-07T01:14:12.265947+00:00",
+    "local_output_path": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.evidence-pack-vs-baseline-01.enriched.openai-batch.output.jsonl",
+    "local_error_path": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/trump-2025-batch-01.evidence-pack-vs-baseline-01.enriched.openai-batch.errors.jsonl",
+    "output_ready": true,
+    "error_file_present": false,
+    "review_artifact_ready": true,
+    "review_artifact_rebuilt": true
+  },
+  "total_item_count": 10,
+  "selected_for_import_count": 10,
+  "decision_covered_count": 10,
+  "decision_missing_count": 0,
+  "invalid_operator_action_count": 0,
+  "unresolved_manual_review_count": 0,
+  "material_conflict_count": 0,
+  "source_gap_count": 10,
+  "high_attention_count": 10,
+  "readiness_status": "ready_with_warnings",
+  "readiness_label": "Ready With Warnings",
+  "readiness_explanation": "You can proceed, but review warnings first.",
+  "readiness_details": {
+    "label": "Ready With Warnings",
+    "meaning": "Import can proceed, but warning signals still deserve a human review.",
+    "operator_guidance": "Review warnings, then run a dry-run import if the queue still looks correct."
+  },
+  "readiness_formula": {
+    "ready": "Safe to proceed to import.",
+    "ready_with_warnings": "You can proceed, but review warnings first.",
+    "blocked": "You cannot proceed. Fix the issues below."
+  },
+  "summary": {
+    "total_items": 10,
+    "approved_items": 10,
+    "manual_review_items": 0,
+    "missing_decisions": 0,
+    "invalid_actions": 0,
+    "high_attention_items": 10,
+    "low_confidence_items": 10
+  },
+  "warning_counts": {
+    "material_conflict_present": 0,
+    "source_or_evidence_gaps": 10,
+    "high_attention_item": 10,
+    "low_confidence": 10,
+    "impact_pending": 10,
+    "deep_review_recommended": 10,
+    "decision_mismatch": 0
+  },
+  "blocking_issues": [],
+  "linkage_warnings": [],
+  "low_confidence_items": [
+    {
+      "slug": "trump-2025-election-integrity-proof-citizenship-paper-ballots",
+      "title": "Require proof of citizenship and paper-ballot election safeguards",
+      "confidence_score": 0.4,
+      "confidence_level": "Low"
+    },
+    {
+      "slug": "trump-2025-end-federal-dei-equity-programs",
+      "title": "End federal DEI and equity-based government programs",
+      "confidence_score": 0.5,
+      "confidence_level": "Low"
+    },
+    {
+      "slug": "trump-2025-strengthen-local-law-enforcement",
+      "title": "Increase federal support for state and local law enforcement",
+      "confidence_score": 0.4,
+      "confidence_level": "Low"
+    },
+    {
+      "slug": "trump-2025-clear-street-encampments-expand-civil-commitment",
+      "title": "Clear street encampments and expand treatment-oriented street-order responses",
+      "confidence_score": 0.4,
+      "confidence_level": "Low"
+    },
+    {
+      "slug": "trump-2025-domestic-production-of-critical-medicines",
+      "title": "Expand domestic production of critical medicines",
+      "confidence_score": 0.4,
+      "confidence_level": "Low"
+    },
+    {
+      "slug": "trump-2025-expand-educational-freedom-for-families",
+      "title": "Expand educational freedom and school-choice options for families",
+      "confidence_score": 0.4,
+      "confidence_level": "Low"
+    },
+    {
+      "slug": "trump-2025-reform-higher-education-accreditation",
+      "title": "Reform higher-education accreditation around student outcomes",
+      "confidence_score": 0.4,
+      "confidence_level": "Low"
+    },
+    {
+      "slug": "trump-2025-promote-hbcu-excellence-and-innovation",
+      "title": "Promote excellence and innovation at HBCUs",
+      "confidence_score": 0.5,
+      "confidence_level": "Low"
+    },
+    {
+      "slug": "trump-2025-reinstate-school-discipline-policies",
+      "title": "Reinstate school discipline policies without equity-based disparate-impact framing",
+      "confidence_score": 0.4,
+      "confidence_level": "Low"
+    },
+    {
+      "slug": "trump-2025-high-paying-skilled-trade-jobs",
+      "title": "Prepare Americans for high-paying skilled trade jobs",
+      "confidence_score": 0.4,
+      "confidence_level": "Low"
+    }
+  ],
+  "diff_preview": {
+    "new_records": [
+      {
+        "slug": "trump-2025-election-integrity-proof-citizenship-paper-ballots",
+        "title": "Require proof of citizenship and paper-ballot election safeguards",
+        "operator_action": "approve_as_is",
+        "decision_alignment": "promotion_auto_approval",
+        "preview": "new record",
+        "reason": "approved as-is"
+      },
+      {
+        "slug": "trump-2025-end-federal-dei-equity-programs",
+        "title": "End federal DEI and equity-based government programs",
+        "operator_action": "approve_as_is",
+        "decision_alignment": "promotion_auto_approval",
+        "preview": "new record",
+        "reason": "approved as-is"
+      },
+      {
+        "slug": "trump-2025-strengthen-local-law-enforcement",
+        "title": "Increase federal support for state and local law enforcement",
+        "operator_action": "approve_as_is",
+        "decision_alignment": "promotion_auto_approval",
+        "preview": "new record",
+        "reason": "approved as-is"
+      },
+      {
+        "slug": "trump-2025-clear-street-encampments-expand-civil-commitment",
+        "title": "Clear street encampments and expand treatment-oriented street-order responses",
+        "operator_action": "approve_as_is",
+        "decision_alignment": "promotion_auto_approval",
+        "preview": "new record",
+        "reason": "approved as-is"
+      },
+      {
+        "slug": "trump-2025-domestic-production-of-critical-medicines",
+        "title": "Expand domestic production of critical medicines",
+        "operator_action": "approve_as_is",
+        "decision_alignment": "promotion_auto_approval",
+        "preview": "new record",
+        "reason": "approved as-is"
+      },
+      {
+        "slug": "trump-2025-expand-educational-freedom-for-families",
+        "title": "Expand educational freedom and school-choice options for families",
+        "operator_action": "approve_as_is",
+        "decision_alignment": "promotion_auto_approval",
+        "preview": "new record",
+        "reason": "approved as-is"
+      },
+      {
+        "slug": "trump-2025-reform-higher-education-accreditation",
+        "title": "Reform higher-education accreditation around student outcomes",
+        "operator_action": "approve_as_is",
+        "decision_alignment": "promotion_auto_approval",
+        "preview": "new record",
+        "reason": "approved as-is"
+      },
+      {
+        "slug": "trump-2025-promote-hbcu-excellence-and-innovation",
+        "title": "Promote excellence and innovation at HBCUs",
+        "operator_action": "approve_as_is",
+        "decision_alignment": "promotion_auto_approval",
+        "preview": "new record",
+        "reason": "approved as-is"
+      },
+      {
+        "slug": "trump-2025-reinstate-school-discipline-policies",
+        "title": "Reinstate school discipline policies without equity-based disparate-impact framing",
+        "operator_action": "approve_as_is",
+        "decision_alignment": "promotion_auto_approval",
+        "preview": "new record",
+        "reason": "approved as-is"
+      },
+      {
+        "slug": "trump-2025-high-paying-skilled-trade-jobs",
+        "title": "Prepare Americans for high-paying skilled trade jobs",
+        "operator_action": "approve_as_is",
+        "decision_alignment": "promotion_auto_approval",
+        "preview": "new record",
+        "reason": "approved as-is"
+      }
+    ],
+    "updated_records": [],
+    "skipped_items": []
+  },
+  "recommended_next_step": "Review the warnings, then run a dry-run import if the queue still looks correct.",
+  "items": [
+    {
+      "slug": "trump-2025-election-integrity-proof-citizenship-paper-ballots",
+      "title": "Require proof of citizenship and paper-ballot election safeguards",
+      "selected_for_import": true,
+      "operator_status": "approved",
+      "approved": true,
+      "operator_action": "approve_as_is",
+      "operator_action_valid": true,
+      "decision_alignment": "promotion_auto_approval",
+      "review_priority": "high",
+      "review_priority_score": 10,
+      "suggested_batch": "high_attention",
+      "has_material_conflict": false,
+      "source_warnings": [
+        "implementation_incomplete",
+        "indirect_impact_evidence",
+        "no_independent/non_government_sources"
+      ],
+      "evidence_gap_count": 3,
+      "confidence_level": "Low",
+      "confidence_score": 0.4,
+      "record_action_suggestion": "manual_review",
+      "impact_status": "impact_pending",
+      "import_readiness": "ready_with_warnings",
+      "blocking_issues": [],
+      "warning_signals": [
+        "source_or_evidence_gaps",
+        "high_attention_item",
+        "low_confidence",
+        "impact_pending",
+        "deep_review_recommended"
+      ]
+    },
+    {
+      "slug": "trump-2025-end-federal-dei-equity-programs",
+      "title": "End federal DEI and equity-based government programs",
+      "selected_for_import": true,
+      "operator_status": "approved",
+      "approved": true,
+      "operator_action": "approve_as_is",
+      "operator_action_valid": true,
+      "decision_alignment": "promotion_auto_approval",
+      "review_priority": "high",
+      "review_priority_score": 9,
+      "suggested_batch": "high_attention",
+      "has_material_conflict": false,
+      "source_warnings": [
+        "implementation_incomplete",
+        "no_independent_verification",
+        "single_source_official_record"
+      ],
+      "evidence_gap_count": 3,
+      "confidence_level": "Low",
+      "confidence_score": 0.5,
+      "record_action_suggestion": "manual_review",
+      "impact_status": "impact_pending",
+      "import_readiness": "ready_with_warnings",
+      "blocking_issues": [],
+      "warning_signals": [
+        "source_or_evidence_gaps",
+        "high_attention_item",
+        "low_confidence",
+        "impact_pending",
+        "deep_review_recommended"
+      ]
+    },
+    {
+      "slug": "trump-2025-strengthen-local-law-enforcement",
+      "title": "Increase federal support for state and local law enforcement",
+      "selected_for_import": true,
+      "operator_status": "approved",
+      "approved": true,
+      "operator_action": "approve_as_is",
+      "operator_action_valid": true,
+      "decision_alignment": "promotion_auto_approval",
+      "review_priority": "high",
+      "review_priority_score": 10,
+      "suggested_batch": "high_attention",
+      "has_material_conflict": false,
+      "source_warnings": [
+        "implementation_incomplete",
+        "indirect_impact_evidence",
+        "no_direct_measurement_of_black_community_outcomes"
+      ],
+      "evidence_gap_count": 3,
+      "confidence_level": "Low",
+      "confidence_score": 0.4,
+      "record_action_suggestion": "manual_review",
+      "impact_status": "impact_pending",
+      "import_readiness": "ready_with_warnings",
+      "blocking_issues": [],
+      "warning_signals": [
+        "source_or_evidence_gaps",
+        "high_attention_item",
+        "low_confidence",
+        "impact_pending",
+        "deep_review_recommended"
+      ]
+    },
+    {
+      "slug": "trump-2025-clear-street-encampments-expand-civil-commitment",
+      "title": "Clear street encampments and expand treatment-oriented street-order responses",
+      "selected_for_import": true,
+      "operator_status": "approved",
+      "approved": true,
+      "operator_action": "approve_as_is",
+      "operator_action_valid": true,
+      "decision_alignment": "promotion_auto_approval",
+      "review_priority": "high",
+      "review_priority_score": 10,
+      "suggested_batch": "high_attention",
+      "has_material_conflict": false,
+      "source_warnings": [
+        "implementation_incomplete",
+        "indirect_impact_evidence",
+        "no_independent_evaluation_of_outcomes"
+      ],
+      "evidence_gap_count": 4,
+      "confidence_level": "Low",
+      "confidence_score": 0.4,
+      "record_action_suggestion": "manual_review",
+      "impact_status": "impact_pending",
+      "import_readiness": "ready_with_warnings",
+      "blocking_issues": [],
+      "warning_signals": [
+        "source_or_evidence_gaps",
+        "high_attention_item",
+        "low_confidence",
+        "impact_pending",
+        "deep_review_recommended"
+      ]
+    },
+    {
+      "slug": "trump-2025-domestic-production-of-critical-medicines",
+      "title": "Expand domestic production of critical medicines",
+      "selected_for_import": true,
+      "operator_status": "approved",
+      "approved": true,
+      "operator_action": "approve_as_is",
+      "operator_action_valid": true,
+      "decision_alignment": "promotion_auto_approval",
+      "review_priority": "high",
+      "review_priority_score": 9,
+      "suggested_batch": "high_attention",
+      "has_material_conflict": false,
+      "source_warnings": [
+        "impact_path_is_indirect",
+        "implementation_incomplete",
+        "no_direct_measurement_of_impact_on_black_communities"
+      ],
+      "evidence_gap_count": 3,
+      "confidence_level": "Low",
+      "confidence_score": 0.4,
+      "record_action_suggestion": "manual_review",
+      "impact_status": "impact_pending",
+      "import_readiness": "ready_with_warnings",
+      "blocking_issues": [],
+      "warning_signals": [
+        "source_or_evidence_gaps",
+        "high_attention_item",
+        "low_confidence",
+        "impact_pending",
+        "deep_review_recommended"
+      ]
+    },
+    {
+      "slug": "trump-2025-expand-educational-freedom-for-families",
+      "title": "Expand educational freedom and school-choice options for families",
+      "selected_for_import": true,
+      "operator_status": "approved",
+      "approved": true,
+      "operator_action": "approve_as_is",
+      "operator_action_valid": true,
+      "decision_alignment": "promotion_auto_approval",
+      "review_priority": "high",
+      "review_priority_score": 10,
+      "suggested_batch": "high_attention",
+      "has_material_conflict": false,
+      "source_warnings": [
+        "impact_path_indirect",
+        "implementation_incomplete",
+        "no_independent_verification",
+        "single_source_official_record"
+      ],
+      "evidence_gap_count": 4,
+      "confidence_level": "Low",
+      "confidence_score": 0.4,
+      "record_action_suggestion": "manual_review",
+      "impact_status": "impact_pending",
+      "import_readiness": "ready_with_warnings",
+      "blocking_issues": [],
+      "warning_signals": [
+        "source_or_evidence_gaps",
+        "high_attention_item",
+        "low_confidence",
+        "impact_pending",
+        "deep_review_recommended"
+      ]
+    },
+    {
+      "slug": "trump-2025-reform-higher-education-accreditation",
+      "title": "Reform higher-education accreditation around student outcomes",
+      "selected_for_import": true,
+      "operator_status": "approved",
+      "approved": true,
+      "operator_action": "approve_as_is",
+      "operator_action_valid": true,
+      "decision_alignment": "promotion_auto_approval",
+      "review_priority": "high",
+      "review_priority_score": 10,
+      "suggested_batch": "high_attention",
+      "has_material_conflict": false,
+      "source_warnings": [
+        "impact_path_indirect",
+        "implementation_incomplete",
+        "no_independent/non_governmental_sources",
+        "single_source_official_record_only"
+      ],
+      "evidence_gap_count": 4,
+      "confidence_level": "Low",
+      "confidence_score": 0.4,
+      "record_action_suggestion": "manual_review",
+      "impact_status": "impact_pending",
+      "import_readiness": "ready_with_warnings",
+      "blocking_issues": [],
+      "warning_signals": [
+        "source_or_evidence_gaps",
+        "high_attention_item",
+        "low_confidence",
+        "impact_pending",
+        "deep_review_recommended"
+      ]
+    },
+    {
+      "slug": "trump-2025-promote-hbcu-excellence-and-innovation",
+      "title": "Promote excellence and innovation at HBCUs",
+      "selected_for_import": true,
+      "operator_status": "approved",
+      "approved": true,
+      "operator_action": "approve_as_is",
+      "operator_action_valid": true,
+      "decision_alignment": "promotion_auto_approval",
+      "review_priority": "high",
+      "review_priority_score": 9,
+      "suggested_batch": "high_attention",
+      "has_material_conflict": false,
+      "source_warnings": [
+        "impact_path_indirect",
+        "implementation_incomplete",
+        "no_independent/non_governmental_sources",
+        "single_source_official_record_only"
+      ],
+      "evidence_gap_count": 3,
+      "confidence_level": "Low",
+      "confidence_score": 0.5,
+      "record_action_suggestion": "manual_review",
+      "impact_status": "impact_pending",
+      "import_readiness": "ready_with_warnings",
+      "blocking_issues": [],
+      "warning_signals": [
+        "source_or_evidence_gaps",
+        "high_attention_item",
+        "low_confidence",
+        "impact_pending",
+        "deep_review_recommended"
+      ]
+    },
+    {
+      "slug": "trump-2025-reinstate-school-discipline-policies",
+      "title": "Reinstate school discipline policies without equity-based disparate-impact framing",
+      "selected_for_import": true,
+      "operator_status": "approved",
+      "approved": true,
+      "operator_action": "approve_as_is",
+      "operator_action_valid": true,
+      "decision_alignment": "promotion_auto_approval",
+      "review_priority": "high",
+      "review_priority_score": 9,
+      "suggested_batch": "high_attention",
+      "has_material_conflict": false,
+      "source_warnings": [
+        "impact_path_indirect",
+        "implementation_incomplete",
+        "no_independent/non_government_sources",
+        "single_source_official_record_only"
+      ],
+      "evidence_gap_count": 4,
+      "confidence_level": "Low",
+      "confidence_score": 0.4,
+      "record_action_suggestion": "manual_review",
+      "impact_status": "impact_pending",
+      "import_readiness": "ready_with_warnings",
+      "blocking_issues": [],
+      "warning_signals": [
+        "source_or_evidence_gaps",
+        "high_attention_item",
+        "low_confidence",
+        "impact_pending",
+        "deep_review_recommended"
+      ]
+    },
+    {
+      "slug": "trump-2025-high-paying-skilled-trade-jobs",
+      "title": "Prepare Americans for high-paying skilled trade jobs",
+      "selected_for_import": true,
+      "operator_status": "approved",
+      "approved": true,
+      "operator_action": "approve_as_is",
+      "operator_action_valid": true,
+      "decision_alignment": "promotion_auto_approval",
+      "review_priority": "high",
+      "review_priority_score": 9,
+      "suggested_batch": "high_attention",
+      "has_material_conflict": false,
+      "source_warnings": [
+        "impact_indirect_and_not_yet_measured",
+        "implementation_incomplete",
+        "no_independent_verification",
+        "single_source_official_record"
+      ],
+      "evidence_gap_count": 3,
+      "confidence_level": "Low",
+      "confidence_score": 0.4,
+      "record_action_suggestion": "manual_review",
+      "impact_status": "impact_pending",
+      "import_readiness": "ready_with_warnings",
+      "blocking_issues": [],
+      "warning_signals": [
+        "source_or_evidence_gaps",
+        "high_attention_item",
+        "low_confidence",
+        "impact_pending",
+        "deep_review_recommended"
+      ]
+    }
+  ]
+}
