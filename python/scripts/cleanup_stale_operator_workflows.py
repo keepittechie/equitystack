@@ -196,6 +196,79 @@ def archive_session(record: SessionRecord, reasons: list[str], *, now: datetime,
     record.path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
 
 
+def build_suppression_entry(record: SessionRecord, reasons: list[str], *, now: datetime, archive_reason: str) -> dict[str, Any]:
+    archived_at = (
+        record.payload.get("archivedAt")
+        if isinstance(record.payload.get("archivedAt"), str) and record.payload.get("archivedAt").strip()
+        else now.isoformat().replace("+00:00", "Z")
+    )
+    cleanup_metadata = record.payload.get("cleanupMetadata") if isinstance(record.payload.get("cleanupMetadata"), dict) else {}
+    return {
+        "session_id": record.session_id,
+        "workflow_family": record.payload.get("workflowFamily"),
+        "canonical_session_key": record.payload.get("canonicalSessionKey"),
+        "archived_canonical_state": record.payload.get("canonicalState"),
+        "archived_at": archived_at,
+        "archived_reason": record.payload.get("archivedReason") or archive_reason,
+        "archived_by": record.payload.get("archivedBy") or "cleanup_stale_operator_workflows.py",
+        "matched_rules": reasons or cleanup_metadata.get("matchedRules") or [],
+        "active": True,
+    }
+
+
+def existing_archived_cleanup_records(records: list[SessionRecord]) -> list[tuple[SessionRecord, list[str]]]:
+    archived: list[tuple[SessionRecord, list[str]]] = []
+    for record in records:
+        if record.active:
+            continue
+        if record.payload.get("archivedBy") != "cleanup_stale_operator_workflows.py":
+            continue
+        cleanup_metadata = record.payload.get("cleanupMetadata")
+        reasons = cleanup_metadata.get("matchedRules") if isinstance(cleanup_metadata, dict) else []
+        archived.append((record, reasons if isinstance(reasons, list) else []))
+    return archived
+
+
+def update_suppressions_file(
+    suppressions_path: Path,
+    entries: list[dict[str, Any]],
+    *,
+    now: datetime,
+) -> dict[str, Any]:
+    existing_payload: dict[str, Any] = {}
+    if suppressions_path.exists():
+        try:
+            loaded = json.loads(suppressions_path.read_text(encoding="utf-8"))
+            if isinstance(loaded, dict):
+                existing_payload = loaded
+        except Exception:
+            existing_payload = {}
+
+    existing_entries = existing_payload.get("suppressions")
+    merged: dict[str, dict[str, Any]] = {}
+    if isinstance(existing_entries, list):
+        for entry in existing_entries:
+            if not isinstance(entry, dict):
+                continue
+            session_id = str(entry.get("session_id") or "").strip()
+            if session_id:
+                merged[session_id] = entry
+
+    for entry in entries:
+        session_id = str(entry.get("session_id") or "").strip()
+        if session_id:
+            merged[session_id] = entry
+
+    payload = {
+        "artifact_version": 1,
+        "updated_at": now.isoformat().replace("+00:00", "Z"),
+        "suppressions": sorted(merged.values(), key=lambda item: str(item.get("session_id") or "")),
+    }
+    suppressions_path.parent.mkdir(parents=True, exist_ok=True)
+    suppressions_path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    return payload
+
+
 def build_parser() -> argparse.ArgumentParser:
     python_dir = default_python_dir()
     parser = argparse.ArgumentParser(description="Mark stale operator workflow sessions inactive without deleting history.")
@@ -208,6 +281,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--report-output",
         default="",
         help="Optional cleanup report output path. Defaults to reports/admin_operator_command_center/stale_workflow_cleanup_<timestamp>.json.",
+    )
+    parser.add_argument(
+        "--suppressions-file",
+        default="",
+        help="Optional suppression sidecar path. Defaults to reports/admin_operator_command_center/workflow_session_suppressions.json.",
     )
     parser.add_argument("--older-than-days", type=int, default=3, help="Age threshold for stale blocked sessions.")
     parser.add_argument("--session-id", action="append", default=[], help="Explicit session id to archive. May be repeated.")
@@ -252,6 +330,15 @@ def main() -> None:
 
     report_dir = sessions_dir.parent
     timestamp = now.strftime("%Y%m%dT%H%M%SZ")
+    suppressions_path = Path(args.suppressions_file).expanduser() if args.suppressions_file else report_dir / "workflow_session_suppressions.json"
+    if not suppressions_path.is_absolute():
+        suppressions_path = (Path.cwd() / suppressions_path).resolve()
+    suppression_records = candidates + existing_archived_cleanup_records(records)
+    suppression_entries = [
+        build_suppression_entry(record, reasons, now=now, archive_reason=args.reason)
+        for record, reasons in suppression_records
+    ]
+    suppressions_payload = update_suppressions_file(suppressions_path, suppression_entries, now=now) if applied else None
     report_output = Path(args.report_output).expanduser() if args.report_output else report_dir / f"stale_workflow_cleanup_{timestamp}.json"
     if not report_output.is_absolute():
         report_output = (Path.cwd() / report_output).resolve()
@@ -263,6 +350,7 @@ def main() -> None:
         "mode": "apply" if applied else "dry_run",
         "sessions_dir": str(sessions_dir),
         "report_output": str(report_output),
+        "suppressions_file": str(suppressions_path),
         "rules": {
             "older_than_days": args.older_than_days,
             "include_test_sessions": not args.no_test_sessions,
@@ -275,10 +363,13 @@ def main() -> None:
             "sessions_scanned": len(records),
             "candidate_count": len(candidates),
             "archived_count": len(candidates) if applied else 0,
+            "suppression_count": len(suppression_entries),
             "skipped_count": len(skipped),
             "load_error_count": len(load_errors),
         },
         "candidates": [summarize_record(record, reasons) for record, reasons in candidates],
+        "suppressions": suppression_entries,
+        "suppressions_written": bool(suppressions_payload),
         "skipped": skipped,
         "load_errors": load_errors,
     }
