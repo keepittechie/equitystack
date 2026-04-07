@@ -50,7 +50,7 @@ python3 -m venv --clear venv
 - Senior review and decision steps should use `qwen3.5:9b`.
 - Verifier, draft, and fallback review steps should use `qwen3.5:9b`.
 - Scheduled LLM review stages now default to a 240 second timeout.
-- `rnj-1:latest` is the executor model for preprocessing, summaries, and approved command execution.
+- `MCP_MODEL` configures the executor/MCP model for preprocessing, summaries, and approved command execution.
 - DB-backed scripts read `.env.local`, but legislative helpers now also honor runtime env overrides such as `DB_HOST=10.10.0.13`.
 - `python/venv` is the preferred local-dev interpreter after bootstrap.
 - If local `python/venv` is unavailable, you can point the wrapper at another interpreter with `EQUITYSTACK_PYTHON_BIN=/path/to/python`.

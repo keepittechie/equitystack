@@ -1,6 +1,6 @@
-# rnj-1 Executor Guardrails
+# MCP Executor Guardrails
 
-`rnj-1:latest` is the EquityStack executor model.
+`MCP_MODEL` configures the EquityStack executor/MCP model.
 
 Approved use:
 
@@ -23,9 +23,9 @@ Not approved:
 
 Execution boundary:
 
-- `rnj-1` may execute `./bin/equitystack` commands that the operator has explicitly approved.
-- `rnj-1` may execute admin-triggered wrapper actions only when the admin route is enforcing the same canonical state checks as the CLI.
-- `rnj-1` may summarize admin-visible artifacts and logs after a supervised run.
-- `rnj-1` may run wrapped legislative apply/import commands only after the operator has saved approval decisions and the admin readiness gates allow the next step.
-- `rnj-1` is an executor, not the final reviewer.
+- The configured MCP executor model may execute `./bin/equitystack` commands that the operator has explicitly approved.
+- The configured MCP executor model may execute admin-triggered wrapper actions only when the admin route is enforcing the same canonical state checks as the CLI.
+- The configured MCP executor model may summarize admin-visible artifacts and logs after a supervised run.
+- The configured MCP executor model may run wrapped legislative apply/import commands only after the operator has saved approval decisions and the admin readiness gates allow the next step.
+- The configured MCP executor model is an executor, not the final reviewer.
 - Import safety still depends on the canonical review path, operator decisions, pre-commit review, and explicit apply confirmation.

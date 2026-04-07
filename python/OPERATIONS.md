@@ -240,9 +240,9 @@ Important:
 
 - Production app host: `10.10.0.13`
 - Production Ollama host: `10.10.0.60`
-- Reserved executor model: `rnj-1:latest`
+- Reserved executor model: `$MCP_MODEL`
 
-`rnj-1` is executor-only. It may assist with summaries, preprocessing, approved wrapper-command execution, and verification support. It is not a decision-maker and cannot approve workflow checkpoints.
+The configured MCP executor model is executor-only. It may assist with summaries, preprocessing, approved wrapper-command execution, and verification support. It is not a decision-maker and cannot approve workflow checkpoints.
 
 ## Verification
 

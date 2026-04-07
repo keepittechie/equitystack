@@ -46,6 +46,7 @@ Active Promise Tracker and operator reference docs now live in:
 - [`database/promise_tracker_import_batch_2_sources.md`](database/promise_tracker_import_batch_2_sources.md) for manual source reconciliation on the approved import batch
 - [`docs/promise-tracker-current-administration.md`](docs/promise-tracker-current-administration.md) for current-admin workflow notes
 - [`docs/admin-operator-system.md`](docs/admin-operator-system.md) for the live operator/admin system
+- [`docs/mcp.md`](docs/mcp.md) for the MCP control-layer wrapper over existing CLI/API workflows
 
 ## Black Impact Score in Plain Language
 

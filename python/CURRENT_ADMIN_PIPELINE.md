@@ -232,6 +232,6 @@ It is not a second ingestion or AI-review pipeline, and it must not bypass:
 
 ## Executor Boundary
 
-- `rnj-1:latest` is the executor model for preprocessing, summaries, MCP tool work, and approved wrapper-command execution.
-- `rnj-1` does not approve imports.
-- `rnj-1` does not bypass decision logs, pre-commit, dry-run import, or `--apply --yes`.
+- `MCP_MODEL` configures the executor model for preprocessing, summaries, MCP tool work, and approved wrapper-command execution.
+- The configured MCP executor model does not approve imports.
+- The configured MCP executor model does not bypass decision logs, pre-commit, dry-run import, or `--apply --yes`.
