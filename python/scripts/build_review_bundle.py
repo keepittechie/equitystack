@@ -340,7 +340,7 @@ def action_candidate(
 
 def index_apply_report_actions(apply_report: dict[str, Any] | None) -> dict[str, dict[str, Any]]:
     indexed: dict[str, dict[str, Any]] = {}
-    if not apply_report:
+    if not apply_report or str(apply_report.get("mode") or "").lower() != "apply":
         return indexed
     for item in report_items(apply_report, "applied_actions"):
         action_id = item.get("action_id")
@@ -926,17 +926,18 @@ def main() -> None:
                     )
                 )
 
-        for item in report_items(apply_report, "applied_actions"):
-            normalization_summary["rows_seen"] += 1
-            future_bill_id = resolve_future_bill_id(item)
-            if future_bill_id is None:
-                register_skip(skipped_items, normalization_summary, "apply_report_applied_actions", item, "missing future_bill_id")
-                continue
-            if wanted_future_bill_ids and future_bill_id not in wanted_future_bill_ids:
-                continue
-            group = ensure_group(future_bill_id)
-            group["_historical_actions"].append(historical_action_from_apply_report(item))
-            normalization_summary["rows_grouped"] += 1
+        if str(apply_report.get("mode") or "").lower() == "apply":
+            for item in report_items(apply_report, "applied_actions"):
+                normalization_summary["rows_seen"] += 1
+                future_bill_id = resolve_future_bill_id(item)
+                if future_bill_id is None:
+                    register_skip(skipped_items, normalization_summary, "apply_report_applied_actions", item, "missing future_bill_id")
+                    continue
+                if wanted_future_bill_ids and future_bill_id not in wanted_future_bill_ids:
+                    continue
+                group = ensure_group(future_bill_id)
+                group["_historical_actions"].append(historical_action_from_apply_report(item))
+                normalization_summary["rows_grouped"] += 1
 
     if manual_queue:
         for item in report_items(manual_queue, "items"):
