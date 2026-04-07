@@ -23,6 +23,9 @@ CREATE TABLE IF NOT EXISTS policy_outcomes (
   source_count INT NOT NULL DEFAULT 0,
   source_quality ENUM('low', 'medium', 'high') NULL,
   status VARCHAR(64) NULL,
+  impact_start_date DATE NULL,
+  impact_end_date DATE NULL,
+  impact_duration_estimate VARCHAR(64) NULL,
   black_community_impact_note TEXT NULL,
   created_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   updated_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
@@ -31,5 +34,7 @@ CREATE TABLE IF NOT EXISTS policy_outcomes (
   KEY idx_policy_outcomes_policy (policy_type, policy_id),
   KEY idx_policy_outcomes_record_key (record_key),
   KEY idx_policy_outcomes_impact_direction (impact_direction),
-  KEY idx_policy_outcomes_evidence_strength (evidence_strength)
+  KEY idx_policy_outcomes_evidence_strength (evidence_strength),
+  KEY idx_policy_outcomes_impact_start_date (impact_start_date),
+  KEY idx_policy_outcomes_impact_date_range (impact_start_date, impact_end_date)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

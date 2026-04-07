@@ -2062,6 +2062,18 @@ run_impact_command() {
       run_step "1/1" "Audit Source Quality" "Source quality audit complete" --output "$EQUITYSTACK_PYTHON_DIR/reports/source-quality-audit.json" -- \
         "$VENV_PYTHON" scripts/audit_source_quality.py "$@"
       ;;
+    report-outcome-time)
+      run_step "1/1" "Report Policy Outcome Time Dimension" "Policy outcome time report complete" --output "$EQUITYSTACK_PYTHON_DIR/reports/policy-outcome-time-dimension-report.json" -- \
+        "$VENV_PYTHON" scripts/report_policy_outcome_time_dimension.py "$@"
+      ;;
+    report-policy-intent)
+      run_step "1/1" "Report Policy Intent Alignment" "Policy intent alignment report complete" --output "$EQUITYSTACK_PYTHON_DIR/reports/policy-intent-alignment-report.json" -- \
+        "$VENV_PYTHON" scripts/report_policy_intent_alignment.py "$@"
+      ;;
+    backfill-policy-time-intent)
+      run_step "1/1" "Backfill Policy Time and Intent" "Policy time and intent backfill complete" --output "$EQUITYSTACK_PYTHON_DIR/reports/policy-time-intent-backfill-report.json" -- \
+        "$VENV_PYTHON" scripts/backfill_policy_time_and_intent.py "$@"
+      ;;
     help|-h|--help|"")
       impact_usage
       ;;
@@ -2656,6 +2668,8 @@ Impact maturation commands:
   sync-current-admin-outcomes  Sync promise_outcomes into policy_outcomes
   audit-historical-duplicates  Audit likely duplicate/variant historical policies
   audit-outcome-temporal-attribution  Audit outcome timing signals without changing scoring
+  report-outcome-time  Report unified policy_outcomes by year, decade, and administration
+  backfill-policy-time-intent  Dry-run or apply safe policy time and intent backfills
 
 Operational maintenance:
   operator cleanup-stale-workflows  Mark stale operator workflow sessions inactive without deleting history
@@ -2668,6 +2682,8 @@ Examples:
   $(cli_hint) impact promote --dry-run
   $(cli_hint) impact audit-historical-duplicates
   $(cli_hint) impact audit-outcome-temporal-attribution
+  $(cli_hint) impact report-outcome-time
+  $(cli_hint) impact backfill-policy-time-intent
   $(cli_hint) current-admin run
   $(cli_hint) current-admin status
   $(cli_hint) operator cleanup-stale-workflows --dry-run
@@ -2695,6 +2711,12 @@ Commands:
              Audit outcome timing signals and optional backfill readiness
   audit-source-quality
              Audit source authority tiers, domains, duplicates, and outcome coverage
+  report-outcome-time
+             Read-only report for policy_outcomes time dimension and date validation
+  report-policy-intent
+             Read-only report for policy intent vs outcome alignment
+  backfill-policy-time-intent
+             Dry-run or apply high-confidence policy time and intent backfills
 
 Examples:
   $(cli_hint) impact evaluate
@@ -2709,6 +2731,10 @@ Examples:
   $(cli_hint) impact audit-historical-duplicates
   $(cli_hint) impact audit-outcome-temporal-attribution
   $(cli_hint) impact audit-source-quality
+  $(cli_hint) impact report-outcome-time
+  $(cli_hint) impact report-policy-intent
+  $(cli_hint) impact backfill-policy-time-intent
+  $(cli_hint) impact backfill-policy-time-intent --apply --yes
 
 Safety:
   Allowed transitions are impact_pending -> impact_review_ready,
@@ -2723,6 +2749,10 @@ Safety:
   Outcome temporal attribution audit is dry-run by default and will not write
   dates unless suitable date/provenance columns exist and --apply --yes is explicit.
   Source quality audit is read-only and never edits source rows or joins.
+  Outcome time reporting is read-only and never mutates policy_outcomes.
+  Policy intent reporting is read-only and never infers missing intent.
+  Policy time/intent backfill is dry-run by default, updates only NULL
+  fields, preserves existing values, and requires --apply --yes.
 EOF
 }
 

@@ -21,6 +21,23 @@ function getRequestedModel(request) {
   return "outcome";
 }
 
+function getConfidenceOptions(request) {
+  const { searchParams } = new URL(request.url);
+
+  return {
+    confidence_filter: {
+      confidence: searchParams.get("confidence") ?? "all",
+      min_confidence: searchParams.get("min_confidence"),
+      include_low_confidence: searchParams.get("include_low_confidence"),
+    },
+    trust_filter: {
+      exclude_incomplete: searchParams.get("exclude_incomplete"),
+    },
+    debug: searchParams.get("debug"),
+    include_score_explanations: searchParams.get("score_explanations"),
+  };
+}
+
 function buildEmptyLegacyPayload() {
   return {
     methodology: null,
@@ -45,6 +62,10 @@ function buildOutcomePayload(data) {
     metadata: data?.metadata ?? {
       total_promises: 0,
       total_outcomes: 0,
+      total_outcomes_before_confidence_filter: 0,
+      total_outcomes_excluded_by_confidence_filter: 0,
+      total_outcomes_before_trust_filter: 0,
+      total_outcomes_excluded_by_trust_filter: 0,
       total_outcomes_available: 0,
       outcomes_included_in_score: 0,
       outcomes_excluded_from_score: 0,
@@ -71,7 +92,68 @@ function buildOutcomePayload(data) {
           excluded_from_score: { count: 0, average_confidence_score: 0 },
         },
         confidence_vs_impact_score: {},
+        confidence_filter: {
+          mode: "all",
+          threshold: 0,
+          include_low_confidence: true,
+          requested_include_low_confidence: null,
+          description: "All confidence levels included.",
+        },
+        filtered_impact_summary: {
+          scored_outcomes_all_data: 0,
+          scored_outcomes_after_confidence_filter: 0,
+          scored_outcomes_excluded_by_confidence_filter: 0,
+          average_impact_score_all_data: 0,
+          average_impact_score_filtered: 0,
+          average_impact_score_high_confidence_only: 0,
+          low_confidence_outcome_count: 0,
+          low_confidence_outcome_percentage: 0,
+        },
+        confidence_distribution_by_policy: [],
       },
+      outcome_completeness: {
+        average_data_completeness_score: 0,
+        completeness_distribution: { complete: 0, partial: 0, insufficient: 0 },
+        incomplete_outcome_count: 0,
+        incomplete_outcome_percentage: 0,
+        insufficient_outcome_count: 0,
+        insufficient_outcome_percentage: 0,
+        missing_field_counts: {},
+        completeness_vs_confidence: {},
+        policies_with_highest_missing_data: [],
+        recommendations: [],
+      },
+      trust: {
+        trust_filter: {
+          exclude_incomplete: false,
+          description: "All completeness levels are included.",
+        },
+        outcomes_evaluated_for_trust: 0,
+        scored_outcomes_all_data: 0,
+        scored_outcomes_after_trust_filter: 0,
+        scored_outcomes_after_all_filters: 0,
+        scored_outcomes_excluded_by_trust_filter: 0,
+        confidence_distribution: { high: 0, medium: 0, low: 0 },
+        completeness_distribution: { complete: 0, partial: 0, insufficient: 0 },
+        high_confidence_outcome_percentage: 0,
+        low_confidence_outcome_percentage: 0,
+        incomplete_outcome_percentage: 0,
+        average_confidence_score: 0,
+        average_data_completeness_score: 0,
+        confidence_vs_impact_correlation: null,
+        completeness_vs_confidence_trends: {
+          correlation: null,
+          by_completeness_label: [],
+        },
+        warnings: {
+          low_confidence_high_impact_outcome_count: 0,
+          incomplete_but_scored_outcome_count: 0,
+          low_confidence_high_impact_outcomes: [],
+          incomplete_but_scored_outcomes: [],
+        },
+        interpretation: "This score is based on 0 scored outcome(s).",
+      },
+      summary_interpretation: "This score is based on 0 scored outcome(s).",
       scoring_model: "outcome-based-v1",
     },
   };
@@ -86,6 +168,10 @@ function buildOutcomeErrorPayload() {
     metadata: {
       total_promises: 0,
       total_outcomes: 0,
+      total_outcomes_before_confidence_filter: 0,
+      total_outcomes_excluded_by_confidence_filter: 0,
+      total_outcomes_before_trust_filter: 0,
+      total_outcomes_excluded_by_trust_filter: 0,
       total_outcomes_available: 0,
       outcomes_included_in_score: 0,
       outcomes_excluded_from_score: 0,
@@ -112,7 +198,68 @@ function buildOutcomeErrorPayload() {
           excluded_from_score: { count: 0, average_confidence_score: 0 },
         },
         confidence_vs_impact_score: {},
+        confidence_filter: {
+          mode: "all",
+          threshold: 0,
+          include_low_confidence: true,
+          requested_include_low_confidence: null,
+          description: "All confidence levels included.",
+        },
+        filtered_impact_summary: {
+          scored_outcomes_all_data: 0,
+          scored_outcomes_after_confidence_filter: 0,
+          scored_outcomes_excluded_by_confidence_filter: 0,
+          average_impact_score_all_data: 0,
+          average_impact_score_filtered: 0,
+          average_impact_score_high_confidence_only: 0,
+          low_confidence_outcome_count: 0,
+          low_confidence_outcome_percentage: 0,
+        },
+        confidence_distribution_by_policy: [],
       },
+      outcome_completeness: {
+        average_data_completeness_score: 0,
+        completeness_distribution: { complete: 0, partial: 0, insufficient: 0 },
+        incomplete_outcome_count: 0,
+        incomplete_outcome_percentage: 0,
+        insufficient_outcome_count: 0,
+        insufficient_outcome_percentage: 0,
+        missing_field_counts: {},
+        completeness_vs_confidence: {},
+        policies_with_highest_missing_data: [],
+        recommendations: [],
+      },
+      trust: {
+        trust_filter: {
+          exclude_incomplete: false,
+          description: "All completeness levels are included.",
+        },
+        outcomes_evaluated_for_trust: 0,
+        scored_outcomes_all_data: 0,
+        scored_outcomes_after_trust_filter: 0,
+        scored_outcomes_after_all_filters: 0,
+        scored_outcomes_excluded_by_trust_filter: 0,
+        confidence_distribution: { high: 0, medium: 0, low: 0 },
+        completeness_distribution: { complete: 0, partial: 0, insufficient: 0 },
+        high_confidence_outcome_percentage: 0,
+        low_confidence_outcome_percentage: 0,
+        incomplete_outcome_percentage: 0,
+        average_confidence_score: 0,
+        average_data_completeness_score: 0,
+        confidence_vs_impact_correlation: null,
+        completeness_vs_confidence_trends: {
+          correlation: null,
+          by_completeness_label: [],
+        },
+        warnings: {
+          low_confidence_high_impact_outcome_count: 0,
+          incomplete_but_scored_outcome_count: 0,
+          low_confidence_high_impact_outcomes: [],
+          incomplete_but_scored_outcomes: [],
+        },
+        interpretation: "This score is based on 0 scored outcome(s).",
+      },
+      summary_interpretation: "This score is based on 0 scored outcome(s).",
       scoring_model: "outcome-based-v1",
     },
   };
@@ -152,6 +299,7 @@ function buildLegacyFallbackResponse(legacyPayload) {
 
 export async function GET(request) {
   const requestedModel = getRequestedModel(request);
+  const confidenceOptions = getConfidenceOptions(request);
 
   try {
     const [legacyData, legacyRecords] = await Promise.all([
@@ -172,7 +320,7 @@ export async function GET(request) {
     let outcomePayload;
 
     try {
-      const outcomeData = await computeOutcomeBasedScores();
+      const outcomeData = await computeOutcomeBasedScores(confidenceOptions);
       outcomePayload = buildOutcomePayload(outcomeData);
     } catch (outcomeError) {
       console.error("Error computing outcome-based promise scores:", outcomeError);
