@@ -701,7 +701,7 @@ def policy_outcomes_post_workflow_validation(cursor) -> dict[str, Any]:
            OR impact_score > 100
            OR impact_direction NOT IN ('Positive', 'Negative', 'Mixed', 'Blocked')
            OR source_count < 0
-           OR policy_type NOT IN ('current_admin', 'legislative')
+           OR policy_type NOT IN ('current_admin', 'legislative', 'judicial_impact')
         """
     )
     invalid_count = int((cursor.fetchone() or {}).get("total") or 0)

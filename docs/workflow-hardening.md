@@ -7,7 +7,7 @@ This document is the operator reference for keeping future current-admin, legisl
 
 Every `policy_outcomes` row created by canonical workflows must have:
 
-- `policy_type` set to `current_admin` or `legislative`
+- `policy_type` set to `current_admin`, `legislative`, or `judicial_impact`
 - `policy_id` pointing to the matching source table for that `policy_type`
 - `outcome_summary` and `outcome_summary_hash`
 - valid `impact_direction`: `Positive`, `Negative`, `Mixed`, or `Blocked`
@@ -51,9 +51,22 @@ Checks:
 - duplicate outcome groups are absent
 - current-admin rows resolve to real promises
 - legislative rows resolve to real tracked bills
+- judicial rows are only president-attributed when explicit majority-justice attribution metadata is present
 - legislative date ranges are valid where present
 
 If validation fails in an apply path, the workflow rolls back or blocks the run and records the validation failure in the report.
+
+Operators can also run the read-only integrity gate directly:
+
+```bash
+./python/bin/equitystack impact validate-integrity
+```
+
+This command validates the same baseline invariants and adds attribution-specific checks:
+
+- `judicial_impact` rows must include explicit `judicial_attribution` entries with `attribution_fraction` values.
+- `judicial_impact` rows must include `majority_justices` and `appointing_presidents` metadata.
+- missing sources, low president outcome coverage, policy-type imbalance, and directional imbalance are reported as warnings rather than silent assumptions.
 
 ## Legislative Attribution Decision
 
@@ -81,6 +94,62 @@ There is no reliable president attribution for non-enacted tracked bills in the 
 ```
 
 This avoids false precision and prevents double-counting.
+
+## Judicial Impact Attribution
+
+Judicial outcomes use `policy_type = judicial_impact`. They are separate from direct current-admin actions and legislative bill status rows.
+
+## Score Families
+
+EquityStack now keeps two president score families separate:
+
+- `Direct Black Impact Score`: the primary headline score. It includes direct policy, administrative, and statutory outcomes with deterministic president attribution. It excludes `judicial_impact`.
+- `Systemic Impact Score`: the secondary score family. It includes `judicial_impact` and future explicitly indirect/systemic outcomes only when deterministic attribution exists.
+
+`combined_context_score` may be reported as contextual blended information, but it must not replace the direct headline score. This prevents judicial appointment-mediated impacts from silently changing the meaning of the direct policy score.
+
+Storage is additive and optional:
+
+```text
+policy_outcomes(policy_type=judicial_impact).policy_id -> policies.id
+court_level
+decision_year
+majority_justices
+appointing_presidents
+judicial_attribution
+judicial_weight
+```
+
+Attribution rule:
+
+```text
+attribution_fraction = number of majority justices appointed by president / total majority justices
+final judicial contribution = outcome_score * attribution_fraction * judicial_weight
+```
+
+The default `judicial_weight` is `0.5`. This prevents Supreme Court or other court decisions from being treated as identical to direct executive action while still making appointment-mediated impact visible.
+
+Judicial rows without explicit attribution metadata are excluded from president totals. The scoring report records that exclusion instead of guessing.
+
+## Low-Coverage Score Display
+
+Raw and normalized president scores remain unchanged. Public score rows now also expose a coverage-aware display score:
+
+```text
+confidence_factor = min(1, log(outcome_count + 1) / log(10))
+display_score = normalized_score * confidence_factor
+```
+
+Coverage labels:
+
+```text
+VERY LOW -> outcome_count <= 2
+LOW      -> outcome_count <= 5
+MEDIUM   -> outcome_count <= 15
+HIGH     -> outcome_count > 15
+```
+
+This prevents one- or two-outcome presidents from looking absolute while preserving the underlying raw score for auditability.
 
 ## Intent Modifier Behavior
 

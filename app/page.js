@@ -206,6 +206,9 @@ function ScoreSnapshotCard({ presidents, metadata, readiness }) {
     .find((president) => Number(president.raw_score_total || 0) < 0) || null;
   const sourceCoverage = formatPercent(readiness?.source_coverage_pct);
   const intentCoverage = formatPercent(readiness?.intent_coverage_pct);
+  const highConfidenceCoverage = formatPercent(readiness?.high_confidence_outcome_pct);
+  const mediumConfidenceCoverage = formatPercent(readiness?.medium_confidence_outcome_pct);
+  const lowConfidenceCoverage = formatPercent(readiness?.low_confidence_outcome_pct);
   const includedCount = Number(metadata?.outcomes_included_in_score ?? metadata?.total_outcomes ?? 0);
   const excludedCount = Number(metadata?.outcomes_excluded_from_score ?? metadata?.total_excluded_outcomes ?? 0);
   const availableCount = Number(metadata?.total_outcomes_available ?? 0);
@@ -232,7 +235,7 @@ function ScoreSnapshotCard({ presidents, metadata, readiness }) {
         <div className="flex flex-wrap items-center justify-end gap-2">
           {readiness?.certification_status ? (
             <MiniPill
-              label={`Readiness: ${readiness.certification_status}`}
+              label={`Certification: ${readiness.certification_status}`}
               tone={getReadinessTone(readiness.certification_status)}
             />
           ) : null}
@@ -290,6 +293,15 @@ function ScoreSnapshotCard({ presidents, metadata, readiness }) {
               ) : null}
               {sourceCoverage ? <MetaPill>{sourceCoverage} sourced</MetaPill> : null}
               {intentCoverage ? <MetaPill>{intentCoverage} intent classified</MetaPill> : null}
+              {highConfidenceCoverage ? (
+                <MetaPill>{highConfidenceCoverage} high confidence</MetaPill>
+              ) : null}
+              {mediumConfidenceCoverage ? (
+                <MetaPill>{mediumConfidenceCoverage} medium confidence</MetaPill>
+              ) : null}
+              {lowConfidenceCoverage ? (
+                <MetaPill>{lowConfidenceCoverage} low confidence</MetaPill>
+              ) : null}
             </div>
           ) : null}
 

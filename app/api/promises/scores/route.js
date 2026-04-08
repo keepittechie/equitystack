@@ -5,6 +5,7 @@ import {
 } from "@/lib/services/promiseService";
 import { computeOutcomeBasedScores } from "@/lib/services/blackImpactScoreService";
 import { getBlackImpactScoreMethodology } from "@/lib/black-impact-score/methodology.js";
+import { buildPresidentComparison } from "@/lib/black-impact-score/presidentComparison.js";
 
 function isPromiseTrackerSchemaMissing(error) {
   return error?.code === "ER_NO_SUCH_TABLE" || error?.errno === 1146;
@@ -38,6 +39,22 @@ function getConfidenceOptions(request) {
   };
 }
 
+function getComparisonIdentifiers(request) {
+  const { searchParams } = new URL(request.url);
+  const identifiers = [
+    searchParams.get("presidents"),
+    searchParams.get("president_ids"),
+    searchParams.get("president_slugs"),
+    searchParams.get("compare"),
+  ]
+    .filter(Boolean)
+    .flatMap((value) => String(value).split(","))
+    .map((value) => value.trim())
+    .filter(Boolean);
+
+  return [...new Set(identifiers)];
+}
+
 function buildEmptyLegacyPayload() {
   return {
     methodology: null,
@@ -59,6 +76,7 @@ function buildOutcomePayload(data) {
     methodology: getBlackImpactScoreMethodology(),
     items: Array.isArray(data?.presidents) ? data.presidents : [],
     records: Array.isArray(data?.records) ? data.records : [],
+    ...(data?.comparison ? { comparison: data.comparison } : {}),
     metadata: data?.metadata ?? {
       total_promises: 0,
       total_outcomes: 0,
@@ -153,7 +171,31 @@ function buildOutcomePayload(data) {
         },
         interpretation: "This score is based on 0 scored outcome(s).",
       },
+      impact_trend: {
+        score_by_year: [],
+        cumulative_score: 0,
+        trend_direction: "stable",
+        strongest_shift: null,
+        dated_outcome_count: 0,
+        undated_outcome_count: 0,
+        interpretation: "No dated scored outcomes are available for time-based impact analysis.",
+      },
+      score_snapshot: null,
+      score_change: {
+        has_prior_snapshot: false,
+        change_summary: "No stored prior snapshot is available yet.",
+        delta_score: 0,
+        new_outcomes_added: 0,
+        key_drivers: [],
+        previous_snapshot_at: null,
+      },
       summary_interpretation: "This score is based on 0 scored outcome(s).",
+      score_families: {
+        primary: "direct_black_impact_score",
+        direct_black_impact_score: "Primary headline score. Includes direct current-admin promise outcomes in this API path.",
+        systemic_impact_score: "Separate score family for judicial_impact outcomes when available in unified reports.",
+        combined_context_score: "Optional contextual blended score in unified reports. It is not the primary score.",
+      },
       scoring_model: "outcome-based-v1",
     },
   };
@@ -259,7 +301,31 @@ function buildOutcomeErrorPayload() {
         },
         interpretation: "This score is based on 0 scored outcome(s).",
       },
+      impact_trend: {
+        score_by_year: [],
+        cumulative_score: 0,
+        trend_direction: "stable",
+        strongest_shift: null,
+        dated_outcome_count: 0,
+        undated_outcome_count: 0,
+        interpretation: "No dated scored outcomes are available for time-based impact analysis.",
+      },
+      score_snapshot: null,
+      score_change: {
+        has_prior_snapshot: false,
+        change_summary: "No stored prior snapshot is available yet.",
+        delta_score: 0,
+        new_outcomes_added: 0,
+        key_drivers: [],
+        previous_snapshot_at: null,
+      },
       summary_interpretation: "This score is based on 0 scored outcome(s).",
+      score_families: {
+        primary: "direct_black_impact_score",
+        direct_black_impact_score: "Primary headline score. Includes direct current-admin promise outcomes in this API path.",
+        systemic_impact_score: "Separate score family for judicial_impact outcomes when available in unified reports.",
+        combined_context_score: "Optional contextual blended score in unified reports. It is not the primary score.",
+      },
       scoring_model: "outcome-based-v1",
     },
   };
@@ -300,6 +366,7 @@ function buildLegacyFallbackResponse(legacyPayload) {
 export async function GET(request) {
   const requestedModel = getRequestedModel(request);
   const confidenceOptions = getConfidenceOptions(request);
+  const comparisonIdentifiers = getComparisonIdentifiers(request);
 
   try {
     const [legacyData, legacyRecords] = await Promise.all([
@@ -321,6 +388,12 @@ export async function GET(request) {
 
     try {
       const outcomeData = await computeOutcomeBasedScores(confidenceOptions);
+      if (comparisonIdentifiers.length) {
+        outcomeData.comparison = buildPresidentComparison(
+          outcomeData.presidents || [],
+          comparisonIdentifiers
+        );
+      }
       outcomePayload = buildOutcomePayload(outcomeData);
     } catch (outcomeError) {
       console.error("Error computing outcome-based promise scores:", outcomeError);

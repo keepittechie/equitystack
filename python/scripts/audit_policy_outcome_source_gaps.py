@@ -45,7 +45,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--limit", type=int, default=50, help="Maximum top-priority rows to include")
     parser.add_argument(
         "--policy-type",
-        choices=["current_admin", "legislative"],
+        choices=["current_admin", "legislative", "judicial_impact"],
         help="Limit report to one policy_outcomes.policy_type",
     )
     return parser.parse_args()

@@ -12,6 +12,7 @@ import {
   toCanonicalImpactDirection,
 } from "@/lib/labels";
 import { aggregatePresidentFromOutcomes } from "@/lib/black-impact-score/presidentAggregation.js";
+import { buildPresidentComparison } from "@/lib/black-impact-score/presidentComparison.js";
 import { fetchPromiseTimelineRelationshipMap } from "@/lib/services/promiseService";
 import { aggregatePromiseScoresByPresident } from "@/lib/promise-tracker-scoring";
 import CopyShareLinkButton from "./CopyShareLinkButton";
@@ -405,6 +406,8 @@ function normalizeOutcomeMetadata(metadata) {
     trust: metadata?.trust || null,
     outcome_confidence: metadata?.outcome_confidence || null,
     outcome_completeness: metadata?.outcome_completeness || null,
+    impact_trend: metadata?.impact_trend || null,
+    score_change: metadata?.score_change || null,
     source_quality_distribution: metadata?.source_quality_distribution || null,
     scoring_model:
       typeof metadata?.scoring_model === "string" && metadata.scoring_model.trim()
@@ -467,6 +470,10 @@ function formatRawScore(value) {
 function formatNormalizedScore(value) {
   const numeric = Number(value ?? 0);
   return Number.isFinite(numeric) ? numeric.toFixed(2) : String(value);
+}
+
+function formatScoreConfidence(value) {
+  return typeof value === "string" && value.trim() ? value.trim().toUpperCase() : null;
 }
 
 function formatSignedScore(value) {
@@ -563,6 +570,25 @@ function CredibilityNote({
   const incompletePct = formatPercent(
     getTrustPercentage(metadata, "incomplete_outcome_percentage")
   );
+  const impactTrend = metadata?.impact_trend || null;
+  const trendInterpretation =
+    !usingLegacyModel &&
+    !isFilteredView &&
+    typeof impactTrend?.interpretation === "string" &&
+    impactTrend.interpretation.trim()
+      ? impactTrend.interpretation.trim()
+      : null;
+  const trendDirection =
+    typeof impactTrend?.trend_direction === "string" && impactTrend.trend_direction.trim()
+      ? impactTrend.trend_direction.trim()
+      : null;
+  const scoreChange =
+    !usingLegacyModel &&
+    !isFilteredView &&
+    typeof metadata?.score_change?.change_summary === "string" &&
+    metadata.score_change.change_summary.trim()
+      ? metadata.score_change
+      : null;
 
   return (
     <section className="card-muted rounded-[1.25rem] p-4">
@@ -588,6 +614,10 @@ function CredibilityNote({
           {!usingLegacyModel && Number.isFinite(excludedCount) ? (
             <MetaPill>{excludedCount} excluded</MetaPill>
           ) : null}
+          {trendDirection ? <MetaPill>Trend: {trendDirection}</MetaPill> : null}
+          {scoreChange?.has_prior_snapshot ? (
+            <MetaPill>Delta {formatSignedScore(scoreChange.delta_score)}</MetaPill>
+          ) : null}
         </div>
       </div>
       <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
@@ -596,6 +626,16 @@ function CredibilityNote({
       {summaryInterpretation ? (
         <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
           {summaryInterpretation}
+        </p>
+      ) : null}
+      {trendInterpretation ? (
+        <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
+          {trendInterpretation}
+        </p>
+      ) : null}
+      {scoreChange?.has_prior_snapshot ? (
+        <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
+          {scoreChange.change_summary}
         </p>
       ) : null}
       {!usingLegacyModel && !isFilteredView && (highConfidencePct || lowConfidencePct || incompletePct || missingSourceCount > 0) ? (
@@ -1015,6 +1055,16 @@ function getImbalanceSignal(president) {
 
 function getPresidentInsightLines(president) {
   const insights = [];
+  const narrative = president.impact_narrative || {};
+  const narrativeLines = [
+    ...(Array.isArray(narrative.key_strengths) ? narrative.key_strengths : []),
+    ...(Array.isArray(narrative.key_weaknesses) ? narrative.key_weaknesses : []),
+  ];
+
+  if (narrativeLines.length) {
+    return narrativeLines.slice(0, 3);
+  }
+
   const primaryImpactArea = getPrimaryImpactArea(president);
   const topPositive = president.top_positive_promises?.[0] || null;
   const topNegative = president.top_negative_promises?.[0] || null;
@@ -1097,6 +1147,7 @@ function PresidentInsightPanel({ president }) {
   const primaryImpactArea = getPrimaryImpactArea(president);
   const imbalanceSignal = getImbalanceSignal(president);
   const insightLines = getPresidentInsightLines(president);
+  const confidenceStatement = president.impact_narrative?.confidence_statement || president.confidence_statement || null;
 
   return (
     <section className="card-muted rounded-[1.25rem] p-4">
@@ -1140,6 +1191,11 @@ function PresidentInsightPanel({ president }) {
               <strong className="text-[var(--ink)]">Context signal:</strong> {imbalanceSignal}
             </p>
           ) : null}
+          {confidenceStatement ? (
+            <p className="text-sm text-[var(--ink-soft)] mt-4 leading-7">
+              <strong className="text-[var(--ink)]">Confidence:</strong> {confidenceStatement}
+            </p>
+          ) : null}
         </div>
       </div>
     </section>
@@ -1158,6 +1214,7 @@ function PresidentCredibilityPanel({
     usingLegacyModel,
     isLegacyFallbackActive,
   });
+  const scoreConfidence = formatScoreConfidence(president.score_confidence);
 
   return (
     <section className="card-muted rounded-[1.25rem] p-4">
@@ -1170,6 +1227,10 @@ function PresidentCredibilityPanel({
         </div>
         <div className="flex flex-wrap gap-2">
           <MetaPill>{coverageSignal.label}</MetaPill>
+          {president.primary_score_family === "direct" ? <MetaPill>Direct score</MetaPill> : null}
+          {scoreConfidence ? (
+            <MetaPill>Confidence: {scoreConfidence} ({president.outcome_count || 0} outcomes)</MetaPill>
+          ) : null}
           <MetaPill>Based on {president.promise_count} records</MetaPill>
           {president.outcome_count != null ? <MetaPill>Based on {president.outcome_count} outcomes</MetaPill> : null}
           <MetaPill>{effectiveScoringModel}</MetaPill>
@@ -1178,6 +1239,11 @@ function PresidentCredibilityPanel({
       <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
         {coverageSignal.description}
       </p>
+      {president.low_coverage_warning ? (
+        <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
+          {president.low_coverage_warning}
+        </p>
+      ) : null}
     </section>
   );
 }
@@ -1217,7 +1283,12 @@ function TopSummarySection({ presidents }) {
                     />
                     <p className="text-base font-semibold">{president.president}</p>
                   </div>
-                  <MetaPill>{formatNormalizedScore(president.normalized_score)}</MetaPill>
+                  <div className="flex flex-wrap justify-end gap-2">
+                    <MetaPill>{formatNormalizedScore(president.normalized_score)}</MetaPill>
+                    {president.display_score != null ? (
+                      <MetaPill>Display {formatNormalizedScore(president.display_score)}</MetaPill>
+                    ) : null}
+                  </div>
                 </div>
               </div>
             ))}
@@ -1241,7 +1312,12 @@ function TopSummarySection({ presidents }) {
                     />
                     <p className="text-base font-semibold">{president.president}</p>
                   </div>
-                  <MetaPill>{formatNormalizedScore(president.normalized_score)}</MetaPill>
+                  <div className="flex flex-wrap justify-end gap-2">
+                    <MetaPill>{formatNormalizedScore(president.normalized_score)}</MetaPill>
+                    {president.display_score != null ? (
+                      <MetaPill>Display {formatNormalizedScore(president.display_score)}</MetaPill>
+                    ) : null}
+                  </div>
                 </div>
               </div>
             ))}
@@ -2546,6 +2622,8 @@ function PresidentCompareSelectorSection({
 function PresidentCompareCard({ president, primaryImpactArea }) {
   const topPositive = president.top_positive_promises?.[0] || null;
   const topNegative = president.top_negative_promises?.[0] || null;
+  const directConfidence = formatScoreConfidence(president.direct_score_confidence || president.score_confidence);
+  const systemicConfidence = formatScoreConfidence(president.systemic_score_confidence);
 
   return (
     <section className="card-muted rounded-[1.25rem] p-5">
@@ -2561,14 +2639,18 @@ function PresidentCompareCard({ president, primaryImpactArea }) {
             {president.president_party ? <MetaPill>{president.president_party}</MetaPill> : null}
           </div>
           <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
-            {president.explanation || "No explanation is available for this president in the current topic."}
+            {president.narrative_summary || president.explanation || "No explanation is available for this president in the current topic."}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
           <MetaPill>Normalized {formatNormalizedScore(president.normalized_score)}</MetaPill>
           <MetaPill>Raw {formatRawScore(president.raw_score)}</MetaPill>
+          <MetaPill>Direct {formatNormalizedScore(president.direct_normalized_score ?? president.normalized_score)}</MetaPill>
+          <MetaPill>Systemic {formatNormalizedScore(president.systemic_normalized_score ?? 0)}</MetaPill>
           <MetaPill>{president.promise_count} promises</MetaPill>
           {president.outcome_count != null ? <MetaPill>{president.outcome_count} outcomes</MetaPill> : null}
+          {directConfidence ? <MetaPill>Direct confidence: {directConfidence}</MetaPill> : null}
+          {systemicConfidence ? <MetaPill>Systemic confidence: {systemicConfidence}</MetaPill> : null}
         </div>
       </div>
 
@@ -2662,6 +2744,10 @@ function PresidentComparisonSection({
   const rawDelta = Number(selectedPresidentA.raw_score || 0) - Number(selectedPresidentB.raw_score || 0);
   const primaryImpactAreaA = getPrimaryImpactArea(selectedPresidentA);
   const primaryImpactAreaB = getPrimaryImpactArea(selectedPresidentB);
+  const comparison = buildPresidentComparison(
+    [selectedPresidentA, selectedPresidentB],
+    [selectedPresidentASlug, selectedPresidentBSlug]
+  );
 
   return (
     <section className="card-surface rounded-[1.6rem] p-5">
@@ -2686,7 +2772,20 @@ function PresidentComparisonSection({
         <div className="flex flex-wrap gap-2 mt-3">
           <MetaPill>Normalized delta {formatSignedScore(normalizedDelta)}</MetaPill>
           <MetaPill>Raw delta {formatSignedScore(rawDelta)}</MetaPill>
+          {comparison.score_difference ? (
+            <MetaPill>
+              Systemic delta {formatSignedScore(comparison.score_difference.systemic_normalized_score_difference)}
+            </MetaPill>
+          ) : null}
+          {comparison.strongest_topic_difference?.topic ? (
+            <MetaPill>Largest topic gap: {comparison.strongest_topic_difference.topic}</MetaPill>
+          ) : null}
         </div>
+        {comparison.directional_contrast_summary ? (
+          <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
+            {comparison.directional_contrast_summary}
+          </p>
+        ) : null}
       </div>
 
       <div className="grid gap-4 xl:grid-cols-2 mt-5">
@@ -2700,10 +2799,31 @@ function PresidentComparisonSection({
 function normalizeOutcomePresident(president) {
   return {
     president: president.president,
+    president_id: president.president_id ?? null,
     president_slug: president.president_slug,
     president_party: president.president_party,
     raw_score: president.raw_score_total,
     normalized_score: president.normalized_score_total,
+    direct_raw_score: president.direct_raw_score ?? president.raw_score_total,
+    direct_normalized_score: president.direct_normalized_score ?? president.normalized_score_total,
+    direct_outcome_count: president.direct_outcome_count ?? president.outcome_count,
+    direct_score_confidence: president.direct_score_confidence ?? president.score_confidence ?? null,
+    systemic_raw_score: president.systemic_raw_score ?? 0,
+    systemic_normalized_score: president.systemic_normalized_score ?? 0,
+    systemic_outcome_count: president.systemic_outcome_count ?? 0,
+    systemic_score_confidence: president.systemic_score_confidence ?? "VERY LOW",
+    combined_context_score: president.combined_context_score ?? president.raw_score_total,
+    combined_context_normalized_score: president.combined_context_normalized_score ?? president.normalized_score_total,
+    primary_score_family: president.primary_score_family || "direct",
+    display_score: president.display_score_total ?? president.display_score ?? null,
+    score_confidence: president.score_confidence || null,
+    score_confidence_factor: president.score_confidence_factor ?? null,
+    low_coverage_warning: president.low_coverage_warning || null,
+    impact_narrative: president.impact_narrative || null,
+    narrative_summary: president.narrative_summary || president.impact_narrative?.summary_paragraph || null,
+    key_strengths: president.key_strengths || president.impact_narrative?.key_strengths || [],
+    key_weaknesses: president.key_weaknesses || president.impact_narrative?.key_weaknesses || [],
+    confidence_statement: president.confidence_statement || president.impact_narrative?.confidence_statement || null,
     promise_count: president.promise_count,
     outcome_count: president.outcome_count,
     explanation: president.explanation_summary,
@@ -2722,9 +2842,15 @@ function normalizeLegacyPresident(president) {
     president_party: president.president_party,
     raw_score: president.raw_score,
     normalized_score: president.normalized_score,
+    primary_score_family: "legacy",
     promise_count: president.promise_count,
     outcome_count: null,
     explanation: president.score_explanation,
+    impact_narrative: null,
+    narrative_summary: null,
+    key_strengths: [],
+    key_weaknesses: [],
+    confidence_statement: null,
     counts_by_direction: president.counts_by_impact_direction || {},
     counts_by_confidence: president.counts_by_relevance || {},
     score_by_topic: (president.score_by_topic || []).map((item) => ({
@@ -3417,7 +3543,7 @@ export default async function BlackImpactScorePage({ searchParams }) {
                     <h2 className="text-3xl font-semibold">{president.president}</h2>
                   </div>
                   <p className="text-sm text-[var(--ink-soft)] mt-2 leading-7 max-w-3xl">
-                    {president.explanation}
+                    {president.narrative_summary || president.explanation}
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-2 items-center">
@@ -3437,7 +3563,11 @@ export default async function BlackImpactScorePage({ searchParams }) {
                 <ScoreCard
                   label="Normalized Score"
                   value={formatNormalizedScore(president.normalized_score)}
-                  subtitle="Primary comparison view across presidents"
+                  subtitle={
+                    president.display_score != null
+                      ? `Primary direct score; coverage-adjusted display ${formatNormalizedScore(president.display_score)}`
+                      : "Primary direct comparison view across presidents"
+                  }
                 />
                 <ScoreCard
                   label="Raw Score"

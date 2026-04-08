@@ -37,6 +37,7 @@ DIRECTION_WEIGHTS = {
 POLICY_TYPE_WEIGHTS = {
     "current_admin": 1.0,
     "legislative": 0.8,
+    "judicial_impact": 1.0,
 }
 
 INTENT_MODIFIERS = {
@@ -193,6 +194,7 @@ def fetch_policy_outcomes(cursor, columns: set[str]) -> list[dict[str, Any]]:
           CASE
             WHEN po.policy_type = 'current_admin' THEN p.title
             WHEN po.policy_type = 'legislative' THEN tb.title
+            WHEN po.policy_type = 'judicial_impact' THEN jp.title
             ELSE NULL
           END AS policy_title,
           CASE
@@ -217,6 +219,7 @@ def fetch_policy_outcomes(cursor, columns: set[str]) -> list[dict[str, Any]]:
           END AS term_end,
           CASE
             WHEN po.policy_type = 'current_admin' THEN related_intent.policy_intent_category
+            WHEN po.policy_type = 'judicial_impact' THEN jp.policy_intent_category
             ELSE NULL
           END AS policy_intent_category,
           tb.bill_status,
@@ -230,6 +233,9 @@ def fetch_policy_outcomes(cursor, columns: set[str]) -> list[dict[str, Any]]:
         LEFT JOIN tracked_bills tb
           ON po.policy_type = 'legislative'
          AND tb.id = po.policy_id
+        LEFT JOIN policies jp
+          ON po.policy_type = 'judicial_impact'
+         AND jp.id = po.policy_id
         LEFT JOIN (
           SELECT
             pa.promise_id,
@@ -337,6 +343,8 @@ def score_outcome(row: dict[str, Any], has_impact_score: bool) -> dict[str, Any]
         "president_score_exclusion_reason": (
             "legislative_outcome_has_no_deterministic_president_attribution"
             if excluded_from_president_score and policy_type == "legislative"
+            else "judicial_impact_requires_explicit_majority_justice_attribution"
+            if excluded_from_president_score and policy_type == "judicial_impact"
             else "missing_president_attribution" if excluded_from_president_score else None
         ),
         "term_start": iso_date(row.get("term_start")),

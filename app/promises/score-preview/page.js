@@ -73,6 +73,10 @@ function formatPercent(value) {
   return `${Math.round(numeric * 100)}%`;
 }
 
+function formatScoreConfidence(value) {
+  return typeof value === "string" && value.trim() ? value.trim().toUpperCase() : null;
+}
+
 function sortByNumericValue(items, getter, direction = "desc") {
   return [...items].sort((left, right) => {
     const leftValue = Number(getter(left) || 0);
@@ -112,6 +116,18 @@ function createPresidentMap(items = [], modelType) {
       raw_score: modelType === "legacy" ? item.raw_score : item.raw_score_total,
       normalized_score:
         modelType === "legacy" ? item.normalized_score : item.normalized_score_total,
+      display_score: modelType === "outcome" ? item.display_score_total ?? item.display_score ?? null : null,
+      score_confidence: modelType === "outcome" ? item.score_confidence || null : null,
+      primary_score_family: modelType === "outcome" ? item.primary_score_family || "direct" : "legacy",
+      low_coverage_warning: modelType === "outcome" ? item.low_coverage_warning || null : null,
+      narrative_summary:
+        modelType === "outcome"
+          ? item.narrative_summary || item.impact_narrative?.summary_paragraph || null
+          : null,
+      confidence_statement:
+        modelType === "outcome"
+          ? item.confidence_statement || item.impact_narrative?.confidence_statement || null
+          : null,
       record_count: item.promise_count || null,
       outcome_count: modelType === "outcome" ? item.outcome_count : null,
       explanation: item.score_explanation || item.explanation_summary || null,
@@ -301,8 +317,37 @@ function RankingList({ title, items, emptyMessage }) {
                   {item.president_party ? (
                     <p className="text-xs text-[var(--ink-soft)] mt-1">{item.president_party}</p>
                   ) : null}
+                  {item.display_score != null ? (
+                    <p className="text-xs text-[var(--ink-soft)] mt-1">
+                      Display {formatNormalizedScore(item.display_score)}
+                    </p>
+                  ) : null}
+                  {item.primary_score_family === "direct" ? (
+                    <p className="text-xs text-[var(--ink-soft)] mt-1">Primary: direct score</p>
+                  ) : null}
+                  {item.score_confidence ? (
+                    <p className="text-xs text-[var(--ink-soft)] mt-1">
+                      Confidence: {formatScoreConfidence(item.score_confidence)}
+                      {item.outcome_count ? ` (${item.outcome_count} outcomes)` : ""}
+                    </p>
+                  ) : null}
                 </div>
               </div>
+              {item.low_coverage_warning ? (
+                <p className="text-xs text-[var(--ink-soft)] mt-3 leading-6">
+                  {item.low_coverage_warning}
+                </p>
+              ) : null}
+              {item.narrative_summary ? (
+                <p className="text-xs text-[var(--ink-soft)] mt-3 leading-6">
+                  {item.narrative_summary}
+                </p>
+              ) : null}
+              {item.confidence_statement ? (
+                <p className="text-xs text-[var(--ink-muted)] mt-2 leading-6">
+                  {item.confidence_statement}
+                </p>
+              ) : null}
             </li>
           ))}
         </ol>
@@ -560,6 +605,11 @@ export default async function PromiseScorePreviewPage() {
       president_slug: item.president_slug,
       president_party: item.president_party,
       normalized_score: item.normalized_score_total,
+      display_score: item.display_score_total ?? item.display_score ?? null,
+      score_confidence: item.score_confidence || null,
+      primary_score_family: item.primary_score_family || "direct",
+      low_coverage_warning: item.low_coverage_warning || null,
+      outcome_count: item.outcome_count,
     })),
     (item) => item.normalized_score,
     "desc"
@@ -571,6 +621,11 @@ export default async function PromiseScorePreviewPage() {
       president_slug: item.president_slug,
       president_party: item.president_party,
       normalized_score: item.normalized_score_total,
+      display_score: item.display_score_total ?? item.display_score ?? null,
+      score_confidence: item.score_confidence || null,
+      primary_score_family: item.primary_score_family || "direct",
+      low_coverage_warning: item.low_coverage_warning || null,
+      outcome_count: item.outcome_count,
     })),
     (item) => item.normalized_score,
     "asc"
@@ -608,6 +663,21 @@ export default async function PromiseScorePreviewPage() {
   const outcomesIncludedInScore = Number(outcomeMetadata?.outcomes_included_in_score);
   const totalOutcomesAvailable = Number(outcomeMetadata?.total_outcomes_available);
   const outcomesExcludedFromScore = Number(outcomeMetadata?.outcomes_excluded_from_score);
+  const impactTrend = outcomeMetadata?.impact_trend || null;
+  const impactTrendInterpretation =
+    typeof impactTrend?.interpretation === "string" && impactTrend.interpretation.trim()
+      ? impactTrend.interpretation.trim()
+      : null;
+  const impactTrendDirection =
+    typeof impactTrend?.trend_direction === "string" && impactTrend.trend_direction.trim()
+      ? impactTrend.trend_direction.trim()
+      : null;
+  const scoreChange =
+    typeof outcomeMetadata?.score_change?.change_summary === "string" &&
+    outcomeMetadata.score_change.change_summary.trim() &&
+    outcomeMetadata.score_change.has_prior_snapshot
+      ? outcomeMetadata.score_change
+      : null;
 
   return (
     <main className="max-w-7xl mx-auto p-6">
@@ -851,11 +921,23 @@ export default async function PromiseScorePreviewPage() {
                     {highConfidencePct ? <MetaPill>{highConfidencePct} high-confidence</MetaPill> : null}
                     {lowConfidencePct ? <MetaPill>{lowConfidencePct} low-confidence</MetaPill> : null}
                     {incompletePct ? <MetaPill>{incompletePct} incomplete</MetaPill> : null}
+                    {impactTrendDirection ? <MetaPill>Trend: {impactTrendDirection}</MetaPill> : null}
+                    {scoreChange ? <MetaPill>Delta {formatSignedValue(scoreChange.delta_score)}</MetaPill> : null}
                     <MetaPill>{outcomeMetadata.scoring_model || "Outcome model"}</MetaPill>
                   </div>
                   {outcomeMetadata.summary_interpretation ? (
                     <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
                       {outcomeMetadata.summary_interpretation}
+                    </p>
+                  ) : null}
+                  {impactTrendInterpretation ? (
+                    <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
+                      {impactTrendInterpretation}
+                    </p>
+                  ) : null}
+                  {scoreChange ? (
+                    <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
+                      {scoreChange.change_summary}
                     </p>
                   ) : null}
                 </>

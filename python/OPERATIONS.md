@@ -88,7 +88,7 @@ Required post-write invariants:
 - `impact_score` is present and bounded
 - `impact_direction` is one of `Positive`, `Negative`, `Mixed`, `Blocked`
 - `source_count` is non-negative
-- `policy_type` is one of `current_admin`, `legislative`
+- `policy_type` is one of `current_admin`, `legislative`, `judicial_impact`
 - duplicate `(policy_type, policy_id, outcome_summary_hash)` groups are absent
 
 Use these read-only verification commands after imports:
@@ -96,6 +96,7 @@ Use these read-only verification commands after imports:
 ```bash
 ./bin/equitystack impact report-final-black-impact-score
 ./bin/equitystack impact certify-production-data
+./bin/equitystack impact validate-integrity
 ```
 
 Legislative outcomes are intentionally excluded from president scoring until the data model has a deterministic president-attribution field. Full details are in `../docs/workflow-hardening.md`.
@@ -116,6 +117,7 @@ This is the core operating loop.
 
 ```bash
 ./python/bin/equitystack impact certify-production-data
+./python/bin/equitystack impact validate-integrity
 ```
 
 Check:
@@ -123,6 +125,7 @@ Check:
 - `certification_status`
 - source coverage percentage
 - intent coverage percentage
+- `violation_count` from `validate-integrity`
 
 You are answering: did anything break or regress?
 

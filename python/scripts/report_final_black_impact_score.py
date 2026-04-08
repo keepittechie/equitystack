@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 import argparse
 import csv
+import json
+import math
 from collections import Counter, defaultdict
 from datetime import date
 from decimal import Decimal
@@ -36,9 +38,13 @@ INTENT_MODIFIERS = {
 POLICY_TYPE_WEIGHTS = {
     "current_admin": 1.0,
     "legislative": 0.8,
+    "judicial_impact": 1.0,
 }
 
 LOW_CONFIDENCE_OUTCOME_THRESHOLD = 5
+JUDICIAL_WEIGHT = 0.5
+SCORE_FAMILY_DIRECT = "direct"
+SCORE_FAMILY_SYSTEMIC = "systemic"
 
 
 def parse_args() -> argparse.Namespace:
@@ -110,6 +116,24 @@ def confidence_multiplier(source_count: Any) -> float:
     return 1.0
 
 
+def coverage_confidence_factor(outcome_count: Any) -> float:
+    count = int(numeric(outcome_count, 0))
+    if count <= 0:
+        return 0.0
+    return round(min(1.0, math.log(count + 1) / math.log(10)), 4)
+
+
+def score_confidence_label(outcome_count: Any) -> str:
+    count = int(numeric(outcome_count, 0))
+    if count <= 2:
+        return "VERY LOW"
+    if count <= 5:
+        return "LOW"
+    if count <= 15:
+        return "MEDIUM"
+    return "HIGH"
+
+
 def normalize_direction(value: Any) -> str | None:
     text = normalize_nullable_text(value)
     if text is None:
@@ -128,9 +152,153 @@ def normalize_intent(value: Any) -> str | None:
     return normalized if normalized in INTENT_MODIFIERS else None
 
 
-def build_policy_outcomes_sql(has_impact_score: bool, has_source_quality: bool) -> str:
+def parse_json_value(value: Any) -> Any:
+    if value in (None, ""):
+        return None
+    if isinstance(value, (list, dict)):
+        return value
+    if isinstance(value, (bytes, bytearray)):
+        value = value.decode("utf-8")
+    if not isinstance(value, str):
+        return None
+    try:
+        return json.loads(value)
+    except json.JSONDecodeError:
+        return None
+
+
+def normalize_justice_name(value: Any) -> str | None:
+    if isinstance(value, str):
+        return normalize_nullable_text(value)
+    if isinstance(value, dict):
+        return (
+            normalize_nullable_text(value.get("name"))
+            or normalize_nullable_text(value.get("justice"))
+            or normalize_nullable_text(value.get("justice_name"))
+        )
+    return None
+
+
+def fetch_president_lookup(cursor) -> dict[str, dict[str, Any]]:
+    cursor.execute(
+        """
+        SELECT id, full_name, slug, term_start, term_end
+        FROM presidents
+        """
+    )
+    lookup: dict[str, dict[str, Any]] = {}
+    for row in cursor.fetchall() or []:
+        normalized = {
+            "president_id": int(row["id"]),
+            "president_name": row.get("full_name"),
+            "president_slug": row.get("slug"),
+            "term_start": iso_date(row.get("term_start")),
+            "term_end": iso_date(row.get("term_end")),
+            "years_in_office": years_between(row.get("term_start"), row.get("term_end")),
+        }
+        lookup[f'id:{row["id"]}'] = normalized
+        if row.get("slug"):
+            lookup[f'slug:{str(row["slug"]).lower()}'] = normalized
+        if row.get("full_name"):
+            lookup[f'name:{str(row["full_name"]).lower()}'] = normalized
+    return lookup
+
+
+def lookup_president(entry: dict[str, Any], president_lookup: dict[str, dict[str, Any]]) -> dict[str, Any] | None:
+    president_id = entry.get("president_id") or entry.get("appointing_president_id")
+    if president_id is not None:
+        found = president_lookup.get(f"id:{president_id}")
+        if found:
+            return found
+    president_slug = normalize_nullable_text(entry.get("president_slug") or entry.get("appointing_president_slug"))
+    if president_slug:
+        found = president_lookup.get(f"slug:{president_slug.lower()}")
+        if found:
+            return found
+    president_name = normalize_nullable_text(
+        entry.get("president_name") or entry.get("appointing_president_name") or entry.get("appointing_president")
+    )
+    if president_name:
+        return president_lookup.get(f"name:{president_name.lower()}")
+    return None
+
+
+def judicial_attributions_from_majority_justices(majority_justices: list[Any]) -> list[dict[str, Any]]:
+    grouped: dict[str, dict[str, Any]] = {}
+    total = len(majority_justices)
+    if total == 0:
+        return []
+    for justice in majority_justices:
+        if not isinstance(justice, dict):
+            continue
+        key = (
+            normalize_nullable_text(justice.get("appointing_president_slug"))
+            or normalize_nullable_text(justice.get("appointing_president_name"))
+            or normalize_nullable_text(justice.get("appointing_president"))
+            or (f'president:{justice.get("appointing_president_id")}' if justice.get("appointing_president_id") else None)
+        )
+        if key is None:
+            continue
+        if key not in grouped:
+            grouped[key] = {
+                "president_id": justice.get("appointing_president_id"),
+                "president_slug": justice.get("appointing_president_slug"),
+                "president_name": justice.get("appointing_president_name") or justice.get("appointing_president"),
+                "contributing_justices": [],
+            }
+        justice_name = normalize_justice_name(justice)
+        if justice_name:
+            grouped[key]["contributing_justices"].append(justice_name)
+    return [
+        {
+            **entry,
+            "attribution_fraction": round(len(entry["contributing_justices"]) / total, 4),
+        }
+        for entry in grouped.values()
+    ]
+
+
+def judicial_attributions_for_row(row: dict[str, Any]) -> list[dict[str, Any]]:
+    explicit_attribution = parse_json_value(row.get("judicial_attribution"))
+    if isinstance(explicit_attribution, list) and explicit_attribution:
+        return [
+            {
+                "president_id": entry.get("president_id") or entry.get("appointing_president_id"),
+                "president_slug": entry.get("president_slug") or entry.get("appointing_president_slug"),
+                "president_name": (
+                    entry.get("president_name")
+                    or entry.get("appointing_president_name")
+                    or entry.get("appointing_president")
+                ),
+                "attribution_fraction": numeric(entry.get("attribution_fraction"), 0.0),
+                "contributing_justices": [
+                    name for name in (normalize_justice_name(value) for value in entry.get("contributing_justices") or []) if name
+                ],
+            }
+            for entry in explicit_attribution
+            if isinstance(entry, dict)
+        ]
+    majority_justices = parse_json_value(row.get("majority_justices"))
+    if isinstance(majority_justices, list):
+        return judicial_attributions_from_majority_justices(majority_justices)
+    return []
+
+
+def column_expr(has_column: bool, expression: str, alias: str) -> str:
+    return f"{expression} AS {alias}" if has_column else f"NULL AS {alias}"
+
+
+def build_policy_outcomes_sql(policy_outcomes_columns: set[str]) -> str:
+    has_impact_score = "impact_score" in policy_outcomes_columns
+    has_source_quality = "source_quality" in policy_outcomes_columns
     impact_expr = "po.impact_score AS impact_score" if has_impact_score else "NULL AS impact_score"
     source_quality_expr = "po.source_quality AS source_quality" if has_source_quality else "NULL AS source_quality"
+    court_level_expr = column_expr("court_level" in policy_outcomes_columns, "po.court_level", "court_level")
+    decision_year_expr = column_expr("decision_year" in policy_outcomes_columns, "po.decision_year", "decision_year")
+    majority_justices_expr = column_expr("majority_justices" in policy_outcomes_columns, "po.majority_justices", "majority_justices")
+    appointing_presidents_expr = column_expr("appointing_presidents" in policy_outcomes_columns, "po.appointing_presidents", "appointing_presidents")
+    judicial_attribution_expr = column_expr("judicial_attribution" in policy_outcomes_columns, "po.judicial_attribution", "judicial_attribution")
+    judicial_weight_expr = column_expr("judicial_weight" in policy_outcomes_columns, "po.judicial_weight", "judicial_weight")
     return f"""
         SELECT
           po.id AS policy_outcome_id,
@@ -142,6 +310,12 @@ def build_policy_outcomes_sql(has_impact_score: bool, has_source_quality: bool) 
           po.source_count,
           {source_quality_expr},
           {impact_expr},
+          {court_level_expr},
+          {decision_year_expr},
+          {majority_justices_expr},
+          {appointing_presidents_expr},
+          {judicial_attribution_expr},
+          {judicial_weight_expr},
           po.status,
           po.impact_start_date,
           CASE
@@ -167,10 +341,12 @@ def build_policy_outcomes_sql(has_impact_score: bool, has_source_quality: bool) 
           CASE
             WHEN po.policy_type = 'current_admin' THEN p.title
             WHEN po.policy_type = 'legislative' THEN tb.title
+            WHEN po.policy_type = 'judicial_impact' THEN jp.title
             ELSE NULL
           END AS policy_title,
           CASE
             WHEN po.policy_type = 'current_admin' THEN related_intent.policy_intent_category
+            WHEN po.policy_type = 'judicial_impact' THEN jp.policy_intent_category
             ELSE NULL
           END AS policy_intent_category,
           CASE
@@ -190,6 +366,9 @@ def build_policy_outcomes_sql(has_impact_score: bool, has_source_quality: bool) 
         LEFT JOIN tracked_bills tb
           ON po.policy_type = 'legislative'
          AND tb.id = po.policy_id
+        LEFT JOIN policies jp
+          ON po.policy_type = 'judicial_impact'
+         AND jp.id = po.policy_id
         LEFT JOIN (
           SELECT
             pa.promise_id,
@@ -212,12 +391,7 @@ def build_policy_outcomes_sql(has_impact_score: bool, has_source_quality: bool) 
 
 
 def fetch_policy_outcomes(cursor, policy_outcomes_columns: set[str]) -> list[dict[str, Any]]:
-    cursor.execute(
-        build_policy_outcomes_sql(
-            has_impact_score="impact_score" in policy_outcomes_columns,
-            has_source_quality="source_quality" in policy_outcomes_columns,
-        )
-    )
+    cursor.execute(build_policy_outcomes_sql(policy_outcomes_columns))
     return list(cursor.fetchall() or [])
 
 
@@ -244,10 +418,12 @@ def contribution_for_row(row: dict[str, Any], has_impact_score: bool) -> dict[st
     confidence_adjusted_score = adjusted_outcome_score * confidence
     intent_adjusted_score = confidence_adjusted_score * intent_modifier
     final_outcome_score = intent_adjusted_score * policy_type_weight
+    judicial_weight = numeric(row.get("judicial_weight"), JUDICIAL_WEIGHT if policy_type == "judicial_impact" else 1.0)
 
     return {
         "policy_outcome_id": int(row["policy_outcome_id"]),
         "policy_type": policy_type,
+        "score_family": SCORE_FAMILY_SYSTEMIC if policy_type == "judicial_impact" else SCORE_FAMILY_DIRECT,
         "policy_id": int(row["policy_id"]),
         "record_key": row.get("record_key"),
         "policy_title": row.get("policy_title"),
@@ -264,9 +440,23 @@ def contribution_for_row(row: dict[str, Any], has_impact_score: bool) -> dict[st
         "confidence_adjusted_score": round(confidence_adjusted_score, 4),
         "policy_intent_category": intent_category,
         "intent_modifier": intent_modifier,
+        "intent_adjusted_score": round(intent_adjusted_score, 4),
         "related_policy_intent_policy_count": int(numeric(row.get("related_policy_intent_policy_count"), 0)),
         "related_policy_intent_category_count": int(numeric(row.get("related_policy_intent_category_count"), 0)),
         "policy_type_weight": policy_type_weight,
+        "judicial_weight": judicial_weight,
+        "court_level": row.get("court_level"),
+        "decision_year": row.get("decision_year"),
+        "attribution_fraction": None,
+        "contributing_justices": [],
+        "appointing_presidents": parse_json_value(row.get("appointing_presidents")) or [],
+        "weighting_applied": {
+            "direction_weight": direction_weight,
+            "confidence_multiplier": confidence,
+            "intent_modifier": intent_modifier,
+            "policy_type_weight": policy_type_weight,
+            "judicial_weight": judicial_weight if policy_type == "judicial_impact" else 1.0,
+        },
         "final_outcome_score": round(final_outcome_score, 4),
         "president_id": int(row["president_id"]) if row.get("president_id") is not None else None,
         "president_name": row.get("president_name"),
@@ -279,7 +469,83 @@ def contribution_for_row(row: dict[str, Any], has_impact_score: bool) -> dict[st
     }
 
 
+def contributions_for_row(
+    row: dict[str, Any],
+    has_impact_score: bool,
+    president_lookup: dict[str, dict[str, Any]],
+) -> list[dict[str, Any]]:
+    base = contribution_for_row(row, has_impact_score)
+    if base.get("policy_type") != "judicial_impact":
+        return [base]
+
+    attributions = judicial_attributions_for_row(row)
+    if not attributions:
+        base.update(
+            {
+                "excluded_from_president_score": True,
+                "president_score_exclusion_reason": "judicial_impact_missing_explicit_attribution_metadata",
+                "policy_type_weight": 1.0,
+                "final_outcome_score": 0.0,
+            }
+        )
+        base["weighting_applied"]["policy_type_weight"] = 1.0
+        return [base]
+
+    contributions = []
+    judicial_weight = numeric(row.get("judicial_weight"), JUDICIAL_WEIGHT)
+    for attribution in attributions:
+        fraction = max(0.0, min(1.0, numeric(attribution.get("attribution_fraction"), 0.0)))
+        if fraction <= 0:
+            continue
+        president = lookup_president(attribution, president_lookup)
+        contribution = {**base}
+        contribution.update(
+            {
+                "president_id": president.get("president_id") if president else None,
+                "president_name": president.get("president_name") if president else attribution.get("president_name"),
+                "president_slug": president.get("president_slug") if president else attribution.get("president_slug"),
+                "term_start": president.get("term_start") if president else None,
+                "term_end": president.get("term_end") if president else None,
+                "years_in_office": president.get("years_in_office") if president else None,
+                "excluded_from_president_score": president is None,
+                "president_score_exclusion_reason": None if president else "judicial_impact_appointer_president_not_found",
+                "attribution_fraction": round(fraction, 4),
+                "contributing_justices": attribution.get("contributing_justices") or [],
+                "appointing_presidents": [president.get("president_name") if president else attribution.get("president_name")],
+                "policy_type_weight": 1.0,
+                "judicial_weight": judicial_weight,
+                "final_outcome_score": round(base["intent_adjusted_score"] * fraction * judicial_weight, 4),
+            }
+        )
+        contribution["weighting_applied"] = {
+            **base["weighting_applied"],
+            "policy_type_weight": 1.0,
+            "judicial_weight": judicial_weight,
+            "attribution_fraction": round(fraction, 4),
+        }
+        contributions.append(contribution)
+    return contributions or [base]
+
+
 def empty_president_bucket(row: dict[str, Any]) -> dict[str, Any]:
+    def empty_family_bucket() -> dict[str, Any]:
+        return {
+            "policy_keys": set(),
+            "total_outcomes": 0,
+            "positive_outcomes": 0,
+            "negative_outcomes": 0,
+            "mixed_outcomes": 0,
+            "blocked_outcomes": 0,
+            "raw_score": 0.0,
+            "base_score_before_direction": 0.0,
+            "direction_adjusted_score": 0.0,
+            "confidence_total": 0.0,
+            "source_quality_counts": Counter(),
+            "policy_type_counts": Counter(),
+            "intent_modifier_counts": Counter(),
+            "contributions": [],
+        }
+
     return {
         "president_id": row.get("president_id"),
         "president_name": row.get("president_name"),
@@ -287,20 +553,99 @@ def empty_president_bucket(row: dict[str, Any]) -> dict[str, Any]:
         "term_start": row.get("term_start"),
         "term_end": row.get("term_end"),
         "years_in_office": row.get("years_in_office"),
-        "policy_keys": set(),
-        "total_outcomes": 0,
-        "positive_outcomes": 0,
-        "negative_outcomes": 0,
-        "mixed_outcomes": 0,
-        "blocked_outcomes": 0,
-        "raw_score": 0.0,
-        "base_score_before_direction": 0.0,
-        "direction_adjusted_score": 0.0,
-        "confidence_total": 0.0,
-        "source_quality_counts": Counter(),
-        "policy_type_counts": Counter(),
-        "intent_modifier_counts": Counter(),
-        "contributions": [],
+        "families": {
+            SCORE_FAMILY_DIRECT: empty_family_bucket(),
+            SCORE_FAMILY_SYSTEMIC: empty_family_bucket(),
+        },
+    }
+
+
+def add_contribution_to_family(bucket: dict[str, Any], contribution: dict[str, Any]) -> None:
+    bucket["policy_keys"].add(f'{contribution["policy_type"]}:{contribution["policy_id"]}')
+    bucket["total_outcomes"] += 1
+    direction = contribution.get("impact_direction")
+    if direction == "Positive":
+        bucket["positive_outcomes"] += 1
+    elif direction == "Negative":
+        bucket["negative_outcomes"] += 1
+    elif direction == "Mixed":
+        bucket["mixed_outcomes"] += 1
+    elif direction == "Blocked":
+        bucket["blocked_outcomes"] += 1
+    bucket["base_score_before_direction"] += contribution["impact_score"]
+    bucket["direction_adjusted_score"] += contribution["adjusted_outcome_score"]
+    bucket["raw_score"] += contribution["final_outcome_score"]
+    bucket["confidence_total"] += contribution["confidence_multiplier"]
+    bucket["source_quality_counts"][contribution.get("source_quality") or "unknown"] += 1
+    bucket["policy_type_counts"][contribution.get("policy_type") or "unknown"] += 1
+    bucket["intent_modifier_counts"][contribution.get("policy_intent_category") or "unknown"] += 1
+    bucket["contributions"].append(contribution)
+
+
+def summarize_family_bucket(bucket: dict[str, Any], years: float) -> dict[str, Any]:
+    total_policies = len(bucket["policy_keys"])
+    total_outcomes = bucket["total_outcomes"]
+    raw_score = bucket["raw_score"]
+    normalized_score = raw_score / years
+    confidence_factor = coverage_confidence_factor(total_outcomes)
+    confidence_label = score_confidence_label(total_outcomes)
+    return {
+        "total_policies": total_policies,
+        "total_outcomes": total_outcomes,
+        "positive_outcomes": bucket["positive_outcomes"],
+        "negative_outcomes": bucket["negative_outcomes"],
+        "mixed_outcomes": bucket["mixed_outcomes"],
+        "blocked_outcomes": bucket["blocked_outcomes"],
+        "base_score_before_direction": round(bucket["base_score_before_direction"], 4),
+        "direction_adjusted_score": round(bucket["direction_adjusted_score"], 4),
+        "raw_score": round(raw_score, 4),
+        "normalized_score": round(normalized_score, 4),
+        "display_score": round(raw_score * confidence_factor, 4),
+        "display_normalized_score": round(normalized_score * confidence_factor, 4),
+        "score_confidence": confidence_label,
+        "score_confidence_factor": confidence_factor,
+        "low_coverage_warning": (
+            "This score is based on extremely limited data and may not be representative."
+            if 0 < total_outcomes <= 2
+            else None
+        ),
+        "avg_score_per_policy": round(raw_score / total_policies, 4) if total_policies else 0,
+        "confidence_avg": round(bucket["confidence_total"] / total_outcomes, 4) if total_outcomes else 0,
+        "source_quality_counts": dict(sorted(bucket["source_quality_counts"].items())),
+        "policy_type_counts": dict(sorted(bucket["policy_type_counts"].items())),
+        "intent_modifier_counts": dict(sorted(bucket["intent_modifier_counts"].items())),
+        "confidence_flag": "low confidence" if total_outcomes < LOW_CONFIDENCE_OUTCOME_THRESHOLD else "standard",
+    }
+
+
+def prefix_summary(summary: dict[str, Any], prefix: str) -> dict[str, Any]:
+    return {
+        f"{prefix}_{key}": value
+        for key, value in summary.items()
+        if key not in {"source_quality_counts", "policy_type_counts", "intent_modifier_counts"}
+    }
+
+
+def legacy_primary_fields(direct: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "total_policies": direct["total_policies"],
+        "total_outcomes": direct["total_outcomes"],
+        "positive_outcomes": direct["positive_outcomes"],
+        "negative_outcomes": direct["negative_outcomes"],
+        "mixed_outcomes": direct["mixed_outcomes"],
+        "blocked_outcomes": direct["blocked_outcomes"],
+        "base_score_before_direction": direct["base_score_before_direction"],
+        "direction_adjusted_score": direct["direction_adjusted_score"],
+        "raw_score": direct["raw_score"],
+        "normalized_score": direct["normalized_score"],
+        "display_score": direct["display_score"],
+        "display_normalized_score": direct["display_normalized_score"],
+        "score_confidence": direct["score_confidence"],
+        "score_confidence_factor": direct["score_confidence_factor"],
+        "low_coverage_warning": direct["low_coverage_warning"],
+        "avg_score_per_policy": direct["avg_score_per_policy"],
+        "confidence_avg": direct["confidence_avg"],
+        "confidence_flag": direct["confidence_flag"],
     }
 
 
@@ -315,32 +660,37 @@ def aggregate_scores(contributions: list[dict[str, Any]]) -> tuple[list[dict[str
         if key not in by_president:
             by_president[key] = empty_president_bucket(contribution)
         bucket = by_president[key]
-        bucket["policy_keys"].add(f'{contribution["policy_type"]}:{contribution["policy_id"]}')
-        bucket["total_outcomes"] += 1
-        direction = contribution.get("impact_direction")
-        if direction == "Positive":
-            bucket["positive_outcomes"] += 1
-        elif direction == "Negative":
-            bucket["negative_outcomes"] += 1
-        elif direction == "Mixed":
-            bucket["mixed_outcomes"] += 1
-        elif direction == "Blocked":
-            bucket["blocked_outcomes"] += 1
-        bucket["base_score_before_direction"] += contribution["impact_score"]
-        bucket["direction_adjusted_score"] += contribution["adjusted_outcome_score"]
-        bucket["raw_score"] += contribution["final_outcome_score"]
-        bucket["confidence_total"] += contribution["confidence_multiplier"]
-        bucket["source_quality_counts"][contribution.get("source_quality") or "unknown"] += 1
-        bucket["policy_type_counts"][contribution.get("policy_type") or "unknown"] += 1
-        bucket["intent_modifier_counts"][contribution.get("policy_intent_category") or "unknown"] += 1
-        bucket["contributions"].append(contribution)
+        family = contribution.get("score_family") or (
+            SCORE_FAMILY_SYSTEMIC if contribution.get("policy_type") == "judicial_impact" else SCORE_FAMILY_DIRECT
+        )
+        if family not in bucket["families"]:
+            bucket["families"][family] = {
+                "policy_keys": set(),
+                "total_outcomes": 0,
+                "positive_outcomes": 0,
+                "negative_outcomes": 0,
+                "mixed_outcomes": 0,
+                "blocked_outcomes": 0,
+                "raw_score": 0.0,
+                "base_score_before_direction": 0.0,
+                "direction_adjusted_score": 0.0,
+                "confidence_total": 0.0,
+                "source_quality_counts": Counter(),
+                "policy_type_counts": Counter(),
+                "intent_modifier_counts": Counter(),
+                "contributions": [],
+            }
+        add_contribution_to_family(bucket["families"][family], contribution)
 
     president_rows = []
     for bucket in by_president.values():
         years = bucket["years_in_office"] or 1.0
-        total_policies = len(bucket["policy_keys"])
-        total_outcomes = bucket["total_outcomes"]
-        raw_score = bucket["raw_score"]
+        direct = summarize_family_bucket(bucket["families"][SCORE_FAMILY_DIRECT], years)
+        systemic = summarize_family_bucket(bucket["families"][SCORE_FAMILY_SYSTEMIC], years)
+        combined_raw_score = direct["raw_score"] + systemic["raw_score"]
+        combined_normalized_score = combined_raw_score / years
+        combined_outcome_count = direct["total_outcomes"] + systemic["total_outcomes"]
+        combined_confidence_factor = coverage_confidence_factor(combined_outcome_count)
         president_rows.append(
             {
                 "president_id": bucket["president_id"],
@@ -349,28 +699,31 @@ def aggregate_scores(contributions: list[dict[str, Any]]) -> tuple[list[dict[str
                 "term_start": bucket["term_start"],
                 "term_end": bucket["term_end"],
                 "years_in_office": round(years, 4),
-                "total_policies": total_policies,
-                "total_outcomes": total_outcomes,
-                "positive_outcomes": bucket["positive_outcomes"],
-                "negative_outcomes": bucket["negative_outcomes"],
-                "mixed_outcomes": bucket["mixed_outcomes"],
-                "blocked_outcomes": bucket["blocked_outcomes"],
-                "base_score_before_direction": round(bucket["base_score_before_direction"], 4),
-                "direction_adjusted_score": round(bucket["direction_adjusted_score"], 4),
-                "raw_score": round(raw_score, 4),
-                "normalized_score": round(raw_score / years, 4),
-                "avg_score_per_policy": round(raw_score / total_policies, 4) if total_policies else 0,
-                "confidence_avg": round(bucket["confidence_total"] / total_outcomes, 4) if total_outcomes else 0,
-                "source_quality_counts": dict(sorted(bucket["source_quality_counts"].items())),
-                "policy_type_counts": dict(sorted(bucket["policy_type_counts"].items())),
-                "intent_modifier_counts": dict(sorted(bucket["intent_modifier_counts"].items())),
-                "confidence_flag": "low confidence" if total_outcomes < LOW_CONFIDENCE_OUTCOME_THRESHOLD else "standard",
+                **legacy_primary_fields(direct),
+                **prefix_summary(direct, "direct"),
+                **prefix_summary(systemic, "systemic"),
+                "direct_outcome_count": direct["total_outcomes"],
+                "systemic_outcome_count": systemic["total_outcomes"],
+                "source_quality_counts": direct["source_quality_counts"],
+                "policy_type_counts": direct["policy_type_counts"],
+                "intent_modifier_counts": direct["intent_modifier_counts"],
+                "systemic_source_quality_counts": systemic["source_quality_counts"],
+                "systemic_policy_type_counts": systemic["policy_type_counts"],
+                "systemic_intent_modifier_counts": systemic["intent_modifier_counts"],
+                "combined_context_score": round(combined_raw_score, 4),
+                "combined_context_normalized_score": round(combined_normalized_score, 4),
+                "combined_context_display_score": round(combined_raw_score * combined_confidence_factor, 4),
+                "combined_context_display_normalized_score": round(combined_normalized_score * combined_confidence_factor, 4),
+                "combined_context_score_confidence": score_confidence_label(combined_outcome_count),
+                "combined_context_outcome_count": combined_outcome_count,
+                "primary_score_family": SCORE_FAMILY_DIRECT,
             }
         )
     president_rows.sort(
         key=lambda row: (
-            -row["normalized_score"],
-            -(row["total_outcomes"] or 0),
+            -row["direct_normalized_score"],
+            -row["systemic_normalized_score"],
+            -(row["direct_total_outcomes"] or 0),
             row["term_start"] or "",
             row["president_name"] or "",
         )
@@ -379,8 +732,12 @@ def aggregate_scores(contributions: list[dict[str, Any]]) -> tuple[list[dict[str
 
 
 def duplicate_outcome_ids(contributions: list[dict[str, Any]]) -> list[int]:
-    counts = Counter(row["policy_outcome_id"] for row in contributions)
-    return sorted(outcome_id for outcome_id, count in counts.items() if count > 1)
+    counts = Counter(
+        (row["policy_outcome_id"], row.get("president_id"))
+        for row in contributions
+        if row.get("president_id") is not None
+    )
+    return sorted(outcome_id for (outcome_id, _president_id), count in counts.items() if count > 1)
 
 
 def build_report(args: argparse.Namespace) -> dict[str, Any]:
@@ -394,9 +751,12 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
                 raise RuntimeError("presidents table does not exist")
             columns = get_table_columns(cursor, "policy_outcomes")
             raw_rows = fetch_policy_outcomes(cursor, columns)
+            president_lookup = fetch_president_lookup(cursor)
 
     has_impact_score = "impact_score" in columns
-    contributions = [contribution_for_row(row, has_impact_score) for row in raw_rows]
+    contributions = []
+    for row in raw_rows:
+        contributions.extend(contributions_for_row(row, has_impact_score, president_lookup))
     president_scores, unassigned = aggregate_scores(contributions)
     duplicate_ids = duplicate_outcome_ids(contributions)
     policy_type_counts = Counter(row.get("policy_type") or "unknown" for row in contributions)
@@ -415,6 +775,11 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         warnings.append(
             f"{len(legislative_unassigned)} legislative policy_outcome row(s) are explicitly excluded from president scoring because no deterministic president attribution exists in the current schema."
         )
+    judicial_unassigned = [row for row in unassigned if row.get("policy_type") == "judicial_impact"]
+    if judicial_unassigned:
+        warnings.append(
+            f"{len(judicial_unassigned)} judicial policy_outcome contribution(s) are excluded because explicit majority-justice appointment attribution is missing or could not be resolved."
+        )
     if duplicate_ids:
         warnings.append(f"Duplicate policy_outcome ids detected in query output: {duplicate_ids}")
 
@@ -424,7 +789,12 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "mode": "read_only",
         "database_mutated": False,
         "formula": {
-            "base_score": "absolute magnitude from policy_outcomes.impact_score when present; otherwise unit outcome magnitude fallback because production schema lacks that column",
+            "score_families": {
+                "direct_black_impact_score": "Primary headline score. Includes direct current-admin outcomes and any direct non-judicial outcomes with deterministic president attribution. Excludes judicial_impact.",
+                "systemic_impact_score": "Secondary score family. Includes judicial_impact and future explicitly indirect/systemic outcomes when deterministic attribution exists.",
+                "combined_context_score": "Contextual blended total only. It is not the primary score.",
+            },
+            "base_score": "absolute magnitude from policy_outcomes.impact_score when present; otherwise a documented unit outcome magnitude fallback is used only for backward-compatible reads of older schemas",
             "direction_weights": DIRECTION_WEIGHTS,
             "confidence_multiplier": {
                 "source_count = 0": 0.6,
@@ -437,13 +807,28 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
                 "neutral_or_unknown": 1.0,
             },
             "policy_type_weights": POLICY_TYPE_WEIGHTS,
-            "president_normalization": "SUM(final_outcome_score) / years_in_office",
-            "final_outcome_score": "ABS(impact_score) * direction_weight * confidence_multiplier * intent_modifier * policy_type_weight",
+            "judicial_attribution": {
+                "judicial_weight": JUDICIAL_WEIGHT,
+                "rule": "Judicial rows require explicit majority-justice attribution metadata. Each majority justice contributes 1 / majority_count to their appointing president; the resulting presidential fraction is multiplied by the judicial weight.",
+            },
+            "coverage_display_scaling": {
+                "formula": "display_score = raw_score * min(1, log(outcome_count + 1) / log(10)); display_normalized_score applies the same factor to normalized_score",
+                "labels": {
+                    "VERY LOW": "outcome_count <= 2",
+                    "LOW": "outcome_count <= 5",
+                    "MEDIUM": "outcome_count <= 15",
+                    "HIGH": "outcome_count > 15",
+                },
+                "raw_scores_preserved": True,
+            },
+            "president_normalization": "SUM(final_outcome_score) / years_in_office, applied separately to direct and systemic score families",
+            "final_outcome_score": "ABS(impact_score) * direction_weight * confidence_multiplier * intent_modifier * policy_type_weight; judicial rows instead use ABS(impact_score) * direction_weight * confidence_multiplier * intent_modifier * attribution_fraction * judicial_weight",
         },
         "join_contract": {
             "current_admin": "policy_outcomes.policy_id -> promises.id -> presidents.id",
             "intent_modifier": "current_admin promise actions may point to historical policies through promise_actions.related_policy_id; intent modifier is applied only when all related historical policies with intent have one deterministic category",
             "legislative": "policy_outcomes.policy_id -> tracked_bills.id; no president attribution is available in current schema, so rows are explicitly excluded with excluded_from_president_score=true until attribution exists",
+            "judicial_impact": "policy_outcomes.policy_id -> policies.id. President attribution is allowed only through explicit judicial_attribution or majority_justices metadata that maps justices to appointing presidents.",
             "historical_policies": "Historical policies are not stored as policy_outcomes rows in production, so they are not counted in this unified-outcome report.",
         },
         "summary": {
@@ -457,6 +842,12 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
             "low_confidence_president_count": sum(
                 1 for row in president_scores if row["confidence_flag"] == "low confidence"
             ),
+            "direct_outcome_contribution_count": sum(
+                1 for row in contributions if row.get("score_family") == SCORE_FAMILY_DIRECT and row.get("president_id") is not None
+            ),
+            "systemic_outcome_contribution_count": sum(
+                1 for row in contributions if row.get("score_family") == SCORE_FAMILY_SYSTEMIC and row.get("president_id") is not None
+            ),
         },
         "warnings": warnings,
         "president_scores": president_scores,
@@ -467,8 +858,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "outcome_contribution_samples": contributions[: args.sample_limit],
         "sql": {
             "policy_outcomes_query": build_policy_outcomes_sql(
-                has_impact_score=has_impact_score,
-                has_source_quality="source_quality" in columns,
+                columns,
             ).strip(),
         },
     }
@@ -487,6 +877,20 @@ def write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         "blocked_outcomes",
         "raw_score",
         "normalized_score",
+        "display_score",
+        "display_normalized_score",
+        "score_confidence",
+        "score_confidence_factor",
+        "direct_raw_score",
+        "direct_normalized_score",
+        "direct_outcome_count",
+        "direct_score_confidence",
+        "systemic_raw_score",
+        "systemic_normalized_score",
+        "systemic_outcome_count",
+        "systemic_score_confidence",
+        "combined_context_score",
+        "combined_context_normalized_score",
         "avg_score_per_policy",
         "confidence_avg",
         "confidence_flag",

@@ -2090,6 +2090,10 @@ run_impact_command() {
       run_step "1/1" "Certify Production Data Model and Scoring" "Production data certification audit complete" --output "$EQUITYSTACK_PYTHON_DIR/reports/production-data-model-scoring-certification.json" -- \
         "$VENV_PYTHON" scripts/audit_production_certification.py "$@"
       ;;
+    validate-integrity)
+      run_step "1/1" "Validate Policy Outcome Integrity" "Policy outcome integrity validation complete" --output "$EQUITYSTACK_PYTHON_DIR/reports/policy-outcome-integrity-validation.json" -- \
+        "$VENV_PYTHON" scripts/validate_policy_outcome_integrity.py "$@"
+      ;;
     complete-certification-readiness)
       run_step "1/1" "Complete Production Certification Readiness" "Production certification readiness completion finished" --output "$EQUITYSTACK_PYTHON_DIR/reports/production-certification-readiness-completion.dry-run.json" -- \
         "$VENV_PYTHON" scripts/complete_production_certification_readiness.py "$@"
@@ -2708,6 +2712,7 @@ Impact maturation commands:
   report-outcome-time  Report unified policy_outcomes by year, decade, and administration
   report-final-black-impact-score  Compute final Black Impact Score per president
   certify-production-data  End-to-end read-only data model and scoring certification
+  validate-integrity  Validate attribution consistency and policy_outcomes drift risks
   complete-certification-readiness  Apply guarded certification readiness backfills
   backfill-policy-time-intent  Dry-run or apply safe policy time and intent backfills
   curate-policy-intent  Manually classify missing historical policy intent
@@ -2728,6 +2733,7 @@ Examples:
   $(cli_hint) impact report-outcome-time
   $(cli_hint) impact report-final-black-impact-score
   $(cli_hint) impact certify-production-data
+  $(cli_hint) impact validate-integrity
   $(cli_hint) impact complete-certification-readiness
   $(cli_hint) impact backfill-policy-time-intent
   $(cli_hint) impact curate-policy-intent --non-interactive --limit 10
@@ -2771,6 +2777,8 @@ Commands:
              Read-only final Black Impact Score per president from unified policy_outcomes
   certify-production-data
              End-to-end read-only production data model and scoring certification audit
+  validate-integrity
+             Read-only attribution consistency and policy_outcomes integrity validation
   complete-certification-readiness
              Dry-run or apply guarded production certification readiness backfills
   audit-policy-intent-gaps
@@ -2801,6 +2809,7 @@ Examples:
   $(cli_hint) impact report-policy-intent
   $(cli_hint) impact report-final-black-impact-score
   $(cli_hint) impact certify-production-data
+  $(cli_hint) impact validate-integrity
   $(cli_hint) impact complete-certification-readiness
   $(cli_hint) impact audit-policy-intent-gaps
   $(cli_hint) impact backfill-policy-time-intent
@@ -2823,6 +2832,8 @@ Safety:
   Outcome temporal attribution audit is dry-run by default and will not write
   dates unless suitable date/provenance columns exist and --apply --yes is explicit.
   Source quality audit is read-only and never edits source rows or joins.
+  Integrity validation is read-only and reports attribution/source/coverage
+  warnings without modifying policy_outcomes.
   Outcome time reporting is read-only and never mutates policy_outcomes.
   Policy intent reporting is read-only and never infers missing intent.
   Policy time/intent backfill is dry-run by default, updates only NULL

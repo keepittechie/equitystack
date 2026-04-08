@@ -1,8 +1,9 @@
--- Unified outcomes model for current-admin and legislative policies.
+-- Unified outcomes model for current-admin, legislative, and judicial impacts.
 --
 -- `policy_id` is a polymorphic reference:
---   - policy_type = 'current_admin' -> promises.id
---   - policy_type = 'legislative'   -> tracked_bills.id
+--   - policy_type = 'current_admin'    -> promises.id
+--   - policy_type = 'legislative'      -> tracked_bills.id
+--   - policy_type = 'judicial_impact'  -> policies.id
 --
 -- MySQL cannot enforce that conditional foreign key directly without splitting
 -- the model into separate nullable columns, so the application resolves and
@@ -10,7 +11,7 @@
 
 CREATE TABLE IF NOT EXISTS policy_outcomes (
   id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  policy_type ENUM('current_admin', 'legislative') NOT NULL,
+  policy_type ENUM('current_admin', 'legislative', 'judicial_impact') NOT NULL,
   policy_id BIGINT UNSIGNED NOT NULL,
   record_key VARCHAR(255) NOT NULL,
   outcome_summary TEXT NOT NULL,
@@ -27,6 +28,12 @@ CREATE TABLE IF NOT EXISTS policy_outcomes (
   impact_start_date DATE NULL,
   impact_end_date DATE NULL,
   impact_duration_estimate VARCHAR(64) NULL,
+  court_level VARCHAR(100) NULL,
+  decision_year SMALLINT UNSIGNED NULL,
+  majority_justices JSON NULL,
+  appointing_presidents JSON NULL,
+  judicial_attribution JSON NULL,
+  judicial_weight DECIMAL(5,4) NULL,
   black_community_impact_note TEXT NULL,
   created_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   updated_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
@@ -36,6 +43,7 @@ CREATE TABLE IF NOT EXISTS policy_outcomes (
   KEY idx_policy_outcomes_record_key (record_key),
   KEY idx_policy_outcomes_impact_direction (impact_direction),
   KEY idx_policy_outcomes_evidence_strength (evidence_strength),
+  KEY idx_policy_outcomes_decision_year (decision_year),
   KEY idx_policy_outcomes_impact_start_date (impact_start_date),
   KEY idx_policy_outcomes_impact_date_range (impact_start_date, impact_end_date)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

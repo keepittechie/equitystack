@@ -402,7 +402,7 @@ def integrity_checks(cursor) -> dict[str, Any]:
             OR impact_score > 100
             OR impact_direction NOT IN ('Positive', 'Negative', 'Mixed', 'Blocked')
             OR source_count < 0
-            OR policy_type NOT IN ('current_admin', 'legislative')
+            OR policy_type NOT IN ('current_admin', 'legislative', 'judicial_impact')
           )
         """
     )
