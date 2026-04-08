@@ -1,0 +1,1445 @@
+{
+  "workflow": "production_data_model_scoring_certification_audit",
+  "generated_at": "2026-04-08T02:05:46+00:00",
+  "mode": "read_only",
+  "database_mutated": false,
+  "data_integrity_status": "WARN",
+  "system_strengths": [
+    "policy_outcomes rows join deterministically to current-admin promises and presidents.",
+    "No duplicate scoring aggregation was detected.",
+    "All policy_outcomes currently have impact_start_date values.",
+    "Major target categories are present in the historical policies table."
+  ],
+  "critical_gaps": [
+    "39 policy_outcomes have source_count=0."
+  ],
+  "minor_gaps": [
+    "55 active policies remain without policy_intent_category.",
+    "Some decades have fewer than 2 historical policy records."
+  ],
+  "recommended_next_actions": [
+    "Add or backfill a canonical numeric outcome impact magnitude if this score must use policy_outcomes.impact_score directly.",
+    "Curate sources for the highest-priority source_count=0 policy_outcomes.",
+    "Review and apply legislative materialization only after accepting procedural blocked-status outcomes.",
+    "Finish manual policy intent curation for remaining high-impact unclassified policies.",
+    "Use the Missing Policy Report to fill remaining landmark historical gaps before public interpretation."
+  ],
+  "dataset_completeness_score": {
+    "final_completeness_score": 82.84,
+    "component_breakdown": {
+      "source_coverage": 16.37,
+      "intent_classification": 11.47,
+      "legislative_inclusion": 15,
+      "temporal_coverage": 20.0,
+      "category_coverage": 20.0
+    },
+    "scale": "0-100"
+  },
+  "sections": {
+    "scoring_integrity_audit": {
+      "status": "PASS",
+      "impact_score_column_present": true,
+      "inconsistency_count": 0,
+      "sample_issues": []
+    },
+    "duplicate_and_collision_detection": {
+      "status": "PASS",
+      "duplicate_group_count": 0,
+      "near_duplicate_group_count": 0,
+      "duplicate_scoring_contribution_count": 0,
+      "duplicate_groups": [],
+      "near_duplicate_groups": [],
+      "duplicate_scoring_contributions": []
+    },
+    "source_coverage_and_confidence_audit": {
+      "status": "WARN",
+      "total_outcomes": 113,
+      "source_bucket_counts": {
+        "1_source": 61,
+        "0_sources": 39,
+        "2_plus_sources": 13
+      },
+      "source_bucket_percentages": {
+        "1_source": 0.5398,
+        "0_sources": 0.3451,
+        "2_plus_sources": 0.115
+      },
+      "by_policy_type": {
+        "current_admin": {
+          "outcome_count": 94,
+          "average_source_count": 0.7234,
+          "source_bucket_counts": {
+            "1_source": 42,
+            "0_sources": 39,
+            "2_plus_sources": 13
+          }
+        },
+        "legislative": {
+          "outcome_count": 19,
+          "average_source_count": 1.0,
+          "source_bucket_counts": {
+            "1_source": 19
+          }
+        }
+      },
+      "low_confidence_outcome_count": 39,
+      "top_25_highest_impact_missing_sources": [
+        {
+          "policy_outcome_id": 53,
+          "policy_type": "current_admin",
+          "policy_id": 58,
+          "policy_title": "Appoint Thurgood Marshall to the Supreme Court",
+          "impact_direction": "Positive",
+          "source_count": 0,
+          "outcome_summary": "Johnson delivered the appointment by nominating and securing confirmation of Thurgood Marshall to the Supreme Court.",
+          "impact_proxy_score": 100,
+          "impact_score_kind": "derived_missing_source_priority",
+          "evidence_strength": "Strong",
+          "status": "Complete"
+        },
+        {
+          "policy_outcome_id": 54,
+          "policy_type": "current_admin",
+          "policy_id": 59,
+          "policy_title": "Expand affirmative-action requirements in federal contracting",
+          "impact_direction": "Positive",
+          "source_count": 0,
+          "outcome_summary": "Nixon administration policy expanded affirmative-action enforcement in federal contracting through the Philadelphia Plan framework.",
+          "impact_proxy_score": 100,
+          "impact_score_kind": "derived_missing_source_priority",
+          "evidence_strength": "Strong",
+          "status": "Complete"
+        },
+        {
+          "policy_outcome_id": 58,
+          "policy_type": "current_admin",
+          "policy_id": 65,
+          "policy_title": "Sign the Civil Rights Act of 1875",
+          "impact_direction": "Positive",
+          "source_count": 0,
+          "outcome_summary": "Grant signed a federal public-accommodations and equal-treatment law, representing a major Reconstruction-era civil-rights protection, though later Supreme Court decisions limited its long-term enforcement.",
+          "impact_proxy_score": 100,
+          "impact_score_kind": "derived_missing_source_priority",
+          "evidence_strength": "Strong",
+          "status": "Complete"
+        },
+        {
+          "policy_outcome_id": 59,
+          "policy_type": "current_admin",
+          "policy_id": 66,
+          "policy_title": "Sign the Civil Rights Act of 1964",
+          "impact_direction": "Positive",
+          "source_count": 0,
+          "outcome_summary": "Johnson delivered the central anti-discrimination law of the Civil Rights era through enactment of the Civil Rights Act of 1964.",
+          "impact_proxy_score": 100,
+          "impact_score_kind": "derived_missing_source_priority",
+          "evidence_strength": "Strong",
+          "status": "Complete"
+        },
+        {
+          "policy_outcome_id": 60,
+          "policy_type": "current_admin",
+          "policy_id": 67,
+          "policy_title": "Issue Executive Order 11246 on nondiscrimination and affirmative action in federal contracting",
+          "impact_direction": "Positive",
+          "source_count": 0,
+          "outcome_summary": "Johnson created a stronger executive framework for nondiscrimination and affirmative-action enforcement in federal contracting before later Nixon-era expansion.",
+          "impact_proxy_score": 100,
+          "impact_score_kind": "derived_missing_source_priority",
+          "evidence_strength": "Strong",
+          "status": "Complete"
+        },
+        {
+          "policy_outcome_id": 61,
+          "policy_type": "current_admin",
+          "policy_id": 68,
+          "policy_title": "Enforce school desegregation at Little Rock",
+          "impact_direction": "Positive",
+          "source_count": 0,
+          "outcome_summary": "Eisenhower used federal executive power to enforce court-ordered school desegregation against state resistance in Little Rock.",
+          "impact_proxy_score": 100,
+          "impact_score_kind": "derived_missing_source_priority",
+          "evidence_strength": "Strong",
+          "status": "Complete"
+        },
+        {
+          "policy_outcome_id": 62,
+          "policy_type": "current_admin",
+          "policy_id": 69,
+          "policy_title": "Sign the Civil Rights Act of 1957",
+          "impact_direction": "Positive",
+          "source_count": 0,
+          "outcome_summary": "Eisenhower signed the first modern federal civil-rights law since Reconstruction, rebuilding federal civil-rights enforcement capacity even in a limited form.",
+          "impact_proxy_score": 100,
+          "impact_score_kind": "derived_missing_source_priority",
+          "evidence_strength": "Strong",
+          "status": "Complete"
+        },
+        {
+          "policy_outcome_id": 63,
+          "policy_type": "current_admin",
+          "policy_id": 72,
+          "policy_title": "Sign the Voting Rights Act Reauthorization of 2006",
+          "impact_direction": "Positive",
+          "source_count": 0,
+          "outcome_summary": "Bush preserved major Voting Rights Act protections by signing the 2006 reauthorization, extending federal voting-rights enforcement before later judicial rollback.",
+          "impact_proxy_score": 100,
+          "impact_score_kind": "derived_missing_source_priority",
+          "evidence_strength": "Strong",
+          "status": "Complete"
+        },
+        {
+          "policy_outcome_id": 64,
+          "policy_type": "current_admin",
+          "policy_id": 73,
+          "policy_title": "Desegregate the armed forces",
+          "impact_direction": "Positive",
+          "source_count": 0,
+          "outcome_summary": "Truman formally committed the federal government to ending segregation in the armed services and began a consequential process of military desegregation.",
+          "impact_proxy_score": 100,
+          "impact_score_kind": "derived_missing_source_priority",
+          "evidence_strength": "Strong",
+          "status": "Complete"
+        },
+        {
+          "policy_outcome_id": 65,
+          "policy_type": "current_admin",
+          "policy_id": 74,
+          "policy_title": "Issue Executive Order 10925 on equal employment opportunity",
+          "impact_direction": "Positive",
+          "source_count": 0,
+          "outcome_summary": "Kennedy created an early modern equal-employment enforcement framework in federal contracting, requiring proactive action against discrimination.",
+          "impact_proxy_score": 100,
+          "impact_score_kind": "derived_missing_source_priority",
+          "evidence_strength": "Strong",
+          "status": "Complete"
+        },
+        {
+          "policy_outcome_id": 66,
+          "policy_type": "current_admin",
+          "policy_id": 75,
+          "policy_title": "Issue Executive Order 11063 on nondiscrimination in federally assisted housing",
+          "impact_direction": "Positive",
+          "source_count": 0,
+          "outcome_summary": "Kennedy created a federal nondiscrimination framework for federally assisted housing before the Fair Housing Act of 1968.",
+          "impact_proxy_score": 100,
+          "impact_score_kind": "derived_missing_source_priority",
+          "evidence_strength": "Strong",
+          "status": "Complete"
+        },
+        {
+          "policy_outcome_id": 67,
+          "policy_type": "current_admin",
+          "policy_id": 76,
+          "policy_title": "Sign the Community Reinvestment Act",
+          "impact_direction": "Positive",
+          "source_count": 0,
+          "outcome_summary": "Carter signed a major anti-redlining law that created a durable federal framework for pushing banks to serve neglected communities more fairly.",
+          "impact_proxy_score": 100,
+          "impact_score_kind": "derived_missing_source_priority",
+          "evidence_strength": "Strong",
+          "status": "Complete"
+        },
+        {
+          "policy_outcome_id": 68,
+          "policy_type": "current_admin",
+          "policy_id": 79,
+          "policy_title": "Withdraw federal troops and accept Southern home rule",
+          "impact_direction": "Negative",
+          "source_count": 0,
+          "outcome_summary": "Federal military and political protection for Reconstruction governments was withdrawn, and no comparable enforcement framework replaced it.",
+          "impact_proxy_score": 100,
+          "impact_score_kind": "derived_missing_source_priority",
+          "evidence_strength": "Strong",
+          "status": "Complete"
+        },
+        {
+          "policy_outcome_id": 70,
+          "policy_type": "current_admin",
+          "policy_id": 81,
+          "policy_title": "Retreat from federal civil-rights enforcement after the Civil Rights Cases",
+          "impact_direction": "Negative",
+          "source_count": 0,
+          "outcome_summary": "The federal government accepted a narrower civil-rights enforcement role after the Civil Rights Cases without mounting a major replacement response.",
+          "impact_proxy_score": 100,
+          "impact_score_kind": "derived_missing_source_priority",
+          "evidence_strength": "Strong",
+          "status": "Complete"
+        },
+        {
+          "policy_outcome_id": 69,
+          "policy_type": "current_admin",
+          "policy_id": 80,
+          "policy_title": "Allow federal enforcement to weaken after United States v. Cruikshank",
+          "impact_direction": "Negative",
+          "source_count": 0,
+          "outcome_summary": "Federal enforcement capacity against racial terror and rights violations weakened substantially late in Grant's presidency.",
+          "impact_proxy_score": 97,
+          "impact_score_kind": "derived_missing_source_priority",
+          "evidence_strength": "Strong",
+          "status": "Failed"
+        },
+        {
+          "policy_outcome_id": 71,
+          "policy_type": "current_admin",
+          "policy_id": 82,
+          "policy_title": "Protect Black voting rights through the Lodge Elections Bill",
+          "impact_direction": "Negative",
+          "source_count": 0,
+          "outcome_summary": "No renewed federal election-protection law was enacted, and the strongest late-nineteenth-century restoration effort failed.",
+          "impact_proxy_score": 97,
+          "impact_score_kind": "derived_missing_source_priority",
+          "evidence_strength": "Strong",
+          "status": "Failed"
+        },
+        {
+          "policy_outcome_id": 55,
+          "policy_type": "current_admin",
+          "policy_id": 60,
+          "policy_title": "Expand the Child Tax Credit and make it fully refundable",
+          "impact_direction": "Positive",
+          "source_count": 0,
+          "outcome_summary": "Biden delivered a large temporary Child Tax Credit expansion, but he did not make the fuller refundable expansion permanent.",
+          "impact_proxy_score": 95,
+          "impact_score_kind": "derived_missing_source_priority",
+          "evidence_strength": "Strong",
+          "status": "Partial"
+        },
+        {
+          "policy_outcome_id": 16,
+          "policy_type": "current_admin",
+          "policy_id": 16,
+          "policy_title": "Withdraw the United States from TPP",
+          "impact_direction": "Mixed",
+          "source_count": 0,
+          "outcome_summary": "The United States formally withdrew from TPP negotiations.",
+          "impact_proxy_score": 80,
+          "impact_score_kind": "derived_missing_source_priority",
+          "evidence_strength": "Strong",
+          "status": "Complete"
+        },
+        {
+          "policy_outcome_id": 19,
+          "policy_type": "current_admin",
+          "policy_id": 19,
+          "policy_title": "Move the U.S. embassy in Israel to Jerusalem",
+          "impact_direction": "Mixed",
+          "source_count": 0,
+          "outcome_summary": "The U.S. embassy was moved to Jerusalem, delivering the central promise.",
+          "impact_proxy_score": 80,
+          "impact_score_kind": "derived_missing_source_priority",
+          "evidence_strength": "Strong",
+          "status": "Complete"
+        },
+        {
+          "policy_outcome_id": 20,
+          "policy_type": "current_admin",
+          "policy_id": 20,
+          "policy_title": "Replace NAFTA with a new trade deal",
+          "impact_direction": "Mixed",
+          "source_count": 0,
+          "outcome_summary": "NAFTA was replaced by USMCA.",
+          "impact_proxy_score": 80,
+          "impact_score_kind": "derived_missing_source_priority",
+          "evidence_strength": "Strong",
+          "status": "Complete"
+        },
+        {
+          "policy_outcome_id": 21,
+          "policy_type": "current_admin",
+          "policy_id": 21,
+          "policy_title": "Appoint conservative Supreme Court justices",
+          "impact_direction": "Mixed",
+          "source_count": 0,
+          "outcome_summary": "Trump delivered on the promise to appoint conservative Supreme Court justices.",
+          "impact_proxy_score": 80,
+          "impact_score_kind": "derived_missing_source_priority",
+          "evidence_strength": "Strong",
+          "status": "Complete"
+        },
+        {
+          "policy_outcome_id": 24,
+          "policy_type": "current_admin",
+          "policy_id": 24,
+          "policy_title": "Deliver a major federal tax cut",
+          "impact_direction": "Mixed",
+          "source_count": 0,
+          "outcome_summary": "Trump delivered a large tax cut package centered on corporate-rate reduction and broad tax changes.",
+          "impact_proxy_score": 80,
+          "impact_score_kind": "derived_missing_source_priority",
+          "evidence_strength": "Strong",
+          "status": "Complete"
+        },
+        {
+          "policy_outcome_id": 6,
+          "policy_type": "current_admin",
+          "policy_id": 6,
+          "policy_title": "Close Guantanamo Bay detention facility",
+          "impact_direction": "Mixed",
+          "source_count": 0,
+          "outcome_summary": "The administration reduced the detainee population and repeatedly pursued closure, but Guantanamo remained open.",
+          "impact_proxy_score": 77,
+          "impact_score_kind": "derived_missing_source_priority",
+          "evidence_strength": "Strong",
+          "status": "Failed"
+        },
+        {
+          "policy_outcome_id": 22,
+          "policy_type": "current_admin",
+          "policy_id": 22,
+          "policy_title": "Repeal and replace the Affordable Care Act",
+          "impact_direction": "Mixed",
+          "source_count": 0,
+          "outcome_summary": "The Affordable Care Act was not repealed, though some regulatory and tax changes weakened parts of the law.",
+          "impact_proxy_score": 77,
+          "impact_score_kind": "derived_missing_source_priority",
+          "evidence_strength": "Strong",
+          "status": "Failed"
+        },
+        {
+          "policy_outcome_id": 7,
+          "policy_type": "current_admin",
+          "policy_id": 7,
+          "policy_title": "End combat-brigade deployment in Iraq",
+          "impact_direction": "Mixed",
+          "source_count": 0,
+          "outcome_summary": "Combat brigades were withdrawn and the formal combat mission ended, but the broader conflict and later U.S. re-engagement undercut the full promise frame.",
+          "impact_proxy_score": 75,
+          "impact_score_kind": "derived_missing_source_priority",
+          "evidence_strength": "Strong",
+          "status": "Partial"
+        }
+      ]
+    },
+    "policy_intent_coverage_audit": {
+      "status": "WARN",
+      "total_policies": 129,
+      "classified_policy_count": 74,
+      "unclassified_policy_count": 55,
+      "classified_policy_pct": 0.5736,
+      "distribution": {
+        "equity_expanding": 56,
+        "equity_restricting": 4,
+        "neutral_administrative": 14,
+        "unclassified": 55
+      },
+      "high_impact_unclassified_policies": [
+        {
+          "policy_id": 157,
+          "title": "Social Security Amendments of 1965",
+          "year": 1965,
+          "impact_direction": "Positive",
+          "impact_score": 39,
+          "categories": [
+            "Healthcare",
+            "Social Welfare"
+          ]
+        },
+        {
+          "policy_id": 85,
+          "title": "Enforcement Act of 1871 (Second Enforcement Act)",
+          "year": 1871,
+          "impact_direction": "Positive",
+          "impact_score": 35,
+          "categories": [
+            "Voting Rights"
+          ]
+        },
+        {
+          "policy_id": 148,
+          "title": "Post-9/11 GI Bill",
+          "year": 2008,
+          "impact_direction": "Positive",
+          "impact_score": 34,
+          "categories": [
+            "Business and Economics",
+            "Education",
+            "Military and Veterans"
+          ]
+        },
+        {
+          "policy_id": 150,
+          "title": "Honoring our PACT Act of 2022",
+          "year": 2022,
+          "impact_direction": "Positive",
+          "impact_score": 34,
+          "categories": [
+            "Healthcare",
+            "Military and Veterans"
+          ]
+        },
+        {
+          "policy_id": 144,
+          "title": "Healthy Start Initiative",
+          "year": 1991,
+          "impact_direction": "Positive",
+          "impact_score": 33,
+          "categories": [
+            "Healthcare",
+            "Social Welfare"
+          ]
+        },
+        {
+          "policy_id": 16,
+          "title": "Enforcement Acts",
+          "year": 1870,
+          "impact_direction": "Positive",
+          "impact_score": 32,
+          "categories": [
+            "Civil Rights",
+            "Voting Rights"
+          ]
+        },
+        {
+          "policy_id": 39,
+          "title": "Smith v. Allwright",
+          "year": 1944,
+          "impact_direction": "Positive",
+          "impact_score": 32,
+          "categories": [
+            "Voting Rights"
+          ]
+        },
+        {
+          "policy_id": 48,
+          "title": "Browder v. Gayle",
+          "year": 1956,
+          "impact_direction": "Positive",
+          "impact_score": 32,
+          "categories": [
+            "Civil Rights",
+            "Constitutional Rights"
+          ]
+        },
+        {
+          "policy_id": 58,
+          "title": "Allen v. State Board of Elections",
+          "year": 1969,
+          "impact_direction": "Positive",
+          "impact_score": 32,
+          "categories": [
+            "Voting Rights"
+          ]
+        },
+        {
+          "policy_id": 143,
+          "title": "Emergency Medical Treatment and Active Labor Act",
+          "year": 1986,
+          "impact_direction": "Positive",
+          "impact_score": 32,
+          "categories": [
+            "Civil Rights",
+            "Healthcare"
+          ]
+        },
+        {
+          "policy_id": 97,
+          "title": "Motor Voter Act (National Voter Registration Act)",
+          "year": 1993,
+          "impact_direction": "Positive",
+          "impact_score": 32,
+          "categories": [
+            "Voting Rights"
+          ]
+        },
+        {
+          "policy_id": 147,
+          "title": "Veterans' Health Care Eligibility Reform Act of 1996",
+          "year": 1996,
+          "impact_direction": "Positive",
+          "impact_score": 32,
+          "categories": [
+            "Healthcare",
+            "Military and Veterans"
+          ]
+        },
+        {
+          "policy_id": 146,
+          "title": "Maternal, Infant, and Early Childhood Home Visiting Program",
+          "year": 2010,
+          "impact_direction": "Positive",
+          "impact_score": 32,
+          "categories": [
+            "Healthcare",
+            "Social Welfare"
+          ]
+        },
+        {
+          "policy_id": 149,
+          "title": "Harry W. Colmery Veterans Educational Assistance Act of 2017",
+          "year": 2017,
+          "impact_direction": "Positive",
+          "impact_score": 32,
+          "categories": [
+            "Business and Economics",
+            "Education",
+            "Military and Veterans"
+          ]
+        },
+        {
+          "policy_id": 56,
+          "title": "Freedom to Vote Act",
+          "year": 2021,
+          "impact_direction": "Blocked",
+          "impact_score": 32,
+          "categories": [
+            "Civil Rights",
+            "Voting Rights"
+          ]
+        },
+        {
+          "policy_id": 135,
+          "title": "Heirs' Property Relending Program",
+          "year": 2021,
+          "impact_direction": "Positive",
+          "impact_score": 32,
+          "categories": [
+            "Business and Economics",
+            "Civil Rights"
+          ]
+        },
+        {
+          "policy_id": 14,
+          "title": "Freedmen's Bureau Act",
+          "year": 1866,
+          "impact_direction": "Positive",
+          "impact_score": 31,
+          "categories": [
+            "Education",
+            "Social Welfare"
+          ]
+        },
+        {
+          "policy_id": 36,
+          "title": "Civil Rights Cases (1883)",
+          "year": 1883,
+          "impact_direction": "Negative",
+          "impact_score": 31,
+          "categories": [
+            "Civil Rights",
+            "Constitutional Rights"
+          ]
+        },
+        {
+          "policy_id": 40,
+          "title": "Shelley v. Kraemer",
+          "year": 1948,
+          "impact_direction": "Positive",
+          "impact_score": 31,
+          "categories": [
+            "Civil Rights",
+            "Housing"
+          ]
+        },
+        {
+          "policy_id": 120,
+          "title": "Executive Order 10925",
+          "year": 1961,
+          "impact_direction": "Positive",
+          "impact_score": 31,
+          "categories": [
+            "Business and Economics",
+            "Civil Rights",
+            "Labor"
+          ]
+        },
+        {
+          "policy_id": 142,
+          "title": "Housing and Community Development Act of 1974",
+          "year": 1974,
+          "impact_direction": "Mixed",
+          "impact_score": 31,
+          "categories": [
+            "Business and Economics",
+            "Civil Rights",
+            "Housing"
+          ]
+        },
+        {
+          "policy_id": 66,
+          "title": "Grutter v. Bollinger",
+          "year": 2003,
+          "impact_direction": "Positive",
+          "impact_score": 31,
+          "categories": [
+            "Civil Rights",
+            "Education"
+          ]
+        },
+        {
+          "policy_id": 145,
+          "title": "Children's Health Insurance Program Reauthorization Act of 2009",
+          "year": 2009,
+          "impact_direction": "Positive",
+          "impact_score": 31,
+          "categories": [
+            "Healthcare",
+            "Social Welfare"
+          ]
+        },
+        {
+          "policy_id": 134,
+          "title": "American Rescue Plan Act of 2021 Section 1005 Debt Relief for Socially Disadvantaged Farmers",
+          "year": 2021,
+          "impact_direction": "Mixed",
+          "impact_score": 31,
+          "categories": [
+            "Business and Economics",
+            "Civil Rights"
+          ]
+        },
+        {
+          "policy_id": 112,
+          "title": "United States v. Cruikshank",
+          "year": 1876,
+          "impact_direction": "Negative",
+          "impact_score": 30,
+          "categories": [
+            "Civil Rights",
+            "Constitutional Rights",
+            "Criminal Justice",
+            "Voting Rights"
+          ]
+        }
+      ]
+    },
+    "legislative_pipeline_validation": {
+      "status": "PASS",
+      "tracked_bills_evaluated": 19,
+      "legislative_policy_outcomes": 19,
+      "tracked_bill_status_distribution": {
+        "In Committee": 17,
+        "Introduced": 2
+      },
+      "legislative_outcome_direction_distribution": {
+        "Blocked": 19
+      },
+      "violations_count": 0,
+      "violations": [],
+      "warnings": []
+    },
+    "president_score_validation": {
+      "status": "PASS",
+      "duplicate_outcome_aggregation_count": 0,
+      "top_10_presidents_by_score": [
+        {
+          "president_name": "Joseph R. Biden Jr.",
+          "president_slug": "joseph-r-biden-jr",
+          "term_start": "2021-01-20",
+          "term_end": "2025-01-20",
+          "years_in_office": 4.0001,
+          "total_policies": 22,
+          "total_outcomes": 22,
+          "positive_outcomes": 9,
+          "negative_outcomes": 0,
+          "mixed_outcomes": 8,
+          "blocked_outcomes": 5,
+          "raw_score": 7.65,
+          "normalized_score": 1.9125,
+          "avg_score_per_policy": 0.3477,
+          "confidence_avg": 0.7,
+          "confidence_flag": "standard"
+        },
+        {
+          "president_name": "Donald J. Trump",
+          "president_slug": "donald-j-trump-2025",
+          "term_start": "2025-01-20",
+          "term_end": null,
+          "years_in_office": 1.2102,
+          "total_policies": 11,
+          "total_outcomes": 11,
+          "positive_outcomes": 3,
+          "negative_outcomes": 2,
+          "mixed_outcomes": 6,
+          "blocked_outcomes": 0,
+          "raw_score": 1.4,
+          "normalized_score": 1.1568,
+          "avg_score_per_policy": 0.1273,
+          "confidence_avg": 0.8,
+          "confidence_flag": "standard"
+        },
+        {
+          "president_name": "Lyndon B. Johnson",
+          "president_slug": "lyndon-b-johnson",
+          "term_start": "1963-11-22",
+          "term_end": "1969-01-20",
+          "years_in_office": 5.1637,
+          "total_policies": 7,
+          "total_outcomes": 7,
+          "positive_outcomes": 7,
+          "negative_outcomes": 0,
+          "mixed_outcomes": 0,
+          "blocked_outcomes": 0,
+          "raw_score": 5.52,
+          "normalized_score": 1.069,
+          "avg_score_per_policy": 0.7886,
+          "confidence_avg": 0.7714,
+          "confidence_flag": "standard"
+        },
+        {
+          "president_name": "Barack Obama",
+          "president_slug": "barack-obama",
+          "term_start": "2009-01-20",
+          "term_end": "2017-01-20",
+          "years_in_office": 8.0002,
+          "total_policies": 16,
+          "total_outcomes": 16,
+          "positive_outcomes": 9,
+          "negative_outcomes": 1,
+          "mixed_outcomes": 4,
+          "blocked_outcomes": 2,
+          "raw_score": 6.98,
+          "normalized_score": 0.8725,
+          "avg_score_per_policy": 0.4363,
+          "confidence_avg": 0.7375,
+          "confidence_flag": "standard"
+        },
+        {
+          "president_name": "John F. Kennedy",
+          "president_slug": "john-f-kennedy",
+          "term_start": "1961-01-20",
+          "term_end": "1963-11-22",
+          "years_in_office": 2.8365,
+          "total_policies": 2,
+          "total_outcomes": 2,
+          "positive_outcomes": 2,
+          "negative_outcomes": 0,
+          "mixed_outcomes": 0,
+          "blocked_outcomes": 0,
+          "raw_score": 1.26,
+          "normalized_score": 0.4442,
+          "avg_score_per_policy": 0.63,
+          "confidence_avg": 0.6,
+          "confidence_flag": "low confidence"
+        },
+        {
+          "president_name": "Woodrow Wilson",
+          "president_slug": "woodrow-wilson",
+          "term_start": "1913-03-04",
+          "term_end": "1921-03-04",
+          "years_in_office": 8.0002,
+          "total_policies": 3,
+          "total_outcomes": 3,
+          "positive_outcomes": 2,
+          "negative_outcomes": 0,
+          "mixed_outcomes": 1,
+          "blocked_outcomes": 0,
+          "raw_score": 2.125,
+          "normalized_score": 0.2656,
+          "avg_score_per_policy": 0.7083,
+          "confidence_avg": 1.0,
+          "confidence_flag": "low confidence"
+        },
+        {
+          "president_name": "Jimmy Carter",
+          "president_slug": "jimmy-carter",
+          "term_start": "1977-01-20",
+          "term_end": "1981-01-20",
+          "years_in_office": 4.0001,
+          "total_policies": 1,
+          "total_outcomes": 1,
+          "positive_outcomes": 1,
+          "negative_outcomes": 0,
+          "mixed_outcomes": 0,
+          "blocked_outcomes": 0,
+          "raw_score": 0.66,
+          "normalized_score": 0.165,
+          "avg_score_per_policy": 0.66,
+          "confidence_avg": 0.6,
+          "confidence_flag": "low confidence"
+        },
+        {
+          "president_name": "Dwight D. Eisenhower",
+          "president_slug": "dwight-d-eisenhower",
+          "term_start": "1953-01-20",
+          "term_end": "1961-01-20",
+          "years_in_office": 8.0002,
+          "total_policies": 2,
+          "total_outcomes": 2,
+          "positive_outcomes": 2,
+          "negative_outcomes": 0,
+          "mixed_outcomes": 0,
+          "blocked_outcomes": 0,
+          "raw_score": 1.26,
+          "normalized_score": 0.1575,
+          "avg_score_per_policy": 0.63,
+          "confidence_avg": 0.6,
+          "confidence_flag": "low confidence"
+        },
+        {
+          "president_name": "Ronald Reagan",
+          "president_slug": "ronald-reagan",
+          "term_start": "1981-01-20",
+          "term_end": "1989-01-20",
+          "years_in_office": 8.0002,
+          "total_policies": 1,
+          "total_outcomes": 1,
+          "positive_outcomes": 1,
+          "negative_outcomes": 0,
+          "mixed_outcomes": 0,
+          "blocked_outcomes": 0,
+          "raw_score": 1.0,
+          "normalized_score": 0.125,
+          "avg_score_per_policy": 1.0,
+          "confidence_avg": 1.0,
+          "confidence_flag": "low confidence"
+        },
+        {
+          "president_name": "Richard Nixon",
+          "president_slug": "richard-nixon",
+          "term_start": "1969-01-20",
+          "term_end": "1974-08-09",
+          "years_in_office": 5.5497,
+          "total_policies": 1,
+          "total_outcomes": 1,
+          "positive_outcomes": 1,
+          "negative_outcomes": 0,
+          "mixed_outcomes": 0,
+          "blocked_outcomes": 0,
+          "raw_score": 0.6,
+          "normalized_score": 0.1081,
+          "avg_score_per_policy": 0.6,
+          "confidence_avg": 0.6,
+          "confidence_flag": "low confidence"
+        }
+      ],
+      "bottom_10_presidents_by_score": [
+        {
+          "president_name": "Donald J. Trump",
+          "president_slug": "donald-j-trump",
+          "term_start": "2017-01-20",
+          "term_end": "2021-01-20",
+          "years_in_office": 4.0001,
+          "total_policies": 13,
+          "total_outcomes": 13,
+          "positive_outcomes": 2,
+          "negative_outcomes": 5,
+          "mixed_outcomes": 6,
+          "blocked_outcomes": 0,
+          "raw_score": -1.95,
+          "normalized_score": -0.4875,
+          "avg_score_per_policy": -0.15,
+          "confidence_avg": 0.7077,
+          "confidence_flag": "standard"
+        },
+        {
+          "president_name": "Grover Cleveland",
+          "president_slug": "grover-cleveland",
+          "term_start": "1893-03-04",
+          "term_end": "1897-03-04",
+          "years_in_office": 4.0001,
+          "total_policies": 1,
+          "total_outcomes": 1,
+          "positive_outcomes": 0,
+          "negative_outcomes": 1,
+          "mixed_outcomes": 0,
+          "blocked_outcomes": 0,
+          "raw_score": -0.9,
+          "normalized_score": -0.225,
+          "avg_score_per_policy": -0.9,
+          "confidence_avg": 1.0,
+          "confidence_flag": "low confidence"
+        },
+        {
+          "president_name": "William McKinley",
+          "president_slug": "william-mckinley",
+          "term_start": "1897-03-04",
+          "term_end": "1901-09-14",
+          "years_in_office": 4.5285,
+          "total_policies": 1,
+          "total_outcomes": 1,
+          "positive_outcomes": 0,
+          "negative_outcomes": 1,
+          "mixed_outcomes": 0,
+          "blocked_outcomes": 0,
+          "raw_score": -1.0,
+          "normalized_score": -0.2208,
+          "avg_score_per_policy": -1.0,
+          "confidence_avg": 1.0,
+          "confidence_flag": "low confidence"
+        },
+        {
+          "president_name": "Chester A. Arthur",
+          "president_slug": "chester-a-arthur",
+          "term_start": "1881-09-19",
+          "term_end": "1885-03-04",
+          "years_in_office": 3.4552,
+          "total_policies": 1,
+          "total_outcomes": 1,
+          "positive_outcomes": 0,
+          "negative_outcomes": 1,
+          "mixed_outcomes": 0,
+          "blocked_outcomes": 0,
+          "raw_score": -0.6,
+          "normalized_score": -0.1737,
+          "avg_score_per_policy": -0.6,
+          "confidence_avg": 0.6,
+          "confidence_flag": "low confidence"
+        },
+        {
+          "president_name": "Benjamin Harrison",
+          "president_slug": "benjamin-harrison",
+          "term_start": "1889-03-04",
+          "term_end": "1893-03-04",
+          "years_in_office": 4.0001,
+          "total_policies": 1,
+          "total_outcomes": 1,
+          "positive_outcomes": 0,
+          "negative_outcomes": 1,
+          "mixed_outcomes": 0,
+          "blocked_outcomes": 0,
+          "raw_score": -0.6,
+          "normalized_score": -0.15,
+          "avg_score_per_policy": -0.6,
+          "confidence_avg": 0.6,
+          "confidence_flag": "low confidence"
+        },
+        {
+          "president_name": "Rutherford B. Hayes",
+          "president_slug": "rutherford-b-hayes",
+          "term_start": "1877-03-04",
+          "term_end": "1881-03-04",
+          "years_in_office": 4.0001,
+          "total_policies": 1,
+          "total_outcomes": 1,
+          "positive_outcomes": 0,
+          "negative_outcomes": 1,
+          "mixed_outcomes": 0,
+          "blocked_outcomes": 0,
+          "raw_score": -0.6,
+          "normalized_score": -0.15,
+          "avg_score_per_policy": -0.6,
+          "confidence_avg": 0.6,
+          "confidence_flag": "low confidence"
+        },
+        {
+          "president_name": "Calvin Coolidge",
+          "president_slug": "calvin-coolidge",
+          "term_start": "1923-08-02",
+          "term_end": "1929-03-04",
+          "years_in_office": 5.5881,
+          "total_policies": 1,
+          "total_outcomes": 1,
+          "positive_outcomes": 0,
+          "negative_outcomes": 1,
+          "mixed_outcomes": 0,
+          "blocked_outcomes": 0,
+          "raw_score": -0.8,
+          "normalized_score": -0.1432,
+          "avg_score_per_policy": -0.8,
+          "confidence_avg": 0.8,
+          "confidence_flag": "low confidence"
+        },
+        {
+          "president_name": "Theodore Roosevelt",
+          "president_slug": "theodore-roosevelt",
+          "term_start": "1901-09-14",
+          "term_end": "1909-03-04",
+          "years_in_office": 7.469,
+          "total_policies": 1,
+          "total_outcomes": 1,
+          "positive_outcomes": 0,
+          "negative_outcomes": 1,
+          "mixed_outcomes": 0,
+          "blocked_outcomes": 0,
+          "raw_score": -1.0,
+          "normalized_score": -0.1339,
+          "avg_score_per_policy": -1.0,
+          "confidence_avg": 1.0,
+          "confidence_flag": "low confidence"
+        },
+        {
+          "president_name": "Franklin D. Roosevelt",
+          "president_slug": "franklin-d-roosevelt",
+          "term_start": "1933-03-04",
+          "term_end": "1945-04-12",
+          "years_in_office": 12.107,
+          "total_policies": 2,
+          "total_outcomes": 2,
+          "positive_outcomes": 0,
+          "negative_outcomes": 0,
+          "mixed_outcomes": 2,
+          "blocked_outcomes": 0,
+          "raw_score": 0.25,
+          "normalized_score": 0.0206,
+          "avg_score_per_policy": 0.125,
+          "confidence_avg": 1.0,
+          "confidence_flag": "low confidence"
+        },
+        {
+          "president_name": "George W. Bush",
+          "president_slug": "george-w-bush",
+          "term_start": "2001-01-20",
+          "term_end": "2009-01-20",
+          "years_in_office": 8.0002,
+          "total_policies": 1,
+          "total_outcomes": 1,
+          "positive_outcomes": 1,
+          "negative_outcomes": 0,
+          "mixed_outcomes": 0,
+          "blocked_outcomes": 0,
+          "raw_score": 0.66,
+          "normalized_score": 0.0825,
+          "avg_score_per_policy": 0.66,
+          "confidence_avg": 0.6,
+          "confidence_flag": "low confidence"
+        }
+      ],
+      "anomalies": [],
+      "low_confidence_presidents": [
+        {
+          "president_name": "John F. Kennedy",
+          "president_slug": "john-f-kennedy",
+          "term_start": "1961-01-20",
+          "term_end": "1963-11-22",
+          "years_in_office": 2.8365,
+          "total_policies": 2,
+          "total_outcomes": 2,
+          "positive_outcomes": 2,
+          "negative_outcomes": 0,
+          "mixed_outcomes": 0,
+          "blocked_outcomes": 0,
+          "raw_score": 1.26,
+          "normalized_score": 0.4442,
+          "avg_score_per_policy": 0.63,
+          "confidence_avg": 0.6,
+          "confidence_flag": "low confidence"
+        },
+        {
+          "president_name": "Woodrow Wilson",
+          "president_slug": "woodrow-wilson",
+          "term_start": "1913-03-04",
+          "term_end": "1921-03-04",
+          "years_in_office": 8.0002,
+          "total_policies": 3,
+          "total_outcomes": 3,
+          "positive_outcomes": 2,
+          "negative_outcomes": 0,
+          "mixed_outcomes": 1,
+          "blocked_outcomes": 0,
+          "raw_score": 2.125,
+          "normalized_score": 0.2656,
+          "avg_score_per_policy": 0.7083,
+          "confidence_avg": 1.0,
+          "confidence_flag": "low confidence"
+        },
+        {
+          "president_name": "Jimmy Carter",
+          "president_slug": "jimmy-carter",
+          "term_start": "1977-01-20",
+          "term_end": "1981-01-20",
+          "years_in_office": 4.0001,
+          "total_policies": 1,
+          "total_outcomes": 1,
+          "positive_outcomes": 1,
+          "negative_outcomes": 0,
+          "mixed_outcomes": 0,
+          "blocked_outcomes": 0,
+          "raw_score": 0.66,
+          "normalized_score": 0.165,
+          "avg_score_per_policy": 0.66,
+          "confidence_avg": 0.6,
+          "confidence_flag": "low confidence"
+        },
+        {
+          "president_name": "Dwight D. Eisenhower",
+          "president_slug": "dwight-d-eisenhower",
+          "term_start": "1953-01-20",
+          "term_end": "1961-01-20",
+          "years_in_office": 8.0002,
+          "total_policies": 2,
+          "total_outcomes": 2,
+          "positive_outcomes": 2,
+          "negative_outcomes": 0,
+          "mixed_outcomes": 0,
+          "blocked_outcomes": 0,
+          "raw_score": 1.26,
+          "normalized_score": 0.1575,
+          "avg_score_per_policy": 0.63,
+          "confidence_avg": 0.6,
+          "confidence_flag": "low confidence"
+        },
+        {
+          "president_name": "Ronald Reagan",
+          "president_slug": "ronald-reagan",
+          "term_start": "1981-01-20",
+          "term_end": "1989-01-20",
+          "years_in_office": 8.0002,
+          "total_policies": 1,
+          "total_outcomes": 1,
+          "positive_outcomes": 1,
+          "negative_outcomes": 0,
+          "mixed_outcomes": 0,
+          "blocked_outcomes": 0,
+          "raw_score": 1.0,
+          "normalized_score": 0.125,
+          "avg_score_per_policy": 1.0,
+          "confidence_avg": 1.0,
+          "confidence_flag": "low confidence"
+        },
+        {
+          "president_name": "Richard Nixon",
+          "president_slug": "richard-nixon",
+          "term_start": "1969-01-20",
+          "term_end": "1974-08-09",
+          "years_in_office": 5.5497,
+          "total_policies": 1,
+          "total_outcomes": 1,
+          "positive_outcomes": 1,
+          "negative_outcomes": 0,
+          "mixed_outcomes": 0,
+          "blocked_outcomes": 0,
+          "raw_score": 0.6,
+          "normalized_score": 0.1081,
+          "avg_score_per_policy": 0.6,
+          "confidence_avg": 0.6,
+          "confidence_flag": "low confidence"
+        },
+        {
+          "president_name": "Ulysses S. Grant",
+          "president_slug": "ulysses-s-grant",
+          "term_start": "1869-03-04",
+          "term_end": "1877-03-04",
+          "years_in_office": 8.0002,
+          "total_policies": 3,
+          "total_outcomes": 3,
+          "positive_outcomes": 2,
+          "negative_outcomes": 1,
+          "mixed_outcomes": 0,
+          "blocked_outcomes": 0,
+          "raw_score": 0.86,
+          "normalized_score": 0.1075,
+          "avg_score_per_policy": 0.2867,
+          "confidence_avg": 0.6667,
+          "confidence_flag": "low confidence"
+        },
+        {
+          "president_name": "Harry S. Truman",
+          "president_slug": "harry-s-truman",
+          "term_start": "1945-04-12",
+          "term_end": "1953-01-20",
+          "years_in_office": 7.7757,
+          "total_policies": 2,
+          "total_outcomes": 2,
+          "positive_outcomes": 1,
+          "negative_outcomes": 0,
+          "mixed_outcomes": 1,
+          "blocked_outcomes": 0,
+          "raw_score": 0.785,
+          "normalized_score": 0.101,
+          "avg_score_per_policy": 0.3925,
+          "confidence_avg": 0.8,
+          "confidence_flag": "low confidence"
+        },
+        {
+          "president_name": "George W. Bush",
+          "president_slug": "george-w-bush",
+          "term_start": "2001-01-20",
+          "term_end": "2009-01-20",
+          "years_in_office": 8.0002,
+          "total_policies": 1,
+          "total_outcomes": 1,
+          "positive_outcomes": 1,
+          "negative_outcomes": 0,
+          "mixed_outcomes": 0,
+          "blocked_outcomes": 0,
+          "raw_score": 0.66,
+          "normalized_score": 0.0825,
+          "avg_score_per_policy": 0.66,
+          "confidence_avg": 0.6,
+          "confidence_flag": "low confidence"
+        },
+        {
+          "president_name": "Franklin D. Roosevelt",
+          "president_slug": "franklin-d-roosevelt",
+          "term_start": "1933-03-04",
+          "term_end": "1945-04-12",
+          "years_in_office": 12.107,
+          "total_policies": 2,
+          "total_outcomes": 2,
+          "positive_outcomes": 0,
+          "negative_outcomes": 0,
+          "mixed_outcomes": 2,
+          "blocked_outcomes": 0,
+          "raw_score": 0.25,
+          "normalized_score": 0.0206,
+          "avg_score_per_policy": 0.125,
+          "confidence_avg": 1.0,
+          "confidence_flag": "low confidence"
+        },
+        {
+          "president_name": "Theodore Roosevelt",
+          "president_slug": "theodore-roosevelt",
+          "term_start": "1901-09-14",
+          "term_end": "1909-03-04",
+          "years_in_office": 7.469,
+          "total_policies": 1,
+          "total_outcomes": 1,
+          "positive_outcomes": 0,
+          "negative_outcomes": 1,
+          "mixed_outcomes": 0,
+          "blocked_outcomes": 0,
+          "raw_score": -1.0,
+          "normalized_score": -0.1339,
+          "avg_score_per_policy": -1.0,
+          "confidence_avg": 1.0,
+          "confidence_flag": "low confidence"
+        },
+        {
+          "president_name": "Calvin Coolidge",
+          "president_slug": "calvin-coolidge",
+          "term_start": "1923-08-02",
+          "term_end": "1929-03-04",
+          "years_in_office": 5.5881,
+          "total_policies": 1,
+          "total_outcomes": 1,
+          "positive_outcomes": 0,
+          "negative_outcomes": 1,
+          "mixed_outcomes": 0,
+          "blocked_outcomes": 0,
+          "raw_score": -0.8,
+          "normalized_score": -0.1432,
+          "avg_score_per_policy": -0.8,
+          "confidence_avg": 0.8,
+          "confidence_flag": "low confidence"
+        },
+        {
+          "president_name": "Benjamin Harrison",
+          "president_slug": "benjamin-harrison",
+          "term_start": "1889-03-04",
+          "term_end": "1893-03-04",
+          "years_in_office": 4.0001,
+          "total_policies": 1,
+          "total_outcomes": 1,
+          "positive_outcomes": 0,
+          "negative_outcomes": 1,
+          "mixed_outcomes": 0,
+          "blocked_outcomes": 0,
+          "raw_score": -0.6,
+          "normalized_score": -0.15,
+          "avg_score_per_policy": -0.6,
+          "confidence_avg": 0.6,
+          "confidence_flag": "low confidence"
+        },
+        {
+          "president_name": "Rutherford B. Hayes",
+          "president_slug": "rutherford-b-hayes",
+          "term_start": "1877-03-04",
+          "term_end": "1881-03-04",
+          "years_in_office": 4.0001,
+          "total_policies": 1,
+          "total_outcomes": 1,
+          "positive_outcomes": 0,
+          "negative_outcomes": 1,
+          "mixed_outcomes": 0,
+          "blocked_outcomes": 0,
+          "raw_score": -0.6,
+          "normalized_score": -0.15,
+          "avg_score_per_policy": -0.6,
+          "confidence_avg": 0.6,
+          "confidence_flag": "low confidence"
+        },
+        {
+          "president_name": "Chester A. Arthur",
+          "president_slug": "chester-a-arthur",
+          "term_start": "1881-09-19",
+          "term_end": "1885-03-04",
+          "years_in_office": 3.4552,
+          "total_policies": 1,
+          "total_outcomes": 1,
+          "positive_outcomes": 0,
+          "negative_outcomes": 1,
+          "mixed_outcomes": 0,
+          "blocked_outcomes": 0,
+          "raw_score": -0.6,
+          "normalized_score": -0.1737,
+          "avg_score_per_policy": -0.6,
+          "confidence_avg": 0.6,
+          "confidence_flag": "low confidence"
+        },
+        {
+          "president_name": "William McKinley",
+          "president_slug": "william-mckinley",
+          "term_start": "1897-03-04",
+          "term_end": "1901-09-14",
+          "years_in_office": 4.5285,
+          "total_policies": 1,
+          "total_outcomes": 1,
+          "positive_outcomes": 0,
+          "negative_outcomes": 1,
+          "mixed_outcomes": 0,
+          "blocked_outcomes": 0,
+          "raw_score": -1.0,
+          "normalized_score": -0.2208,
+          "avg_score_per_policy": -1.0,
+          "confidence_avg": 1.0,
+          "confidence_flag": "low confidence"
+        },
+        {
+          "president_name": "Grover Cleveland",
+          "president_slug": "grover-cleveland",
+          "term_start": "1893-03-04",
+          "term_end": "1897-03-04",
+          "years_in_office": 4.0001,
+          "total_policies": 1,
+          "total_outcomes": 1,
+          "positive_outcomes": 0,
+          "negative_outcomes": 1,
+          "mixed_outcomes": 0,
+          "blocked_outcomes": 0,
+          "raw_score": -0.9,
+          "normalized_score": -0.225,
+          "avg_score_per_policy": -0.9,
+          "confidence_avg": 1.0,
+          "confidence_flag": "low confidence"
+        }
+      ]
+    },
+    "temporal_coverage_audit": {
+      "status": "WARN",
+      "policy_count_by_decade": {
+        "1860s": 8,
+        "1870s": 8,
+        "1880s": 1,
+        "1890s": 2,
+        "1900s": 2,
+        "1910s": 2,
+        "1920s": 2,
+        "1930s": 11,
+        "1940s": 7,
+        "1950s": 4,
+        "1960s": 17,
+        "1970s": 11,
+        "1980s": 7,
+        "1990s": 9,
+        "2000s": 7,
+        "2010s": 13,
+        "2020s": 18
+      },
+      "underrepresented_periods": [
+        {
+          "decade": "1880s",
+          "policy_count": 1
+        }
+      ]
+    },
+    "category_coverage_audit": {
+      "status": "PASS",
+      "policy_count_per_category": {
+        "Criminal Justice": 18,
+        "Education": 22,
+        "Healthcare": 11,
+        "Housing": 20,
+        "Labor": 12,
+        "Voting Rights": 28
+      },
+      "missing_or_weak_categories": []
+    }
+  },
+  "readiness_assessment": {
+    "internally_consistent": true,
+    "historically_credible": false,
+    "ready_for_public_facing_interpretation": false,
+    "plain_language": "Ready for cautious internal/operator interpretation, but not fully certified for public-facing final-score claims."
+  }
+}

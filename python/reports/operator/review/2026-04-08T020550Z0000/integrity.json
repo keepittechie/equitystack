@@ -1,0 +1,457 @@
+{
+  "workflow": "policy_outcome_integrity_validation",
+  "generated_at": "2026-04-08T02:05:50+00:00",
+  "mode": "read_only",
+  "database_mutated": false,
+  "status": "WARN",
+  "summary": {
+    "total_policy_outcomes": 113,
+    "policy_type_distribution": {
+      "current_admin": 94,
+      "legislative": 19
+    },
+    "source_count_zero": 39,
+    "judicial_impact_outcome_count": 0
+  },
+  "validation_rules": [
+    "policy_type must be one of current_admin, legislative, judicial_impact",
+    "impact_direction must be one of Positive, Negative, Mixed, Blocked",
+    "impact_score must be present and bounded between -100 and 100",
+    "source_count must be non-negative",
+    "duplicate rows by policy_type + policy_id + outcome_summary_hash are invalid",
+    "judicial_impact rows must include explicit judicial_attribution entries with attribution_fraction values",
+    "judicial_impact rows must include majority_justices and appointing_presidents metadata",
+    "impact_end_date must be on or after impact_start_date when both are present"
+  ],
+  "warnings_generated_for": [
+    "missing sources",
+    "low president outcome coverage",
+    "high policy_type imbalance",
+    "high directional imbalance within a policy_type"
+  ],
+  "violations": {
+    "status": "PASS",
+    "violation_count": 0,
+    "violations": [],
+    "duplicate_group_count": 0
+  },
+  "warnings": {
+    "status": "WARN",
+    "warning_count": 4,
+    "warnings": [
+      {
+        "warning": "missing_sources",
+        "severity": "medium",
+        "affected_outcomes": 39,
+        "affected_pct": 0.3451,
+        "samples": [
+          {
+            "policy_outcome_id": 53,
+            "policy_type": "current_admin",
+            "policy_id": 58,
+            "policy_title": "Appoint Thurgood Marshall to the Supreme Court",
+            "president_name": "Lyndon B. Johnson",
+            "impact_direction": "Positive",
+            "impact_score": 1.0,
+            "source_count": 0,
+            "outcome_summary": "Johnson delivered the appointment by nominating and securing confirmation of Thurgood Marshall to the Supreme Court."
+          },
+          {
+            "policy_outcome_id": 54,
+            "policy_type": "current_admin",
+            "policy_id": 59,
+            "policy_title": "Expand affirmative-action requirements in federal contracting",
+            "president_name": "Richard Nixon",
+            "impact_direction": "Positive",
+            "impact_score": 1.0,
+            "source_count": 0,
+            "outcome_summary": "Nixon administration policy expanded affirmative-action enforcement in federal contracting through the Philadelphia Plan framework."
+          },
+          {
+            "policy_outcome_id": 55,
+            "policy_type": "current_admin",
+            "policy_id": 60,
+            "policy_title": "Expand the Child Tax Credit and make it fully refundable",
+            "president_name": "Joseph R. Biden Jr.",
+            "impact_direction": "Positive",
+            "impact_score": 1.0,
+            "source_count": 0,
+            "outcome_summary": "Biden delivered a large temporary Child Tax Credit expansion, but he did not make the fuller refundable expansion permanent."
+          },
+          {
+            "policy_outcome_id": 58,
+            "policy_type": "current_admin",
+            "policy_id": 65,
+            "policy_title": "Sign the Civil Rights Act of 1875",
+            "president_name": "Ulysses S. Grant",
+            "impact_direction": "Positive",
+            "impact_score": 1.0,
+            "source_count": 0,
+            "outcome_summary": "Grant signed a federal public-accommodations and equal-treatment law, representing a major Reconstruction-era civil-rights protection, though later Supreme Court decisions limited its long-term enforcement."
+          },
+          {
+            "policy_outcome_id": 59,
+            "policy_type": "current_admin",
+            "policy_id": 66,
+            "policy_title": "Sign the Civil Rights Act of 1964",
+            "president_name": "Lyndon B. Johnson",
+            "impact_direction": "Positive",
+            "impact_score": 1.0,
+            "source_count": 0,
+            "outcome_summary": "Johnson delivered the central anti-discrimination law of the Civil Rights era through enactment of the Civil Rights Act of 1964."
+          },
+          {
+            "policy_outcome_id": 60,
+            "policy_type": "current_admin",
+            "policy_id": 67,
+            "policy_title": "Issue Executive Order 11246 on nondiscrimination and affirmative action in federal contracting",
+            "president_name": "Lyndon B. Johnson",
+            "impact_direction": "Positive",
+            "impact_score": 1.0,
+            "source_count": 0,
+            "outcome_summary": "Johnson created a stronger executive framework for nondiscrimination and affirmative-action enforcement in federal contracting before later Nixon-era expansion."
+          },
+          {
+            "policy_outcome_id": 61,
+            "policy_type": "current_admin",
+            "policy_id": 68,
+            "policy_title": "Enforce school desegregation at Little Rock",
+            "president_name": "Dwight D. Eisenhower",
+            "impact_direction": "Positive",
+            "impact_score": 1.0,
+            "source_count": 0,
+            "outcome_summary": "Eisenhower used federal executive power to enforce court-ordered school desegregation against state resistance in Little Rock."
+          },
+          {
+            "policy_outcome_id": 62,
+            "policy_type": "current_admin",
+            "policy_id": 69,
+            "policy_title": "Sign the Civil Rights Act of 1957",
+            "president_name": "Dwight D. Eisenhower",
+            "impact_direction": "Positive",
+            "impact_score": 1.0,
+            "source_count": 0,
+            "outcome_summary": "Eisenhower signed the first modern federal civil-rights law since Reconstruction, rebuilding federal civil-rights enforcement capacity even in a limited form."
+          },
+          {
+            "policy_outcome_id": 63,
+            "policy_type": "current_admin",
+            "policy_id": 72,
+            "policy_title": "Sign the Voting Rights Act Reauthorization of 2006",
+            "president_name": "George W. Bush",
+            "impact_direction": "Positive",
+            "impact_score": 1.0,
+            "source_count": 0,
+            "outcome_summary": "Bush preserved major Voting Rights Act protections by signing the 2006 reauthorization, extending federal voting-rights enforcement before later judicial rollback."
+          },
+          {
+            "policy_outcome_id": 64,
+            "policy_type": "current_admin",
+            "policy_id": 73,
+            "policy_title": "Desegregate the armed forces",
+            "president_name": "Harry S. Truman",
+            "impact_direction": "Positive",
+            "impact_score": 1.0,
+            "source_count": 0,
+            "outcome_summary": "Truman formally committed the federal government to ending segregation in the armed services and began a consequential process of military desegregation."
+          },
+          {
+            "policy_outcome_id": 65,
+            "policy_type": "current_admin",
+            "policy_id": 74,
+            "policy_title": "Issue Executive Order 10925 on equal employment opportunity",
+            "president_name": "John F. Kennedy",
+            "impact_direction": "Positive",
+            "impact_score": 1.0,
+            "source_count": 0,
+            "outcome_summary": "Kennedy created an early modern equal-employment enforcement framework in federal contracting, requiring proactive action against discrimination."
+          },
+          {
+            "policy_outcome_id": 66,
+            "policy_type": "current_admin",
+            "policy_id": 75,
+            "policy_title": "Issue Executive Order 11063 on nondiscrimination in federally assisted housing",
+            "president_name": "John F. Kennedy",
+            "impact_direction": "Positive",
+            "impact_score": 1.0,
+            "source_count": 0,
+            "outcome_summary": "Kennedy created a federal nondiscrimination framework for federally assisted housing before the Fair Housing Act of 1968."
+          },
+          {
+            "policy_outcome_id": 67,
+            "policy_type": "current_admin",
+            "policy_id": 76,
+            "policy_title": "Sign the Community Reinvestment Act",
+            "president_name": "Jimmy Carter",
+            "impact_direction": "Positive",
+            "impact_score": 1.0,
+            "source_count": 0,
+            "outcome_summary": "Carter signed a major anti-redlining law that created a durable federal framework for pushing banks to serve neglected communities more fairly."
+          },
+          {
+            "policy_outcome_id": 68,
+            "policy_type": "current_admin",
+            "policy_id": 79,
+            "policy_title": "Withdraw federal troops and accept Southern home rule",
+            "president_name": "Rutherford B. Hayes",
+            "impact_direction": "Negative",
+            "impact_score": -1.0,
+            "source_count": 0,
+            "outcome_summary": "Federal military and political protection for Reconstruction governments was withdrawn, and no comparable enforcement framework replaced it."
+          },
+          {
+            "policy_outcome_id": 69,
+            "policy_type": "current_admin",
+            "policy_id": 80,
+            "policy_title": "Allow federal enforcement to weaken after United States v. Cruikshank",
+            "president_name": "Ulysses S. Grant",
+            "impact_direction": "Negative",
+            "impact_score": -1.0,
+            "source_count": 0,
+            "outcome_summary": "Federal enforcement capacity against racial terror and rights violations weakened substantially late in Grant's presidency."
+          },
+          {
+            "policy_outcome_id": 70,
+            "policy_type": "current_admin",
+            "policy_id": 81,
+            "policy_title": "Retreat from federal civil-rights enforcement after the Civil Rights Cases",
+            "president_name": "Chester A. Arthur",
+            "impact_direction": "Negative",
+            "impact_score": -1.0,
+            "source_count": 0,
+            "outcome_summary": "The federal government accepted a narrower civil-rights enforcement role after the Civil Rights Cases without mounting a major replacement response."
+          },
+          {
+            "policy_outcome_id": 71,
+            "policy_type": "current_admin",
+            "policy_id": 82,
+            "policy_title": "Protect Black voting rights through the Lodge Elections Bill",
+            "president_name": "Benjamin Harrison",
+            "impact_direction": "Negative",
+            "impact_score": -1.0,
+            "source_count": 0,
+            "outcome_summary": "No renewed federal election-protection law was enacted, and the strongest late-nineteenth-century restoration effort failed."
+          },
+          {
+            "policy_outcome_id": 6,
+            "policy_type": "current_admin",
+            "policy_id": 6,
+            "policy_title": "Close Guantanamo Bay detention facility",
+            "president_name": "Barack Obama",
+            "impact_direction": "Mixed",
+            "impact_score": 0.5,
+            "source_count": 0,
+            "outcome_summary": "The administration reduced the detainee population and repeatedly pursued closure, but Guantanamo remained open."
+          },
+          {
+            "policy_outcome_id": 7,
+            "policy_type": "current_admin",
+            "policy_id": 7,
+            "policy_title": "End combat-brigade deployment in Iraq",
+            "president_name": "Barack Obama",
+            "impact_direction": "Mixed",
+            "impact_score": 0.5,
+            "source_count": 0,
+            "outcome_summary": "Combat brigades were withdrawn and the formal combat mission ended, but the broader conflict and later U.S. re-engagement undercut the full promise frame."
+          },
+          {
+            "policy_outcome_id": 15,
+            "policy_type": "current_admin",
+            "policy_id": 15,
+            "policy_title": "Roll back Bush tax cuts for upper-income households",
+            "president_name": "Barack Obama",
+            "impact_direction": "Mixed",
+            "impact_score": 0.5,
+            "source_count": 0,
+            "outcome_summary": "Top-end Bush tax cuts were partially rolled back, but the final result came as a negotiated compromise."
+          },
+          {
+            "policy_outcome_id": 16,
+            "policy_type": "current_admin",
+            "policy_id": 16,
+            "policy_title": "Withdraw the United States from TPP",
+            "president_name": "Donald J. Trump",
+            "impact_direction": "Mixed",
+            "impact_score": 0.5,
+            "source_count": 0,
+            "outcome_summary": "The United States formally withdrew from TPP negotiations."
+          },
+          {
+            "policy_outcome_id": 19,
+            "policy_type": "current_admin",
+            "policy_id": 19,
+            "policy_title": "Move the U.S. embassy in Israel to Jerusalem",
+            "president_name": "Donald J. Trump",
+            "impact_direction": "Mixed",
+            "impact_score": 0.5,
+            "source_count": 0,
+            "outcome_summary": "The U.S. embassy was moved to Jerusalem, delivering the central promise."
+          },
+          {
+            "policy_outcome_id": 20,
+            "policy_type": "current_admin",
+            "policy_id": 20,
+            "policy_title": "Replace NAFTA with a new trade deal",
+            "president_name": "Donald J. Trump",
+            "impact_direction": "Mixed",
+            "impact_score": 0.5,
+            "source_count": 0,
+            "outcome_summary": "NAFTA was replaced by USMCA."
+          },
+          {
+            "policy_outcome_id": 21,
+            "policy_type": "current_admin",
+            "policy_id": 21,
+            "policy_title": "Appoint conservative Supreme Court justices",
+            "president_name": "Donald J. Trump",
+            "impact_direction": "Mixed",
+            "impact_score": 0.5,
+            "source_count": 0,
+            "outcome_summary": "Trump delivered on the promise to appoint conservative Supreme Court justices."
+          },
+          {
+            "policy_outcome_id": 22,
+            "policy_type": "current_admin",
+            "policy_id": 22,
+            "policy_title": "Repeal and replace the Affordable Care Act",
+            "president_name": "Donald J. Trump",
+            "impact_direction": "Mixed",
+            "impact_score": 0.5,
+            "source_count": 0,
+            "outcome_summary": "The Affordable Care Act was not repealed, though some regulatory and tax changes weakened parts of the law."
+          }
+        ]
+      },
+      {
+        "warning": "policy_type_imbalance",
+        "severity": "medium",
+        "dominant_policy_type": "current_admin",
+        "dominant_share": 0.8319,
+        "distribution": {
+          "current_admin": 94,
+          "legislative": 19
+        }
+      },
+      {
+        "warning": "directional_imbalance",
+        "severity": "low",
+        "policy_type": "legislative",
+        "dominant_direction": "Blocked",
+        "dominant_share": 1.0,
+        "distribution": {
+          "Blocked": 19
+        }
+      },
+      {
+        "warning": "low_president_coverage",
+        "severity": "medium",
+        "threshold": 5,
+        "affected_president_count": 17,
+        "presidents": [
+          {
+            "president_name": "Benjamin Harrison",
+            "outcome_count": 1,
+            "positive": 0,
+            "negative": 1
+          },
+          {
+            "president_name": "Calvin Coolidge",
+            "outcome_count": 1,
+            "positive": 0,
+            "negative": 1
+          },
+          {
+            "president_name": "Chester A. Arthur",
+            "outcome_count": 1,
+            "positive": 0,
+            "negative": 1
+          },
+          {
+            "president_name": "Dwight D. Eisenhower",
+            "outcome_count": 2,
+            "positive": 2,
+            "negative": 0
+          },
+          {
+            "president_name": "Franklin D. Roosevelt",
+            "outcome_count": 2,
+            "positive": 0,
+            "negative": 0
+          },
+          {
+            "president_name": "George W. Bush",
+            "outcome_count": 1,
+            "positive": 1,
+            "negative": 0
+          },
+          {
+            "president_name": "Grover Cleveland",
+            "outcome_count": 1,
+            "positive": 0,
+            "negative": 1
+          },
+          {
+            "president_name": "Harry S. Truman",
+            "outcome_count": 2,
+            "positive": 1,
+            "negative": 0
+          },
+          {
+            "president_name": "Jimmy Carter",
+            "outcome_count": 1,
+            "positive": 1,
+            "negative": 0
+          },
+          {
+            "president_name": "John F. Kennedy",
+            "outcome_count": 2,
+            "positive": 2,
+            "negative": 0
+          },
+          {
+            "president_name": "Richard Nixon",
+            "outcome_count": 1,
+            "positive": 1,
+            "negative": 0
+          },
+          {
+            "president_name": "Ronald Reagan",
+            "outcome_count": 1,
+            "positive": 1,
+            "negative": 0
+          },
+          {
+            "president_name": "Rutherford B. Hayes",
+            "outcome_count": 1,
+            "positive": 0,
+            "negative": 1
+          },
+          {
+            "president_name": "Theodore Roosevelt",
+            "outcome_count": 1,
+            "positive": 0,
+            "negative": 1
+          },
+          {
+            "president_name": "Ulysses S. Grant",
+            "outcome_count": 3,
+            "positive": 2,
+            "negative": 1
+          },
+          {
+            "president_name": "William McKinley",
+            "outcome_count": 1,
+            "positive": 0,
+            "negative": 1
+          },
+          {
+            "president_name": "Woodrow Wilson",
+            "outcome_count": 3,
+            "positive": 2,
+            "negative": 0
+          }
+        ]
+      }
+    ]
+  }
+}

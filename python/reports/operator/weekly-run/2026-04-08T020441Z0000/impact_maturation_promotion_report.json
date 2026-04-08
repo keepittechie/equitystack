@@ -1,0 +1,68 @@
+{
+  "artifact_version": 1,
+  "generated_at": "2026-04-08T02:04:42+00:00",
+  "mode": "dry_run",
+  "workflow": "impact_maturation_promotion",
+  "source_evaluation": "/home/josh/Documents/GitHub/equitystack/python/reports/operator/weekly-run/2026-04-08T020441Z0000/impact_maturation_review.json",
+  "ledger_path": "/home/josh/Documents/GitHub/equitystack/python/reports/impact_maturation_state.json",
+  "precommit": {
+    "readiness_status": "ready_with_warnings",
+    "blocking_issue_count": 0,
+    "warnings": [
+      "some transitions were skipped because they were unchanged or not approved"
+    ],
+    "blocked_items": []
+  },
+  "impact_promoted_count": 0,
+  "impact_skipped_count": 10,
+  "impact_preserved_count": 0,
+  "new_outcomes_created": 0,
+  "existing_outcomes_preserved": 0,
+  "policy_outcomes_created": 0,
+  "policy_outcomes_preserved": 0,
+  "policy_outcomes_validation": null,
+  "promotion_events": [],
+  "preservation_events": [],
+  "skipped_items": [
+    {
+      "record_key": "trump-2025-election-integrity-proof-citizenship-paper-ballots",
+      "reason": "no forward transition recommended"
+    },
+    {
+      "record_key": "trump-2025-end-federal-dei-equity-programs",
+      "reason": "no forward transition recommended"
+    },
+    {
+      "record_key": "trump-2025-strengthen-local-law-enforcement",
+      "reason": "no forward transition recommended"
+    },
+    {
+      "record_key": "trump-2025-clear-street-encampments-expand-civil-commitment",
+      "reason": "no forward transition recommended"
+    },
+    {
+      "record_key": "trump-2025-domestic-production-of-critical-medicines",
+      "reason": "no forward transition recommended"
+    },
+    {
+      "record_key": "trump-2025-expand-educational-freedom-for-families",
+      "reason": "no forward transition recommended"
+    },
+    {
+      "record_key": "trump-2025-reform-higher-education-accreditation",
+      "reason": "no forward transition recommended"
+    },
+    {
+      "record_key": "trump-2025-promote-hbcu-excellence-and-innovation",
+      "reason": "no forward transition recommended"
+    },
+    {
+      "record_key": "trump-2025-reinstate-school-discipline-policies",
+      "reason": "no forward transition recommended"
+    },
+    {
+      "record_key": "trump-2025-high-paying-skilled-trade-jobs",
+      "reason": "no forward transition recommended"
+    }
+  ]
+}

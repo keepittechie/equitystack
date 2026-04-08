@@ -2657,6 +2657,8 @@ run_current_admin_command() {
 main_usage() {
   cat <<EOF
 Usage:
+  equitystack weekly-run
+  equitystack review
   equitystack legislative <command> [args]
   equitystack current-admin <command> [args]
   equitystack impact <command> [args]
@@ -2719,10 +2721,14 @@ Impact maturation commands:
   curate-sources  Manually attach operator-provided sources to policy outcomes
 
 Operational maintenance:
+  weekly-run   Run the low-touch weekly operator check and summary
+  review       Show the compact manual task queue
   operator cleanup-stale-workflows  Mark stale operator workflow sessions inactive without deleting history
   admin-reset-operational-state   Archive non-canonical run-state artifacts for a fresh walkthrough
 
 Examples:
+  $(cli_hint) weekly-run
+  $(cli_hint) review
   $(cli_hint) legislative run
   $(cli_hint) legislative run --model "$DEFAULT_MODEL_REVIEW"
   $(cli_hint) impact evaluate
@@ -3256,6 +3262,16 @@ EOF
 case "${1:-}" in
   ""|-h|--help|help)
     main_usage
+    ;;
+  weekly-run)
+    shift
+    run_step "1/1" "EquityStack Weekly Run" "Weekly operator report complete" --output "$EQUITYSTACK_PYTHON_DIR/reports/operator/weekly-run.latest.json" -- \
+      "$VENV_PYTHON" scripts/operator_weekly_report.py weekly-run "$@"
+    ;;
+  review)
+    shift
+    run_step "1/1" "EquityStack Review Queue" "Operator review queue complete" --output "$EQUITYSTACK_PYTHON_DIR/reports/operator/review.latest.json" -- \
+      "$VENV_PYTHON" scripts/operator_weekly_report.py review "$@"
     ;;
   admin-reset-operational-state)
     shift
