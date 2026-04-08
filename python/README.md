@@ -47,8 +47,8 @@ python3 -m venv --clear venv
 
 - The CLI is self-locating. It resolves the Python workspace from `python/bin/equitystack`.
 - LLM execution uses the configured provider endpoint from `config/llm.json` or `EQUITYSTACK_LLM_ENDPOINT`.
-- Senior review and decision steps should use `qwen3.5:9b`.
-- Verifier, draft, and fallback review steps should use `qwen3.5:9b`.
+- Senior review and decision steps use the wrapper defaults shown by `./bin/equitystack --help`.
+- Verifier, draft, and fallback review steps use the same configured provider/model family unless explicitly overridden.
 - Scheduled LLM review stages now default to a 240 second timeout.
 - `MCP_MODEL` configures the executor/MCP model for preprocessing, summaries, and approved command execution.
 - DB-backed scripts read `.env.local`, but legislative helpers now also honor runtime env overrides such as `DB_HOST=10.10.0.13`.
@@ -65,11 +65,16 @@ DB_HOST=10.10.0.13 \
 
 ## Workflows
 
+- Low-touch weekly operation
 - Legislative / future bills
 - Current-administration Promise Tracker
+- Unified outcome / impact certification
+- Manual source and policy-intent curation
 
 Read these next:
 
+- `../docs/QUICK_START.md`
+- `../docs/PYTHON_WORKFLOWS.md`
 - `CURRENT_ADMIN_DAILY.md`
 - `CURRENT_ADMIN_PIPELINE.md`
 - `LEGISLATIVE_PIPELINE.md`
@@ -77,6 +82,24 @@ Read these next:
 - `RNJ1_EXECUTOR_GUARDRAILS.md`
 - `../docs/admin-operator-system.md`
 - `../docs/workflow-hardening.md`
+
+## Low-Touch Operator Path
+
+From the repo root:
+
+```bash
+./python/bin/equitystack weekly-run
+./python/bin/equitystack review
+```
+
+From `python/`:
+
+```bash
+./bin/equitystack weekly-run
+./bin/equitystack review
+```
+
+Use this first when returning after time away. `weekly-run` runs the safe checks and reports what needs attention; `review` shows only the compact manual queue.
 
 ## Current-Admin Safe Path
 
@@ -119,9 +142,11 @@ From `python/`:
 
 Important:
 
-- `legislative run` executes verifier-assisted suggestion/discovery with `qwen3.5:9b`, senior audit review with `qwen3.5:9b`, auto-triages safe bundle actions, then rebuilds the review bundle.
-- the daily review path now uses a 240 second Ollama timeout.
-- `legislative import` is dry-run unless `--apply --yes` is passed to the underlying script directly.
+- `legislative run` executes verifier-assisted suggestion/discovery, senior audit review, auto-triages safe bundle actions, then rebuilds the review bundle.
+- review models default to the wrapper defaults shown by `./bin/equitystack --help`; current production defaults resolve to OpenAI-style models such as `gpt-4.1-mini`.
+- legacy script filenames may still include `ollama`, but the provider layer can route OpenAI-style models when configured.
+- the daily review path uses 240 second senior/verifier timeouts by default.
+- `legislative import` is dry-run unless `--apply --yes` is passed through the wrapper or underlying script.
 
 ## Unified Outcome Integrity
 
@@ -146,9 +171,24 @@ Use these read-only checks after new imports or deployments:
 ```bash
 ./bin/equitystack impact report-final-black-impact-score
 ./bin/equitystack impact certify-production-data
+./bin/equitystack impact validate-integrity
 ```
 
 Legislative outcomes are materialized into `policy_outcomes`, but are explicitly excluded from president scoring until a deterministic president attribution model exists. See `../docs/workflow-hardening.md`.
+
+## Manual Curation Path
+
+When `weekly-run` or `review` reports coverage gaps:
+
+```bash
+./bin/equitystack impact audit-outcome-source-gaps --limit 10
+./bin/equitystack impact curate-sources --only-policy-outcome-id <ID> --source-title "..." --source-url "https://..." --source-type Government --apply --yes
+
+./bin/equitystack impact audit-policy-intent-gaps
+./bin/equitystack impact curate-policy-intent --only-policy-id <ID> --category <category> --summary "..." --source-reference "..." --apply --yes
+```
+
+Source and intent curation are manual by design. They do not auto-generate sources or infer policy intent without operator input.
 
 ## Operator Maintenance
 

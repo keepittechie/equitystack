@@ -56,6 +56,17 @@ Practical examples:
 
 If a page cannot trace a value back to this chain, treat it as a trust risk.
 
+## Low-Touch Operator Layer
+
+The preferred maintenance entry point is the CLI operator layer:
+
+```bash
+./python/bin/equitystack weekly-run
+./python/bin/equitystack review
+```
+
+`weekly-run` orchestrates the read-only production certification, integrity, impact, source-gap, intent-gap, and final score checks. `review` shows only the compact manual queue. The admin UI remains a control plane on top of the same canonical workflows; it does not replace these checks.
+
 ## Main Concepts
 
 ### Jobs

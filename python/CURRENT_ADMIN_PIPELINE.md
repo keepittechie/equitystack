@@ -108,19 +108,19 @@ Tracker status meaning:
 1. `scripts/discover_current_admin_updates.py`
 2. `scripts/generate_current_admin_batch_from_discovery.py`
 3. `scripts/normalize_current_admin_batch.py`
-4. `scripts/review_current_admin_batch_with_ollama.py`
+4. `scripts/review_current_admin_batch_with_openai_batch.py`
 5. `scripts/apply_current_admin_ai_review.py`
 
 `run --input ...` and `workflow start` run the pre-import path:
 
 1. `scripts/normalize_current_admin_batch.py`
-2. `scripts/review_current_admin_batch_with_ollama.py`
+2. `scripts/review_current_admin_batch_with_openai_batch.py`
 3. `scripts/apply_current_admin_ai_review.py`
 
 `review` wraps:
 
 - `scripts/generate_current_admin_decision_template.py`
-- `scripts/review_current_admin_batch_with_ollama.py --decision-file ... --log-decisions`
+- `scripts/review_current_admin_batch_with_openai_batch.py --decision-file ... --log-decisions`
 
 `workflow review` still runs only:
 
@@ -128,7 +128,7 @@ Tracker status meaning:
 
 `workflow finalize` still replays the canonical review artifact settings and writes a decision log via:
 
-- `scripts/review_current_admin_batch_with_ollama.py --decision-file ... --log-decisions`
+- `scripts/review_current_admin_batch_with_openai_batch.py --decision-file ... --log-decisions`
 
 `apply` wraps:
 
@@ -146,19 +146,17 @@ Optional discovery path:
 
 Wrapper defaults:
 
-- `current-admin discover`: `qwen3.5:9b`
-- `current-admin ai-review` verifier pass: `qwen3.5:9b`
-- `current-admin ai-review` senior pass: `qwen3.5:9b`
-- `current-admin workflow start`: verifier `qwen3.5:9b`, senior `qwen3.5:9b`
-- `current-admin workflow finalize`: verifier `qwen3.5:9b`, senior `qwen3.5:9b`
-- senior-review fallback model: `qwen3.5:9b`
-- default LLM timeout: `240` seconds
+- `current-admin discover`: the verifier/default provider model from `./bin/equitystack --help`
+- `current-admin ai-review`: OpenAI Batch review via `scripts/review_current_admin_batch_with_openai_batch.py`
+- `current-admin workflow start`: verifier, senior, and fallback models from the wrapper defaults
+- `current-admin workflow finalize`: reuses the canonical review artifact settings where possible
+- default senior/verifier timeout: `240` seconds
 
 LLM provider endpoint:
 
 - `config/llm.json` or `EQUITYSTACK_LLM_ENDPOINT`
 
-The review artifact stores requested model, effective model, backend, fallback status, fallback reason, and timeout metadata in the generated `.ai-review.json`.
+The review artifact stores requested model, effective model, backend, fallback status, fallback reason, OpenAI Batch metadata when applicable, and timeout metadata in the generated `.ai-review.json`.
 
 ## Required Files In The Main Path
 

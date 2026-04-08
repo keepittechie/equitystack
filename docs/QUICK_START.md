@@ -101,6 +101,8 @@ Use these only when you need detail:
 ./python/bin/equitystack impact report-final-black-impact-score
 ```
 
+For the full command-to-script map, see [`PYTHON_WORKFLOWS.md`](PYTHON_WORKFLOWS.md).
+
 ## Do Nothing Safely
 
 If the weekly report says:

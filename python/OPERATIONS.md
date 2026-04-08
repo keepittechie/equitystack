@@ -109,9 +109,35 @@ The commands in this section assume you are running from the repository root:
 cd /home/josh/black-policy-site
 ```
 
+### Fast Path
+
+If you are coming back after time away, start here:
+
+```bash
+./python/bin/equitystack weekly-run
+./python/bin/equitystack review
+```
+
+`weekly-run` runs the certification, integrity, impact, source-gap, intent-gap, and final score checks and prints the short operator summary. `review` prints only the highest-priority manual tasks.
+
+Artifacts:
+
+```text
+python/reports/operator/weekly-run.latest.json
+python/reports/operator/review.latest.json
+```
+
 ### Weekly Workflow: 30-60 Minutes
 
 This is the core operating loop.
+
+Preferred command:
+
+```bash
+./python/bin/equitystack weekly-run
+```
+
+If you need the lower-level commands, run the steps below.
 
 1. Run the system health check:
 
@@ -191,6 +217,8 @@ Check:
 - the system still runs cleanly
 - no unexpected scoring jumps
 - no validation failures
+
+If `weekly-run` says `No urgent action needed this week.`, stop. That is the intended safe do-nothing path.
 
 ### Monthly Workflow: 1-2 Hours
 
@@ -395,7 +423,7 @@ Important:
 ## Remote Executor
 
 - Production app host: `10.10.0.13`
-- Production Ollama host: `10.10.0.60`
+- Production LLM/executor host, when configured: `10.10.0.60`
 - Reserved executor model: `$MCP_MODEL`
 
 The configured MCP executor model is executor-only. It may assist with summaries, preprocessing, approved wrapper-command execution, and verification support. It is not a decision-maker and cannot approve workflow checkpoints.

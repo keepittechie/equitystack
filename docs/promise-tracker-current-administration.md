@@ -170,10 +170,11 @@ Primary scripts:
 - `python/scripts/discover_current_admin_updates.py`
 - `python/scripts/export_current_admin_discovery_candidates.py`
 - `python/scripts/normalize_current_admin_batch.py`
-- `python/scripts/review_current_admin_batch_with_ollama.py`
+- `python/scripts/review_current_admin_batch_with_openai_batch.py`
 - `python/scripts/apply_current_admin_ai_review.py`
 - `python/scripts/import_curated_current_admin_batch.py`
 - `python/scripts/validate_current_admin_import.py`
+- `python/scripts/sync_current_admin_policy_outcomes.py`
 
 Wrapper commands remain the recommended operator interface. Raw Python entrypoints are for
 debugging and lower-level inspection.

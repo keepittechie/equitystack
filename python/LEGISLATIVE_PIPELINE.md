@@ -28,9 +28,12 @@ Legacy shortcuts still work:
 
 ```bash
 ./bin/equitystack run
-./bin/equitystack review
 ./bin/equitystack apply
+./bin/equitystack import
+./bin/equitystack feedback
 ```
+
+Note: top-level `./bin/equitystack review` is now the compact operator review queue. Use `./bin/equitystack legislative review` for legislative bundle review.
 
 ## What `legislative run` Actually Does
 
@@ -43,17 +46,19 @@ The wrapper runs these stages in order:
 Inside `run_equitystack_pipeline.py`, the daily pipeline runs:
 
 1. `update_database.py`
-2. `scripts/review_future_bill_audit_with_ollama.py` with verifier `qwen3.5:9b`, senior `qwen3.5:9b`, fallback `qwen3.5:9b`
+2. `scripts/review_future_bill_audit_with_ollama.py` with verifier, senior, and fallback models from the wrapper defaults
 3. `scripts/apply_future_bill_ai_review.py`
-4. `scripts/suggest_partial_future_bill_links.py` with verifier `qwen3.5:9b`
-5. `scripts/find_candidate_tracked_bills.py` with verifier `qwen3.5:9b` only when the suggestion output still needs discovery
+4. `scripts/suggest_partial_future_bill_links.py` with the configured verifier model
+5. `scripts/find_candidate_tracked_bills.py` with the configured verifier model only when the suggestion output still needs discovery
 6. `scripts/build_review_bundle.py`
 
 Default review models:
 
-- senior review: `qwen3.5:9b`
-- verifier / fallback review: `qwen3.5:9b`
-- default Ollama timeout: `240` seconds
+- senior review: wrapper `review AI` default from `./bin/equitystack --help`
+- verifier / fallback review: wrapper verifier/fallback defaults from `./bin/equitystack --help`
+- default senior/verifier timeout: `240` seconds
+
+Some script names still include `ollama` for compatibility. The provider layer can route OpenAI-style models such as `gpt-4.1-mini` when configured.
 
 Primary outputs:
 
@@ -79,6 +84,7 @@ Most days:
 ./bin/equitystack legislative review
 ./bin/equitystack legislative apply --dry-run
 ./bin/equitystack legislative apply --apply --yes
+./bin/equitystack legislative materialize-outcomes
 ```
 
 Use these only when needed:
@@ -97,6 +103,7 @@ Use these only when needed:
 - `find_candidate_tracked_bills.py` never mutates the DB unless you explicitly write a seed file.
 - `import_approved_tracked_bills.py` is dry-run unless `--apply --yes` is supplied.
 - `apply_review_bundle.py` is mutating and should only be run through the normal approval path.
+- `materialize_legislative_policy_outcomes.py` is dry-run unless `--apply --yes` is explicit; it inserts unified `policy_outcomes` with `policy_type = legislative` and `impact_score` populated.
 
 ## Environment Notes
 
@@ -128,6 +135,7 @@ Primary supporting scripts:
 - `scripts/review_bundle_actions.py`
 - `scripts/apply_review_bundle.py`
 - `scripts/import_approved_tracked_bills.py`
+- `scripts/materialize_legislative_policy_outcomes.py`
 - `scripts/analyze_feedback.py`
 
 Helper / maintenance scripts:

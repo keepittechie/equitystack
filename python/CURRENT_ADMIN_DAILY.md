@@ -134,9 +134,8 @@ These still work and remain the canonical lower-level path:
 
 ## Daily Safety Notes
 
-- Verifier review defaults to `qwen3.5:9b`.
-- Senior review and decision stages default to `qwen3.5:9b`.
-- Senior-review fallback defaults to `qwen3.5:9b`.
+- Verifier, senior, and fallback review models default to the wrapper defaults shown by `./bin/equitystack --help`.
+- Current-admin AI review uses the OpenAI Batch wrapper, `scripts/review_current_admin_batch_with_openai_batch.py`, unless a paired-evaluation mode is explicitly requested.
 - LLM review timeout defaults to `240` seconds.
 - LLM execution uses the configured provider endpoint from `config/llm.json` or `EQUITYSTACK_LLM_ENDPOINT`.
 - `current-admin status` is the fastest way to see the current state and next command.

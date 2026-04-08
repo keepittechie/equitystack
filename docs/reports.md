@@ -45,6 +45,14 @@ node scripts/snapshot-black-impact-score.mjs --url http://127.0.0.1:3000/api/pro
 
 The change output includes `change_summary`, `delta_score`, `new_outcomes_added`, and `key_drivers`. If no prior snapshot exists, the UI omits the change note.
 
+For routine operations, the report should usually be checked through:
+
+```bash
+./python/bin/equitystack weekly-run
+```
+
+That command includes the final Black Impact Score report, certification audit, integrity validation, and the top manual curation queues in one operator-facing summary.
+
 Primary modes:
 
 - `Standard Report`

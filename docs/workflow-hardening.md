@@ -179,6 +179,13 @@ Existing source metadata may be refreshed only when the new source signal is str
 
 ## Verification Commands
 
+Use the weekly wrapper first when you want the fast operator answer:
+
+```bash
+./python/bin/equitystack weekly-run
+./python/bin/equitystack review
+```
+
 Use these read-only commands after deploys and after new imports:
 
 ```bash
