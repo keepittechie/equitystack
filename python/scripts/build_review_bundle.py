@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+import copy
 import csv
 import json
 from datetime import UTC, datetime
@@ -7,6 +8,60 @@ from pathlib import Path
 from typing import Any
 
 from apply_future_bill_ai_review import get_db_connection
+
+
+AUTOMATION_THRESHOLDS = {
+    "auto_dismiss_score_max": 3,
+    "auto_dismiss_confidence_max": 0.45,
+    "manual_review_score_min": 4,
+    "manual_review_score_max": 9,
+    "auto_partial_score_min": 8,
+    "auto_partial_confidence_min": 0.55,
+    "auto_direct_score_min": 10,
+    "auto_direct_confidence_min": 0.8,
+}
+RESOLVED_REVIEW_STATES = {"already_applied", "stale", "superseded", "dismissed", "archived", "resolved"}
+RESOLVED_APPLY_RESULTS = {
+    "applied",
+    "already_applied",
+    "already_partial",
+    "already_removed",
+    "partial_link_already_exists",
+    "skipped_already_absent",
+    "stale_target_absent",
+    "stale_future_bill_missing",
+    "stale_tracked_bill_missing",
+}
+MANUAL_QUEUE_ENRICHMENT_KEYS = [
+    "target_area",
+    "problem_statement",
+    "proposed_solution",
+    "official_summary",
+    "match_score",
+    "shared_keywords",
+    "problem_alignment",
+    "solution_alignment",
+    "population_alignment",
+    "mechanism_specificity",
+    "evidence_strength",
+    "total_score",
+    "match_label",
+    "llm_decision",
+    "llm_confidence",
+    "signal_evidence_gaps",
+    "signal_ambiguity",
+    "signal_conflicts",
+    "applied_penalties",
+    "self_check",
+    "llm_reasoning_short",
+    "llm_suggested_new_link_type",
+    "llm_recommended_action",
+    "recommended_action",
+    "suggested_new_link_type",
+    "heuristic_flags",
+    "original_link_type",
+    "review_timestamp",
+]
 
 
 def python_dir() -> Path:
@@ -199,6 +254,13 @@ def future_bill_group_template(future_bill_id: int) -> dict[str, Any]:
         "stale_suggestions_count": 0,
         "already_applied_count": 0,
         "suppressed_weak_candidates_count": 0,
+        "automation_counts": {
+            "auto_dismiss": 0,
+            "auto_partial": 0,
+            "auto_direct": 0,
+            "manual_review": 0,
+            "resolved": 0,
+        },
     }
 
 
@@ -312,6 +374,15 @@ def action_candidate(
     rationale: str,
     source: str,
     raw_data: dict[str, Any],
+    approved: bool = False,
+    auto_triaged: bool = False,
+    auto_triage_decision: str | None = None,
+    auto_triage_reason: str | None = None,
+    automation_bucket: str | None = None,
+    automation_reason: str | None = None,
+    threshold_used: dict[str, Any] | None = None,
+    evidence_summary: str | None = None,
+    guardrail_triggered: list[str] | None = None,
 ) -> dict[str, Any]:
     action_id = f"{action_type}:{future_bill_id}:{future_bill_link_id or candidate_tracked_bill_id or candidate_bill_number or 'na'}"
     return {
@@ -321,9 +392,9 @@ def action_candidate(
         "target_id": target_id,
         "payload": payload,
         "status": "pending",
-        "approved": False,
-        "approved_by": None,
-        "approved_at": None,
+        "approved": approved,
+        "approved_by": "bundle_automation" if approved and auto_triaged else None,
+        "approved_at": datetime.now(UTC).isoformat() if approved and auto_triaged else None,
         "source": source,
         "rationale": rationale,
         "review_state": "actionable",
@@ -335,7 +406,366 @@ def action_candidate(
         "candidate_title": candidate_title,
         "proposed_link_type": proposed_link_type,
         "raw_data": raw_data,
+        "auto_triaged": auto_triaged,
+        "auto_triage_decision": auto_triage_decision,
+        "auto_triage_reason": auto_triage_reason,
+        "automation_bucket": automation_bucket,
+        "automation_reason": automation_reason,
+        "threshold_used": threshold_used or {},
+        "evidence_summary": evidence_summary,
+        "guardrail_triggered": guardrail_triggered or [],
     }
+
+
+def normalize_float(value: Any, fallback: float = 0.0) -> float:
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return fallback
+
+
+def normalize_str(value: Any) -> str:
+    return str(value or "").strip()
+
+
+def heuristic_flag(item: dict[str, Any], key: str) -> bool:
+    flags = item.get("heuristic_flags") or {}
+    if not isinstance(flags, dict):
+        return False
+    return bool(flags.get(key))
+
+
+def summarize_evidence(item: dict[str, Any]) -> str:
+    return (
+        f"score={coerce_int(item.get('total_score')) or 0}, "
+        f"problem={coerce_int(item.get('problem_alignment')) or 0}, "
+        f"solution={coerce_int(item.get('solution_alignment')) or 0}, "
+        f"population={coerce_int(item.get('population_alignment')) or 0}, "
+        f"mechanism={coerce_int(item.get('mechanism_specificity')) or 0}, "
+        f"evidence={coerce_int(item.get('evidence_strength')) or 0}, "
+        f"confidence={normalize_float(item.get('llm_confidence'), 0.0):.2f}"
+    )
+
+
+def guardrail_reasons(item: dict[str, Any]) -> list[str]:
+    reasons: list[str] = []
+    flags = item.get("heuristic_flags") or {}
+    if isinstance(flags, dict):
+        for key in [
+            "issue_domain_mismatch",
+            "weak_evidence",
+            "weak_title_evidence",
+            "missing_summary_low_overlap",
+            "lexical_floor_trigger",
+            "bias_remove",
+            "bias_partial",
+            "bias_manual",
+        ]:
+            if flags.get(key):
+                reasons.append(key)
+    for key in ["signal_evidence_gaps", "signal_conflicts", "why_not_auto_applied"]:
+        raw = item.get(key)
+        if isinstance(raw, list):
+            reasons.extend(str(entry).strip() for entry in raw if str(entry).strip())
+    return list(dict.fromkeys(reasons))
+
+
+def record_automation_bucket(group: dict[str, Any], bucket: str) -> None:
+    counts = group.get("automation_counts") or {}
+    counts[bucket] = int(counts.get(bucket) or 0) + 1
+    group["automation_counts"] = counts
+
+
+def enrich_manual_queue_item(item: dict[str, Any], source_item: dict[str, Any] | None) -> dict[str, Any]:
+    enriched = copy.deepcopy(item)
+    source = source_item or {}
+    for key in MANUAL_QUEUE_ENRICHMENT_KEYS:
+        if key not in enriched or enriched.get(key) in (None, "", [], {}):
+            value = source.get(key)
+            if value not in (None, "", [], {}):
+                enriched[key] = copy.deepcopy(value)
+    return enriched
+
+
+def manual_review_bucket(item: dict[str, Any]) -> dict[str, Any]:
+    review_state = normalize_str(item.get("review_state")).lower() or "actionable"
+    status = normalize_str(item.get("status")).lower() or "pending"
+    apply_result = normalize_str(item.get("apply_result")).lower()
+    if review_state in RESOLVED_REVIEW_STATES or status in RESOLVED_REVIEW_STATES or apply_result in RESOLVED_APPLY_RESULTS:
+        return {
+            "bucket": "resolved",
+            "reason": "candidate is already resolved in canonical state",
+            "threshold_used": {"resolved_states": sorted(RESOLVED_REVIEW_STATES)},
+            "guardrail_triggered": guardrail_reasons(item),
+            "evidence_summary": summarize_evidence(item),
+        }
+
+    total_score = coerce_int(item.get("total_score")) or 0
+    problem_alignment = coerce_int(item.get("problem_alignment")) or 0
+    solution_alignment = coerce_int(item.get("solution_alignment")) or 0
+    population_alignment = coerce_int(item.get("population_alignment")) or 0
+    mechanism_specificity = coerce_int(item.get("mechanism_specificity")) or 0
+    evidence_strength = coerce_int(item.get("evidence_strength")) or 0
+    llm_confidence = normalize_float(item.get("llm_confidence"), 0.0)
+    llm_decision = normalize_str(item.get("llm_decision")).lower()
+    final_decision = normalize_str(item.get("final_decision")).lower()
+    original_link_type = normalize_str(item.get("original_link_type")) or None
+    exact_title_match = heuristic_flag(item, "exact_title_match")
+    weak_title_evidence = heuristic_flag(item, "weak_title_evidence")
+    weak_evidence = heuristic_flag(item, "weak_evidence")
+    lexical_floor_trigger = heuristic_flag(item, "lexical_floor_trigger")
+    missing_summary_low_overlap = heuristic_flag(item, "missing_summary_low_overlap")
+    domain_mismatch = heuristic_flag(item, "issue_domain_mismatch")
+    bias_remove = heuristic_flag(item, "bias_remove")
+    signal_conflicts = {normalize_str(entry).lower() for entry in (item.get("signal_conflicts") or [])}
+
+    threshold_used = copy.deepcopy(AUTOMATION_THRESHOLDS)
+    evidence_summary = summarize_evidence(item)
+    guardrails = guardrail_reasons(item)
+
+    obvious_dismiss = (
+        final_decision == "remove_link"
+        or llm_decision == "remove_link"
+        or domain_mismatch
+        or (problem_alignment == 0 and population_alignment == 0)
+        or total_score <= AUTOMATION_THRESHOLDS["auto_dismiss_score_max"]
+        or (
+            solution_alignment == 0
+            and mechanism_specificity == 0
+            and evidence_strength <= 1
+            and not exact_title_match
+            and (
+                weak_title_evidence
+                or weak_evidence
+                or lexical_floor_trigger
+                or missing_summary_low_overlap
+                or "topic overlap without mechanism overlap" in signal_conflicts
+                or bias_remove
+            )
+        )
+    )
+    if obvious_dismiss:
+        return {
+            "bucket": "auto_dismiss",
+            "reason": "obvious mismatch or weak evidence does not justify human review",
+            "threshold_used": threshold_used,
+            "guardrail_triggered": guardrails,
+            "evidence_summary": evidence_summary,
+            "original_link_type": original_link_type,
+        }
+
+    direct_allowed = (
+        total_score >= AUTOMATION_THRESHOLDS["auto_direct_score_min"]
+        and llm_confidence >= AUTOMATION_THRESHOLDS["auto_direct_confidence_min"]
+        and problem_alignment >= 2
+        and solution_alignment >= 2
+        and population_alignment >= 2
+        and mechanism_specificity >= 2
+        and evidence_strength >= 2
+        and not domain_mismatch
+        and not weak_evidence
+        and not weak_title_evidence
+        and not missing_summary_low_overlap
+    )
+    if direct_allowed:
+        return {
+            "bucket": "auto_direct",
+            "reason": "strong end-to-end alignment clears the direct threshold",
+            "threshold_used": threshold_used,
+            "guardrail_triggered": guardrails,
+            "evidence_summary": evidence_summary,
+            "original_link_type": original_link_type,
+        }
+
+    partial_allowed = (
+        total_score >= AUTOMATION_THRESHOLDS["auto_partial_score_min"]
+        and llm_confidence >= AUTOMATION_THRESHOLDS["auto_partial_confidence_min"]
+        and population_alignment >= 1
+        and problem_alignment >= 1
+        and (solution_alignment >= 1 or mechanism_specificity >= 1)
+        and evidence_strength >= 1
+        and not domain_mismatch
+        and final_decision != "remove_link"
+        and llm_decision != "remove_link"
+    )
+    if partial_allowed:
+        return {
+            "bucket": "auto_partial",
+            "reason": "meaningful but incomplete policy overlap clears the partial threshold",
+            "threshold_used": threshold_used,
+            "guardrail_triggered": guardrails,
+            "evidence_summary": evidence_summary,
+            "original_link_type": original_link_type,
+        }
+
+    gray_zone = (
+        total_score >= AUTOMATION_THRESHOLDS["manual_review_score_min"]
+        and total_score <= AUTOMATION_THRESHOLDS["manual_review_score_max"]
+        and population_alignment >= 1
+        and problem_alignment >= 1
+        and not domain_mismatch
+    )
+    if gray_zone:
+        return {
+            "bucket": "manual_review",
+            "reason": "domain and population align, but mechanism or evidence remains uncertain",
+            "threshold_used": threshold_used,
+            "guardrail_triggered": guardrails,
+            "evidence_summary": evidence_summary,
+            "original_link_type": original_link_type,
+        }
+
+    return {
+        "bucket": "auto_dismiss",
+        "reason": "candidate does not clear a defensible partial or direct threshold",
+        "threshold_used": threshold_used,
+        "guardrail_triggered": guardrails,
+        "evidence_summary": evidence_summary,
+        "original_link_type": original_link_type,
+    }
+
+
+def automated_action_for_manual_item(group: dict[str, Any], item: dict[str, Any], bucket: str, metadata: dict[str, Any]) -> dict[str, Any] | None:
+    future_bill_link_id = coerce_int(item.get("future_bill_link_id"))
+    tracked_bill_id = coerce_int(item.get("tracked_bill_id"))
+    original_link_type = normalize_str(metadata.get("original_link_type") or item.get("original_link_type"))
+    original_link_type_norm = original_link_type.lower() if original_link_type else ""
+    common = {
+        "future_bill_id": group["future_bill_id"],
+        "future_bill_link_id": future_bill_link_id,
+        "current_tracked_bill_id": tracked_bill_id,
+        "candidate_tracked_bill_id": tracked_bill_id,
+        "candidate_bill_number": item.get("bill_number"),
+        "candidate_title": item.get("tracked_bill_title"),
+        "rationale": metadata["reason"],
+        "source": "future_bill_link_manual_review_queue",
+        "raw_data": item,
+        "approved": True,
+        "auto_triaged": True,
+        "auto_triage_decision": f"approved_{bucket}",
+        "auto_triage_reason": metadata["reason"],
+        "automation_bucket": bucket,
+        "automation_reason": metadata["reason"],
+        "threshold_used": metadata.get("threshold_used"),
+        "evidence_summary": metadata.get("evidence_summary"),
+        "guardrail_triggered": metadata.get("guardrail_triggered"),
+    }
+
+    if bucket == "auto_dismiss" and future_bill_link_id is not None:
+        return action_candidate(
+            action_type="remove_direct_link",
+            target_type="future_bill_link",
+            target_id=future_bill_link_id,
+            payload={"future_bill_link_id": future_bill_link_id},
+            proposed_link_type=None,
+            **common,
+        )
+
+    if bucket == "auto_partial":
+        if future_bill_link_id is not None and original_link_type_norm != "partial":
+            return action_candidate(
+                action_type="convert_to_partial",
+                target_type="future_bill_link",
+                target_id=future_bill_link_id,
+                payload={
+                    "future_bill_link_id": future_bill_link_id,
+                    "new_link_type": "Partial",
+                    "notes": metadata["reason"],
+                },
+                proposed_link_type="Partial",
+                **common,
+            )
+        if future_bill_link_id is None and tracked_bill_id is not None:
+            return action_candidate(
+                action_type="create_partial_link",
+                target_type="tracked_bill",
+                target_id=tracked_bill_id,
+                payload={
+                    "future_bill_id": group["future_bill_id"],
+                    "tracked_bill_id": tracked_bill_id,
+                    "notes": metadata["reason"],
+                },
+                proposed_link_type="Partial",
+                **common,
+            )
+
+    if bucket == "auto_direct" and future_bill_link_id is not None and original_link_type_norm != "direct":
+        return action_candidate(
+            action_type="convert_to_direct",
+            target_type="future_bill_link",
+            target_id=future_bill_link_id,
+            payload={
+                "future_bill_link_id": future_bill_link_id,
+                "new_link_type": "Direct",
+                "notes": metadata["reason"],
+            },
+            proposed_link_type="Direct",
+            **common,
+        )
+
+    return None
+
+
+def reconcile_manual_review_queue(group: dict[str, Any]) -> None:
+    reconciled_items: list[dict[str, Any]] = []
+    for item in group["manual_review_queue"]:
+        metadata = manual_review_bucket(item)
+        bucket = metadata["bucket"]
+        item["automation_bucket"] = bucket
+        item["automation_reason"] = metadata.get("reason")
+        item["threshold_used"] = metadata.get("threshold_used") or {}
+        item["evidence_summary"] = metadata.get("evidence_summary")
+        item["guardrail_triggered"] = metadata.get("guardrail_triggered") or []
+
+        if bucket == "resolved":
+            item["review_state"] = "resolved"
+            item["status"] = "resolved"
+            item["apply_result"] = item.get("apply_result") or "already_resolved"
+            record_automation_bucket(group, "resolved")
+            reconciled_items.append(item)
+            continue
+
+        if bucket == "manual_review":
+            item["review_state"] = "actionable"
+            item["status"] = "pending_review"
+            record_automation_bucket(group, "manual_review")
+            reconciled_items.append(item)
+            continue
+
+        automated_action = automated_action_for_manual_item(group, item, bucket, metadata)
+        item["auto_triaged"] = True
+        item["auto_triage_decision"] = f"approved_{bucket}"
+        item["auto_triage_reason"] = metadata.get("reason")
+
+        if automated_action:
+            item["review_state"] = "already_triaged"
+            item["status"] = bucket
+            group["_pending_actions"].append(automated_action)
+        else:
+            original_link_type = normalize_str(metadata.get("original_link_type") or item.get("original_link_type")).lower()
+            already_satisfied = (
+                (bucket == "auto_partial" and original_link_type == "partial")
+                or (bucket == "auto_direct" and original_link_type == "direct")
+                or bucket == "auto_dismiss"
+            )
+            if already_satisfied:
+                item["review_state"] = "already_applied"
+                item["status"] = "already_applied"
+                item["apply_result"] = item.get("apply_result") or "already_satisfied"
+                mark_counts(group, "already_applied")
+            else:
+                item["review_state"] = "actionable"
+                item["status"] = "pending_review"
+                item["automation_bucket"] = "manual_review"
+                item["automation_reason"] = "automation could not safely execute against the current canonical state"
+                record_automation_bucket(group, "manual_review")
+                reconciled_items.append(item)
+                continue
+
+        record_automation_bucket(group, bucket)
+        reconciled_items.append(item)
+
+    group["manual_review_queue"] = reconciled_items
 
 
 def index_apply_report_actions(apply_report: dict[str, Any] | None) -> dict[str, dict[str, Any]]:
@@ -651,6 +1081,7 @@ def link_type_score(action: dict[str, Any], feedback_adjustments: dict[str, dict
 
 def action_type_score(action_type: str | None, feedback_adjustments: dict[str, dict[str, float]]) -> tuple[float, float]:
     mapping = {
+        "convert_to_direct": 0.95,
         "replace_link": 0.9,
         "create_partial_link": 0.8,
         "import_candidate_seed": 0.75,
@@ -819,6 +1250,13 @@ def finalize_operator_actions(
                 review_state = "already_applied"
             elif not live:
                 review_state = "stale"
+        elif action.get("action_type") == "convert_to_direct":
+            future_bill_link_id = payload.get("future_bill_link_id")
+            live = by_link_id.get(int(future_bill_link_id)) if future_bill_link_id is not None else None
+            if live and str(live.get("link_type")) == "Direct":
+                review_state = "already_applied"
+            elif not live:
+                review_state = "stale"
         elif action.get("action_type") == "create_partial_link":
             tracked_bill_id = payload.get("tracked_bill_id")
             live = by_pair.get((int(group["future_bill_id"]), int(tracked_bill_id))) if tracked_bill_id is not None else None
@@ -955,27 +1393,8 @@ def main() -> None:
             group = ensure_group(future_bill_id)
             group["future_bill_title"] = group["future_bill_title"] or (source_item or {}).get("future_bill_title")
             group["target_area"] = group["target_area"] or (source_item or {}).get("target_area")
-            group["manual_review_queue"].append(item)
+            group["manual_review_queue"].append(enrich_manual_queue_item(item, source_item))
             normalization_summary["rows_grouped"] += 1
-            if item.get("final_decision") == "remove_link":
-                group["_pending_actions"].append(
-                    action_candidate(
-                        action_type="remove_direct_link",
-                        target_type="future_bill_link",
-                        target_id=future_bill_link_id,
-                        payload={"future_bill_link_id": future_bill_link_id},
-                        future_bill_id=future_bill_id,
-                        future_bill_link_id=future_bill_link_id,
-                        current_tracked_bill_id=(source_item or {}).get("tracked_bill_id"),
-                        candidate_tracked_bill_id=None,
-                        candidate_bill_number=item.get("bill_number"),
-                        candidate_title=item.get("tracked_bill_title"),
-                        proposed_link_type=None,
-                        rationale="Manual removal review candidate from the manual review queue.",
-                        source="future_bill_link_manual_review_queue",
-                        raw_data=item,
-                    )
-                )
 
     if suggestions:
         for item in report_items(suggestions, "items"):
@@ -1033,6 +1452,7 @@ def main() -> None:
             unique_links.append(row)
         group["current_links"] = unique_links
         reconcile_safe_apply_and_manual(group)
+        reconcile_manual_review_queue(group)
         reconcile_partial_suggestions(group)
         reconcile_candidate_discovery(group)
         finalize_operator_actions(group, applied_actions_by_id, feedback_adjustments)
@@ -1067,6 +1487,16 @@ def main() -> None:
             "future_bills_in_bundle": len(deduped_groups),
             "total_actions": sum(len(group["operator_actions"]) for group in deduped_groups),
             "safe_auto_removals_available": sum(1 for action in pending_actions_index if action["action_type"] == "remove_direct_link"),
+            "auto_dismissed_count": sum(group["automation_counts"].get("auto_dismiss", 0) for group in deduped_groups),
+            "auto_partial_count": sum(group["automation_counts"].get("auto_partial", 0) for group in deduped_groups),
+            "auto_direct_count": sum(group["automation_counts"].get("auto_direct", 0) for group in deduped_groups),
+            "manual_review_required_count": sum(group["automation_counts"].get("manual_review", 0) for group in deduped_groups),
+            "resolved_or_stale_count": sum(
+                group["automation_counts"].get("resolved", 0)
+                + group["stale_suggestions_count"]
+                + group["already_applied_count"]
+                for group in deduped_groups
+            ),
             "manual_review_items": sum(
                 1
                 for group in deduped_groups
@@ -1074,6 +1504,7 @@ def main() -> None:
                 if str(item.get("review_state") or "actionable") == "actionable"
             ),
             "partial_candidates": sum(1 for action in pending_actions_index if action["action_type"] in {"convert_to_partial", "create_partial_link"}),
+            "direct_candidates": sum(1 for action in pending_actions_index if action["action_type"] == "convert_to_direct"),
             "discovery_candidates": sum(1 for action in pending_actions_index if action["action_type"] == "import_candidate_seed"),
             "items_requiring_operator_action": len(pending_actions_index),
             "total_applied_actions": sum(
@@ -1133,6 +1564,15 @@ def main() -> None:
                         "discovery_rows": len(group["candidate_discovery"]),
                         "operator_actions": len(group["operator_actions"]),
                         "actionable_operator_actions_count": group["actionable_operator_actions_count"],
+                        "auto_dismissed_count": group["automation_counts"].get("auto_dismiss", 0),
+                        "auto_partial_count": group["automation_counts"].get("auto_partial", 0),
+                        "auto_direct_count": group["automation_counts"].get("auto_direct", 0),
+                        "manual_review_required_count": group["automation_counts"].get("manual_review", 0),
+                        "resolved_or_stale_count": (
+                            group["automation_counts"].get("resolved", 0)
+                            + group["stale_suggestions_count"]
+                            + group["already_applied_count"]
+                        ),
                         "stale_suggestions_count": group["stale_suggestions_count"],
                         "already_applied_count": group["already_applied_count"],
                         "suppressed_weak_candidates_count": group["suppressed_weak_candidates_count"],

@@ -301,6 +301,10 @@ def validate_payload(action: dict[str, Any]) -> tuple[bool, str | None]:
         if not payload.get("future_bill_link_id"):
             return False, "remove_direct_link requires payload.future_bill_link_id"
         return True, None
+    if action_type == "convert_to_direct":
+        if not payload.get("future_bill_link_id"):
+            return False, "convert_to_direct requires payload.future_bill_link_id"
+        return True, None
     if action_type == "convert_to_partial":
         if not payload.get("future_bill_link_id"):
             return False, "convert_to_partial requires payload.future_bill_link_id"
@@ -461,6 +465,42 @@ def apply_convert_to_partial(cursor, action: dict[str, Any], bundle_path: Path) 
     )
 
 
+def apply_convert_to_direct(cursor, action: dict[str, Any], bundle_path: Path) -> dict[str, Any]:
+    payload = action["payload"]
+    future_bill_link_id = int(payload["future_bill_link_id"])
+    new_link_type = payload.get("new_link_type") or "Direct"
+    prior = fetch_future_bill_link(cursor, future_bill_link_id)
+    if not prior:
+        raise ValueError(f"future_bill_link_id {future_bill_link_id} was not found")
+    update_future_bill_link(cursor, future_bill_link_id, new_link_type, payload.get("notes"))
+    insert_operator_log(
+        cursor,
+        action=action,
+        previous_link_type=prior.get("link_type"),
+        new_link_type=new_link_type,
+        bundle_path=bundle_path,
+        action_status="applied",
+        action_reason="Approved review bundle direct conversion",
+        tracked_bill_id=prior.get("tracked_bill_id"),
+    )
+    return base_result(
+        action,
+        "applied",
+        {
+            "future_bill_link_id": future_bill_link_id,
+            "new_link_type": new_link_type,
+            "change_summary": change_summary(
+                future_bill_link_id=future_bill_link_id,
+                future_bill_id=int(prior["future_bill_id"]),
+                tracked_bill_id=prior.get("tracked_bill_id"),
+                old_link_type=prior.get("link_type"),
+                new_link_type=new_link_type,
+                action=action,
+            ),
+        },
+    )
+
+
 def apply_create_partial_link(cursor, action: dict[str, Any], bundle_path: Path) -> dict[str, Any]:
     payload = action["payload"]
     future_bill_id = int(payload["future_bill_id"])
@@ -535,6 +575,8 @@ def dry_run_result(action: dict[str, Any]) -> dict[str, Any]:
     new_link_type = None
     if action_type == "remove_direct_link":
         new_link_type = None
+    elif action_type == "convert_to_direct":
+        new_link_type = payload.get("new_link_type") or "Direct"
     elif action_type == "convert_to_partial":
         new_link_type = payload.get("new_link_type") or "Partial"
     elif action_type == "create_partial_link":
@@ -553,7 +595,7 @@ def dry_run_result(action: dict[str, Any]) -> dict[str, Any]:
                 old_link_type=old_link_type,
                 new_link_type=new_link_type,
                 action=action,
-            ) if action_type in {"remove_direct_link", "convert_to_partial", "create_partial_link"} else None,
+            ) if action_type in {"remove_direct_link", "convert_to_direct", "convert_to_partial", "create_partial_link"} else None,
         },
     )
 
@@ -597,7 +639,7 @@ def record_db_action_result(
                 updated_links.append(change_summary_payload)
             else:
                 created_links.append(change_summary_payload)
-        elif action["action_type"] == "convert_to_partial":
+        elif action["action_type"] in {"convert_to_direct", "convert_to_partial"}:
             updated_links.append(change_summary_payload)
         elif action["action_type"] == "remove_direct_link":
             deleted_links.append(change_summary_payload)
@@ -643,7 +685,7 @@ def main() -> None:
                 )
             )
 
-    db_action_types = {"remove_direct_link", "convert_to_partial", "create_partial_link"}
+    db_action_types = {"remove_direct_link", "convert_to_direct", "convert_to_partial", "create_partial_link"}
     approved_db_actions = [action for action in approved_actions if action.get("action_type") in db_action_types]
     approved_seed_actions = [action for action in approved_actions if action.get("action_type") == "import_candidate_seed"]
 
@@ -660,7 +702,7 @@ def main() -> None:
             if result.get("change_summary"):
                 if action["action_type"] == "create_partial_link":
                     created_links.append(result["change_summary"])
-                elif action["action_type"] == "convert_to_partial":
+                elif action["action_type"] in {"convert_to_direct", "convert_to_partial"}:
                     updated_links.append(result["change_summary"])
                 elif action["action_type"] == "remove_direct_link":
                     deleted_links.append(result["change_summary"])
@@ -679,6 +721,17 @@ def main() -> None:
                         try:
                             if action["action_type"] == "remove_direct_link":
                                 result = apply_remove_direct_link(cursor, action, input_path)
+                                record_db_action_result(
+                                    action,
+                                    result,
+                                    applied_actions=applied_actions,
+                                    skipped_actions=skipped_actions,
+                                    created_links=created_links,
+                                    updated_links=updated_links,
+                                    deleted_links=deleted_links,
+                                )
+                            elif action["action_type"] == "convert_to_direct":
+                                result = apply_convert_to_direct(cursor, action, input_path)
                                 record_db_action_result(
                                     action,
                                     result,

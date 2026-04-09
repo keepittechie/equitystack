@@ -25,6 +25,32 @@ def sample_action(action_id: str, action_type: str, payload: dict, *, future_bil
 
 
 class ApplyReviewBundleTests(unittest.TestCase):
+    def test_convert_to_direct_applies_when_target_exists(self) -> None:
+        action = sample_action(
+            "direct:1:11",
+            "convert_to_direct",
+            {"future_bill_link_id": 11, "new_link_type": "Direct", "notes": "strong alignment"},
+        )
+        prior = {
+            "id": 11,
+            "future_bill_id": 1,
+            "tracked_bill_id": 50,
+            "link_type": "Partial",
+        }
+
+        with (
+            patch.object(apply_review_bundle, "fetch_future_bill_link", return_value=prior),
+            patch.object(apply_review_bundle, "update_future_bill_link") as update_mock,
+            patch.object(apply_review_bundle, "insert_operator_log") as log_mock,
+        ):
+            result = apply_review_bundle.apply_convert_to_direct(object(), action, Path("/tmp/review-bundle.json"))
+
+        self.assertEqual(result["result"], "applied")
+        self.assertEqual(result["new_link_type"], "Direct")
+        update_args, _ = update_mock.call_args
+        self.assertEqual(update_args[1:], (11, "Direct", "strong alignment"))
+        log_mock.assert_called_once()
+
     def test_remove_direct_link_applies_when_target_exists(self) -> None:
         action = sample_action("remove:1:11", "remove_direct_link", {"future_bill_link_id": 11})
         prior = {
