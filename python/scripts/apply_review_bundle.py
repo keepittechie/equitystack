@@ -378,7 +378,25 @@ def apply_remove_direct_link(cursor, action: dict[str, Any], bundle_path: Path) 
     future_bill_link_id = int(action["payload"]["future_bill_link_id"])
     prior = fetch_future_bill_link(cursor, future_bill_link_id)
     if not prior:
-        raise ValueError(f"future_bill_link_id {future_bill_link_id} was not found")
+        insert_operator_log(
+            cursor,
+            action=action,
+            previous_link_type=None,
+            new_link_type=None,
+            bundle_path=bundle_path,
+            action_status="skipped_already_absent",
+            action_reason="Approved review bundle removal target was already absent",
+            tracked_bill_id=None,
+        )
+        return base_result(
+            action,
+            "skipped_already_absent",
+            {
+                "future_bill_link_id": future_bill_link_id,
+                "message": f"future_bill_link_id {future_bill_link_id} was already absent",
+                "reason": "remove_direct_link target no longer exists",
+            },
+        )
     delete_future_bill_link(cursor, future_bill_link_id)
     insert_operator_log(
         cursor,
@@ -559,6 +577,35 @@ def csv_row(category: str, item: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def record_db_action_result(
+    action: dict[str, Any],
+    result: dict[str, Any],
+    *,
+    applied_actions: list[dict[str, Any]],
+    skipped_actions: list[dict[str, Any]],
+    created_links: list[dict[str, Any]],
+    updated_links: list[dict[str, Any]],
+    deleted_links: list[dict[str, Any]],
+) -> None:
+    if result.get("result") == "applied":
+        applied_actions.append(result)
+        change_summary_payload = result.get("change_summary")
+        if not change_summary_payload:
+            return
+        if action["action_type"] == "create_partial_link":
+            if result.get("mode") == "updated_existing":
+                updated_links.append(change_summary_payload)
+            else:
+                created_links.append(change_summary_payload)
+        elif action["action_type"] == "convert_to_partial":
+            updated_links.append(change_summary_payload)
+        elif action["action_type"] == "remove_direct_link":
+            deleted_links.append(change_summary_payload)
+        return
+
+    skipped_actions.append(result)
+
+
 def main() -> None:
     args = parse_args()
     input_path = args.input.resolve()
@@ -632,19 +679,37 @@ def main() -> None:
                         try:
                             if action["action_type"] == "remove_direct_link":
                                 result = apply_remove_direct_link(cursor, action, input_path)
-                                applied_actions.append(result)
-                                deleted_links.append(result["change_summary"])
+                                record_db_action_result(
+                                    action,
+                                    result,
+                                    applied_actions=applied_actions,
+                                    skipped_actions=skipped_actions,
+                                    created_links=created_links,
+                                    updated_links=updated_links,
+                                    deleted_links=deleted_links,
+                                )
                             elif action["action_type"] == "convert_to_partial":
                                 result = apply_convert_to_partial(cursor, action, input_path)
-                                applied_actions.append(result)
-                                updated_links.append(result["change_summary"])
+                                record_db_action_result(
+                                    action,
+                                    result,
+                                    applied_actions=applied_actions,
+                                    skipped_actions=skipped_actions,
+                                    created_links=created_links,
+                                    updated_links=updated_links,
+                                    deleted_links=deleted_links,
+                                )
                             elif action["action_type"] == "create_partial_link":
                                 result = apply_create_partial_link(cursor, action, input_path)
-                                applied_actions.append(result)
-                                if result.get("mode") == "updated_existing":
-                                    updated_links.append(result["change_summary"])
-                                else:
-                                    created_links.append(result["change_summary"])
+                                record_db_action_result(
+                                    action,
+                                    result,
+                                    applied_actions=applied_actions,
+                                    skipped_actions=skipped_actions,
+                                    created_links=created_links,
+                                    updated_links=updated_links,
+                                    deleted_links=deleted_links,
+                                )
                             else:
                                 errors.append(base_result(action, "error", {"error": f"Unsupported action_type: {action['action_type']}"}))
                         except Exception as error_obj:

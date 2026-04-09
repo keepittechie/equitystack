@@ -177,6 +177,24 @@ Legislative materialization uses official bill/action URLs from `tracked_bills` 
 
 Existing source metadata may be refreshed only when the new source signal is stronger. The workflows do not downgrade source quality or reduce source counts.
 
+## Legislative Bundle Repair
+
+Legislative bundle state can become stale when an approved bundle action targets a `future_bill_links` row that was already removed by an earlier apply, archive path, or other canonical workflow step.
+
+This is handled in two layers:
+
+- `./python/bin/equitystack legislative apply --apply --yes`
+  - treats a missing `remove_direct_link` target as an idempotent resolved state instead of a hard failure
+  - continues applying the rest of the approved batch
+  - rebuilds the review bundle
+  - runs canonical bundle repair automatically after rebuild
+- `./python/bin/equitystack legislative repair --dry-run`
+- `./python/bin/equitystack legislative repair --apply --yes`
+  - reconciles stale bundle and manual-review-queue artifacts already persisted on disk
+  - writes `python/reports/equitystack_bundle_repair_report.json`
+
+The repair path updates canonical artifacts only. It does not create a separate admin-side database write path.
+
 ## Verification Commands
 
 Use the weekly wrapper first when you want the fast operator answer:

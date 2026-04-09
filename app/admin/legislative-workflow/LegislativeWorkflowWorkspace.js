@@ -97,7 +97,10 @@ function getTrustBannerConfig(summary) {
 
 export default function LegislativeWorkflowWorkspace({ workspace }) {
   const router = useRouter();
-  const [actions, setActions] = useState(cloneActions(workspace.operator_actions || []));
+  const actionableBundleActions = Array.isArray(workspace.actionable_operator_actions)
+    ? workspace.actionable_operator_actions
+    : workspace.operator_actions || [];
+  const [actions, setActions] = useState(cloneActions(actionableBundleActions));
   const [message, setMessage] = useState("");
   const [isPending, startTransition] = useTransition();
   const permissions = workspace.action_permissions || {};
@@ -109,6 +112,7 @@ export default function LegislativeWorkflowWorkspace({ workspace }) {
   const manualReviewItems = Array.isArray(workspace.manual_review_queue?.items)
     ? workspace.manual_review_queue.items
     : [];
+  const debugState = workspace.debug_state || null;
   const aiState = toCanonicalAiState(outcomeSummary?.ai_status?.run_status || "not_started");
   const aiStateTone = getAiStateTone(aiState);
   const confidenceLabel = toCanonicalConfidence(outcomeSummary?.confidence_level || "unknown");
@@ -205,14 +209,16 @@ export default function LegislativeWorkflowWorkspace({ workspace }) {
                 {outcomeSummary.decisions?.kept || 0} kept, {outcomeSummary.decisions?.modified || 0} modified, {outcomeSummary.decisions?.removed || 0} removed
               </p>
               <p className="mt-1 text-[11px] text-[#4B5563]">
-                {outcomeSummary.decisions?.manual_review || 0} require manual review
+                {reviewQueueCount > 0
+                  ? `${reviewQueueCount} actionable item(s) require manual review`
+                  : "No actionable legislative items require manual review"}
               </p>
             </div>
             <div className="rounded border border-[#E5EAF0] bg-white p-3">
               <p className="text-[11px] text-[#6B7280]">Manual review queue</p>
               <p className="mt-1 font-semibold text-[#1F2937]">{reviewQueueCount} item(s)</p>
               <p className="mt-1 break-all font-mono text-[11px] text-[#4B5563]">
-                {workspace.manual_review_queue?.path || "No manual-review queue artifact recorded."}
+                {workspace.review_bundle?.path || workspace.manual_review_queue?.path || "No canonical review bundle recorded."}
               </p>
             </div>
             <div className="rounded border border-[#E5EAF0] bg-white p-3">
@@ -225,6 +231,14 @@ export default function LegislativeWorkflowWorkspace({ workspace }) {
               </p>
             </div>
           </div>
+          {debugState ? (
+            <p className="mt-3 text-[11px] text-[#4B5563]">
+              Canonical bundle debug: {debugState.total_actions} total actions,{" "}
+              {debugState.actionable_manual_review} actionable manual review,{" "}
+              {debugState.stale_actions} stale, {debugState.applied_actions} applied, state{" "}
+              {debugState.workflow_state}.
+            </p>
+          ) : null}
         </section>
       ) : null}
 
@@ -454,7 +468,7 @@ export default function LegislativeWorkflowWorkspace({ workspace }) {
           <div className="rounded border border-[#E5EAF0] bg-[#F9FBFD] px-3 py-2 text-[11px] text-[#4B5563]">
             <div>Queue items: <span className="font-semibold text-[#1F2937]">{reviewQueueCount}</span></div>
             <div className="mt-1 break-all font-mono text-[#6B7280]">
-              {workspace.manual_review_queue?.path || "No manual-review queue artifact recorded."}
+              {workspace.review_bundle?.path || workspace.manual_review_queue?.path || "No canonical review bundle recorded."}
             </div>
           </div>
         </div>
@@ -513,7 +527,7 @@ export default function LegislativeWorkflowWorkspace({ workspace }) {
           </div>
         ) : (
           <div className="rounded border border-[#E5EAF0] bg-[#F9FBFD] p-3 text-[12px] text-[#4B5563]">
-            <p className="font-medium text-[#1F2937]">No review items pending.</p>
+            <p className="font-medium text-[#1F2937]">No actionable legislative items require manual review.</p>
             <p className="mt-1">
               Next step: run the legislative workflow again if you expected new review work, or continue to bundle approval if the queue is genuinely clear.
             </p>
@@ -534,7 +548,7 @@ export default function LegislativeWorkflowWorkspace({ workspace }) {
         <div className="mb-3">
           <h2 className="text-base font-semibold">Bundle actions</h2>
           <p className="mt-1 text-[12px] text-gray-600">
-            Dense approval table. Approve or dismiss inline, then inspect the row for rationale and notes.
+            Dense approval table. Only actionable canonical bundle actions are shown here.
           </p>
         </div>
         <div className="overflow-x-auto rounded border border-zinc-200">

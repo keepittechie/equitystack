@@ -1925,19 +1925,22 @@ run_legislative_command() {
           exit 1
         fi
 
-        run_step "1/3" "Apply Review Bundle" "Approved legislative actions applied" --output "$(apply_report_path)" -- \
+        run_step "1/4" "Apply Review Bundle" "Approved legislative actions applied" --output "$(apply_report_path)" -- \
           "$VENV_PYTHON" scripts/apply_review_bundle.py --apply --yes --csv
 
         if apply_report_has_affected_bills; then
-          run_step "2/3" "Rerun Affected Future Bills" "Affected future bills rerun" -- \
+          run_step "2/4" "Rerun Affected Future Bills" "Affected future bills rerun" -- \
             "$VENV_PYTHON" scripts/rerun_affected_future_bills.py --from-apply-report "$(apply_report_path)" --csv
         else
-          print_step_header "2/3" "Rerun Affected Future Bills"
+          print_step_header "2/4" "Rerun Affected Future Bills"
           printf 'SUCCESS: No affected future bills were recorded. Skipping rerun.\n'
         fi
 
-        run_step "3/3" "Rebuild Review Bundle" "Review bundle rebuilt" --output "$(review_bundle_path)" -- \
+        run_step "3/4" "Rebuild Review Bundle" "Review bundle rebuilt" --output "$(review_bundle_path)" -- \
           "$VENV_PYTHON" scripts/build_review_bundle.py --csv --use-feedback
+
+        run_step "4/4" "Repair Canonical Review State" "Stale legislative bundle state reconciled" --output "$EQUITYSTACK_PYTHON_DIR/reports/equitystack_bundle_repair_report.json" -- \
+          "$VENV_PYTHON" scripts/repair_review_bundle.py --apply --yes
 
         print_system_state \
           "REVIEW_READY" \
@@ -2004,6 +2007,10 @@ run_legislative_command() {
           "Review the new bundle after import" \
           "$(cli_hint) legislative review"
       fi
+      ;;
+    repair|reconcile)
+      run_step "1/1" "Repair Legislative Review Bundle" "Legislative bundle repair complete" --output "$EQUITYSTACK_PYTHON_DIR/reports/equitystack_bundle_repair_report.json" -- \
+        "$VENV_PYTHON" scripts/repair_review_bundle.py "$@"
       ;;
     materialize-outcomes)
       run_step "1/1" "Materialize Legislative Outcomes" "Legislative policy_outcomes materialization complete" --output "$EQUITYSTACK_PYTHON_DIR/reports/legislative-policy-outcomes-materialize.dry-run.json" -- \
@@ -2679,6 +2686,7 @@ Legislative commands:
   review     Open the legislative review CLI
   apply      Apply approved legislative actions, rerun affected bills when needed, rebuild the bundle
   import     Import approved tracked-bill seed rows, rebuild the bundle
+  repair     Reconcile stale legislative bundle and manual-review-queue state
   feedback   Refresh feedback analysis and rebuild the bundle
 
 Current-admin commands:
@@ -2908,6 +2916,7 @@ Commands:
   review     Open the legislative review CLI
   apply      Dry-run or apply approved legislative actions
   import     Dry-run or apply approved tracked-bill seed rows
+  repair     Dry-run or apply canonical review-bundle/manual-queue repair for stale actions
   materialize-outcomes
              Dry-run or apply safe tracked_bills into unified policy_outcomes
   feedback   Refresh feedback analysis and rebuild the bundle
@@ -2930,6 +2939,8 @@ Apply / import options:
   legislative apply --apply --yes
   legislative import --dry-run
   legislative import --apply --yes
+  legislative repair --dry-run
+  legislative repair --apply --yes
   legislative materialize-outcomes
   legislative materialize-outcomes --apply --yes
 EOF

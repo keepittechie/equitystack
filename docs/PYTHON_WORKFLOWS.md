@@ -73,6 +73,8 @@ Canonical commands:
 ./python/bin/equitystack legislative review
 ./python/bin/equitystack legislative apply --dry-run
 ./python/bin/equitystack legislative apply --apply --yes
+./python/bin/equitystack legislative repair --dry-run
+./python/bin/equitystack legislative repair --apply --yes
 ./python/bin/equitystack legislative materialize-outcomes
 ./python/bin/equitystack legislative materialize-outcomes --apply --yes
 ```
@@ -91,14 +93,17 @@ Important scripts:
 | Review bundle | `scripts/build_review_bundle.py` |
 | Bundle review | `scripts/review_bundle_actions.py` |
 | Bundle apply | `scripts/apply_review_bundle.py` |
+| Bundle repair | `scripts/repair_review_bundle.py` |
 | Approved bill import | `scripts/import_approved_tracked_bills.py` |
 | Legislative outcome materialization | `scripts/materialize_legislative_policy_outcomes.py` |
 
 Safety:
 
 - `legislative apply` and `legislative import` are dry-run unless `--apply --yes` is explicit.
+- `legislative repair` is dry-run unless `--apply --yes` is explicit.
 - `legislative materialize-outcomes` is dry-run unless `--apply --yes` is explicit.
 - Legislative outcomes are inserted into `policy_outcomes` with `impact_score`, but are excluded from per-president scoring until deterministic president attribution exists.
+- Stale approved `remove_direct_link` actions are treated as already resolved when their target link is already absent.
 
 Note: some legacy script filenames still include `ollama`; the provider layer can route OpenAI-style models such as `gpt-4.1-mini` when configured.
 

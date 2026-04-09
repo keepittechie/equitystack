@@ -220,6 +220,42 @@ Check:
 
 If `weekly-run` says `No urgent action needed this week.`, stop. That is the intended safe do-nothing path.
 
+### Legislative Repair Case
+
+Use this when the legislative workflow looks logically complete but the canonical bundle still carries dead approval state.
+
+Typical symptoms:
+
+- `./python/bin/equitystack legislative review` shows no truly pending manual work
+- `./python/bin/equitystack legislative apply --apply --yes` fails on a missing `future_bill_link_id`
+- the admin legislative tracker stays on `Manual Review Queue` or `REVIEW_READY`
+
+Run:
+
+```bash
+./python/bin/equitystack legislative repair --dry-run
+./python/bin/equitystack legislative repair --apply --yes
+```
+
+What it does:
+
+- loads `python/reports/equitystack_review_bundle.json`
+- checks whether approved bundle actions are still executable against the live DB
+- marks dead or already-satisfied actions as resolved in canonical artifacts
+- repairs stale manual-review-queue rows that no longer match live link state
+- writes `python/reports/equitystack_bundle_repair_report.json`
+
+What it does not do:
+
+- it does not bypass the workflow
+- it does not invent approvals
+- it does not perform direct admin-side DB edits outside the canonical CLI path
+
+Note:
+
+- `legislative apply --apply --yes` now tolerates already-absent `remove_direct_link` targets and automatically runs bundle repair after rebuilding the review bundle
+- the explicit `legislative repair` command is for cases where old artifact state is already stranded on disk and you need to reconcile it safely
+
 ### Monthly Workflow: 1-2 Hours
 
 This is the deeper cleanup and expansion pass.

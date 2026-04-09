@@ -89,6 +89,21 @@ Classify policy intent:
   --apply --yes
 ```
 
+Repair stale legislative bundle state when review/apply is stuck:
+
+```bash
+./python/bin/equitystack legislative repair --dry-run
+./python/bin/equitystack legislative repair --apply --yes
+```
+
+Use this when:
+
+- `legislative review` shows no real pending work
+- `legislative apply` still complains about an approved `remove_direct_link`
+- the admin legislative tracker is stuck on `Manual Review Queue` or `REVIEW_READY`
+
+This repairs canonical artifact state only. It does not invent approvals or create direct admin-side DB writes around the workflow.
+
 ## Deeper Commands
 
 Use these only when you need detail:

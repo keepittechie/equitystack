@@ -176,7 +176,7 @@ function legislativeSurfaceSummary(workspace, session) {
     currentNext: tracker?.nextStep?.title || workspace?.next_step?.label || session?.recommendedAction?.title || "No next step recorded",
     reviewLoad:
       reviewCount > 0
-        ? `${reviewCount} manual-review item(s)`
+        ? `${reviewCount} actionable manual-review item(s)`
         : Number(workspace?.counts?.pending_unreviewed_actions || 0) > 0
           ? `${workspace.counts.pending_unreviewed_actions} bundle approval item(s)`
           : "No review work pending",

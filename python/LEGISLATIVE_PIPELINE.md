@@ -21,6 +21,7 @@ If local Python is not set up yet:
 ./bin/equitystack legislative review
 ./bin/equitystack legislative apply
 ./bin/equitystack legislative import
+./bin/equitystack legislative repair
 ./bin/equitystack legislative feedback
 ```
 
@@ -92,6 +93,8 @@ Use these only when needed:
 ```bash
 ./bin/equitystack legislative import --dry-run
 ./bin/equitystack legislative import --apply --yes
+./bin/equitystack legislative repair --dry-run
+./bin/equitystack legislative repair --apply --yes
 ./bin/equitystack legislative feedback
 ```
 
@@ -103,7 +106,34 @@ Use these only when needed:
 - `find_candidate_tracked_bills.py` never mutates the DB unless you explicitly write a seed file.
 - `import_approved_tracked_bills.py` is dry-run unless `--apply --yes` is supplied.
 - `apply_review_bundle.py` is mutating and should only be run through the normal approval path.
+- missing targets for approved `remove_direct_link` actions are now treated as an idempotent resolved state, not a hard failure.
+- `repair_review_bundle.py` rewrites stale canonical review-bundle/manual-review-queue state when approved actions are no longer executable against current DB reality.
 - `materialize_legislative_policy_outcomes.py` is dry-run unless `--apply --yes` is explicit; it inserts unified `policy_outcomes` with `policy_type = legislative` and `impact_score` populated.
+
+## When The Bundle Is Stale
+
+The canonical review bundle can lag behind current DB state. This usually shows up as:
+
+- an approved `remove_direct_link:<future_bill_id>:<future_bill_link_id>` action still present in the bundle
+- `future_bill_link_id` no longer existing in the DB
+- `legislative review` showing no real pending manual items
+- the admin tracker still looking stuck on `Manual Review Queue` or `REVIEW_READY`
+
+Use:
+
+```bash
+./bin/equitystack legislative repair --dry-run
+./bin/equitystack legislative repair --apply --yes
+```
+
+This command:
+
+- validates bundle actions against live DB state
+- marks dead or already-satisfied actions as resolved in the canonical bundle
+- removes stale manual-review queue rows that no longer match live links
+- writes `reports/equitystack_bundle_repair_report.json`
+
+`legislative apply --apply --yes` now also runs this repair step automatically after rebuilding the review bundle.
 
 ## Environment Notes
 
@@ -134,6 +164,7 @@ Primary supporting scripts:
 - `scripts/build_review_bundle.py`
 - `scripts/review_bundle_actions.py`
 - `scripts/apply_review_bundle.py`
+- `scripts/repair_review_bundle.py`
 - `scripts/import_approved_tracked_bills.py`
 - `scripts/materialize_legislative_policy_outcomes.py`
 - `scripts/analyze_feedback.py`

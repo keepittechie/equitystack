@@ -350,6 +350,7 @@ def index_apply_report_actions(apply_report: dict[str, Any] | None) -> dict[str,
 
 
 def choose_group_action(group: dict[str, Any]) -> str:
+    actionable_manual_items = [item for item in group["manual_review_queue"] if str(item.get("review_state") or "actionable") == "actionable"]
     if group["actionable_operator_actions_count"]:
         return "review_operator_actions"
     if any(item.get("status") == "eligible_dry_run" for item in group["safe_apply"]):
@@ -358,17 +359,18 @@ def choose_group_action(group: dict[str, Any]) -> str:
         return "review_partial_and_replacement_suggestions"
     if group["candidate_discovery"]:
         return "review_candidate_seed_imports"
-    if group["manual_review_queue"]:
+    if actionable_manual_items:
         return "manual_review_required"
     return "retain_for_now"
 
 
 def choose_priority(group: dict[str, Any]) -> str:
+    actionable_manual_items = [item for item in group["manual_review_queue"] if str(item.get("review_state") or "actionable") == "actionable"]
     if group["actionable_operator_actions_count"]:
         return "high"
     if any(item.get("status") == "eligible_dry_run" for item in group["safe_apply"]):
         return "high"
-    if group["manual_review_queue"]:
+    if actionable_manual_items:
         return "high"
     if group["partial_suggestions"] or group["candidate_discovery"]:
         return "medium"
@@ -1065,7 +1067,12 @@ def main() -> None:
             "future_bills_in_bundle": len(deduped_groups),
             "total_actions": sum(len(group["operator_actions"]) for group in deduped_groups),
             "safe_auto_removals_available": sum(1 for action in pending_actions_index if action["action_type"] == "remove_direct_link"),
-            "manual_review_items": sum(len(group["manual_review_queue"]) for group in deduped_groups),
+            "manual_review_items": sum(
+                1
+                for group in deduped_groups
+                for item in group["manual_review_queue"]
+                if str(item.get("review_state") or "actionable") == "actionable"
+            ),
             "partial_candidates": sum(1 for action in pending_actions_index if action["action_type"] in {"convert_to_partial", "create_partial_link"}),
             "discovery_candidates": sum(1 for action in pending_actions_index if action["action_type"] == "import_candidate_seed"),
             "items_requiring_operator_action": len(pending_actions_index),

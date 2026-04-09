@@ -800,7 +800,7 @@ function deriveLegislativeOutcome(session) {
         blockers,
       attentionSummary:
         Number(outcome.manual_review_queue_count || 0) > 0
-          ? `${outcome.manual_review_queue_count} manual review`
+          ? `${outcome.manual_review_queue_count} actionable manual review`
           : Number(outcome.pending_bundle_approvals || 0) > 0
             ? `${outcome.pending_bundle_approvals} bundle approvals`
             : blockers > 0
