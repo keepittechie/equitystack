@@ -1,0 +1,367 @@
+import Link from "next/link";
+import { buildPageMetadata } from "@/lib/metadata";
+import { fetchDashboardData, buildPolicySlug } from "@/lib/public-site-data";
+import { CategoryImpactChart, DirectionBreakdownChart, ImpactTrendChart } from "@/app/components/public/charts";
+import {
+  DashboardFilterBar,
+  ImpactOverviewCards,
+  MethodologyCallout,
+  PresidentScoreMethodologyNote,
+  SourceTrustPanel,
+} from "@/app/components/public/core";
+import {
+  PresidentRankingBoard,
+  PromiseResultsTable,
+  RecentPolicyChangesTable,
+} from "@/app/components/public/entities";
+import PromiseStatusLegend from "@/app/components/public/PromiseStatusLegend";
+import PromiseSystemExplanation from "@/app/components/public/PromiseSystemExplanation";
+
+export const dynamic = "force-dynamic";
+
+export const metadata = buildPageMetadata({
+  title: "Dashboard",
+  description:
+    "A public command-center view of EquityStack metrics, trends, top policies, and the latest tracked movement.",
+  path: "/dashboard",
+});
+
+function pct(value) {
+  return `${Math.round(Number(value || 0) * 100)}%`;
+}
+
+function countPromiseStatuses(items = []) {
+  return items.reduce((totals, item) => {
+    totals[item.status] = (totals[item.status] || 0) + 1;
+    return totals;
+  }, {});
+}
+
+export default async function DashboardPage({ searchParams }) {
+  const resolvedSearchParams = (await searchParams) || {};
+  const data = await fetchDashboardData(resolvedSearchParams);
+  const trend = data.scores.metadata?.impact_trend || { score_by_year: [] };
+  const trust = data.scores.metadata?.trust || {};
+  const directionData = ["Positive", "Mixed", "Negative", "Blocked"].map((name, index) => ({
+    name,
+    value: Number(
+      data.scores.records.reduce(
+        (total, row) => total + Number(row.breakdown_by_direction?.[name] || 0),
+        0
+      )
+    ),
+    color: ["#84f7c6", "#fbbf24", "#ff8a8a", "#8da1b9"][index],
+  }));
+  const categoryData = (data.categorySummary || []).slice(0, 8).map((item) => ({
+    name: item.name,
+    score: Number(item.avg_policy_impact_score || 0),
+  }));
+  const promiseStatusCounts = countPromiseStatuses(data.promiseSnapshot.items || []);
+
+  return (
+    <main className="space-y-8">
+      <section className="hero-panel p-8 md:p-10">
+        <div className="max-w-4xl">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[var(--accent)]">
+            Public data center
+          </p>
+          <h1 className="mt-4 text-[clamp(2.2rem,5vw,4.4rem)] font-semibold leading-[0.96] tracking-[-0.05em] text-white">
+            Command-center view of Black policy impact.
+          </h1>
+          <p className="mt-5 text-base leading-8 text-[var(--ink-soft)] md:text-lg">
+            Use this page the way you would use a civic intelligence dashboard: filter the dataset, scan the headline metrics,
+            open major shifts, then move into policy, president, promise, and source detail.
+          </p>
+        </div>
+      </section>
+
+      <DashboardFilterBar helpText="Filters narrow the promise snapshot and latest updates without hiding methodology or evidence access.">
+        <form action="/dashboard" className="grid flex-1 gap-3 md:grid-cols-4">
+          <input
+            type="search"
+            name="q"
+            defaultValue={resolvedSearchParams.q || ""}
+            placeholder="Search tracked promises"
+            className="rounded-xl border border-white/8 bg-white/5 px-3 py-2.5 text-sm text-white"
+          />
+          <input
+            type="text"
+            name="president"
+            defaultValue={resolvedSearchParams.president || ""}
+            placeholder="President"
+            className="rounded-xl border border-white/8 bg-white/5 px-3 py-2.5 text-sm text-white"
+          />
+          <input
+            type="text"
+            name="status"
+            defaultValue={resolvedSearchParams.status || ""}
+            placeholder="Promise status"
+            className="rounded-xl border border-white/8 bg-white/5 px-3 py-2.5 text-sm text-white"
+          />
+          <button type="submit" className="rounded-full bg-[var(--accent)] px-4 py-2.5 text-sm font-medium text-[#051019]">
+            Update dashboard
+          </button>
+        </form>
+      </DashboardFilterBar>
+
+      <ImpactOverviewCards
+        items={[
+          {
+            label: "Outcomes in score",
+            value: data.scores.metadata?.outcomes_included_in_score ?? 0,
+            description: `${data.scores.metadata?.outcomes_excluded_from_score ?? 0} excluded from the current model`,
+            tone: "accent",
+          },
+          {
+            label: "High-confidence share",
+            value: pct(trust.high_confidence_outcome_percentage),
+            description: `${pct(trust.low_confidence_outcome_percentage)} low-confidence`,
+          },
+          {
+            label: "Source coverage",
+            value: pct(data.readiness.source_coverage_pct),
+            description: `${data.readiness.unsourced_outcomes} unsourced outcomes still visible`,
+          },
+          {
+            label: "Intent coverage",
+            value: pct(data.readiness.intent_coverage_pct),
+            description: `${data.readiness.certification_status} certification status`,
+          },
+        ]}
+      />
+
+      <section className="grid gap-4 xl:grid-cols-3">
+        {[
+          {
+            title: "Positive movement",
+            value: data.topPositivePolicies.length,
+            summary: "High-scoring policies with documented positive contribution in the current dataset.",
+          },
+          {
+            title: "Negative movement",
+            value: data.topNegativePolicies.length,
+            summary: "Records pulling the score downward remain visible instead of being averaged away.",
+          },
+          {
+            title: "Mixed movement",
+            value: data.topMixedPolicies.length,
+            summary: "Mixed-impact records signal contested or uneven policy effects that still matter for interpretation.",
+          },
+        ].map((item) => (
+          <div key={item.title} className="rounded-[1.5rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">{item.title}</p>
+            <p className="mt-3 text-3xl font-semibold tracking-[-0.05em] text-white">{item.value}</p>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item.summary}</p>
+          </div>
+        ))}
+      </section>
+
+      <section className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
+        <ImpactTrendChart
+          data={trend.score_by_year || []}
+          title="Score movement over time"
+          description={trend.interpretation || "Grouped into yearly buckets using the outcome time dimension."}
+        />
+        <DirectionBreakdownChart
+          data={directionData}
+          title="Outcome direction mix"
+          description="Positive and negative movement stay visible alongside mixed and blocked outcomes."
+        />
+      </section>
+
+      <section className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+        <CategoryImpactChart
+          data={categoryData}
+          title="Category distribution"
+          description="Average policy score by category, using currently available historical scoring data."
+        />
+        <MethodologyCallout description="The dashboard is a reading surface, not a black box. Every metric should lead you to a policy page, promise page, source, or methodology explanation." />
+      </section>
+
+      <section className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
+        <div className="space-y-5">
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--accent)]">
+                Flagship score feature
+              </p>
+              <h2 className="mt-3 text-3xl font-semibold tracking-[-0.05em] text-white">
+                Black Impact Score by president
+              </h2>
+              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+                This ranking summarizes how presidents compare on measured policy impact in the current EquityStack dataset. Open the ranking for the full field or compare presidents directly when you need a tighter read.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Link href="/presidents" className="public-button-primary">
+                Open ranking
+              </Link>
+              <Link href="/compare/presidents" className="public-button-secondary">
+                Compare presidents
+              </Link>
+            </div>
+          </div>
+          <PresidentRankingBoard
+            items={data.presidentRanking || []}
+            buildHref={(item) => `/presidents/${item.slug}`}
+            limit={5}
+          />
+        </div>
+        <div className="space-y-5">
+          <PresidentScoreMethodologyNote />
+          <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+            <h2 className="text-lg font-semibold text-white">How to interpret this block</h2>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+              Scores reflect measured policy impact in the EquityStack dataset, not a complete judgment of a presidency. Confidence, direction mix, and profile-level drivers matter when reading differences between presidents.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <SourceTrustPanel
+        sourceCount={data.readiness.sourced_outcomes}
+        sourceQuality="Dataset coverage"
+        confidenceLabel={`${pct(trust.high_confidence_outcome_percentage)} high confidence`}
+        completenessLabel={`${pct(trust.incomplete_outcome_percentage || 0)} incomplete`}
+        includedCount={data.scores.metadata?.outcomes_included_in_score}
+        excludedCount={data.scores.metadata?.outcomes_excluded_from_score}
+        summary="How to read this: included outcomes are currently usable in the score, excluded outcomes remain visible so missing data cannot silently disappear."
+      />
+
+      <section className="grid gap-6 xl:grid-cols-2">
+        <div className="space-y-4">
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <h2 className="text-2xl font-semibold text-white">Top positive policies</h2>
+              <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
+                Highest-scoring records currently pushing the dataset upward.
+              </p>
+            </div>
+            <Link href="/policies?impact_direction=Positive&sort=impact_score_desc" className="accent-link text-sm">
+              View all
+            </Link>
+          </div>
+          <RecentPolicyChangesTable
+            items={data.topPositivePolicies}
+            buildHref={(item) => `/policies/${buildPolicySlug(item)}`}
+          />
+        </div>
+
+        <div className="space-y-4">
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <h2 className="text-2xl font-semibold text-white">Top negative policies</h2>
+              <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
+                Records producing the strongest downward pull in the documented dataset.
+              </p>
+            </div>
+            <Link href="/policies?impact_direction=Negative&sort=impact_score_desc" className="accent-link text-sm">
+              View all
+            </Link>
+          </div>
+          <RecentPolicyChangesTable
+            items={data.topNegativePolicies}
+            buildHref={(item) => `/policies/${buildPolicySlug(item)}`}
+          />
+        </div>
+      </section>
+
+      {data.topMixedPolicies.length ? (
+        <section className="space-y-4">
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <h2 className="text-2xl font-semibold text-white">Top mixed-impact policies</h2>
+              <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
+                Mixed records deserve their own lane because they often explain why a period looks more complicated than a single headline score suggests.
+              </p>
+            </div>
+            <Link href="/policies?impact_direction=Mixed&sort=impact_score_desc" className="accent-link text-sm">
+              View all
+            </Link>
+          </div>
+          <RecentPolicyChangesTable
+            items={data.topMixedPolicies}
+            buildHref={(item) => `/policies/${buildPolicySlug(item)}`}
+          />
+        </section>
+      ) : null}
+
+      <section className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+        <div className="space-y-4">
+          <h2 className="text-2xl font-semibold text-white">Latest policy updates</h2>
+          <RecentPolicyChangesTable
+            items={data.latestPolicyUpdates}
+            buildHref={(item) => `/policies/${buildPolicySlug(item)}`}
+          />
+        </div>
+
+        <div className="space-y-4">
+          <div>
+            <h2 className="text-2xl font-semibold text-white">Promise Tracker Overview</h2>
+            <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
+              Promise records remain visible in the dashboard because they show what was promised, what action followed, and whether that produced visible policy outcomes in the current dataset.
+            </p>
+          </div>
+          <div className="grid gap-3 md:grid-cols-2">
+            <div className="rounded-[1.2rem] border border-white/8 bg-white/5 p-4">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+                Completed
+              </p>
+              <p className="mt-2 text-2xl font-semibold text-white">{promiseStatusCounts.Delivered || 0}</p>
+            </div>
+            <div className="rounded-[1.2rem] border border-white/8 bg-white/5 p-4">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+                In Progress
+              </p>
+              <p className="mt-2 text-2xl font-semibold text-white">{promiseStatusCounts["In Progress"] || 0}</p>
+            </div>
+            <div className="rounded-[1.2rem] border border-white/8 bg-white/5 p-4">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+                Blocked
+              </p>
+              <p className="mt-2 text-2xl font-semibold text-white">{promiseStatusCounts.Blocked || 0}</p>
+            </div>
+            <div className="rounded-[1.2rem] border border-white/8 bg-white/5 p-4">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+                Broken or failed
+              </p>
+              <p className="mt-2 text-2xl font-semibold text-white">{promiseStatusCounts.Failed || 0}</p>
+            </div>
+          </div>
+          <PromiseSystemExplanation />
+          <PromiseStatusLegend />
+          <PromiseResultsTable items={data.promiseSnapshot.items || []} buildHref={(item) => `/promises/${item.slug}`} />
+          <div className="flex flex-wrap gap-2">
+            <Link href="/promises" className="public-button-secondary">
+              Open Promise Tracker
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6">
+        <h2 className="text-2xl font-semibold text-white">How to read this</h2>
+        <div className="mt-4 grid gap-4 md:grid-cols-3">
+          <div className="rounded-[1.2rem] border border-white/8 bg-white/5 p-4">
+            <p className="text-sm font-medium text-white">Start with summary</p>
+            <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
+              Scan the KPI row and score movement before drilling into any individual claim.
+            </p>
+          </div>
+          <div className="rounded-[1.2rem] border border-white/8 bg-white/5 p-4">
+            <p className="text-sm font-medium text-white">Open the underlying record</p>
+            <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
+              Every major item here should send you to a policy, promise, president, or report page with more context.
+            </p>
+          </div>
+          <div className="rounded-[1.2rem] border border-white/8 bg-white/5 p-4">
+            <p className="text-sm font-medium text-white">Read evidence nearby</p>
+            <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
+              Source counts, confidence, completeness, and methodology stay close to the metrics so trust never becomes a separate screen.
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+  );
+}

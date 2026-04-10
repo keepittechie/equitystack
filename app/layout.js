@@ -6,28 +6,37 @@ import PageViewTracker from "@/app/components/telemetry/PageViewTracker";
 export const metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://equitystack.org"),
   title: {
-    default: "EquityStack",
+    default: "EquityStack | Measure how government actions impact Black Americans",
     template: "%s | EquityStack",
   },
   description:
-    "EquityStack is a data-driven platform for tracking laws, court cases, executive actions, and future legislation affecting Black communities in the United States.",
+    "EquityStack is a public civic intelligence platform for measuring how government actions impact Black Americans through policies, promises, evidence, and outcome-based analysis.",
   applicationName: "EquityStack",
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "EquityStack",
+    title: "EquityStack | Measure how government actions impact Black Americans",
     description:
-      "Track how U.S. laws, court cases, executive actions, and proposed reforms have helped, harmed, or failed Black Americans over time.",
+      "A public civic intelligence platform for tracking policy records, promises, evidence, and measurable impact on Black Americans.",
     siteName: "EquityStack",
     type: "website",
     url: "/",
+    images: [
+      {
+        url: "/images/hero/civil-rights-march.jpg",
+        width: 2200,
+        height: 1490,
+        alt: "March on Washington for Jobs and Freedom, 1963",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "EquityStack",
+    title: "EquityStack | Measure how government actions impact Black Americans",
     description:
-      "Explore historical policy records, legislation, explainers, and evidence on Black political and legal history.",
+      "Explore policy records, presidents, promises, reports, sources, and evidence on Black political and legal history.",
+    images: ["/images/hero/civil-rights-march.jpg"],
   },
 };
 

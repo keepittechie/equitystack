@@ -1,683 +1,232 @@
+import Image from "next/image";
 import Link from "next/link";
-import PresidentAvatar from "@/app/components/PresidentAvatar";
-import {
-  ImpactBadge,
-  PromiseStatusBadge,
-  statusPillClasses,
-} from "@/app/components/policy-badges";
-import TrustImpactSummaryCard from "@/app/components/TrustImpactSummaryCard";
-import { EXPLANATION_CONTENT } from "@/lib/content/explanations";
-import {
-  EVIDENCE_STRENGTHS,
-  TRUST_STATES,
-} from "@/lib/labels";
 import { buildPageMetadata } from "@/lib/metadata";
-import { computeOutcomeBasedScores } from "@/lib/services/blackImpactScoreService";
-import {
-  fetchCurrentAdministrationOverview,
-  fetchPromiseList,
-} from "@/lib/services/promiseService";
-import { fetchHomepageReadinessSummary } from "@/lib/services/systemReadinessService";
-import { buildSiteJsonLd, serializeJsonLd } from "@/lib/structured-data";
+import { fetchHomePageData, buildPolicySlug } from "@/lib/public-site-data";
+import { SectionIntro, KpiCard, MethodologyCallout, SourceTrustPanel } from "@/app/components/public/core";
+import { CategoryImpactChart, DirectionBreakdownChart, ImpactTrendChart } from "@/app/components/public/charts";
+import { PolicyCardList, PresidentCardGrid, RecentPolicyChangesTable } from "@/app/components/public/entities";
+import TrustBar from "@/app/components/public/TrustBar";
 
 export const dynamic = "force-dynamic";
 
 export const metadata = buildPageMetadata({
-  title: "EquityStack | Track What Policies Actually Did",
+  title: "Measure how government actions impact Black Americans",
   description:
-    "Track documented policy outcomes, evidence, and Black community impact across history and the current administration.",
+    "A data-first civic intelligence platform tracking policies, promises, evidence, and measurable impact on Black Americans.",
   path: "/",
+  imagePath: "/images/hero/civil-rights-march.jpg",
 });
 
-function formatDate(dateString) {
-  if (!dateString) return null;
-
-  const date = new Date(dateString);
-  if (Number.isNaN(date.getTime())) return dateString;
-
-  return date.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-}
-
-function formatScore(value) {
-  const numeric = Number(value ?? 0);
-
-  if (!Number.isFinite(numeric)) {
-    return String(value ?? "0");
-  }
-
-  const fixed = numeric.toFixed(2);
-  return numeric > 0 ? `+${fixed}` : fixed;
-}
-
-function formatPercent(value) {
-  const numeric = Number(value);
-  if (!Number.isFinite(numeric)) {
-    return null;
-  }
-
+function pct(value) {
+  const numeric = Number(value || 0);
   return `${Math.round(numeric * 100)}%`;
 }
 
-function CompactStat({ label, value, detail }) {
-  return (
-    <div className="metric-card px-4 py-4">
-      <p className="text-xs uppercase tracking-[0.18em] text-[var(--accent)]">{label}</p>
-      <p className="mt-3 text-2xl font-bold">{value}</p>
-      {detail ? <p className="mt-2 text-sm text-[var(--ink-muted)]">{detail}</p> : null}
-    </div>
-  );
-}
-
-function MetaPill({ children }) {
-  return <span className="public-pill">{children}</span>;
-}
-
-function SummaryStat({ label, value, tone = "default", detail = null }) {
-  const toneClasses =
-    tone === "accent"
-      ? "border-[rgba(37,99,235,0.16)] bg-[rgba(37,99,235,0.08)]"
-      : "border-[var(--line)] bg-white";
-
-  return (
-    <div className={`rounded-[1.2rem] border px-4 py-4 ${toneClasses}`}>
-      <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">{label}</p>
-      <p className="mt-2 text-2xl font-semibold">{value}</p>
-      {detail ? <p className="mt-2 text-sm text-[var(--ink-soft)]">{detail}</p> : null}
-    </div>
-  );
-}
-
-function SectionIntro({ eyebrow, title, description, href, hrefLabel }) {
-  return (
-    <div className="flex items-start justify-between gap-4 flex-wrap">
-      <div className="section-intro max-w-3xl">
-        {eyebrow ? <p className="eyebrow mb-4">{eyebrow}</p> : null}
-        <h2 className="section-title">{title}</h2>
-        {description ? <p className="body-copy mt-3">{description}</p> : null}
-      </div>
-      {href && hrefLabel ? (
-        <Link href={href} className="accent-link text-sm font-medium">
-          {hrefLabel}
-        </Link>
-      ) : null}
-    </div>
-  );
-}
-
-function StartHereCard({ eyebrow, title, description, href, linkLabel, meta }) {
-  return (
-    <Link href={href} className="panel-link block rounded-[1.4rem] p-5">
-      <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">{eyebrow}</p>
-      <h3 className="card-title mt-3">{title}</h3>
-      <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{description}</p>
-      {meta ? (
-        <p className="mt-4 text-xs uppercase tracking-[0.14em] text-[var(--ink-muted)]">{meta}</p>
-      ) : null}
-      <span className="accent-link mt-4 inline-block text-sm font-medium">{linkLabel}</span>
-    </Link>
-  );
-}
-
-function TrustSignal({ title, description }) {
-  return (
-    <div className="card-muted rounded-[1.2rem] p-4">
-      <h3 className="card-title">{title}</h3>
-      <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{description}</p>
-    </div>
-  );
-}
-
-function PreviewRecordCard({
-  eyebrow,
-  title,
-  description,
-  href,
-  detailLabel,
-  record,
-  date,
-  topic,
-  status,
-  impactDirection,
-  presidentSlug,
-  presidentName,
-}) {
-  return (
-    <article className="panel-link rounded-[1.3rem] p-5">
-      <div className="flex items-start justify-between gap-3 flex-wrap">
-        <div>
-          <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">
-            {eyebrow}
-          </p>
-          <h3 className="mt-3 text-base font-semibold leading-6">{title}</h3>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {presidentSlug || presidentName ? (
-            <PresidentAvatar
-              presidentSlug={presidentSlug}
-              presidentName={presidentName}
-              size={40}
-            />
-          ) : null}
-          {status ? <PromiseStatusBadge status={status} /> : null}
-          {impactDirection ? <ImpactBadge impact={impactDirection} /> : null}
-        </div>
-      </div>
-
-      <div className="mt-3 flex flex-wrap gap-2">
-        {topic ? <span className="public-pill">{topic}</span> : null}
-        {date ? <span className="public-pill">{formatDate(date)}</span> : null}
-      </div>
-
-      <p className="mt-4 text-sm leading-7 text-[var(--ink-soft)]">
-        {description}
-      </p>
-
-      <TrustImpactSummaryCard
-        record={record}
-        detailHref={href}
-        detailLabel={detailLabel}
-      />
-    </article>
-  );
-}
-
-function MiniPill({ label, tone = "default" }) {
-  return (
-    <span className={statusPillClasses(tone, "text-xs")}>
-      {label}
-    </span>
-  );
-}
-
-function getReadinessTone(status) {
-  if (status === "PASS") return "success";
-  if (status === "FAIL") return "danger";
-  return "warning";
-}
-
-function ScoreSnapshotCard({ presidents, metadata, readiness }) {
-  const highest = presidents[0] || null;
-  const lowest = [...presidents]
-    .reverse()
-    .find((president) => Number(president.raw_score_total || 0) < 0) || null;
-  const sourceCoverage = formatPercent(readiness?.source_coverage_pct);
-  const intentCoverage = formatPercent(readiness?.intent_coverage_pct);
-  const highConfidenceCoverage = formatPercent(readiness?.high_confidence_outcome_pct);
-  const mediumConfidenceCoverage = formatPercent(readiness?.medium_confidence_outcome_pct);
-  const lowConfidenceCoverage = formatPercent(readiness?.low_confidence_outcome_pct);
-  const includedCount = Number(metadata?.outcomes_included_in_score ?? metadata?.total_outcomes ?? 0);
-  const excludedCount = Number(metadata?.outcomes_excluded_from_score ?? metadata?.total_excluded_outcomes ?? 0);
-  const availableCount = Number(metadata?.total_outcomes_available ?? 0);
-  const summaryInterpretation =
-    typeof metadata?.summary_interpretation === "string" && metadata.summary_interpretation.trim()
-      ? metadata.summary_interpretation.trim()
-      : null;
-
-  return (
-    <section className="card-surface rounded-[1.6rem] p-5">
-      <div className="flex items-start justify-between gap-4 flex-wrap">
-        <div className="max-w-2xl">
-          <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Live Score</p>
-          <h3 className="card-title mt-3">Black Impact Score snapshot</h3>
-          <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-            The current public score model uses documented, scoring-ready outcomes from Promise Tracker.
-          </p>
-          {summaryInterpretation ? (
-            <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
-              {summaryInterpretation}
-            </p>
-          ) : null}
-        </div>
-        <div className="flex flex-wrap items-center justify-end gap-2">
-          {readiness?.certification_status ? (
-            <MiniPill
-              label={`Certification: ${readiness.certification_status}`}
-              tone={getReadinessTone(readiness.certification_status)}
-            />
-          ) : null}
-          <Link href="/reports/black-impact-score" className="accent-link text-sm font-medium">
-            Open Black Impact Score report
-          </Link>
-        </div>
-      </div>
-
-      {presidents.length === 0 ? (
-        <div className="mt-5 rounded-[1.1rem] border border-[rgba(120,53,15,0.1)] bg-white/80 p-4">
-          <p className="text-sm font-medium">Insufficient evidence</p>
-          <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
-            The public score view needs scoring-ready outcomes with written summaries, impact direction, and linked sources.
-          </p>
-        </div>
-      ) : (
-        <>
-          <div className="mt-5 grid gap-4 md:grid-cols-4">
-            <SummaryStat
-              label="Presidents"
-              value={presidents.length}
-              detail="Visible in this score view"
-              tone="accent"
-            />
-            <SummaryStat
-              label="Outcomes"
-              value={metadata.total_outcomes}
-              detail={
-                availableCount
-                  ? `${includedCount} of ${availableCount} currently included`
-                  : "Scoring-ready outcomes"
-              }
-            />
-            <SummaryStat
-              label="Promises"
-              value={metadata.total_promises}
-              detail="Records contributing"
-            />
-            <SummaryStat
-              label="Excluded"
-              value={excludedCount}
-              detail="Visible but not scored"
-            />
-          </div>
-
-          {readiness?.total_policy_outcomes ? (
-            <div className="mt-4 flex flex-wrap gap-2">
-              <MetaPill>{readiness.total_policy_outcomes} unified outcomes</MetaPill>
-              {readiness.current_admin_outcomes ? (
-                <MetaPill>{readiness.current_admin_outcomes} current-admin</MetaPill>
-              ) : null}
-              {readiness.legislative_outcomes ? (
-                <MetaPill>{readiness.legislative_outcomes} legislative</MetaPill>
-              ) : null}
-              {sourceCoverage ? <MetaPill>{sourceCoverage} sourced</MetaPill> : null}
-              {intentCoverage ? <MetaPill>{intentCoverage} intent classified</MetaPill> : null}
-              {highConfidenceCoverage ? (
-                <MetaPill>{highConfidenceCoverage} high confidence</MetaPill>
-              ) : null}
-              {mediumConfidenceCoverage ? (
-                <MetaPill>{mediumConfidenceCoverage} medium confidence</MetaPill>
-              ) : null}
-              {lowConfidenceCoverage ? (
-                <MetaPill>{lowConfidenceCoverage} low confidence</MetaPill>
-              ) : null}
-            </div>
-          ) : null}
-
-          <div className="mt-5 grid gap-4 lg:grid-cols-2">
-            <div className="card-muted rounded-[1.2rem] p-4">
-              <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Highest current score</p>
-              {highest ? (
-                <>
-                  <div className="mt-3 flex items-center gap-3">
-                    <PresidentAvatar
-                      presidentSlug={highest.president_slug}
-                      presidentName={highest.president}
-                      size={40}
-                    />
-                    <h4 className="text-lg font-semibold">{highest.president}</h4>
-                  </div>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    <MiniPill label={`Normalized ${formatScore(highest.normalized_score_total)}`} tone="success" />
-                    <MiniPill label={`${highest.outcome_count} outcomes`} />
-                  </div>
-                </>
-              ) : (
-                <p className="mt-3 text-sm text-[var(--ink-soft)]">No president summary is available yet.</p>
-              )}
-            </div>
-
-            <div className="card-muted rounded-[1.2rem] p-4">
-              <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Lowest current score</p>
-              {lowest ? (
-                <>
-                  <div className="mt-3 flex items-center gap-3">
-                    <PresidentAvatar
-                      presidentSlug={lowest.president_slug}
-                      presidentName={lowest.president}
-                      size={40}
-                    />
-                    <h4 className="text-lg font-semibold">{lowest.president}</h4>
-                  </div>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    <MiniPill label={`Normalized ${formatScore(lowest.normalized_score_total)}`} tone="danger" />
-                    <MiniPill label={`${lowest.outcome_count} outcomes`} />
-                  </div>
-                </>
-              ) : (
-                <p className="mt-3 text-sm text-[var(--ink-soft)]">
-                  No negative-scoring president summary is available in the current report.
-                </p>
-              )}
-            </div>
-          </div>
-        </>
-      )}
-    </section>
-  );
-}
-
-function LabelGuideCard({ impactGuide }) {
-  return (
-    <div className="card-surface rounded-[1.6rem] p-5">
-      <h3 className="card-title">How to read the labels</h3>
-      <div className="mt-4 space-y-4 text-sm leading-7 text-[var(--ink-soft)]">
-        <div className="card-muted rounded-[1.2rem] p-4">
-          <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Impact</p>
-          <p className="mt-2">{impactGuide}</p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            <ImpactBadge impact="Positive" />
-            <ImpactBadge impact="Negative" />
-            <ImpactBadge impact="Mixed" />
-            <ImpactBadge impact="Blocked" />
-          </div>
-        </div>
-
-        <div className="card-muted rounded-[1.2rem] p-4">
-          <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Evidence</p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            <MiniPill label={EVIDENCE_STRENGTHS.STRONG} tone="success" />
-            <MiniPill label={EVIDENCE_STRENGTHS.MODERATE} tone="warning" />
-            <MiniPill label={EVIDENCE_STRENGTHS.LIMITED} tone="warning" />
-            <MiniPill label={EVIDENCE_STRENGTHS.MISSING} tone="danger" />
-          </div>
-        </div>
-
-        <div className="card-muted rounded-[1.2rem] p-4">
-          <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Trust</p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            <MiniPill label={TRUST_STATES.VERIFIED} tone="success" />
-            <MiniPill label={TRUST_STATES.GUARDED} tone="warning" />
-            <MiniPill label={TRUST_STATES.NEEDS_REVIEW} tone="danger" />
-            <MiniPill label={TRUST_STATES.PENDING} />
-          </div>
-        </div>
-      </div>
-
-      <Link href="/reports/black-impact-score" className="accent-link mt-4 inline-block text-sm font-medium">
-        Open Black Impact Score methodology
-      </Link>
-    </div>
-  );
-}
-
 export default async function HomePage() {
-  const [promiseList, currentAdministration, impactScore, readinessSummary] = await Promise.all([
-    fetchPromiseList({
-      sort: "promise_date_desc",
-      page: 1,
-      pageSize: 2,
-    }),
-    fetchCurrentAdministrationOverview(),
-    computeOutcomeBasedScores(),
-    fetchHomepageReadinessSummary(),
-  ]);
-
-  const recentPromises = promiseList.items || [];
-  const currentHighlights = (
-    currentAdministration?.featured_records?.length
-      ? currentAdministration.featured_records
-      : currentAdministration?.recent_activity || []
-  ).slice(0, 2);
-  const currentAdministrationName =
-    currentAdministration?.administration_name || "Current Administration";
-  const impactGuide = EXPLANATION_CONTENT.currentAdministration.interpret;
-  const presidents = impactScore.presidents || [];
-  const scoreMetadata = impactScore.metadata || {
-    total_outcomes: 0,
-    total_promises: 0,
-    total_excluded_outcomes: 0,
-  };
-  const sourceCoverage = formatPercent(readinessSummary?.source_coverage_pct);
+  const { scores, readiness, featuredPolicies, recentPromises, presidents } = await fetchHomePageData();
+  const trend = scores.metadata?.impact_trend || { score_by_year: [] };
+  const trust = scores.metadata?.trust || {};
+  const directionData = ["Positive", "Mixed", "Negative", "Blocked"].map((name, index) => ({
+    name,
+    value: Number(
+      scores.records.reduce(
+        (total, row) => total + Number(row.breakdown_by_direction?.[name] || 0),
+        0
+      )
+    ),
+    color: ["#84f7c6", "#fbbf24", "#ff8a8a", "#8da1b9"][index],
+  }));
+  const topicData = (scores.presidents[0]?.breakdowns?.by_topic || [])
+    .slice(0, 6)
+    .map((item) => ({ name: item.topic, score: Number(item.raw_score_total || 0) }));
 
   return (
-    <main className="mx-auto max-w-7xl space-y-10 p-6 md:space-y-12">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: serializeJsonLd(buildSiteJsonLd()) }}
+    <main className="space-y-10">
+      <section className="relative left-1/2 right-1/2 w-screen -translate-x-1/2 overflow-hidden border-y border-white/8 bg-[#040911]">
+        <div className="absolute inset-0">
+          <Image
+            src="/images/hero/civil-rights-march.jpg"
+            alt=""
+            fill
+            priority
+            aria-hidden="true"
+            className="object-cover object-center md:object-[center_38%] scale-[1.02]"
+            sizes="100vw"
+          />
+          <div className="absolute inset-0 bg-[rgba(0,0,0,0.55)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(3,8,14,0.36),rgba(3,8,14,0.84))]" />
+        </div>
+
+        <div className="relative mx-auto flex min-h-[78vh] max-w-[1500px] items-center px-5 py-16 xl:px-8">
+          <div className="max-w-4xl">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[var(--accent)]">
+              Public civic intelligence
+            </p>
+            <h1 className="mt-5 max-w-4xl text-[clamp(2.8rem,7vw,6.2rem)] font-semibold leading-[0.92] tracking-[-0.06em] text-white">
+              Measure how government actions impact Black Americans
+            </h1>
+            <p className="mt-6 max-w-3xl text-base leading-8 text-[#d8e2ee] md:text-lg">
+              EquityStack measures how documented government actions changed outcomes for
+              Black Americans across administrations, legislatures, and historical records.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link href="/policies" className="public-button-primary">
+                Explore Policies
+              </Link>
+              <Link href="/presidents" className="public-button-secondary">
+                View Presidents
+              </Link>
+              <Link href="/promises" className="public-button-secondary">
+                See Promise Tracker
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        <p className="absolute bottom-4 right-5 z-10 rounded-full border border-white/10 bg-[rgba(4,10,18,0.72)] px-3 py-1.5 text-[11px] font-medium tracking-[0.08em] text-[#d8e2ee] backdrop-blur-sm xl:right-8">
+          March on Washington for Jobs and Freedom, 1963
+        </p>
+      </section>
+
+      <TrustBar />
+
+      <section className="grid gap-4 md:grid-cols-3">
+        {[
+          {
+            title: "Tracks real policies",
+            summary:
+              "EquityStack organizes federal laws, executive actions, and related outcomes into a searchable public record instead of a generic issue feed.",
+          },
+          {
+            title: "Measures measurable impact",
+            summary:
+              "Scores, direction labels, time windows, and trend summaries keep the focus on documented effects rather than rhetoric alone.",
+          },
+          {
+            title: "Shows the evidence",
+            summary:
+              "Sources, confidence, completeness, and methodology remain close to every major metric so users can inspect trust directly.",
+          },
+        ].map((item) => (
+          <article key={item.title} className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--accent)]">Platform logic</p>
+            <h2 className="mt-4 text-2xl font-semibold text-white">{item.title}</h2>
+            <p className="mt-4 text-sm leading-7 text-[var(--ink-soft)]">{item.summary}</p>
+          </article>
+        ))}
+      </section>
+
+      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <KpiCard
+          label="Unified outcomes"
+          value={readiness.total_policy_outcomes}
+          delta={`${readiness.current_admin_outcomes} current-admin / ${readiness.legislative_outcomes} legislative`}
+          description="The public scoring and evidence layer runs on unified policy outcomes rather than disconnected record silos."
+          tone="accent"
+        />
+        <KpiCard
+          label="Source coverage"
+          value={pct(readiness.source_coverage_pct)}
+          delta={`${readiness.sourced_outcomes} sourced`}
+          description="Source coverage is visible up front so users know how much of the dataset is evidence-backed."
+        />
+        <KpiCard
+          label="Intent coverage"
+          value={pct(readiness.intent_coverage_pct)}
+          delta={`${readiness.intent_classified_policies} classified`}
+          description="Policy intent remains distinct from outcome, and missing classifications stay visible rather than guessed."
+        />
+        <KpiCard
+          label="Certification"
+          value={readiness.certification_status}
+          delta={`${pct(readiness.high_confidence_outcome_pct)} high confidence`}
+          description="Trust status reflects whether the public dataset is complete, sourced, and internally consistent."
+        />
+      </section>
+
+      <SourceTrustPanel
+        sourceCount={readiness.sourced_outcomes}
+        sourceQuality="System-wide coverage"
+        confidenceLabel={`${pct(readiness.high_confidence_outcome_pct)} high confidence`}
+        completenessLabel={`${pct(trust.incomplete_outcome_percentage || 0)} incomplete`}
+        includedCount={scores.metadata?.outcomes_included_in_score}
+        excludedCount={scores.metadata?.outcomes_excluded_from_score}
+        summary={scores.metadata?.summary_interpretation}
       />
 
-      <section className="hero-panel p-8 md:p-10 lg:p-12">
-        <div className="relative z-10 grid gap-8 lg:grid-cols-[minmax(0,1.3fr)_minmax(18rem,0.7fr)] lg:items-end">
-          <div className="max-w-4xl">
-            <p className="eyebrow mb-4">EquityStack.org</p>
-            <h1 className="page-title max-w-4xl">
-              Track what policies actually did for Black Americans.
-            </h1>
-            <p className="mt-5 max-w-3xl text-lg leading-8 text-[var(--ink-soft)]">
-              EquityStack follows policy from action to documented outcome, shows the evidence behind
-              that record, and helps you see how those results affected Black communities over time.
-            </p>
-            <div className="mt-7 flex flex-wrap gap-3">
-              <Link href="/promises" className="public-button-primary">
-                Open Promise Tracker
-              </Link>
-            <Link href="/reports/black-impact-score" className="public-button-secondary">
-              Open Black Impact Score
-            </Link>
-            <Link href="/current-administration" className="public-button-secondary">
-              Track Current Administration
-            </Link>
-          </div>
-          <div className="mt-6 flex flex-wrap gap-2">
-              <MetaPill>Source-backed records</MetaPill>
-              <MetaPill>Outcome-based scoring</MetaPill>
-              <MetaPill>Visible uncertainty and evidence</MetaPill>
-          </div>
-        </div>
-
-          <div className="card-muted rounded-[1.4rem] p-5">
-            <p className="text-xs uppercase tracking-[0.18em] text-[var(--accent)]">What You Can Do Here</p>
-            <div className="mt-4 space-y-3 text-sm leading-7 text-[var(--ink-soft)]">
-              <p>Start with a live record, not a generic summary.</p>
-              <p>Open the source trail behind each documented outcome.</p>
-              <p>Use Black Impact Score as a rollup of the same evidence base.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="grid grid-cols-2 gap-4 lg:grid-cols-5">
-        <CompactStat
-          label="Recent Records"
-          value={recentPromises.length}
-          detail="Public records shown below"
+      <section className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
+        <ImpactTrendChart
+          data={trend.score_by_year || []}
+          title="How impact changed over time"
+          description={trend.interpretation || "Track yearly change and cumulative movement across scored outcomes."}
         />
-        <CompactStat
-          label="Current-Term Records"
-          value={currentAdministration?.total_promises ?? 0}
-          detail="Reviewed current-term tracking"
-        />
-        <CompactStat
-          label="Presidents Scored"
-          value={presidents.length}
-          detail="Visible in the current BIS view"
-        />
-        <CompactStat
-          label="Outcomes Scored"
-          value={scoreMetadata.total_outcomes}
-          detail={
-            scoreMetadata.total_outcomes_available
-              ? `${scoreMetadata.total_outcomes} of ${scoreMetadata.total_outcomes_available} included`
-              : "Scoring-ready documented outcomes"
-          }
-        />
-        <CompactStat
-          label="Excluded Outcomes"
-          value={scoreMetadata.total_excluded_outcomes}
-          detail={sourceCoverage ? `${sourceCoverage} unified outcomes sourced` : "Visible records outside numeric scoring"}
+        <DirectionBreakdownChart
+          data={directionData}
+          title="Direction of documented outcomes"
+          description="Positive, negative, mixed, and blocked outcomes are counted separately so the headline score never hides distribution."
         />
       </section>
 
-      <section className="card-surface rounded-[1.6rem] p-6 md:p-8">
+      <section className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+        <CategoryImpactChart
+          data={topicData}
+          title="Leading topic contributions"
+          description="Top issue areas currently shaping the direct score."
+        />
+        <MethodologyCallout description="The Black Impact Score is always paired with inclusion counts, confidence, source coverage, and limitations. Read the method before treating a number as a conclusion." />
+      </section>
+
+      <section className="space-y-5">
         <SectionIntro
-          eyebrow="Start Here"
-          title="Three strong ways to enter the platform"
-          description="If this is your first visit, start with one of these paths. Each one is designed to move from summary to evidence without making you guess where to click next."
+          eyebrow="What changed recently"
+          title="Latest promise and policy movement"
+          description="Recent records give you the fastest path from system summary into underlying detail and evidence."
         />
-
-        <div className="mt-6 grid gap-4 md:grid-cols-3">
-          <StartHereCard
-            eyebrow="Outcomes"
-            title="Black Impact Score"
-            description="Start with the highest-level accountability view built from documented outcomes and visible methodology."
-            href="/reports/black-impact-score"
-            linkLabel="Open Black Impact Score"
-            meta="Best for big-picture comparison"
-          />
-          <StartHereCard
-            eyebrow="Evidence"
-            title="Promise Tracker"
-            description="See what was promised, what actions followed, and what outcomes were documented on the record."
-            href="/promises"
-            linkLabel="Open Promise Tracker"
-            meta="Best for record-level inspection"
-          />
-          <StartHereCard
-            eyebrow="Live Tracking"
-            title="Current Administration"
-            description="Follow ongoing current-term records, reviewed updates, and documented outcomes."
-            href="/current-administration"
-            linkLabel="Open Current Administration"
-            meta="Best for active policy monitoring"
-          />
-        </div>
+        <RecentPolicyChangesTable
+          items={[...recentPromises.slice(0, 5), ...featuredPolicies.slice(0, 5)].slice(0, 8)}
+          buildHref={(item) => (item.slug ? `/promises/${item.slug}` : `/policies/${buildPolicySlug(item)}`)}
+        />
       </section>
 
-      <section className="card-surface rounded-[1.6rem] p-6 md:p-8">
+      <section className="space-y-5">
         <SectionIntro
-          eyebrow="Live Preview"
-          title="See the system working with real records"
-          description="Recent Promise Tracker records, current-term highlights, and the live Black Impact Score using the same public data."
+          eyebrow="Policy explorer"
+          title="Start with the highest-impact documented records"
+          description="Open a policy record to read the summary, score, evidence, time window, related promises, and sources without losing context."
+          actions={<Link href="/policies" className="public-button-secondary">Browse all policies</Link>}
         />
-
-        <div className="mt-6 grid gap-6 xl:grid-cols-2">
-          <div>
-            <div className="mb-4 flex items-center justify-between gap-4 flex-wrap">
-              <h3 className="card-title">Recent Promise Tracker records</h3>
-              <Link href="/promises" className="accent-link text-sm font-medium">
-                Open Promise Tracker
-              </Link>
-            </div>
-            <div className="space-y-4">
-              {recentPromises.map((record) => (
-                <PreviewRecordCard
-                  key={record.id}
-                  eyebrow={record.president || "Promise Tracker"}
-                  title={record.title}
-                  description={
-                    record.summary || "Open the record to inspect actions, outcomes, and linked sources."
-                  }
-                  href={`/promises/${record.slug}`}
-                  detailLabel="View record"
-                  record={record}
-                  date={record.latest_action_date || record.promise_date}
-                  topic={record.topic}
-                  status={record.status}
-                  impactDirection={record.impact_direction_for_curation}
-                />
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <div className="mb-4 flex items-center justify-between gap-4 flex-wrap">
-              <h3 className="card-title">{currentAdministrationName} highlights</h3>
-              <Link href="/current-administration" className="accent-link text-sm font-medium">
-                Open Current Administration overview
-              </Link>
-            </div>
-            <div className="space-y-4">
-              {currentHighlights.map((record) => (
-                <PreviewRecordCard
-                  key={record.id || record.slug}
-                  eyebrow={currentAdministrationName}
-                  title={record.title}
-                  description={
-                    record.latest_action_title ||
-                    record.summary ||
-                    "Open the record to inspect the latest action and documented outcome."
-                  }
-                  href={`/promises/${record.slug}`}
-                  detailLabel="Open promise record"
-                  record={record}
-                  date={record.latest_action_date || record.promise_date}
-                  topic={record.topic}
-                  status={record.status}
-                  impactDirection={
-                    record.impact_direction_for_curation || record.latest_impact_direction
-                  }
-                  presidentSlug={currentAdministration?.president?.slug}
-                  presidentName={
-                    currentAdministration?.president?.president || currentAdministration?.administration_name
-                  }
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-6">
-          <ScoreSnapshotCard
-            presidents={presidents}
-            metadata={scoreMetadata}
-            readiness={readinessSummary}
-          />
-        </div>
+        <PolicyCardList items={featuredPolicies.slice(0, 6)} buildHref={(item) => `/policies/${buildPolicySlug(item)}`} />
       </section>
 
-      <section className="card-surface rounded-[1.6rem] p-6 md:p-8">
+      <section className="space-y-5">
         <SectionIntro
-          eyebrow="Trust Signals"
-          title="Built to be inspected, not taken on faith"
-          description="EquityStack is built as a public research product. The summary is fast, but every path still leads back to actions, outcomes, and source-backed records."
-          href="/methodology"
-          hrefLabel="Read methodology"
+          eyebrow="Entity hubs"
+          title="Navigate by president, policy, promise, or report"
+          description="The public site is organized like a civic data platform: summary first, then filters, then evidence-backed detail pages."
         />
-
-        <div className="mt-6 grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
-          <div className="grid gap-4">
-            <TrustSignal
-              title="Records before rhetoric"
-              description="Summaries stay tied to public actions, documented outcomes, and linked sources."
-            />
-            <TrustSignal
-              title="Visible uncertainty"
-              description="Evidence strength, mixed outcomes, blocked efforts, and thinner records stay visible."
-            />
-            <TrustSignal
-              title="Human-readable verification"
-              description="You can move from homepage summary to Promise Tracker record to source trail without changing systems."
-            />
-          </div>
-
-          <LabelGuideCard impactGuide={impactGuide} />
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          {[
+            { href: "/presidents", title: "Presidents", summary: "Rankings, profiles, timelines, and compare flows." },
+            { href: "/policies", title: "Policies", summary: "Browse the structured policy record with filters, direction, evidence, and related history." },
+            { href: "/promises", title: "Promises", summary: "Track statements, statuses, rationale, and linked policy outcomes." },
+            { href: "/methodology", title: "Methodology", summary: "Read how the Black Impact Score, promise grading, confidence, and evidence rules actually work." },
+          ].map((item) => (
+            <Link key={item.href} href={item.href} className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 hover:border-[rgba(132,247,198,0.24)]">
+              <h3 className="text-xl font-semibold text-white">{item.title}</h3>
+              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item.summary}</p>
+            </Link>
+          ))}
         </div>
       </section>
 
-      <section className="hero-panel p-8 md:p-10">
-        <div className="max-w-4xl">
-          <p className="eyebrow mb-4">Start Exploring</p>
-          <h2 className="page-title text-[clamp(2rem,3.8vw,3.1rem)]">
-            Start with the record, then follow the evidence.
-          </h2>
-          <p className="mt-5 max-w-3xl text-base leading-8 text-[var(--ink-soft)] md:text-lg">
-            Start with Promise Tracker. Use Black Impact Score to compare the bigger picture. Use
-            Current Administration to follow what is active now.
-          </p>
-          <div className="mt-7 flex flex-wrap gap-3">
-            <Link href="/promises" className="public-button-primary">
-              Open Promise Tracker
-            </Link>
-            <Link href="/reports/black-impact-score" className="public-button-secondary">
-              Compare with Black Impact Score
-            </Link>
-            <Link href="/current-administration" className="public-button-secondary">
-              Track the Current Administration
-            </Link>
-          </div>
-        </div>
+      <section className="space-y-5">
+        <SectionIntro
+          eyebrow="Presidential records"
+          title="Who drives the score"
+          description="President profiles combine direct impact scoring, confidence, promise-tracker context, and evidence-linked policy records."
+          actions={<Link href="/presidents" className="public-button-secondary">View ranking</Link>}
+        />
+        <PresidentCardGrid items={presidents.slice(0, 6)} buildHref={(item) => `/presidents/${item.slug}`} />
       </section>
     </main>
   );

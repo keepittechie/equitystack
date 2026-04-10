@@ -2,34 +2,29 @@ import Link from "next/link";
 
 export default function NotFound() {
   return (
-    <main className="content-shell max-w-3xl mx-auto p-6 min-h-[60vh] flex items-center">
-      <section className="hero-panel w-full p-8">
-        <p className="eyebrow mb-4">
-          Not Found
+    <main className="mx-auto flex min-h-[60vh] max-w-4xl items-center">
+      <section className="hero-panel w-full p-8 md:p-10">
+        <p className="eyebrow mb-4">Not Found</p>
+        <h1 className="text-[clamp(2rem,4vw,3.5rem)] font-semibold tracking-[-0.05em] text-white">
+          The requested page is not available.
+        </h1>
+        <p className="mt-5 max-w-2xl text-base leading-8 text-[var(--ink-soft)]">
+          The record may have moved, been unpublished, or never existed in the public
+          site. Use one of the main public entry points below to continue browsing
+          EquityStack.
         </p>
-        <h1 className="text-3xl font-bold mb-4">The requested page does not exist.</h1>
-        <p className="text-[var(--ink-soft)] leading-7 mb-6">
-          The record may have been removed, renamed, or never published. Use one of the
-          main entry points below to continue exploring EquityStack.
-        </p>
-        <div className="flex flex-wrap gap-3">
-          <Link
-            href="/"
-            className="px-4 py-2 rounded-lg bg-black text-white font-medium"
-          >
+        <div className="mt-8 flex flex-wrap gap-3">
+          <Link href="/" className="public-button-primary">
             Home
           </Link>
-          <Link
-            href="/policies"
-            className="border rounded-lg px-4 py-2 font-medium bg-[rgba(255,252,247,0.85)] hover:bg-[rgba(255,252,247,1)] transition"
-          >
-            Browse Policies
+          <Link href="/dashboard" className="public-button-secondary">
+            Open dashboard
           </Link>
-          <Link
-            href="/explainers"
-            className="border rounded-lg px-4 py-2 font-medium bg-[rgba(255,252,247,0.85)] hover:bg-[rgba(255,252,247,1)] transition"
-          >
-            Read Explainers
+          <Link href="/policies" className="public-button-secondary">
+            Browse policies
+          </Link>
+          <Link href="/search" className="public-button-secondary">
+            Search records
           </Link>
         </div>
       </section>

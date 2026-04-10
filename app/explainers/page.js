@@ -1,72 +1,151 @@
 import Link from "next/link";
-import { fetchInternalJson } from "@/lib/api";
-import { PUBLIC_REVALIDATE_SECONDS, withRevalidate } from "@/lib/cache";
 import { buildPageMetadata } from "@/lib/metadata";
+import { fetchExplainersIndexData } from "@/lib/public-site-data";
+import { Breadcrumbs } from "@/app/components/public/chrome";
+import {
+  DashboardFilterBar,
+  ImpactOverviewCards,
+  MethodologyCallout,
+  SectionIntro,
+} from "@/app/components/public/core";
+import { ExplainerIndexGrid } from "@/app/components/public/entities";
+
+export const dynamic = "force-dynamic";
 
 export const metadata = buildPageMetadata({
   title: "Explainers",
   description:
-    "Read EquityStack explainers on major historical debates, legal arguments, and policy narratives affecting Black Americans.",
+    "Read structured EquityStack explainers that connect public claims to policy records, evidence, and historical context.",
   path: "/explainers",
 });
 
-async function getExplainers() {
-  return fetchInternalJson("/api/explainers", {
-    ...withRevalidate(PUBLIC_REVALIDATE_SECONDS),
-    errorMessage: "Failed to fetch explainers",
+export default async function ExplainersPage({ searchParams }) {
+  const resolvedSearchParams = (await searchParams) || {};
+  const data = await fetchExplainersIndexData();
+  const query = String(resolvedSearchParams.q || "").trim().toLowerCase();
+  const category = String(resolvedSearchParams.category || "").trim();
+  const explainers = (data.items || []).filter((item) => {
+    const queryMatch =
+      !query ||
+      [item.title, item.summary, item.category]
+        .filter(Boolean)
+        .some((value) => String(value).toLowerCase().includes(query));
+    const categoryMatch = !category || item.category === category;
+    return queryMatch && categoryMatch;
   });
-}
-
-export default async function ExplainersPage() {
-  const explainers = await getExplainers();
 
   return (
-    <main className="max-w-7xl mx-auto p-6 space-y-10">
-      <section className="hero-panel p-8 md:p-10">
-        <div className="section-intro">
-          <p className="eyebrow mb-4">Editorial Library</p>
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Explainers</h1>
-          <p className="text-[var(--ink-soft)] text-lg max-w-3xl leading-8">
-            Long-form, evidence-backed breakdowns of major historical and policy debates.
-            These articles connect common public arguments to real laws, court decisions,
-            and documented outcomes.
-          </p>
+    <main className="space-y-10">
+      <Breadcrumbs items={[{ href: "/", label: "Home" }, { label: "Explainers" }]} />
+
+      <section className="hero-panel p-8 md:p-10 xl:p-14">
+        <SectionIntro
+          eyebrow="Explainers"
+          title="Context pages that connect public arguments back to the record."
+          description="Explainers are the bridge between broad public claims and the specific policies, promises, and sources inside EquityStack. They are meant to clarify the record, not replace it."
+          actions={
+            <>
+              <Link href="/reports" className="public-button-primary">
+                Open reports
+              </Link>
+              <Link href="/methodology" className="public-button-secondary">
+                Read methodology
+              </Link>
+            </>
+          }
+        />
+      </section>
+
+      <DashboardFilterBar helpText="Browse by category or keyword. The best explainer is usually the one that helps you move from a claim into the specific records underneath it.">
+        <form action="/explainers" method="GET" className="flex flex-1 flex-wrap items-end gap-4">
+          <label className="grid gap-2">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+              Search
+            </span>
+            <input
+              type="search"
+              name="q"
+              defaultValue={resolvedSearchParams.q || ""}
+              placeholder="Topic, title, or claim"
+              className="rounded-xl border border-white/8 bg-white/5 px-3 py-2.5 text-sm text-white"
+            />
+          </label>
+          <label className="grid gap-2">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+              Category
+            </span>
+            <select
+              name="category"
+              defaultValue={resolvedSearchParams.category || ""}
+              className="rounded-xl border border-white/8 bg-white/5 px-3 py-2.5 text-sm text-white"
+            >
+              <option value="">All categories</option>
+              {(data.categories || []).map((item) => (
+                <option key={item} value={item}>
+                  {item}
+                </option>
+              ))}
+            </select>
+          </label>
+          <button type="submit" className="public-button-secondary">
+            Apply filters
+          </button>
+        </form>
+      </DashboardFilterBar>
+
+      <ImpactOverviewCards
+        items={[
+          {
+            label: "Explainers visible",
+            value: explainers.length,
+            description: "Published explainers matching the current browse state.",
+            tone: "accent",
+          },
+          {
+            label: "Categories",
+            value: data.categories?.length || 0,
+            description: "Issue or topic categories currently represented in the explainer library.",
+          },
+          {
+            label: "Published library",
+            value: data.items?.length || 0,
+            description: "Total explainers currently available in the public site.",
+          },
+          {
+            label: "Use case",
+            value: "Context",
+            description: "Best for understanding how claims, history, and linked records fit together.",
+          },
+        ]}
+      />
+
+      <section className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
+        <div className="space-y-5">
+          <SectionIntro
+            eyebrow="Library"
+            title="Browse the explainer archive"
+            description="Each explainer should make the next step obvious: open the linked policy, promise, report, or source page rather than stopping at narrative alone."
+          />
+          <ExplainerIndexGrid items={explainers} />
+        </div>
+        <div className="space-y-5">
+          <MethodologyCallout description="Explainers help interpret the public record, but the evidence hierarchy still matters. Use them as context pages that route you into primary records and linked sources." />
+          <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+            <h2 className="text-lg font-semibold text-white">How to use explainers</h2>
+            <div className="mt-4 grid gap-3 text-sm leading-7 text-[var(--ink-soft)]">
+              <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+                Start here when the policy or legal context is unfamiliar.
+              </div>
+              <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+                Use the related records section on each explainer to verify the narrative against underlying evidence.
+              </div>
+              <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+                When the claim is especially important, move from explainer to report, then into the linked policy or promise records.
+              </div>
+            </div>
+          </div>
         </div>
       </section>
-
-      <section className="card-muted rounded-[1.5rem] p-5">
-        <p className="text-sm text-[var(--ink-soft)] max-w-3xl leading-7">
-          Use these essays as your front door into the database. Each one is designed to do
-          three things clearly: frame the claim, connect it to actual policy history, and point
-          you toward the records, bills, and scorecards that matter next.
-        </p>
-      </section>
-
-      {explainers.length === 0 ? (
-        <section className="card-surface rounded-[1.6rem] p-6">
-          <p className="text-[var(--ink-soft)]">No explainers published yet.</p>
-        </section>
-      ) : (
-        <section className="grid gap-6 md:grid-cols-2">
-          {explainers.map((item) => (
-            <Link
-              key={item.id}
-              href={`/explainers/${item.slug}`}
-              className="panel-link block rounded-[1.5rem] p-6"
-            >
-              <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)] mb-2">
-                {item.category || "Explainer"}
-              </p>
-
-              <h2 className="text-xl font-semibold">{item.title}</h2>
-
-              <p className="text-[var(--ink-soft)] mt-3 text-sm leading-6">
-                {item.summary}
-              </p>
-            </Link>
-          ))}
-        </section>
-      )}
     </main>
   );
 }

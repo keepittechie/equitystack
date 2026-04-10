@@ -24,6 +24,7 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url);
 
     const q = searchParams.get("q");
+    const president = searchParams.get("president");
     const party = searchParams.get("party");
     const era = searchParams.get("era");
     const category = searchParams.get("category");
@@ -126,6 +127,11 @@ export async function GET(request) {
     if (party) {
       fromAndWhere += ` AND pa.name = ?`;
       params.push(party);
+    }
+
+    if (president) {
+      fromAndWhere += ` AND pr.full_name = ?`;
+      params.push(president);
     }
 
     if (era) {

@@ -1,619 +1,351 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PromiseStatusBadge } from "@/app/components/policy-badges";
-import { fetchInternalJson } from "@/lib/api";
 import { buildPageMetadata } from "@/lib/metadata";
-import { buildExplainerJsonLd, serializeJsonLd } from "@/lib/structured-data";
+import {
+  fetchExplainerDetailData,
+  fetchExplainersIndexData,
+} from "@/lib/public-site-data";
+import { Breadcrumbs } from "@/app/components/public/chrome";
+import {
+  KpiCard,
+  MethodologyCallout,
+  SectionIntro,
+} from "@/app/components/public/core";
+import {
+  EvidenceSourceList,
+  ExplainerIndexGrid,
+  PolicyTimeline,
+  PromiseResultsTable,
+} from "@/app/components/public/entities";
 import { buildExplainerCardHref } from "@/lib/shareable-card-links";
+import {
+  buildExplainerJsonLd,
+  serializeJsonLd,
+} from "@/lib/structured-data";
 
-async function getExplainer(slug) {
-  return fetchInternalJson(`/api/explainers/${slug}`, {
-    allow404: true,
-    errorMessage: "Failed to fetch explainer",
-  });
+export const dynamic = "force-dynamic";
+
+function parseTakeaways(text) {
+  return String(text || "")
+    .split("\n")
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function parseTimeline(text) {
+  return String(text || "")
+    .split("\n")
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .map((line) => {
+      const [label, ...rest] = line.split("|");
+      return {
+        label: label?.trim(),
+        summary: rest.join("|").trim() || line,
+      };
+    });
 }
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
-  const explainer = await getExplainer(slug);
+  const explainer = await fetchExplainerDetailData(slug);
 
   if (!explainer) {
     return buildPageMetadata({
-      title: "Explainer Not Found | EquityStack",
-      description: "The requested explainer could not be found on EquityStack.",
+      title: "Explainer Not Found",
+      description: "The requested explainer could not be found.",
       path: `/explainers/${slug}`,
     });
   }
 
   return buildPageMetadata({
-    title: `${explainer.title} | Explainer`,
+    title: `${explainer.title} | Explainers`,
     description:
       explainer.summary ||
-      "Evidence-backed explainer connecting policy history, current context, and public records on EquityStack.",
+      "Evidence-backed explainer connecting policy history, public claims, and related records.",
     path: `/explainers/${slug}`,
     imagePath: `${buildExplainerCardHref(explainer)}/opengraph-image`,
     type: "article",
   });
 }
 
-function SectionBlock({ title, children }) {
-  if (!children) return null;
-
-  return (
-    <section className="card-surface rounded-[1.6rem] p-6 space-y-3">
-      <h2 className="text-2xl font-semibold">{title}</h2>
-      <div className="text-[var(--ink-soft)] leading-8 whitespace-pre-line">{children}</div>
-    </section>
-  );
-}
-
-function MiniStat({ label, value }) {
-  return (
-    <div className="card-muted rounded-[1.15rem] px-4 py-4">
-      <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">{label}</p>
-      <p className="text-xl font-semibold mt-2">{value}</p>
-    </div>
-  );
-}
-
-function priorityClasses(priority) {
-  switch (priority) {
-    case "Critical":
-      return "status-pill--danger";
-    case "High":
-      return "status-pill--warning";
-    case "Medium":
-      return "status-pill--warning";
-    case "Low":
-      return "status-pill--default";
-    default:
-      return "status-pill--default";
-  }
-}
-
-function parseLines(text) {
-  if (!text) return [];
-  return text
-    .split("\n")
-    .map((line) => line.trim())
-    .filter(Boolean);
-}
-
-function parseTimeline(text) {
-  if (!text) return [];
-  return text
-    .split("\n")
-    .map((line) => line.trim())
-    .filter(Boolean)
-    .map((line) => {
-      const [year, ...rest] = line.split("|");
-      return {
-        year: year?.trim() || "",
-        event: rest.join("|").trim() || line,
-      };
-    });
-}
-
-function formatSourceDate(dateString) {
-  if (!dateString) return null;
-
-  const date = new Date(dateString);
-  if (Number.isNaN(date.getTime())) return dateString;
-
-  return date.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-}
-
-function formatImpactMetric(value) {
-  return Number(value || 0).toFixed(2);
-}
-
-function PromiseMetaPill({ children }) {
-  return <span className="public-pill">{children}</span>;
-}
-
-function getRelatedExplainers(slug) {
-  const map = {
-    "equal-protection-under-the-law": [
-      {
-        slug: "party-switch-southern-strategy",
-        title: "Party Switch and the Southern Strategy",
-      },
-      {
-        slug: "redlining-black-homeownership",
-        title: "Redlining and Black Homeownership",
-      },
-      {
-        slug: "sentencing-disparities-united-states",
-        title: "Sentencing Disparities in the United States",
-      },
-    ],
-
-    "redlining-black-homeownership": [
-      {
-        slug: "homestead-act-exclusion",
-        title: "The Homestead Act and Unequal Access to Land",
-      },
-      {
-        slug: "gi-bill-access-and-impact",
-        title: "The GI Bill: Opportunity, Access, and Unequal Outcomes",
-      },
-      {
-        slug: "bootstraps-vs-policy-reality",
-        title: "“Pull Yourself Up by Your Bootstraps” vs. Policy Reality",
-      },
-    ],
-
-    "crime-statistics-context-and-misuse": [
-      {
-        slug: "sentencing-disparities-united-states",
-        title: "Sentencing Disparities in the United States",
-      },
-      {
-        slug: "mass-incarceration-policy-history",
-        title: "Mass Incarceration in the United States",
-      },
-    ],
-  };
-
-  return map[slug] || [];
-}
-
 export default async function ExplainerDetailPage({ params }) {
   const { slug } = await params;
-  const explainer = await getExplainer(slug);
+  const [explainer, explainersIndex] = await Promise.all([
+    fetchExplainerDetailData(slug),
+    fetchExplainersIndexData(),
+  ]);
 
   if (!explainer) {
     notFound();
   }
 
-  const takeaways = parseLines(explainer.key_takeaways);
-  const timeline = parseTimeline(explainer.timeline_events);
-  const relatedExplainers = getRelatedExplainers(slug);
-  const sourceCount = explainer.sources?.length || 0;
-  const policyCount = explainer.related_policies?.length || 0;
-  const futureBillCount = explainer.related_future_bills?.length || 0;
+  const takeaways = parseTakeaways(explainer.key_takeaways);
+  const timelineItems = parseTimeline(explainer.timeline_events);
+  const relatedPolicies = explainer.related_policies || [];
+  const relatedPromises = explainer.related_promises || [];
+  const relatedFutureBills = explainer.related_future_bills || [];
+  const relatedExplainers =
+    explainer.related_explainers?.length
+      ? explainer.related_explainers
+      : (explainersIndex.items || [])
+          .filter((item) => item.slug !== slug)
+          .slice(0, 3);
 
   return (
-    <main className="max-w-4xl mx-auto p-6 space-y-8">
+    <main className="space-y-10">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: serializeJsonLd(buildExplainerJsonLd(explainer)),
         }}
       />
-      <div className="space-y-3">
-        <Link
-          href="/explainers"
-          className="text-sm text-[var(--ink-soft)] hover:text-[var(--accent)] underline"
-        >
-          Back to Explainers
-        </Link>
-      </div>
 
-      <section className="hero-panel p-8 md:p-10 space-y-6">
-        <div className="flex items-start justify-between gap-4 flex-wrap">
-          <div>
-            <p className="eyebrow mb-4">{explainer.category || "Explainer"}</p>
-            <h1 className="text-4xl font-bold">{explainer.title}</h1>
-            {explainer.summary && (
-              <p className="text-lg text-[var(--ink-soft)] leading-8 mt-4">{explainer.summary}</p>
-            )}
-          </div>
-          <Link
-            href={buildExplainerCardHref(explainer)}
-            className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
-          >
-            Share Card
-          </Link>
-        </div>
+      <Breadcrumbs
+        items={[
+          { href: "/", label: "Home" },
+          { href: "/explainers", label: "Explainers" },
+          { label: explainer.title },
+        ]}
+      />
 
-        <div className="grid gap-3 sm:grid-cols-3">
-          <MiniStat label="Linked Policies" value={policyCount} />
-          <MiniStat label="Tracked Bills" value={futureBillCount} />
-          <MiniStat label="Sources" value={sourceCount} />
-        </div>
+      <section className="hero-panel p-8 md:p-10 xl:p-14">
+        <SectionIntro
+          eyebrow={explainer.category || "Explainer"}
+          title={explainer.title}
+          description={
+            explainer.summary ||
+            "This explainer connects a common public claim to the relevant historical record and linked policy evidence."
+          }
+          actions={
+            <>
+              <Link href="/explainers" className="public-button-secondary">
+                Back to explainers
+              </Link>
+              <Link
+                href={buildExplainerCardHref(explainer)}
+                className="public-button-primary"
+              >
+                Share card
+              </Link>
+            </>
+          }
+        />
       </section>
 
-      <section className="card-muted rounded-[1.5rem] p-5">
-        <div className="grid gap-4 md:grid-cols-3">
-          <div>
-            <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">
-              Read This For
-            </p>
-            <p className="text-sm text-[var(--ink-soft)] leading-6 mt-2">
-              A fast orientation to the claim, the record behind it, and the evidence trail.
-            </p>
-          </div>
-          <div>
-            <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">
-              Use It With
-            </p>
-            <p className="text-sm text-[var(--ink-soft)] leading-6 mt-2">
-              The linked policy pages, timeline sections, and future-bill records below.
-            </p>
-          </div>
-          <div>
-            <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">
-              Best Next Step
-            </p>
-            <p className="text-sm text-[var(--ink-soft)] leading-6 mt-2">
-              Open the linked records after each section rather than treating the explainer as the last stop.
-            </p>
-          </div>
-        </div>
+      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <KpiCard
+          label="Linked policies"
+          value={relatedPolicies.length}
+          description="Policy records tied directly to this explainer."
+          tone="accent"
+        />
+        <KpiCard
+          label="Related promises"
+          value={relatedPromises.length}
+          description="Promise tracker records that connect to the same subject matter."
+        />
+        <KpiCard
+          label="Tracked bills"
+          value={relatedFutureBills.length}
+          description="Legislative reform records linked from this explainer."
+        />
+        <KpiCard
+          label="Sources"
+          value={explainer.sources?.length || 0}
+          description="Cited explainer sources visible alongside the narrative."
+        />
       </section>
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1.35fr)_minmax(260px,0.85fr)] items-start">
-        <div className="space-y-6">
-          {takeaways.length > 0 && (
-            <section className="card-surface rounded-[1.6rem] p-6 space-y-3">
-              <h2 className="text-2xl font-semibold">Key Takeaways</h2>
-              <ul className="list-disc pl-6 space-y-2 text-[var(--ink-soft)]">
-                {takeaways.map((item, index) => (
-                  <li key={`${index}-${item}`}>{item}</li>
-                ))}
-              </ul>
-            </section>
-          )}
-
-          <SectionBlock title="Introduction">{explainer.intro_text}</SectionBlock>
-          <SectionBlock title="Why This Matters">{explainer.why_it_matters}</SectionBlock>
-          <SectionBlock title="The Common Claim">{explainer.common_claim}</SectionBlock>
-          <SectionBlock title="What Actually Happened">
-            {explainer.what_actually_happened}
-          </SectionBlock>
-          <SectionBlock title="Key Policies and Events">
-            {explainer.key_policies_text}
-          </SectionBlock>
-          <SectionBlock title="Why It Still Matters">
-            {explainer.why_it_still_matters}
-          </SectionBlock>
+      <section className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
+        <div className="space-y-5">
+          <SectionIntro
+            eyebrow="Read this for"
+            title="What the explainer is doing"
+            description="The best use of an explainer is to clarify the claim, connect it to history, and make the next evidentiary click obvious."
+          />
+          <div className="grid gap-3 text-sm leading-7 text-[var(--ink-soft)]">
+            <div className="rounded-[1.1rem] border border-white/8 bg-[rgba(8,14,24,0.92)] px-4 py-4">
+              Use this explainer to understand the topic before jumping into linked policies or promise records.
+            </div>
+            <div className="rounded-[1.1rem] border border-white/8 bg-[rgba(8,14,24,0.92)] px-4 py-4">
+              The linked records below are where the public evidence trail becomes concrete.
+            </div>
+          </div>
         </div>
+        <MethodologyCallout description="Explainers are interpretation layers. They help frame the record, but methodology and sources still determine how much weight a reader should place on the claim." />
+      </section>
 
-        <aside className="space-y-6">
-          {timeline.length > 0 && (
-            <section className="card-surface rounded-[1.6rem] p-6 space-y-4">
-              <h2 className="text-2xl font-semibold">Timeline</h2>
-              <div className="space-y-3">
-                {timeline.map((item, index) => (
-                  <div
-                    key={`${item.year}-${index}`}
-                    className="card-muted rounded-[1.1rem] p-4"
-                  >
-                    <p className="text-sm font-semibold text-[var(--accent)]">{item.year}</p>
-                    <p className="text-sm text-[var(--ink-soft)] mt-2 leading-6">{item.event}</p>
-                  </div>
-                ))}
+      {takeaways.length ? (
+        <section className="space-y-5">
+          <SectionIntro
+            eyebrow="Key takeaways"
+            title="What to retain from this page"
+            description="These takeaways summarize the core argument before you move into the underlying record."
+          />
+          <div className="grid gap-3">
+            {takeaways.map((item) => (
+              <div
+                key={item}
+                className="rounded-[1.2rem] border border-white/8 bg-[rgba(8,14,24,0.92)] px-4 py-4 text-sm leading-7 text-[var(--ink-soft)]"
+              >
+                {item}
               </div>
-            </section>
-          )}
+            ))}
+          </div>
+        </section>
+      ) : null}
 
-          <section className="card-surface rounded-[1.6rem] p-6 space-y-4">
-            <h2 className="text-2xl font-semibold">Next Steps</h2>
-            <div className="space-y-3 text-sm">
-              <Link href="/policies" className="panel-link block rounded-xl p-3">
-                Browse the full policy database
+      <section className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
+        <div className="space-y-5">
+          {explainer.intro_text ? (
+            <article className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6">
+              <h2 className="text-2xl font-semibold text-white">Introduction</h2>
+              <p className="mt-4 whitespace-pre-line text-sm leading-8 text-[var(--ink-soft)]">
+                {explainer.intro_text}
+              </p>
+            </article>
+          ) : null}
+
+          {(explainer.structured_sections || []).map((section) => (
+            <article
+              key={section.title}
+              className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6"
+            >
+              <h2 className="text-2xl font-semibold text-white">{section.title}</h2>
+              <p className="mt-4 whitespace-pre-line text-sm leading-8 text-[var(--ink-soft)]">
+                {section.body}
+              </p>
+            </article>
+          ))}
+        </div>
+
+        <div className="space-y-5">
+          <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6">
+            <h2 className="text-xl font-semibold text-white">What this connects to</h2>
+            <div className="mt-4 grid gap-3 text-sm leading-7 text-[var(--ink-soft)]">
+              <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+                {relatedPolicies.length} linked policy records
+              </div>
+              <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+                {relatedPromises.length} related promise records
+              </div>
+              <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+                {relatedFutureBills.length} reform or tracked-bill records
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6">
+            <h2 className="text-xl font-semibold text-white">Related links</h2>
+            <div className="mt-4 flex flex-wrap gap-3">
+              <Link href="/reports" className="public-button-secondary">
+                Open reports
               </Link>
-              <Link href="/timeline" className="panel-link block rounded-xl p-3">
-                Place this story on the timeline
+              <Link href="/policies" className="public-button-secondary">
+                Browse policies
               </Link>
-              <Link href="/future-bills" className="panel-link block rounded-xl p-3">
-                See current reform proposals linked to this topic
+              <Link href="/sources" className="public-button-secondary">
+                Open sources
               </Link>
             </div>
-          </section>
-        </aside>
-      </div>
-
-      {explainer.sources_note && (
-        <SectionBlock title="Sources Note">{explainer.sources_note}</SectionBlock>
-      )}
-
-      <section className="space-y-4">
-        <div className="flex items-end justify-between gap-4 flex-wrap">
-          <div>
-            <h2 className="text-2xl font-semibold">Related Policies</h2>
-            <p className="text-sm text-[var(--ink-soft)] mt-1">
-              Open the primary record layer behind this explainer.
-            </p>
           </div>
-          <Link href="/policies" className="text-sm accent-link">
-            Browse all policies
-          </Link>
         </div>
+      </section>
 
-        {explainer.related_policies?.length ? (
-          <div className="grid gap-4 md:grid-cols-2">
-            {explainer.related_policies.map((policy) => (
-              <Link
-                key={policy.id}
-                href={`/policies/${policy.id}`}
-                className="panel-link block rounded-[1.35rem] p-4"
-              >
-                <h3 className="font-semibold">{policy.title}</h3>
-                <p className="text-sm text-[var(--ink-soft)] mt-1">
-                  {policy.year_enacted} {" • "} {policy.policy_type || "Policy"} {" • "}{" "}
-                  {policy.primary_party || "Unknown party"}
-                </p>
-              </Link>
-            ))}
-          </div>
+      <section className="space-y-5">
+        <SectionIntro
+          eyebrow="Timeline"
+          title="Historical sequence"
+          description="When timeline data is available, it helps turn the explainer from an argument into a chronological record."
+        />
+        {timelineItems.length ? (
+          <PolicyTimeline items={timelineItems} />
         ) : (
-          <p className="text-[var(--ink-soft)]">No related policies linked yet.</p>
+          <div className="rounded-[1.6rem] border border-dashed border-white/12 bg-white/4 p-6 text-sm leading-7 text-[var(--ink-soft)]">
+            No structured timeline entries are attached to this explainer yet.
+          </div>
         )}
       </section>
 
-      {explainer.related_promises?.length > 0 && (
-        <section className="space-y-4">
-          <div>
-            <h2 className="text-2xl font-semibold">Related Promise Tracker</h2>
-            <p className="text-sm text-[var(--ink-soft)] mt-1">
-              This explainer is referenced in tracked presidential promises and can be used as
-              context for the broader promise record.
-            </p>
-          </div>
+      <section className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
+        <div className="space-y-5">
+          <SectionIntro
+            eyebrow="Evidence"
+            title="Sources stay nearby"
+            description="The explainer layer should never hide the source layer. Use these citations to check the narrative against the record."
+          />
+          {explainer.sources?.length ? (
+            <EvidenceSourceList items={explainer.sources} />
+          ) : (
+            <div className="rounded-[1.6rem] border border-dashed border-white/12 bg-white/4 p-6 text-sm leading-7 text-[var(--ink-soft)]">
+              No structured explainer sources are attached yet.
+            </div>
+          )}
+        </div>
 
-          <div className="grid gap-4 md:grid-cols-2">
-            {explainer.related_promises.map((promise) => (
-              <div key={promise.id} className="card-surface rounded-[1.35rem] p-4">
-                <div className="flex items-start justify-between gap-3 flex-wrap">
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">
-                      {promise.president}
+        <div className="space-y-5">
+          <SectionIntro
+            eyebrow="Related promises"
+            title="Promise tracker context"
+            description="Promise records help connect the explainer to public commitments and status changes where available."
+          />
+          {relatedPromises.length ? (
+            <PromiseResultsTable
+              items={relatedPromises}
+              buildHref={(item) => `/promises/${item.slug}`}
+            />
+          ) : (
+            <div className="rounded-[1.6rem] border border-dashed border-white/12 bg-white/4 p-6 text-sm leading-7 text-[var(--ink-soft)]">
+              No related promise records were attached to this explainer.
+            </div>
+          )}
+        </div>
+      </section>
+
+      <section className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
+        <div className="space-y-5">
+          <SectionIntro
+            eyebrow="Related policies"
+            title="Policy records linked from this explainer"
+            description="These records are usually the fastest route from narrative framing into the underlying policy evidence."
+          />
+          {relatedPolicies.length ? (
+            <div className="grid gap-3">
+              {relatedPolicies.map((item) => (
+                <Link
+                  key={item.id}
+                  href={`/policies/${item.id}`}
+                  className="rounded-[1.2rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-4 hover:border-[rgba(132,247,198,0.24)]"
+                >
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+                    {item.year_enacted || "Undated"} • {item.policy_type || "Policy"}
+                  </p>
+                  <h3 className="mt-2 text-base font-medium text-white">{item.title}</h3>
+                  {item.primary_party ? (
+                    <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
+                      {item.primary_party}
                     </p>
-                    <Link
-                      href={`/promises/${promise.slug}`}
-                      className="font-semibold mt-2 inline-block"
-                    >
-                      {promise.title}
-                    </Link>
-                  </div>
-                  <PromiseStatusBadge status={promise.status} />
-                </div>
-
-                <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
-                  {promise.summary || "No summary added yet."}
-                </p>
-
-                <div className="flex flex-wrap gap-2 mt-4">
-                  <PromiseMetaPill>
-                    {promise.action_count} action{promise.action_count === 1 ? "" : "s"}
-                  </PromiseMetaPill>
-                  <PromiseMetaPill>
-                    {promise.source_count} distinct source{promise.source_count === 1 ? "" : "s"}
-                  </PromiseMetaPill>
-                  {promise.latest_action_date ? (
-                    <PromiseMetaPill>
-                      Latest action: {formatSourceDate(promise.latest_action_date)}
-                    </PromiseMetaPill>
                   ) : null}
-                </div>
-
-                <div className="mt-4 flex flex-wrap gap-4 text-sm">
-                  <Link href={`/promises/${promise.slug}`} className="accent-link">
-                    Open promise record
-                  </Link>
-                  <Link
-                    href={`/promises/president/${promise.president_slug}`}
-                    className="accent-link"
-                  >
-                    View presidency context
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-
-      <section className="space-y-4">
-        <div className="flex items-end justify-between gap-4 flex-wrap">
-          <div>
-            <h2 className="text-2xl font-semibold">Current Reform Connections</h2>
-            <p className="text-sm text-[var(--ink-soft)] mt-1">
-              Bills and legislators connected to the issue area this explainer is tracking.
-            </p>
-          </div>
-          <Link href="/future-bills" className="text-sm accent-link">
-            Open future bills
-          </Link>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-[1.6rem] border border-dashed border-white/12 bg-white/4 p-6 text-sm leading-7 text-[var(--ink-soft)]">
+              No linked policy records are attached to this explainer yet.
+            </div>
+          )}
         </div>
 
-        {explainer.related_future_bills?.length ? (
-          <div className="grid gap-4 md:grid-cols-2">
-            {explainer.related_future_bills.map((bill) => (
-              <div
-                key={bill.id}
-                className="card-surface rounded-[1.35rem] p-4"
-              >
-                <div className="flex items-center justify-between gap-3 flex-wrap">
-                  <h3 className="font-semibold">{bill.title}</h3>
-                  <span
-                    className={`status-pill ${priorityClasses(
-                      bill.priority_level
-                    )}`}
-                  >
-                    {bill.priority_level}
-                  </span>
-                </div>
-
-                <p className="text-sm text-[var(--ink-soft)] mt-2">
-                  {bill.target_area || "No target area"} {" • "} {bill.status}
-                </p>
-
-                <p className="mt-2 text-sm text-[var(--ink-soft)] line-clamp-3">
-                  {bill.problem_statement}
-                </p>
-
-                {bill.tracked_bills?.length > 0 && (
-                  <div className="mt-4 space-y-2">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-[var(--accent)]">
-                      Related Real Bills
-                    </p>
-
-                    {bill.tracked_bills.map((trackedBill) => (
-                      <div
-                        key={trackedBill.id}
-                        className="card-muted rounded-xl p-3"
-                      >
-                        <div className="flex items-center justify-between gap-2 flex-wrap">
-                          <span className="font-medium text-sm">
-                            {trackedBill.bill_number}
-                          </span>
-                          <span className="text-xs text-[var(--ink-soft)]">
-                            {trackedBill.bill_status}
-                          </span>
-                        </div>
-
-                        <p className="text-sm text-[var(--ink-soft)] mt-1">
-                          {trackedBill.title}
-                        </p>
-
-                        {(trackedBill.sponsor_name || trackedBill.sponsor_party) && (
-                          <p className="text-xs text-[var(--ink-soft)] mt-1">
-                            {trackedBill.sponsor_name || "Unknown sponsor"}
-                            {trackedBill.sponsor_party ? ` (${trackedBill.sponsor_party})` : ""}
-                            {trackedBill.sponsor_state ? ` - ${trackedBill.sponsor_state}` : ""}
-                          </p>
-                        )}
-
-                        {trackedBill.bill_url && (
-                          <p className="mt-2">
-                            <a
-                              href={trackedBill.bill_url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-xs accent-link hover:underline"
-                            >
-                              View bill source
-                            </a>
-                          </p>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {bill.linked_legislators?.length > 0 && (
-                  <div className="mt-4 space-y-2">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-[var(--accent)]">
-                      Linked Legislator Scorecards
-                    </p>
-
-                    <div className="grid gap-3">
-                      {bill.linked_legislators.slice(0, 4).map((legislator) => (
-                        <Link
-                          key={`${bill.id}-legislator-${legislator.id}`}
-                          href={`/scorecards/${legislator.id}`}
-                          className="panel-link block rounded-xl p-3"
-                        >
-                          <div className="flex items-center justify-between gap-3 flex-wrap">
-                            <div>
-                              <p className="font-medium text-sm">{legislator.full_name}</p>
-                              <p className="text-xs text-[var(--ink-soft)] mt-1">
-                                {[legislator.role, legislator.chamber, legislator.party, legislator.state]
-                                  .filter(Boolean)
-                                  .join(" • ")}
-                              </p>
-                            </div>
-                            <span className="text-xs text-[var(--ink-soft)]">
-                              Net Impact {formatImpactMetric(legislator.net_weighted_impact)}
-                            </span>
-                          </div>
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                <div className="mt-4">
-                  <Link
-                    href={`/future-bills?focus=${bill.id}`}
-                    className="text-sm font-medium accent-link hover:underline"
-                  >
-                    View in Future Bills
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-[var(--ink-soft)]">No related future bills linked yet.</p>
-        )}
-      </section>
-
-      <section className="space-y-4">
-        <div className="flex items-end justify-between gap-4 flex-wrap">
-          <div>
-            <h2 className="text-2xl font-semibold">Evidence Base</h2>
-            <p className="text-sm text-[var(--ink-soft)] mt-1">
-              Primary and secondary sources used to support this explainer.
-            </p>
-          </div>
-          <span className="text-sm text-[var(--ink-soft)]">{sourceCount} linked sources</span>
+        <div className="space-y-5">
+          <SectionIntro
+            eyebrow="Keep reading"
+            title="Related explainers"
+            description="Use related explainers when you need adjacent context instead of reopening the same topic from scratch."
+          />
+          <ExplainerIndexGrid items={relatedExplainers} />
         </div>
-
-        {explainer.sources?.length ? (
-          <div className="space-y-3">
-            {explainer.sources.map((source) => (
-              <div
-                key={source.id}
-                className="card-surface rounded-[1.35rem] p-4"
-              >
-                <div className="flex items-center justify-between gap-3 flex-wrap">
-                  <h3 className="font-semibold">{source.source_title}</h3>
-                  <span className="public-pill">
-                    {source.source_type}
-                  </span>
-                </div>
-
-                <p className="text-sm text-[var(--ink-soft)] mt-2">
-                  {source.publisher || "Unknown publisher"}
-                  {source.published_date ? ` • ${formatSourceDate(source.published_date)}` : ""}
-                </p>
-
-                {source.notes && (
-                  <p className="mt-2 text-sm text-[var(--ink-soft)]">{source.notes}</p>
-                )}
-
-                <p className="mt-3">
-                  <a
-                    href={source.source_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm accent-link hover:underline"
-                  >
-                    Open source
-                  </a>
-                </p>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-[var(--ink-soft)]">No sources linked yet.</p>
-        )}
       </section>
-      {relatedExplainers.length > 0 && (
-        <section className="space-y-4">
-          <h2 className="text-2xl font-semibold">Read Next</h2>
-
-          <div className="grid gap-4 md:grid-cols-3">
-            {relatedExplainers.map((item) => (
-              <Link
-                key={item.slug}
-                href={`/explainers/${item.slug}`}
-                className="panel-link block rounded-[1.2rem] p-4"
-              >
-                <p className="text-sm font-medium">{item.title}</p>
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
     </main>
   );
 }

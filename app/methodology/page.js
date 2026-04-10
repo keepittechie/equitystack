@@ -1,196 +1,212 @@
 import { buildPageMetadata } from "@/lib/metadata";
+import Link from "next/link";
+import { Breadcrumbs } from "@/app/components/public/chrome";
+import { KpiCard, SectionIntro } from "@/app/components/public/core";
 
 export const metadata = buildPageMetadata({
   title: "Methodology",
   description:
-    "Learn how EquityStack categorizes, scores, and interprets policies, evidence, and historical impact.",
+    "Read how EquityStack handles Black Impact Score logic, promise grading, confidence, source quality, and known limitations.",
   path: "/methodology",
 });
 
-function StatCard({ title, value, subtitle }) {
-  return (
-    <div className="metric-card p-4">
-      <p className="text-xs uppercase tracking-[0.18em] text-[var(--accent)]">{title}</p>
-      <p className="text-2xl font-bold mt-2">{value}</p>
-      {subtitle ? <p className="text-sm text-[var(--ink-soft)] mt-2">{subtitle}</p> : null}
-    </div>
-  );
-}
+const SCORE_DIMENSIONS = [
+  {
+    title: "Black Impact Score",
+    description:
+      "Presidential score reporting keeps direct impact and systemic impact separate. Direct score tracks direct policy outcomes. Systemic score tracks judicial or other explicitly indirect effects when attribution is defensible.",
+  },
+  {
+    title: "Direction weighting",
+    description:
+      "Positive, negative, mixed, and blocked outcomes do not contribute equally. Mixed and blocked outcomes remain visible so the score cannot hide uncertainty or constrained delivery.",
+  },
+  {
+    title: "Confidence adjustment",
+    description:
+      "Source count and source quality influence the confidence layer. Low-coverage records remain in the dataset, but they are visibly dampened for display and labeled with lower confidence.",
+  },
+  {
+    title: "Intent modifier",
+    description:
+      "When policy intent is deterministically classified, EquityStack can distinguish equity-expanding intent from restrictive intent. Missing intent never gets guessed silently.",
+  },
+  {
+    title: "Promise grading",
+    description:
+      "Promise status is a public-accountability layer, not a substitute for downstream impact. Delivered, partial, failed, or blocked promise status stays distinct from the Black Impact Score.",
+  },
+  {
+    title: "Time dimension",
+    description:
+      "Impact start and end dates make it possible to describe when impact occurred, how long it lasted, and how yearly score movement changed over time.",
+  },
+];
 
-function ScoreCard({ title, description }) {
-  return (
-    <div className="card-surface rounded-[1.5rem] p-5">
-      <h3 className="text-lg font-semibold">{title}</h3>
-      <p className="text-sm text-[var(--ink-soft)] mt-2 leading-7">{description}</p>
-    </div>
-  );
-}
+const SOURCE_RULES = [
+  "Primary and official sources are preferred: government records, archives, congressional records, court rulings, and similarly authoritative documentation.",
+  "Source quality remains visible on outcome and report views so users can distinguish well-supported records from incomplete ones.",
+  "Low-source records are not hidden. They stay visible with lower confidence and incomplete-data signals.",
+  "Methodology pages exist to make the system auditable, not to hide uncertainty behind design.",
+];
+
+const LIMITATIONS = [
+  "The dataset is still incomplete in some historical periods and policy areas.",
+  "Intent coverage is improving, but not every historical policy is classified yet.",
+  "Judicial attribution is handled separately because appointment-driven downstream effects should not be blended into direct policy credit.",
+  "A score is a structured summary, not a replacement for reading the underlying record and sources.",
+];
+
+const DATA_LIMITATION_SECTIONS = [
+  {
+    title: "Dataset incompleteness",
+    description:
+      "Coverage varies across time, topic, and institution. Some historical periods have stronger documentation and curation than others, so absence in the dataset should not be read as absence in history.",
+  },
+  {
+    title: "Interpretation limits",
+    description:
+      "Scores and statuses summarize the current structured record. They help compare patterns in documented policy impact, but they do not replace reading the underlying policy record, evidence, and historical context.",
+  },
+  {
+    title: "Attribution challenges",
+    description:
+      "Attributing policy impact across branches and over time is difficult. EquityStack separates direct and systemic score families, keeps judicial attribution distinct, and does not silently resolve ambiguous causality.",
+  },
+];
+
+const CONFIDENCE_NOTES = [
+  "Very low confidence usually means the score rests on one or two included outcomes and should be treated as provisional.",
+  "Low and medium confidence still appear publicly so incomplete records remain inspectable instead of disappearing from view.",
+  "High confidence means the included outcomes have stronger source support, better completeness, and enough coverage to reduce volatility.",
+];
 
 export default function MethodologyPage() {
   return (
-    <main className="max-w-7xl mx-auto p-6 space-y-10">
-      <section className="hero-panel p-8 md:p-10">
-        <p className="eyebrow mb-4">
-          Research Framework
-        </p>
-        <h1 className="text-4xl font-bold tracking-tight mb-4">Methodology</h1>
-        <p className="text-[var(--ink-soft)] text-lg max-w-3xl leading-8">
-          EquityStack is designed to document, compare, and analyze
-          U.S. laws, executive actions, amendments, court cases, and major policy
-          decisions based on their material effect on Black Americans. This page
-          explains how entries are categorized, scored, and interpreted across the site.
-        </p>
-      </section>
+    <main className="space-y-10">
+      <Breadcrumbs items={[{ href: "/", label: "Home" }, { label: "Methodology" }]} />
 
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard
-          title="Core Focus"
-          value="Impact"
-          subtitle="The project prioritizes measurable policy effect over symbolism."
-        />
-        <StatCard
-          title="Scoring Scale"
-          value="0–5"
-          subtitle="Most score fields are evaluated on a structured 0 to 5 scale."
-        />
-        <StatCard
-          title="Primary Lens"
-          value="Black Americans"
-          subtitle="Entries are assessed through their documented effect on Black communities."
-        />
-        <StatCard
-          title="Evidence Priority"
-          value="Sources + Metrics"
-          subtitle="Government, archival, academic, and measurable outcomes are preferred."
+      <section className="hero-panel p-8 md:p-10 xl:p-14">
+        <SectionIntro
+          eyebrow="Methodology"
+          title="Transparent scoring, visible uncertainty, and evidence-first interpretation."
+          description="EquityStack is built as a public civic intelligence platform, which means every headline metric must stay close to methodology, evidence, and known limitations. This page explains the scoring architecture the site uses and what it does not claim."
         />
       </section>
 
-      <section className="card-surface rounded-[1.6rem] p-6 space-y-6">
-        <div>
-          <h2 className="text-2xl font-semibold mb-2">Purpose</h2>
-          <p className="text-[var(--ink-soft)] leading-8">
-            The goal of EquityStack is not just to list policies, but to
-            organize them into a structured historical framework. The project is meant
-            to help readers examine patterns over time, compare policy eras, and
-            understand how reforms, rollbacks, court rulings, and blocked legislation
-            shaped outcomes for Black Americans.
-          </p>
-        </div>
+      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <KpiCard label="Score families" value="2" description="Direct and systemic scores stay separate so judicial downstream effects do not get mixed into direct presidential policy credit." tone="accent" />
+        <KpiCard label="Trust layers" value="4" description="Confidence, completeness, source quality, and certification status remain visible throughout the public site." />
+        <KpiCard label="Time-aware" value="Yes" description="Outcomes can be read by year, date range, duration estimate, and change-over-time summaries." />
+        <KpiCard label="Evidence access" value="Nearby" description="Every score-oriented page keeps evidence and methodology links close to the headline number." />
+      </section>
 
-        <div>
-          <h2 className="text-2xl font-semibold mb-2">How policies are categorized</h2>
-          <p className="text-[var(--ink-soft)] leading-8">
-            Each policy is tagged by era, party association where appropriate, policy type,
-            and one or more issue categories such as voting rights, housing, healthcare,
-            education, criminal justice, labor, HBCUs, and related areas. Court cases and
-            some nonpartisan actions may be listed under no primary party when assigning
-            a partisan label would be misleading.
-          </p>
-        </div>
+      <section className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+        {SCORE_DIMENSIONS.map((item) => (
+          <article key={item.title} className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+            <h2 className="text-lg font-semibold text-white">{item.title}</h2>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item.description}</p>
+          </article>
+        ))}
+      </section>
 
-        <div>
-          <h2 className="text-2xl font-semibold mb-2">How impact direction is assigned</h2>
-          <p className="text-[var(--ink-soft)] leading-8">
-            Each entry is also assigned an impact direction such as positive, negative,
-            mixed, or blocked. These labels are based on the documented effect of the action,
-            not simply the language used to promote it. A policy may be classified as mixed
-            when it produced both meaningful gains and major harms, limitations, exclusions,
-            or uneven enforcement.
-          </p>
+      <section className="grid gap-6 xl:grid-cols-[1fr_1fr]">
+        <div className="rounded-[1.8rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--accent)]">Presidential Black Impact Score</p>
+          <h2 className="mt-4 text-2xl font-semibold text-white">How presidential scoring works</h2>
+          <div className="mt-5 grid gap-3 text-sm leading-7 text-[var(--ink-soft)]">
+            <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+              Presidential Black Impact Score is derived from tracked policy impacts in the EquityStack dataset. It aggregates measured policy outcomes rather than campaign messaging or general reputation.
+            </div>
+            <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+              The score reflects the available structured record, not every action in a presidency. Source coverage, attribution limits, mixed-impact outcomes, and historical dataset gaps all affect interpretation.
+            </div>
+            <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+              Direct and systemic score families stay separate so judicial downstream effects do not silently blend into direct presidential policy credit.
+            </div>
+          </div>
+          <div className="mt-5 flex flex-wrap gap-3">
+            <Link href="/presidents" className="public-button-primary">
+              Open presidential ranking
+            </Link>
+            <Link href="/compare/presidents" className="public-button-secondary">
+              Compare presidents
+            </Link>
+          </div>
+        </div>
+        <div className="rounded-[1.8rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--accent)]">Source hierarchy</p>
+          <h2 className="mt-4 text-2xl font-semibold text-white">How the evidence layer works</h2>
+          <ul className="mt-5 grid gap-3 text-sm leading-7 text-[var(--ink-soft)]">
+            {SOURCE_RULES.map((item) => (
+              <li key={item} className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+                {item}
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className="rounded-[1.8rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--accent)]">Limitations</p>
+          <h2 className="mt-4 text-2xl font-semibold text-white">What the site does not pretend away</h2>
+          <ul className="mt-5 grid gap-3 text-sm leading-7 text-[var(--ink-soft)]">
+            {LIMITATIONS.map((item) => (
+              <li key={item} className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+                {item}
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
-      <section className="space-y-4">
-        <div>
-          <h2 className="text-2xl font-semibold">Scoring Framework</h2>
-          <p className="text-sm text-[var(--ink-soft)] mt-1">
-            Each policy can receive scores from 0 to 5 across the following dimensions.
-          </p>
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          <ScoreCard
-            title="Directness"
-            description="How explicitly the policy targeted, protected, excluded, or otherwise affected Black Americans."
-          />
-          <ScoreCard
-            title="Material Impact"
-            description="Whether the policy changed rights, money, legal treatment, access, safety, or opportunity in a meaningful real-world way."
-          />
-          <ScoreCard
-            title="Evidence"
-            description="The strength of the historical sourcing and measurable support for the claimed impact."
-          />
-          <ScoreCard
-            title="Durability"
-            description="Whether the policy’s effects lasted over time or were quickly undermined, weakened, reversed, or limited."
-          />
-          <ScoreCard
-            title="Equity"
-            description="Whether the policy helped reduce racial disparities, expand equal access, or improve fairness in practice."
-          />
-          <ScoreCard
-            title="Harm Offset"
-            description="The degree to which limitations, exclusions, weak enforcement, tradeoffs, or contradictory outcomes reduced the policy’s net benefit."
-          />
+      <section className="space-y-5">
+        <SectionIntro
+          eyebrow="Data limitations"
+          title="Limits that matter when reading the site"
+          description="EquityStack is designed to make uncertainty and incomplete coverage visible rather than burying them."
+        />
+        <div className="grid gap-5 md:grid-cols-3">
+          {DATA_LIMITATION_SECTIONS.map((item) => (
+            <article
+              key={item.title}
+              className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5"
+            >
+              <h2 className="text-lg font-semibold text-white">{item.title}</h2>
+              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+                {item.description}
+              </p>
+            </article>
+          ))}
         </div>
       </section>
 
-      <section className="card-surface rounded-[1.6rem] p-6 space-y-6">
-        <div>
-          <h2 className="text-2xl font-semibold mb-2">How total policy impact is interpreted</h2>
-          <p className="text-[var(--ink-soft)] leading-8">
-            Composite scores are intended to make comparison easier, but they are not a
-            substitute for reading the policy record itself. A high score suggests broad,
-            durable, and well-supported impact. A lower score may reflect limited reach,
-            incomplete enforcement, or mixed outcomes. Negative and blocked entries are also
-            important because they help explain losses, gaps, and missed opportunities.
-          </p>
+      <section className="grid gap-6 xl:grid-cols-[1fr_1fr]">
+        <div className="rounded-[1.8rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--accent)]">Promise grading</p>
+          <h2 className="mt-4 text-2xl font-semibold text-white">Why promise status is shown separately</h2>
+          <div className="mt-5 grid gap-3 text-sm leading-7 text-[var(--ink-soft)]">
+            <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+              Promise status tracks whether a public commitment was delivered, blocked, partially fulfilled, still in progress, or failed.
+            </div>
+            <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+              Promise status does not automatically mean positive impact. A delivered promise can still have mixed or negative downstream effects, and EquityStack keeps that distinction visible.
+            </div>
+            <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+              Promise pages therefore sit beside policy and score pages, not on top of them.
+            </div>
+          </div>
         </div>
 
-        <div>
-          <h2 className="text-2xl font-semibold mb-2">Party attribution</h2>
-          <p className="text-[var(--ink-soft)] leading-8">
-            Party attribution reflects the party most associated with passage,
-            sponsorship, or executive approval at the time. Historical party
-            labels are not treated as ideologically fixed across all eras.
-            Reconstruction-era Republicans and modern Republicans are not assumed
-            to represent identical coalitions, and the same caution applies to
-            Democrats across different periods.
-          </p>
+        <div className="rounded-[1.8rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--accent)]">Confidence and review status</p>
+          <h2 className="mt-4 text-2xl font-semibold text-white">How uncertainty stays visible</h2>
+          <ul className="mt-5 grid gap-3 text-sm leading-7 text-[var(--ink-soft)]">
+            {CONFIDENCE_NOTES.map((item) => (
+              <li key={item} className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+                {item}
+              </li>
+            ))}
+          </ul>
         </div>
-
-        <div>
-          <h2 className="text-2xl font-semibold mb-2">Evidence standards</h2>
-          <p className="text-[var(--ink-soft)] leading-8">
-            Wherever possible, entries should be supported by primary government sources,
-            archival materials, academic research, and measurable outcomes. Symbolic rhetoric,
-            campaign language, or retrospective partisan claims are not treated as sufficient
-            evidence on their own. The strongest entries combine primary sources with metrics
-            or well-established historical analysis.
-          </p>
-        </div>
-
-        <div>
-          <h2 className="text-2xl font-semibold mb-2">Scope</h2>
-          <p className="text-[var(--ink-soft)] leading-8">
-            The project focuses primarily on federal actions, major court rulings,
-            and significant policy developments tied to Black political, civil, social,
-            and economic outcomes. It may expand over time to include more enforcement
-            history, additional federal programs, and selected state-level patterns where
-            those patterns materially shaped national outcomes.
-          </p>
-        </div>
-      </section>
-
-      <section className="card-surface-strong rounded-[1.6rem] p-6">
-        <h2 className="text-2xl font-semibold mb-3">Interpretation Note</h2>
-        <p className="text-[var(--ink-soft)] leading-8">
-          This site is a structured historical analysis tool. It is designed to help users
-          interpret patterns in policy impact, not to reduce history to a single number or
-          a simplistic partisan ranking. Scores, categories, and labels should be read together
-          with the underlying summaries, sources, metrics, and historical context.
-        </p>
       </section>
     </main>
   );
