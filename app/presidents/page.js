@@ -101,7 +101,7 @@ export default async function PresidentsPage({ searchParams }) {
 
       <TrustBar />
 
-      <section className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
+      <section className="grid items-start gap-6 xl:grid-cols-[1.05fr_0.95fr]">
         <PageContextBlock
           description="This page ranks presidential records using direct Impact Score first, then adds systemic context, outcome counts, and Confidence so users can compare administrations without flattening uncertainty."
           detail="Use the ranking table for fast scan, then open a profile to read trend lines, policy drivers, evidence footprint, and related promise records."
@@ -179,8 +179,8 @@ export default async function PresidentsPage({ searchParams }) {
         ]}
       />
 
-      <section className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
-        <div className="space-y-5">
+      <section className="grid items-start gap-6 xl:grid-cols-[1.15fr_0.85fr]">
+        <div className="space-y-5 xl:self-start">
           <SectionIntro
             eyebrow="Flagship ranking"
             title="Black Impact Score ranking"
@@ -199,8 +199,8 @@ export default async function PresidentsPage({ searchParams }) {
         </div>
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
-        <div className="space-y-5">
+      <section className="grid items-start gap-6 xl:grid-cols-[1.15fr_0.85fr]">
+        <div className="space-y-5 xl:self-start">
           <SectionIntro
             eyebrow="Comparison table"
             title="Read the ranking in compact form"

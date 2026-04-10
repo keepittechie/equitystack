@@ -64,7 +64,7 @@ export default async function PromisesPage({ searchParams }) {
         detail="Promise Status is not the same as Impact Score. Open a promise record when you want to see the statement, rationale, evidence, Confidence, and linked policy history together."
       />
 
-      <section className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
+      <section className="grid items-start gap-6 xl:grid-cols-[1.05fr_0.95fr]">
         <PromiseSystemExplanation />
         <PromiseStatusLegend />
       </section>
@@ -150,8 +150,8 @@ export default async function PromisesPage({ searchParams }) {
         ]}
       />
 
-      <section className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
-        <div className="space-y-5">
+      <section className="grid items-start gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+        <div className="space-y-5 xl:self-start">
           <SectionIntro
             eyebrow="Results table"
             title="Searchable public promise records"

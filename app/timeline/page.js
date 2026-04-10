@@ -132,8 +132,8 @@ export default async function TimelinePage({ searchParams }) {
         ]}
       />
 
-      <section className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
-        <div className="space-y-5">
+      <section className="grid items-start gap-6 xl:grid-cols-[1.15fr_0.85fr]">
+        <div className="space-y-5 xl:self-start">
           <SectionIntro
             eyebrow="Chronology"
             title="Browse the public record"

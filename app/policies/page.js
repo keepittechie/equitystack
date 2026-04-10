@@ -71,7 +71,7 @@ export default async function PoliciesPage({ searchParams }) {
 
       <TrustBar />
 
-      <section className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
+      <section className="grid items-start gap-6 xl:grid-cols-[1.05fr_0.95fr]">
         <PageContextBlock
           description="This explorer shows individual policy records, their Impact Score, Impact Direction, and evidence footprint across time."
           detail="Use search and filters to move from broad scan into record-level proof, then open a policy page for plain-language summary, sources, and related records."
@@ -85,8 +85,8 @@ export default async function PoliciesPage({ searchParams }) {
         <PolicyFilterSidebar filters={resolvedSearchParams} options={data.filterOptions} />
       </FilterDrawer>
 
-      <section className="grid gap-6 xl:grid-cols-[300px_minmax(0,1fr)]">
-        <div className="hidden xl:block">
+      <section className="grid items-start gap-6 xl:grid-cols-[300px_minmax(0,1fr)]">
+        <div className="hidden xl:self-start xl:block">
           <PolicyFilterSidebar filters={resolvedSearchParams} options={data.filterOptions} />
         </div>
         <div className="space-y-5">
