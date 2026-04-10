@@ -150,7 +150,7 @@ export default async function PromisesPage({ searchParams }) {
         ]}
       />
 
-      <section className="grid items-start gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+      <section className="public-two-col-rail grid items-start gap-6 xl:grid-cols-[1.1fr_0.9fr]">
         <div className="space-y-5 xl:self-start">
           <SectionIntro
             eyebrow="Results table"

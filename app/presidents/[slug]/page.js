@@ -145,8 +145,8 @@ export default async function PresidentProfilePage({ params }) {
         ]}
       />
 
-      <section className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
-        <div className="space-y-5">
+      <section className="grid items-start gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+        <div className="space-y-5 xl:self-start">
           <ImpactTrendChart
             data={trend?.score_by_year || []}
             title="Impact over time"
@@ -172,8 +172,8 @@ export default async function PresidentProfilePage({ params }) {
         </div>
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[1.08fr_0.92fr]">
-        <div className="space-y-5">
+      <section className="public-two-col-rail grid items-start gap-6 xl:grid-cols-[1.08fr_0.92fr]">
+        <div className="space-y-5 xl:self-start">
           <SectionIntro
             eyebrow="Top records"
             title="Policies and promises driving this profile"
@@ -216,8 +216,8 @@ export default async function PresidentProfilePage({ params }) {
         </div>
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
-        <div className="space-y-5">
+      <section className="public-two-col-rail grid items-start gap-6 xl:grid-cols-[1.15fr_0.85fr]">
+        <div className="space-y-5 xl:self-start">
           <SectionIntro
             eyebrow="What shaped this score"
             title="Driver visibility"
@@ -298,8 +298,8 @@ export default async function PresidentProfilePage({ params }) {
         </div>
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
-        <div className="space-y-5">
+      <section className="public-two-col-rail grid items-start gap-6 xl:grid-cols-[0.95fr_1.05fr]">
+        <div className="space-y-5 xl:self-start">
           <SectionIntro
             eyebrow="Promise tracker snapshot"
             title="Status mix for this presidential record"
@@ -376,8 +376,8 @@ export default async function PresidentProfilePage({ params }) {
         </div>
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
-        <div className="space-y-5">
+      <section className="public-two-col-rail grid items-start gap-6 xl:grid-cols-[0.95fr_1.05fr]">
+        <div className="space-y-5 xl:self-start">
           <SectionIntro
             eyebrow="Timeline"
             title="Promise and impact chronology"

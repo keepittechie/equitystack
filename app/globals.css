@@ -141,6 +141,14 @@ textarea:focus {
   background: rgba(141, 161, 185, 0.65);
 }
 
+@media (min-width: 1280px) {
+  .public-two-col-rail > :last-child {
+    position: sticky;
+    top: 6.5rem;
+    align-self: start;
+  }
+}
+
 .card-surface,
 .metric-card,
 .card-muted,

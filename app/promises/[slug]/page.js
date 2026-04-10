@@ -115,7 +115,7 @@ export default async function PromiseDetailPage({ params }) {
         <PromiseStatusLegend statuses={["Delivered", "In Progress", "Partial", "Blocked", "Failed"]} />
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[1.08fr_0.92fr]">
+      <section className="public-two-col-rail grid gap-6 xl:grid-cols-[1.08fr_0.92fr]">
         <div className="space-y-5">
           <SectionIntro
             eyebrow="What this means"

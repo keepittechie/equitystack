@@ -119,7 +119,7 @@ export default async function SourcesPage({ searchParams }) {
         ]}
       />
 
-      <section className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
+      <section className="public-two-col-rail grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
         <div className="space-y-5">
           <SectionIntro
             eyebrow="Source records"

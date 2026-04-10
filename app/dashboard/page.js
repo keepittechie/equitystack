@@ -183,7 +183,7 @@ export default async function DashboardPage({ searchParams }) {
         />
       </section>
 
-      <section className="grid items-start gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+      <section className="public-two-col-rail grid items-start gap-6 xl:grid-cols-[1.1fr_0.9fr]">
         <CategoryImpactChart
           data={categoryData}
           title="Category distribution"
@@ -192,7 +192,7 @@ export default async function DashboardPage({ searchParams }) {
         <MethodologyCallout description="The dashboard is a reading surface, not a black box. Every metric should lead you to a policy page, promise page, source, or methodology explanation." />
       </section>
 
-      <section className="grid items-start gap-6 xl:grid-cols-[1.15fr_0.85fr]">
+      <section className="public-two-col-rail grid items-start gap-6 xl:grid-cols-[1.15fr_0.85fr]">
         <div className="space-y-5 xl:self-start">
           <div className="flex items-end justify-between gap-4">
             <div>
@@ -309,7 +309,7 @@ export default async function DashboardPage({ searchParams }) {
         </section>
       ) : null}
 
-      <section className="grid items-start gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+      <section className="public-two-col-rail grid items-start gap-6 xl:grid-cols-[1.1fr_0.9fr]">
         <div className="space-y-4 xl:self-start">
           <h2 className="text-2xl font-semibold text-white">Latest policy updates</h2>
           <RecentPolicyChangesTable

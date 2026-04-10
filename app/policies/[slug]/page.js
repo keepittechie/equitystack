@@ -154,7 +154,7 @@ export default async function PolicyDetailPage({ params }) {
 
       <TrustBar />
 
-      <section className="grid gap-6 xl:grid-cols-[1.08fr_0.92fr]">
+      <section className="public-two-col-rail grid gap-6 xl:grid-cols-[1.08fr_0.92fr]">
         <div className="space-y-5">
           <SectionIntro
             eyebrow="Plain-language summary"
@@ -204,7 +204,7 @@ export default async function PolicyDetailPage({ params }) {
         </div>
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[1.08fr_0.92fr]">
+      <section className="public-two-col-rail grid gap-6 xl:grid-cols-[1.08fr_0.92fr]">
         <div className="space-y-5">
           <SectionIntro
             eyebrow="Evidence"

@@ -182,7 +182,7 @@ export default async function PresidentsPage({ searchParams }) {
         ]}
       />
 
-      <section className="grid items-start gap-6 xl:grid-cols-[1.15fr_0.85fr]">
+      <section className="public-two-col-rail grid items-start gap-6 xl:grid-cols-[1.15fr_0.85fr]">
         <div className="space-y-5 xl:self-start">
           <SectionIntro
             eyebrow="Flagship ranking"

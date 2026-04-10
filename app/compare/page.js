@@ -46,7 +46,7 @@ export default function ComparePage() {
 
       <TrustBar />
 
-      <section className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
+      <section className="public-two-col-rail grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
         <div className="grid gap-6 md:grid-cols-2">
           <CompareHubCard
             title="Compare presidents"

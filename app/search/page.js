@@ -55,7 +55,7 @@ export default async function SearchPage({ searchParams }) {
       </section>
 
       {!query ? (
-        <section className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
+        <section className="public-two-col-rail grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
           <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6">
             <h2 className="text-2xl font-semibold text-white">Start with a public query</h2>
             <p className="mt-4 text-sm leading-7 text-[var(--ink-soft)]">

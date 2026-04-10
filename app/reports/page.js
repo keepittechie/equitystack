@@ -194,7 +194,7 @@ export default async function ReportsPage({ searchParams }) {
         Charts reflect underlying policy data in the EquityStack database.
       </div>
 
-      <section className="grid items-start gap-6 xl:grid-cols-[1.15fr_0.85fr]">
+      <section className="public-two-col-rail grid items-start gap-6 xl:grid-cols-[1.15fr_0.85fr]">
         <div className="space-y-5">
           <SectionIntro
             eyebrow="All reports"
