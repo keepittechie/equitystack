@@ -154,7 +154,7 @@ export function SiteHeader() {
           <div className="min-w-0 flex-1 xl:max-w-[280px] xl:flex-none 2xl:max-w-[310px]">
             <Link href="/" className="flex min-w-0 items-center gap-3">
               <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-2xl border border-white/10 bg-[rgba(17,29,46,0.9)] shadow-[0_12px_30px_rgba(0,0,0,0.25)]">
-                <Image src="/logo-v2.png" alt="EquityStack" fill className="object-contain p-1.5" priority />
+                <Image src="/logo.png" alt="EquityStack" fill className="object-contain p-1.5" priority />
               </div>
               <div className="min-w-0 xl:max-w-[220px] 2xl:max-w-[250px]">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[var(--accent)]">
