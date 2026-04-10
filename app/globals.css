@@ -118,6 +118,29 @@ textarea:focus {
   position: relative;
 }
 
+.thin-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(141, 161, 185, 0.45) rgba(255, 255, 255, 0.04);
+}
+
+.thin-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.thin-scrollbar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.thin-scrollbar::-webkit-scrollbar-thumb {
+  border-radius: 9999px;
+  background: rgba(141, 161, 185, 0.45);
+}
+
+.thin-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(141, 161, 185, 0.65);
+}
+
 .card-surface,
 .metric-card,
 .card-muted,

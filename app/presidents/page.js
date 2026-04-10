@@ -75,6 +75,9 @@ export default async function PresidentsPage({ searchParams }) {
     (item) => String(item.score_confidence || "").toLowerCase() === "high"
   ).length;
   const topRanked = filteredPresidents.slice(0, 10);
+  const showSystemicComparison = filteredPresidents.some(
+    (item) => Math.abs(Number(item.systemic_score || 0)) > 0.001
+  );
 
   return (
     <main className="space-y-10">
@@ -199,32 +202,34 @@ export default async function PresidentsPage({ searchParams }) {
         </div>
       </section>
 
-      <section className="grid items-start gap-6 xl:grid-cols-[1.15fr_0.85fr]">
-        <div className="space-y-5 xl:self-start">
-          <SectionIntro
-            eyebrow="Comparison table"
-            title="Read the ranking in compact form"
-            description="Use the table when you want a fast side-by-side view of headline score, confidence, and tracked record counts before opening profiles."
-          />
-          <ComparisonMetricsTable
-            rows={comparisonRows}
-            metrics={[
-              { key: "direct_score", label: "Direct Impact Score" },
-              { key: "systemic_score", label: "Systemic Impact Score" },
-              { key: "outcomes", label: "Outcomes" },
-              { key: "promises", label: "Promises" },
-              { key: "confidence", label: "Confidence" },
-            ]}
-          />
+      <section className="space-y-5">
+        <SectionIntro
+          eyebrow="Comparison table"
+          title="Read the ranking in compact form"
+          description="Use the table when you want a fast side-by-side view of headline score, confidence, and tracked record counts before opening profiles."
+        />
+        <div className="rounded-[1.45rem] border border-white/8 bg-[rgba(8,14,24,0.86)] p-4 md:p-5">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--accent)]">
+            How to read this ranking
+          </p>
+          <p className="mt-3 max-w-4xl text-sm leading-7 text-[var(--ink-soft)]">
+            Higher scores indicate stronger measured positive impact in the current dataset. Lower scores indicate stronger measured negative impact. This compact table emphasizes the fields that currently differentiate presidential records most clearly.
+          </p>
         </div>
-        <div className="space-y-5">
-          <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
-            <h2 className="text-lg font-semibold text-white">Interpret the ranking carefully</h2>
-            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-              Higher scores indicate stronger measured positive impact in the current dataset. Lower scores indicate stronger measured negative impact. Mixed and blocked outcomes stay visible so the ranking does not flatten away complexity.
-            </p>
-          </div>
-        </div>
+        <ComparisonMetricsTable
+          rows={comparisonRows}
+          scrollClassName="thin-scrollbar"
+          minTableWidthClassName="min-w-[720px]"
+          metrics={[
+            { key: "direct_score", label: "Direct Impact Score" },
+            ...(showSystemicComparison
+              ? [{ key: "systemic_score", label: "Systemic Impact Score" }]
+              : []),
+            { key: "outcomes", label: "Outcomes" },
+            { key: "promises", label: "Promises" },
+            { key: "confidence", label: "Confidence" },
+          ]}
+        />
       </section>
 
       <section className="space-y-5">

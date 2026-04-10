@@ -897,7 +897,12 @@ export function CompareSelector({ options = [], selected = [], name = "compare" 
   );
 }
 
-export function ComparisonMetricsTable({ rows = [], metrics = [] }) {
+export function ComparisonMetricsTable({
+  rows = [],
+  metrics = [],
+  minTableWidthClassName = "min-w-[44rem]",
+  scrollClassName = "",
+}) {
   if (!rows.length) {
     return (
       <div className="rounded-[1.6rem] border border-dashed border-white/12 bg-white/4 p-6 text-sm leading-7 text-[var(--ink-soft)]">
@@ -908,23 +913,28 @@ export function ComparisonMetricsTable({ rows = [], metrics = [] }) {
 
   return (
     <div className="overflow-hidden rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)]">
-      <div className="overflow-x-auto">
-        <table className="min-w-full text-left text-sm">
+      <div className={`overflow-x-auto ${scrollClassName}`.trim()}>
+        <table className={`w-full text-left text-sm ${minTableWidthClassName}`.trim()}>
           <thead className="border-b border-white/8 text-[11px] uppercase tracking-[0.2em] text-[var(--ink-muted)]">
             <tr>
-              <th className="px-5 py-4">Metric</th>
+              <th className="w-[13rem] px-4 py-4 md:px-5">Metric</th>
               {rows.map((row) => (
-                <th key={row.label} className="px-5 py-4">{row.label}</th>
+                <th key={row.label} className="min-w-[8.75rem] px-4 py-4 md:px-5">
+                  {row.label}
+                </th>
               ))}
             </tr>
           </thead>
           <tbody>
             {metrics.map((metric) => (
               <tr key={metric.key} className="border-b border-white/6 last:border-b-0">
-                <td className="px-5 py-4 font-medium text-white">{metric.label}</td>
+                <td className="px-4 py-4 align-top font-medium text-white md:px-5">{metric.label}</td>
                 {rows.map((row) => (
-                  <td key={`${row.label}-${metric.key}`} className="px-5 py-4 text-[var(--ink-soft)]">
-                    {row[metric.key] ?? "—"}
+                  <td
+                    key={`${row.label}-${metric.key}`}
+                    className="px-4 py-4 align-top text-[var(--ink-soft)] md:px-5"
+                  >
+                    <span className="font-medium text-white">{row[metric.key] ?? "—"}</span>
                   </td>
                 ))}
               </tr>
