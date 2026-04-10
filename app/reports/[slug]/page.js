@@ -136,7 +136,7 @@ export default async function ReportDetailPage({ params }) {
         </section>
       ) : null}
 
-      <section className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
+      <section className="grid items-start gap-6 xl:grid-cols-[1.15fr_0.85fr]">
         <div className="space-y-5">
           <SectionIntro
             eyebrow="Findings"
@@ -159,7 +159,7 @@ export default async function ReportDetailPage({ params }) {
             </div>
           )}
         </div>
-        <div className="space-y-5">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-1">
           <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
             <h2 className="text-lg font-semibold text-white">About this report</h2>
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
@@ -169,7 +169,7 @@ export default async function ReportDetailPage({ params }) {
           <CitationNote description="When referencing this report externally, cite the report title, EquityStack, the page URL, and your access date. The report summarizes the current structured dataset and should be read with the linked policy records, sources, and methodology." />
           <ScoreExplanation title="How to interpret score language in this report" />
           <MethodologyCallout description="This report is a structured reading layer, not a standalone claim. Use the related links, policies, and methodology access below to validate what the report is summarizing." />
-          <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+          <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 md:col-span-2 xl:col-span-1">
             <h2 className="text-lg font-semibold text-white">Related paths</h2>
             <div className="mt-4 flex flex-wrap gap-3">
               {(report.relatedLinks || []).map((item) => (
@@ -184,7 +184,7 @@ export default async function ReportDetailPage({ params }) {
 
       {report.chartBlocks?.length ? (
         <>
-          <section className="grid gap-6 xl:grid-cols-2">
+          <section className="grid items-start gap-6 xl:grid-cols-2">
             {report.chartBlocks.map((block, index) => renderChartBlock(block, index))}
           </section>
           <div className="rounded-[1.3rem] border border-white/8 bg-white/5 px-5 py-4 text-sm leading-7 text-[var(--ink-soft)]">
@@ -204,7 +204,7 @@ export default async function ReportDetailPage({ params }) {
             title="Linked policy records"
             description="These policy records are the fastest way to move from summary interpretation into the underlying public evidence."
           />
-          <div className="grid gap-6 xl:grid-cols-3">
+          <div className="grid items-start gap-6 xl:grid-cols-3">
             {["positive", "mixed", "negative"].map((bucket) => (
               <div key={bucket} className="space-y-4">
                 <h3 className="text-lg font-semibold text-white capitalize">{bucket} records</h3>

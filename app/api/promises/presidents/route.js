@@ -8,13 +8,13 @@ function isPromiseTrackerSchemaMissing(error) {
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
-    const showAll = searchParams.get("show_all") === "1";
+    const showAll = searchParams.get("show_all") !== "0";
     const items = await fetchPromisePresidentIndex({ showAll });
     return NextResponse.json({
       items,
       curation: {
         show_all: showAll,
-        default_scope: "High and Medium relevance",
+        default_scope: showAll ? "Full public promise dataset" : "High and Medium relevance",
       },
     });
   } catch (error) {

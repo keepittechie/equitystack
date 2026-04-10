@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ImpactBadge, PromiseStatusBadge } from "@/app/components/policy-badges";
 import PresidentAvatar from "@/app/components/PresidentAvatar";

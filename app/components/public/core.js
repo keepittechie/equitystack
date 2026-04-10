@@ -8,9 +8,11 @@ export function SectionIntro({
   align = "default",
   as: HeadingTag = "h2",
 }) {
+  const isHero = HeadingTag === "h1";
+
   return (
     <div
-      className={`flex flex-wrap items-end justify-between gap-6 ${
+      className={`flex flex-wrap items-end justify-between gap-4 md:gap-6 ${
         align === "center" ? "text-center" : ""
       }`}
     >
@@ -20,16 +22,28 @@ export function SectionIntro({
             {eyebrow}
           </p>
         ) : null}
-        <HeadingTag className="mt-4 text-[clamp(2.3rem,5vw,4.6rem)] font-semibold leading-[0.95] tracking-[-0.05em] text-white">
+        <HeadingTag
+          className={`text-white ${
+            isHero
+              ? "mt-4 text-[clamp(2.35rem,5vw,4.8rem)] font-semibold leading-[0.95] tracking-[-0.05em]"
+              : "mt-3 text-[clamp(1.65rem,3.2vw,2.5rem)] font-semibold leading-[1.02] tracking-[-0.045em]"
+          }`}
+        >
           {title}
         </HeadingTag>
         {description ? (
-          <p className="mt-5 max-w-3xl text-base leading-8 text-[var(--ink-soft)] md:text-lg">
+          <p
+            className={`max-w-3xl text-[var(--ink-soft)] ${
+              isHero
+                ? "mt-5 text-base leading-8 md:text-lg"
+                : "mt-4 text-sm leading-7 md:text-base md:leading-8"
+            }`}
+          >
             {description}
           </p>
         ) : null}
       </div>
-      {actions ? <div className="flex flex-wrap gap-3">{actions}</div> : null}
+      {actions ? <div className="flex w-full flex-wrap gap-3 sm:w-auto">{actions}</div> : null}
     </div>
   );
 }
@@ -41,18 +55,18 @@ export function KpiCard({ label, value, delta, description, tone = "default" }) 
       : "border-white/8 bg-[linear-gradient(180deg,rgba(13,20,32,0.96),rgba(6,11,18,0.96))]";
 
   return (
-    <article className={`rounded-[1.6rem] border p-5 shadow-[0_20px_60px_rgba(0,0,0,0.24)] ${borderTone}`}>
+    <article className={`flex h-full flex-col rounded-[1.6rem] border p-5 md:p-6 shadow-[0_20px_60px_rgba(0,0,0,0.24)] ${borderTone}`}>
       <div className="flex items-start justify-between gap-3">
         <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--ink-muted)]">
           {label}
         </p>
         {delta ? (
-          <span className="rounded-full border border-white/10 px-2.5 py-1 text-xs text-[var(--accent)]">
+          <span className="rounded-full border border-white/10 px-2.5 py-1 text-xs text-[var(--accent)] whitespace-nowrap">
             {delta}
           </span>
         ) : null}
       </div>
-      <p className="mt-4 text-4xl font-semibold tracking-[-0.05em] text-white">{value}</p>
+      <p className="mt-4 text-[clamp(2rem,4.5vw,3rem)] font-semibold tracking-[-0.05em] text-white">{value}</p>
       {description ? (
         <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{description}</p>
       ) : null}
@@ -75,7 +89,7 @@ export function ScoreBadge({
         : "border-[rgba(96,165,250,0.18)] bg-[rgba(7,32,52,0.72)] text-[var(--accent)]";
 
   return (
-    <div className={`inline-flex flex-col rounded-[1.3rem] border px-4 py-3 ${colorClasses}`}>
+    <div className={`inline-flex min-w-[116px] flex-col rounded-[1.3rem] border px-4 py-3 ${colorClasses}`}>
       <span className="text-[11px] font-semibold uppercase tracking-[0.22em]">{label}</span>
       <span className={`mt-2 font-semibold tracking-[-0.04em] ${size === "lg" ? "text-4xl" : "text-2xl"}`}>
         {value}
@@ -92,11 +106,11 @@ export function MethodologyCallout({
   linkLabel = "Open methodology",
 }) {
   return (
-    <aside className="rounded-[1.5rem] border border-[rgba(96,165,250,0.14)] bg-[linear-gradient(135deg,rgba(7,30,47,0.9),rgba(10,15,23,0.95))] p-5">
+    <aside className="h-full rounded-[1.5rem] border border-[rgba(96,165,250,0.14)] bg-[linear-gradient(135deg,rgba(7,30,47,0.9),rgba(10,15,23,0.95))] p-5 md:p-6">
       <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--accent)]">
         Methodology nearby
       </p>
-      <h3 className="mt-3 text-lg font-semibold text-white">{title}</h3>
+      <h3 className="mt-3 text-base font-semibold text-white md:text-lg">{title}</h3>
       <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
         {description}
       </p>
@@ -113,11 +127,11 @@ export function PageContextBlock({
   detail = null,
 }) {
   return (
-    <aside className="rounded-[1.5rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+    <aside className="h-full rounded-[1.5rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 md:p-6">
       <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--accent)]">
         How to read this page
       </p>
-      <h3 className="mt-3 text-lg font-semibold text-white">{title}</h3>
+      <h3 className="mt-3 text-base font-semibold text-white md:text-lg">{title}</h3>
       <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{description}</p>
       {detail ? (
         <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{detail}</p>
@@ -130,11 +144,11 @@ export function PresidentScoreMethodologyNote({
   title = "How to interpret presidential scores",
 }) {
   return (
-    <aside className="rounded-[1.5rem] border border-[rgba(96,165,250,0.14)] bg-[linear-gradient(135deg,rgba(7,30,47,0.9),rgba(10,15,23,0.95))] p-5">
+    <aside className="h-full rounded-[1.5rem] border border-[rgba(96,165,250,0.14)] bg-[linear-gradient(135deg,rgba(7,30,47,0.9),rgba(10,15,23,0.95))] p-5 md:p-6">
       <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--accent)]">
         Presidential score note
       </p>
-      <h3 className="mt-3 text-lg font-semibold text-white">{title}</h3>
+      <h3 className="mt-3 text-base font-semibold text-white md:text-lg">{title}</h3>
       <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
         Presidential Black Impact Score reflects measured policy impact in the
         current EquityStack dataset. It is not a popularity measure, a party
@@ -155,11 +169,11 @@ export function CitationNote({
     "When referencing this page externally, cite the page title, EquityStack, the page URL, and your access date. Treat the page as a structured summary of the current dataset, not a complete historical judgment.",
 }) {
   return (
-    <aside className="rounded-[1.5rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+    <aside className="h-full rounded-[1.5rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 md:p-6">
       <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--accent)]">
         Citation-friendly context
       </p>
-      <h3 className="mt-3 text-lg font-semibold text-white">{title}</h3>
+      <h3 className="mt-3 text-base font-semibold text-white md:text-lg">{title}</h3>
       <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{description}</p>
     </aside>
   );
@@ -184,7 +198,7 @@ export function SourceTrustPanel({
   ].filter(Boolean);
 
   return (
-    <section className="rounded-[1.5rem] border border-white/8 bg-[rgba(8,14,24,0.9)] p-5">
+    <section className="rounded-[1.5rem] border border-white/8 bg-[rgba(8,14,24,0.9)] p-5 md:p-6">
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--accent)]">
@@ -195,7 +209,7 @@ export function SourceTrustPanel({
           ) : null}
         </div>
       </div>
-      <div className="mt-5 grid gap-3 md:grid-cols-3">
+      <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
         {metrics.map((metric) => (
           <div key={metric.label} className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
@@ -222,7 +236,7 @@ export function FilterDrawer({ title = "Filters", children }) {
 
 export function DashboardFilterBar({ children, helpText = null }) {
   return (
-    <section className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+    <section className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 md:p-6">
       <div className="flex flex-wrap items-end gap-4">{children}</div>
       {helpText ? (
         <p className="mt-4 text-sm leading-7 text-[var(--ink-soft)]">{helpText}</p>

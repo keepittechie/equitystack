@@ -1,10 +1,10 @@
 export default function PromiseSystemExplanation() {
   return (
-    <aside className="rounded-[1.5rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+    <aside className="h-full rounded-[1.5rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 md:p-6">
       <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--accent)]">
         Promise system
       </p>
-      <h3 className="mt-3 text-lg font-semibold text-white">
+      <h3 className="mt-3 text-base font-semibold text-white md:text-lg">
         What a promise means in EquityStack
       </h3>
       <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">

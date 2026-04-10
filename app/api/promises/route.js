@@ -33,7 +33,7 @@ export async function GET(request) {
 
     const page = parsePage(searchParams.get("page"), 1);
     const pageSize = Math.min(parsePage(searchParams.get("page_size"), 12), 100);
-    const showAll = searchParams.get("show_all") === "1";
+    const showAll = searchParams.get("show_all") !== "0";
 
     const data = await fetchPromiseList({
       q,
@@ -51,6 +51,10 @@ export async function GET(request) {
     if (isPromiseTrackerSchemaMissing(error)) {
       return NextResponse.json({
         items: [],
+        status_counts: PROMISE_STATUSES.reduce((totals, item) => {
+          totals[item] = 0;
+          return totals;
+        }, {}),
         pagination: {
           page: 1,
           page_size: 12,

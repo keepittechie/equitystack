@@ -52,6 +52,34 @@ function RecordTypeBadge({ label }) {
   );
 }
 
+export function PresidentPortrait({
+  imageSrc,
+  alt,
+  context = "card",
+  className = "",
+}) {
+  if (!imageSrc) {
+    return null;
+  }
+
+  const sizeClass =
+    context === "hero"
+      ? "h-32 w-32 rounded-[1.7rem] md:h-40 md:w-40"
+      : context === "ranking"
+        ? "h-[4.5rem] w-[4.5rem] rounded-[1.2rem]"
+        : context === "compare"
+          ? "h-20 w-20 rounded-[1.35rem]"
+          : "h-20 w-20 rounded-[1.35rem]";
+
+  return (
+    <div
+      className={`relative shrink-0 overflow-hidden border border-white/10 bg-white/5 ${sizeClass} ${className}`}
+    >
+      <Image src={imageSrc} alt={alt} fill className="object-cover object-top" />
+    </div>
+  );
+}
+
 export function PolicySearchBar({ defaultValue = "", action = "/policies" }) {
   return (
     <form action={action} method="GET" className="flex items-center gap-3 rounded-[1.4rem] border border-white/8 bg-[rgba(8,14,24,0.92)] px-4 py-3">
@@ -216,7 +244,7 @@ export function PolicyCardList({ items = [], buildHref }) {
         <Link
           key={item.id}
           href={buildHref(item)}
-          className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 hover:border-[rgba(132,247,198,0.24)]"
+          className="flex h-full flex-col rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 md:p-6 hover:border-[rgba(132,247,198,0.24)]"
         >
           <div className="flex items-center justify-between gap-4">
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
@@ -228,7 +256,7 @@ export function PolicyCardList({ items = [], buildHref }) {
           {item.summary ? (
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item.summary}</p>
           ) : null}
-          <div className="mt-4 flex flex-wrap gap-2 text-xs text-[var(--ink-muted)]">
+          <div className="mt-auto pt-4 flex flex-wrap gap-2 text-xs text-[var(--ink-muted)]">
             <span>{item.impact_direction || "Unknown direction"}</span>
             <span>•</span>
             <span>{item.president || item.primary_party || "Historical record"}</span>
@@ -331,14 +359,14 @@ export function PresidentCardGrid({ items = [], buildHref, compareHref = null })
         });
 
         return (
-          <article key={item.slug || item.id} className="rounded-[1.7rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+          <article key={item.slug || item.id} className="flex h-full flex-col rounded-[1.7rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 md:p-6">
             <div className="flex items-start justify-between gap-4">
-              <div className="flex items-center gap-4">
-                <div className="relative h-16 w-16 overflow-hidden rounded-[1.2rem] border border-white/10 bg-white/5">
-                  {imageSrc ? (
-                    <Image src={imageSrc} alt={item.name || item.president} fill className="object-cover" />
-                  ) : null}
-                </div>
+              <div className="flex items-start gap-4">
+                <PresidentPortrait
+                  imageSrc={imageSrc}
+                  alt={item.name || item.president || "President portrait"}
+                  context="card"
+                />
                 <div>
                   <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
                     {item.party || item.president_party || "Historical record"}
@@ -353,7 +381,7 @@ export function PresidentCardGrid({ items = [], buildHref, compareHref = null })
               </div>
               <ScoreBadge value={item.score ?? item.direct_normalized_score ?? "—"} label="Direct" />
             </div>
-            <p className="mt-4 text-sm leading-7 text-[var(--ink-soft)]">{item.summary || item.narrative_summary || "View metrics, timelines, and policy drivers for this presidential record."}</p>
+            <p className="mt-4 line-clamp-4 text-sm leading-7 text-[var(--ink-soft)]">{item.summary || item.narrative_summary || "View metrics, timelines, and policy drivers for this presidential record."}</p>
             <div className="mt-4 flex flex-wrap gap-2 text-xs text-[var(--ink-muted)]">
               {item.score_confidence ? (
                 <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5">
@@ -371,7 +399,7 @@ export function PresidentCardGrid({ items = [], buildHref, compareHref = null })
                 </span>
               ) : null}
             </div>
-            <div className="mt-5 flex flex-wrap gap-3">
+            <div className="mt-auto flex flex-wrap gap-3 pt-5">
               <Link href={buildHref(item)} className="rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-medium text-[#051019]">
                 Open profile
               </Link>
@@ -417,7 +445,7 @@ export function PresidentRankingBoard({ items = [], buildHref, limit = 10, title
             <Link
               key={item.slug || item.id || index}
               href={buildHref(item)}
-              className="grid gap-4 px-5 py-5 transition hover:bg-white/5 xl:grid-cols-[52px_minmax(0,1.1fr)_180px_220px]"
+              className="grid gap-4 px-5 py-5 transition hover:bg-white/5 md:px-6 md:py-6 xl:grid-cols-[64px_minmax(0,1.1fr)_minmax(0,190px)_minmax(0,240px)]"
             >
               <div className="flex items-center gap-4">
                 <span className="text-2xl font-semibold tracking-[-0.05em] text-white">
@@ -425,16 +453,11 @@ export function PresidentRankingBoard({ items = [], buildHref, limit = 10, title
                 </span>
               </div>
               <div className="flex items-start gap-4">
-                <div className="relative h-14 w-14 overflow-hidden rounded-[1rem] border border-white/10 bg-white/5">
-                  {imageSrc ? (
-                    <Image
-                      src={imageSrc}
-                      alt={item.name || item.president || "President portrait"}
-                      fill
-                      className="object-cover"
-                    />
-                  ) : null}
-                </div>
+                <PresidentPortrait
+                  imageSrc={imageSrc}
+                  alt={item.name || item.president || "President portrait"}
+                  context="ranking"
+                />
                 <div className="min-w-0">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
                     {item.party || item.president_party || "Historical record"}
@@ -496,13 +519,9 @@ export function PresidentHero({ name, party, termLabel, summary, score, systemic
           {termLabel ? <p className="mt-3 text-sm uppercase tracking-[0.18em] text-[var(--ink-muted)]">{termLabel}</p> : null}
           {summary ? <p className="mt-5 max-w-3xl text-base leading-8 text-[var(--ink-soft)] md:text-lg">{summary}</p> : null}
         </div>
-        <div className="flex flex-col items-end gap-4">
-          {imageSrc ? (
-            <div className="relative h-28 w-28 overflow-hidden rounded-[1.6rem] border border-white/10 bg-white/5">
-              <Image src={imageSrc} alt={name} fill className="object-cover" />
-            </div>
-          ) : null}
-          <div className="flex gap-3">
+        <div className="flex w-full flex-wrap items-start justify-between gap-4 sm:w-auto sm:flex-col sm:items-end">
+          <PresidentPortrait imageSrc={imageSrc} alt={name} context="hero" />
+          <div className="flex flex-wrap gap-3 sm:justify-end">
             <ScoreBadge value={score} label="Black Impact Score" size="lg" />
             {systemicScore != null ? <ScoreBadge value={systemicScore} label="Systemic context" /> : null}
           </div>
@@ -682,13 +701,15 @@ export function ReportCardGrid({ items = [] }) {
         <Link
           key={item.slug}
           href={item.href || `/reports/${item.slug}`}
-          className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 hover:border-[rgba(132,247,198,0.24)]"
+          className="flex h-full flex-col rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 md:p-6 hover:border-[rgba(132,247,198,0.24)]"
         >
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
-            {item.category || "Report"}
-          </p>
+          <div className="flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+            <span>{item.category || "Report"}</span>
+            {item.theme ? <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1">{item.theme}</span> : null}
+          </div>
           <h3 className="mt-4 text-xl font-semibold text-white">{item.title}</h3>
-          <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item.summary}</p>
+          <p className="mt-3 line-clamp-4 text-sm leading-7 text-[var(--ink-soft)]">{item.summary}</p>
+          <span className="mt-auto pt-5 text-sm font-medium text-[var(--accent)]">Open report</span>
         </Link>
       ))}
     </div>
@@ -710,13 +731,14 @@ export function ExplainerIndexGrid({ items = [] }) {
         <Link
           key={item.slug}
           href={`/explainers/${item.slug}`}
-          className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 hover:border-[rgba(132,247,198,0.24)]"
+          className="flex h-full flex-col rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 md:p-6 hover:border-[rgba(132,247,198,0.24)]"
         >
           <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
             {item.category || "Explainer"}
           </p>
           <h3 className="mt-4 text-xl font-semibold text-white">{item.title}</h3>
-          <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item.summary}</p>
+          <p className="mt-3 line-clamp-4 text-sm leading-7 text-[var(--ink-soft)]">{item.summary}</p>
+          <span className="mt-auto pt-5 text-sm font-medium text-[var(--accent)]">Open explainer</span>
         </Link>
       ))}
     </div>

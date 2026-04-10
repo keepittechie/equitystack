@@ -83,7 +83,7 @@ export function GlobalSearch({
       action="/search"
       method="GET"
       aria-label="Search EquityStack"
-      className={`flex items-center gap-2 rounded-full border border-white/10 bg-white/5 ${
+      className={`flex items-center gap-2 rounded-full border border-white/10 bg-white/5 shadow-[0_16px_36px_rgba(0,0,0,0.18)] ${
         compact ? "px-3 py-2" : "px-4 py-3"
       } ${expanded ? "w-full" : ""} ${className} transition-[border-color,background-color,transform] focus-within:border-[rgba(132,247,198,0.32)] focus-within:bg-white/8`}
     >
@@ -108,7 +108,7 @@ export function PrimaryNav({ mobile = false }) {
   return (
     <nav
       aria-label={mobile ? "Mobile primary navigation" : "Primary navigation"}
-      className={mobile ? "grid gap-2" : "hidden shrink-0 items-center justify-center gap-1 xl:flex xl:flex-nowrap"}
+      className={mobile ? "grid gap-2" : "hidden shrink-0 items-center justify-center gap-1 xl:flex xl:flex-nowrap 2xl:gap-1.5"}
     >
       {PRIMARY_NAV_ITEMS.map((item) => {
         const active = isActive(pathname, item.href);
@@ -117,7 +117,7 @@ export function PrimaryNav({ mobile = false }) {
             key={item.href}
             href={item.href}
             aria-current={active ? "page" : undefined}
-            className={`rounded-full px-3 py-2 text-sm font-medium xl:px-4 ${
+            className={`rounded-full px-3 py-2 text-sm font-medium xl:px-3.5 2xl:px-4 ${
               active
                 ? "bg-[var(--accent)] text-[#04131d]"
                 : "text-[var(--ink-soft)] hover:bg-white/6 hover:text-white"
@@ -136,46 +136,48 @@ export function SiteHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
 
+  useEffect(() => {
+    queueMicrotask(() => {
+      setMenuOpen(false);
+      setSearchOpen(false);
+    });
+  }, [pathname]);
+
   if (pathname?.startsWith("/admin")) {
     return null;
   }
 
-  useEffect(() => {
-    setMenuOpen(false);
-    setSearchOpen(false);
-  }, [pathname]);
-
   return (
-    <header className="sticky top-0 z-50 overflow-hidden border-b border-white/8 bg-[rgba(4,10,18,0.88)] backdrop-blur-xl">
+    <header className="sticky top-0 z-50 border-b border-white/8 bg-[rgba(4,10,18,0.88)] backdrop-blur-xl">
       <div className="mx-auto max-w-[1500px] px-5 py-4 xl:px-8">
-        <div className="flex items-center gap-3 xl:grid xl:grid-cols-[minmax(0,320px)_minmax(0,1fr)_minmax(0,460px)] xl:items-center xl:gap-6">
-          <div className="min-w-0 flex-1 xl:min-w-0 xl:overflow-hidden">
+        <div className="flex min-w-0 items-center gap-3 xl:grid xl:grid-cols-[minmax(0,280px)_minmax(0,1fr)_minmax(0,420px)] xl:items-center xl:gap-5 2xl:grid-cols-[minmax(0,310px)_minmax(0,1fr)_minmax(0,440px)] 2xl:gap-6">
+          <div className="min-w-0 flex-1 xl:max-w-[280px] xl:flex-none 2xl:max-w-[310px]">
             <Link href="/" className="flex min-w-0 items-center gap-3">
               <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-2xl border border-white/10 bg-[rgba(17,29,46,0.9)] shadow-[0_12px_30px_rgba(0,0,0,0.25)]">
                 <Image src="/logo-v2.png" alt="EquityStack" fill className="object-contain p-1.5" priority />
               </div>
-              <div className="min-w-0">
+              <div className="min-w-0 xl:max-w-[220px] 2xl:max-w-[250px]">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[var(--accent)]">
                   EquityStack
                 </p>
-                <p className="hidden truncate text-sm text-[var(--ink-muted)] sm:block md:max-w-[16rem] xl:max-w-none">
+                <p className="hidden truncate text-sm text-[var(--ink-muted)] sm:block md:max-w-[16rem] xl:hidden 2xl:block 2xl:max-w-[15rem]">
                   Civic intelligence for Black policy impact
                 </p>
               </div>
             </Link>
           </div>
 
-          <div className="hidden min-w-0 overflow-hidden xl:flex xl:min-w-0 xl:justify-center">
+          <div className="hidden min-w-0 xl:flex xl:justify-center xl:px-2 2xl:px-4">
             <PrimaryNav />
           </div>
 
-          <div className="ml-auto flex min-w-0 items-center justify-end gap-2 overflow-hidden md:gap-3 xl:ml-0 xl:min-w-0 xl:max-w-[460px] xl:justify-end">
-            <div className="hidden min-w-0 flex-none xl:flex xl:w-full xl:max-w-[340px]">
+          <div className="ml-auto flex min-w-0 items-center justify-end gap-2 md:gap-3 xl:ml-0 xl:w-full xl:max-w-[420px] xl:flex-nowrap xl:justify-end 2xl:max-w-[440px]">
+            <div className="hidden min-w-0 flex-none xl:flex xl:w-[320px] 2xl:w-[340px]">
               <GlobalSearch
                 compact
                 idSuffix="desktop"
                 placeholder="Search policies, presidents, reports"
-                className="w-full max-w-[340px] flex-none"
+                className="w-full"
               />
             </div>
 
@@ -274,8 +276,8 @@ export function Breadcrumbs({ items = [] }) {
 export function Footer() {
   return (
     <footer className="mt-20 border-t border-white/8 bg-[rgba(4,10,18,0.9)]">
-      <div className="mx-auto grid max-w-[1500px] gap-10 px-5 py-12 text-left xl:grid-cols-[0.95fr_0.95fr_1.2fr] xl:px-8">
-        <nav aria-label="Project footer links" className="text-left">
+      <div className="mx-auto grid max-w-[1500px] gap-10 px-5 py-12 text-left md:grid-cols-2 xl:grid-cols-[0.95fr_0.95fr_1.2fr] xl:px-8">
+        <nav aria-label="Project footer links" className="min-w-0 text-left">
           <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[var(--accent)]">
             Project
           </p>
@@ -293,7 +295,7 @@ export function Footer() {
           </div>
         </nav>
 
-        <nav aria-label="Sources and code footer links" className="text-left">
+        <nav aria-label="Sources and code footer links" className="min-w-0 text-left">
           <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[var(--accent)]">
             Sources &amp; Code
           </p>
@@ -328,7 +330,7 @@ export function Footer() {
 
         <section
           aria-labelledby="footer-branding-title"
-          className="max-w-xl rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.72)] p-6 text-left"
+          className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.72)] p-6 text-left md:col-span-2 md:max-w-none xl:col-span-1 xl:max-w-xl"
         >
           <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[var(--accent)]">
             Branding

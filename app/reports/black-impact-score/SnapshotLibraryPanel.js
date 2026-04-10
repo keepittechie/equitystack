@@ -98,14 +98,34 @@ export default function SnapshotLibraryPanel({ currentSnapshot }) {
   const [statusMessage, setStatusMessage] = useState("");
 
   useEffect(() => {
+    let cancelled = false;
+
     try {
       const items = readSnapshots();
-      setSnapshots(items);
-      setStorageReady(typeof window !== "undefined" && Boolean(window.localStorage));
+      const ready = typeof window !== "undefined" && Boolean(window.localStorage);
+
+      queueMicrotask(() => {
+        if (cancelled) {
+          return;
+        }
+
+        setSnapshots(items);
+        setStorageReady(ready);
+      });
     } catch {
-      setStorageReady(false);
-      setSnapshots([]);
+      queueMicrotask(() => {
+        if (cancelled) {
+          return;
+        }
+
+        setStorageReady(false);
+        setSnapshots([]);
+      });
     }
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const currentSnapshotRecord = useMemo(

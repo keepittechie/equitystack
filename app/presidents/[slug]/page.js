@@ -138,9 +138,9 @@ export default async function PresidentProfilePage({ params }) {
             detail: "Promise tracker performance stays separate from the impact score.",
           },
           {
-            label: "Source footprint",
+            label: "Source references",
             value: promiseTracker.visible_source_count ?? 0,
-            detail: "Evidence access stays visible on the profile rather than buried in methodology.",
+            detail: "These totals reflect visible promise-tracker source references, not guaranteed unique source rows.",
           },
         ]}
       />
@@ -195,7 +195,7 @@ export default async function PresidentProfilePage({ params }) {
         <div className="space-y-5">
           <SourceTrustPanel
             sourceCount={promiseTracker.visible_source_count}
-            sourceQuality="Profile evidence footprint"
+            sourceQuality="Profile evidence references"
             confidenceLabel={president.direct_score_confidence || president.score_confidence}
             completenessLabel={`${promiseTracker.visible_outcome_count || 0} outcomes in visible promise set`}
             summary="Direct score remains the headline metric. Systemic score is shown nearby when downstream judicial attribution exists and is strong enough to defend."

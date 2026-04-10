@@ -21,11 +21,11 @@ export default function PromiseStatusLegend({
   statuses = ["Delivered", "In Progress", "Partial", "Blocked", "Failed"],
 }) {
   return (
-    <aside className="rounded-[1.5rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+    <aside className="h-full rounded-[1.5rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 md:p-6">
       <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--accent)]">
         Status legend
       </p>
-      <h3 className="mt-3 text-lg font-semibold text-white">
+      <h3 className="mt-3 text-base font-semibold text-white md:text-lg">
         How Promise Status is assigned
       </h3>
       <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
@@ -36,7 +36,7 @@ export default function PromiseStatusLegend({
         {statuses.map((status) => (
           <div
             key={status}
-            className="rounded-[1.05rem] border border-white/8 bg-white/5 px-4 py-3"
+            className="rounded-[1.05rem] border border-white/8 bg-white/5 px-4 py-3.5"
           >
             <p className="text-sm font-semibold text-white">{status}</p>
             <p className="mt-1 text-sm leading-7 text-[var(--ink-soft)]">

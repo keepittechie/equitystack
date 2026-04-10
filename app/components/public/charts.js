@@ -50,14 +50,14 @@ function TooltipShell({ active, payload, label }) {
 
 export function ReportChartBlock({ title, description, children }) {
   return (
-    <section className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
-      <div className="mb-5">
-        <h3 className="text-lg font-semibold text-white">{title}</h3>
+    <section className="flex h-full flex-col rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 md:p-6">
+      <div className="mb-5 flex-none">
+        <h3 className="text-base font-semibold text-white md:text-lg">{title}</h3>
         {description ? (
           <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">{description}</p>
         ) : null}
       </div>
-      <div className="h-[300px] w-full">{children}</div>
+      <div className="mt-auto h-[280px] w-full md:h-[320px] xl:h-[340px]">{children}</div>
     </section>
   );
 }
@@ -145,4 +145,3 @@ export function CategoryImpactChart({
     </ReportChartBlock>
   );
 }
-

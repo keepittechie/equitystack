@@ -25,17 +25,16 @@ export const metadata = buildPageMetadata({
   path: "/promises",
 });
 
-function countStatuses(items = []) {
-  return items.reduce((totals, item) => {
-    totals[item.status] = (totals[item.status] || 0) + 1;
-    return totals;
-  }, {});
-}
-
 export default async function PromisesPage({ searchParams }) {
   const resolvedSearchParams = (await searchParams) || {};
   const data = await fetchPromiseIndexData(resolvedSearchParams);
-  const statusCounts = data.statusCounts || countStatuses(data.items || []);
+  const statusCounts = data.statusCounts || {
+    Delivered: 0,
+    "In Progress": 0,
+    Partial: 0,
+    Blocked: 0,
+    Failed: 0,
+  };
 
   return (
     <main className="space-y-10">

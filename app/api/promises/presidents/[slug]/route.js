@@ -9,7 +9,7 @@ export async function GET(request, { params }) {
   try {
     const { slug } = await params;
     const { searchParams } = new URL(request.url);
-    const showAll = searchParams.get("show_all") === "1";
+    const showAll = searchParams.get("show_all") !== "0";
     const president = await fetchPromisePresidentDetail(slug, { showAll });
 
     if (!president) {

@@ -121,7 +121,7 @@ export default async function HomePage() {
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <KpiCard
-          label="Unified outcomes"
+          label="Tracked outcomes"
           value={readiness.total_policy_outcomes}
           delta={`${readiness.current_admin_outcomes} current-admin / ${readiness.legislative_outcomes} legislative`}
           description="The public scoring and evidence layer runs on unified policy outcomes rather than disconnected record silos."
@@ -140,7 +140,7 @@ export default async function HomePage() {
           description="Policy intent remains distinct from outcome, and missing classifications stay visible rather than guessed."
         />
         <KpiCard
-          label="Certification"
+          label="Certification status"
           value={readiness.certification_status}
           delta={`${pct(readiness.high_confidence_outcome_pct)} high confidence`}
           description="Trust status reflects whether the public dataset is complete, sourced, and internally consistent."

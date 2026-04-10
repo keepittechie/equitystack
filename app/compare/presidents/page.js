@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { buildPageMetadata } from "@/lib/metadata";
+import { resolvePresidentImageSrc } from "@/lib/president-image-paths";
 import { fetchComparePresidentsData } from "@/lib/public-site-data";
 import { Breadcrumbs } from "@/app/components/public/chrome";
 import {
@@ -13,6 +14,7 @@ import {
 import {
   CompareSelector,
   ComparisonMetricsTable,
+  PresidentPortrait,
 } from "@/app/components/public/entities";
 import TrustBar from "@/app/components/public/TrustBar";
 import ScoreExplanation from "@/app/components/public/ScoreExplanation";
@@ -75,7 +77,7 @@ export default async function ComparePresidentsPage({ searchParams }) {
 
       <TrustBar />
 
-      <section className="grid gap-6 xl:grid-cols-[0.92fr_1.08fr]">
+      <section className="grid items-start gap-6 xl:grid-cols-[0.92fr_1.08fr]">
         <form action="/compare/presidents" method="GET" className="space-y-4">
           <CompareSelector
             options={data.options || []}
@@ -86,7 +88,7 @@ export default async function ComparePresidentsPage({ searchParams }) {
             Compare selected presidents
           </button>
         </form>
-        <div className="space-y-5">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-1">
           <PageContextBlock
             description="This page compares up to four presidential records using direct Impact Score first, then systemic context, outcome counts, and Confidence."
             detail="Use it to identify meaningful differences, then open each profile for trend lines, evidence footprint, and record-level detail."
@@ -135,7 +137,7 @@ export default async function ComparePresidentsPage({ searchParams }) {
             ]}
           />
 
-          <section className="grid gap-6 xl:grid-cols-[1.08fr_0.92fr]">
+          <section className="grid items-start gap-6 xl:grid-cols-[1.08fr_0.92fr]">
             <div className="space-y-5">
               <SectionIntro
                 eyebrow="Interpretation"
@@ -168,24 +170,37 @@ export default async function ComparePresidentsPage({ searchParams }) {
               ) : null}
             </div>
             <div className="grid gap-4">
-              {(data.compared_presidents || []).map((item) => (
-                <article
-                  key={item.president_slug || item.president_id}
-                  className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5"
-                >
+              {(data.compared_presidents || []).map((item) => {
+                const imageSrc = resolvePresidentImageSrc({
+                  presidentSlug: item.president_slug,
+                  presidentName: item.president_name,
+                });
+
+                return (
+                  <article
+                    key={item.president_slug || item.president_id}
+                    className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 md:p-6"
+                  >
                   <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
-                        {item.president_party || "Historical record"}
-                      </p>
-                      <h2 className="mt-2 text-xl font-semibold text-white">
-                        {item.president_name}
-                      </h2>
-                      {item.termLabel ? (
-                        <p className="mt-1 text-xs uppercase tracking-[0.18em] text-[var(--ink-muted)]">
-                          {item.termLabel}
+                    <div className="flex items-start gap-4">
+                      <PresidentPortrait
+                        imageSrc={imageSrc}
+                        alt={item.president_name || "President portrait"}
+                        context="compare"
+                      />
+                      <div>
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+                          {item.president_party || "Historical record"}
                         </p>
-                      ) : null}
+                        <h2 className="mt-2 text-xl font-semibold text-white">
+                          {item.president_name}
+                        </h2>
+                        {item.termLabel ? (
+                          <p className="mt-1 text-xs uppercase tracking-[0.18em] text-[var(--ink-muted)]">
+                            {item.termLabel}
+                          </p>
+                        ) : null}
+                      </div>
                     </div>
                     <ScoreBadge value={formatScore(item.direct_normalized_score)} label="Direct" />
                   </div>
@@ -224,8 +239,9 @@ export default async function ComparePresidentsPage({ searchParams }) {
                   >
                     Open profile
                   </Link>
-                </article>
-              ))}
+                  </article>
+                );
+              })}
             </div>
           </section>
         </>

@@ -23,7 +23,7 @@ async function getPromises(searchParams) {
   if (searchParams.topic) params.set("topic", searchParams.topic);
   if (searchParams.page) params.set("page", searchParams.page);
   if (searchParams.sort) params.set("sort", searchParams.sort);
-  if (searchParams.show_all === "1") params.set("show_all", "1");
+  if (searchParams.show_all === "0") params.set("show_all", "0");
 
   const query = params.toString();
   return fetchInternalJson(`/api/promises${query ? `?${query}` : ""}`, {
@@ -92,8 +92,8 @@ function buildShowAllHref(searchParams, showAll) {
     }
   });
 
-  if (showAll) {
-    params.set("show_all", "1");
+  if (!showAll) {
+    params.set("show_all", "0");
   }
 
   const query = params.toString();
@@ -113,8 +113,8 @@ function getActiveFilters(searchParams) {
   if (searchParams.topic) {
     filters.push({ key: "topic", label: `Topic: ${searchParams.topic}` });
   }
-  if (searchParams.show_all === "1") {
-    filters.push({ key: "show_all", label: "Showing all promises" });
+  if (searchParams.show_all === "0") {
+    filters.push({ key: "show_all", label: "Showing prioritized promises" });
   }
 
   return filters;
@@ -145,7 +145,7 @@ export default async function AllPromisesPage({ searchParams }) {
     has_next: false,
   };
   const activeFilters = getActiveFilters(resolvedSearchParams);
-  const showAll = resolvedSearchParams.show_all === "1";
+  const showAll = resolvedSearchParams.show_all !== "0";
 
   return (
     <main className="max-w-7xl mx-auto p-6">
@@ -154,13 +154,13 @@ export default async function AllPromisesPage({ searchParams }) {
           <p className="eyebrow mb-4">Promise Tracker</p>
           <h1 className="text-4xl md:text-5xl font-bold">All Promise Records</h1>
           <p className="text-base md:text-lg text-[var(--ink-soft)] mt-4 leading-8 max-w-3xl">
-            Browse tracked promise records across presidents. The default view prioritizes promises
-            with direct or meaningful downstream Black-community impact, with an option to show all records.
+            Browse tracked promise records across presidents. The default public view shows the full public dataset,
+            with an option to switch into the prioritized relevance subset when a tighter editorial view is useful.
           </p>
           <div className="mt-5 flex flex-wrap gap-2">
             <MetaPill>{data.pagination?.total || 0} tracked promises</MetaPill>
             <MetaPill>Distinct source counts across promise, action, and outcome records</MetaPill>
-            <MetaPill>High and Medium relevance appear by default</MetaPill>
+            <MetaPill>{showAll ? "Full public promise dataset" : "Prioritized relevance subset"}</MetaPill>
           </div>
         </div>
       </section>
@@ -267,11 +267,11 @@ export default async function AllPromisesPage({ searchParams }) {
               <input
                 type="checkbox"
                 name="show_all"
-                value="1"
-                defaultChecked={showAll}
+                value="0"
+                defaultChecked={!showAll}
                 className="rounded border-[rgba(120,53,15,0.24)]"
               />
-              Show all promises
+              Show prioritized view
             </label>
             <button
               type="submit"

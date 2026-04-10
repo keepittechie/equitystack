@@ -15,7 +15,7 @@ import PresidentAvatar from "@/app/components/PresidentAvatar";
 
 async function getPromisePresident(slug, showAll) {
   const params = new URLSearchParams();
-  if (showAll) params.set("show_all", "1");
+  if (!showAll) params.set("show_all", "0");
 
   return fetchInternalJson(`/api/promises/presidents/${slug}${params.toString() ? `?${params.toString()}` : ""}`, {
     ...withRevalidate(PUBLIC_REVALIDATE_SECONDS),
@@ -26,7 +26,7 @@ async function getPromisePresident(slug, showAll) {
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
-  const president = await getPromisePresident(slug, false);
+  const president = await getPromisePresident(slug, true);
 
   if (!president) {
     return buildPageMetadata({
@@ -110,7 +110,7 @@ function promiseCardClasses(promise) {
 export default async function PromisePresidentPage({ params, searchParams }) {
   const { slug } = await params;
   const resolvedSearchParams = (await searchParams) || {};
-  const showAll = resolvedSearchParams.show_all === "1";
+  const showAll = resolvedSearchParams.show_all !== "0";
   const president = await getPromisePresident(slug, showAll);
 
   if (!president) {
@@ -133,13 +133,13 @@ export default async function PromisePresidentPage({ params, searchParams }) {
           Back to Presidency Terms
         </Link>
         <Link
-          href={showAll ? "/promises/all?show_all=1" : "/promises/all"}
+          href={showAll ? "/promises/all" : "/promises/all?show_all=0"}
           className="inline-flex items-center rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
         >
           Browse All Promise Records
         </Link>
         <Link
-          href={showAll ? `/promises/president/${slug}` : `/promises/president/${slug}?show_all=1`}
+          href={showAll ? `/promises/president/${slug}?show_all=0` : `/promises/president/${slug}`}
           className="inline-flex items-center rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
         >
           {showAll ? "Show Prioritized View" : "Show All Promises"}
@@ -158,8 +158,8 @@ export default async function PromisePresidentPage({ params, searchParams }) {
             <p className="eyebrow mb-4">Promise Tracker</p>
             <h1 className="text-3xl md:text-4xl font-bold">{president.president}</h1>
             <p className="text-base md:text-lg text-[var(--ink-soft)] mt-4 leading-8">
-              Promise Tracker groups this presidency term&apos;s records by status. The default view prioritizes
-              promises with direct or meaningful downstream Black-community impact while keeping repeated administrations distinct.
+              Promise Tracker groups this presidency term&apos;s records by status. The default public view shows the full
+              tracked promise set for this term, while the prioritized view narrows to higher-relevance records when needed.
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
               {president.president_party ? <MetaPill>{president.president_party}</MetaPill> : null}
@@ -175,7 +175,7 @@ export default async function PromisePresidentPage({ params, searchParams }) {
             <p className="text-sm text-[var(--ink-soft)] mt-4 leading-7">
               {showAll
                 ? "All tracked promises for this president are visible, including secondary and deprioritized records."
-                : "Low-relevance and overlapping records remain accessible through Show All."}
+                : "This prioritized view narrows the term to higher-relevance records while keeping the full set available."}
             </p>
           </div>
           <PresidentAvatar

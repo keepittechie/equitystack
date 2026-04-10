@@ -4,7 +4,7 @@ export default function InsightCard({ title = "Insight", text }) {
   }
 
   return (
-    <article className="rounded-[1.5rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+    <article className="h-full rounded-[1.5rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 md:p-6">
       <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--accent)]">
         {title}
       </p>

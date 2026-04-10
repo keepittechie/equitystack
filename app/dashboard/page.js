@@ -32,13 +32,6 @@ function pct(value) {
   return `${Math.round(Number(value || 0) * 100)}%`;
 }
 
-function countPromiseStatuses(items = []) {
-  return items.reduce((totals, item) => {
-    totals[item.status] = (totals[item.status] || 0) + 1;
-    return totals;
-  }, {});
-}
-
 export default async function DashboardPage({ searchParams }) {
   const resolvedSearchParams = (await searchParams) || {};
   const data = await fetchDashboardData(resolvedSearchParams);
@@ -58,7 +51,7 @@ export default async function DashboardPage({ searchParams }) {
     name: item.name,
     score: Number(item.avg_policy_impact_score || 0),
   }));
-  const promiseStatusCounts = countPromiseStatuses(data.promiseSnapshot.items || []);
+  const promiseStatusCounts = data.promiseSnapshot?.status_counts || {};
 
   return (
     <main className="space-y-8">
