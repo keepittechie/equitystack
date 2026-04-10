@@ -34,6 +34,7 @@ export default async function TimelinePage({ searchParams }) {
 
       <section className="hero-panel p-8 md:p-10 xl:p-14">
         <SectionIntro
+          as="h1"
           eyebrow="Timeline"
           title="See the record in chronological order."
           description="The timeline is a discovery layer for users who want sequence before synthesis. It mixes policies and promises in one public chronology so changes, reversals, and continuity become easier to follow."

@@ -69,6 +69,7 @@ export default async function ComparePoliciesPage({ searchParams }) {
 
       <section className="hero-panel p-8 md:p-10 xl:p-14">
         <SectionIntro
+          as="h1"
           eyebrow="Policy comparison"
           title="Put policy records next to each other and keep the evidence visible."
           description="Policy comparison is most useful when the records are meaningfully comparable. The page keeps source count, confidence, and direction close to the score so users can see when the evidence base is thin."

@@ -38,6 +38,7 @@ export default async function SourcesPage({ searchParams }) {
 
       <section className="hero-panel p-8 md:p-10 xl:p-14">
         <SectionIntro
+          as="h1"
           eyebrow="Source library"
           title="Transparency should be browseable, not hidden behind the record."
           description="The source library gives users a direct view into the public evidence base behind policies, promises, and outcomes. Use it to inspect source types, publishers, linked-record counts, and coverage depth."

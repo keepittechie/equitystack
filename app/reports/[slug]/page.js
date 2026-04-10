@@ -103,6 +103,7 @@ export default async function ReportDetailPage({ params }) {
 
       <section className="hero-panel p-8 md:p-10 xl:p-14">
         <SectionIntro
+          as="h1"
           eyebrow={report.category || "Report"}
           title={report.title}
           description={report.summary}
@@ -225,7 +226,10 @@ export default async function ReportDetailPage({ params }) {
             description="Use recent changes to jump directly into the most recent records contributing to this analytical view."
           />
           <RecentPolicyChangesTable
-            items={report.latestUpdates}
+            items={report.latestUpdates.map((item) => ({
+              ...item,
+              record_type: "Policy",
+            }))}
             buildHref={(item) => `/policies/${item.slug || item.id}`}
           />
         </section>

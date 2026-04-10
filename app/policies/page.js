@@ -52,6 +52,7 @@ export default async function PoliciesPage({ searchParams }) {
 
       <section className="hero-panel p-8 md:p-10 xl:p-14">
         <SectionIntro
+          as="h1"
           eyebrow="Policy explorer"
           title="Move from national summary into filterable policy evidence."
           description="The policy explorer is built for civic research: search first, filter by direction and category, and switch between cards and a sortable table from the same public record."

@@ -33,6 +33,7 @@ export default async function AdministrationsPage({ searchParams }) {
 
       <section className="hero-panel p-8 md:p-10 xl:p-14">
         <SectionIntro
+          as="h1"
           eyebrow="Administration index"
           title="Track presidencies as governing administrations, not just score rows."
           description="Administration pages summarize promise throughput, outcome counts, impact direction, and recent governing activity in one place."

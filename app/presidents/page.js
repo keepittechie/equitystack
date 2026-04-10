@@ -82,6 +82,7 @@ export default async function PresidentsPage({ searchParams }) {
 
       <section className="hero-panel p-8 md:p-10 xl:p-14">
         <SectionIntro
+          as="h1"
           eyebrow="President records"
           title="Compare presidential impact records without losing evidence or context."
           description="The presidents index starts with the direct score, keeps systemic judicial effects separate, and surfaces confidence, outcome counts, and narrative drivers before you open a profile."

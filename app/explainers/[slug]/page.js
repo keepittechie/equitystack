@@ -111,6 +111,7 @@ export default async function ExplainerDetailPage({ params }) {
 
       <section className="hero-panel p-8 md:p-10 xl:p-14">
         <SectionIntro
+          as="h1"
           eyebrow={explainer.category || "Explainer"}
           title={explainer.title}
           description={

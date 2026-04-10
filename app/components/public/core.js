@@ -6,6 +6,7 @@ export function SectionIntro({
   description,
   actions = null,
   align = "default",
+  as: HeadingTag = "h2",
 }) {
   return (
     <div
@@ -19,9 +20,9 @@ export function SectionIntro({
             {eyebrow}
           </p>
         ) : null}
-        <h1 className="mt-4 text-[clamp(2.3rem,5vw,4.6rem)] font-semibold leading-[0.95] tracking-[-0.05em] text-white">
+        <HeadingTag className="mt-4 text-[clamp(2.3rem,5vw,4.6rem)] font-semibold leading-[0.95] tracking-[-0.05em] text-white">
           {title}
-        </h1>
+        </HeadingTag>
         {description ? (
           <p className="mt-5 max-w-3xl text-base leading-8 text-[var(--ink-soft)] md:text-lg">
             {description}

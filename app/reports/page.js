@@ -59,6 +59,7 @@ export default async function ReportsPage({ searchParams }) {
 
       <section className="hero-panel p-8 md:p-10 xl:p-14">
         <SectionIntro
+          as="h1"
           eyebrow="Analysis hub"
           title="Read the score, the evidence, and the wider historical context side by side."
           description="Reports are the public intelligence layer on top of the browseable database. Use them to move from headline interpretation into policy records, promise evidence, timelines, and methodology without losing the audit trail."
@@ -231,6 +232,7 @@ export default async function ReportsPage({ searchParams }) {
               date: item.impact_start_date || item.action_date || "—",
               impact_direction: item.impact_direction,
               slug: item.policy_slug || item.policy_id,
+              record_type: "Policy",
             }))}
           buildHref={(item) =>
             item.slug ? `/policies/${item.slug}` : "/policies"

@@ -35,6 +35,7 @@ export default async function SearchPage({ searchParams }) {
 
       <section className="hero-panel p-8 md:p-10 xl:p-14">
         <SectionIntro
+          as="h1"
           eyebrow="Universal search"
           title="Search across the public intelligence layer."
           description="Search is designed to move users across entity types without forcing them to know the database structure in advance. Policies, presidents, promises, reports, explainers, and sources should be discoverable from one query."

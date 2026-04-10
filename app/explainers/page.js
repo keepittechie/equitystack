@@ -40,6 +40,7 @@ export default async function ExplainersPage({ searchParams }) {
 
       <section className="hero-panel p-8 md:p-10 xl:p-14">
         <SectionIntro
+          as="h1"
           eyebrow="Explainers"
           title="Context pages that connect public arguments back to the record."
           description="Explainers are the bridge between broad public claims and the specific policies, promises, and sources inside EquityStack. They are meant to clarify the record, not replace it."

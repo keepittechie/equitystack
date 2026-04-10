@@ -41,6 +41,7 @@ export default function AboutPage() {
 
       <section className="hero-panel p-8 md:p-10 xl:p-14">
         <SectionIntro
+          as="h1"
           eyebrow="About EquityStack"
           title="A public platform for measuring how government action affected Black Americans."
           description="EquityStack is built to make policy impact readable, evidence-linked, and methodologically transparent. It aims to help users understand what the data shows, what it does not show, and how to interpret it responsibly."

@@ -73,6 +73,7 @@ export default async function AdministrationDetailPage({ params }) {
 
       <section className="hero-panel p-8 md:p-10 xl:p-14">
         <SectionIntro
+          as="h1"
           eyebrow="Administration profile"
           title={title}
           description="Administration pages summarize governing activity, promise throughput, and directional outcome mix in one place, then point back into the underlying public record."

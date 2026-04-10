@@ -66,6 +66,7 @@ export default async function ComparePresidentsPage({ searchParams }) {
 
       <section className="hero-panel p-8 md:p-10 xl:p-14">
         <SectionIntro
+          as="h1"
           eyebrow="President comparison"
           title="Compare presidents without blending away direct and systemic differences."
           description="This page keeps direct score as the headline, keeps systemic judicial effects separate, and shows confidence so low-coverage records do not look more absolute than they are."

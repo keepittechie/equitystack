@@ -43,6 +43,7 @@ export default async function PromisesPage({ searchParams }) {
 
       <section className="hero-panel p-8 md:p-10 xl:p-14">
         <SectionIntro
+          as="h1"
           eyebrow="Promise tracker"
           title="Follow statements, status changes, and linked outcomes in one place."
           description="Promise pages separate political intent from the documented outcomes that followed. That lets users move from stated commitment into evidence-backed delivery, partial progress, failure, or blockage."
@@ -61,7 +62,7 @@ export default async function PromisesPage({ searchParams }) {
 
       <PageContextBlock
         description="This page tracks public promises, their current status, and the documented actions or outcomes used to justify that status."
-        detail="Promise status is not the same as Impact Score. Open a promise record when you want to see the statement, rationale, evidence, and linked policy history together."
+        detail="Promise Status is not the same as Impact Score. Open a promise record when you want to see the statement, rationale, evidence, Confidence, and linked policy history together."
       />
 
       <section className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
@@ -123,14 +124,19 @@ export default async function PromisesPage({ searchParams }) {
             tone: "accent",
           },
           {
-            label: "Completed",
+            label: "Delivered",
             value: statusCounts.Delivered || 0,
-            description: "Promises with implemented policy action in the filtered result set.",
+            description: "Promises with documented implemented policy action in the filtered result set.",
           },
           {
-            label: "In progress",
+            label: "In Progress",
             value: statusCounts["In Progress"] || 0,
             description: "Promises with ongoing action or incomplete implementation.",
+          },
+          {
+            label: "Partial",
+            value: statusCounts.Partial || 0,
+            description: "Promises with meaningful but incomplete documented implementation.",
           },
           {
             label: "Blocked",
@@ -138,7 +144,7 @@ export default async function PromisesPage({ searchParams }) {
             description: "Promises that did not reach implementation because of visible barriers.",
           },
           {
-            label: "Broken or failed",
+            label: "Failed",
             value: statusCounts.Failed || 0,
             description: "Promises currently marked failed in the filtered result set.",
           },
@@ -158,10 +164,10 @@ export default async function PromisesPage({ searchParams }) {
           <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
             <h2 className="text-lg font-semibold text-white">Promise Tracker interpretation</h2>
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-              Promise Status shows what happened to a documented commitment. Linked policy action and policy outcomes show whether that commitment produced visible implementation in the current EquityStack dataset.
+              Promise Status shows what happened to a documented commitment. Linked policy action and Policy Outcomes show whether that commitment produced visible implementation in the current EquityStack dataset.
             </p>
           </div>
-          <MethodologyCallout description="Promise status tells users what happened to the commitment. It does not automatically imply a positive or negative real-world outcome without linked evidence." />
+          <MethodologyCallout description="Promise Status tells users what happened to the commitment. It does not automatically imply a positive or negative real-world outcome without linked Policy Outcomes and evidence." />
           <SectionIntro
             eyebrow="Latest status changes"
             title="Recent movement"
@@ -172,6 +178,7 @@ export default async function PromisesPage({ searchParams }) {
               ...item,
               date: item.latest_action_date || item.promise_date,
               impact_direction: item.status,
+              record_type: "Promise",
             }))}
             buildHref={(item) => `/promises/${item.slug}`}
           />

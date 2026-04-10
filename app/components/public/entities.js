@@ -40,6 +40,18 @@ function summarizeDirectionLeader(breakdown = {}) {
   return rows[0]?.[1] ? `${rows[0][0]}-leaning mix` : "Direction mix unavailable";
 }
 
+function RecordTypeBadge({ label }) {
+  if (!label) {
+    return null;
+  }
+
+  return (
+    <span className="inline-flex rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--accent)]">
+      {label}
+    </span>
+  );
+}
+
 export function PolicySearchBar({ defaultValue = "", action = "/policies" }) {
   return (
     <form action={action} method="GET" className="flex items-center gap-3 rounded-[1.4rem] border border-white/8 bg-[rgba(8,14,24,0.92)] px-4 py-3">
@@ -159,7 +171,7 @@ export function PolicyResultsTable({ items = [], buildHref }) {
               <th className="px-5 py-4">Policy</th>
               <th className="px-5 py-4">Year</th>
               <th className="px-5 py-4">President</th>
-              <th className="px-5 py-4">Direction</th>
+              <th className="px-5 py-4">Status / Direction</th>
               <th className="px-5 py-4">Impact Score</th>
               <th className="px-5 py-4">Sources</th>
             </tr>
@@ -529,7 +541,7 @@ export function PresidentPolicyTable({ items = [], buildHref }) {
         <table className="min-w-full text-left text-sm">
           <thead className="border-b border-white/8 text-[11px] uppercase tracking-[0.2em] text-[var(--ink-muted)]">
             <tr>
-              <th className="px-5 py-4">Policy</th>
+              <th className="px-5 py-4">Record</th>
               <th className="px-5 py-4">Topic</th>
               <th className="px-5 py-4">Status</th>
               <th className="px-5 py-4">Impact Score</th>
@@ -539,6 +551,9 @@ export function PresidentPolicyTable({ items = [], buildHref }) {
             {items.map((item, index) => (
               <tr key={`${item.id || item.slug}-${index}`} className="border-b border-white/6 last:border-b-0">
                 <td className="px-5 py-4">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <RecordTypeBadge label={item.record_type || (item.slug ? "Promise" : "Policy")} />
+                  </div>
                   <Link href={buildHref(item)} className="font-medium text-white hover:text-[var(--accent)]">
                     {item.title}
                   </Link>
@@ -571,11 +586,11 @@ export function PromiseResultsTable({ items = [], buildHref }) {
           <thead className="border-b border-white/8 text-[11px] uppercase tracking-[0.2em] text-[var(--ink-muted)]">
             <tr>
               <th className="px-5 py-4">Promise</th>
-              <th className="px-5 py-4">President</th>
               <th className="px-5 py-4">Status</th>
-              <th className="px-5 py-4">Topic</th>
+              <th className="px-5 py-4">Confidence</th>
               <th className="px-5 py-4">Policy Outcomes</th>
               <th className="px-5 py-4">Sources</th>
+              <th className="px-5 py-4">Detail</th>
             </tr>
           </thead>
           <tbody>
@@ -587,14 +602,24 @@ export function PromiseResultsTable({ items = [], buildHref }) {
                   </Link>
                   {item.summary ? <p className="mt-1 line-clamp-2 text-xs leading-6 text-[var(--ink-soft)]">{item.summary}</p> : null}
                   <p className="mt-1 text-xs leading-6 text-[var(--ink-muted)]">
-                    {item.president || "Historical record"}{item.topic ? ` • ${item.topic}` : ""}
+                    {item.president || "Historical record"}
+                    {item.topic ? ` • ${item.topic}` : ""}
+                    {item.promise_type ? ` • ${item.promise_type}` : ""}
                   </p>
                 </td>
-                <td className="px-5 py-4 text-[var(--ink-soft)]">{item.president}</td>
-                <td className="px-5 py-4 text-[var(--ink-soft)]">{item.status}</td>
-                <td className="px-5 py-4 text-[var(--ink-soft)]">{item.topic || "—"}</td>
+                <td className="px-5 py-4 text-[var(--ink-soft)]">
+                  <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5">
+                    {item.status || "Unknown"}
+                  </span>
+                </td>
+                <td className="px-5 py-4 text-[var(--ink-soft)]">{item.confidence_label || "—"}</td>
                 <td className="px-5 py-4 text-[var(--ink-soft)]">{item.outcome_count ?? item.action_count ?? 0}</td>
                 <td className="px-5 py-4 text-[var(--ink-soft)]">{item.source_count ?? 0}</td>
+                <td className="px-5 py-4">
+                  <Link href={buildHref(item)} className="text-[var(--accent)] hover:text-white">
+                    Open record
+                  </Link>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -906,6 +931,11 @@ export function RecentPolicyChangesTable({ items = [], buildHref }) {
             {items.map((item, index) => (
               <tr key={`${item.slug || item.id}-${index}`} className="border-b border-white/6 last:border-b-0">
                 <td className="px-5 py-4">
+                  {item.record_type ? (
+                    <div className="mb-2">
+                      <RecordTypeBadge label={item.record_type} />
+                    </div>
+                  ) : null}
                   <p className="font-medium text-white">{item.title}</p>
                   {item.summary ? <p className="mt-1 text-xs leading-6 text-[var(--ink-soft)]">{item.summary}</p> : null}
                 </td>

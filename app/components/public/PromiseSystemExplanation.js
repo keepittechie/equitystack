@@ -8,14 +8,15 @@ export default function PromiseSystemExplanation() {
         What a promise means in EquityStack
       </h3>
       <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-        A promise is a documented public commitment that EquityStack tracks
-        alongside policy action and policy outcomes. Promise status is assigned
-        from measurable implementation and outcome evidence, not rhetoric alone.
+        In EquityStack, a Promise is a documented public commitment tied to
+        policy action or intended government action. Promise tracking tests
+        whether that commitment translated into documented implementation and
+        measurable Policy Outcomes in the current dataset.
       </p>
       <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-        Promise pages are designed to show the link between the commitment, the
-        policy action that followed, and the resulting policy outcomes visible in
-        the current dataset.
+        Promise Status is assigned from visible evidence, implementation, and
+        linked outcomes, not rhetoric alone. Promise pages are designed to show
+        the path from the commitment to the policy action that followed.
       </p>
     </aside>
   );

@@ -37,6 +37,7 @@ export default function ComparePage() {
 
       <section className="hero-panel p-8 md:p-10 xl:p-14">
         <SectionIntro
+          as="h1"
           eyebrow="Compare"
           title="Put records side by side without flattening away context."
           description="Comparison pages are built to help users read differences in score, confidence, evidence, and direction mix more carefully. They are analytical pages, not ranking gimmicks."

@@ -88,6 +88,7 @@ export default function MethodologyPage() {
 
       <section className="hero-panel p-8 md:p-10 xl:p-14">
         <SectionIntro
+          as="h1"
           eyebrow="Methodology"
           title="Transparent scoring, visible uncertainty, and evidence-first interpretation."
           description="EquityStack is built as a public civic intelligence platform, which means every headline metric must stay close to methodology, evidence, and known limitations. This page explains the scoring architecture the site uses and what it does not claim."
@@ -144,6 +145,9 @@ export default function MethodologyPage() {
               </li>
             ))}
           </ul>
+          <div className="mt-5 rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4 text-sm leading-7 text-[var(--ink-soft)]">
+            Certification status is a concise trust signal. It reflects current source coverage, how complete the visible verification work is, and how much confidence the available evidence supports in the public dataset.
+          </div>
         </div>
         <div className="rounded-[1.8rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6">
           <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--accent)]">Limitations</p>
@@ -185,13 +189,13 @@ export default function MethodologyPage() {
           <h2 className="mt-4 text-2xl font-semibold text-white">Why promise status is shown separately</h2>
           <div className="mt-5 grid gap-3 text-sm leading-7 text-[var(--ink-soft)]">
             <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
-              Promise status tracks whether a public commitment was delivered, blocked, partially fulfilled, still in progress, or failed.
+              Promise tracking is based on documented commitments and observed Policy Outcomes in the current EquityStack dataset. Promise Status tracks whether a public commitment was delivered, blocked, partially fulfilled, still in progress, or failed.
             </div>
             <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
               Promise status does not automatically mean positive impact. A delivered promise can still have mixed or negative downstream effects, and EquityStack keeps that distinction visible.
             </div>
             <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
-              Promise pages therefore sit beside policy and score pages, not on top of them.
+              Promise Status assignments are constrained by available source coverage and implementation evidence. Promise pages therefore sit beside policy and score pages, not on top of them.
             </div>
           </div>
         </div>

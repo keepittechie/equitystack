@@ -307,16 +307,43 @@ export default async function PresidentProfilePage({ params }) {
           />
           <PromiseSystemExplanation />
           <PresidentMetricsRow
-            items={Object.entries(promiseStatusSnapshot || {}).map(([label, value]) => ({
-              label,
-              value,
-              detail: "Promise status count in the currently visible tracker set.",
-            }))}
+            items={[
+              {
+                label: "Promises tracked",
+                value: promiseTracker.visible_promise_count ?? 0,
+                detail: "Visible promise records in the current tracker set for this presidential profile.",
+              },
+              {
+                label: "Delivered",
+                value: promiseStatusSnapshot.Delivered ?? 0,
+                detail: "Promises with documented implemented policy action.",
+              },
+              {
+                label: "In Progress",
+                value: promiseStatusSnapshot["In Progress"] ?? 0,
+                detail: "Promises with ongoing or incomplete implementation.",
+              },
+              {
+                label: "Partial",
+                value: promiseStatusSnapshot.Partial ?? 0,
+                detail: "Promises with meaningful but incomplete documented implementation.",
+              },
+              {
+                label: "Blocked",
+                value: promiseStatusSnapshot.Blocked ?? 0,
+                detail: "Promises that did not reach implementation because of visible barriers.",
+              },
+              {
+                label: "Failed",
+                value: promiseStatusSnapshot.Failed ?? 0,
+                detail: "Promises not fulfilled in the current documented record.",
+              },
+            ]}
           />
           <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
             <h3 className="text-lg font-semibold text-white">How to interpret promise outcomes</h3>
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-              Promise outcomes provide context for how stated goals translated into policy action. They help explain implementation, but they are not the same thing as presidential Impact Score.
+              Promise outcomes provide context for how stated goals translated into documented policy action. They help explain implementation, but they are not the same thing as presidential Impact Score.
             </p>
           </div>
         </div>

@@ -7,6 +7,7 @@ import {
   ImpactOverviewCards,
   MethodologyCallout,
   PresidentScoreMethodologyNote,
+  SectionIntro,
   SourceTrustPanel,
 } from "@/app/components/public/core";
 import InsightCard from "@/app/components/public/InsightCard";
@@ -70,13 +71,13 @@ export default async function DashboardPage({ searchParams }) {
             Command-center view of Black policy impact.
           </h1>
           <p className="mt-5 text-base leading-8 text-[var(--ink-soft)] md:text-lg">
-            Use this page the way you would use a civic intelligence dashboard: filter the dataset, scan the headline metrics,
+            Use this page the way you would use a civic intelligence dashboard: filter promise tracker data, scan the headline metrics,
             open major shifts, then move into policy, president, promise, and source detail.
           </p>
         </div>
       </section>
 
-      <DashboardFilterBar helpText="Filters narrow the promise snapshot and latest updates without hiding methodology or evidence access.">
+      <DashboardFilterBar helpText="These filters narrow promise tracker data and recent promise updates without changing the broader dataset summaries on this page.">
         <form action="/dashboard" className="grid flex-1 gap-3 md:grid-cols-4">
           <input
             type="search"
@@ -262,7 +263,10 @@ export default async function DashboardPage({ searchParams }) {
             </Link>
           </div>
           <RecentPolicyChangesTable
-            items={data.topPositivePolicies}
+            items={data.topPositivePolicies.map((item) => ({
+              ...item,
+              record_type: "Policy",
+            }))}
             buildHref={(item) => `/policies/${buildPolicySlug(item)}`}
           />
         </div>
@@ -280,7 +284,10 @@ export default async function DashboardPage({ searchParams }) {
             </Link>
           </div>
           <RecentPolicyChangesTable
-            items={data.topNegativePolicies}
+            items={data.topNegativePolicies.map((item) => ({
+              ...item,
+              record_type: "Policy",
+            }))}
             buildHref={(item) => `/policies/${buildPolicySlug(item)}`}
           />
         </div>
@@ -300,7 +307,10 @@ export default async function DashboardPage({ searchParams }) {
             </Link>
           </div>
           <RecentPolicyChangesTable
-            items={data.topMixedPolicies}
+            items={data.topMixedPolicies.map((item) => ({
+              ...item,
+              record_type: "Policy",
+            }))}
             buildHref={(item) => `/policies/${buildPolicySlug(item)}`}
           />
         </section>
@@ -310,7 +320,10 @@ export default async function DashboardPage({ searchParams }) {
         <div className="space-y-4">
           <h2 className="text-2xl font-semibold text-white">Latest policy updates</h2>
           <RecentPolicyChangesTable
-            items={data.latestPolicyUpdates}
+            items={data.latestPolicyUpdates.map((item) => ({
+              ...item,
+              record_type: "Policy",
+            }))}
             buildHref={(item) => `/policies/${buildPolicySlug(item)}`}
           />
         </div>
@@ -319,15 +332,21 @@ export default async function DashboardPage({ searchParams }) {
           <div>
             <h2 className="text-2xl font-semibold text-white">Promise Tracker Overview</h2>
             <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
-              Promise records remain visible in the dashboard because they show what was promised, what action followed, and whether that produced visible policy outcomes in the current dataset.
+              Promise tracking matters because it shows what was promised, what action followed, and whether that produced visible Policy Outcomes in the current dataset.
             </p>
           </div>
           <div className="grid gap-3 md:grid-cols-2">
             <div className="rounded-[1.2rem] border border-white/8 bg-white/5 p-4">
               <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
-                Completed
+                Delivered
               </p>
               <p className="mt-2 text-2xl font-semibold text-white">{promiseStatusCounts.Delivered || 0}</p>
+            </div>
+            <div className="rounded-[1.2rem] border border-white/8 bg-white/5 p-4">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+                Partial
+              </p>
+              <p className="mt-2 text-2xl font-semibold text-white">{promiseStatusCounts.Partial || 0}</p>
             </div>
             <div className="rounded-[1.2rem] border border-white/8 bg-white/5 p-4">
               <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
@@ -343,14 +362,31 @@ export default async function DashboardPage({ searchParams }) {
             </div>
             <div className="rounded-[1.2rem] border border-white/8 bg-white/5 p-4">
               <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
-                Broken or failed
+                Failed
               </p>
               <p className="mt-2 text-2xl font-semibold text-white">{promiseStatusCounts.Failed || 0}</p>
             </div>
           </div>
           <PromiseSystemExplanation />
           <PromiseStatusLegend />
-          <PromiseResultsTable items={data.promiseSnapshot.items || []} buildHref={(item) => `/promises/${item.slug}`} />
+          <div className="space-y-4">
+            <div>
+              <h3 className="text-lg font-semibold text-white">Recent Promise Status changes</h3>
+              <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
+                Recent updates help users move from the Promise Tracker summary into the most recently changed records.
+              </p>
+            </div>
+            <RecentPolicyChangesTable
+              items={(data.promiseLatestChanges || []).map((item) => ({
+                ...item,
+                date: item.latest_action_date || item.promise_date,
+                impact_direction: item.status,
+                record_type: "Promise",
+              }))}
+              buildHref={(item) => `/promises/${item.slug}`}
+            />
+          </div>
+          <PromiseResultsTable items={(data.promiseSnapshot.items || []).slice(0, 6)} buildHref={(item) => `/promises/${item.slug}`} />
           <div className="flex flex-wrap gap-2">
             <Link href="/promises" className="public-button-secondary">
               Open Promise Tracker

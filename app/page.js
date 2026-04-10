@@ -23,7 +23,7 @@ function pct(value) {
 }
 
 export default async function HomePage() {
-  const { scores, readiness, featuredPolicies, recentPromises, presidents } = await fetchHomePageData();
+  const { scores, readiness, featuredPolicies, recentPromises, presidents, categorySummary } = await fetchHomePageData();
   const trend = scores.metadata?.impact_trend || { score_by_year: [] };
   const trust = scores.metadata?.trust || {};
   const directionData = ["Positive", "Mixed", "Negative", "Blocked"].map((name, index) => ({
@@ -36,9 +36,12 @@ export default async function HomePage() {
     ),
     color: ["#84f7c6", "#fbbf24", "#ff8a8a", "#8da1b9"][index],
   }));
-  const topicData = (scores.presidents[0]?.breakdowns?.by_topic || [])
+  const topicData = (categorySummary || [])
     .slice(0, 6)
-    .map((item) => ({ name: item.topic, score: Number(item.raw_score_total || 0) }));
+    .map((item) => ({
+      name: item.name,
+      score: Number(item.net_weighted_impact || 0),
+    }));
 
   return (
     <main className="space-y-10">
@@ -170,8 +173,8 @@ export default async function HomePage() {
       <section className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
         <CategoryImpactChart
           data={topicData}
-          title="Leading topic contributions"
-          description="Top issue areas currently shaping the direct score."
+          title="Leading category contributions"
+          description="Top policy categories currently shaping the measured dataset-wide impact."
         />
         <MethodologyCallout description="The Black Impact Score is always paired with inclusion counts, confidence, source coverage, and limitations. Read the method before treating a number as a conclusion." />
       </section>
@@ -183,7 +186,16 @@ export default async function HomePage() {
           description="Recent records give you the fastest path from system summary into underlying detail and evidence."
         />
         <RecentPolicyChangesTable
-          items={[...recentPromises.slice(0, 5), ...featuredPolicies.slice(0, 5)].slice(0, 8)}
+          items={[
+            ...recentPromises.slice(0, 5).map((item) => ({
+              ...item,
+              record_type: "Promise",
+            })),
+            ...featuredPolicies.slice(0, 5).map((item) => ({
+              ...item,
+              record_type: "Policy",
+            })),
+          ].slice(0, 8)}
           buildHref={(item) => (item.slug ? `/promises/${item.slug}` : `/policies/${buildPolicySlug(item)}`)}
         />
       </section>
