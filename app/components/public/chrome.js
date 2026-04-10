@@ -85,7 +85,7 @@ export function GlobalSearch({
       aria-label="Search EquityStack"
       className={`flex items-center gap-2 rounded-full border border-white/10 bg-white/5 ${
         compact ? "px-3 py-2" : "px-4 py-3"
-      } ${expanded ? "w-full" : ""} ${className} transition-[width,border-color,background-color] focus-within:border-[rgba(132,247,198,0.32)] focus-within:bg-white/8`}
+      } ${expanded ? "w-full" : ""} ${className} transition-[border-color,background-color,transform] focus-within:border-[rgba(132,247,198,0.32)] focus-within:bg-white/8`}
     >
       <label htmlFor={`global-search-${idSuffix}`} className="sr-only">
         Search policies, presidents, promises, reports, and sources
@@ -108,7 +108,7 @@ export function PrimaryNav({ mobile = false }) {
   return (
     <nav
       aria-label={mobile ? "Mobile primary navigation" : "Primary navigation"}
-      className={mobile ? "grid gap-2" : "hidden min-w-0 items-center justify-center gap-1 xl:flex"}
+      className={mobile ? "grid gap-2" : "hidden shrink-0 items-center justify-center gap-1 xl:flex xl:flex-nowrap"}
     >
       {PRIMARY_NAV_ITEMS.map((item) => {
         const active = isActive(pathname, item.href);
@@ -146,10 +146,10 @@ export function SiteHeader() {
   }, [pathname]);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-white/8 bg-[rgba(4,10,18,0.88)] backdrop-blur-xl">
+    <header className="sticky top-0 z-50 overflow-hidden border-b border-white/8 bg-[rgba(4,10,18,0.88)] backdrop-blur-xl">
       <div className="mx-auto max-w-[1500px] px-5 py-4 xl:px-8">
-        <div className="flex items-center gap-3 xl:gap-6">
-          <div className="min-w-0 flex-1 xl:basis-[28%]">
+        <div className="flex items-center gap-3 xl:grid xl:grid-cols-[minmax(0,320px)_minmax(0,1fr)_minmax(0,460px)] xl:items-center xl:gap-6">
+          <div className="min-w-0 flex-1 xl:min-w-0 xl:overflow-hidden">
             <Link href="/" className="flex min-w-0 items-center gap-3">
               <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-2xl border border-white/10 bg-[rgba(17,29,46,0.9)] shadow-[0_12px_30px_rgba(0,0,0,0.25)]">
                 <Image src="/logo-v2.png" alt="EquityStack" fill className="object-contain p-1.5" priority />
@@ -165,17 +165,17 @@ export function SiteHeader() {
             </Link>
           </div>
 
-          <div className="hidden min-w-0 flex-1 justify-center xl:flex">
+          <div className="hidden min-w-0 overflow-hidden xl:flex xl:min-w-0 xl:justify-center">
             <PrimaryNav />
           </div>
 
-          <div className="ml-auto flex min-w-0 items-center justify-end gap-2 md:gap-3 xl:basis-[28%]">
-            <div className="hidden min-w-0 xl:flex">
+          <div className="ml-auto flex min-w-0 items-center justify-end gap-2 overflow-hidden md:gap-3 xl:ml-0 xl:min-w-0 xl:max-w-[460px] xl:justify-end">
+            <div className="hidden min-w-0 flex-none xl:flex xl:w-full xl:max-w-[340px]">
               <GlobalSearch
                 compact
                 idSuffix="desktop"
                 placeholder="Search policies, presidents, reports"
-                className="w-[15rem] max-w-[20rem] focus-within:w-[20rem]"
+                className="w-full max-w-[340px] flex-none"
               />
             </div>
 
