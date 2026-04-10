@@ -9,6 +9,7 @@ import {
   PresidentScoreMethodologyNote,
   SourceTrustPanel,
 } from "@/app/components/public/core";
+import InsightCard from "@/app/components/public/InsightCard";
 import {
   PresidentRankingBoard,
   PromiseResultsTable,
@@ -129,6 +130,25 @@ export default async function DashboardPage({ searchParams }) {
           },
         ]}
       />
+
+      {data.insights?.length ? (
+        <section className="space-y-5">
+          <SectionIntro
+            eyebrow="Key insights"
+            title="Key insights from the data"
+            description="These observations are derived from the current public dataset and are intended to help users see broad patterns before opening the underlying records."
+          />
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            {data.insights.map((item, index) => (
+              <InsightCard
+                key={`${item.title}-${index}`}
+                title={item.title}
+                text={item.text}
+              />
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       <section className="grid gap-4 xl:grid-cols-3">
         {[

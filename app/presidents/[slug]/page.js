@@ -15,6 +15,7 @@ import {
 import TrustBar from "@/app/components/public/TrustBar";
 import PromiseSystemExplanation from "@/app/components/public/PromiseSystemExplanation";
 import ScoreExplanation from "@/app/components/public/ScoreExplanation";
+import InsightCard from "@/app/components/public/InsightCard";
 import {
   PresidentHero,
   PresidentMetricsRow,
@@ -202,6 +203,12 @@ export default async function PresidentProfilePage({ params }) {
           <PresidentScoreMethodologyNote />
           <CitationNote description="When referencing this presidential profile, cite the president name, page title, EquityStack, the page URL, and your access date. Treat the profile as a structured summary of the current dataset and its current evidence coverage." />
           <ScoreExplanation title="How to interpret this presidential profile" />
+          {profile.profileInsight ? (
+            <InsightCard
+              title={profile.profileInsight.title}
+              text={profile.profileInsight.text}
+            />
+          ) : null}
           <MethodologyCallout
             description="Direct score reflects direct policy action. Systemic score reflects judicial or appointment-driven downstream impact. They stay separate on purpose."
             linkLabel="Read score architecture"

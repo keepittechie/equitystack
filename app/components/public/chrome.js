@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const PRIMARY_NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard" },
@@ -11,8 +12,6 @@ const PRIMARY_NAV_ITEMS = [
   { href: "/promises", label: "Promises" },
   { href: "/reports", label: "Reports" },
   { href: "/timeline", label: "Timeline" },
-  { href: "/about", label: "About" },
-  { href: "/methodology", label: "Methodology" },
 ];
 
 function isActive(pathname, href) {
@@ -23,7 +22,62 @@ function isActive(pathname, href) {
   return pathname === href || pathname?.startsWith(`${href}/`);
 }
 
-export function GlobalSearch({ compact = false }) {
+function SearchIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      className="h-4 w-4 text-[var(--ink-muted)]"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+    >
+      <circle cx="11" cy="11" r="7" />
+      <path d="m20 20-3.5-3.5" />
+    </svg>
+  );
+}
+
+function MenuIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      className="h-4 w-4 text-[var(--ink-soft)]"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+    >
+      <path d="M4 7h16" />
+      <path d="M4 12h16" />
+      <path d="M4 17h16" />
+    </svg>
+  );
+}
+
+function CloseIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      className="h-4 w-4 text-[var(--ink-soft)]"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+    >
+      <path d="M6 6l12 12" />
+      <path d="M18 6 6 18" />
+    </svg>
+  );
+}
+
+export function GlobalSearch({
+  compact = false,
+  expanded = false,
+  idSuffix = "full",
+  placeholder = "Search the public dataset",
+  className = "",
+}) {
   return (
     <form
       action="/search"
@@ -31,27 +85,17 @@ export function GlobalSearch({ compact = false }) {
       aria-label="Search EquityStack"
       className={`flex items-center gap-2 rounded-full border border-white/10 bg-white/5 ${
         compact ? "px-3 py-2" : "px-4 py-3"
-      }`}
+      } ${expanded ? "w-full" : ""} ${className} transition-[width,border-color,background-color] focus-within:border-[rgba(132,247,198,0.32)] focus-within:bg-white/8`}
     >
-      <label htmlFor={`global-search-${compact ? "compact" : "full"}`} className="sr-only">
+      <label htmlFor={`global-search-${idSuffix}`} className="sr-only">
         Search policies, presidents, promises, reports, and sources
       </label>
-      <svg
-        aria-hidden="true"
-        viewBox="0 0 24 24"
-        className="h-4 w-4 text-[var(--ink-muted)]"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-      >
-        <circle cx="11" cy="11" r="7" />
-        <path d="m20 20-3.5-3.5" />
-      </svg>
+      <SearchIcon />
       <input
-        id={`global-search-${compact ? "compact" : "full"}`}
+        id={`global-search-${idSuffix}`}
         type="search"
         name="q"
-        placeholder="Search policies, presidents, promises, reports, sources"
+        placeholder={placeholder}
         className="min-w-0 flex-1 border-0 bg-transparent p-0 text-sm text-white placeholder:text-[var(--ink-muted)] focus:outline-none focus:ring-0"
       />
     </form>
@@ -64,7 +108,7 @@ export function PrimaryNav({ mobile = false }) {
   return (
     <nav
       aria-label={mobile ? "Mobile primary navigation" : "Primary navigation"}
-      className={mobile ? "grid gap-2" : "hidden items-center gap-2 lg:flex"}
+      className={mobile ? "grid gap-2" : "hidden min-w-0 items-center justify-center gap-1 xl:flex"}
     >
       {PRIMARY_NAV_ITEMS.map((item) => {
         const active = isActive(pathname, item.href);
@@ -73,7 +117,7 @@ export function PrimaryNav({ mobile = false }) {
             key={item.href}
             href={item.href}
             aria-current={active ? "page" : undefined}
-            className={`rounded-full px-4 py-2 text-sm font-medium ${
+            className={`rounded-full px-3 py-2 text-sm font-medium xl:px-4 ${
               active
                 ? "bg-[var(--accent)] text-[#04131d]"
                 : "text-[var(--ink-soft)] hover:bg-white/6 hover:text-white"
@@ -89,49 +133,113 @@ export function PrimaryNav({ mobile = false }) {
 
 export function SiteHeader() {
   const pathname = usePathname();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
 
   if (pathname?.startsWith("/admin")) {
     return null;
   }
 
+  useEffect(() => {
+    setMenuOpen(false);
+    setSearchOpen(false);
+  }, [pathname]);
+
   return (
     <header className="sticky top-0 z-50 border-b border-white/8 bg-[rgba(4,10,18,0.88)] backdrop-blur-xl">
-      <div className="mx-auto flex max-w-[1500px] items-center gap-4 px-5 py-4 xl:px-8">
-        <Link href="/" className="flex min-w-[208px] items-center gap-3">
-          <div className="relative h-10 w-10 overflow-hidden rounded-2xl border border-white/10 bg-[rgba(17,29,46,0.9)] shadow-[0_12px_30px_rgba(0,0,0,0.25)]">
-            <Image src="/logo-v2.png" alt="EquityStack" fill className="object-contain p-1.5" priority />
+      <div className="mx-auto max-w-[1500px] px-5 py-4 xl:px-8">
+        <div className="flex items-center gap-3 xl:gap-6">
+          <div className="min-w-0 flex-1 xl:basis-[28%]">
+            <Link href="/" className="flex min-w-0 items-center gap-3">
+              <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-2xl border border-white/10 bg-[rgba(17,29,46,0.9)] shadow-[0_12px_30px_rgba(0,0,0,0.25)]">
+                <Image src="/logo-v2.png" alt="EquityStack" fill className="object-contain p-1.5" priority />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[var(--accent)]">
+                  EquityStack
+                </p>
+                <p className="hidden truncate text-sm text-[var(--ink-muted)] sm:block md:max-w-[16rem] xl:max-w-none">
+                  Civic intelligence for Black policy impact
+                </p>
+              </div>
+            </Link>
           </div>
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[var(--accent)]">
-              EquityStack
-            </p>
-            <p className="text-sm text-[var(--ink-muted)]">
-              Civic intelligence for Black policy impact
-            </p>
+
+          <div className="hidden min-w-0 flex-1 justify-center xl:flex">
+            <PrimaryNav />
           </div>
-        </Link>
 
-        <div className="hidden min-w-0 flex-1 xl:block">
-          <PrimaryNav />
+          <div className="ml-auto flex min-w-0 items-center justify-end gap-2 md:gap-3 xl:basis-[28%]">
+            <div className="hidden min-w-0 xl:flex">
+              <GlobalSearch
+                compact
+                idSuffix="desktop"
+                placeholder="Search policies, presidents, reports"
+                className="w-[15rem] max-w-[20rem] focus-within:w-[20rem]"
+              />
+            </div>
+
+            <button
+              type="button"
+              aria-label={searchOpen ? "Close search" : "Open search"}
+              aria-expanded={searchOpen}
+              onClick={() => setSearchOpen((value) => !value)}
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 text-[var(--ink-soft)] hover:border-white/20 hover:bg-white/8 xl:hidden"
+            >
+              {searchOpen ? <CloseIcon /> : <SearchIcon />}
+            </button>
+
+            <Link
+              href="/dashboard"
+              className="hidden shrink-0 rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-white hover:border-white/20 hover:bg-white/6 md:inline-flex"
+            >
+              Open Data Center
+            </Link>
+
+            <button
+              type="button"
+              aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
+              aria-expanded={menuOpen}
+              onClick={() => setMenuOpen((value) => !value)}
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 text-[var(--ink-soft)] hover:border-white/20 hover:bg-white/8 xl:hidden"
+            >
+              {menuOpen ? <CloseIcon /> : <MenuIcon />}
+            </button>
+          </div>
         </div>
 
-        <div className="hidden min-w-[360px] xl:block">
-          <GlobalSearch compact />
-        </div>
+        {(searchOpen || menuOpen) ? (
+          <div className="mt-4 grid gap-3 border-t border-white/6 pt-4 xl:hidden">
+            {searchOpen ? (
+              <GlobalSearch
+                compact
+                expanded
+                idSuffix="mobile"
+                placeholder="Search policies, presidents, promises, reports"
+              />
+            ) : null}
 
-        <Link
-          href="/dashboard"
-          className="hidden rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-white hover:border-white/20 hover:bg-white/6 md:inline-flex"
-        >
-          Open Data Center
-        </Link>
-      </div>
-
-      <div className="border-t border-white/6 px-5 py-3 xl:hidden">
-        <div className="mx-auto grid max-w-[1500px] gap-3">
-          <GlobalSearch compact />
-          <PrimaryNav mobile />
-        </div>
+            {menuOpen ? (
+              <>
+                <PrimaryNav mobile />
+                <div className="grid gap-2 pt-1 text-sm text-[var(--ink-soft)]">
+                  <Link href="/about" className="rounded-2xl px-1 py-2 hover:text-white">
+                    About
+                  </Link>
+                  <Link href="/methodology" className="rounded-2xl px-1 py-2 hover:text-white">
+                    Methodology
+                  </Link>
+                </div>
+                <Link
+                  href="/dashboard"
+                  className="inline-flex w-full items-center justify-center rounded-full border border-white/10 px-4 py-3 text-sm font-medium text-white hover:border-white/20 hover:bg-white/6 md:hidden"
+                >
+                  Open Data Center
+                </Link>
+              </>
+            ) : null}
+          </div>
+        ) : null}
       </div>
     </header>
   );

@@ -14,6 +14,7 @@ import {
 } from "@/app/components/public/core";
 import TrustBar from "@/app/components/public/TrustBar";
 import ScoreExplanation from "@/app/components/public/ScoreExplanation";
+import InsightCard from "@/app/components/public/InsightCard";
 import {
   PolicyCardList,
   RecentPolicyChangesTable,
@@ -143,13 +144,12 @@ export default async function ReportDetailPage({ params }) {
           />
           {report.findings?.length ? (
             <div className="grid gap-3">
-              {report.findings.map((item) => (
-                <div
-                  key={item}
-                  className="rounded-[1.2rem] border border-white/8 bg-[rgba(8,14,24,0.92)] px-4 py-4 text-sm leading-7 text-[var(--ink-soft)]"
-                >
-                  {item}
-                </div>
+              {report.findings.map((item, index) => (
+                <InsightCard
+                  key={`${item.title || item.text || index}-${index}`}
+                  title={item.title || "Finding"}
+                  text={item.text || item}
+                />
               ))}
             </div>
           ) : (

@@ -20,6 +20,7 @@ import {
 } from "@/app/components/public/charts";
 import TrustBar from "@/app/components/public/TrustBar";
 import ScoreExplanation from "@/app/components/public/ScoreExplanation";
+import InsightCard from "@/app/components/public/InsightCard";
 
 export const dynamic = "force-dynamic";
 
@@ -146,6 +147,25 @@ export default async function ReportsPage({ searchParams }) {
           },
         ]}
       />
+
+      {data.insights?.length ? (
+        <section className="space-y-5">
+          <SectionIntro
+            eyebrow="Dataset observations"
+            title="What the current report layer is highlighting"
+            description="These are short factual readouts derived from the same structured data used by the report hub."
+          />
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {data.insights.map((item, index) => (
+              <InsightCard
+                key={`${item.title}-${index}`}
+                title={item.title}
+                text={item.text}
+              />
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       <section className="space-y-5">
         <SectionIntro
