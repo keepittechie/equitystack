@@ -3,6 +3,21 @@ import Link from "next/link";
 import { resolvePresidentImageSrc } from "@/lib/president-image-paths";
 import { ScoreBadge } from "./core";
 
+function formatRenderableDate(value) {
+  if (!value) {
+    return null;
+  }
+
+  if (value instanceof Date) {
+    if (Number.isNaN(value.getTime())) {
+      return null;
+    }
+    return value.toISOString().slice(0, 10);
+  }
+
+  return value;
+}
+
 function formatDirectionMixLabel(breakdown = {}) {
   const counts = {
     Positive: Number(breakdown.Positive || 0),
@@ -257,7 +272,7 @@ export function EvidenceSourceList({ items = [] }) {
         >
           <div className="flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
             <span>{item.source_type || item.publisher || "Source"}</span>
-            {item.published_date ? <span>{item.published_date}</span> : null}
+            {formatRenderableDate(item.published_date) ? <span>{formatRenderableDate(item.published_date)}</span> : null}
           </div>
           <h3 className="mt-3 text-base font-medium text-white">
             {item.source_title || item.title || item.url || item.source_url}
@@ -277,7 +292,7 @@ export function PolicyTimeline({ items = [] }) {
       {items.map((item, index) => (
         <div key={`${item.year || item.date || index}`} className="rounded-[1.2rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-4">
           <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--accent)]">
-            {item.year || item.date || item.label || `Step ${index + 1}`}
+            {item.year || formatRenderableDate(item.date) || item.label || `Step ${index + 1}`}
           </p>
           <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item.summary || item.event || item.description}</p>
         </div>
@@ -617,7 +632,7 @@ export function PromiseTimeline({ items = [] }) {
       {items.map((item) => (
         <div key={`${item.id || item.action_date || item.label}`} className="rounded-[1.2rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-4">
           <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--accent)]">
-            {item.action_date || item.date || item.label || "Update"}
+            {formatRenderableDate(item.action_date) || formatRenderableDate(item.date) || item.label || "Update"}
           </p>
           <h3 className="mt-3 text-base font-medium text-white">{item.title || item.event}</h3>
           {item.description ? <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">{item.description}</p> : null}
@@ -764,7 +779,7 @@ export function SourceLibraryTable({ items = [] }) {
                   {item.trust_label || item.confidence_label || "—"}
                 </td>
                 <td className="px-5 py-4 text-[var(--ink-soft)]">
-                  {item.published_date || "—"}
+                  {formatRenderableDate(item.published_date) || "—"}
                 </td>
               </tr>
             ))}
@@ -894,7 +909,9 @@ export function RecentPolicyChangesTable({ items = [], buildHref }) {
                   <p className="font-medium text-white">{item.title}</p>
                   {item.summary ? <p className="mt-1 text-xs leading-6 text-[var(--ink-soft)]">{item.summary}</p> : null}
                 </td>
-                <td className="px-5 py-4 text-[var(--ink-soft)]">{item.date || item.latest_action_date || "—"}</td>
+                <td className="px-5 py-4 text-[var(--ink-soft)]">
+                  {formatRenderableDate(item.date) || formatRenderableDate(item.latest_action_date) || "—"}
+                </td>
                 <td className="px-5 py-4 text-[var(--ink-soft)]">{item.impact_direction || item.status || "—"}</td>
                 <td className="px-5 py-4">
                   <Link href={buildHref(item)} className="text-[var(--accent)] hover:text-white">
