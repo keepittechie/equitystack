@@ -151,28 +151,26 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 border-b border-white/8 bg-[rgba(4,10,18,0.88)] backdrop-blur-xl">
       <div className="mx-auto max-w-[1500px] px-5 py-4 xl:px-8">
-        <div className="flex min-w-0 items-center gap-3 xl:grid xl:grid-cols-[minmax(0,280px)_minmax(0,1fr)_minmax(0,420px)] xl:items-center xl:gap-5 2xl:grid-cols-[minmax(0,310px)_minmax(0,1fr)_minmax(0,440px)] 2xl:gap-6">
-          <div className="min-w-0 flex-1 xl:max-w-[280px] xl:flex-none 2xl:max-w-[310px]">
-            <Link href="/" className="flex min-w-0 items-center gap-3">
-              <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-2xl border border-white/10 bg-[rgba(17,29,46,0.9)] shadow-[0_12px_30px_rgba(0,0,0,0.25)]">
+        <div className="flex min-w-0 items-center gap-3 xl:grid xl:grid-cols-[minmax(0,320px)_minmax(0,1fr)_minmax(0,340px)] xl:grid-rows-[auto_auto] xl:items-center xl:gap-x-5 xl:gap-y-2 2xl:grid-cols-[minmax(0,340px)_minmax(0,1fr)_minmax(0,360px)] 2xl:gap-x-6">
+          <div className="min-w-0 flex-1 xl:row-span-2 xl:min-w-0">
+            <Link href="/" className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-center gap-x-3 gap-y-1.5">
+              <div className="relative row-span-2 h-10 w-10 shrink-0 overflow-hidden rounded-2xl border border-white/10 bg-[rgba(17,29,46,0.9)] shadow-[0_12px_30px_rgba(0,0,0,0.25)] xl:h-11 xl:w-11">
                 <Image src="/logo.png" alt="EquityStack" fill className="object-contain p-1.5" priority />
               </div>
-              <div className="min-w-0 xl:max-w-[220px] 2xl:max-w-[250px]">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[var(--accent)]">
-                  EquityStack
-                </p>
-                <p className="hidden truncate text-xs text-[var(--ink-muted)] sm:block md:max-w-[16rem] xl:hidden 2xl:block 2xl:max-w-[15rem]">
-                  Civic intelligence for Black policy impact
-                </p>
-              </div>
+              <p className="min-w-0 self-center text-[13px] font-semibold uppercase tracking-[0.28em] text-[var(--accent)] md:text-[14px] xl:text-[15px]">
+                EquityStack
+              </p>
+              <p className="hidden min-w-0 max-w-[17rem] text-[11px] leading-[1.35] text-[var(--ink-muted)] sm:block xl:max-w-[16.5rem] 2xl:max-w-[17.5rem]">
+                Civic intelligence for Black policy impact
+              </p>
             </Link>
           </div>
 
-          <div className="hidden min-w-0 xl:flex xl:justify-center xl:px-2 2xl:px-4">
+          <div className="hidden min-w-0 xl:col-start-2 xl:row-start-1 xl:flex xl:justify-center xl:px-2 2xl:px-4">
             <PrimaryNav />
           </div>
 
-          <div className="ml-auto flex min-w-0 items-center justify-end gap-2 md:gap-3 xl:ml-0 xl:w-full xl:max-w-[420px] xl:flex-nowrap xl:justify-end 2xl:max-w-[440px]">
+          <div className="ml-auto flex min-w-0 items-center justify-end gap-2 md:gap-3 xl:col-start-3 xl:row-start-1 xl:ml-0 xl:w-full xl:max-w-[340px] xl:flex-nowrap xl:justify-end 2xl:max-w-[360px]">
             <div className="hidden min-w-0 flex-none xl:flex xl:w-[320px] 2xl:w-[340px]">
               <GlobalSearch
                 compact
@@ -194,7 +192,7 @@ export function SiteHeader() {
 
             <Link
               href="/dashboard"
-              className="hidden shrink-0 rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-white hover:border-white/20 hover:bg-white/6 md:inline-flex"
+              className="hidden shrink-0 rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-white hover:border-white/20 hover:bg-white/6 md:inline-flex xl:hidden"
             >
               Open Data Center
             </Link>
@@ -208,6 +206,15 @@ export function SiteHeader() {
             >
               {menuOpen ? <CloseIcon /> : <MenuIcon />}
             </button>
+          </div>
+
+          <div className="hidden xl:col-start-3 xl:row-start-2 xl:flex xl:justify-end xl:pt-0.5">
+            <Link
+              href="/dashboard"
+              className="inline-flex shrink-0 rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-white hover:border-white/20 hover:bg-white/6"
+            >
+              Open Data Center
+            </Link>
           </div>
         </div>
 
