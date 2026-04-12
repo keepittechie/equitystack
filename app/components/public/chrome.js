@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 const PRIMARY_NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/policies", label: "Policies" },
+  { href: "/bills", label: "Bills" },
   { href: "/presidents", label: "Presidents" },
   { href: "/promises", label: "Promises" },
   { href: "/reports", label: "Reports" },
@@ -289,6 +290,7 @@ export function Footer() {
             <Link href="/reports" className="hover:text-white">Reports</Link>
             <Link href="/promises" className="hover:text-white">Promise Tracker</Link>
             <Link href="/current-administration" className="hover:text-white">Current Administration</Link>
+            <Link href="/bills" className="hover:text-white">Bills</Link>
             <Link href="/future-bills" className="hover:text-white">Future Bills</Link>
             <Link href="/activity" className="hover:text-white">Activity</Link>
             <Link href="/policies" className="hover:text-white">Policies</Link>

@@ -90,6 +90,68 @@ export async function GET() {
       ORDER BY efbl.future_bill_id ASC, e.title ASC
     `);
 
+    const [policyRows] = await db.query(`
+      SELECT DISTINCT
+        efbl.future_bill_id,
+        p.id AS policy_id,
+        p.title AS policy_title,
+        p.year_enacted,
+        p.policy_type,
+        p.status AS policy_status,
+        p.impact_direction,
+        pr.slug AS president_slug,
+        pr.full_name AS president_name
+      FROM explainer_future_bill_links efbl
+      JOIN explainer_policy_links epl
+        ON epl.explainer_id = efbl.explainer_id
+      JOIN policies p
+        ON p.id = epl.policy_id
+       AND p.is_archived = 0
+      LEFT JOIN presidents pr
+        ON pr.id = p.president_id
+      ORDER BY efbl.future_bill_id ASC, p.year_enacted DESC, p.title ASC
+    `);
+
+    const [promiseRows] = await db.query(`
+      SELECT DISTINCT
+        links.future_bill_id,
+        p.id AS promise_id,
+        p.slug AS promise_slug,
+        p.title AS promise_title,
+        p.topic AS promise_topic,
+        p.status AS promise_status,
+        p.summary AS promise_summary,
+        pr.slug AS president_slug,
+        pr.full_name AS president_name,
+        links.relationship_type
+      FROM (
+        SELECT DISTINCT
+          efbl.future_bill_id,
+          pact.promise_id,
+          'explainer_context' AS relationship_type
+        FROM explainer_future_bill_links efbl
+        JOIN promise_actions pact
+          ON pact.related_explainer_id = efbl.explainer_id
+
+        UNION
+
+        SELECT DISTINCT
+          efbl.future_bill_id,
+          pact.promise_id,
+          'policy_lineage' AS relationship_type
+        FROM explainer_future_bill_links efbl
+        JOIN explainer_policy_links epl
+          ON epl.explainer_id = efbl.explainer_id
+        JOIN promise_actions pact
+          ON pact.related_policy_id = epl.policy_id
+      ) links
+      JOIN promises p
+        ON p.id = links.promise_id
+      JOIN presidents pr
+        ON pr.id = p.president_id
+      ORDER BY links.future_bill_id ASC, p.promise_date DESC, p.title ASC
+    `);
+
     const trackedIds = trackedRows
       .map((row) => row.tracked_id)
       .filter(Boolean);
@@ -237,6 +299,8 @@ export async function GET() {
         created_at: row.created_at,
         tracked_bills: [],
         related_explainers: [],
+        related_policies: [],
+        related_promises: [],
       });
     }
 
@@ -329,6 +393,49 @@ export async function GET() {
       }
     }
 
+    for (const row of policyRows) {
+      const bill = bills.get(row.future_bill_id);
+      if (!bill) continue;
+
+      if (row.policy_id && !bill.related_policies.some((item) => item.id === row.policy_id)) {
+        bill.related_policies.push({
+          id: row.policy_id,
+          title: row.policy_title,
+          year_enacted: row.year_enacted,
+          policy_type: row.policy_type,
+          status: row.policy_status,
+          impact_direction: row.impact_direction,
+          president_slug: row.president_slug,
+          president_name: row.president_name,
+        });
+      }
+    }
+
+    for (const row of promiseRows) {
+      const bill = bills.get(row.future_bill_id);
+      if (!bill || !row.promise_id) continue;
+
+      const existing = bill.related_promises.find((item) => item.id === row.promise_id);
+      if (existing) {
+        if (existing.relationship_type !== "explainer_context" && row.relationship_type === "explainer_context") {
+          existing.relationship_type = row.relationship_type;
+        }
+        continue;
+      }
+
+      bill.related_promises.push({
+        id: row.promise_id,
+        slug: row.promise_slug,
+        title: row.promise_title,
+        topic: row.promise_topic,
+        status: row.promise_status,
+        summary: row.promise_summary,
+        president_slug: row.president_slug,
+        president_name: row.president_name,
+        relationship_type: row.relationship_type,
+      });
+    }
+
     const structured = Array.from(bills.values()).map((bill) => {
       const linkedLegislatorMap = new Map();
 
@@ -359,6 +466,15 @@ export async function GET() {
         return String(b.date).localeCompare(String(a.date));
         }),
         related_explainers: bill.related_explainers.sort((a, b) =>
+          a.title.localeCompare(b.title)
+        ),
+        related_policies: bill.related_policies.sort((a, b) => {
+          return (
+            Number(b.year_enacted || 0) - Number(a.year_enacted || 0) ||
+            a.title.localeCompare(b.title)
+          );
+        }),
+        related_promises: bill.related_promises.sort((a, b) =>
           a.title.localeCompare(b.title)
         ),
         linked_legislators: Array.from(linkedLegislatorMap.values()).sort((left, right) => {

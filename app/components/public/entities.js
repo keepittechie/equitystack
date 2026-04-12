@@ -360,18 +360,20 @@ export function PresidentCardGrid({ items = [], buildHref, compareHref = null })
 
         return (
           <article key={item.slug || item.id} className="flex h-full flex-col rounded-[1.7rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 md:p-6">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex items-start gap-4">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div className="flex min-w-0 flex-1 items-start gap-4">
                 <PresidentPortrait
                   imageSrc={imageSrc}
                   alt={item.name || item.president || "President portrait"}
                   context="card"
                 />
-                <div>
+                <div className="min-w-0">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
                     {item.party || item.president_party || "Historical record"}
                   </p>
-                  <h3 className="mt-2 text-xl font-semibold text-white">{item.name || item.president}</h3>
+                  <h3 className="mt-2 line-clamp-2 text-xl font-semibold text-white">
+                    {item.name || item.president}
+                  </h3>
                   {item.termLabel ? (
                     <p className="mt-1 text-xs uppercase tracking-[0.18em] text-[var(--ink-muted)]">
                       {item.termLabel}
@@ -379,7 +381,10 @@ export function PresidentCardGrid({ items = [], buildHref, compareHref = null })
                   ) : null}
                 </div>
               </div>
-              <ScoreBadge value={item.score ?? item.direct_normalized_score ?? "—"} label="Direct" />
+              <ScoreBadge
+                value={item.score ?? item.normalized_score_total ?? item.direct_normalized_score ?? "—"}
+                label="Black Impact Score"
+              />
             </div>
             <p className="mt-4 line-clamp-4 text-sm leading-7 text-[var(--ink-soft)]">{item.summary || item.narrative_summary || "View metrics, timelines, and policy drivers for this presidential record."}</p>
             <div className="mt-4 flex flex-wrap gap-2 text-xs text-[var(--ink-muted)]">
@@ -396,6 +401,11 @@ export function PresidentCardGrid({ items = [], buildHref, compareHref = null })
               {item.direction_breakdown ? (
                 <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5">
                   {summarizeDirectionLeader(item.direction_breakdown)}
+                </span>
+              ) : null}
+              {Number(item.linked_bill_count || 0) > 0 ? (
+                <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5">
+                  {item.linked_bill_count} linked bill{Number(item.linked_bill_count || 0) === 1 ? "" : "s"}
                 </span>
               ) : null}
             </div>

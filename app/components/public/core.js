@@ -89,7 +89,7 @@ export function ScoreBadge({
         : "border-[rgba(96,165,250,0.18)] bg-[rgba(7,32,52,0.72)] text-[var(--accent)]";
 
   return (
-    <div className={`inline-flex min-w-[116px] flex-col rounded-[1.3rem] border px-4 py-3 ${colorClasses}`}>
+    <div className={`inline-flex min-w-[116px] shrink-0 self-start flex-col rounded-[1.3rem] border px-4 py-3 ${colorClasses}`}>
       <span className="text-[11px] font-semibold uppercase tracking-[0.22em]">{label}</span>
       <span className={`mt-2 font-semibold tracking-[-0.04em] ${size === "lg" ? "text-4xl" : "text-2xl"}`}>
         {value}
@@ -141,23 +141,55 @@ export function PageContextBlock({
 }
 
 export function PresidentScoreMethodologyNote({
-  title = "How to interpret presidential scores",
+  title = "How this score works",
 }) {
+  const items = [
+    {
+      label: "Outcome-based score",
+      description:
+        "Documented policy outcomes remain the anchor. The score starts from measured impact in the current EquityStack record.",
+    },
+    {
+      label: "Promise context",
+      description:
+        "Promise Tracker data adds accountability context so visitors can see what was committed, what was delivered, and where records stay incomplete.",
+    },
+    {
+      label: "Linked bills",
+      description:
+        "Tracked bills add legislative context only when current Bills to Promises to Presidents lineage is strong enough to support the join.",
+    },
+  ];
+
   return (
     <aside className="h-full rounded-[1.5rem] border border-[rgba(96,165,250,0.14)] bg-[linear-gradient(135deg,rgba(7,30,47,0.9),rgba(10,15,23,0.95))] p-5 md:p-6">
       <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--accent)]">
-        Presidential score note
+        Presidential methodology
       </p>
       <h3 className="mt-3 text-base font-semibold text-white md:text-lg">{title}</h3>
       <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-        Presidential Black Impact Score reflects measured policy impact in the
-        current EquityStack dataset. It is not a popularity measure, a party
-        ranking, or a complete judgment of a presidency.
+        EquityStack combines outcome evidence, promise-tracker context, and
+        linked legislative signals into one public-facing presidential score.
+        The outcome-based layer still carries the most weight.
       </p>
+      <div className="mt-4 grid gap-3">
+        {items.map((item) => (
+          <div
+            key={item.label}
+            className="rounded-[1.05rem] border border-white/8 bg-white/5 px-4 py-3.5"
+          >
+            <p className="text-sm font-semibold text-white">{item.label}</p>
+            <p className="mt-1 text-sm leading-7 text-[var(--ink-soft)]">
+              {item.description}
+            </p>
+          </div>
+        ))}
+      </div>
       <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-        Scores depend on the available structured record, evidence coverage,
-        attribution limits, and the balance of positive, negative, mixed, and
-        blocked outcomes.
+        Bill influence is bounded, so one thin or weak legislative link cannot
+        override the outcome-based record. Scores remain a structured measure of
+        public evidence, not a popularity rating or a complete judgment of a
+        presidency.
       </p>
     </aside>
   );

@@ -9,6 +9,7 @@ import {
   CitationNote,
   MethodologyCallout,
   PresidentScoreMethodologyNote,
+  ScoreBadge,
   SectionIntro,
   SourceTrustPanel,
 } from "@/app/components/public/core";
@@ -45,6 +46,61 @@ function formatTermLabel(start, end) {
   return "Historical record";
 }
 
+function formatBillConfidenceSummary(summary = {}) {
+  return ["High", "Medium", "Low"]
+    .map((label) => `${label} ${Number(summary[label] || 0)}`)
+    .join(" • ");
+}
+
+function formatBillRelationshipType(type) {
+  return String(type || "linked_context")
+    .split("_")
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+function LinkedBillCard({ item }) {
+  return (
+    <Link
+      href={item.detailHref}
+      className="flex min-w-0 flex-col rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4 hover:border-[rgba(132,247,198,0.24)]"
+    >
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div className="min-w-0 flex-1">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+            {item.billNumber}
+          </p>
+          <h3 className="mt-2 line-clamp-2 text-base font-semibold text-white">
+            {item.title}
+          </h3>
+        </div>
+        <ScoreBadge value={String(item.blackImpactScore)} label="Bill BIS" />
+      </div>
+      <div className="mt-3 flex flex-wrap gap-2 text-xs text-[var(--ink-muted)]">
+        {item.primaryDomain ? (
+          <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5">
+            {item.primaryDomain}
+          </span>
+        ) : null}
+        {item.status ? (
+          <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5">
+            {item.status}
+          </span>
+        ) : null}
+        <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5">
+          {formatBillRelationshipType(item.relationshipType)}
+        </span>
+        <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5">
+          {item.impactConfidence} confidence
+        </span>
+      </div>
+      <p className="mt-3 line-clamp-4 text-sm leading-7 text-[var(--ink-soft)]">
+        {item.whyItMatters || "Open the bill detail page for the full tracked record and linked context."}
+      </p>
+    </Link>
+  );
+}
+
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   const profile = await fetchPresidentProfileData(slug);
@@ -63,7 +119,7 @@ export async function generateMetadata({ params }) {
     title: `${name}`,
     description:
       profile.president.narrative_summary ||
-      "Review a presidential impact profile with direct score, trend, policy drivers, and promise context.",
+      "Review a presidential impact profile with the final score, outcome-based anchor, bill-linked inputs, trend, and policy context.",
     path: `/presidents/${slug}`,
   });
 }
@@ -78,6 +134,7 @@ export default async function PresidentProfilePage({ params }) {
 
   const { president, promiseTracker, trend, topPolicies, promises, promiseStatusSnapshot, scoreDrivers } = profile;
   const presidentName = president.president || president.president_name || "Unknown president";
+  const billInputs = president.bill_impact_inputs || {};
   const imageSrc = resolvePresidentImageSrc({
     presidentSlug: president.president_slug || slug,
     presidentName,
@@ -112,8 +169,8 @@ export default async function PresidentProfilePage({ params }) {
         name={presidentName}
         party={president.president_party || promiseTracker.president_party}
         termLabel={formatTermLabel(promiseTracker.term_start, promiseTracker.term_end)}
-        summary={president.narrative_summary || "Direct and systemic scores are shown separately so users can compare policy action with longer downstream institutional effects."}
-        score={formatScore(president.direct_normalized_score)}
+        summary={president.narrative_summary || "The final Black Impact Score stays anchored in outcome-based evidence, then adds a bounded bill-informed signal when current legislative lineage is strong enough to support it."}
+        score={formatScore(president.normalized_score_total ?? president.score ?? president.direct_normalized_score)}
         systemicScore={formatScore(president.systemic_normalized_score)}
         imageSrc={imageSrc}
       />
@@ -123,9 +180,9 @@ export default async function PresidentProfilePage({ params }) {
       <PresidentMetricsRow
         items={[
           {
-            label: "Direct confidence",
+            label: "Outcome-based confidence",
             value: president.direct_score_confidence || president.score_confidence || "Unknown",
-            detail: `Based on ${president.direct_outcome_count ?? president.outcome_count ?? 0} scored outcomes.`,
+            detail: `The final score remains anchored by ${president.direct_outcome_count ?? president.outcome_count ?? 0} scored outcomes.`,
           },
           {
             label: "Promises tracked",
@@ -142,8 +199,82 @@ export default async function PresidentProfilePage({ params }) {
             value: promiseTracker.visible_source_count ?? 0,
             detail: "These totals reflect visible promise-tracker source references, not guaranteed unique source rows.",
           },
+          {
+            label: "Linked bills",
+            value: billInputs.linked_bill_count ?? 0,
+            detail: `${billInputs.linked_promises_with_bill_support ?? 0} promise-backed bill joins currently support this profile.`,
+          },
         ]}
       />
+
+      <section className="public-two-col-rail grid items-start gap-6 xl:grid-cols-[1.05fr_0.95fr]">
+        <div className="space-y-5 xl:self-start">
+          <SectionIntro
+            eyebrow="Bill-informed signals"
+            title="Legislative inputs linked through promises"
+            description="These bill-linked inputs are derived only from tracked bills that already reach this president through the existing Bills → Promises → Presidents lineage."
+          />
+          {Number(billInputs.linked_bill_count || 0) > 0 ? (
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+                <h3 className="text-lg font-semibold text-white">Bill input summary</h3>
+                <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+                  {president.bill_input_summary} The final Black Impact Score blends this bill-informed layer in as a capped modifier rather than letting bill links override the outcome-based record.
+                </p>
+                <div className="mt-4 grid gap-3 text-sm text-[var(--ink-soft)]">
+                  <p>Unweighted avg bill BIS: {formatScore(billInputs.linked_bill_score_avg)}</p>
+                  <p>Weighted avg bill BIS: {formatScore(billInputs.linked_bill_score_weighted)}</p>
+                  <p>Linked bills influence: {formatScore(billInputs.bill_blend_weight_pct)}%</p>
+                  <p>Positive / Mixed / Negative: {billInputs.linked_positive_bill_count || 0} / {billInputs.linked_mixed_bill_count || 0} / {billInputs.linked_negative_bill_count || 0}</p>
+                </div>
+              </div>
+              <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+                <h3 className="text-lg font-semibold text-white">Evidence and domains</h3>
+                <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+                  Join confidence stays bounded by the existing promise lineage and the bill’s own evidence depth.
+                </p>
+                <p className="mt-4 text-sm leading-7 text-[var(--ink-soft)]">
+                  Bill confidence mix: {formatBillConfidenceSummary(billInputs.linked_bill_confidence_summary)}
+                </p>
+                <p className="mt-4 text-sm leading-7 text-[var(--ink-soft)]">
+                  Blend status: {billInputs.bill_influence_label || "No bill-linked inputs"}
+                </p>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {(billInputs.linked_bill_domains || []).map((item) => (
+                    <span key={item.domain} className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-[var(--ink-soft)]">
+                      {item.domain} • {item.count}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="rounded-[1.4rem] border border-dashed border-white/12 bg-white/4 p-5 text-sm leading-7 text-[var(--ink-soft)]">
+              No tracked bills currently reach this president through supported promise lineage, so no bill-informed inputs are shown yet.
+            </div>
+          )}
+        </div>
+
+        <div className="space-y-5">
+          <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+            <h3 className="text-lg font-semibold text-white">Top linked bills</h3>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+              These are the strongest currently linked bills by bill-level BIS contribution within this president’s existing promise-linked legislative context.
+            </p>
+            <div className="mt-4 grid gap-3">
+              {(billInputs.top_linked_bills || []).length ? (
+                billInputs.top_linked_bills.slice(0, 4).map((item) => (
+                  <LinkedBillCard key={item.slug || item.id} item={item} />
+                ))
+              ) : (
+                <div className="rounded-[1.1rem] border border-dashed border-white/12 bg-white/4 px-4 py-4 text-sm leading-7 text-[var(--ink-soft)]">
+                  No linked bills are available to rank for this profile yet.
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
 
       <section className="grid items-start gap-6 xl:grid-cols-[1.1fr_0.9fr]">
         <div className="space-y-5 xl:self-start">
@@ -198,7 +329,7 @@ export default async function PresidentProfilePage({ params }) {
             sourceQuality="Profile evidence references"
             confidenceLabel={president.direct_score_confidence || president.score_confidence}
             completenessLabel={`${promiseTracker.visible_outcome_count || 0} outcomes in visible promise set`}
-            summary="Direct score remains the headline metric. Systemic score is shown nearby when downstream judicial attribution exists and is strong enough to defend."
+            summary="The final score remains outcome-anchored. Bill-linked inputs can shift it modestly when promise-backed legislative lineage and bill evidence are strong enough to defend."
           />
           <PresidentScoreMethodologyNote />
           <CitationNote description="When referencing this presidential profile, cite the president name, page title, EquityStack, the page URL, and your access date. Treat the profile as a structured summary of the current dataset and its current evidence coverage." />
@@ -210,7 +341,7 @@ export default async function PresidentProfilePage({ params }) {
             />
           ) : null}
           <MethodologyCallout
-            description="Direct score reflects direct policy action. Systemic score reflects judicial or appointment-driven downstream impact. They stay separate on purpose."
+            description="Outcome-based score remains the anchor. Bill-informed inputs now add a bounded supporting modifier when the current Bills → Promises → Presidents lineage is strong enough to support it. Systemic score remains separate."
             linkLabel="Read score architecture"
           />
         </div>

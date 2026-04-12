@@ -24,7 +24,7 @@ export const dynamic = "force-dynamic";
 export const metadata = buildPageMetadata({
   title: "Presidents",
   description:
-    "Compare presidential records using direct Black Impact Score, systemic score context, confidence, and policy drivers.",
+    "Compare presidential records using the final Black Impact Score, outcome-based context, bill-linked inputs, and policy drivers.",
   path: "/presidents",
 });
 
@@ -58,16 +58,19 @@ export default async function PresidentsPage({ searchParams }) {
 
   const comparisonRows = filteredPresidents.slice(0, 12).map((item) => ({
     label: item.name,
-    direct_score: formatScore(item.direct_normalized_score),
+    final_score: formatScore(item.score ?? item.normalized_score_total),
+    outcome_score: formatScore(item.direct_normalized_score),
     systemic_score: formatScore(item.systemic_score),
     outcomes: item.outcome_count ?? 0,
     promises: item.promise_count ?? 0,
+    bills: item.linked_bill_count ?? 0,
+    bill_input: formatScore(item.bill_blended_score ?? item.linked_bill_score_weighted),
     confidence: item.score_confidence || "Unknown",
   }));
 
-  const averageDirectScore = filteredPresidents.length
+  const averageFinalScore = filteredPresidents.length
     ? filteredPresidents.reduce(
-        (total, item) => total + Number(item.direct_normalized_score || 0),
+        (total, item) => total + Number((item.score ?? item.normalized_score_total) || 0),
         0
       ) / filteredPresidents.length
     : null;
@@ -77,6 +80,13 @@ export default async function PresidentsPage({ searchParams }) {
   const topRanked = filteredPresidents.slice(0, 10);
   const showSystemicComparison = filteredPresidents.some(
     (item) => Math.abs(Number(item.systemic_score || 0)) > 0.001
+  );
+  const showBillComparison = filteredPresidents.some(
+    (item) => Number(item.linked_bill_count || 0) > 0
+  );
+  const linkedBillTotal = filteredPresidents.reduce(
+    (total, item) => total + Number(item.linked_bill_count || 0),
+    0
   );
 
   return (
@@ -88,7 +98,7 @@ export default async function PresidentsPage({ searchParams }) {
           as="h1"
           eyebrow="President records"
           title="Compare presidential impact records without losing evidence or context."
-          description="The presidents index starts with the direct score, keeps systemic judicial effects separate, and surfaces confidence, outcome counts, and narrative drivers before you open a profile."
+          description="The presidents index leads with the final Black Impact Score, keeps outcome-based and systemic context visible, and now adds bounded bill-linked inputs where the current Bills → Promises → Presidents lineage supports them."
           actions={
             <>
               <Link href="/dashboard" className="public-button-primary">
@@ -106,8 +116,8 @@ export default async function PresidentsPage({ searchParams }) {
 
       <section className="grid items-start gap-6 xl:grid-cols-[1.05fr_0.95fr]">
         <PageContextBlock
-          description="This page ranks presidential records using direct Impact Score first, then adds systemic context, outcome counts, and Confidence so users can compare administrations without flattening uncertainty."
-          detail="Use the ranking table for fast scan, then open a profile to read trend lines, policy drivers, evidence footprint, and related promise records."
+          description="This page ranks presidential records using the final Black Impact Score, anchored by outcome-based scoring and lightly blended with bill-informed inputs when real legislative lineage supports them."
+          detail="Use the ranking table for fast scan, then open a profile to read the outcome-based anchor, bill influence, trend lines, policy drivers, evidence footprint, and related promise records."
         />
         <ScoreExplanation title="How to read presidential Impact Scores" />
       </section>
@@ -145,7 +155,7 @@ export default async function PresidentsPage({ searchParams }) {
           <label className="grid gap-2">
             <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">Sort</span>
             <select name="sort" defaultValue={sort} className="rounded-xl border border-white/8 bg-white/5 px-3 py-2.5 text-sm text-white">
-              <option value="score_desc">Highest direct score</option>
+              <option value="score_desc">Highest final score</option>
               <option value="name_asc">Name A-Z</option>
               <option value="term_asc">Oldest term first</option>
             </select>
@@ -170,14 +180,19 @@ export default async function PresidentsPage({ searchParams }) {
             description: "Profiles with stronger confidence-backed score coverage.",
           },
           {
-            label: "Average direct score",
-            value: averageDirectScore == null ? "—" : formatScore(averageDirectScore),
-            description: "Simple filtered mean of direct normalized score.",
+            label: "Average final score",
+            value: averageFinalScore == null ? "—" : formatScore(averageFinalScore),
+            description: "Simple filtered mean of the current final Black Impact Score.",
           },
           {
             label: "Tracked promises",
             value: filteredPresidents.reduce((total, item) => total + Number(item.promise_count || 0), 0),
             description: "Promise tracker records attached to the filtered presidential set.",
+          },
+          {
+            label: "Linked bills",
+            value: linkedBillTotal,
+            description: "Tracked bills that reach these presidents through existing bill-to-promise lineage.",
           },
         ]}
       />
@@ -187,7 +202,7 @@ export default async function PresidentsPage({ searchParams }) {
           <SectionIntro
             eyebrow="Flagship ranking"
             title="Black Impact Score ranking"
-            description="This ranking shows how presidents compare on measured policy impact in the current EquityStack dataset. It is a structured policy-impact measure, not a complete judgment of a presidency."
+            description="This ranking shows how presidents compare on the current final Black Impact Score. It remains a structured policy-impact measure, not a complete judgment of a presidency."
           />
           <PresidentRankingBoard
             items={topRanked}
@@ -215,18 +230,26 @@ export default async function PresidentsPage({ searchParams }) {
           <p className="mt-3 max-w-4xl text-sm leading-7 text-[var(--ink-soft)]">
             Higher scores indicate stronger measured positive impact in the current dataset. Lower scores indicate stronger measured negative impact. This compact table emphasizes the fields that currently differentiate presidential records most clearly.
           </p>
+          {showBillComparison ? (
+            <p className="mt-3 max-w-4xl text-sm leading-7 text-[var(--ink-soft)]">
+              Bill-linked inputs remain bounded. The outcome-based score stays the anchor, while linked bills add a smaller supporting signal when current promise-backed legislative lineage is strong enough to support it.
+            </p>
+          ) : null}
         </div>
         <ComparisonMetricsTable
           rows={comparisonRows}
           scrollClassName="thin-scrollbar"
-          minTableWidthClassName="min-w-[720px]"
+          minTableWidthClassName="min-w-[860px]"
           metrics={[
-            { key: "direct_score", label: "Direct Impact Score" },
+            { key: "final_score", label: "Final Black Impact Score" },
+            { key: "outcome_score", label: "Outcome-based score" },
             ...(showSystemicComparison
               ? [{ key: "systemic_score", label: "Systemic Impact Score" }]
               : []),
             { key: "outcomes", label: "Outcomes" },
             { key: "promises", label: "Promises" },
+            ...(showBillComparison ? [{ key: "bills", label: "Linked bills" }] : []),
+            ...(showBillComparison ? [{ key: "bill_input", label: "Bill-informed input" }] : []),
             { key: "confidence", label: "Confidence" },
           ]}
         />

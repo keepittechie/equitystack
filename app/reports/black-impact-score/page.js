@@ -3565,8 +3565,8 @@ export default async function BlackImpactScorePage({ searchParams }) {
                   value={formatNormalizedScore(president.normalized_score)}
                   subtitle={
                     president.display_score != null
-                      ? `Primary direct score; coverage-adjusted display ${formatNormalizedScore(president.display_score)}`
-                      : "Primary direct comparison view across presidents"
+                      ? `Primary final score; coverage-adjusted display ${formatNormalizedScore(president.display_score)}`
+                      : "Primary comparison view across presidents"
                   }
                 />
                 <ScoreCard
