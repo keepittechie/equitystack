@@ -7,6 +7,7 @@ import {
   ScoreBadge,
   SectionIntro,
 } from "@/app/components/public/core";
+import StructuredData from "@/app/components/public/StructuredData";
 import {
   EvidenceSourceList,
   PolicyTimeline,
@@ -21,6 +22,10 @@ import {
   getRelatedBillsForSlug,
 } from "@/lib/public-bills";
 import { getFutureBills } from "@/lib/shareable-cards";
+import {
+  buildBreadcrumbJsonLd,
+  buildLegislationJsonLd,
+} from "@/lib/structured-data";
 
 async function getBillPageData(slug) {
   const futureBills = await getFutureBills();
@@ -184,10 +189,15 @@ export async function generateMetadata({ params }) {
   }
 
   return buildPageMetadata({
-    title: `${bill.billNumber} · ${bill.title}`,
+    title: `${bill.billNumber} | ${bill.title}`,
     description: buildBillDescription(bill),
     path: bill.detailHref,
     type: "article",
+    keywords: [
+      bill.billNumber,
+      ...bill.topicTags,
+      "legislation affecting Black Americans",
+    ].filter(Boolean),
   });
 }
 
@@ -201,6 +211,38 @@ export default async function BillDetailPage({ params }) {
 
   return (
     <main className="space-y-10">
+      <StructuredData
+        data={[
+          buildBreadcrumbJsonLd(
+            [
+              { href: "/", label: "Home" },
+              { href: "/bills", label: "Bills" },
+              { label: bill.title },
+            ],
+            bill.detailHref
+          ),
+          buildLegislationJsonLd({
+            title: bill.title,
+            description: buildBillDescription(bill),
+            path: bill.detailHref,
+            identifier: bill.billNumber,
+            dateCreated: bill.introducedDate,
+            dateModified: bill.latestActionDate,
+            about: [
+              "Congress",
+              "civil rights policy",
+              "Black Americans",
+              ...bill.topicTags,
+            ],
+            keywords: [
+              bill.billNumber,
+              ...bill.topicTags,
+              "legislation affecting Black Americans",
+            ],
+            legislationType: bill.chamber,
+          }),
+        ]}
+      />
       <Breadcrumbs
         items={[
           { href: "/", label: "Home" },

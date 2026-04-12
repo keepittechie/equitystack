@@ -2,9 +2,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buildPageMetadata } from "@/lib/metadata";
 import { buildPolicySlug, fetchPromisePageData } from "@/lib/public-site-data";
+import StructuredData from "@/app/components/public/StructuredData";
 import { Breadcrumbs } from "@/app/components/public/chrome";
 import {
   MethodologyCallout,
+  PageContextBlock,
   SectionIntro,
   SourceTrustPanel,
 } from "@/app/components/public/core";
@@ -16,6 +18,10 @@ import {
   PromiseHero,
   PromiseTimeline,
 } from "@/app/components/public/entities";
+import {
+  buildBreadcrumbJsonLd,
+  buildPromiseJsonLd,
+} from "@/lib/structured-data";
 
 export const dynamic = "force-dynamic";
 
@@ -43,6 +49,14 @@ function flattenPromiseSources(promise) {
   return items;
 }
 
+function buildWhyPromiseMatters(promise) {
+  const president = promise.president || "the relevant administration";
+  const topic = promise.topic || "Black policy priorities";
+  const status = promise.status || "an unresolved";
+
+  return `Promise records matter because they connect public commitments to documented implementation. This page helps readers study how ${president} handled ${topic.toLowerCase()}, why the promise is currently marked ${status.toLowerCase()}, and which policy actions or outcomes currently support that reading.`;
+}
+
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   const promise = await fetchPromisePageData(slug);
@@ -56,11 +70,17 @@ export async function generateMetadata({ params }) {
   }
 
   return buildPageMetadata({
-    title: promise.title,
+    title: `${promise.title} | Promise Tracker record`,
     description:
       promise.summary ||
-      "Review a promise record with statement, status rationale, evidence, and linked policies.",
+      `Review a promise record from ${promise.president || "the public tracker"} with status rationale, evidence, linked policies, and outcomes affecting Black Americans.`,
     path: `/promises/${slug}`,
+    keywords: [
+      promise.president,
+      promise.topic,
+      "campaign promises to Black Americans",
+      "promise tracker",
+    ].filter(Boolean),
   });
 }
 
@@ -85,9 +105,31 @@ export default async function PromiseDetailPage({ params }) {
   const linkedPolicyCount = (promise.related_policies || []).length;
   const policyOutcomeCount = (promise.outcomes || []).length;
   const actionCount = (promise.actions || []).length;
+  const presidentPromiseHref = promise.president_slug
+    ? `/promises/president/${promise.president_slug}`
+    : null;
+  const presidentProfileHref = promise.president_slug
+    ? `/presidents/${promise.president_slug}`
+    : null;
+  const presidentPoliciesHref = promise.president
+    ? `/policies?president=${encodeURIComponent(promise.president)}`
+    : "/policies";
 
   return (
     <main className="space-y-10">
+      <StructuredData
+        data={[
+          buildBreadcrumbJsonLd(
+            [
+              { href: "/", label: "Home" },
+              { href: "/promises", label: "Promises" },
+              { label: promise.title },
+            ],
+            `/promises/${slug}`
+          ),
+          buildPromiseJsonLd(promise),
+        ]}
+      />
       <Breadcrumbs
         items={[
           { href: "/", label: "Home" },
@@ -115,12 +157,31 @@ export default async function PromiseDetailPage({ params }) {
         <PromiseStatusLegend statuses={["Delivered", "In Progress", "Partial", "Blocked", "Failed"]} />
       </section>
 
+      <section className="grid items-start gap-6 xl:grid-cols-[1.05fr_0.95fr]">
+        <PageContextBlock
+          description="This page is the landing point for a single promise record: the original commitment, the current status, the linked policy actions, and the evidence used to justify the classification."
+          detail="Use it when you want to move from a broad question about campaign promises to Black Americans into the specific public record behind one promise."
+        />
+        <div className="rounded-[1.6rem] border border-[rgba(132,247,198,0.18)] bg-[linear-gradient(145deg,rgba(14,36,33,0.72),rgba(8,14,24,0.96))] p-6">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--accent)]">
+            Why this promise matters
+          </p>
+          <h2 className="mt-4 text-2xl font-semibold text-white">Intent, follow-through, and evidence</h2>
+          <p className="mt-4 text-sm leading-7 text-[var(--ink-soft)]">
+            {buildWhyPromiseMatters(promise)}
+          </p>
+        </div>
+      </section>
+
       <section className="public-two-col-rail grid gap-6 xl:grid-cols-[1.08fr_0.92fr]">
         <div className="space-y-5">
           <SectionIntro
             eyebrow="What this means"
             title="Status and rationale"
-            description={promise.summary || "This promise record does not yet have a long-form rationale summary."}
+            description={
+              promise.summary ||
+              "This promise record does not yet have a long-form rationale summary."
+            }
           />
           <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6">
             <h2 className="text-lg font-semibold text-white">What was promised</h2>
@@ -222,8 +283,8 @@ export default async function PromiseDetailPage({ params }) {
         <div className="space-y-5">
           <SectionIntro
             eyebrow="Linked policies"
-            title="Policies connected to this promise"
-            description="Policy links help users move from campaign or governing statement into administrative or statutory records."
+            title="Policies and context connected to this promise"
+            description="Policy links help users move from campaign or governing statements into administrative records, legislation, and broader historical context."
           />
           {(promise.related_policies || []).length ? (
             <PolicyCardList
@@ -236,6 +297,43 @@ export default async function PromiseDetailPage({ params }) {
             </div>
           )}
           <div className="grid gap-4">
+            {presidentPromiseHref ? (
+              <Link href={presidentPromiseHref} className="panel-link rounded-[1.4rem] p-5">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+                  Presidency term
+                </p>
+                <h3 className="mt-3 text-lg font-semibold text-white">
+                  Read {promise.president}&apos;s full promise tracker
+                </h3>
+                <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+                  See how this promise fits into the wider record of delivered, partial, failed, and blocked promises for the same president.
+                </p>
+              </Link>
+            ) : null}
+            {presidentProfileHref ? (
+              <Link href={presidentProfileHref} className="panel-link rounded-[1.4rem] p-5">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+                  President profile
+                </p>
+                <h3 className="mt-3 text-lg font-semibold text-white">
+                  Read {promise.president}&apos;s presidential record
+                </h3>
+                <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+                  Move from this single promise into the wider presidential profile, including score context, policy drivers, and broader historical framing.
+                </p>
+              </Link>
+            ) : null}
+            <Link href={presidentPoliciesHref} className="panel-link rounded-[1.4rem] p-5">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+                Policy context
+              </p>
+              <h3 className="mt-3 text-lg font-semibold text-white">
+                Browse related policy records
+              </h3>
+              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+                Open the policy explorer to see the legislation, executive actions, and court decisions that help explain this promise record.
+              </p>
+            </Link>
             {(promise.related_explainers || []).map((item) => (
               <Link key={item.slug} href={`/explainers/${item.slug}`} className="panel-link rounded-[1.4rem] p-5">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
@@ -251,7 +349,7 @@ export default async function PromiseDetailPage({ params }) {
               </p>
               <h3 className="mt-3 text-lg font-semibold text-white">Black Impact Score</h3>
               <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-                Open the flagship report when you want to place this promise record inside the wider presidential score context.
+                Read the flagship report when you want to place this promise record inside the wider presidential score and historical policy context.
               </p>
             </Link>
           </div>

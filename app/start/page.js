@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { buildPageMetadata } from "@/lib/metadata";
+import { Breadcrumbs } from "@/app/components/public/chrome";
 
 export const metadata = buildPageMetadata({
   title: "Start Here",
@@ -74,18 +75,19 @@ const learningPath = [
 export default function StartPage() {
   return (
     <main className="max-w-5xl mx-auto p-6 space-y-10">
+      <Breadcrumbs items={[{ href: "/", label: "Home" }, { label: "Start Here" }]} />
       <section className="hero-panel p-8 md:p-10">
         <p className="eyebrow mb-4">
           Start Here
         </p>
         <h1 className="text-4xl font-bold tracking-tight mb-4">
-          A guided path through EquityStack
+          A guided path through Black history, policy, and EquityStack
         </h1>
         <p className="text-[var(--ink-soft)] text-lg leading-8 max-w-3xl">
           This page provides a structured introduction to the major themes covered
           on EquityStack. It is designed for readers who want a clear starting point
           and a logical sequence for understanding the relationship between law,
-          policy, history, and long-term outcomes.
+          policy, Black history, and long-term outcomes.
         </p>
       </section>
 
@@ -94,7 +96,7 @@ export default function StartPage() {
         <p className="text-sm text-[var(--ink-soft)] leading-7">
           The sequence below moves from constitutional foundations to political
           realignment, housing and wealth, economic mobility, and criminal justice.
-          Each explainer links back into the larger policy database.
+          Each explainer links back into the larger policy, promise, and historical research database.
         </p>
       </section>
 

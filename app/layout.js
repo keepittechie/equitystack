@@ -1,24 +1,26 @@
 import "./globals.css";
 import { Suspense } from "react";
 import MainLayout from "@/app/components/layout/MainLayout";
+import StructuredData from "@/app/components/public/StructuredData";
 import PageViewTracker from "@/app/components/telemetry/PageViewTracker";
+import { buildSiteJsonLd } from "@/lib/structured-data";
 
 export const metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://equitystack.org"),
   title: {
-    default: "EquityStack | Measure how government actions impact Black Americans",
+    default: "EquityStack | Black history, presidents, promises, and policy impact",
     template: "%s | EquityStack",
   },
   description:
-    "EquityStack is a public civic intelligence platform for measuring how government actions impact Black Americans through policies, promises, evidence, and outcome-based analysis.",
+    "EquityStack is a public-interest research platform covering Black history, U.S. presidents, campaign promises, civil rights policy, legislation, and policy impact on Black Americans.",
   applicationName: "EquityStack",
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "EquityStack | Measure how government actions impact Black Americans",
+    title: "EquityStack | Black history, presidents, promises, and policy impact",
     description:
-      "A public civic intelligence platform for tracking policy records, promises, evidence, and measurable impact on Black Americans.",
+      "Research Black history by president, campaign promises, legislation, civil rights policy, and measured policy impact on Black Americans.",
     siteName: "EquityStack",
     type: "website",
     url: "/",
@@ -33,9 +35,9 @@ export const metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "EquityStack | Measure how government actions impact Black Americans",
+    title: "EquityStack | Black history, presidents, promises, and policy impact",
     description:
-      "Explore policy records, presidents, promises, reports, sources, and evidence on Black political and legal history.",
+      "Explore Black history, presidents, campaign promises, legislation, and policy impact on Black Americans.",
     images: ["/images/hero/civil-rights-march.jpg"],
   },
 };
@@ -44,6 +46,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className="antialiased">
+        <StructuredData data={buildSiteJsonLd()} />
         <Suspense fallback={null}>
           <PageViewTracker />
         </Suspense>

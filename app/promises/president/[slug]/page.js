@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Breadcrumbs } from "@/app/components/public/chrome";
 import {
   PromiseImpactDirectionBadge,
   PromiseRelevanceBadge,
@@ -12,6 +13,11 @@ import { EXPLANATION_CONTENT } from "@/lib/content/explanations";
 import { buildPageMetadata } from "@/lib/metadata";
 import { buildPromiseCardHref } from "@/lib/shareable-card-links";
 import PresidentAvatar from "@/app/components/PresidentAvatar";
+import StructuredData from "@/app/components/public/StructuredData";
+import {
+  buildBreadcrumbJsonLd,
+  buildCollectionPageJsonLd,
+} from "@/lib/structured-data";
 
 async function getPromisePresident(slug, showAll) {
   const params = new URLSearchParams();
@@ -36,12 +42,15 @@ export async function generateMetadata({ params }) {
     });
   }
 
-  const termLabel = formatTermRange(president.term_start, president.term_end);
-
   return buildPageMetadata({
-    title: `${president.president} (${termLabel}) Promise Tracker`,
-    description: `Review Promise Tracker records for the ${termLabel} ${president.president} term, grouped by status.`,
+    title: `${president.president} promise tracker`,
+    description: `Review Promise Tracker records for ${president.president}, grouped by status and tied to documented actions and outcomes affecting Black Americans.`,
     path: `/promises/president/${slug}`,
+    keywords: [
+      president.president,
+      "campaign promises to Black Americans",
+      "promise tracker by president",
+    ],
   });
 }
 
@@ -125,6 +134,40 @@ export default async function PromisePresidentPage({ params, searchParams }) {
 
   return (
     <main className="max-w-7xl mx-auto p-6">
+      <StructuredData
+        data={[
+          buildBreadcrumbJsonLd(
+            [
+              { href: "/", label: "Home" },
+              { href: "/promises", label: "Promises" },
+              { label: president.president },
+            ],
+            `/promises/president/${slug}`
+          ),
+          buildCollectionPageJsonLd({
+            title: `${president.president} promise tracker`,
+            description: `A status-based view of ${president.president}'s campaign and governing promises, linked actions, and documented outcomes affecting Black Americans.`,
+            path: `/promises/president/${slug}`,
+            about: [
+              "campaign promises",
+              president.president,
+              "Black Americans",
+              "promise tracking",
+            ],
+            keywords: [
+              `${president.president} promises`,
+              "campaign promises to Black Americans",
+            ],
+          }),
+        ]}
+      />
+      <Breadcrumbs
+        items={[
+          { href: "/", label: "Home" },
+          { href: "/promises", label: "Promises" },
+          { label: president.president },
+        ]}
+      />
       <div className="mb-4 flex flex-wrap gap-3">
         <Link
           href="/promises"
@@ -158,8 +201,7 @@ export default async function PromisePresidentPage({ params, searchParams }) {
             <p className="eyebrow mb-4">Promise Tracker</p>
             <h1 className="text-3xl md:text-4xl font-bold">{president.president}</h1>
             <p className="text-base md:text-lg text-[var(--ink-soft)] mt-4 leading-8">
-              Promise Tracker groups this presidency term&apos;s records by status. The default public view shows the full
-              tracked promise set for this term, while the prioritized view narrows to higher-relevance records when needed.
+              Promise Tracker groups this presidency term&apos;s records by status so users can study campaign promises, governing commitments, and linked outcomes affecting Black Americans in one place. The default public view shows the full tracked promise set for this term, while the prioritized view narrows to higher-relevance records when needed.
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
               {president.president_party ? <MetaPill>{president.president_party}</MetaPill> : null}
@@ -224,6 +266,39 @@ export default async function PromisePresidentPage({ params, searchParams }) {
             Explore Black Impact Score
           </Link>
         </div>
+      </section>
+
+      <section className="grid gap-4 md:grid-cols-3 mb-8">
+        <Link
+          href={`/presidents/${slug}`}
+          className="rounded-[1.4rem] border border-[rgba(120,53,15,0.12)] bg-white/80 p-5 hover:border-[rgba(120,53,15,0.22)]"
+        >
+          <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Presidential profile</p>
+          <h2 className="mt-3 text-lg font-semibold">Read the full presidential record</h2>
+          <p className="mt-3 text-sm text-[var(--ink-soft)] leading-7">
+            Move from promise delivery into Black Impact Score context, policy drivers, and the broader historical record for this presidency.
+          </p>
+        </Link>
+        <Link
+          href={`/policies?president=${encodeURIComponent(president.president)}`}
+          className="rounded-[1.4rem] border border-[rgba(120,53,15,0.12)] bg-white/80 p-5 hover:border-[rgba(120,53,15,0.22)]"
+        >
+          <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Policy context</p>
+          <h2 className="mt-3 text-lg font-semibold">Browse policy records under this president</h2>
+          <p className="mt-3 text-sm text-[var(--ink-soft)] leading-7">
+            Use the policy explorer to see which laws, executive actions, and court decisions help explain the promise outcomes grouped below.
+          </p>
+        </Link>
+        <Link
+          href="/explainers"
+          className="rounded-[1.4rem] border border-[rgba(120,53,15,0.12)] bg-white/80 p-5 hover:border-[rgba(120,53,15,0.22)]"
+        >
+          <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Historical context</p>
+          <h2 className="mt-3 text-lg font-semibold">Read explainers connected to this record</h2>
+          <p className="mt-3 text-sm text-[var(--ink-soft)] leading-7">
+            Explain the broader legal and historical context before returning to a specific promise record or policy detail page.
+          </p>
+        </Link>
       </section>
 
       <div className="space-y-8">

@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { buildPageMetadata } from "@/lib/metadata";
+import { buildListingMetadata } from "@/lib/metadata";
 import { fetchExplainersIndexData } from "@/lib/public-site-data";
+import StructuredData from "@/app/components/public/StructuredData";
 import { Breadcrumbs } from "@/app/components/public/chrome";
 import {
   DashboardFilterBar,
@@ -9,15 +10,29 @@ import {
   SectionIntro,
 } from "@/app/components/public/core";
 import { ExplainerIndexGrid } from "@/app/components/public/entities";
+import {
+  buildBreadcrumbJsonLd,
+  buildCollectionPageJsonLd,
+} from "@/lib/structured-data";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = buildPageMetadata({
-  title: "Explainers",
-  description:
-    "Read structured EquityStack explainers that connect public claims to policy records, evidence, and historical context.",
-  path: "/explainers",
-});
+export async function generateMetadata({ searchParams }) {
+  const resolvedSearchParams = (await searchParams) || {};
+
+  return buildListingMetadata({
+    title: "Black history and policy explainers",
+    description:
+      "Read EquityStack explainers on Black history, civil rights policy, presidents, legislation, and historical context tied to the public record.",
+    path: "/explainers",
+    keywords: [
+      "Black history explainers",
+      "civil rights policy explainer",
+      "presidents and Black Americans",
+    ],
+    searchParams: resolvedSearchParams,
+  });
+}
 
 export default async function ExplainersPage({ searchParams }) {
   const resolvedSearchParams = (await searchParams) || {};
@@ -36,18 +51,42 @@ export default async function ExplainersPage({ searchParams }) {
 
   return (
     <main className="space-y-10">
+      <StructuredData
+        data={[
+          buildBreadcrumbJsonLd(
+            [{ href: "/", label: "Home" }, { label: "Explainers" }],
+            "/explainers"
+          ),
+          buildCollectionPageJsonLd({
+            title: "Black history and policy explainers",
+            description:
+              "A library of explainers that connect public claims about Black history, presidents, and policy to the underlying records in EquityStack.",
+            path: "/explainers",
+            about: [
+              "Black history",
+              "U.S. presidents",
+              "civil rights policy",
+              "legislation affecting Black Americans",
+            ],
+            keywords: [
+              "Black history explainers",
+              "presidents and Black Americans",
+            ],
+          }),
+        ]}
+      />
       <Breadcrumbs items={[{ href: "/", label: "Home" }, { label: "Explainers" }]} />
 
       <section className="hero-panel p-8 md:p-10 xl:p-14">
         <SectionIntro
           as="h1"
           eyebrow="Explainers"
-          title="Context pages that connect public arguments back to the record."
-          description="Explainers are the bridge between broad public claims and the specific policies, promises, and sources inside EquityStack. They are meant to clarify the record, not replace it."
+          title="Black history and policy explainers grounded in the public record."
+          description="Explainers are the bridge between broad public claims and the specific presidents, policies, promises, and sources inside EquityStack. They are meant to clarify the record, not replace it."
           actions={
             <>
               <Link href="/reports" className="public-button-primary">
-                Open reports
+                Open historical reports
               </Link>
               <Link href="/methodology" className="public-button-secondary">
                 Read methodology

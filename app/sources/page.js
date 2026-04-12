@@ -40,7 +40,7 @@ export default async function SourcesPage({ searchParams }) {
         <SectionIntro
           as="h1"
           eyebrow="Source library"
-          title="Transparency should be browseable, not hidden behind the record."
+          title="Browse the evidence behind EquityStack’s public record."
           description="The source library gives users a direct view into the public evidence base behind policies, promises, and outcomes. Use it to inspect source types, publishers, linked-record counts, and coverage depth."
           actions={
             <>
@@ -71,6 +71,21 @@ export default async function SourcesPage({ searchParams }) {
           Multiple sources can support a single policy, promise, or outcome record. The public library
           exists so readers can inspect that evidence layer directly.
         </p>
+      </section>
+
+      <section className="grid gap-4 md:grid-cols-2">
+        <div className="rounded-[1.5rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+          <h2 className="text-lg font-semibold text-white">Why this page matters</h2>
+          <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+            Readers can use this page to verify claims, understand what kinds of sources support Black policy impact analysis, and see how widely a source is used across the site.
+          </p>
+        </div>
+        <div className="rounded-[1.5rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+          <h2 className="text-lg font-semibold text-white">How to use it</h2>
+          <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+            Search by publisher, title, or URL when you want to inspect a specific evidentiary trail, then return to the linked policy or promise record for full context.
+          </p>
+        </div>
       </section>
 
       <DashboardFilterBar helpText="Search by source title, publisher, type, or URL. The goal is to make transparency legible without exposing raw internal junction-table noise.">

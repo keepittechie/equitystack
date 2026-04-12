@@ -348,8 +348,8 @@ export default function BillsClient({ bills }) {
         <SectionIntro
           as="h1"
           eyebrow="Legislative tracker"
-          title="Track the bills shaping Black outcomes"
-          description="Browse the tracked bills EquityStack is watching, see where they sit in the process, and open the context behind why they matter for Black outcomes."
+          title="Track the bills shaping policy outcomes for Black Americans"
+          description="Browse the tracked bills EquityStack is watching, see where they sit in the legislative process, and open the context behind why they matter for Black Americans, civil-rights policy, and related public outcomes."
           actions={
             <>
               <Link href="/activity" className="public-button-primary">
@@ -508,8 +508,8 @@ export default function BillsClient({ bills }) {
       <section className="grid items-start gap-6 xl:grid-cols-[1.1fr_0.9fr]">
         <PageContextBlock
           title="How to read this bill layer"
-          description="The public bill cards are built from real tracked-bill records already linked into EquityStack’s legislative dataset."
-          detail="Estimated BIS, impact direction, and impact confidence are derived from a deterministic bill-level model that uses domain relevance, reach, enforcement, legislative progress, risk signals, and source-backed completeness. They should still be read alongside the underlying bill record and source links."
+          description="The public bill cards are built from tracked-bill records already linked into EquityStack’s legislative dataset."
+          detail="Use this page as a search-friendly entry point for current legislation affecting Black Americans, then open the bill detail page for legislative history, linked promises, related presidents, and source-backed context."
         />
         <MethodologyCallout
           title="Why the score is marked estimated"

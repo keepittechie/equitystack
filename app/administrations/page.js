@@ -35,9 +35,24 @@ export default async function AdministrationsPage({ searchParams }) {
         <SectionIntro
           as="h1"
           eyebrow="Administration index"
-          title="Track presidencies as governing administrations, not just score rows."
-          description="Administration pages summarize promise throughput, outcome counts, impact direction, and recent governing activity in one place."
+          title="Browse presidencies as governing administrations."
+          description="Administration pages summarize promise throughput, outcome counts, impact direction, and recent governing activity so users can compare presidential terms as operating administrations, not just score rows."
         />
+      </section>
+
+      <section className="grid gap-4 md:grid-cols-2">
+        <div className="rounded-[1.5rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+          <h2 className="text-lg font-semibold text-white">What this section covers</h2>
+          <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+            This index groups public records by administration so users can study governing activity, promise status, and visible policy movement across terms.
+          </p>
+        </div>
+        <div className="rounded-[1.5rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+          <h2 className="text-lg font-semibold text-white">Best next step</h2>
+          <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+            Open an administration profile when you want the promise feed and recent activity, then move into the president profile for Black Impact Score interpretation.
+          </p>
+        </div>
       </section>
 
       <DashboardFilterBar helpText="Browse administrations as public entities with both governing throughput and presidential score context.">
@@ -112,7 +127,7 @@ export default async function AdministrationsPage({ searchParams }) {
         )}
       </section>
 
-      <MethodologyCallout description="Administration pages are browse-first summaries. Use the linked president profile when you want the fuller direct/systemic score interpretation." />
+      <MethodologyCallout description="Administration pages are browse-first summaries. Use the linked president profile when you want the fuller Black Impact Score interpretation, broader historical context, and policy drivers." />
     </main>
   );
 }

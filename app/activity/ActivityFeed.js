@@ -170,7 +170,7 @@ function ActivityCard({ item }) {
           href={`/future-bills?focus=${item.futureBillId}`}
           className="px-4 py-2 rounded-full bg-[var(--accent)] text-white text-sm font-medium"
         >
-          Open Future Bill
+          Open future-bill context
         </Link>
         {item.billUrl ? (
           <a
@@ -179,7 +179,7 @@ function ActivityCard({ item }) {
             rel="noopener noreferrer"
             className="px-4 py-2 rounded-full border border-[var(--line-strong)] bg-white/80 text-sm font-medium"
           >
-            View Bill Source
+            View the original bill source
           </a>
         ) : null}
       </div>
@@ -307,6 +307,21 @@ export default function ActivityFeed({ bills }) {
           and the legislators attached to them. This page is built for browsing the latest
           activity without having to jump between multiple sections first.
         </p>
+      </section>
+
+      <section className="grid gap-4 md:grid-cols-2">
+        <div className="card-surface rounded-[1.5rem] p-5">
+          <h2 className="text-lg font-semibold">What this feed shows</h2>
+          <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+            Each entry connects recent legislative action to the future-bill proposal, tracked bill, and linked legislator context already modeled in EquityStack.
+          </p>
+        </div>
+        <div className="card-surface rounded-[1.5rem] p-5">
+          <h2 className="text-lg font-semibold">How to use it</h2>
+          <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+            Use the activity feed as a recent-updates landing page, then open the future-bill or scorecard pages when you need the full policy or accountability context.
+          </p>
+        </div>
       </section>
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">

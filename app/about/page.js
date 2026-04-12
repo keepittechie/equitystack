@@ -43,8 +43,8 @@ export default function AboutPage() {
         <SectionIntro
           as="h1"
           eyebrow="About EquityStack"
-          title="A public platform for measuring how government action affected Black Americans."
-          description="EquityStack is built to make policy impact readable, evidence-linked, and methodologically transparent. It aims to help users understand what the data shows, what it does not show, and how to interpret it responsibly."
+          title="A public research platform about presidents, policy, and Black Americans."
+          description="EquityStack is built to make policy impact readable, evidence-linked, and methodologically transparent. It helps users understand what the data shows, what it does not show, and how to interpret it responsibly."
           actions={
             <>
               <Link href="/methodology" className="public-button-primary">
@@ -84,6 +84,21 @@ export default function AboutPage() {
         />
       </section>
 
+      <section className="grid gap-4 md:grid-cols-2">
+        <div className="rounded-[1.5rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+          <h2 className="text-lg font-semibold text-white">What you can do on EquityStack</h2>
+          <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+            Browse presidents, campaign promises, legislation, executive actions, explainers, reports, and sources through one connected public record.
+          </p>
+        </div>
+        <div className="rounded-[1.5rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+          <h2 className="text-lg font-semibold text-white">Who it is useful for</h2>
+          <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+            The platform is designed for researchers, students, journalists, voters, and historically curious readers who want a clearer view of policy impact on Black Americans.
+          </p>
+        </div>
+      </section>
+
       <section className="grid gap-5 md:grid-cols-2">
         {ABOUT_SECTIONS.map((item) => (
           <article
@@ -107,9 +122,9 @@ export default function AboutPage() {
               </p>
             </Link>
             <Link href="/presidents" className="panel-link rounded-[1.2rem] p-4">
-              <h3 className="text-lg font-semibold text-white">Explore presidential scores</h3>
+              <h3 className="text-lg font-semibold text-white">Browse presidents and Black history</h3>
               <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
-                Use the presidential ranking and profile pages to inspect score drivers, trend lines, and evidence footprint.
+                Use the presidential ranking and profile pages to inspect score drivers, trend lines, and historical policy impact on Black Americans.
               </p>
             </Link>
           </div>

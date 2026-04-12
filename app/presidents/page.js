@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { buildPageMetadata } from "@/lib/metadata";
+import { buildListingMetadata } from "@/lib/metadata";
 import { fetchPresidentsOverviewData } from "@/lib/public-site-data";
+import StructuredData from "@/app/components/public/StructuredData";
 import { Breadcrumbs } from "@/app/components/public/chrome";
 import {
   CitationNote,
@@ -18,15 +19,31 @@ import {
 } from "@/app/components/public/entities";
 import TrustBar from "@/app/components/public/TrustBar";
 import ScoreExplanation from "@/app/components/public/ScoreExplanation";
+import {
+  buildBreadcrumbJsonLd,
+  buildCollectionPageJsonLd,
+  buildDatasetJsonLd,
+} from "@/lib/structured-data";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = buildPageMetadata({
-  title: "Presidents",
-  description:
-    "Compare presidential records using the final Black Impact Score, outcome-based context, bill-linked inputs, and policy drivers.",
-  path: "/presidents",
-});
+export async function generateMetadata({ searchParams }) {
+  const resolvedSearchParams = (await searchParams) || {};
+
+  return buildListingMetadata({
+    title: "U.S. presidents and Black policy impact",
+    description:
+      "Compare U.S. presidents using the Black Impact Score, linked promises, policy drivers, and historical context on Black Americans.",
+    path: "/presidents",
+    keywords: [
+      "Black history by president",
+      "presidents and Black Americans",
+      "civil rights policy by president",
+      "which presidents helped Black Americans",
+    ],
+    searchParams: resolvedSearchParams,
+  });
+}
 
 function matchesFilter(value, selected) {
   if (!selected) {
@@ -91,21 +108,59 @@ export default async function PresidentsPage({ searchParams }) {
 
   return (
     <main className="space-y-10">
+      <StructuredData
+        data={[
+          buildBreadcrumbJsonLd(
+            [{ href: "/", label: "Home" }, { label: "Presidents" }],
+            "/presidents"
+          ),
+          buildCollectionPageJsonLd({
+            title: "U.S. presidents and Black policy impact",
+            description:
+              "Browse presidential profiles, compare scores, and research how presidents affected Black Americans through policy, promises, and historical context.",
+            path: "/presidents",
+            about: [
+              "U.S. presidents",
+              "Black history",
+              "civil rights policy",
+              "presidential policy impact on Black Americans",
+            ],
+            keywords: [
+              "presidential record on Black issues",
+              "Black progress under presidents",
+            ],
+          }),
+          buildDatasetJsonLd({
+            title: "EquityStack presidential impact dataset",
+            description:
+              "Structured presidential profiles, promise counts, outcome-based scores, and historical policy context used by the EquityStack presidents index.",
+            path: "/presidents",
+            about: ["U.S. presidents", "Black Americans", "historical policy impact"],
+            keywords: ["presidents and Black Americans", "Black history by president"],
+            variableMeasured: [
+              "Black Impact Score",
+              "Systemic score",
+              "Promise count",
+              "Outcome count",
+            ],
+          }),
+        ]}
+      />
       <Breadcrumbs items={[{ href: "/", label: "Home" }, { label: "Presidents" }]} />
 
       <section className="hero-panel p-8 md:p-10 xl:p-14">
         <SectionIntro
           as="h1"
           eyebrow="President records"
-          title="Compare presidential impact records without losing evidence or context."
-          description="The presidents index leads with the final Black Impact Score, keeps outcome-based and systemic context visible, and now adds bounded bill-linked inputs where the current Bills → Promises → Presidents lineage supports them."
+          title="Compare U.S. presidents and their policy impact on Black Americans."
+          description="Use this index to research Black history by president, compare civil-rights policy records, and see how presidential score, promises, legislation, and evidence fit together."
           actions={
             <>
               <Link href="/dashboard" className="public-button-primary">
-                Open dashboard
+                Open the public data dashboard
               </Link>
               <Link href="/methodology" className="public-button-secondary">
-                Read scoring method
+                Read the presidential scoring method
               </Link>
             </>
           }
@@ -116,8 +171,8 @@ export default async function PresidentsPage({ searchParams }) {
 
       <section className="grid items-start gap-6 xl:grid-cols-[1.05fr_0.95fr]">
         <PageContextBlock
-          description="This page ranks presidential records using the final Black Impact Score, anchored by outcome-based scoring and lightly blended with bill-informed inputs when real legislative lineage supports them."
-          detail="Use the ranking table for fast scan, then open a profile to read the outcome-based anchor, bill influence, trend lines, policy drivers, evidence footprint, and related promise records."
+          description="This page ranks presidential records using the final Black Impact Score, anchored by documented policy outcomes and supported by promise and legislative context."
+          detail="Use it to answer questions like which presidents most affected Black Americans, how civil-rights policy differed across administrations, and where the current evidence base is strongest or thinnest."
         />
         <ScoreExplanation title="How to read presidential Impact Scores" />
       </section>
@@ -165,6 +220,21 @@ export default async function PresidentsPage({ searchParams }) {
           </button>
         </form>
       </DashboardFilterBar>
+
+      <section className="grid gap-4 md:grid-cols-2">
+        <Link href="/promises" className="panel-link rounded-[1.5rem] p-5">
+          <h2 className="text-lg font-semibold text-white">Open campaign promises by president</h2>
+          <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+            Use the Promise Tracker to see what presidents said they would do for Black Americans and how those commitments were later graded.
+          </p>
+        </Link>
+        <Link href="/reports/black-impact-score" className="panel-link rounded-[1.5rem] p-5">
+          <h2 className="text-lg font-semibold text-white">Read the Black Impact Score report</h2>
+          <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+            The flagship report adds ranking context, score interpretation, and broader historical framing beyond the profile cards on this page.
+          </p>
+        </Link>
+      </section>
 
       <ImpactOverviewCards
         items={[

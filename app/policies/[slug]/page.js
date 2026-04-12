@@ -2,9 +2,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buildPageMetadata } from "@/lib/metadata";
 import { buildPolicySlug, fetchPolicyDetailBySlug } from "@/lib/public-site-data";
+import StructuredData from "@/app/components/public/StructuredData";
 import { Breadcrumbs } from "@/app/components/public/chrome";
 import {
   MethodologyCallout,
+  PageContextBlock,
   SectionIntro,
   SourceTrustPanel,
 } from "@/app/components/public/core";
@@ -16,6 +18,10 @@ import {
   PolicyTimeline,
   PromiseResultsTable,
 } from "@/app/components/public/entities";
+import {
+  buildBreadcrumbJsonLd,
+  buildPolicyJsonLd,
+} from "@/lib/structured-data";
 
 export const dynamic = "force-dynamic";
 
@@ -94,6 +100,38 @@ function buildWhyItMatters(policy) {
   return `EquityStack classifies this policy as ${direction.toLowerCase()} impact with ${evidence.toLowerCase()} supporting evidence. The record matters because it helps explain how government action shaped Black Americans' rights, resources, exposure to harm, or access to institutions.`;
 }
 
+function buildResearchPaths(policy) {
+  const paths = [];
+
+  if (policy.president) {
+    paths.push({
+      href: `/policies?president=${encodeURIComponent(policy.president)}`,
+      label: "Presidential context",
+      title: `Browse more policy records under ${policy.president}`,
+      description:
+        "Use the filtered policy index to see whether this record fits a broader presidential pattern on Black rights, access, or public investment.",
+    });
+  }
+
+  paths.push({
+    href: "/narratives",
+    label: "Historical threads",
+    title: "Read narrative policy threads",
+    description:
+      "Narrative pages group policies into larger historical patterns, making it easier to place one record inside a broader Black history or civil-rights arc.",
+  });
+
+  paths.push({
+    href: "/reports",
+    label: "Analysis layer",
+    title: "Continue into reports and comparative analysis",
+    description:
+      "Reports help move from one policy record into cross-administration patterns, score context, and higher-level historical interpretation.",
+  });
+
+  return paths;
+}
+
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   const policy = await fetchPolicyDetailBySlug(slug);
@@ -110,8 +148,14 @@ export async function generateMetadata({ params }) {
     title: policy.title,
     description:
       policy.summary ||
-      "Review a policy record with score, impact narrative, evidence, and linked records.",
+      `Review a policy record on ${policy.title} with impact score, evidence, and historical context affecting Black Americans.`,
     path: `/policies/${policy.slug}`,
+    keywords: [
+      policy.policy_type,
+      policy.president,
+      policy.era,
+      "legislation affecting Black Americans",
+    ].filter(Boolean),
   });
 }
 
@@ -125,6 +169,8 @@ export default async function PolicyDetailPage({ params }) {
 
   const timeline = buildTimeline(policy);
   const score = computePolicyScore(policy);
+  const policyPath = `/policies/${policy.slug}`;
+  const researchPaths = buildResearchPaths(policy);
   const badges = [
     policy.year_enacted ? `Year ${policy.year_enacted}` : null,
     policy.president ? `President: ${policy.president}` : null,
@@ -136,6 +182,19 @@ export default async function PolicyDetailPage({ params }) {
 
   return (
     <main className="space-y-10">
+      <StructuredData
+        data={[
+          buildBreadcrumbJsonLd(
+            [
+              { href: "/", label: "Home" },
+              { href: "/policies", label: "Policies" },
+              { label: policy.title },
+            ],
+            policyPath
+          ),
+          buildPolicyJsonLd(policy, policy.slug, score),
+        ]}
+      />
       <Breadcrumbs
         items={[
           { href: "/", label: "Home" },
@@ -153,6 +212,22 @@ export default async function PolicyDetailPage({ params }) {
       />
 
       <TrustBar />
+
+      <section className="grid items-start gap-6 xl:grid-cols-[1.05fr_0.95fr]">
+        <PageContextBlock
+          description="Policy detail pages are the core evidence layer of EquityStack. Each one is meant to answer what happened, how the record is classified, and why it matters for Black Americans."
+          detail="Use this page when you want to verify a law, executive action, or court decision directly before moving into broader presidential, legislative, or historical comparisons."
+        />
+        <div className="rounded-[1.6rem] border border-[rgba(132,247,198,0.18)] bg-[linear-gradient(145deg,rgba(14,36,33,0.72),rgba(8,14,24,0.96))] p-6">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--accent)]">
+            Why this page matters
+          </p>
+          <h2 className="mt-4 text-2xl font-semibold text-white">Policy history with public evidence attached</h2>
+          <p className="mt-4 text-sm leading-7 text-[var(--ink-soft)]">
+            Search visitors often arrive with a broad question about civil-rights law, presidential impact, or historical harm. This page is where that question should become concrete through summary, score, sources, and related records.
+          </p>
+        </div>
+      </section>
 
       <section className="public-two-col-rail grid gap-6 xl:grid-cols-[1.08fr_0.92fr]">
         <div className="space-y-5">
@@ -223,7 +298,7 @@ export default async function PolicyDetailPage({ params }) {
           <SectionIntro
             eyebrow="Related records"
             title="Promises, explainers, and report paths"
-            description="Related records make it easier to move from a single policy into the broader public narrative or administrative context."
+            description="Related records make it easier to move from a single policy into campaign promises, Black history explainers, and broader presidential or administrative context."
           />
           {(policy.related_promises || []).length ? (
             <PromiseResultsTable items={policy.related_promises} buildHref={(item) => `/promises/${item.slug}`} />
@@ -246,9 +321,18 @@ export default async function PolicyDetailPage({ params }) {
               <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">Related report</p>
               <h3 className="mt-3 text-lg font-semibold text-white">Black Impact Score</h3>
               <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-                Move from the policy proof page into the flagship report when you want presidential or historical comparison context.
+                Move from this policy proof page into the flagship report when you want presidential or historical comparison context.
               </p>
             </Link>
+            {researchPaths.map((item) => (
+              <Link key={item.href} href={item.href} className="panel-link rounded-[1.4rem] p-5">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+                  {item.label}
+                </p>
+                <h3 className="mt-3 text-lg font-semibold text-white">{item.title}</h3>
+                <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item.description}</p>
+              </Link>
+            ))}
           </div>
         </div>
       </section>

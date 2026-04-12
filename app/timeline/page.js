@@ -36,22 +36,37 @@ export default async function TimelinePage({ searchParams }) {
         <SectionIntro
           as="h1"
           eyebrow="Timeline"
-          title="See the record in chronological order."
-          description="The timeline is a discovery layer for users who want sequence before synthesis. It mixes policies and promises in one public chronology so changes, reversals, and continuity become easier to follow."
+          title="Follow Black policy history in chronological order."
+          description="The timeline is a discovery layer for readers who want sequence before synthesis. It mixes policies and promises in one public chronology so civil-rights gains, reversals, and continuity become easier to follow."
           actions={
             <>
               <Link href="/reports/civil-rights-timeline" className="public-button-primary">
-                Open civil-rights timeline
+                Open the civil-rights timeline report
               </Link>
               <Link href="/dashboard" className="public-button-secondary">
-                Open dashboard
+                Return to the public dashboard
               </Link>
             </>
           }
         />
       </section>
 
-      <DashboardFilterBar helpText="Use the timeline as a discovery and context surface. Filter by record type or visible direction/status when you want a narrower historical slice.">
+      <section className="grid gap-4 md:grid-cols-2">
+        <div className="rounded-[1.5rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+          <h2 className="text-lg font-semibold text-white">What this timeline covers</h2>
+          <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+            This page combines historical policy records and promise records so users can see when major shifts affecting Black Americans took place.
+          </p>
+        </div>
+        <div className="rounded-[1.5rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+          <h2 className="text-lg font-semibold text-white">What to look for</h2>
+          <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+            Use the timeline to identify turning points, then open the linked policy or promise pages for the evidence, explanation, and historical context behind each entry.
+          </p>
+        </div>
+      </section>
+
+      <DashboardFilterBar helpText="Use the timeline as a discovery and context surface. Filter by record type or visible direction/status when you want a narrower slice of Black policy history.">
         <form action="/timeline" method="GET" className="flex flex-1 flex-wrap items-end gap-4">
           <label className="grid gap-2">
             <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
@@ -164,7 +179,7 @@ export default async function TimelinePage({ searchParams }) {
             <h2 className="text-lg font-semibold text-white">How to read the timeline</h2>
             <div className="mt-4 grid gap-3 text-sm leading-7 text-[var(--ink-soft)]">
               <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
-                Use it to identify when major shifts happened.
+                Use it to identify when major shifts in Black policy history happened.
               </div>
               <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
                 Open policy cards when you need the evidence and impact explanation.

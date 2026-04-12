@@ -1,8 +1,14 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Breadcrumbs } from "@/app/components/public/chrome";
+import StructuredData from "@/app/components/public/StructuredData";
 import HelpfulFeedback from "@/app/components/feedback/HelpfulFeedback";
 import TrackedLink from "@/app/components/telemetry/TrackedLink";
 import CopyShareLinkButton from "@/app/reports/black-impact-score/CopyShareLinkButton";
+import {
+  MethodologyCallout,
+  PageContextBlock,
+} from "@/app/components/public/core";
 import {
   FutureBillDetailSections,
   formatDate,
@@ -11,6 +17,10 @@ import {
 } from "@/app/future-bills/FutureBillContent";
 import { buildPageMetadata } from "@/lib/metadata";
 import { getFutureBillDetail } from "@/lib/shareable-cards";
+import {
+  buildBreadcrumbJsonLd,
+  buildLegislationJsonLd,
+} from "@/lib/structured-data";
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
@@ -34,6 +44,11 @@ export async function generateMetadata({ params }) {
     path: bill.detailPath,
     imagePath: `${bill.cardPath}/opengraph-image`,
     type: "article",
+    keywords: [
+      bill.target_area,
+      "future legislation affecting Black Americans",
+      "reform proposal",
+    ].filter(Boolean),
   });
 }
 
@@ -65,6 +80,45 @@ export default async function FutureBillDetailPage({ params }) {
 
   return (
     <main className="max-w-5xl mx-auto p-6 space-y-6">
+      <StructuredData
+        data={[
+          buildBreadcrumbJsonLd(
+            [
+              { href: "/", label: "Home" },
+              { href: "/future-bills", label: "Future Bills" },
+              { label: bill.title },
+            ],
+            bill.detailPath
+          ),
+          buildLegislationJsonLd({
+            title: bill.title,
+            description: bill.summary,
+            path: bill.detailPath,
+            identifier: bill.slug,
+            imagePath: `${bill.cardPath}/opengraph-image`,
+            dateCreated: bill.created_at,
+            dateModified: bill.latest_tracked_update,
+            about: [
+              bill.target_area,
+              "reform proposal",
+              "future legislation affecting Black Americans",
+            ],
+            keywords: [
+              bill.target_area,
+              "future legislation affecting Black Americans",
+              "reform proposal",
+            ].filter(Boolean),
+            legislationType: "Future bill",
+          }),
+        ]}
+      />
+      <Breadcrumbs
+        items={[
+          { href: "/", label: "Home" },
+          { href: "/future-bills", label: "Future Bills" },
+          { label: bill.title },
+        ]}
+      />
       <div className="flex flex-wrap gap-3">
         <Link
           href="/future-bills"
@@ -151,6 +205,49 @@ export default async function FutureBillDetailPage({ params }) {
           value={String(bill.sources?.length || 0)}
           subtitle="Public source links pulled from linked bills and tracked actions."
         />
+      </section>
+
+      <section className="grid items-start gap-6 xl:grid-cols-[1.05fr_0.95fr]">
+        <PageContextBlock
+          description="This page is the detail view for one future bill or reform proposal. It brings together the problem statement, proposed solution, linked bills, explainers, and sponsor context already present in EquityStack."
+          detail="Use it when you want to understand what the proposal is trying to change, how much supporting legislative context is already linked, and where to continue the research path."
+        />
+        <div className="rounded-[1.6rem] border border-[rgba(132,247,198,0.18)] bg-[linear-gradient(145deg,rgba(14,36,33,0.72),rgba(8,14,24,0.96))] p-6">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--accent)]">
+            Why this proposal matters
+          </p>
+          <h2 className="mt-4 text-2xl font-semibold text-white">A forward-looking policy record</h2>
+          <p className="mt-4 text-sm leading-7 text-[var(--ink-soft)]">
+            Future-bill pages help search visitors understand reform ideas before they become settled law. They connect unresolved harms, proposed solutions, live legislative tracking, and surrounding context without pretending the proposal is already implemented.
+          </p>
+        </div>
+      </section>
+
+      <section className="grid gap-4 md:grid-cols-3">
+        <Link href="/bills" className="panel-link rounded-[1.4rem] p-5">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+            Legislative tracking
+          </p>
+          <h2 className="mt-3 text-lg font-semibold text-white">Browse linked bills and current movement</h2>
+          <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+            Open the bill tracker when you want current congressional status, bill-level impact estimates, and deeper legislative timelines.
+          </p>
+        </Link>
+        <Link href="/explainers" className="panel-link rounded-[1.4rem] p-5">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+            Historical context
+          </p>
+          <h2 className="mt-3 text-lg font-semibold text-white">Read explainers tied to the same reform area</h2>
+          <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+            Explainers help place this proposal inside the longer history of Black policy impact, legal change, and unfinished reform.
+          </p>
+        </Link>
+        <div className="space-y-4">
+          <MethodologyCallout
+            title="How to read future-bill pages"
+            description="Proposal pages surface reform direction and linked context, but they remain limited by the current public legislative and source record."
+          />
+        </div>
       </section>
 
       <section className="card-surface rounded-[1.7rem] p-7 md:p-8">

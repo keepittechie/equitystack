@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { buildPageMetadata } from "@/lib/metadata";
+import { buildListingMetadata } from "@/lib/metadata";
 import { fetchReportsHubData } from "@/lib/public-site-data";
+import StructuredData from "@/app/components/public/StructuredData";
 import { Breadcrumbs } from "@/app/components/public/chrome";
 import {
   CitationNote,
@@ -21,15 +22,30 @@ import {
 import TrustBar from "@/app/components/public/TrustBar";
 import ScoreExplanation from "@/app/components/public/ScoreExplanation";
 import InsightCard from "@/app/components/public/InsightCard";
+import {
+  buildBreadcrumbJsonLd,
+  buildCollectionPageJsonLd,
+  buildDatasetJsonLd,
+} from "@/lib/structured-data";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = buildPageMetadata({
-  title: "Reports",
-  description:
-    "Browse flagship reports, dataset analysis, historical distribution views, and evidence-first public reporting on EquityStack.",
-  path: "/reports",
-});
+export async function generateMetadata({ searchParams }) {
+  const resolvedSearchParams = (await searchParams) || {};
+
+  return buildListingMetadata({
+    title: "Black history, civil-rights, and policy impact reports",
+    description:
+      "Browse EquityStack reports on Black history, U.S. presidents, civil-rights policy, legislation, and historical policy impact on Black Americans.",
+    path: "/reports",
+    keywords: [
+      "Black history reports",
+      "civil rights policy report",
+      "policy impact on Black communities",
+    ],
+    searchParams: resolvedSearchParams,
+  });
+}
 
 export default async function ReportsPage({ searchParams }) {
   const resolvedSearchParams = (await searchParams) || {};
@@ -55,13 +71,51 @@ export default async function ReportsPage({ searchParams }) {
 
   return (
     <main className="space-y-10">
+      <StructuredData
+        data={[
+          buildBreadcrumbJsonLd(
+            [{ href: "/", label: "Home" }, { label: "Reports" }],
+            "/reports"
+          ),
+          buildCollectionPageJsonLd({
+            title: "Black history, civil-rights, and policy impact reports",
+            description:
+              "A public report library covering Black history, U.S. presidents, civil-rights policy, promise tracking, and historical policy impact on Black Americans.",
+            path: "/reports",
+            about: [
+              "Black history",
+              "civil rights policy",
+              "U.S. presidents",
+              "historical policy impact",
+            ],
+            keywords: [
+              "Black history reports",
+              "policy impact on Black communities",
+            ],
+          }),
+          buildDatasetJsonLd({
+            title: "EquityStack report layer dataset",
+            description:
+              "Structured analytical summaries, score context, and historical report data presented through the EquityStack reports hub.",
+            path: "/reports",
+            about: ["Black history", "civil rights policy", "policy impact on Black Americans"],
+            keywords: ["Black history reports", "historical policy impact"],
+            variableMeasured: [
+              "Black Impact Score",
+              "Outcome coverage",
+              "Category impact",
+              "Direction breakdown",
+            ],
+          }),
+        ]}
+      />
       <Breadcrumbs items={[{ href: "/", label: "Home" }, { label: "Reports" }]} />
 
       <section className="hero-panel p-8 md:p-10 xl:p-14">
         <SectionIntro
           as="h1"
           eyebrow="Analysis hub"
-          title="Read the score, the evidence, and the wider historical context side by side."
+          title="Read Black history, policy impact, and evidence side by side."
           description="Reports are the public intelligence layer on top of the browseable database. Use them to move from headline interpretation into policy records, promise evidence, timelines, and methodology without losing the audit trail."
           actions={
             <>
@@ -199,7 +253,7 @@ export default async function ReportsPage({ searchParams }) {
           <SectionIntro
             eyebrow="All reports"
             title={`${reports.length} reports currently visible`}
-            description="Use report cards as the jump layer into deeper analysis. Static flagship routes and synthesized report pages share the same public design language."
+            description="Use report cards as the jump layer into deeper analysis of presidents, legislation, civil-rights policy, and historical policy impact."
           />
           <ReportCardGrid items={reports} />
         </div>

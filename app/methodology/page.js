@@ -90,9 +90,24 @@ export default function MethodologyPage() {
         <SectionIntro
           as="h1"
           eyebrow="Methodology"
-          title="Transparent scoring, visible uncertainty, and evidence-first interpretation."
-          description="EquityStack is built as a public civic intelligence platform, which means every headline metric must stay close to methodology, evidence, and known limitations. This page explains the scoring architecture the site uses and what it does not claim."
+          title="How EquityStack scores presidents, promises, and policy impact."
+          description="EquityStack is built as a public research platform, which means every headline metric must stay close to methodology, evidence, and known limitations. This page explains how the site handles Black Impact Score logic, promise grading, evidence, and uncertainty."
         />
+      </section>
+
+      <section className="grid gap-4 md:grid-cols-2">
+        <div className="rounded-[1.5rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+          <h2 className="text-lg font-semibold text-white">Who this page is for</h2>
+          <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+            Use this page if you need to understand how EquityStack interprets presidents, policy impact on Black Americans, source quality, and promise-status logic.
+          </p>
+        </div>
+        <div className="rounded-[1.5rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+          <h2 className="text-lg font-semibold text-white">What to do next</h2>
+          <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+            Read the scoring notes here first, then return to the presidents, policies, or promise tracker pages to apply the method to the public record.
+          </p>
+        </div>
       </section>
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">

@@ -187,12 +187,36 @@ export default function FutureBillsClient({ bills, focusId }) {
         <p className="eyebrow mb-4">
           Forward-Looking Policy Ideas
         </p>
-        <h1 className="page-title mb-4">Future Bills</h1>
+        <h1 className="page-title mb-4">Future bills and reform proposals</h1>
         <p className="text-[var(--ink-soft)] text-lg max-w-3xl leading-8">
           This page tracks proposed policy ideas, legislative priorities, and reform concepts
           that could address unresolved harms, close equity gaps, or strengthen protections
-          for Black communities in the future.
+          for Black communities in the future. Use it as a landing page for forward-looking
+          legislation, then open linked bills, explainers, and scorecards for deeper context.
         </p>
+      </section>
+
+      <section className="grid gap-4 md:grid-cols-2">
+        <div className="card-surface rounded-[1.6rem] p-5">
+          <h2 className="text-lg font-semibold">Why future-bill tracking matters</h2>
+          <p className="mt-3 text-sm text-[var(--ink-soft)] leading-7">
+            Some search visitors are not looking for a passed law. They are trying to understand proposed reforms, unresolved harms, and which legislative ideas are meant to address Black communities more directly. This page makes that proposal layer readable.
+          </p>
+        </div>
+        <div className="card-surface rounded-[1.6rem] p-5">
+          <h2 className="text-lg font-semibold">Best research paths from here</h2>
+          <div className="mt-3 flex flex-wrap gap-3 text-sm">
+            <Link href="/bills" className="accent-link">
+              Browse tracked bills
+            </Link>
+            <Link href="/explainers" className="accent-link">
+              Read related explainers
+            </Link>
+            <Link href="/scorecards" className="accent-link">
+              Browse legislator scorecards
+            </Link>
+          </div>
+        </div>
       </section>
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
@@ -215,10 +239,10 @@ export default function FutureBillsClient({ bills, focusId }) {
           </div>
           <div className="flex flex-wrap gap-3 text-sm">
             <Link href="/scorecards" className="accent-link">
-              Open Scorecards
+              Browse legislator scorecards
             </Link>
             <Link href="/promises" className="accent-link">
-              Open Promise Tracker
+              Browse Promise Tracker
             </Link>
           </div>
         </div>
@@ -362,9 +386,9 @@ export default function FutureBillsClient({ bills, focusId }) {
 
       <section className="space-y-4">
         <div>
-          <h2 className="text-2xl font-semibold">Proposals</h2>
+          <h2 className="text-2xl font-semibold">Proposal records</h2>
           <p className="text-sm text-[var(--ink-soft)] mt-1">
-            These entries represent future-facing bill ideas and reform directions tracked in the project.
+            These entries represent future-facing bill ideas and reform directions tracked in the project, with links out to legislation, explainers, and sponsor context where available.
           </p>
         </div>
 
@@ -478,7 +502,7 @@ export default function FutureBillsClient({ bills, focusId }) {
                       }
                       className="public-button-secondary"
                     >
-                      Open Future Bill
+                      Read proposal detail
                     </Link>
                   </div>
                 </div>

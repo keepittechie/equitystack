@@ -76,11 +76,11 @@ export default async function AdministrationDetailPage({ params }) {
           as="h1"
           eyebrow="Administration profile"
           title={title}
-          description="Administration pages summarize governing activity, promise throughput, and directional outcome mix in one place, then point back into the underlying public record."
+          description="Administration pages summarize governing activity, promise throughput, and directional outcome mix in one place, then point back into the underlying promise and policy record."
           actions={
             profile?.president?.president_slug ? (
               <Link href={`/presidents/${profile.president.president_slug}`} className="public-button-secondary">
-                Open president profile
+                Open the full president profile
               </Link>
             ) : null
           }
@@ -150,7 +150,7 @@ export default async function AdministrationDetailPage({ params }) {
           <SectionIntro
             eyebrow="Linked feed"
             title="Featured administration records"
-            description="Open the featured feed for the most useful entry points into the administration’s visible record."
+            description="Open the featured feed for the most useful entry points into the administration’s promise tracker and related public record."
           />
           <PromiseResultsTable
             items={administration?.featured_records || []}
@@ -159,6 +159,9 @@ export default async function AdministrationDetailPage({ params }) {
           {(detail.linkedPolicyFeed || []).length ? (
             <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
               <h3 className="text-lg font-semibold text-white">Linked policy feed</h3>
+              <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
+                These policy records help connect the administration summary to legislation, executive action, and other documented policy changes.
+              </p>
               <div className="mt-4 grid gap-3">
                 {detail.linkedPolicyFeed.slice(0, 5).map((item) => (
                   <Link
@@ -182,10 +185,29 @@ export default async function AdministrationDetailPage({ params }) {
         </div>
         <div className="space-y-5">
           <MethodologyCallout description="Administration views are descriptive operating summaries. Presidential score pages remain the place to read the Black Impact Score itself." />
+          <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+            <h2 className="text-lg font-semibold text-white">Keep researching this administration</h2>
+            <div className="mt-4 grid gap-3">
+              <Link href="/promises" className="panel-link rounded-[1.2rem] p-4">
+                <h3 className="text-base font-semibold text-white">Open the full promise tracker</h3>
+                <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
+                  Move from this administration summary into the broader promise library when you want cross-president comparison.
+                </p>
+              </Link>
+              {profile?.president?.president_slug ? (
+                <Link href={`/presidents/${profile.president.president_slug}`} className="panel-link rounded-[1.2rem] p-4">
+                  <h3 className="text-base font-semibold text-white">Open the president profile</h3>
+                  <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
+                    Use the president page for Black Impact Score context, score drivers, and deeper historical interpretation.
+                  </p>
+                </Link>
+              ) : null}
+            </div>
+          </div>
           <SectionIntro
             eyebrow="Recent activity"
             title="Latest administration updates"
-            description="Recent activity keeps users close to the newest promise and action movement."
+            description="Recent activity keeps users close to the newest promise and action movement inside this administration."
           />
           <div className="grid gap-4">
             {(administration?.recent_activity || []).slice(0, 6).map((item) => (

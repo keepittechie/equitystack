@@ -173,8 +173,7 @@ export default async function CurrentAdministrationPage() {
               {overview.administration_name} ({termLabel})
             </h1>
             <p className="mt-5 max-w-3xl text-base leading-8 text-[var(--ink-soft)] md:text-lg">
-              This page tracks the current presidency term through reviewed Promise Tracker records.
-              It shows what has been promised, what actions have happened, and what documented outcomes are in the public record so far.
+              This page tracks the current presidency term through reviewed Promise Tracker records. It shows what has been promised, what actions have happened, and what documented outcomes affecting Black Americans are in the public record so far.
             </p>
             <div className="mt-5 flex flex-wrap gap-2">
               {overview?.president?.president_party ? (
@@ -205,7 +204,7 @@ export default async function CurrentAdministrationPage() {
                 targetPath={`/promises/president/${overview.president.slug}?show_all=1`}
                 className="public-button-secondary"
               >
-                Open current-term Promise Tracker
+                Open the current-term promise tracker
               </TrackedLink>
             </div>
           </div>
@@ -219,9 +218,15 @@ export default async function CurrentAdministrationPage() {
       </section>
 
       <section className="card-surface rounded-[1.6rem] p-6">
+        <div className="max-w-3xl mb-5">
+          <h2 className="text-2xl font-semibold">How to read the current administration overview</h2>
+          <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
+            This page is a landing view for the live presidency record. It helps users see recent promise movement, documented actions, and early outcome patterns before moving into individual promise pages.
+          </p>
+        </div>
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div className="max-w-3xl">
-            <h2 className="text-2xl font-semibold">Current Term Summary</h2>
+            <h3 className="text-2xl font-semibold">Current term summary</h3>
             <p className="mt-2 text-xs uppercase tracking-[0.14em] text-[var(--ink-soft)]">
               {latestReviewedDate
                 ? `Data reflects latest reviewed records through ${formatDate(latestReviewedDate)}`
@@ -253,9 +258,9 @@ export default async function CurrentAdministrationPage() {
       <section className="card-surface rounded-[1.6rem] p-6">
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <div>
-            <h2 className="text-2xl font-semibold">Recent Activity</h2>
+            <h2 className="text-2xl font-semibold">Recent administration activity</h2>
             <p className="mt-1 text-sm text-[var(--ink-soft)]">
-              The newest reviewed records and updates in the current term.
+              The newest reviewed promise-tracker records and updates in the current term.
             </p>
           </div>
           <TrackedLink

@@ -6,7 +6,7 @@ import { buildPageMetadata } from "@/lib/metadata";
 export const metadata = buildPageMetadata({
   title: "Activity Feed",
   description:
-    "Browse recent accountability activity across tracked future bills, legislative actions, and linked legislator scorecards.",
+    "Browse recent accountability activity across tracked future bills, legislative actions, and linked legislator scorecards on EquityStack.",
   path: "/activity",
 });
 

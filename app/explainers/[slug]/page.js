@@ -2,9 +2,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buildPageMetadata } from "@/lib/metadata";
 import {
+  buildPolicySlug,
   fetchExplainerDetailData,
   fetchExplainersIndexData,
 } from "@/lib/public-site-data";
+import StructuredData from "@/app/components/public/StructuredData";
 import { Breadcrumbs } from "@/app/components/public/chrome";
 import {
   KpiCard,
@@ -19,11 +21,37 @@ import {
 } from "@/app/components/public/entities";
 import { buildExplainerCardHref } from "@/lib/shareable-card-links";
 import {
+  buildBreadcrumbJsonLd,
   buildExplainerJsonLd,
-  serializeJsonLd,
 } from "@/lib/structured-data";
 
 export const dynamic = "force-dynamic";
+
+function buildExplainerResearchPaths() {
+  return [
+    {
+      href: "/reports",
+      eyebrow: "Reports",
+      title: "Read reports built from the same public record",
+      description:
+        "Reports synthesize broader patterns across presidents, policies, and time, making them the next step when you need comparative analysis instead of a single explainer.",
+    },
+    {
+      href: "/policies",
+      eyebrow: "Policy explorer",
+      title: "Browse the underlying policy records",
+      description:
+        "Policy pages expose the laws, executive actions, and court decisions that help verify or complicate the narrative on this explainer page.",
+    },
+    {
+      href: "/sources",
+      eyebrow: "Sources",
+      title: "Inspect the broader source library",
+      description:
+        "The source library helps readers move from one explainer's citations into the wider evidence base behind EquityStack's public record.",
+    },
+  ];
+}
 
 function parseTakeaways(text) {
   return String(text || "")
@@ -59,13 +87,18 @@ export async function generateMetadata({ params }) {
   }
 
   return buildPageMetadata({
-    title: `${explainer.title} | Explainers`,
+    title: `${explainer.title} | Black history explainer`,
     description:
       explainer.summary ||
-      "Evidence-backed explainer connecting policy history, public claims, and related records.",
+      "Evidence-backed explainer connecting Black history, policy history, public claims, and related records.",
     path: `/explainers/${slug}`,
     imagePath: `${buildExplainerCardHref(explainer)}/opengraph-image`,
     type: "article",
+    keywords: [
+      explainer.category,
+      "Black history explainer",
+      "civil rights policy explainer",
+    ].filter(Boolean),
   });
 }
 
@@ -85,6 +118,7 @@ export default async function ExplainerDetailPage({ params }) {
   const relatedPolicies = explainer.related_policies || [];
   const relatedPromises = explainer.related_promises || [];
   const relatedFutureBills = explainer.related_future_bills || [];
+  const researchPaths = buildExplainerResearchPaths();
   const relatedExplainers =
     explainer.related_explainers?.length
       ? explainer.related_explainers
@@ -94,11 +128,18 @@ export default async function ExplainerDetailPage({ params }) {
 
   return (
     <main className="space-y-10">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: serializeJsonLd(buildExplainerJsonLd(explainer)),
-        }}
+      <StructuredData
+        data={[
+          buildBreadcrumbJsonLd(
+            [
+              { href: "/", label: "Home" },
+              { href: "/explainers", label: "Explainers" },
+              { label: explainer.title },
+            ],
+            `/explainers/${slug}`
+          ),
+          buildExplainerJsonLd(explainer),
+        ]}
       />
 
       <Breadcrumbs
@@ -162,8 +203,8 @@ export default async function ExplainerDetailPage({ params }) {
         <div className="space-y-5">
           <SectionIntro
             eyebrow="Read this for"
-            title="What the explainer is doing"
-            description="The best use of an explainer is to clarify the claim, connect it to history, and make the next evidentiary click obvious."
+            title="What this explainer contributes"
+            description="The best use of an explainer is to clarify the claim, connect it to Black history or policy history, and make the next evidentiary click obvious."
           />
           <div className="grid gap-3 text-sm leading-7 text-[var(--ink-soft)]">
             <div className="rounded-[1.1rem] border border-white/8 bg-[rgba(8,14,24,0.92)] px-4 py-4">
@@ -239,16 +280,16 @@ export default async function ExplainerDetailPage({ params }) {
 
           <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6">
             <h2 className="text-xl font-semibold text-white">Related links</h2>
-            <div className="mt-4 flex flex-wrap gap-3">
-              <Link href="/reports" className="public-button-secondary">
-                Open reports
-              </Link>
-              <Link href="/policies" className="public-button-secondary">
-                Browse policies
-              </Link>
-              <Link href="/sources" className="public-button-secondary">
-                Open sources
-              </Link>
+            <div className="mt-4 grid gap-3">
+              {researchPaths.map((item) => (
+                <Link key={item.href} href={item.href} className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4 hover:border-[rgba(132,247,198,0.24)]">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+                    {item.eyebrow}
+                  </p>
+                  <h3 className="mt-2 text-base font-semibold text-white">{item.title}</h3>
+                  <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">{item.description}</p>
+                </Link>
+              ))}
             </div>
           </div>
         </div>
@@ -316,7 +357,7 @@ export default async function ExplainerDetailPage({ params }) {
               {relatedPolicies.map((item) => (
                 <Link
                   key={item.id}
-                  href={`/policies/${item.id}`}
+                  href={`/policies/${buildPolicySlug(item)}`}
                   className="rounded-[1.2rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-4 hover:border-[rgba(132,247,198,0.24)]"
                 >
                   <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">

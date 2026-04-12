@@ -39,8 +39,8 @@ export default function ComparePage() {
         <SectionIntro
           as="h1"
           eyebrow="Compare"
-          title="Put records side by side without flattening away context."
-          description="Comparison pages are built to help users read differences in score, confidence, evidence, and direction mix more carefully. They are analytical pages, not ranking gimmicks."
+          title="Compare presidents and policies without flattening away context."
+          description="Comparison pages help users read differences in score, confidence, evidence, and direction mix more carefully. They are designed for public-interest research, not ranking gimmicks."
         />
       </section>
 
@@ -50,15 +50,15 @@ export default function ComparePage() {
         <div className="grid gap-6 md:grid-cols-2">
           <CompareHubCard
             title="Compare presidents"
-            description="Read direct score, systemic score, confidence, promise throughput, and directional mix across up to four presidents."
+            description="Read direct score, systemic score, confidence, promise throughput, and directional mix across up to four presidents to study presidential records on Black issues."
             href="/compare/presidents"
-            label="Open president comparison"
+            label="Compare presidential records"
           />
           <CompareHubCard
             title="Compare policies"
-            description="Put policy records side by side by impact score, direction, evidence depth, topic, timing, and source count."
+            description="Put policy records side by side by impact score, direction, evidence depth, topic, timing, and source count to study legislation and executive action more carefully."
             href="/compare/policies"
-            label="Open policy comparison"
+            label="Compare policy records"
           />
         </div>
         <div className="space-y-5">

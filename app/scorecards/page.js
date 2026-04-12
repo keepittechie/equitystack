@@ -106,8 +106,27 @@ export default async function ScorecardsPage({ searchParams }) {
         <p className="text-[var(--ink-soft)] text-lg max-w-3xl leading-8 mt-4">
           EquityStack now connects members of Congress to the reform bills they sponsor and
           cosponsor, then turns that activity into a weighted snapshot. The goal is not to
-          produce campaign-style ratings, but to make legislative patterns easier to inspect.
+          produce campaign-style ratings, but to make legislative patterns easier to inspect in the context of Black policy impact and related reform efforts.
         </p>
+      </section>
+
+      <section className="grid gap-4 md:grid-cols-2">
+        <section className="card-surface rounded-[1.6rem] p-6 space-y-4">
+          <h2 className="text-2xl font-semibold">What this section is for</h2>
+          <div className="text-[var(--ink-soft)] leading-7 space-y-3">
+            <p>
+              Scorecards connect legislators to the bills they sponsor, cosponsor, and advance, giving users a way to inspect congressional activity alongside the rest of EquityStack.
+            </p>
+          </div>
+        </section>
+        <section className="card-surface rounded-[1.6rem] p-6 space-y-4">
+          <h2 className="text-2xl font-semibold">How to use it</h2>
+          <div className="text-[var(--ink-soft)] leading-7 space-y-3">
+            <p>
+              Start with the overview here, then open a legislator profile or move into Future Bills when you want the linked legislative context behind the scorecard snapshot.
+            </p>
+          </div>
+        </section>
       </section>
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">

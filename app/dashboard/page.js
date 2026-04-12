@@ -64,13 +64,27 @@ export default async function DashboardPage({ searchParams }) {
             Command-center view of Black policy impact.
           </h1>
           <p className="mt-5 text-base leading-8 text-[var(--ink-soft)] md:text-lg">
-            Use this page the way you would use a civic intelligence dashboard: filter promise tracker data, scan the headline metrics,
-            open major shifts, then move into policy, president, promise, and source detail.
+            Use this page the way you would use a civic research dashboard: scan the headline measures, see where Black policy impact is moving, and then open the relevant president, promise, legislation, or source page for detail.
           </p>
         </div>
       </section>
 
-      <DashboardFilterBar helpText="These filters narrow promise tracker data and recent promise updates without changing the broader dataset summaries on this page.">
+      <section className="grid gap-4 md:grid-cols-2">
+        <div className="rounded-[1.5rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+          <h2 className="text-lg font-semibold text-white">What this page contains</h2>
+          <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+            The dashboard combines presidential score context, promise-tracker movement, policy direction, and source coverage into one public overview.
+          </p>
+        </div>
+        <div className="rounded-[1.5rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+          <h2 className="text-lg font-semibold text-white">How to use it</h2>
+          <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+            Start here when you want a fast read on historical progress, current movement, and where to click next for evidence-backed detail.
+          </p>
+        </div>
+      </section>
+
+      <DashboardFilterBar helpText="These filters narrow the Promise Tracker sections on this page. The larger score and coverage summaries remain sitewide context, not query-specific totals.">
         <form action="/dashboard" className="grid flex-1 gap-3 md:grid-cols-4">
           <input
             type="search"
@@ -130,7 +144,7 @@ export default async function DashboardPage({ searchParams }) {
           <SectionIntro
             eyebrow="Key insights"
             title="Key insights from the data"
-            description="These observations are derived from the current public dataset and are intended to help users see broad patterns before opening the underlying records."
+            description="These observations are derived from the current public dataset and are meant to help readers identify broad historical or policy patterns before opening the underlying records."
           />
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             {data.insights.map((item, index) => (
@@ -203,15 +217,15 @@ export default async function DashboardPage({ searchParams }) {
                 Black Impact Score by president
               </h2>
               <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-                This ranking summarizes how presidents compare on measured policy impact in the current EquityStack dataset. Open the ranking for the full field or compare presidents directly when you need a tighter read.
+                This ranking summarizes how presidents compare on measured policy impact in the current EquityStack dataset. Open the full presidents index for broader Black history by president, or compare presidents directly when you need a tighter read.
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
               <Link href="/presidents" className="public-button-primary">
-                Open ranking
+                Open the presidents index
               </Link>
               <Link href="/compare/presidents" className="public-button-secondary">
-                Compare presidents
+                Compare presidents side by side
               </Link>
             </div>
           </div>
@@ -248,11 +262,11 @@ export default async function DashboardPage({ searchParams }) {
             <div>
               <h2 className="text-2xl font-semibold text-white">Top positive policies</h2>
               <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
-                Highest-scoring records currently pushing the dataset upward.
+                Highest-scoring policy records currently pushing the dataset upward for Black Americans.
               </p>
             </div>
             <Link href="/policies?impact_direction=Positive&sort=impact_score_desc" className="accent-link text-sm">
-              View all
+              Browse all positive-impact policies
             </Link>
           </div>
           <RecentPolicyChangesTable
@@ -269,11 +283,11 @@ export default async function DashboardPage({ searchParams }) {
             <div>
               <h2 className="text-2xl font-semibold text-white">Top negative policies</h2>
               <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
-                Records producing the strongest downward pull in the documented dataset.
+                Policy records producing the strongest downward pull in the documented dataset.
               </p>
             </div>
             <Link href="/policies?impact_direction=Negative&sort=impact_score_desc" className="accent-link text-sm">
-              View all
+              Browse all negative-impact policies
             </Link>
           </div>
           <RecentPolicyChangesTable
@@ -296,7 +310,7 @@ export default async function DashboardPage({ searchParams }) {
               </p>
             </div>
             <Link href="/policies?impact_direction=Mixed&sort=impact_score_desc" className="accent-link text-sm">
-              View all
+              Browse all mixed-impact policies
             </Link>
           </div>
           <RecentPolicyChangesTable
@@ -325,7 +339,7 @@ export default async function DashboardPage({ searchParams }) {
           <div>
             <h2 className="text-2xl font-semibold text-white">Promise Tracker Overview</h2>
             <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
-              Promise tracking matters because it shows what was promised, what action followed, and whether that produced visible Policy Outcomes in the current dataset.
+              Promise tracking matters because it shows what was promised, what action followed, and whether that produced visible policy outcomes in the current dataset.
             </p>
           </div>
           <div className="grid gap-3 md:grid-cols-2">
@@ -366,7 +380,7 @@ export default async function DashboardPage({ searchParams }) {
             <div>
               <h3 className="text-lg font-semibold text-white">Recent Promise Status changes</h3>
               <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
-                Recent updates help users move from the Promise Tracker summary into the most recently changed records.
+                Recent updates help users move from the Promise Tracker summary into the most recently changed records and then into the fuller president or promise pages.
               </p>
             </div>
             <RecentPolicyChangesTable
@@ -382,7 +396,7 @@ export default async function DashboardPage({ searchParams }) {
           <PromiseResultsTable items={(data.promiseSnapshot.items || []).slice(0, 6)} buildHref={(item) => `/promises/${item.slug}`} />
           <div className="flex flex-wrap gap-2">
             <Link href="/promises" className="public-button-secondary">
-              Open Promise Tracker
+              Open the full promise tracker
             </Link>
           </div>
         </div>

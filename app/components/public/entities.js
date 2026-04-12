@@ -411,7 +411,7 @@ export function PresidentCardGrid({ items = [], buildHref, compareHref = null })
             </div>
             <div className="mt-auto flex flex-wrap gap-3 pt-5">
               <Link href={buildHref(item)} className="rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-medium text-[#051019]">
-                Open profile
+                Read presidential record
               </Link>
               {compareHref ? (
                 <Link href={compareHref} className="rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-white">
@@ -559,7 +559,7 @@ export function PresidentPolicyTable({ items = [], buildHref }) {
   if (!items.length) {
     return (
       <div className="rounded-[1.6rem] border border-dashed border-white/12 bg-white/4 p-6 text-sm leading-7 text-[var(--ink-soft)]">
-        No linked policy or promise records are available in this view yet. Open the broader indexes to explore related records.
+        No linked policy or promise records are available in this view yet. Browse the policy and promise indexes to continue the research path.
       </div>
     );
   }
@@ -646,7 +646,7 @@ export function PromiseResultsTable({ items = [], buildHref }) {
                 <td className="px-5 py-4 text-[var(--ink-soft)]">{item.source_count ?? 0}</td>
                 <td className="px-5 py-4">
                   <Link href={buildHref(item)} className="text-[var(--accent)] hover:text-white">
-                    Open record
+                    Read promise record
                   </Link>
                 </td>
               </tr>
@@ -719,7 +719,7 @@ export function ReportCardGrid({ items = [] }) {
           </div>
           <h3 className="mt-4 text-xl font-semibold text-white">{item.title}</h3>
           <p className="mt-3 line-clamp-4 text-sm leading-7 text-[var(--ink-soft)]">{item.summary}</p>
-          <span className="mt-auto pt-5 text-sm font-medium text-[var(--accent)]">Open report</span>
+          <span className="mt-auto pt-5 text-sm font-medium text-[var(--accent)]">Read report analysis</span>
         </Link>
       ))}
     </div>
@@ -748,7 +748,7 @@ export function ExplainerIndexGrid({ items = [] }) {
           </p>
           <h3 className="mt-4 text-xl font-semibold text-white">{item.title}</h3>
           <p className="mt-3 line-clamp-4 text-sm leading-7 text-[var(--ink-soft)]">{item.summary}</p>
-          <span className="mt-auto pt-5 text-sm font-medium text-[var(--accent)]">Open explainer</span>
+          <span className="mt-auto pt-5 text-sm font-medium text-[var(--accent)]">Read explainer</span>
         </Link>
       ))}
     </div>
@@ -987,7 +987,7 @@ export function RecentPolicyChangesTable({ items = [], buildHref }) {
                 <td className="px-5 py-4 text-[var(--ink-soft)]">{item.impact_direction || item.status || "—"}</td>
                 <td className="px-5 py-4">
                   <Link href={buildHref(item)} className="text-[var(--accent)] hover:text-white">
-                    Open record
+                    {`Read ${(item.record_type || "record").toLowerCase()}`}
                   </Link>
                 </td>
               </tr>

@@ -2,19 +2,31 @@ import Image from "next/image";
 import Link from "next/link";
 import { buildPageMetadata } from "@/lib/metadata";
 import { fetchHomePageData, buildPolicySlug } from "@/lib/public-site-data";
+import StructuredData from "@/app/components/public/StructuredData";
 import { SectionIntro, KpiCard, MethodologyCallout, SourceTrustPanel } from "@/app/components/public/core";
 import { CategoryImpactChart, DirectionBreakdownChart, ImpactTrendChart } from "@/app/components/public/charts";
 import { PolicyCardList, PresidentCardGrid, RecentPolicyChangesTable } from "@/app/components/public/entities";
 import TrustBar from "@/app/components/public/TrustBar";
+import {
+  buildCollectionPageJsonLd,
+  buildDatasetJsonLd,
+} from "@/lib/structured-data";
 
 export const dynamic = "force-dynamic";
 
 export const metadata = buildPageMetadata({
-  title: "Measure how government actions impact Black Americans",
+  title: "Black history, presidents, promises, and policy impact",
   description:
-    "A data-first civic intelligence platform tracking policies, promises, evidence, and measurable impact on Black Americans.",
+    "Research Black history by president, campaign promises, civil rights policy, legislation, and measured policy impact on Black Americans.",
   path: "/",
   imagePath: "/images/hero/civil-rights-march.jpg",
+  keywords: [
+    "Black history by president",
+    "presidents and Black Americans",
+    "campaign promises to Black Americans",
+    "civil rights policy",
+    "legislation affecting Black Americans",
+  ],
 });
 
 function pct(value) {
@@ -45,6 +57,50 @@ export default async function HomePage() {
 
   return (
     <main className="space-y-10">
+      <StructuredData
+        data={[
+          buildCollectionPageJsonLd({
+            title: "EquityStack home",
+            description:
+              "A public-interest research platform for Black history, U.S. presidents, campaign promises, legislation, and policy impact on Black Americans.",
+            path: "/",
+            about: [
+              "Black history",
+              "U.S. presidents",
+              "campaign promises",
+              "civil rights policy",
+              "legislation affecting Black Americans",
+            ],
+            keywords: [
+              "Black history by president",
+              "Black policy research site",
+              "policy impact on Black communities",
+            ],
+          }),
+          buildDatasetJsonLd({
+            title: "EquityStack public policy and promise dataset",
+            description:
+              "Structured public records used by EquityStack to connect presidents, policies, promises, reports, and historical context affecting Black Americans.",
+            path: "/",
+            about: [
+              "Black Americans",
+              "civil rights policy",
+              "campaign promises",
+              "historical legislation",
+            ],
+            keywords: [
+              "presidential record on Black issues",
+              "historical policy impact",
+            ],
+            variableMeasured: [
+              "Black Impact Score",
+              "Promise status",
+              "Impact direction",
+              "Source coverage",
+            ],
+          }),
+        ]}
+      />
       <section className="relative left-1/2 right-1/2 w-screen -translate-x-1/2 overflow-hidden border-y border-white/8 bg-[#040911]">
         <div className="absolute inset-0">
           <Image
@@ -69,18 +125,19 @@ export default async function HomePage() {
               Measure how government actions impact Black Americans
             </h1>
             <p className="mt-6 max-w-3xl text-base leading-8 text-[#d8e2ee] md:text-lg">
-              EquityStack measures how documented government actions changed outcomes for
-              Black Americans across administrations, legislatures, and historical records.
+              EquityStack is a public-interest research platform for studying Black history,
+              U.S. presidents, campaign promises, legislation, executive actions, and the
+              documented policy impact of government decisions on Black Americans.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href="/policies" className="public-button-primary">
-                Explore Policies
+                Explore civil-rights policy records
               </Link>
               <Link href="/presidents" className="public-button-secondary">
-                View Presidents
+                Browse presidents and Black history
               </Link>
               <Link href="/promises" className="public-button-secondary">
-                See Promise Tracker
+                Track campaign promises
               </Link>
             </div>
           </div>
@@ -93,17 +150,50 @@ export default async function HomePage() {
 
       <TrustBar />
 
+      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        {[
+          {
+            title: "For researchers",
+            summary:
+              "Use the site to move from a broad question about Black history or presidential records into linked policies, promises, sources, and methodology.",
+          },
+          {
+            title: "For students",
+            summary:
+              "Start with explainers and reports, then open the underlying policies and timelines to see how legal and administrative change unfolded over time.",
+          },
+          {
+            title: "For journalists",
+            summary:
+              "Trace a claim about a president, civil-rights policy, or campaign promise back to the structured public record and visible evidence trail.",
+          },
+          {
+            title: "For curious readers",
+            summary:
+              "Browse presidents, legislation, and promise tracking without needing to know the database structure in advance.",
+          },
+        ].map((item) => (
+          <article key={item.title} className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--accent)]">
+              Audience
+            </p>
+            <h2 className="mt-4 text-2xl font-semibold text-white">{item.title}</h2>
+            <p className="mt-4 text-sm leading-7 text-[var(--ink-soft)]">{item.summary}</p>
+          </article>
+        ))}
+      </section>
+
       <section className="grid gap-4 md:grid-cols-3">
         {[
           {
-            title: "Tracks real policies",
+            title: "Tracks real policy records",
             summary:
-              "EquityStack organizes federal laws, executive actions, and related outcomes into a searchable public record instead of a generic issue feed.",
+              "EquityStack organizes federal laws, executive actions, court decisions, and related outcomes into a searchable public record instead of a generic issue feed.",
           },
           {
-            title: "Measures measurable impact",
+            title: "Measures policy impact",
             summary:
-              "Scores, direction labels, time windows, and trend summaries keep the focus on documented effects rather than rhetoric alone.",
+              "Scores, direction labels, time windows, and trend summaries keep the focus on documented effects on Black Americans rather than rhetoric alone.",
           },
           {
             title: "Shows the evidence",
@@ -183,7 +273,7 @@ export default async function HomePage() {
         <SectionIntro
           eyebrow="What changed recently"
           title="Latest promise and policy movement"
-          description="Recent records give you the fastest path from system summary into underlying detail and evidence."
+          description="Recent records give you the fastest path from broad historical questions into the latest policy, promise, and evidence-backed detail."
         />
         <RecentPolicyChangesTable
           items={[
@@ -213,15 +303,15 @@ export default async function HomePage() {
       <section className="space-y-5">
         <SectionIntro
           eyebrow="Entity hubs"
-          title="Navigate by president, policy, promise, or report"
-          description="The public site is organized like a civic data platform: summary first, then filters, then evidence-backed detail pages."
+          title="Navigate by president, promise, legislation, or report"
+          description="The public site is organized for search and research: start with the major topic hub, then move into filters, linked records, and evidence-backed detail pages."
         />
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           {[
-            { href: "/presidents", title: "Presidents", summary: "Rankings, profiles, timelines, and compare flows." },
-            { href: "/policies", title: "Policies", summary: "Browse the structured policy record with filters, direction, evidence, and related history." },
-            { href: "/promises", title: "Promises", summary: "Track statements, statuses, rationale, and linked policy outcomes." },
-            { href: "/methodology", title: "Methodology", summary: "Read how the Black Impact Score, promise grading, confidence, and evidence rules actually work." },
+            { href: "/presidents", title: "Presidents and Black history", summary: "Compare presidents, read profile pages, and trace how presidential records affected Black Americans over time." },
+            { href: "/policies", title: "Legislation and executive actions", summary: "Browse the structured policy record with filters, impact direction, evidence, and related historical context." },
+            { href: "/promises", title: "Campaign promises and delivery", summary: "Track presidential promises, status changes, rationale, and linked policy outcomes affecting Black communities." },
+            { href: "/methodology", title: "Methodology and evidence", summary: "Read how the Black Impact Score, promise grading, confidence, and source rules are defined." },
           ].map((item) => (
             <Link key={item.href} href={item.href} className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 hover:border-[rgba(132,247,198,0.24)]">
               <h3 className="text-xl font-semibold text-white">{item.title}</h3>

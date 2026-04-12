@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { buildPageMetadata } from "@/lib/metadata";
+import { buildListingMetadata } from "@/lib/metadata";
 import {
   buildPolicySlug,
   fetchPolicyExplorerData,
 } from "@/lib/public-site-data";
+import StructuredData from "@/app/components/public/StructuredData";
 import { Breadcrumbs } from "@/app/components/public/chrome";
 import {
   FilterDrawer,
@@ -19,15 +20,30 @@ import {
 } from "@/app/components/public/entities";
 import TrustBar from "@/app/components/public/TrustBar";
 import ScoreExplanation from "@/app/components/public/ScoreExplanation";
+import {
+  buildBreadcrumbJsonLd,
+  buildCollectionPageJsonLd,
+  buildDatasetJsonLd,
+} from "@/lib/structured-data";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = buildPageMetadata({
-  title: "Policies",
-  description:
-    "Search, filter, sort, and browse historical policy records affecting Black Americans.",
-  path: "/policies",
-});
+export async function generateMetadata({ searchParams }) {
+  const resolvedSearchParams = (await searchParams) || {};
+
+  return buildListingMetadata({
+    title: "Civil-rights policy, legislation, and executive actions",
+    description:
+      "Search, filter, and browse legislation, executive actions, and court decisions affecting Black Americans across U.S. history.",
+    path: "/policies",
+    keywords: [
+      "civil rights laws by president",
+      "legislation affecting Black Americans",
+      "historical policy impact",
+    ],
+    searchParams: resolvedSearchParams,
+  });
+}
 
 function countDirections(items = []) {
   return items.reduce(
@@ -48,18 +64,56 @@ export default async function PoliciesPage({ searchParams }) {
 
   return (
     <main className="space-y-10">
+      <StructuredData
+        data={[
+          buildBreadcrumbJsonLd(
+            [{ href: "/", label: "Home" }, { label: "Policies" }],
+            "/policies"
+          ),
+          buildCollectionPageJsonLd({
+            title: "Civil-rights policy, legislation, and executive actions",
+            description:
+              "A browseable public index of legislation, executive actions, and court decisions affecting Black Americans.",
+            path: "/policies",
+            about: [
+              "civil rights policy",
+              "legislation affecting Black Americans",
+              "executive actions",
+              "court decisions",
+            ],
+            keywords: [
+              "civil rights laws by president",
+              "historical legislation affecting Black Americans",
+            ],
+          }),
+          buildDatasetJsonLd({
+            title: "EquityStack policy dataset",
+            description:
+              "Structured public policy records used by EquityStack to measure impact direction, score, source coverage, and historical context.",
+            path: "/policies",
+            about: ["civil rights policy", "Black Americans", "historical policy impact"],
+            keywords: ["legislation affecting Black Americans", "policy impact on Black communities"],
+            variableMeasured: [
+              "Impact Score",
+              "Impact direction",
+              "Evidence strength",
+              "Source count",
+            ],
+          }),
+        ]}
+      />
       <Breadcrumbs items={[{ href: "/", label: "Home" }, { label: "Policies" }]} />
 
       <section className="hero-panel p-8 md:p-10 xl:p-14">
         <SectionIntro
           as="h1"
           eyebrow="Policy explorer"
-          title="Move from national summary into filterable policy evidence."
-          description="The policy explorer is built for civic research: search first, filter by direction and category, and switch between cards and a sortable table from the same public record."
+          title="Browse legislation, executive actions, and court decisions affecting Black Americans."
+          description="The policy explorer is built for civic research: search first, filter by president, era, direction, or category, and move from broad historical questions into record-level evidence."
           actions={
             <>
               <Link href="/dashboard" className="public-button-primary">
-                Open dashboard
+                Open the policy dashboard
               </Link>
               <Link href="/methodology" className="public-button-secondary">
                 Read methodology
@@ -74,7 +128,7 @@ export default async function PoliciesPage({ searchParams }) {
       <section className="grid items-start gap-6 xl:grid-cols-[1.05fr_0.95fr]">
         <PageContextBlock
           description="This explorer shows individual policy records, their Impact Score, Impact Direction, and evidence footprint across time."
-          detail="Use search and filters to move from broad scan into record-level proof, then open a policy page for plain-language summary, sources, and related records."
+          detail="Use it to research civil-rights laws by president, compare executive actions and court decisions, and move from broad search intent into record-level proof."
         />
         <ScoreExplanation title="How to read policy Impact Scores" />
       </section>
@@ -100,7 +154,7 @@ export default async function PoliciesPage({ searchParams }) {
                 Positive {counts.Positive || 0} • Negative {counts.Negative || 0} • Mixed {counts.Mixed || 0} • Blocked {counts.Blocked || 0}
               </p>
               <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
-                Search by title, filter by president, era, category, or direction, and keep using slug-based policy URLs with numeric backward compatibility.
+                Search by title, filter by president, era, category, or direction, and open each record for plain-language summary, sources, and related history.
               </p>
             </div>
             <div className="flex flex-wrap gap-2">

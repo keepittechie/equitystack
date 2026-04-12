@@ -1,7 +1,30 @@
 import Link from "next/link";
 import { ImpactBadge } from "@/app/components/policy-badges";
 import { formatPartyLabel } from "@/app/components/policy-formatters";
+import StructuredData from "@/app/components/public/StructuredData";
+import { Breadcrumbs } from "@/app/components/public/chrome";
+import {
+  MethodologyCallout,
+  PageContextBlock,
+} from "@/app/components/public/core";
 import { fetchInternalJson } from "@/lib/api";
+import { buildPageMetadata } from "@/lib/metadata";
+import {
+  buildBreadcrumbJsonLd,
+  buildCollectionPageJsonLd,
+} from "@/lib/structured-data";
+
+export const metadata = buildPageMetadata({
+  title: "Narratives and historical policy threads",
+  description:
+    "Explore curated policy narratives on Black history, civil-rights setbacks, legal change, and historical policy patterns affecting Black Americans.",
+  path: "/narratives",
+  keywords: [
+    "Black history by policy",
+    "historical legislation affecting Black Americans",
+    "civil rights policy history",
+  ],
+});
 
 async function getJson(url) {
   return fetchInternalJson(url);
@@ -128,6 +151,30 @@ export default async function NarrativesPage() {
 
   return (
     <main className="max-w-7xl mx-auto p-6 space-y-12">
+      <StructuredData
+        data={[
+          buildBreadcrumbJsonLd(
+            [{ href: "/", label: "Home" }, { label: "Narratives" }],
+            "/narratives"
+          ),
+          buildCollectionPageJsonLd({
+            title: "Narratives and historical policy threads",
+            description:
+              "Curated views of policy records that help readers follow major historical patterns affecting Black Americans across eras.",
+            path: "/narratives",
+            about: [
+              "Black history",
+              "civil rights policy history",
+              "historical legislation affecting Black Americans",
+            ],
+            keywords: [
+              "Black history by policy",
+              "civil rights policy history",
+            ],
+          }),
+        ]}
+      />
+      <Breadcrumbs items={[{ href: "/", label: "Home" }, { label: "Narratives" }]} />
       <section className="hero-panel p-8 md:p-10">
         <p className="eyebrow mb-4">
           Narrative Mode
@@ -142,12 +189,23 @@ export default async function NarrativesPage() {
         </p>
       </section>
 
+      <section className="grid gap-4 md:grid-cols-2">
+        <PageContextBlock
+          description="Narratives organize public records into thematic historical paths instead of leaving readers inside one record at a time."
+          detail="Use this page when the question is broader than a single policy, such as how Black rights expanded, where reform stalled, or which eras concentrated the most harmful outcomes."
+        />
+        <MethodologyCallout
+          title="How to use narrative pages"
+          description="Narratives are curated pathways through the same public dataset. They help visitors follow historical threads, then move back into individual policy records for source-backed detail."
+        />
+      </section>
+
       <section className="space-y-4">
         <SectionHeader
-          title="Policies That Expanded Black Rights"
-          description="A curated view of policies in the dataset with positive direction and direct Black impact."
+          title="Policies that expanded Black rights and access"
+          description="A curated view of laws, executive actions, and court decisions in the dataset with positive direction and direct Black impact."
           href="/policies?direct_black_impact=true&impact_direction=Positive"
-          linkLabel="View all"
+          linkLabel="Browse positive-impact policy records"
         />
 
         <div className="grid gap-4 md:grid-cols-2">
@@ -159,10 +217,10 @@ export default async function NarrativesPage() {
 
       <section className="space-y-4">
         <SectionHeader
-          title="Policies That Rolled Rights Back or Stalled Reform"
-          description="Policies marked negative, mixed, or blocked that help explain reversals, limitations, and unfinished reform efforts."
+          title="Policies that rolled rights back or stalled reform"
+          description="Policies marked negative, mixed, or blocked that help explain reversals, limitations, and unfinished reform efforts affecting Black Americans."
           href="/policies?impact_direction=Negative"
-          linkLabel="Explore policies"
+          linkLabel="Browse harmful or blocked policy records"
         />
 
         <div className="grid gap-4 md:grid-cols-2">
@@ -174,8 +232,8 @@ export default async function NarrativesPage() {
 
       <section className="space-y-6">
         <SectionHeader
-          title="Most Harmful Policies by Era"
-          description="A grouped view of negative, mixed, and blocked policies to show how harm and rollback patterns changed over time."
+          title="Harm and rollback by era"
+          description="A grouped view of negative, mixed, and blocked policies to show how harm, restriction, and rollback patterns changed over time."
         />
 
         <div className="space-y-8">
@@ -198,10 +256,10 @@ export default async function NarrativesPage() {
 
       <section className="space-y-4">
         <SectionHeader
-          title="Most Impactful Supreme Court Cases"
-          description="High-scoring court decisions that shaped the legal landscape around rights, access, and enforcement."
+          title="Supreme Court cases with major Black-history impact"
+          description="High-scoring court decisions that shaped the legal landscape around rights, access, and enforcement for Black Americans."
           href="/timeline"
-          linkLabel="View timeline"
+          linkLabel="Open the civil-rights timeline"
         />
 
         <div className="grid gap-4 md:grid-cols-2">

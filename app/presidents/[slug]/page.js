@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { buildPageMetadata } from "@/lib/metadata";
 import { resolvePresidentImageSrc } from "@/lib/president-image-paths";
 import { buildPolicySlug, fetchPresidentProfileData } from "@/lib/public-site-data";
+import StructuredData from "@/app/components/public/StructuredData";
 import { Breadcrumbs } from "@/app/components/public/chrome";
 import { CategoryImpactChart, ImpactTrendChart } from "@/app/components/public/charts";
 import {
@@ -23,6 +24,10 @@ import {
   PresidentPolicyTable,
   PromiseTimeline,
 } from "@/app/components/public/entities";
+import {
+  buildBreadcrumbJsonLd,
+  buildProfilePageJsonLd,
+} from "@/lib/structured-data";
 
 export const dynamic = "force-dynamic";
 
@@ -114,13 +119,23 @@ export async function generateMetadata({ params }) {
   }
 
   const name = profile.president.president || profile.president.president_name || slug;
+  const imagePath = resolvePresidentImageSrc({
+    presidentSlug: profile.president.president_slug || slug,
+    presidentName: name,
+  });
 
   return buildPageMetadata({
-    title: `${name}`,
+    title: `${name} and Black Americans`,
     description:
       profile.president.narrative_summary ||
-      "Review a presidential impact profile with the final score, outcome-based anchor, bill-linked inputs, trend, and policy context.",
+      `Review ${name}'s EquityStack profile for presidential policy impact on Black Americans, linked promises, legislation, and Black Impact Score context.`,
     path: `/presidents/${slug}`,
+    imagePath,
+    keywords: [
+      `${name} Black history`,
+      `${name} civil rights policy`,
+      `${name} Black Impact Score`,
+    ],
   });
 }
 
@@ -139,6 +154,7 @@ export default async function PresidentProfilePage({ params }) {
     presidentSlug: president.president_slug || slug,
     presidentName,
   });
+  const presidentPoliciesHref = `/policies?president=${encodeURIComponent(presidentName)}`;
   const topicData = (president.score_by_topic || president.breakdowns?.by_topic || [])
     .slice(0, 6)
     .map((item) => ({
@@ -157,6 +173,36 @@ export default async function PresidentProfilePage({ params }) {
 
   return (
     <main className="space-y-10">
+      <StructuredData
+        data={[
+          buildBreadcrumbJsonLd(
+            [
+              { href: "/", label: "Home" },
+              { href: "/presidents", label: "Presidents" },
+              { label: presidentName },
+            ],
+            `/presidents/${slug}`
+          ),
+          buildProfilePageJsonLd({
+            title: `${presidentName} and Black Americans`,
+            description:
+              president.narrative_summary ||
+              `An EquityStack presidential profile covering ${presidentName}'s promises, policy record, Black Impact Score, and historical impact on Black Americans.`,
+            path: `/presidents/${slug}`,
+            imagePath: imageSrc,
+            entityName: presidentName,
+            entityDescription:
+              president.narrative_summary ||
+              `Presidential profile for ${presidentName} on EquityStack.`,
+            about: [
+              "U.S. presidents",
+              "Black Americans",
+              "civil rights policy",
+              "historical policy impact",
+            ],
+          }),
+        ]}
+      />
       <Breadcrumbs
         items={[
           { href: "/", label: "Home" },
@@ -211,8 +257,8 @@ export default async function PresidentProfilePage({ params }) {
         <div className="space-y-5 xl:self-start">
           <SectionIntro
             eyebrow="Bill-informed signals"
-            title="Legislative inputs linked through promises"
-            description="These bill-linked inputs are derived only from tracked bills that already reach this president through the existing Bills → Promises → Presidents lineage."
+            title="Legislation linked to this presidential record"
+            description="These bill-linked inputs help connect the presidency to legislation, promises, and the wider historical record affecting Black Americans."
           />
           {Number(billInputs.linked_bill_count || 0) > 0 ? (
             <div className="grid gap-4 md:grid-cols-2">
@@ -307,8 +353,8 @@ export default async function PresidentProfilePage({ params }) {
         <div className="space-y-5 xl:self-start">
           <SectionIntro
             eyebrow="Top records"
-            title="Policies and promises driving this profile"
-            description="Open the most consequential underlying records instead of treating the score as self-explanatory."
+            title="Policies and promises shaping this record"
+            description="Open the most consequential underlying policies and promises instead of treating the presidential score as self-explanatory."
           />
           {topPolicies.length ? (
             <PresidentPolicyTable
@@ -433,8 +479,8 @@ export default async function PresidentProfilePage({ params }) {
         <div className="space-y-5 xl:self-start">
           <SectionIntro
             eyebrow="Promise tracker snapshot"
-            title="Status mix for this presidential record"
-            description="Promise status stays visible on the profile because delivery, blockage, and partial fulfillment help explain the shape of the broader governing record."
+            title="Promise tracker context for this president"
+            description="Promise status stays visible here because campaign and governing commitments help explain the broader historical record and policy impact on Black Americans."
           />
           <PromiseSystemExplanation />
           <PresidentMetricsRow
@@ -511,8 +557,8 @@ export default async function PresidentProfilePage({ params }) {
         <div className="space-y-5 xl:self-start">
           <SectionIntro
             eyebrow="Timeline"
-            title="Promise and impact chronology"
-            description="The profile timeline helps users place scoring movement against dated promise records."
+            title="Promise and policy chronology"
+            description="The profile timeline helps users place campaign promises and policy movement into a clearer historical sequence."
           />
           {timelineItems.length ? (
             <PromiseTimeline items={timelineItems} />
@@ -525,14 +571,26 @@ export default async function PresidentProfilePage({ params }) {
         <div className="space-y-5">
           <SectionIntro
             eyebrow="Related routes"
-            title="Keep moving through the public record"
-            description="Every profile should make it easy to move from summary to compare, promise detail, and methodology."
+            title="Keep researching this president"
+            description="Every presidential profile should make it easy to move from summary into promises, legislation, comparison tools, and methodology."
           />
           <div className="grid gap-4">
-            <Link href="/promises" className="panel-link rounded-[1.5rem] p-5">
-              <h3 className="text-lg font-semibold text-white">Open the promise tracker</h3>
+            <Link href={`/promises/president/${slug}`} className="panel-link rounded-[1.5rem] p-5">
+              <h3 className="text-lg font-semibold text-white">Open this president&apos;s promise tracker</h3>
               <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-                Use the promise index to see the full delivery, partial, failed, and blocked record behind this profile.
+                Review delivered, partial, failed, and blocked promises for this presidency term in one place.
+              </p>
+            </Link>
+            <Link href={presidentPoliciesHref} className="panel-link rounded-[1.5rem] p-5">
+              <h3 className="text-lg font-semibold text-white">Browse policies under {presidentName}</h3>
+              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+                Open the policy index filtered to this president to study legislation, executive actions, and court-era context tied to this record.
+              </p>
+            </Link>
+            <Link href="/explainers" className="panel-link rounded-[1.5rem] p-5">
+              <h3 className="text-lg font-semibold text-white">Read related Black history explainers</h3>
+              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+                Use explainers when you need more historical or legal context before returning to the president, promise, or policy detail pages.
               </p>
             </Link>
           </div>
