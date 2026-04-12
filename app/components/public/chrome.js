@@ -161,7 +161,7 @@ export function SiteHeader() {
                 <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[var(--accent)]">
                   EquityStack
                 </p>
-                <p className="hidden truncate text-sm text-[var(--ink-muted)] sm:block md:max-w-[16rem] xl:hidden 2xl:block 2xl:max-w-[15rem]">
+                <p className="hidden truncate text-xs text-[var(--ink-muted)] sm:block md:max-w-[16rem] xl:hidden 2xl:block 2xl:max-w-[15rem]">
                   Civic intelligence for Black policy impact
                 </p>
               </div>
