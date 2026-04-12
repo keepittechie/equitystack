@@ -2,6 +2,15 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buildPageMetadata } from "@/lib/metadata";
 import { buildPolicySlug, fetchPolicyDetailBySlug } from "@/lib/public-site-data";
+import {
+  countLabel,
+  filterParagraphs,
+  isThinText,
+  oxfordJoin,
+  sentenceJoin,
+  takeLabels,
+} from "@/lib/editorial-depth";
+import { getFlagshipPolicyEditorial } from "@/lib/flagship-editorial";
 import StructuredData from "@/app/components/public/StructuredData";
 import { Breadcrumbs } from "@/app/components/public/chrome";
 import {
@@ -9,6 +18,7 @@ import {
   PageContextBlock,
   SectionIntro,
   SourceTrustPanel,
+  CitationNote,
 } from "@/app/components/public/core";
 import TrustBar from "@/app/components/public/TrustBar";
 import ScoreExplanation from "@/app/components/public/ScoreExplanation";
@@ -100,8 +110,146 @@ function buildWhyItMatters(policy) {
   return `EquityStack classifies this policy as ${direction.toLowerCase()} impact with ${evidence.toLowerCase()} supporting evidence. The record matters because it helps explain how government action shaped Black Americans' rights, resources, exposure to harm, or access to institutions.`;
 }
 
-function buildResearchPaths(policy) {
-  const paths = [];
+function buildPolicyRecordOverview(policy, editorial = null) {
+  const categoryLabels = takeLabels(policy.categories, (item) => item.name, 3);
+
+  return sentenceJoin([
+    policy.president
+      ? `${policy.title} is tracked here inside the ${policy.president} record.`
+      : `${policy.title} is tracked here as part of the public historical policy record.`,
+    policy.year_enacted
+      ? `The page anchors the record in ${policy.year_enacted}${policy.policy_type ? ` as a ${policy.policy_type.toLowerCase()}` : ""}.`
+      : policy.policy_type
+        ? `The page treats it as a ${policy.policy_type.toLowerCase()} record.`
+        : null,
+    categoryLabels.length
+      ? `Its clearest topical connections in the current dataset are ${oxfordJoin(categoryLabels)}.`
+      : null,
+    editorial?.overviewSuffix || null,
+  ]);
+}
+
+function buildPolicyCoverageNote(policy) {
+  const sourceCount = Number(policy.evidence_summary?.total_sources || 0);
+  const evidenceStrength = policy.evidence_summary?.evidence_strength || "limited";
+
+  return sentenceJoin([
+    `This page is designed to stay useful even when the narrative summary is short.`,
+    `Use the score, source trail, and related records together rather than relying on one paragraph alone.`,
+    `${countLabel(sourceCount, "source")} currently support this record, with ${String(
+      evidenceStrength
+    ).toLowerCase()} evidence strength in the public view.`,
+  ]);
+}
+
+function buildPolicyGuideCards(policy, editorial = null) {
+  const thinNarrative =
+    isThinText(policy.summary, 140) || isThinText(policy.outcome_summary, 140);
+
+  return [
+    {
+      eyebrow: "What this record covers",
+      title: "A single policy, law, order, or court-era record",
+      description:
+        buildPolicyRecordOverview(policy, editorial) ||
+        "This page organizes one policy record with score, evidence, and related context.",
+    },
+    {
+      eyebrow: "How to use it",
+      title: "Read the record before drawing broader conclusions",
+      description:
+        "Start with the summary and outcome language, then compare the source trail, linked promises, and related policies before moving into reports or thematic pages.",
+    },
+    {
+      eyebrow: "Coverage note",
+      title: thinNarrative ? "This record needs context around a short narrative" : "Use this page as the evidence layer",
+      description: thinNarrative
+        ? buildPolicyCoverageNote(policy)
+        : "This record already has a fuller narrative, but it is still best read alongside the source list, related policies, and broader presidential or thematic context.",
+    },
+  ];
+}
+
+function buildPolicyContextParagraphs(policy, editorial = null) {
+  const categoryLabels = takeLabels(policy.categories, (item) => item.name, 4);
+  const sourceCount = Number(policy.evidence_summary?.total_sources || 0);
+  const relatedPromiseCount = Number((policy.related_promises || []).length || 0);
+  const relatedExplainerCount = Number((policy.related_explainers || []).length || 0);
+
+  return filterParagraphs([
+    sentenceJoin([
+      `${policy.title} is treated here as one evidence-bearing policy record inside the broader EquityStack research graph.`,
+      policy.president ? `The page currently connects it to ${policy.president}'s presidential context.` : null,
+      categoryLabels.length
+        ? `Its clearest public topic links are ${oxfordJoin(categoryLabels)}.`
+        : null,
+    ]),
+    sentenceJoin([
+      `${countLabel(sourceCount, "source")} currently support the public evidence layer on this page, alongside ${countLabel(
+        relatedPromiseCount,
+        "related promise"
+      )} and ${countLabel(relatedExplainerCount, "related explainer")}.`,
+      `That surrounding structure matters most when the written summary or outcome note is still short.`,
+    ]),
+    sentenceJoin([
+      `The strongest reading comes from comparing the summary, outcome language, source trail, and related records together.`,
+      editorial?.overviewSuffix ||
+        "That keeps the interpretation tied to the visible record instead of leaning on one paragraph alone.",
+    ]),
+  ]);
+}
+
+function buildPolicyThematicPath(policy, editorial = null) {
+  if (editorial?.priorityPath) {
+    return editorial.priorityPath;
+  }
+
+  const signals = [
+    policy.policy_type,
+    policy.impact_direction,
+    ...(policy.categories || []).map((item) => item.name),
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+
+  if (
+    /law|amendment|voting|rights|civil|court/.test(signals)
+  ) {
+    return {
+      href: "/analysis/civil-rights-laws-by-president",
+      label: "Legislation lens",
+      title: "Trace civil-rights laws across administrations",
+      description:
+        "Use the legislation pathway when this record matters most as part of the longer legal history affecting Black Americans.",
+    };
+  }
+
+  if (
+    /housing|education|labor|employment|economic|business|bank|mortgage|opportunity|wealth/.test(
+      signals
+    )
+  ) {
+    return {
+      href: "/analysis/how-presidents-shaped-black-opportunity",
+      label: "Opportunity pathway",
+      title: "Review policies affecting access and advancement",
+      description:
+        "Use the opportunity pathway when the question is about housing, labor, education, investment, or federal access over time.",
+    };
+  }
+
+  return {
+    href: "/analysis/presidential-impact-on-black-americans",
+    label: "Impact pathway",
+    title: "Explore broader presidential impact on Black Americans",
+    description:
+      "Use the broader impact page when this policy should be read inside a larger administration-level or cross-administration pattern.",
+  };
+}
+
+function buildResearchPaths(policy, editorial = null) {
+  const paths = [buildPolicyThematicPath(policy, editorial)];
 
   if (policy.president) {
     paths.push({
@@ -127,6 +275,14 @@ function buildResearchPaths(policy) {
     title: "Continue into reports and comparative analysis",
     description:
       "Reports help move from one policy record into cross-administration patterns, score context, and higher-level historical interpretation.",
+  });
+
+  paths.push({
+    href: "/research",
+    label: "Research hub",
+    title: "Return to the curated research hub",
+    description:
+      "Use the research hub when this policy opens into a broader question and you need the strongest next explainer, report, or thematic path.",
   });
 
   return paths;
@@ -170,7 +326,12 @@ export default async function PolicyDetailPage({ params }) {
   const timeline = buildTimeline(policy);
   const score = computePolicyScore(policy);
   const policyPath = `/policies/${policy.slug}`;
-  const researchPaths = buildResearchPaths(policy);
+  const flagshipEditorial = getFlagshipPolicyEditorial(policy.id);
+  const researchPaths = buildResearchPaths(policy, flagshipEditorial);
+  const guideCards = buildPolicyGuideCards(policy, flagshipEditorial);
+  const thinSummary = isThinText(policy.summary, 140);
+  const thinOutcome = isThinText(policy.outcome_summary, 140);
+  const contextParagraphs = buildPolicyContextParagraphs(policy, flagshipEditorial);
   const badges = [
     policy.year_enacted ? `Year ${policy.year_enacted}` : null,
     policy.president ? `President: ${policy.president}` : null,
@@ -229,6 +390,36 @@ export default async function PolicyDetailPage({ params }) {
         </div>
       </section>
 
+      <section className="grid gap-4 md:grid-cols-3">
+        {guideCards.map((item) => (
+          <div
+            key={item.title}
+            className="rounded-[1.4rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5"
+          >
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--accent)]">
+              {item.eyebrow}
+            </p>
+            <h2 className="mt-3 text-lg font-semibold text-white">{item.title}</h2>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item.description}</p>
+          </div>
+        ))}
+      </section>
+
+      <section className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6">
+        <SectionIntro
+          eyebrow="Context and background"
+          title="What this policy page adds beyond the headline summary"
+          description="This section helps keep shorter policy narratives useful by framing them with the supporting evidence, relationships, and record structure already present on the page."
+        />
+        <div className="mt-5 grid gap-4">
+          {contextParagraphs.map((paragraph, index) => (
+            <p key={`${policy.id}-context-${index}`} className="text-sm leading-8 text-[var(--ink-soft)]">
+              {paragraph}
+            </p>
+          ))}
+        </div>
+      </section>
+
       <section className="public-two-col-rail grid gap-6 xl:grid-cols-[1.08fr_0.92fr]">
         <div className="space-y-5">
           <SectionIntro
@@ -241,10 +432,20 @@ export default async function PolicyDetailPage({ params }) {
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
               {policy.summary || "A plain-language summary has not been published for this record yet."}
             </p>
+            {thinSummary ? (
+              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+                {buildPolicyRecordOverview(policy, flagshipEditorial)}
+              </p>
+            ) : null}
             <p className="mt-6 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--accent)]">Why it matters</p>
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
               {buildWhyItMatters(policy)}
             </p>
+            {thinSummary || thinOutcome ? (
+              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+                {buildPolicyCoverageNote(policy)}
+              </p>
+            ) : null}
             {policy.categories?.length ? (
               <div className="mt-5 flex flex-wrap gap-2">
                 {policy.categories.map((category) => (
@@ -262,6 +463,14 @@ export default async function PolicyDetailPage({ params }) {
             <p className="mt-4 text-sm leading-7 text-[var(--ink-soft)]">
               {buildWhatItMeans(policy)}
             </p>
+            {thinOutcome ? (
+              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+                {sentenceJoin([
+                  buildPolicyRecordOverview(policy, flagshipEditorial),
+                  "Use the related promises, reports, and policy lineage below if you need fuller context than the current outcome summary provides.",
+                ])}
+              </p>
+            ) : null}
           </div>
 
           {timeline.length ? <PolicyTimeline items={timeline} /> : null}
@@ -275,6 +484,12 @@ export default async function PolicyDetailPage({ params }) {
             summary="Policy pages keep score, evidence, and completeness side by side so users can evaluate what is known, what is sourced, and what still needs work."
           />
           <ScoreExplanation title="How to interpret this policy record" />
+          <CitationNote
+            description={
+              flagshipEditorial?.citationDescription ||
+              "When referencing this policy page externally, cite the policy title, EquityStack, the page URL, and your access date. Treat the page as a structured public record summary and pair it with linked sources or methodology when precision matters."
+            }
+          />
           <MethodologyCallout description="Impact Score is a structured record-level metric. The presidential Black Impact Score is a separate aggregate model built from outcomes, confidence, and time normalization." />
         </div>
       </section>
@@ -296,8 +511,8 @@ export default async function PolicyDetailPage({ params }) {
         </div>
         <div className="space-y-5">
           <SectionIntro
-            eyebrow="Related records"
-            title="Promises, explainers, and report paths"
+            eyebrow="Continue exploring"
+            title="Promises, explainers, reports, and research paths"
             description="Related records make it easier to move from a single policy into campaign promises, Black history explainers, and broader presidential or administrative context."
           />
           {(policy.related_promises || []).length ? (

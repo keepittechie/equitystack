@@ -2,6 +2,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buildPageMetadata } from "@/lib/metadata";
 import { buildPolicySlug, fetchPromisePageData } from "@/lib/public-site-data";
+import {
+  countLabel,
+  filterParagraphs,
+  isThinText,
+  sentenceJoin,
+} from "@/lib/editorial-depth";
 import StructuredData from "@/app/components/public/StructuredData";
 import { Breadcrumbs } from "@/app/components/public/chrome";
 import {
@@ -57,6 +63,93 @@ function buildWhyPromiseMatters(promise) {
   return `Promise records matter because they connect public commitments to documented implementation. This page helps readers study how ${president} handled ${topic.toLowerCase()}, why the promise is currently marked ${status.toLowerCase()}, and which policy actions or outcomes currently support that reading.`;
 }
 
+function buildPromiseOverview(promise) {
+  return sentenceJoin([
+    promise.promise_type
+      ? `This is a ${promise.promise_type.toLowerCase()} tracked in the public promise layer.`
+      : "This is a tracked promise record in the public promise layer.",
+    promise.campaign_or_official
+      ? `${promise.campaign_or_official} framing matters here because the page separates pre-office rhetoric from documented governing follow-through.`
+      : null,
+    promise.topic
+      ? `The record sits in the ${promise.topic.toLowerCase()} topic area.`
+      : null,
+  ]);
+}
+
+function buildPromiseComparisonNote(promise) {
+  const actions = countLabel((promise.actions || []).length, "action");
+  const outcomes = countLabel((promise.outcomes || []).length, "outcome");
+  const linkedPolicies = countLabel(
+    (promise.related_policies || []).length,
+    "linked policy",
+    "linked policies"
+  );
+
+  return sentenceJoin([
+    `Use this page to compare the original commitment against ${actions}, ${outcomes}, and ${linkedPolicies} in the current EquityStack dataset.`,
+    promise.confidence_label
+      ? `The current evidence confidence is ${promise.confidence_label.toLowerCase()}, so readers should keep the source trail and linked records in view while interpreting the status.`
+      : "Keep the linked records and source trail in view while interpreting the current status.",
+  ]);
+}
+
+function buildPromiseGuideCards(promise) {
+  const thinSummary = isThinText(promise.summary, 140);
+
+  return [
+    {
+      eyebrow: "What this page tracks",
+      title: "Promise language, status, and follow-through",
+      description: sentenceJoin([
+        buildPromiseOverview(promise),
+        `The page separates the statement itself from the public record used to classify the promise today.`,
+      ]),
+    },
+    {
+      eyebrow: "What to compare",
+      title: "Compare the promise against policy action and outcomes",
+      description:
+        "Do not stop at the status label. Compare the promise text to linked policies, dated actions, and outcome evidence to understand how implementation did or did not take shape.",
+    },
+    {
+      eyebrow: "Coverage note",
+      title: thinSummary ? "This record needs surrounding context" : "Use the record as an accountability layer",
+      description: thinSummary
+        ? buildPromiseComparisonNote(promise)
+        : "Even when the summary is stronger, the best use of a promise page is to read it alongside the linked policies, presidential profile, and report or explainer context.",
+    },
+  ];
+}
+
+function buildPromiseContextParagraphs(promise) {
+  const actionCount = (promise.actions || []).length;
+  const outcomeCount = (promise.outcomes || []).length;
+  const policyCount = (promise.related_policies || []).length;
+  const explainerCount = (promise.related_explainers || []).length;
+
+  return filterParagraphs([
+    sentenceJoin([
+      `This promise page is designed to answer a narrower question than a campaign summary or thematic guide: what was promised, how is it currently classified, and what visible record supports that reading today?`,
+      buildPromiseOverview(promise),
+    ]),
+    sentenceJoin([
+      `The page currently connects ${countLabel(actionCount, "documented action")}, ${countLabel(
+        outcomeCount,
+        "linked outcome"
+      )}, ${countLabel(policyCount, "related policy")}, and ${countLabel(
+        explainerCount,
+        "related explainer"
+      )} where those joins exist in the dataset.`,
+      `That makes it more useful as an accountability record than as a stand-alone statement page.`,
+    ]),
+    sentenceJoin([
+      `Promise status is only one layer of interpretation.`,
+      `The stronger reading comes from comparing the promise text, the status rationale, the linked policy record, and the source trail together.`,
+    ]),
+  ]);
+}
+
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   const promise = await fetchPromisePageData(slug);
@@ -105,6 +198,9 @@ export default async function PromiseDetailPage({ params }) {
   const linkedPolicyCount = (promise.related_policies || []).length;
   const policyOutcomeCount = (promise.outcomes || []).length;
   const actionCount = (promise.actions || []).length;
+  const guideCards = buildPromiseGuideCards(promise);
+  const thinSummary = isThinText(promise.summary, 140);
+  const thinRationale = isThinText(promise.review_summary, 120);
   const presidentPromiseHref = promise.president_slug
     ? `/promises/president/${promise.president_slug}`
     : null;
@@ -114,6 +210,7 @@ export default async function PromiseDetailPage({ params }) {
   const presidentPoliciesHref = promise.president
     ? `/policies?president=${encodeURIComponent(promise.president)}`
     : "/policies";
+  const contextParagraphs = buildPromiseContextParagraphs(promise);
 
   return (
     <main className="space-y-10">
@@ -173,6 +270,36 @@ export default async function PromiseDetailPage({ params }) {
         </div>
       </section>
 
+      <section className="grid gap-4 md:grid-cols-3">
+        {guideCards.map((item) => (
+          <div
+            key={item.title}
+            className="rounded-[1.4rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5"
+          >
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--accent)]">
+              {item.eyebrow}
+            </p>
+            <h2 className="mt-3 text-lg font-semibold text-white">{item.title}</h2>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item.description}</p>
+          </div>
+        ))}
+      </section>
+
+      <section className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6">
+        <SectionIntro
+          eyebrow="Context and background"
+          title="How to interpret this promise when the narrative is brief"
+          description="This framing keeps shorter promise summaries from feeling thin by tying them back to the actions, outcomes, linked policies, and surrounding research paths already visible on the page."
+        />
+        <div className="mt-5 grid gap-4">
+          {contextParagraphs.map((paragraph, index) => (
+            <p key={`${slug}-context-${index}`} className="text-sm leading-8 text-[var(--ink-soft)]">
+              {paragraph}
+            </p>
+          ))}
+        </div>
+      </section>
+
       <section className="public-two-col-rail grid gap-6 xl:grid-cols-[1.08fr_0.92fr]">
         <div className="space-y-5">
           <SectionIntro
@@ -188,6 +315,11 @@ export default async function PromiseDetailPage({ params }) {
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
               {promise.promise_text || promise.summary || "No promise statement is currently available."}
             </p>
+            {thinSummary ? (
+              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+                {buildPromiseOverview(promise)}
+              </p>
+            ) : null}
             <div className="mt-6 grid gap-3 md:grid-cols-2">
               <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
@@ -221,6 +353,11 @@ export default async function PromiseDetailPage({ params }) {
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
               This Promise currently has {actionCount} documented action record{actionCount === 1 ? "" : "s"} and {policyOutcomeCount} linked Policy Outcome{policyOutcomeCount === 1 ? "" : "s"} in the current EquityStack dataset.
             </p>
+            {thinSummary ? (
+              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+                {buildPromiseComparisonNote(promise)}
+              </p>
+            ) : null}
             <h2 className="mt-6 text-lg font-semibold text-white">Linked policy actions</h2>
             {(promise.related_policies || []).length ? (
               <div className="mt-3 grid gap-3">
@@ -244,6 +381,11 @@ export default async function PromiseDetailPage({ params }) {
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
               {whyStatus}
             </p>
+            {thinRationale ? (
+              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+                The current rationale is still short, so the most reliable way to read this status is to compare the promise language with the linked policy actions, outcome evidence, and the president&apos;s broader record below.
+              </p>
+            ) : null}
           </div>
           {timelineItems.length ? (
             <PromiseTimeline items={timelineItems} />
@@ -282,7 +424,7 @@ export default async function PromiseDetailPage({ params }) {
         </div>
         <div className="space-y-5">
           <SectionIntro
-            eyebrow="Linked policies"
+            eyebrow="Continue exploring"
             title="Policies and context connected to this promise"
             description="Policy links help users move from campaign or governing statements into administrative records, legislation, and broader historical context."
           />
@@ -350,6 +492,24 @@ export default async function PromiseDetailPage({ params }) {
               <h3 className="mt-3 text-lg font-semibold text-white">Black Impact Score</h3>
               <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
                 Read the flagship report when you want to place this promise record inside the wider presidential score and historical policy context.
+              </p>
+            </Link>
+            <Link href="/analysis/campaign-promises-to-black-americans" className="panel-link rounded-[1.4rem] p-5">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+                Thematic guide
+              </p>
+              <h3 className="mt-3 text-lg font-semibold text-white">Compare campaign promises and outcomes</h3>
+              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+                Use the thematic landing page when you need the broader question behind this one record: what was promised, what followed, and how those paths diverged across administrations.
+              </p>
+            </Link>
+            <Link href="/research" className="panel-link rounded-[1.4rem] p-5">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+                Research hub
+              </p>
+              <h3 className="mt-3 text-lg font-semibold text-white">Return to the curated research hub</h3>
+              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+                Move back into the wider research hub when this promise opens into a larger question about presidents, policies, reports, or historical context.
               </p>
             </Link>
           </div>

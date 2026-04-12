@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { buildPageMetadata } from "@/lib/metadata";
 import { fetchTimelineData } from "@/lib/public-site-data";
+import StructuredData from "@/app/components/public/StructuredData";
 import { Breadcrumbs } from "@/app/components/public/chrome";
 import {
   DashboardFilterBar,
@@ -9,6 +10,10 @@ import {
   SectionIntro,
 } from "@/app/components/public/core";
 import { TimelineEventCard } from "@/app/components/public/entities";
+import {
+  buildBreadcrumbJsonLd,
+  buildCollectionPageJsonLd,
+} from "@/lib/structured-data";
 
 export const dynamic = "force-dynamic";
 
@@ -30,6 +35,31 @@ export default async function TimelinePage({ searchParams }) {
 
   return (
     <main className="space-y-10">
+      <StructuredData
+        data={[
+          buildBreadcrumbJsonLd(
+            [{ href: "/", label: "Home" }, { label: "Timeline" }],
+            "/timeline"
+          ),
+          buildCollectionPageJsonLd({
+            title: "EquityStack timeline",
+            description:
+              "A chronological discovery layer connecting policies, promises, and historical context affecting Black Americans.",
+            path: "/timeline",
+            about: [
+              "timeline",
+              "Black policy history",
+              "policies",
+              "promises",
+            ],
+            keywords: [
+              "Black history timeline",
+              "civil rights timeline",
+              "policy history by year",
+            ],
+          }),
+        ]}
+      />
       <Breadcrumbs items={[{ href: "/", label: "Home" }, { label: "Timeline" }]} />
 
       <section className="hero-panel p-8 md:p-10 xl:p-14">
@@ -189,6 +219,52 @@ export default async function TimelinePage({ searchParams }) {
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      <section className="space-y-5">
+        <SectionIntro
+          eyebrow="Continue exploring"
+          title="Use chronology as a starting point, then move into records and research guides"
+          description="The timeline works best as a discovery layer. These next steps help you turn sequence into policy detail, promise context, and broader research paths."
+        />
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <Link href="/reports/civil-rights-timeline" className="panel-link rounded-[1.4rem] p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+              Historical report
+            </p>
+            <h3 className="mt-3 text-lg font-semibold text-white">Open the civil-rights timeline report</h3>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+              Use the curated report when you want a chronology-first interpretation layer rather than a mixed event stream.
+            </p>
+          </Link>
+          <Link href="/policies" className="panel-link rounded-[1.4rem] p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+              Policy explorer
+            </p>
+            <h3 className="mt-3 text-lg font-semibold text-white">Review policy records behind the timeline</h3>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+              Open policy pages when you need the evidence, score, and record-level explanation behind a timeline event.
+            </p>
+          </Link>
+          <Link href="/promises" className="panel-link rounded-[1.4rem] p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+              Promise tracker
+            </p>
+            <h3 className="mt-3 text-lg font-semibold text-white">Compare promises with chronological change</h3>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+              Use the promise tracker when the timeline raises a question about commitments, delivery, and what followed over time.
+            </p>
+          </Link>
+          <Link href="/research" className="panel-link rounded-[1.4rem] p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+              Research hub
+            </p>
+            <h3 className="mt-3 text-lg font-semibold text-white">Return to the curated research hub</h3>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+              Use the research hub when chronology opens into a broader question about presidents, laws, reports, explainers, or methods.
+            </p>
+          </Link>
         </div>
       </section>
     </main>

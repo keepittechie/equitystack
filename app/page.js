@@ -209,6 +209,116 @@ export default async function HomePage() {
         ))}
       </section>
 
+      <section className="space-y-5">
+        <SectionIntro
+          eyebrow="Key Questions"
+          title="Start with the major historical questions EquityStack can help you explore"
+          description="These primary thematic guides are designed for first-time visitors who arrive with a serious research question and need the clearest route into presidents, legislation, policy records, reports, and historical context."
+        />
+        <div className="grid gap-4 md:grid-cols-3">
+          {[
+            {
+              href: "/analysis/presidents-and-black-americans",
+              title: "Presidents and Black Americans",
+              summary:
+                "Start with the broad entry guide for comparing presidents, Black history, policy records, promises, and historical context across the site.",
+              cta: "Explore presidents and Black history",
+            },
+            {
+              href: "/analysis/presidential-impact-on-black-americans",
+              title: "Presidential Impact on Black Americans",
+              summary:
+                "Use the synthesis hub when the question is how administrations affected Black Americans across rights, legislation, enforcement, policy, and longer historical change.",
+              cta: "Explore presidential impact on Black Americans",
+            },
+            {
+              href: "/analysis/civil-rights-laws-by-president",
+              title: "Civil Rights Laws by President",
+              summary:
+                "Follow federal legislation, civil-rights policy, and administration context when the question turns on laws affecting Black Americans and how they changed over time.",
+              cta: "Trace civil-rights laws across administrations",
+            },
+          ].map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 hover:border-[rgba(132,247,198,0.24)]"
+            >
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--accent)]">
+                Research guide
+              </p>
+              <h2 className="mt-4 text-xl font-semibold text-white">{item.title}</h2>
+              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item.summary}</p>
+              <span className="mt-5 inline-flex text-sm font-medium text-[var(--accent)]">
+                {item.cta}
+              </span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <section className="space-y-5">
+        <SectionIntro
+          eyebrow="Reference Pages"
+          title="Start with the site&apos;s strongest citation and reference pages"
+          description="These pages are the clearest entry points for journalists, researchers, educators, students, and writers who want a shareable overview, a defensible methods page, or a source-backed hub to cite."
+        />
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+          {[
+            {
+              href: "/research",
+              title: "Research hub",
+              summary:
+                "Use the curated research hub when you need one serious entry point into the site’s strongest thematic guides, flagship reports, explainers, methods, and sources.",
+              cta: "Open the research hub",
+            },
+            {
+              href: "/reports",
+              title: "Reports and analysis hub",
+              summary:
+                "Use the report library when you need a higher-level synthesis page that still routes back into policy records, sources, and methodology.",
+              cta: "Browse reference-ready reports",
+            },
+            {
+              href: "/methodology",
+              title: "Methodology and scoring rules",
+              summary:
+                "Link here when readers need to understand how EquityStack defines scores, promise grading, confidence, attribution, and source quality.",
+              cta: "Review the methodology",
+            },
+            {
+              href: "/sources",
+              title: "Public source library",
+              summary:
+                "Use the source library when a reader needs to inspect the evidence layer behind policies, promises, outcomes, and reports.",
+              cta: "Inspect the source base",
+            },
+            {
+              href: "/start",
+              title: "Guided research path",
+              summary:
+                "Share the guided reading path when someone needs a structured introduction to the site&apos;s core explainers, legal context, and historical themes.",
+              cta: "Open the research guide",
+            },
+          ].map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 hover:border-[rgba(132,247,198,0.24)]"
+            >
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--accent)]">
+                Citation-friendly
+              </p>
+              <h2 className="mt-4 text-xl font-semibold text-white">{item.title}</h2>
+              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item.summary}</p>
+              <span className="mt-5 inline-flex text-sm font-medium text-[var(--accent)]">
+                {item.cta}
+              </span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <KpiCard
           label="Tracked outcomes"

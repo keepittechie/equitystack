@@ -748,7 +748,9 @@ export function ExplainerIndexGrid({ items = [] }) {
           </p>
           <h3 className="mt-4 text-xl font-semibold text-white">{item.title}</h3>
           <p className="mt-3 line-clamp-4 text-sm leading-7 text-[var(--ink-soft)]">{item.summary}</p>
-          <span className="mt-auto pt-5 text-sm font-medium text-[var(--accent)]">Read explainer</span>
+          <span className="mt-auto pt-5 text-sm font-medium text-[var(--accent)]">
+            Read historical context and linked records
+          </span>
         </Link>
       ))}
     </div>

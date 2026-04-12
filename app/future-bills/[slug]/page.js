@@ -6,8 +6,10 @@ import HelpfulFeedback from "@/app/components/feedback/HelpfulFeedback";
 import TrackedLink from "@/app/components/telemetry/TrackedLink";
 import CopyShareLinkButton from "@/app/reports/black-impact-score/CopyShareLinkButton";
 import {
+  CitationNote,
   MethodologyCallout,
   PageContextBlock,
+  SectionIntro,
 } from "@/app/components/public/core";
 import {
   FutureBillDetailSections,
@@ -15,6 +17,7 @@ import {
   priorityClasses,
   statusClasses,
 } from "@/app/future-bills/FutureBillContent";
+import { countLabel, isThinText, sentenceJoin } from "@/lib/editorial-depth";
 import { buildPageMetadata } from "@/lib/metadata";
 import { getFutureBillDetail } from "@/lib/shareable-cards";
 import {
@@ -70,6 +73,52 @@ function SummaryCard({ title, value, subtitle }) {
   );
 }
 
+function buildFutureBillOverview(bill) {
+  return sentenceJoin([
+    bill.target_area
+      ? `${bill.title} is grouped under ${bill.target_area.toLowerCase()} in the public reform pipeline.`
+      : `${bill.title} is tracked here as a future-facing reform proposal.`,
+    `${countLabel((bill.tracked_bills || []).length, "linked bill")} and ${countLabel(
+      (bill.related_explainers || []).length,
+      "linked explainer"
+    )} currently provide surrounding context.`,
+    `${countLabel(
+      (bill.sources || []).length,
+      "public source"
+    )} are visible in the current detail view.`,
+  ]);
+}
+
+function buildFutureBillGuideCards(bill) {
+  const thinLead =
+    isThinText(bill.summary, 140) && isThinText(bill.problem_statement, 180);
+
+  return [
+    {
+      eyebrow: "What this page tracks",
+      title: "A proposal, not a settled law",
+      description:
+        "Future-bill pages keep the problem statement, proposed solution, tracked legislative movement, and surrounding historical context in one place without treating the proposal as already enacted.",
+    },
+    {
+      eyebrow: "How to use it",
+      title: "Read the problem, solution, and linked legislative trail together",
+      description:
+        "Start with the problem statement and proposed solution, then compare the linked bills, explainers, and sponsor context before treating the proposal as a likely outcome.",
+    },
+    {
+      eyebrow: "Coverage note",
+      title: thinLead ? "This proposal still depends on linked context" : "Use the proposal page as an early research path",
+      description: thinLead
+        ? sentenceJoin([
+            buildFutureBillOverview(bill),
+            "Proposal pages can still be thin when the legislative record is early, so the linked bills, explainers, and sources matter more than one short lead paragraph.",
+          ])
+        : "Even when the summary is stronger, this page is best used together with the linked bills, sources, and explainers rather than as a standalone prediction.",
+    },
+  ];
+}
+
 export default async function FutureBillDetailPage({ params }) {
   const { slug } = await params;
   const bill = await getFutureBillDetail(slug);
@@ -77,6 +126,9 @@ export default async function FutureBillDetailPage({ params }) {
   if (!bill) {
     notFound();
   }
+
+  const guideCards = buildFutureBillGuideCards(bill);
+  const thinSummary = isThinText(bill.summary, 140);
 
   return (
     <main className="max-w-5xl mx-auto p-6 space-y-6">
@@ -146,6 +198,11 @@ export default async function FutureBillDetailPage({ params }) {
             <p className="text-base md:text-lg text-[var(--ink-soft)] mt-4 leading-8">
               {bill.summary}
             </p>
+            {thinSummary ? (
+              <p className="text-sm leading-7 text-[var(--ink-soft)] mt-4">
+                {buildFutureBillOverview(bill)}
+              </p>
+            ) : null}
             <div className="flex flex-wrap gap-2 mt-4">
               <span className={`status-pill ${priorityClasses(bill.priority_level)}`}>
                 {bill.priority_level}
@@ -224,6 +281,21 @@ export default async function FutureBillDetailPage({ params }) {
       </section>
 
       <section className="grid gap-4 md:grid-cols-3">
+        {guideCards.map((item) => (
+          <div
+            key={item.title}
+            className="rounded-[1.4rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5"
+          >
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--accent)]">
+              {item.eyebrow}
+            </p>
+            <h2 className="mt-3 text-lg font-semibold text-white">{item.title}</h2>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item.description}</p>
+          </div>
+        ))}
+      </section>
+
+      <section className="grid gap-4 md:grid-cols-3">
         <Link href="/bills" className="panel-link rounded-[1.4rem] p-5">
           <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
             Legislative tracking
@@ -252,6 +324,64 @@ export default async function FutureBillDetailPage({ params }) {
 
       <section className="card-surface rounded-[1.7rem] p-7 md:p-8">
         <FutureBillDetailSections bill={bill} detailMode sources={bill.sources} />
+      </section>
+
+      <section className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
+        <CitationNote
+          title="How to cite this proposal page"
+          description="When referencing a future-bill page externally, cite the proposal title, EquityStack, the page URL, and your access date. Treat the page as a tracked reform record built from linked bills, sources, and contextual explainers rather than a prediction that the proposal will pass."
+        />
+        <MethodologyCallout
+          title="How to read proposal-stage records"
+          description="Proposal pages show direction, problem framing, and linked legislative context, but they can remain thinner than enacted-law pages while a bill is still in idea, drafting, advocacy, or introduced status."
+          linkLabel="Review methodology and limits"
+        />
+      </section>
+
+      <section className="space-y-5">
+        <SectionIntro
+          eyebrow="Continue exploring"
+          title="Continue into legislation, explainers, reports, and trust pages"
+          description="Proposal pages work best when they lead outward into the bill tracker, historical context, analytical summaries, and the trust pages that explain how EquityStack organizes the record."
+        />
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <Link href="/bills" className="panel-link rounded-[1.4rem] p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+              Bill tracker
+            </p>
+            <h2 className="mt-3 text-lg font-semibold text-white">Browse linked legislation and enacted bills</h2>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+              Move from proposal language into current or historical legislation when you need chamber activity, sponsor history, and bill-level impact context.
+            </p>
+          </Link>
+          <Link href="/explainers" className="panel-link rounded-[1.4rem] p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+              Historical context
+            </p>
+            <h2 className="mt-3 text-lg font-semibold text-white">Read explainers tied to the same reform area</h2>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+              Use explainers when the proposal depends on longer histories of rights, exclusion, enforcement, or unfinished policy repair.
+            </p>
+          </Link>
+          <Link href="/reports" className="panel-link rounded-[1.4rem] p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+              Reports
+            </p>
+            <h2 className="mt-3 text-lg font-semibold text-white">Read report analysis before comparing proposals</h2>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+              Reports help place one proposal inside larger patterns across administrations, issue areas, and tracked outcomes.
+            </p>
+          </Link>
+          <Link href="/research" className="panel-link rounded-[1.4rem] p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+              Research hub
+            </p>
+            <h2 className="mt-3 text-lg font-semibold text-white">Return to the curated research hub</h2>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+              Use the research hub when this proposal leads into a larger question about presidents, policy pathways, explainers, or public methodology.
+            </p>
+          </Link>
+        </div>
       </section>
 
       <HelpfulFeedback

@@ -4,8 +4,14 @@ import {
   PromiseStatusBadge,
 } from "@/app/components/policy-badges";
 import PresidentAvatar from "@/app/components/PresidentAvatar";
+import StructuredData from "@/app/components/public/StructuredData";
+import { Breadcrumbs } from "@/app/components/public/chrome";
 import { buildPageMetadata } from "@/lib/metadata";
 import { fetchCivilRightsTimeline } from "@/lib/services/promiseService";
+import {
+  buildBreadcrumbJsonLd,
+  buildReportJsonLd,
+} from "@/lib/structured-data";
 
 export const dynamic = "force-dynamic";
 
@@ -163,6 +169,42 @@ export default async function CivilRightsTimelinePage() {
 
   return (
     <main className="report-shell w-full pt-4 pb-6 space-y-6">
+      <StructuredData
+        data={[
+          buildBreadcrumbJsonLd(
+            [
+              { href: "/", label: "Home" },
+              { href: "/reports", label: "Reports" },
+              { label: "Civil Rights Timeline" },
+            ],
+            "/reports/civil-rights-timeline"
+          ),
+          buildReportJsonLd({
+            title: "Civil Rights Timeline",
+            description:
+              "A chronology-first report tracing major federal civil-rights commitments, rollback, continuity, and policy change affecting Black Americans.",
+            path: "/reports/civil-rights-timeline",
+            about: [
+              "civil rights history",
+              "Black Americans",
+              "timeline",
+              "federal policy",
+            ],
+            keywords: [
+              "civil rights timeline",
+              "civil rights history by administration",
+              "laws affecting Black Americans",
+            ],
+          }),
+        ]}
+      />
+      <Breadcrumbs
+        items={[
+          { href: "/", label: "Home" },
+          { href: "/reports", label: "Reports" },
+          { label: "Civil Rights Timeline" },
+        ]}
+      />
       <div className="flex flex-wrap gap-3">
         <Link
           href="/reports"
@@ -262,6 +304,42 @@ export default async function CivilRightsTimelinePage() {
           </section>
         ))}
       </div>
+
+      <section className="card-surface rounded-[1.6rem] p-6">
+        <div className="max-w-3xl">
+          <p className="eyebrow mb-3">Continue exploring</p>
+          <h2 className="text-2xl font-semibold">Move from chronology into records, methods, and broader research paths</h2>
+          <p className="mt-3 text-sm text-[var(--ink-soft)] leading-7">
+            Use these next steps when the timeline raises a deeper question about one administration, a specific law, a related promise, or the methodology behind the public record.
+          </p>
+        </div>
+        <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <Link href="/promises" className="panel-link block rounded-[1.25rem] p-5">
+            <h3 className="text-lg font-semibold">Review promise records</h3>
+            <p className="mt-2 text-sm text-[var(--ink-soft)] leading-7">
+              Open the promise tracker when you want the full record behind a timeline entry rather than the chronological summary.
+            </p>
+          </Link>
+          <Link href="/analysis/civil-rights-laws-by-president" className="panel-link block rounded-[1.25rem] p-5">
+            <h3 className="text-lg font-semibold">Trace civil-rights laws across administrations</h3>
+            <p className="mt-2 text-sm text-[var(--ink-soft)] leading-7">
+              Use the legislation guide when the timeline leads into a broader question about laws, enforcement, and administration context.
+            </p>
+          </Link>
+          <Link href="/methodology" className="panel-link block rounded-[1.25rem] p-5">
+            <h3 className="text-lg font-semibold">Review methodology and interpretation limits</h3>
+            <p className="mt-2 text-sm text-[var(--ink-soft)] leading-7">
+              Read the methodology page before citing the timeline as evidence of a broader historical interpretation.
+            </p>
+          </Link>
+          <Link href="/research" className="panel-link block rounded-[1.25rem] p-5">
+            <h3 className="text-lg font-semibold">Return to the research hub</h3>
+            <p className="mt-2 text-sm text-[var(--ink-soft)] leading-7">
+              Use the research hub when this timeline opens into reports, explainers, thematic guides, or source-backed comparison work.
+            </p>
+          </Link>
+        </div>
+      </section>
     </main>
   );
 }

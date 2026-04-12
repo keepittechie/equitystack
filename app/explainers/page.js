@@ -13,6 +13,7 @@ import { ExplainerIndexGrid } from "@/app/components/public/entities";
 import {
   buildBreadcrumbJsonLd,
   buildCollectionPageJsonLd,
+  buildItemListJsonLd,
 } from "@/lib/structured-data";
 
 export const dynamic = "force-dynamic";
@@ -72,6 +73,19 @@ export default async function ExplainersPage({ searchParams }) {
               "Black history explainers",
               "presidents and Black Americans",
             ],
+          }),
+          buildItemListJsonLd({
+            title: "Explainers visible in the EquityStack explainer library",
+            description:
+              "The current visible explainer entries on the public explainer library page.",
+            path: "/explainers",
+            items: explainers
+              .filter((item) => item?.slug && item?.title)
+              .slice(0, 12)
+              .map((item) => ({
+                href: `/explainers/${item.slug}`,
+                name: item.title,
+              })),
           }),
         ]}
       />

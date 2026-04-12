@@ -1,8 +1,13 @@
 import Link from "next/link";
 import { buildPageMetadata } from "@/lib/metadata";
+import StructuredData from "@/app/components/public/StructuredData";
 import { Breadcrumbs } from "@/app/components/public/chrome";
-import { KpiCard, SectionIntro } from "@/app/components/public/core";
+import { CitationNote, KpiCard, SectionIntro } from "@/app/components/public/core";
 import TrustBar from "@/app/components/public/TrustBar";
+import {
+  buildAboutPageJsonLd,
+  buildBreadcrumbJsonLd,
+} from "@/lib/structured-data";
 
 export const metadata = buildPageMetadata({
   title: "About",
@@ -37,6 +42,32 @@ const ABOUT_SECTIONS = [
 export default function AboutPage() {
   return (
     <main className="space-y-10">
+      <StructuredData
+        data={[
+          buildBreadcrumbJsonLd(
+            [{ href: "/", label: "Home" }, { label: "About" }],
+            "/about"
+          ),
+          buildAboutPageJsonLd({
+            title: "About EquityStack",
+            description:
+              "Learn what EquityStack is, how it studies presidents, promises, policies, and Black Americans, and where its analytical limits begin.",
+            path: "/about",
+            about: [
+              "EquityStack",
+              "public-interest research",
+              "U.S. presidents",
+              "Black Americans",
+              "policy impact",
+            ],
+            keywords: [
+              "about EquityStack",
+              "Black policy research site",
+              "public-interest research platform",
+            ],
+          }),
+        ]}
+      />
       <Breadcrumbs items={[{ href: "/", label: "Home" }, { label: "About" }]} />
 
       <section className="hero-panel p-8 md:p-10 xl:p-14">
@@ -99,6 +130,11 @@ export default function AboutPage() {
         </div>
       </section>
 
+      <CitationNote
+        title="When to link this page"
+        description="Use the About page when someone needs a concise description of what EquityStack is, what it studies, and what it does not claim to do. Pair it with the methodology page or source library when the audience needs verification detail beyond the platform description."
+      />
+
       <section className="grid gap-5 md:grid-cols-2">
         {ABOUT_SECTIONS.map((item) => (
           <article
@@ -143,6 +179,27 @@ export default function AboutPage() {
             </li>
           </ul>
         </div>
+      </section>
+
+      <section className="grid gap-4 md:grid-cols-3">
+        <Link href="/methodology" className="panel-link rounded-[1.4rem] p-5">
+          <h2 className="text-lg font-semibold text-white">Methodology</h2>
+          <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+            Share the methodology page when a reader needs to understand the rules behind scores, statuses, and confidence labels.
+          </p>
+        </Link>
+        <Link href="/sources" className="panel-link rounded-[1.4rem] p-5">
+          <h2 className="text-lg font-semibold text-white">Sources</h2>
+          <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+            Use the source library when someone wants to inspect the public evidence base behind EquityStack&apos;s summaries.
+          </p>
+        </Link>
+        <Link href="/start" className="panel-link rounded-[1.4rem] p-5">
+          <h2 className="text-lg font-semibold text-white">Guided research path</h2>
+          <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+            Link the research guide when a first-time visitor needs a structured introduction to the strongest public explainers and themes.
+          </p>
+        </Link>
       </section>
     </main>
   );

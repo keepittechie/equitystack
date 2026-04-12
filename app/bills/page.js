@@ -4,8 +4,10 @@ import StructuredData from "@/app/components/public/StructuredData";
 import { buildPublicBillsDataset } from "@/lib/public-bills";
 import { getFutureBills } from "@/lib/shareable-cards";
 import {
+  buildBreadcrumbJsonLd,
   buildCollectionPageJsonLd,
   buildDatasetJsonLd,
+  buildItemListJsonLd,
 } from "@/lib/structured-data";
 
 export const metadata = buildPageMetadata({
@@ -28,6 +30,10 @@ export default async function BillsPage() {
     <>
       <StructuredData
         data={[
+          buildBreadcrumbJsonLd(
+            [{ href: "/", label: "Home" }, { label: "Bills" }],
+            "/bills"
+          ),
           buildCollectionPageJsonLd({
             title: "Bills affecting Black Americans",
             description:
@@ -53,6 +59,19 @@ export default async function BillsPage() {
               "Source count",
               "Linked promises",
             ],
+          }),
+          buildItemListJsonLd({
+            title: "Bills visible on the EquityStack bill tracker",
+            description:
+              "The current visible bill entries on the public EquityStack bill tracker.",
+            path: "/bills",
+            items: bills
+              .filter((item) => item?.detailHref && item?.title)
+              .slice(0, 12)
+              .map((item) => ({
+                href: item.detailHref,
+                name: item.title,
+              })),
           }),
         ]}
       />

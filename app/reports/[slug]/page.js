@@ -5,6 +5,7 @@ import {
   fetchReportDetailData,
   fetchReportsHubData,
 } from "@/lib/public-site-data";
+import { getFlagshipReportEditorial } from "@/lib/flagship-editorial";
 import StructuredData from "@/app/components/public/StructuredData";
 import { Breadcrumbs } from "@/app/components/public/chrome";
 import {
@@ -28,8 +29,8 @@ import {
   ImpactTrendChart,
 } from "@/app/components/public/charts";
 import {
-  buildArticleJsonLd,
   buildBreadcrumbJsonLd,
+  buildReportJsonLd,
 } from "@/lib/structured-data";
 
 export const dynamic = "force-dynamic";
@@ -78,6 +79,16 @@ function buildRelatedPathCards(report) {
       };
     }
 
+    if (item.href === "/sources") {
+      return {
+        ...item,
+        eyebrow: "Sources",
+        title: "Inspect the source library behind this analysis",
+        description:
+          "Use the source library when you need to verify the evidence base, trace publisher quality, or move from report summary into documentation.",
+      };
+    }
+
     return {
       ...item,
       eyebrow: "Related path",
@@ -86,6 +97,37 @@ function buildRelatedPathCards(report) {
     };
   });
 }
+
+const CONTINUE_EXPLORING_CARDS = [
+  {
+    href: "/research",
+    eyebrow: "Research hub",
+    title: "Return to the curated research hub",
+    description:
+      "Use the research hub when this report opens into a broader question and you need the strongest next thematic, explainer, or methodology path.",
+  },
+  {
+    href: "/methodology",
+    eyebrow: "Methodology",
+    title: "Review methodology before citing the analysis",
+    description:
+      "Read the methodology page when you need to understand how scores, source rules, confidence, and interpretation shape the report layer.",
+  },
+  {
+    href: "/sources",
+    eyebrow: "Sources",
+    title: "Inspect the evidence behind the report",
+    description:
+      "Use the source library when the next step is verifying the visible documentation behind the records summarized here.",
+  },
+  {
+    href: "/start",
+    eyebrow: "How to use EquityStack",
+    title: "Follow the guided research path",
+    description:
+      "Use the start page when a reader needs orientation before moving between explainers, reports, records, and methodology.",
+  },
+];
 
 function renderChartBlock(block, index) {
   const key = `${block.title}-${index}`;
@@ -159,6 +201,7 @@ export default async function ReportDetailPage({ params }) {
   }
 
   const relatedPathCards = buildRelatedPathCards(report);
+  const reportEditorial = getFlagshipReportEditorial(slug);
 
   return (
     <main className="space-y-10">
@@ -172,11 +215,13 @@ export default async function ReportDetailPage({ params }) {
             ],
             `/reports/${slug}`
           ),
-          buildArticleJsonLd({
+          buildReportJsonLd({
             title: report.title,
             description: report.summary,
             path: `/reports/${slug}`,
             section: report.category || "Report",
+            datePublished: report.published_at || report.created_at,
+            dateModified: report.updated_at,
             about: [
               "Black history",
               "U.S. presidents",
@@ -236,6 +281,63 @@ export default async function ReportDetailPage({ params }) {
         </div>
       </section>
 
+      <section className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
+        <CitationNote
+          title="Why readers cite this report"
+          description={
+            reportEditorial?.citationDescription ||
+            "This page is best used as a reference when someone needs a concise analytical summary that still links back into the underlying records. Cite the report title, EquityStack, the report URL, and your access date, then link to the related policies, sources, or methodology page when precision matters."
+          }
+        />
+        <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--accent)]">
+            What this page covers
+          </p>
+          <h2 className="mt-3 text-2xl font-semibold text-white">A reference page, not just a visualization layer</h2>
+          <div className="mt-4 grid gap-3 text-sm leading-7 text-[var(--ink-soft)]">
+            <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+              Use this page when the audience needs a readable summary before opening the underlying policy records.
+            </div>
+            <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+              The strongest use of a report page is as a bridge between broad interpretation, linked charts, related records, and visible methodology.
+            </div>
+            <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+              When the topic is contested or technical, pair this report with the source library or methodology page rather than treating the summary as self-sufficient.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="grid gap-4 md:grid-cols-3">
+        {(reportEditorial?.cards || [
+          {
+            title: "What this report does",
+            description:
+              "Use the report layer when the first question is comparative or interpretive and the reader needs a concise synthesis before opening individual policy pages.",
+          },
+          {
+            title: "What it does not do",
+            description:
+              "A report summarizes the current public dataset. It should still be paired with linked policy pages, the source library, or methodology when the topic is contested or highly specific.",
+          },
+          {
+            title: "Best next step",
+            description:
+              "Read the findings first, then move into the linked records, charts, and trust pages rather than treating the report summary as self-sufficient.",
+          },
+        ]).map((item) => (
+          <div key={item.title} className="rounded-[1.4rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--accent)]">
+              Flagship note
+            </p>
+            <h2 className="mt-3 text-lg font-semibold text-white">{item.title}</h2>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+              {item.description}
+            </p>
+          </div>
+        ))}
+      </section>
+
       {report.metrics?.length ? (
         <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {report.metrics.map((item) => (
@@ -275,9 +377,9 @@ export default async function ReportDetailPage({ params }) {
         </div>
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-1">
           <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
-            <h2 className="text-lg font-semibold text-white">About this report</h2>
+            <h2 className="text-lg font-semibold text-white">Why researchers use this page</h2>
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-              This report is generated from structured policy data in EquityStack. It is not an opinion piece. The analysis aggregates policy-level records, score context, and linked evidence into a readable public summary.
+              This report is generated from structured policy data in EquityStack. It is not an opinion piece. The analysis aggregates policy-level records, score context, and linked evidence into a readable public summary that can be shared before readers drill down into the records themselves.
             </p>
           </div>
           <CitationNote description="When referencing this report externally, cite the report title, EquityStack, the page URL, and your access date. The report summarizes the current structured dataset and should be read with the linked policy records, sources, and methodology." />
@@ -355,11 +457,11 @@ export default async function ReportDetailPage({ params }) {
 
       <section className="space-y-5">
         <SectionIntro
-          eyebrow="Related analysis"
-          title="Continue through reports, explainers, and public records"
-          description="Reports should open outward into the rest of the site. Use these next steps to move into adjacent analysis or back down into the underlying public record."
+          eyebrow="Continue exploring"
+          title="Continue through reports, explainers, public records, and trust pages"
+          description="Reports should open outward into the rest of the site. Use these next steps to move into adjacent analysis, underlying records, or the trust pages that explain and verify the public record."
         />
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           <Link href="/explainers" className="panel-link rounded-[1.4rem] p-5">
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">Historical context</p>
             <h3 className="mt-3 text-lg font-semibold text-white">Read related explainers</h3>
@@ -381,6 +483,13 @@ export default async function ReportDetailPage({ params }) {
               Use the policy explorer when you want the laws, executive actions, and court decisions underneath the report&apos;s main findings.
             </p>
           </Link>
+          <Link href="/research" className="panel-link rounded-[1.4rem] p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">Research hub</p>
+            <h3 className="mt-3 text-lg font-semibold text-white">Return to the broader research hub</h3>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+              Use the research hub when this report leads into a larger question about presidents, legislation, promises, explainers, or methods.
+            </p>
+          </Link>
         </div>
         <ReportCardGrid
           items={
@@ -389,6 +498,19 @@ export default async function ReportDetailPage({ params }) {
               : hub.reports.filter((item) => item.slug !== slug).slice(0, 3)
           }
         />
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          {CONTINUE_EXPLORING_CARDS.map((item) => (
+            <Link key={item.href} href={item.href} className="panel-link rounded-[1.4rem] p-5">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+                {item.eyebrow}
+              </p>
+              <h3 className="mt-3 text-lg font-semibold text-white">{item.title}</h3>
+              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+                {item.description}
+              </p>
+            </Link>
+          ))}
+        </div>
       </section>
     </main>
   );

@@ -3,8 +3,10 @@ import { buildPageMetadata } from "@/lib/metadata";
 import StructuredData from "@/app/components/public/StructuredData";
 import { getFutureBills } from "@/lib/shareable-cards";
 import {
+  buildBreadcrumbJsonLd,
   buildCollectionPageJsonLd,
   buildDatasetJsonLd,
+  buildItemListJsonLd,
 } from "@/lib/structured-data";
 
 export const metadata = buildPageMetadata({
@@ -28,6 +30,10 @@ export default async function FutureBillsPage({ searchParams }) {
     <>
       <StructuredData
         data={[
+          buildBreadcrumbJsonLd(
+            [{ href: "/", label: "Home" }, { label: "Future Bills" }],
+            "/future-bills"
+          ),
           buildCollectionPageJsonLd({
             title: "Future bills and reform proposals",
             description:
@@ -56,6 +62,19 @@ export default async function FutureBillsPage({ searchParams }) {
               "Source count",
               "Legislative updates",
             ],
+          }),
+          buildItemListJsonLd({
+            title: "Future bills visible on the EquityStack proposal library",
+            description:
+              "The current visible future-bill and reform-proposal entries on the public EquityStack site.",
+            path: "/future-bills",
+            items: bills
+              .filter((item) => item?.detailPath && item?.title)
+              .slice(0, 12)
+              .map((item) => ({
+                href: item.detailPath,
+                name: item.title,
+              })),
           }),
         ]}
       />

@@ -23,6 +23,7 @@ import {
   buildBreadcrumbJsonLd,
   buildCollectionPageJsonLd,
   buildDatasetJsonLd,
+  buildItemListJsonLd,
 } from "@/lib/structured-data";
 
 export const dynamic = "force-dynamic";
@@ -144,6 +145,18 @@ export default async function PresidentsPage({ searchParams }) {
               "Outcome count",
             ],
           }),
+          buildItemListJsonLd({
+            title: "Presidential profiles visible on the presidents index",
+            description:
+              "The current visible presidential profiles on the EquityStack presidents index.",
+            path: "/presidents",
+            items: topRanked
+              .filter((item) => (item.slug || item.president_slug) && item.name)
+              .map((item) => ({
+                href: `/presidents/${item.slug || item.president_slug}`,
+                name: item.name,
+              })),
+          }),
         ]}
       />
       <Breadcrumbs items={[{ href: "/", label: "Home" }, { label: "Presidents" }]} />
@@ -221,7 +234,7 @@ export default async function PresidentsPage({ searchParams }) {
         </form>
       </DashboardFilterBar>
 
-      <section className="grid gap-4 md:grid-cols-2">
+      <section className="grid gap-4 md:grid-cols-3">
         <Link href="/promises" className="panel-link rounded-[1.5rem] p-5">
           <h2 className="text-lg font-semibold text-white">Open campaign promises by president</h2>
           <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
@@ -232,6 +245,12 @@ export default async function PresidentsPage({ searchParams }) {
           <h2 className="text-lg font-semibold text-white">Read the Black Impact Score report</h2>
           <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
             The flagship report adds ranking context, score interpretation, and broader historical framing beyond the profile cards on this page.
+          </p>
+        </Link>
+        <Link href="/analysis/presidents-and-black-americans" className="panel-link rounded-[1.5rem] p-5">
+          <h2 className="text-lg font-semibold text-white">Read the presidents and Black Americans guide</h2>
+          <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+            Start with the thematic guide when the question is broader than one president and you want the best research paths across profiles, policies, promises, and reports.
           </p>
         </Link>
       </section>

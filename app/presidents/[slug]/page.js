@@ -1,6 +1,15 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buildPageMetadata } from "@/lib/metadata";
+import {
+  countLabel,
+  filterParagraphs,
+  isThinText,
+  oxfordJoin,
+  sentenceJoin,
+  takeLabels,
+} from "@/lib/editorial-depth";
+import { getFlagshipPresidentEditorial } from "@/lib/flagship-editorial";
 import { resolvePresidentImageSrc } from "@/lib/president-image-paths";
 import { buildPolicySlug, fetchPresidentProfileData } from "@/lib/public-site-data";
 import StructuredData from "@/app/components/public/StructuredData";
@@ -106,6 +115,114 @@ function LinkedBillCard({ item }) {
   );
 }
 
+function buildPresidentOverview(profile, editorial = null) {
+  const { president, promiseTracker, scoreDrivers } = profile;
+  const topicLabels = takeLabels(
+    scoreDrivers?.topic_drivers,
+    (item) => item.topic,
+    3
+  );
+  const outcomes = countLabel(
+    president.direct_outcome_count ?? president.outcome_count ?? 0,
+    "scored outcome"
+  );
+  const promises = countLabel(
+    promiseTracker.visible_promise_count ?? promiseTracker.total_tracked_promises ?? 0,
+    "tracked promise"
+  );
+
+  return sentenceJoin([
+    `This profile organizes ${outcomes}, ${promises}, and the supporting score context for ${president.president || president.name || "this presidency"}.`,
+    topicLabels.length
+      ? `The clearest documented movement in the current dataset appears in ${oxfordJoin(
+          topicLabels
+        )}.`
+      : null,
+    Number(president.linked_bill_count || 0) > 0
+      ? `${countLabel(
+          president.linked_bill_count,
+          "linked bill"
+        )} currently add legislative context through supported promise lineage.`
+      : "No supported bill lineage is attached yet, so this profile leans more heavily on promise and outcome records.",
+    editorial?.summarySuffix || null,
+  ]);
+}
+
+function buildPresidentGuideCards(profile, editorial = null) {
+  const { president, promiseTracker } = profile;
+  const thinNarrative = isThinText(president.narrative_summary, 180);
+
+  return [
+    {
+      eyebrow: "What this profile covers",
+      title: "Score, promise tracker, and legislative context",
+      description:
+        buildPresidentOverview(profile, editorial) ||
+        "This profile combines outcome evidence, promise records, and linked legislative context.",
+    },
+    {
+      eyebrow: "How to use it",
+      title: "Move from the headline score into the underlying record",
+      description:
+        "Use the score as a starting point, then inspect the driver tables, linked promises, policy records, and bill context before treating the profile as a settled historical judgment.",
+    },
+    {
+      eyebrow: "Coverage note",
+      title: thinNarrative ? "The narrative summary is shorter than the underlying record" : "The narrative summary sits on top of a larger record set",
+      description: thinNarrative
+        ? sentenceJoin([
+            "Some presidential pages still depend on structured records more than long-form narrative text.",
+            `${countLabel(
+              promiseTracker.visible_source_count || 0,
+              "source reference"
+            )} and the linked tables below provide the fuller trail for this profile.`,
+          ])
+        : "Even when the summary is stronger, the best use of a profile is to compare the written framing with the visible promises, topic drivers, and source-backed score context below.",
+    },
+  ];
+}
+
+function buildPresidentContextParagraphs(profile, editorial = null) {
+  const { president, promiseTracker, scoreDrivers } = profile;
+  const presidentName = president.president || president.president_name || "this presidency";
+  const topicLabels = takeLabels(scoreDrivers?.topic_drivers, (item) => item.topic, 4);
+  const visibleStatuses = [
+    { label: "delivered", value: promiseTracker.visible_delivered_count ?? promiseTracker.delivered_count ?? 0 },
+    { label: "partial", value: promiseTracker.visible_partial_count ?? promiseTracker.partial_count ?? 0 },
+    { label: "blocked", value: promiseTracker.visible_blocked_count ?? promiseTracker.blocked_count ?? 0 },
+    { label: "failed", value: promiseTracker.visible_failed_count ?? promiseTracker.failed_count ?? 0 },
+  ]
+    .filter((item) => item.value > 0)
+    .map((item) => item.label)
+    .slice(0, 3);
+
+  return filterParagraphs([
+    sentenceJoin([
+      `${presidentName}'s profile is meant to function as a structured research page, not just a score card.`,
+      topicLabels.length
+        ? `Within the current public dataset, the clearest issue areas are ${oxfordJoin(topicLabels)}.`
+        : null,
+    ]),
+    sentenceJoin([
+      `The page keeps ${countLabel(
+        promiseTracker.visible_promise_count ?? promiseTracker.total_tracked_promises ?? 0,
+        "tracked promise"
+      )}, ${countLabel(
+        president.direct_outcome_count ?? president.outcome_count ?? 0,
+        "scored outcome"
+      )}, and ${countLabel(president.linked_bill_count || 0, "linked bill")} in the same frame so readers can move from summary into underlying records.`,
+      visibleStatuses.length
+        ? `Visible promise results currently include ${oxfordJoin(visibleStatuses)} records.`
+        : null,
+    ]),
+    sentenceJoin([
+      `This page is strongest when read alongside the linked promise tracker, policy routes, and methodology notes below.`,
+      editorial?.summarySuffix ||
+        "If the narrative summary feels brief, the surrounding tables and linked routes carry more of the explanatory depth.",
+    ]),
+  ]);
+}
+
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   const profile = await fetchPresidentProfileData(slug);
@@ -155,6 +272,9 @@ export default async function PresidentProfilePage({ params }) {
     presidentName,
   });
   const presidentPoliciesHref = `/policies?president=${encodeURIComponent(presidentName)}`;
+  const flagshipEditorial = getFlagshipPresidentEditorial(slug);
+  const thinNarrative = isThinText(president.narrative_summary, 180);
+  const contextParagraphs = buildPresidentContextParagraphs(profile, flagshipEditorial);
   const topicData = (president.score_by_topic || president.breakdowns?.by_topic || [])
     .slice(0, 6)
     .map((item) => ({
@@ -215,7 +335,17 @@ export default async function PresidentProfilePage({ params }) {
         name={presidentName}
         party={president.president_party || promiseTracker.president_party}
         termLabel={formatTermLabel(promiseTracker.term_start, promiseTracker.term_end)}
-        summary={president.narrative_summary || "The final Black Impact Score stays anchored in outcome-based evidence, then adds a bounded bill-informed signal when current legislative lineage is strong enough to support it."}
+        summary={
+          president.narrative_summary
+            ? thinNarrative
+              ? sentenceJoin([
+                  president.narrative_summary,
+                  buildPresidentOverview(profile, flagshipEditorial),
+                ])
+              : president.narrative_summary
+            : buildPresidentOverview(profile, flagshipEditorial) ||
+              "The final Black Impact Score stays anchored in outcome-based evidence, then adds a bounded bill-informed signal when current legislative lineage is strong enough to support it."
+        }
         score={formatScore(president.normalized_score_total ?? president.score ?? president.direct_normalized_score)}
         systemicScore={formatScore(president.systemic_normalized_score)}
         imageSrc={imageSrc}
@@ -252,6 +382,36 @@ export default async function PresidentProfilePage({ params }) {
           },
         ]}
       />
+
+      <section className="grid gap-4 md:grid-cols-3">
+        {buildPresidentGuideCards(profile, flagshipEditorial).map((item) => (
+          <div
+            key={item.title}
+            className="rounded-[1.4rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5"
+          >
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--accent)]">
+              {item.eyebrow}
+            </p>
+            <h2 className="mt-3 text-lg font-semibold text-white">{item.title}</h2>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item.description}</p>
+          </div>
+        ))}
+      </section>
+
+      <section className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6">
+        <SectionIntro
+          eyebrow="Context and background"
+          title="What this presidential page shows in practice"
+          description="This added context is meant to keep shorter profile narratives anchored in the visible promise, policy, and bill record already attached to the page."
+        />
+        <div className="mt-5 grid gap-4">
+          {contextParagraphs.map((paragraph, index) => (
+            <p key={`${slug}-context-${index}`} className="text-sm leading-8 text-[var(--ink-soft)]">
+              {paragraph}
+            </p>
+          ))}
+        </div>
+      </section>
 
       <section className="public-two-col-rail grid items-start gap-6 xl:grid-cols-[1.05fr_0.95fr]">
         <div className="space-y-5 xl:self-start">
@@ -378,7 +538,12 @@ export default async function PresidentProfilePage({ params }) {
             summary="The final score remains outcome-anchored. Bill-linked inputs can shift it modestly when promise-backed legislative lineage and bill evidence are strong enough to defend."
           />
           <PresidentScoreMethodologyNote />
-          <CitationNote description="When referencing this presidential profile, cite the president name, page title, EquityStack, the page URL, and your access date. Treat the profile as a structured summary of the current dataset and its current evidence coverage." />
+          <CitationNote
+            description={
+              flagshipEditorial?.citationDescription ||
+              "When referencing this presidential profile, cite the president name, page title, EquityStack, the page URL, and your access date. Treat the profile as a structured summary of the current dataset and its current evidence coverage."
+            }
+          />
           <ScoreExplanation title="How to interpret this presidential profile" />
           {profile.profileInsight ? (
             <InsightCard
@@ -526,11 +691,31 @@ export default async function PresidentProfilePage({ params }) {
         </div>
         <div className="space-y-5">
           <SectionIntro
-            eyebrow="Related content"
-            title="Where to go next"
+            eyebrow="Continue exploring"
+            title="Where to go next from this presidential record"
             description="Profiles should lead naturally into compare, methodology, and underlying record detail."
           />
           <div className="grid gap-4">
+            {(flagshipEditorial?.priorityLinks || []).map((item) => (
+              <Link key={item.href} href={item.href} className="panel-link rounded-[1.5rem] p-5">
+                <h3 className="text-lg font-semibold text-white">{item.title}</h3>
+                <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+                  {item.description}
+                </p>
+              </Link>
+            ))}
+            <Link href="/research" className="panel-link rounded-[1.5rem] p-5">
+              <h3 className="text-lg font-semibold text-white">Return to the research hub</h3>
+              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+                Use the curated research hub when this profile opens into a larger question about civil-rights law, thematic analysis, explainers, or public methods.
+              </p>
+            </Link>
+            <Link href="/analysis/presidential-impact-on-black-americans" className="panel-link rounded-[1.5rem] p-5">
+              <h3 className="text-lg font-semibold text-white">Explore presidential impact on Black Americans</h3>
+              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+                Move into the broader synthesis page when you want to compare this presidency against the wider historical impact question rather than this profile alone.
+              </p>
+            </Link>
             <Link href={`/compare/presidents?compare=${slug}`} className="panel-link rounded-[1.5rem] p-5">
               <h3 className="text-lg font-semibold text-white">Compare this president</h3>
               <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
@@ -571,7 +756,7 @@ export default async function PresidentProfilePage({ params }) {
         <div className="space-y-5">
           <SectionIntro
             eyebrow="Related routes"
-            title="Keep researching this president"
+            title="Keep researching this president through linked records"
             description="Every presidential profile should make it easy to move from summary into promises, legislation, comparison tools, and methodology."
           />
           <div className="grid gap-4">

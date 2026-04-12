@@ -26,6 +26,7 @@ import {
   buildBreadcrumbJsonLd,
   buildCollectionPageJsonLd,
   buildDatasetJsonLd,
+  buildItemListJsonLd,
 } from "@/lib/structured-data";
 
 export const dynamic = "force-dynamic";
@@ -107,6 +108,19 @@ export default async function ReportsPage({ searchParams }) {
               "Direction breakdown",
             ],
           }),
+          buildItemListJsonLd({
+            title: "Reports visible on the EquityStack reports hub",
+            description:
+              "The current visible report cards on the public reports hub.",
+            path: "/reports",
+            items: reports
+              .filter((item) => item?.slug && item?.title)
+              .slice(0, 12)
+              .map((item) => ({
+                href: `/reports/${item.slug}`,
+                name: item.title,
+              })),
+          }),
         ]}
       />
       <Breadcrumbs items={[{ href: "/", label: "Home" }, { label: "Reports" }]} />
@@ -138,6 +152,30 @@ export default async function ReportsPage({ searchParams }) {
           detail="Reports summarize structured policy data. They are designed to help users move from synthesis into the underlying records, sources, and methodology."
         />
         <ScoreExplanation title="How to read report score language" />
+      </section>
+
+      <section className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
+        <CitationNote
+          title="Why this hub is worth citing"
+          description="The reports hub is the strongest page to share when someone needs a curated entry point into EquityStack&apos;s analysis layer. It organizes flagship reports, score interpretation, and related record pathways in one place instead of forcing readers to start with a raw table."
+        />
+        <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--accent)]">
+            Best external use cases
+          </p>
+          <h2 className="mt-3 text-2xl font-semibold text-white">Where this page helps most</h2>
+          <div className="mt-4 grid gap-3 text-sm leading-7 text-[var(--ink-soft)]">
+            <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+              Share this page when a reader needs a summary-level entry into EquityStack before opening presidents, policies, or promises.
+            </div>
+            <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+              Link here when a story or class discussion needs a report library rather than one isolated chart or one isolated record.
+            </div>
+            <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+              Use the flagship reports below when you need the most shareable pages for historical comparison, score context, or timeline framing.
+            </div>
+          </div>
+        </div>
       </section>
 
       <DashboardFilterBar helpText="Browse reports by category or keyword. Flagship reports stay visible, but the hub is designed to move you into the right analysis path fast.">
@@ -229,6 +267,68 @@ export default async function ReportsPage({ searchParams }) {
           description="These are the clearest entry points for public users who want the score, the recent state of the dataset, and the longer historical arc."
         />
         <ReportCardGrid items={data.featuredReports || []} />
+      </section>
+
+      <section className="space-y-5">
+        <SectionIntro
+          eyebrow="Most shareable report paths"
+          title="These are the strongest report pages to promote externally first"
+          description="Use these report destinations when you need a serious summary page that can be cited, taught from, or linked before readers drill into underlying records."
+        />
+        <div className="grid gap-4 md:grid-cols-3">
+          <Link href="/reports/black-impact-score" className="panel-link rounded-[1.4rem] p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">Flagship report</p>
+            <h3 className="mt-3 text-lg font-semibold text-white">Black Impact Score</h3>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+              Best first report for journalists, researchers, and general readers who need a comparative synthesis page before opening presidents or policies.
+            </p>
+          </Link>
+          <Link href="/reports/civil-rights-timeline" className="panel-link rounded-[1.4rem] p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">Historical report</p>
+            <h3 className="mt-3 text-lg font-semibold text-white">Civil Rights Timeline</h3>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+              Best report when chronology matters and the reader needs the long civil-rights arc rather than one administration snapshot.
+            </p>
+          </Link>
+          <Link href="/reports" className="panel-link rounded-[1.4rem] p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">Report hub</p>
+            <h3 className="mt-3 text-lg font-semibold text-white">Full reports library</h3>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+              Best page to share when the audience needs a curated report layer rather than one isolated chart, scorecard, or dashboard slice.
+            </p>
+          </Link>
+        </div>
+      </section>
+
+      <section className="space-y-5">
+        <SectionIntro
+          eyebrow="Reference paths"
+          title="Pair reports with methodology, sources, and guided context"
+          description="The strongest outreach-ready pages usually combine a report with the methodology page, the source library, or a guided explainer path."
+        />
+        <div className="grid gap-4 md:grid-cols-3">
+          <Link href="/methodology" className="panel-link rounded-[1.4rem] p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">Methodology</p>
+            <h3 className="mt-3 text-lg font-semibold text-white">Explain how the report was built</h3>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+              Pair a report with the methodology page when a reader needs to understand score construction, evidence thresholds, and analytical limits.
+            </p>
+          </Link>
+          <Link href="/sources" className="panel-link rounded-[1.4rem] p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">Sources</p>
+            <h3 className="mt-3 text-lg font-semibold text-white">Verify the evidence base directly</h3>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+              Link the source library when the next question is about documentation, publisher quality, or the breadth of the visible evidence layer.
+            </p>
+          </Link>
+          <Link href="/start" className="panel-link rounded-[1.4rem] p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">Research guide</p>
+            <h3 className="mt-3 text-lg font-semibold text-white">Give first-time readers a guided path</h3>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+              Use the guided research page when the person you are sending here needs historical background before they can use the report layer well.
+            </p>
+          </Link>
+        </div>
       </section>
 
       <section className="grid items-start gap-6 xl:grid-cols-2">

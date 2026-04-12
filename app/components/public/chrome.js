@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { getResearchNavItems } from "@/lib/thematic-pages";
 
 const PRIMARY_NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard" },
@@ -12,7 +13,69 @@ const PRIMARY_NAV_ITEMS = [
   { href: "/presidents", label: "Presidents" },
   { href: "/promises", label: "Promises" },
   { href: "/reports", label: "Reports" },
-  { href: "/timeline", label: "Timeline" },
+];
+
+const RESEARCH_NAV_ITEMS = [
+  {
+    href: "/research",
+    label: "Research Hub",
+    description:
+      "Start with a curated gateway to EquityStack’s strongest thematic guides, reports, explainers, and methods.",
+  },
+  ...getResearchNavItems().map((item) => ({
+    href: item.path,
+    label: item.label,
+    description: item.navDescription,
+  })),
+  {
+    href: "/reports/civil-rights-timeline",
+    label: "Civil-Rights Timeline",
+    description:
+      "Follow laws, court decisions, and policy change across time when chronology matters most.",
+  },
+];
+
+const RESEARCH_HUB_ITEM = RESEARCH_NAV_ITEMS[0];
+const IMPACT_ANALYSIS_ITEMS = RESEARCH_NAV_ITEMS.slice(1, -1);
+const RESEARCH_EXTRA_ITEMS = RESEARCH_NAV_ITEMS.slice(-1);
+
+const HEADER_UTILITY_LINKS = [
+  { href: "/about", label: "About" },
+  { href: "/start", label: "How to Use" },
+  { href: "/methodology", label: "Methodology" },
+  { href: "/glossary", label: "Glossary" },
+];
+
+const FOOTER_RESEARCH_LINKS = [
+  { href: "/research", label: "Research Hub" },
+  { href: "/presidents", label: "Presidents" },
+  { href: "/policies", label: "Policies" },
+  { href: "/bills", label: "Bills" },
+  { href: "/promises", label: "Promises" },
+  { href: "/reports", label: "Reports" },
+  { href: "/explainers", label: "Explainers" },
+  { href: "/narratives", label: "Narratives" },
+];
+
+const FOOTER_GUIDE_LINKS = [
+  { href: "/start", label: "How to Use EquityStack" },
+  { href: "/methodology", label: "Methodology" },
+  { href: "/glossary", label: "Glossary" },
+  { href: "/sources", label: "Sources" },
+  { href: "/about", label: "About" },
+];
+
+const FOOTER_ANALYSIS_LINKS = getResearchNavItems().map((item) => ({
+  href: item.path,
+  label: item.label,
+}));
+
+const FOOTER_REFERENCE_LINKS = [
+  { href: "/reports/civil-rights-timeline", label: "Civil-Rights Timeline" },
+  { href: "/scorecards", label: "Scorecards" },
+  { href: "/current-administration", label: "Current Administration" },
+  { href: "/future-bills", label: "Future Bills" },
+  { href: "/activity", label: "Activity" },
 ];
 
 function isActive(pathname, href) {
@@ -72,6 +135,21 @@ function CloseIcon() {
   );
 }
 
+function ChevronDownIcon({ open = false }) {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      className={`h-4 w-4 transition-transform ${open ? "rotate-180" : ""}`}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+    >
+      <path d="m6 9 6 6 6-6" />
+    </svg>
+  );
+}
+
 export function GlobalSearch({
   compact = false,
   expanded = false,
@@ -105,6 +183,9 @@ export function GlobalSearch({
 
 export function PrimaryNav({ mobile = false }) {
   const pathname = usePathname();
+  const [researchOpenForPath, setResearchOpenForPath] = useState(null);
+  const researchActive = RESEARCH_NAV_ITEMS.some((item) => isActive(pathname, item.href));
+  const researchOpen = researchOpenForPath === pathname;
 
   return (
     <nav
@@ -128,6 +209,178 @@ export function PrimaryNav({ mobile = false }) {
           </Link>
         );
       })}
+
+      {mobile ? (
+        <div className="rounded-[1.4rem] border border-white/8 bg-white/5 p-4">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--accent)]">
+                Research
+              </p>
+              <p className="mt-1 text-sm text-[var(--ink-soft)]">
+                Thematic guides and historical reading paths.
+              </p>
+            </div>
+          </div>
+          <div className="mt-3 space-y-4">
+            <div className="grid gap-2">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+                Research hub
+              </p>
+              <Link
+                href={RESEARCH_HUB_ITEM.href}
+                aria-current={isActive(pathname, RESEARCH_HUB_ITEM.href) ? "page" : undefined}
+                className={`rounded-[1.1rem] border px-4 py-3 ${
+                  isActive(pathname, RESEARCH_HUB_ITEM.href)
+                    ? "border-[rgba(132,247,198,0.3)] bg-[rgba(132,247,198,0.12)] text-white"
+                    : "border-white/8 bg-white/5 text-[var(--ink-soft)] hover:border-white/14 hover:text-white"
+                }`}
+              >
+                <p className="text-sm font-medium">{RESEARCH_HUB_ITEM.label}</p>
+                <p className="mt-1 text-xs leading-6 text-[var(--ink-muted)]">{RESEARCH_HUB_ITEM.description}</p>
+              </Link>
+            </div>
+            <div className="grid gap-2">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+                Impact analysis
+              </p>
+              {IMPACT_ANALYSIS_ITEMS.map((item) => {
+              const active = isActive(pathname, item.href);
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  aria-current={active ? "page" : undefined}
+                  className={`rounded-[1.1rem] border px-4 py-3 ${
+                    active
+                      ? "border-[rgba(132,247,198,0.3)] bg-[rgba(132,247,198,0.12)] text-white"
+                      : "border-white/8 bg-white/5 text-[var(--ink-soft)] hover:border-white/14 hover:text-white"
+                  }`}
+                >
+                  <p className="text-sm font-medium">{item.label}</p>
+                  <p className="mt-1 text-xs leading-6 text-[var(--ink-muted)]">{item.description}</p>
+                </Link>
+              );
+              })}
+            </div>
+            <div className="grid gap-2">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+                Historical tools
+              </p>
+              {RESEARCH_EXTRA_ITEMS.map((item) => {
+                const active = isActive(pathname, item.href);
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    aria-current={active ? "page" : undefined}
+                    className={`rounded-[1.1rem] border px-4 py-3 ${
+                      active
+                        ? "border-[rgba(132,247,198,0.3)] bg-[rgba(132,247,198,0.12)] text-white"
+                        : "border-white/8 bg-white/5 text-[var(--ink-soft)] hover:border-white/14 hover:text-white"
+                    }`}
+                  >
+                    <p className="text-sm font-medium">{item.label}</p>
+                    <p className="mt-1 text-xs leading-6 text-[var(--ink-muted)]">{item.description}</p>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div
+          className="relative"
+          onMouseEnter={() => setResearchOpenForPath(pathname || "/")}
+          onMouseLeave={() => setResearchOpenForPath(null)}
+        >
+          <button
+            type="button"
+            aria-haspopup="menu"
+            aria-expanded={researchOpen}
+            onClick={() =>
+              setResearchOpenForPath((value) => (value === pathname ? null : pathname || "/"))
+            }
+            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-sm font-medium xl:px-3.5 2xl:px-4 ${
+              researchActive || researchOpen
+                ? "bg-[var(--accent)] text-[#04131d]"
+                : "text-[var(--ink-soft)] hover:bg-white/6 hover:text-white"
+            }`}
+          >
+            Research
+            <ChevronDownIcon open={researchOpen} />
+          </button>
+          {researchOpen ? (
+            <div className="absolute left-1/2 top-full z-40 mt-3 w-[24rem] -translate-x-1/2 rounded-[1.6rem] border border-white/10 bg-[rgba(5,11,19,0.98)] p-4 shadow-[0_24px_80px_rgba(0,0,0,0.34)] backdrop-blur-xl">
+              <div className="space-y-4">
+                <div className="grid gap-2">
+                  <p className="px-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+                    Research hub
+                  </p>
+                  <Link
+                    href={RESEARCH_HUB_ITEM.href}
+                    aria-current={isActive(pathname, RESEARCH_HUB_ITEM.href) ? "page" : undefined}
+                    className={`rounded-[1.2rem] border px-4 py-4 ${
+                      isActive(pathname, RESEARCH_HUB_ITEM.href)
+                        ? "border-[rgba(132,247,198,0.28)] bg-[rgba(132,247,198,0.12)]"
+                        : "border-white/8 bg-white/5 hover:border-[rgba(132,247,198,0.2)]"
+                    }`}
+                  >
+                    <p className="text-sm font-medium text-white">{RESEARCH_HUB_ITEM.label}</p>
+                    <p className="mt-1 text-sm leading-6 text-[var(--ink-soft)]">{RESEARCH_HUB_ITEM.description}</p>
+                  </Link>
+                </div>
+                <div className="grid gap-2">
+                  <p className="px-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+                    Impact analysis
+                  </p>
+                  {IMPACT_ANALYSIS_ITEMS.map((item) => {
+                  const active = isActive(pathname, item.href);
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      aria-current={active ? "page" : undefined}
+                      className={`rounded-[1.2rem] border px-4 py-4 ${
+                        active
+                          ? "border-[rgba(132,247,198,0.28)] bg-[rgba(132,247,198,0.12)]"
+                          : "border-white/8 bg-white/5 hover:border-[rgba(132,247,198,0.2)]"
+                      }`}
+                    >
+                      <p className="text-sm font-medium text-white">{item.label}</p>
+                      <p className="mt-1 text-sm leading-6 text-[var(--ink-soft)]">{item.description}</p>
+                    </Link>
+                  );
+                  })}
+                </div>
+                <div className="grid gap-2">
+                  <p className="px-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+                    Historical tools
+                  </p>
+                  {RESEARCH_EXTRA_ITEMS.map((item) => {
+                    const active = isActive(pathname, item.href);
+                    return (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        aria-current={active ? "page" : undefined}
+                        className={`rounded-[1.2rem] border px-4 py-4 ${
+                          active
+                            ? "border-[rgba(132,247,198,0.28)] bg-[rgba(132,247,198,0.12)]"
+                            : "border-white/8 bg-white/5 hover:border-[rgba(132,247,198,0.2)]"
+                        }`}
+                      >
+                        <p className="text-sm font-medium text-white">{item.label}</p>
+                        <p className="mt-1 text-sm leading-6 text-[var(--ink-soft)]">{item.description}</p>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          ) : null}
+        </div>
+      )}
     </nav>
   );
 }
@@ -233,12 +486,11 @@ export function SiteHeader() {
               <>
                 <PrimaryNav mobile />
                 <div className="grid gap-2 pt-1 text-sm text-[var(--ink-soft)]">
-                  <Link href="/about" className="rounded-2xl px-1 py-2 hover:text-white">
-                    About
-                  </Link>
-                  <Link href="/methodology" className="rounded-2xl px-1 py-2 hover:text-white">
-                    Methodology
-                  </Link>
+                  {HEADER_UTILITY_LINKS.map((item) => (
+                    <Link key={item.href} href={item.href} className="rounded-2xl px-1 py-2 hover:text-white">
+                      {item.label}
+                    </Link>
+                  ))}
                 </div>
                 <Link
                   href="/dashboard"
@@ -284,23 +536,56 @@ export function Breadcrumbs({ items = [] }) {
 export function Footer() {
   return (
     <footer className="mt-20 border-t border-white/8 bg-[rgba(4,10,18,0.9)]">
-      <div className="mx-auto grid max-w-[1500px] gap-10 px-5 py-12 text-left md:grid-cols-2 xl:grid-cols-[0.95fr_0.95fr_1.2fr] xl:px-8">
-        <nav aria-label="Project footer links" className="min-w-0 text-left">
+      <div className="mx-auto grid max-w-[1500px] gap-10 px-5 py-12 text-left md:grid-cols-2 xl:grid-cols-[0.95fr_0.95fr_1fr_0.95fr_0.95fr] xl:px-8">
+        <nav aria-label="Research and explore footer links" className="min-w-0 text-left">
           <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[var(--accent)]">
-            Project
+            Research / Explore
           </p>
           <div className="mt-4 grid gap-3 text-sm text-[var(--ink-soft)]">
-            <Link href="/start" className="hover:text-white">Start Here</Link>
-            <Link href="/explainers" className="hover:text-white">Explainers</Link>
-            <Link href="/scorecards" className="hover:text-white">Scorecards</Link>
-            <Link href="/methodology" className="hover:text-white">Methodology</Link>
-            <Link href="/reports" className="hover:text-white">Reports</Link>
-            <Link href="/promises" className="hover:text-white">Promise Tracker</Link>
-            <Link href="/current-administration" className="hover:text-white">Current Administration</Link>
-            <Link href="/bills" className="hover:text-white">Bills</Link>
-            <Link href="/future-bills" className="hover:text-white">Future Bills</Link>
-            <Link href="/activity" className="hover:text-white">Activity</Link>
-            <Link href="/policies" className="hover:text-white">Policies</Link>
+            {FOOTER_RESEARCH_LINKS.map((item) => (
+              <Link key={item.href} href={item.href} className="hover:text-white">
+                {item.label}
+              </Link>
+            ))}
+          </div>
+        </nav>
+
+        <nav aria-label="Guides and understanding footer links" className="min-w-0 text-left">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[var(--accent)]">
+            Guides / Understanding
+          </p>
+          <div className="mt-4 grid gap-3 text-sm text-[var(--ink-soft)]">
+            {FOOTER_GUIDE_LINKS.map((item) => (
+              <Link key={item.href} href={item.href} className="hover:text-white">
+                {item.label}
+              </Link>
+            ))}
+          </div>
+        </nav>
+
+        <nav aria-label="Impact analysis footer links" className="min-w-0 text-left">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[var(--accent)]">
+            Impact Analysis
+          </p>
+          <div className="mt-4 grid gap-3 text-sm text-[var(--ink-soft)]">
+            {FOOTER_ANALYSIS_LINKS.map((item) => (
+              <Link key={item.href} href={item.href} className="hover:text-white">
+                {item.label}
+              </Link>
+            ))}
+          </div>
+        </nav>
+
+        <nav aria-label="Reference routes footer links" className="min-w-0 text-left">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[var(--accent)]">
+            Reference Paths
+          </p>
+          <div className="mt-4 grid gap-3 text-sm text-[var(--ink-soft)]">
+            {FOOTER_REFERENCE_LINKS.map((item) => (
+              <Link key={item.href} href={item.href} className="hover:text-white">
+                {item.label}
+              </Link>
+            ))}
           </div>
         </nav>
 
@@ -337,21 +622,20 @@ export function Footer() {
           </div>
         </nav>
 
+      </div>
+      <div className="mx-auto max-w-[1500px] px-5 pb-12 xl:px-8">
         <section
           aria-labelledby="footer-branding-title"
-          className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.72)] p-6 text-left md:col-span-2 md:max-w-none xl:col-span-1 xl:max-w-xl"
+          className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.72)] p-6 text-left"
         >
           <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[var(--accent)]">
-            Branding
+            EquityStack
           </p>
           <h2 id="footer-branding-title" className="mt-4 text-2xl font-semibold text-white">
-            EquityStack
+            Public research on presidents, policy, and Black Americans
           </h2>
-          <p className="mt-4 max-w-[36rem] text-sm leading-7 text-[var(--ink-soft)]">
-            EquityStack is a data-driven platform for tracking laws, court cases,
-            executive actions, and future legislation affecting Black communities in
-            the United States. The project connects policy history, evidence, and
-            legislative tracking in one place.
+          <p className="mt-4 max-w-[52rem] text-sm leading-7 text-[var(--ink-soft)]">
+            EquityStack connects presidential records, policy history, legislation, promises, reports, explainers, methodology, sources, and thematic analysis in one public-interest research platform. The site is designed to help readers move from broad questions into evidence, context, and comparison without losing track of how the public record is organized.
           </p>
         </section>
       </div>

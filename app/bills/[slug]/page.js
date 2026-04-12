@@ -544,6 +544,52 @@ export default async function BillDetailPage({ params }) {
           ) : null}
         </div>
       </section>
+
+      <section className="space-y-5">
+        <SectionIntro
+          eyebrow="Continue exploring"
+          title="Move from this bill into broader legislative, policy, and research paths"
+          description="Bill pages are strongest when they lead outward into the surrounding legal history, related records, and trust pages that help users verify what the bill record can and cannot show."
+        />
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <Link href="/analysis/civil-rights-laws-by-president" className="panel-link rounded-[1.4rem] p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+              Legislation lens
+            </p>
+            <h3 className="mt-3 text-lg font-semibold text-white">Review civil-rights laws by president</h3>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+              Use the legislation guide when this bill belongs in a longer administration-level legal history affecting Black Americans.
+            </p>
+          </Link>
+          <Link href="/policies" className="panel-link rounded-[1.4rem] p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+              Policy explorer
+            </p>
+            <h3 className="mt-3 text-lg font-semibold text-white">Compare the bill with policy records</h3>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+              Move into policy records when you need laws, executive actions, or court decisions that sit next to this bill in the broader public record.
+            </p>
+          </Link>
+          <Link href="/future-bills" className="panel-link rounded-[1.4rem] p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+              Reform proposals
+            </p>
+            <h3 className="mt-3 text-lg font-semibold text-white">Browse related future bills and reform ideas</h3>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+              Use the proposal layer when this bill opens into unresolved reform paths, newer proposals, or legislative follow-on context.
+            </p>
+          </Link>
+          <Link href="/research" className="panel-link rounded-[1.4rem] p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+              Research hub
+            </p>
+            <h3 className="mt-3 text-lg font-semibold text-white">Return to the curated research hub</h3>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+              Use the research hub when this bill leads into a broader question about presidents, reports, explainers, methods, or historical comparison.
+            </p>
+          </Link>
+        </div>
+      </section>
     </main>
   );
 }

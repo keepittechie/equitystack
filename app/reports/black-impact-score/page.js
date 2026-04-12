@@ -1,6 +1,8 @@
 import Link from "next/link";
 import HelpfulFeedback from "@/app/components/feedback/HelpfulFeedback";
 import PresidentAvatar from "@/app/components/PresidentAvatar";
+import { Breadcrumbs } from "@/app/components/public/chrome";
+import StructuredData from "@/app/components/public/StructuredData";
 import { ImpactBadge, statusPillClasses } from "@/app/components/policy-badges";
 import TrackedLink from "@/app/components/telemetry/TrackedLink";
 import { fetchInternalJson } from "@/lib/api";
@@ -15,6 +17,10 @@ import { aggregatePresidentFromOutcomes } from "@/lib/black-impact-score/preside
 import { buildPresidentComparison } from "@/lib/black-impact-score/presidentComparison.js";
 import { fetchPromiseTimelineRelationshipMap } from "@/lib/services/promiseService";
 import { aggregatePromiseScoresByPresident } from "@/lib/promise-tracker-scoring";
+import {
+  buildBreadcrumbJsonLd,
+  buildReportJsonLd,
+} from "@/lib/structured-data";
 import CopyShareLinkButton from "./CopyShareLinkButton";
 import SnapshotLibraryPanel from "./SnapshotLibraryPanel";
 
@@ -3212,6 +3218,22 @@ export default async function BlackImpactScorePage({ searchParams }) {
     topic: selectedTopic?.value || requestedTopicParam,
     scoringReady: requestedScoringReadyOnly,
   });
+  const reportTitle =
+    isTimelineView
+      ? "Black Impact Score Timeline"
+      : isTopicCompareView
+        ? "Black Impact Score Topic Comparison"
+        : isPresidentCompareView
+          ? "Black Impact Score President Comparison"
+          : "Black Impact Score";
+  const reportDescription =
+    isTimelineView
+      ? "A chronology-first Black Impact Score view showing how tracked records unfold over time."
+      : isTopicCompareView
+        ? "A topic-specific Black Impact Score view for comparing presidents within one issue area."
+        : isPresidentCompareView
+          ? "A side-by-side Black Impact Score view for comparing two presidents within the visible public record."
+          : DEFAULT_DESCRIPTION;
   const modelStatusLabel = getModelStatusLabel({
     metadata,
     usingLegacyModel,
@@ -3372,9 +3394,47 @@ export default async function BlackImpactScorePage({ searchParams }) {
   });
 
   return (
-    <main
-      className={`report-shell w-full ${isPublicView ? "pt-6 pb-8 space-y-8" : "pt-4 pb-6 space-y-6"}`}
-    >
+    <>
+      <StructuredData
+        data={[
+          buildBreadcrumbJsonLd(
+            [
+              { href: "/", label: "Home" },
+              { href: "/reports", label: "Reports" },
+              { label: "Black Impact Score" },
+            ],
+            REPORT_PATH
+          ),
+          buildReportJsonLd({
+            title: reportTitle,
+            description: reportDescription,
+            path: REPORT_PATH,
+            about: [
+              "Black Impact Score",
+              "U.S. presidents",
+              "Black Americans",
+              "policy outcomes",
+            ],
+            keywords: [
+              "Black Impact Score",
+              "presidential impact on Black Americans",
+              "policy impact report",
+            ],
+          }),
+        ]}
+      />
+      {!isPublicView ? (
+        <Breadcrumbs
+          items={[
+            { href: "/", label: "Home" },
+            { href: "/reports", label: "Reports" },
+            { label: "Black Impact Score" },
+          ]}
+        />
+      ) : null}
+      <main
+        className={`report-shell w-full ${isPublicView ? "pt-6 pb-8 space-y-8" : "pt-4 pb-6 space-y-6"}`}
+      >
       {!isPublicView ? (
         <div className="flex flex-wrap gap-3 print:hidden">
           <Link
@@ -3850,6 +3910,7 @@ export default async function BlackImpactScorePage({ searchParams }) {
         entityKey="black-impact-score"
         title="Was this report helpful?"
       />
-    </main>
+      </main>
+    </>
   );
 }
