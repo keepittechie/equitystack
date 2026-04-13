@@ -211,7 +211,7 @@ export function PrimaryNav({ mobile = false }) {
       })}
 
       {mobile ? (
-        <div className="rounded-[1.4rem] border border-white/8 bg-white/5 p-4">
+        <div className="w-full rounded-[1.4rem] border border-white/8 bg-white/5 p-4">
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--accent)]">
@@ -222,75 +222,83 @@ export function PrimaryNav({ mobile = false }) {
               </p>
             </div>
           </div>
-          <div className="mt-3 space-y-4">
-            <div className="grid gap-2">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
-                Research hub
-              </p>
-              <Link
-                href={RESEARCH_HUB_ITEM.href}
-                aria-current={isActive(pathname, RESEARCH_HUB_ITEM.href) ? "page" : undefined}
-                className={`rounded-[1.1rem] border px-4 py-3 ${
-                  isActive(pathname, RESEARCH_HUB_ITEM.href)
-                    ? "border-[rgba(132,247,198,0.3)] bg-[rgba(132,247,198,0.12)] text-white"
-                    : "border-white/8 bg-white/5 text-[var(--ink-soft)] hover:border-white/14 hover:text-white"
-                }`}
-              >
-                <p className="text-sm font-medium">{RESEARCH_HUB_ITEM.label}</p>
-                <p className="mt-1 text-xs leading-6 text-[var(--ink-muted)]">{RESEARCH_HUB_ITEM.description}</p>
-              </Link>
-            </div>
-            <div className="grid gap-2">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
-                Impact analysis
-              </p>
-              {IMPACT_ANALYSIS_ITEMS.map((item) => {
-              const active = isActive(pathname, item.href);
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  aria-current={active ? "page" : undefined}
-                  className={`rounded-[1.1rem] border px-4 py-3 ${
-                    active
-                      ? "border-[rgba(132,247,198,0.3)] bg-[rgba(132,247,198,0.12)] text-white"
-                      : "border-white/8 bg-white/5 text-[var(--ink-soft)] hover:border-white/14 hover:text-white"
-                  }`}
-                >
-                  <p className="text-sm font-medium">{item.label}</p>
-                  <p className="mt-1 text-xs leading-6 text-[var(--ink-muted)]">{item.description}</p>
-                </Link>
-              );
-              })}
-            </div>
-            <div className="grid gap-2">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
-                Historical tools
-              </p>
-              {RESEARCH_EXTRA_ITEMS.map((item) => {
-                const active = isActive(pathname, item.href);
-                return (
+          <div className="mt-3 overflow-hidden">
+            <div className="max-h-[min(82vh,42rem)] overflow-y-auto overscroll-contain pr-1 pb-2">
+              <div className="space-y-4">
+                <div className="grid gap-2">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+                    Research hub
+                  </p>
                   <Link
-                    key={item.href}
-                    href={item.href}
-                    aria-current={active ? "page" : undefined}
+                    href={RESEARCH_HUB_ITEM.href}
+                    aria-current={isActive(pathname, RESEARCH_HUB_ITEM.href) ? "page" : undefined}
                     className={`rounded-[1.1rem] border px-4 py-3 ${
-                      active
+                      isActive(pathname, RESEARCH_HUB_ITEM.href)
                         ? "border-[rgba(132,247,198,0.3)] bg-[rgba(132,247,198,0.12)] text-white"
                         : "border-white/8 bg-white/5 text-[var(--ink-soft)] hover:border-white/14 hover:text-white"
                     }`}
                   >
-                    <p className="text-sm font-medium">{item.label}</p>
-                    <p className="mt-1 text-xs leading-6 text-[var(--ink-muted)]">{item.description}</p>
+                    <p className="text-sm font-medium">{RESEARCH_HUB_ITEM.label}</p>
+                    <p className="mt-1 text-xs leading-6 text-[var(--ink-muted)]">{RESEARCH_HUB_ITEM.description}</p>
                   </Link>
-                );
-              })}
+                </div>
+                <div className="grid gap-2">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+                    Impact analysis
+                  </p>
+                  {IMPACT_ANALYSIS_ITEMS.map((item) => {
+                    const active = isActive(pathname, item.href);
+                    return (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        aria-current={active ? "page" : undefined}
+                        className={`rounded-[1.1rem] border px-4 py-3 ${
+                          active
+                            ? "border-[rgba(132,247,198,0.3)] bg-[rgba(132,247,198,0.12)] text-white"
+                            : "border-white/8 bg-white/5 text-[var(--ink-soft)] hover:border-white/14 hover:text-white"
+                        }`}
+                      >
+                        <p className="text-sm font-medium">{item.label}</p>
+                        <p className="mt-1 text-xs leading-6 text-[var(--ink-muted)]">{item.description}</p>
+                      </Link>
+                    );
+                  })}
+                </div>
+                <div className="grid gap-2">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+                    Historical tools
+                  </p>
+                  {RESEARCH_EXTRA_ITEMS.map((item) => {
+                    const active = isActive(pathname, item.href);
+                    return (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        aria-current={active ? "page" : undefined}
+                        className={`rounded-[1.1rem] border px-4 py-3 ${
+                          active
+                            ? "border-[rgba(132,247,198,0.3)] bg-[rgba(132,247,198,0.12)] text-white"
+                            : "border-white/8 bg-white/5 text-[var(--ink-soft)] hover:border-white/14 hover:text-white"
+                        }`}
+                      >
+                        <p className="text-sm font-medium">{item.label}</p>
+                        <p className="mt-1 text-xs leading-6 text-[var(--ink-muted)]">{item.description}</p>
+                      </Link>
+                    );
+                  })}
+                </div>
+                <div
+                  aria-hidden="true"
+                  className="pointer-events-none sticky bottom-0 h-6 bg-gradient-to-b from-transparent to-[rgba(8,14,24,0.96)]"
+                />
+              </div>
             </div>
           </div>
         </div>
       ) : (
         <div
-          className="relative"
+          className="relative overflow-visible"
           onMouseEnter={() => setResearchOpenForPath(pathname || "/")}
           onMouseLeave={() => setResearchOpenForPath(null)}
         >
@@ -311,70 +319,76 @@ export function PrimaryNav({ mobile = false }) {
             <ChevronDownIcon open={researchOpen} />
           </button>
           {researchOpen ? (
-            <div className="absolute left-1/2 top-full z-40 mt-3 w-[24rem] -translate-x-1/2 rounded-[1.6rem] border border-white/10 bg-[rgba(5,11,19,0.98)] p-4 shadow-[0_24px_80px_rgba(0,0,0,0.34)] backdrop-blur-xl">
-              <div className="space-y-4">
-                <div className="grid gap-2">
-                  <p className="px-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
-                    Research hub
-                  </p>
-                  <Link
-                    href={RESEARCH_HUB_ITEM.href}
-                    aria-current={isActive(pathname, RESEARCH_HUB_ITEM.href) ? "page" : undefined}
-                    className={`rounded-[1.2rem] border px-4 py-4 ${
-                      isActive(pathname, RESEARCH_HUB_ITEM.href)
-                        ? "border-[rgba(132,247,198,0.28)] bg-[rgba(132,247,198,0.12)]"
-                        : "border-white/8 bg-white/5 hover:border-[rgba(132,247,198,0.2)]"
-                    }`}
-                  >
-                    <p className="text-sm font-medium text-white">{RESEARCH_HUB_ITEM.label}</p>
-                    <p className="mt-1 text-sm leading-6 text-[var(--ink-soft)]">{RESEARCH_HUB_ITEM.description}</p>
-                  </Link>
-                </div>
-                <div className="grid gap-2">
-                  <p className="px-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
-                    Impact analysis
-                  </p>
-                  {IMPACT_ANALYSIS_ITEMS.map((item) => {
-                  const active = isActive(pathname, item.href);
-                  return (
+            <div className="absolute left-1/2 top-full z-[60] mt-3 w-[24rem] max-w-[calc(100vw-2rem)] -translate-x-1/2 rounded-[1.6rem] border border-white/10 bg-[rgba(5,11,19,0.98)] p-4 shadow-[0_24px_80px_rgba(0,0,0,0.34)] backdrop-blur-xl pointer-events-auto">
+              <div className="max-h-[min(70vh,36rem)] overflow-y-auto overscroll-contain pr-1 pb-2">
+                <div className="space-y-4">
+                  <div className="grid gap-2">
+                    <p className="px-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+                      Research hub
+                    </p>
                     <Link
-                      key={item.href}
-                      href={item.href}
-                      aria-current={active ? "page" : undefined}
+                      href={RESEARCH_HUB_ITEM.href}
+                      aria-current={isActive(pathname, RESEARCH_HUB_ITEM.href) ? "page" : undefined}
                       className={`rounded-[1.2rem] border px-4 py-4 ${
-                        active
+                        isActive(pathname, RESEARCH_HUB_ITEM.href)
                           ? "border-[rgba(132,247,198,0.28)] bg-[rgba(132,247,198,0.12)]"
                           : "border-white/8 bg-white/5 hover:border-[rgba(132,247,198,0.2)]"
                       }`}
                     >
-                      <p className="text-sm font-medium text-white">{item.label}</p>
-                      <p className="mt-1 text-sm leading-6 text-[var(--ink-soft)]">{item.description}</p>
+                      <p className="text-sm font-medium text-white">{RESEARCH_HUB_ITEM.label}</p>
+                      <p className="mt-1 text-sm leading-6 text-[var(--ink-soft)]">{RESEARCH_HUB_ITEM.description}</p>
                     </Link>
-                  );
-                  })}
-                </div>
-                <div className="grid gap-2">
-                  <p className="px-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
-                    Historical tools
-                  </p>
-                  {RESEARCH_EXTRA_ITEMS.map((item) => {
-                    const active = isActive(pathname, item.href);
-                    return (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        aria-current={active ? "page" : undefined}
-                        className={`rounded-[1.2rem] border px-4 py-4 ${
-                          active
-                            ? "border-[rgba(132,247,198,0.28)] bg-[rgba(132,247,198,0.12)]"
-                            : "border-white/8 bg-white/5 hover:border-[rgba(132,247,198,0.2)]"
-                        }`}
-                      >
-                        <p className="text-sm font-medium text-white">{item.label}</p>
-                        <p className="mt-1 text-sm leading-6 text-[var(--ink-soft)]">{item.description}</p>
-                      </Link>
-                    );
-                  })}
+                  </div>
+                  <div className="grid gap-2">
+                    <p className="px-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+                      Impact analysis
+                    </p>
+                    {IMPACT_ANALYSIS_ITEMS.map((item) => {
+                      const active = isActive(pathname, item.href);
+                      return (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          aria-current={active ? "page" : undefined}
+                          className={`rounded-[1.2rem] border px-4 py-4 ${
+                            active
+                              ? "border-[rgba(132,247,198,0.28)] bg-[rgba(132,247,198,0.12)]"
+                              : "border-white/8 bg-white/5 hover:border-[rgba(132,247,198,0.2)]"
+                          }`}
+                        >
+                          <p className="text-sm font-medium text-white">{item.label}</p>
+                          <p className="mt-1 text-sm leading-6 text-[var(--ink-soft)]">{item.description}</p>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                  <div className="grid gap-2">
+                    <p className="px-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+                      Historical tools
+                    </p>
+                    {RESEARCH_EXTRA_ITEMS.map((item) => {
+                      const active = isActive(pathname, item.href);
+                      return (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          aria-current={active ? "page" : undefined}
+                          className={`rounded-[1.2rem] border px-4 py-4 ${
+                            active
+                              ? "border-[rgba(132,247,198,0.28)] bg-[rgba(132,247,198,0.12)]"
+                              : "border-white/8 bg-white/5 hover:border-[rgba(132,247,198,0.2)]"
+                          }`}
+                        >
+                          <p className="text-sm font-medium text-white">{item.label}</p>
+                          <p className="mt-1 text-sm leading-6 text-[var(--ink-soft)]">{item.description}</p>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                  <div
+                    aria-hidden="true"
+                    className="pointer-events-none sticky bottom-0 h-6 bg-gradient-to-b from-transparent to-[rgba(5,11,19,0.98)]"
+                  />
                 </div>
               </div>
             </div>
