@@ -276,7 +276,7 @@ export default function GlossaryPage() {
         />
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
+      <section className="grid items-start gap-6 md:grid-cols-2 xl:grid-cols-[1.05fr_0.95fr]">
         <CitationNote
           title="Why this page is useful"
           description="Use the glossary when a reader needs quick clarification about how EquityStack uses terms like policy, promise, report, record, source, explainer, or thematic page before moving deeper into the site."

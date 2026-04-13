@@ -331,7 +331,7 @@ export default function ResearchHubPage() {
         />
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
+      <section className="grid items-start gap-6 md:grid-cols-2 xl:grid-cols-[1.05fr_0.95fr]">
         <CitationNote
           title="Why this page is worth sharing"
           description="Use the Research Hub when someone needs one serious entry point into EquityStack’s strongest public pages. It is designed for teachers, journalists, researchers, students, and skeptical first-time visitors who need a curated path into the site rather than a raw archive."

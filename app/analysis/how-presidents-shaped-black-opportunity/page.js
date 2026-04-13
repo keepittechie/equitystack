@@ -293,7 +293,7 @@ export default function HowPresidentsShapedBlackOpportunityPage() {
 
       <TrustBar />
 
-      <section className="grid items-start gap-6 xl:grid-cols-[1.05fr_0.95fr]">
+      <section className="grid items-start gap-6 md:grid-cols-2 xl:grid-cols-[1.05fr_0.95fr]">
         <PageContextBlock
           title="What this page is for"
           description="Use this page when the search intent is about Black opportunity, access, advancement, and the governance pathways that shaped those conditions under different presidents."

@@ -173,7 +173,7 @@ export default async function ExplainersPage({ searchParams }) {
         ]}
       />
 
-      <section className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
+      <section className="grid items-start gap-6 md:grid-cols-2 xl:grid-cols-[1.15fr_0.85fr]">
         <div className="space-y-5">
           <SectionIntro
             eyebrow="Library"

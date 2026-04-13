@@ -292,7 +292,7 @@ export default function BlackProgressUnderPresidentsPage() {
 
       <TrustBar />
 
-      <section className="grid items-start gap-6 xl:grid-cols-[1.05fr_0.95fr]">
+      <section className="grid items-start gap-6 md:grid-cols-2 xl:grid-cols-[1.05fr_0.95fr]">
         <PageContextBlock
           title="What this page is for"
           description="Use this page when the search intent is about measurable progress, policy outcomes, mixed results, or whether change advanced, stalled, or reversed under different administrations."
