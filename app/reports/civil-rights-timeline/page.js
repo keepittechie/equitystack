@@ -48,7 +48,11 @@ const ERA_HELPER_COPY = {
 };
 
 function MetaPill({ children }) {
-  return <span className="public-pill">{children}</span>;
+  return (
+    <span className="inline-flex items-center rounded-full border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.06)] px-3 py-1.5 text-xs font-semibold text-[var(--ink-muted)]">
+      {children}
+    </span>
+  );
 }
 
 function formatTimelineDate(value) {
@@ -74,7 +78,7 @@ function EraChip({ era }) {
   return (
     <a
       href={`#${era.id}`}
-      className="inline-flex items-center rounded-full border border-[rgba(120,53,15,0.14)] bg-white/85 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
+      className="inline-flex items-center rounded-full border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.05)] px-4 py-2 text-sm font-medium text-[var(--ink-soft)] transition hover:border-[rgba(96,165,250,0.28)] hover:bg-[rgba(255,255,255,0.08)] hover:text-white"
     >
       {era.label}
     </a>
@@ -86,13 +90,13 @@ function TimelineEntry({ item }) {
 
   return (
     <article
-      className={`relative rounded-[1.35rem] border bg-white/90 p-5 md:p-6 ${
+      className={`relative rounded-[1.35rem] border p-5 md:p-6 ${
         item.impact_direction === "Mixed"
-          ? "border-[rgba(180,83,9,0.14)] bg-[linear-gradient(180deg,rgba(255,251,235,0.9),rgba(255,255,255,0.98))]"
-          : "border-[rgba(120,53,15,0.1)]"
+          ? "border-[rgba(251,191,36,0.18)] bg-[linear-gradient(180deg,rgba(42,27,11,0.84),rgba(11,16,25,0.98))]"
+          : "border-[rgba(255,255,255,0.08)] bg-[linear-gradient(180deg,rgba(14,20,31,0.96),rgba(9,14,23,0.98))]"
       }`}
     >
-      <div className="absolute left-0 top-6 hidden h-[calc(100%-3rem)] w-px bg-[rgba(120,53,15,0.12)] md:block" />
+      <div className="absolute left-0 top-6 hidden h-[calc(100%-3rem)] w-px bg-[rgba(255,255,255,0.08)] md:block" />
       <div className="grid gap-4 md:grid-cols-[156px,minmax(0,1fr)] md:gap-6">
         <div className="md:pl-6">
           <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">
@@ -100,7 +104,7 @@ function TimelineEntry({ item }) {
           </p>
           <p className="mt-2 text-sm text-[var(--ink-soft)]">{formatTimelineDate(item.promise_date)}</p>
           <div className="mt-3 flex items-start justify-between gap-3">
-            <p className="text-sm font-medium">{item.president}</p>
+            <p className="text-sm font-medium text-white">{item.president}</p>
             <PresidentAvatar
               presidentSlug={item.president_slug}
               presidentName={item.president}
@@ -119,7 +123,7 @@ function TimelineEntry({ item }) {
               <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">
                 {item.topic || "Civil Rights Timeline"}
               </p>
-              <h3 className="text-xl font-semibold mt-2">{item.title}</h3>
+              <h3 className="mt-2 text-xl font-semibold text-white">{item.title}</h3>
             </div>
             <div className="flex flex-wrap items-center gap-2">
               <PromiseStatusBadge status={item.status} />
@@ -127,7 +131,7 @@ function TimelineEntry({ item }) {
             </div>
           </div>
 
-          <p className="text-sm text-[var(--ink-soft)] mt-4 leading-7">
+          <p className="mt-4 text-sm leading-7 text-[var(--ink-soft)]">
             {item.summary || "No summary added yet."}
           </p>
 
@@ -136,7 +140,7 @@ function TimelineEntry({ item }) {
             {item.topic ? <MetaPill>{item.topic}</MetaPill> : null}
           </div>
 
-          <div className="mt-5 flex flex-wrap gap-3 text-sm">
+          <div className="mt-5 flex flex-wrap gap-3 text-sm text-[var(--accent)]">
             <Link href={`/promises/${item.slug}`} className="accent-link">
               Open promise record
             </Link>
