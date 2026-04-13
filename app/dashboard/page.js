@@ -61,7 +61,7 @@ export default async function DashboardPage({ searchParams }) {
             Public data center
           </p>
           <h1 className="mt-4 text-[clamp(2.2rem,5vw,4.4rem)] font-semibold leading-[0.96] tracking-[-0.05em] text-white">
-            Command-center view of Black policy impact.
+            Command Center view of Black policy impact.
           </h1>
           <p className="mt-5 text-base leading-8 text-[var(--ink-soft)] md:text-lg">
             Use this page the way you would use a civic research dashboard: scan the headline measures, see where Black policy impact is moving, and then open the relevant president, promise, legislation, or source page for detail.
