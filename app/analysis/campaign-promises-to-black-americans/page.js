@@ -275,7 +275,7 @@ export default function CampaignPromisesToBlackAmericansPage() {
 
       <TrustBar />
 
-      <section className="grid items-start gap-6 md:grid-cols-2 xl:grid-cols-[1.05fr_0.95fr]">
+      <section className="public-two-col-rail grid items-start gap-6 md:grid-cols-2 xl:grid-cols-[1.05fr_0.95fr]">
         <PageContextBlock
           title="What this page is for"
           description="Use this page when the search intent is about promises made to Black Americans, Black voter commitments, or the gap between rhetoric and later follow-through."

@@ -284,7 +284,7 @@ export default function PresidentsAndBlackAmericansPage() {
 
       <TrustBar />
 
-      <section className="grid items-start gap-6 md:grid-cols-2 xl:grid-cols-[1.05fr_0.95fr]">
+      <section className="public-two-col-rail grid items-start gap-6 md:grid-cols-2 xl:grid-cols-[1.05fr_0.95fr]">
         <PageContextBlock
           title="What this page is for"
           description="Start here when the search intent is broad and comparative: presidents and Black Americans, Black history by president, or the overall relationship between administrations and Black communities."

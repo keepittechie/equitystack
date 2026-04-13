@@ -293,7 +293,7 @@ export default function PresidentialRecordsOnBlackOpportunityPage() {
 
       <TrustBar />
 
-      <section className="grid items-start gap-6 md:grid-cols-2 xl:grid-cols-[1.05fr_0.95fr]">
+      <section className="public-two-col-rail grid items-start gap-6 md:grid-cols-2 xl:grid-cols-[1.05fr_0.95fr]">
         <PageContextBlock
           title="What this page is for"
           description="Use this page when the search intent is about documentary evidence, administration records, policy records, or how to interpret the record behind Black opportunity claims."

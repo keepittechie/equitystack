@@ -414,7 +414,7 @@ export default function MethodologyPage() {
         </div>
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[1fr_1fr]">
+      <section className="public-two-col-rail grid gap-6 xl:grid-cols-[1fr_1fr]">
         <div className="rounded-[1.8rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6">
           <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--accent)]">
             Record framing
@@ -454,7 +454,7 @@ export default function MethodologyPage() {
         </div>
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[1fr_1fr]">
+      <section className="public-two-col-rail grid gap-6 xl:grid-cols-[1fr_1fr]">
         <div className="rounded-[1.8rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6">
           <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--accent)]">
             Presidential Black Impact Score
@@ -518,7 +518,7 @@ export default function MethodologyPage() {
         </div>
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[1fr_1fr]">
+      <section className="public-two-col-rail grid gap-6 xl:grid-cols-[1fr_1fr]">
         <div className="rounded-[1.8rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6">
           <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--accent)]">
             Promise grading
