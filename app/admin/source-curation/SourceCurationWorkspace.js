@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Fragment, useMemo, useState, useTransition } from "react";
 import { formatAdminDateTime } from "@/app/admin/components/adminDateTime";
 import { readAdminJsonResponse } from "@/app/admin/components/readAdminJsonResponse";
+import { SOURCE_TYPES } from "@/lib/admin/promiseValidation";
 
 const SOURCE_CURATION_ENDPOINT = "/admin/source-curation/api";
 
@@ -936,7 +937,7 @@ export default function SourceCurationWorkspace({ workspace }) {
                                           </label>
                                           <label className="flex flex-col gap-1 text-[11px] text-[var(--admin-text-soft)]">
                                             Source type
-                                            <input
+                                            <select
                                               value={draft.newSourceDraft?.source_type || ""}
                                               onChange={(event) =>
                                                 updateMissingNewSourceDraft(
@@ -946,7 +947,14 @@ export default function SourceCurationWorkspace({ workspace }) {
                                                 )
                                               }
                                               className="rounded border border-[var(--admin-line-strong)] bg-[var(--admin-surface)] px-2 py-1.5 text-[12px] text-[var(--admin-text)]"
-                                            />
+                                            >
+                                              <option value="">Auto (infer from URL)</option>
+                                              {SOURCE_TYPES.map((sourceType) => (
+                                                <option key={sourceType} value={sourceType}>
+                                                  {sourceType}
+                                                </option>
+                                              ))}
+                                            </select>
                                           </label>
                                           <label className="flex flex-col gap-1 text-[11px] text-[var(--admin-text-soft)]">
                                             Publisher
