@@ -306,6 +306,10 @@ function orderGroupsByCompletion(groups = []) {
   return [...pending, ...completed];
 }
 
+function filterActiveGroups(groups = []) {
+  return groups.filter((group) => !group.isExplicitlyComplete);
+}
+
 function decorateMissingGroups(workspace, savedDecisions, confirmedGroups = {}) {
   const groups = (workspace.missingSources.groups || []).map((group, index) => {
     const groupId = group.id || `missing-group-${index}`;
@@ -512,6 +516,11 @@ export default function SourceCurationWorkspace({ workspace }) {
     () => decorateDuplicateGroups(workspace, duplicateDecisions, groupCompletion.duplicates),
     [workspace, duplicateDecisions, groupCompletion.duplicates]
   );
+  const activeMissingGroups = useMemo(() => filterActiveGroups(missingGroups), [missingGroups]);
+  const activeDuplicateGroups = useMemo(
+    () => filterActiveGroups(duplicateGroups),
+    [duplicateGroups]
+  );
 
   useEffect(() => {
     setGroupExpansion(readStoredGroupExpansion());
@@ -581,19 +590,19 @@ export default function SourceCurationWorkspace({ workspace }) {
     return map;
   }, [duplicateGroups]);
 
-  const missingItemCount = missingGroups.reduce(
+  const missingItemCount = activeMissingGroups.reduce(
     (count, group) => count + group.items.length,
     0
   );
-  const missingReviewedCount = missingGroups.reduce(
+  const missingReviewedCount = activeMissingGroups.reduce(
     (count, group) => count + group.completedCount,
     0
   );
-  const duplicateClusterCount = duplicateGroups.reduce(
+  const duplicateClusterCount = activeDuplicateGroups.reduce(
     (count, group) => count + group.clusters.length,
     0
   );
-  const duplicateReviewedCount = duplicateGroups.reduce(
+  const duplicateReviewedCount = activeDuplicateGroups.reduce(
     (count, group) => count + group.completedCount,
     0
   );
@@ -1047,13 +1056,13 @@ export default function SourceCurationWorkspace({ workspace }) {
           title="Missing Source Attribution"
           description="Review unresolved action/outcome rows, inspect same-promise evidence, and explicitly attach or draft sources."
         >
-          {!missingGroups.length ? (
+          {!activeMissingGroups.length ? (
             <p className="text-[12px] text-[var(--admin-text-soft)]">
               No unresolved missing-source records are pending.
             </p>
           ) : (
             <div className="space-y-4">
-              {missingGroups.map((group) => {
+              {activeMissingGroups.map((group) => {
                 const isExpanded = Boolean(groupExpansion.missing?.[group.id]);
 
                 return (
@@ -1188,26 +1197,18 @@ export default function SourceCurationWorkspace({ workspace }) {
 
                                 <div className="space-y-3">
                                   <InfoBlock label="Existing Source Context">
-                                    <div className="space-y-3">
-                                      <div>
-                                        <div className="mb-2 text-[10px] font-medium uppercase tracking-wide text-[var(--admin-text-muted)]">
-                                          Same promise
-                                        </div>
-                                        <SourcePreviewList sources={item.existing_promise_sources || []} />
+                                    {(item.direct_record_sources || []).length ? (
+                                      <div className="space-y-3">
+                                        <SourcePreviewList sources={item.direct_record_sources || []} />
                                         <div className="mt-2 text-[10px] text-[var(--admin-text-muted)]">
-                                          {item.existing_promise_source_count || 0} total same-promise source(s)
+                                          {item.direct_record_source_count || 0} direct source(s) attached to this record
                                         </div>
                                       </div>
-
-                                      {item.existing_policy_source_count ? (
-                                        <div>
-                                          <div className="mb-2 text-[10px] font-medium uppercase tracking-wide text-[var(--admin-text-muted)]">
-                                            Same policy
-                                          </div>
-                                          <SourcePreviewList sources={item.existing_policy_sources || []} />
-                                        </div>
-                                      ) : null}
-                                    </div>
+                                    ) : (
+                                      <span className="text-[var(--admin-text-muted)]">
+                                        No direct source is attached to this record yet.
+                                      </span>
+                                    )}
                                   </InfoBlock>
 
                                   <InfoBlock label="Saved Decision">
@@ -1642,13 +1643,13 @@ export default function SourceCurationWorkspace({ workspace }) {
           title="Duplicate Source Review"
           description="Review unsafe duplicate clusters, compare member rows, keep them separate, or merge a selected compatible subset after confirmation."
         >
-          {!duplicateGroups.length ? (
+          {!activeDuplicateGroups.length ? (
             <p className="text-[12px] text-[var(--admin-text-soft)]">
               No duplicate source clusters require manual review.
             </p>
           ) : (
             <div className="space-y-4">
-              {duplicateGroups.map((group) => {
+              {activeDuplicateGroups.map((group) => {
                 const isExpanded = Boolean(groupExpansion.duplicates?.[group.id]);
 
                 return (
