@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { formatAdminDateTime } from "@/app/admin/components/adminDateTime";
 import { readAdminJsonResponse } from "@/app/admin/components/readAdminJsonResponse";
@@ -480,6 +481,7 @@ function formatCountLabel(completedCount, pendingCount, noun) {
 }
 
 export default function SourceCurationWorkspace({ workspace }) {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState("missing");
   const [missingDecisions, setMissingDecisions] = useState(
     buildInitialMissingDecisionMap(workspace)
@@ -507,6 +509,7 @@ export default function SourceCurationWorkspace({ workspace }) {
   const [message, setMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [isPending, startTransition] = useTransition();
+  const workspaceSyncKey = useMemo(() => JSON.stringify(workspace), [workspace]);
 
   const missingGroups = useMemo(
     () => decorateMissingGroups(workspace, missingDecisions, groupCompletion.missing),
@@ -527,6 +530,19 @@ export default function SourceCurationWorkspace({ workspace }) {
     setGroupCompletion(readStoredGroupCompletion());
     setGroupExpansionReady(true);
   }, []);
+
+  useEffect(() => {
+    setMissingDecisions(buildInitialMissingDecisionMap(workspace));
+    setDuplicateDecisions(buildInitialDuplicateDecisionMap(workspace));
+    setMissingDrafts(buildInitialMissingDrafts(workspace));
+    setDuplicateDrafts(buildInitialDuplicateDrafts(workspace));
+    setActiveMissingPanel({});
+    setActiveDuplicatePanel({});
+    setConfirmationState(null);
+    setConfirmationChecked(false);
+    setMessage("");
+    setErrorMessage("");
+  }, [workspaceSyncKey, workspace]);
 
   useEffect(() => {
     if (!groupExpansionReady) {
@@ -939,6 +955,7 @@ export default function SourceCurationWorkspace({ workspace }) {
       setConfirmationState(null);
       setConfirmationChecked(false);
       setMessage(`${confirmationState.title} recorded for this session.`);
+      router.refresh();
       return;
     }
 
@@ -971,6 +988,7 @@ export default function SourceCurationWorkspace({ workspace }) {
         setMessage(
           `${payload.data.actionType} completed. Audit trail written to ${payload.data.auditLogPath}.`
         );
+        router.refresh();
       } catch (error) {
         setErrorMessage(error.message);
       }
