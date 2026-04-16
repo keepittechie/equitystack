@@ -11,6 +11,7 @@ const SOURCE_CURATION_ENDPOINTS = [
   "/admin/source-curation/api",
 ];
 const GROUP_EXPANSION_STORAGE_KEY = "equitystack.source-curation.group-expansion";
+const GROUP_COMPLETION_STORAGE_KEY = "equitystack.source-curation.group-completion";
 
 async function fetchSourceCurationJson(path = "", init = {}) {
   let lastError = null;
@@ -300,12 +301,12 @@ function decisionStatus(decision, entityType) {
 }
 
 function orderGroupsByCompletion(groups = []) {
-  const pending = groups.filter((group) => !group.isComplete);
-  const completed = groups.filter((group) => group.isComplete);
+  const pending = groups.filter((group) => !group.isExplicitlyComplete);
+  const completed = groups.filter((group) => group.isExplicitlyComplete);
   return [...pending, ...completed];
 }
 
-function decorateMissingGroups(workspace, savedDecisions) {
+function decorateMissingGroups(workspace, savedDecisions, confirmedGroups = {}) {
   const groups = (workspace.missingSources.groups || []).map((group, index) => {
     const groupId = group.id || `missing-group-${index}`;
     const items = (group.items || []).map((item) => {
@@ -319,7 +320,8 @@ function decorateMissingGroups(workspace, savedDecisions) {
     });
     const completedCount = items.filter((item) => Boolean(item.saved_decision)).length;
     const pendingCount = items.length - completedCount;
-    const isComplete = items.length > 0 && pendingCount === 0;
+    const isReadyForCompletion = items.length > 0 && pendingCount === 0;
+    const isExplicitlyComplete = isReadyForCompletion && Boolean(confirmedGroups[groupId]);
 
     return {
       ...group,
@@ -327,16 +329,23 @@ function decorateMissingGroups(workspace, savedDecisions) {
       items,
       completedCount,
       pendingCount,
-      isComplete,
-      group_status: isComplete ? "complete" : completedCount > 0 ? "in progress" : "pending",
-      group_status_tone: isComplete ? "success" : "warning",
+      isReadyForCompletion,
+      isExplicitlyComplete,
+      group_status: isExplicitlyComplete
+        ? "complete"
+        : isReadyForCompletion
+          ? "ready"
+          : completedCount > 0
+            ? "in progress"
+            : "pending",
+      group_status_tone: isExplicitlyComplete ? "success" : isReadyForCompletion ? "warning" : "warning",
     };
   });
 
   return orderGroupsByCompletion(groups);
 }
 
-function decorateDuplicateGroups(workspace, savedDecisions) {
+function decorateDuplicateGroups(workspace, savedDecisions, confirmedGroups = {}) {
   const groups = (workspace.duplicates.groups || []).map((group, index) => {
     const groupId = group.id || `duplicate-group-${index}`;
     const clusters = (group.clusters || []).map((cluster) => {
@@ -350,7 +359,8 @@ function decorateDuplicateGroups(workspace, savedDecisions) {
     });
     const completedCount = clusters.filter((cluster) => Boolean(cluster.saved_decision)).length;
     const pendingCount = clusters.length - completedCount;
-    const isComplete = clusters.length > 0 && pendingCount === 0;
+    const isReadyForCompletion = clusters.length > 0 && pendingCount === 0;
+    const isExplicitlyComplete = isReadyForCompletion && Boolean(confirmedGroups[groupId]);
 
     return {
       ...group,
@@ -358,13 +368,50 @@ function decorateDuplicateGroups(workspace, savedDecisions) {
       clusters,
       completedCount,
       pendingCount,
-      isComplete,
-      group_status: isComplete ? "complete" : completedCount > 0 ? "in progress" : "pending",
-      group_status_tone: isComplete ? "success" : "warning",
+      isReadyForCompletion,
+      isExplicitlyComplete,
+      group_status: isExplicitlyComplete
+        ? "complete"
+        : isReadyForCompletion
+          ? "ready"
+          : completedCount > 0
+            ? "in progress"
+            : "pending",
+      group_status_tone: isExplicitlyComplete ? "success" : isReadyForCompletion ? "warning" : "warning",
     };
   });
 
   return orderGroupsByCompletion(groups);
+}
+
+function readStoredGroupCompletion() {
+  if (typeof window === "undefined") {
+    return {
+      missing: {},
+      duplicates: {},
+    };
+  }
+
+  try {
+    const raw = window.sessionStorage.getItem(GROUP_COMPLETION_STORAGE_KEY);
+    if (!raw) {
+      return {
+        missing: {},
+        duplicates: {},
+      };
+    }
+    const parsed = JSON.parse(raw);
+    return {
+      missing: parsed?.missing && typeof parsed.missing === "object" ? parsed.missing : {},
+      duplicates:
+        parsed?.duplicates && typeof parsed.duplicates === "object" ? parsed.duplicates : {},
+    };
+  } catch {
+    return {
+      missing: {},
+      duplicates: {},
+    };
+  }
 }
 
 function readStoredGroupExpansion() {
@@ -398,7 +445,8 @@ function readStoredGroupExpansion() {
 }
 
 function mergeGroupExpansionState(currentState = {}, groups = []) {
-  const firstIncompleteGroupId = groups.find((group) => !group.isComplete)?.id || groups[0]?.id || null;
+  const firstIncompleteGroupId =
+    groups.find((group) => !group.isExplicitlyComplete)?.id || groups[0]?.id || null;
   let changed = false;
   const nextState = {};
 
@@ -445,6 +493,10 @@ export default function SourceCurationWorkspace({ workspace }) {
     missing: {},
     duplicates: {},
   });
+  const [groupCompletion, setGroupCompletion] = useState({
+    missing: {},
+    duplicates: {},
+  });
   const [groupExpansionReady, setGroupExpansionReady] = useState(false);
   const [confirmationState, setConfirmationState] = useState(null);
   const [confirmationChecked, setConfirmationChecked] = useState(false);
@@ -453,16 +505,17 @@ export default function SourceCurationWorkspace({ workspace }) {
   const [isPending, startTransition] = useTransition();
 
   const missingGroups = useMemo(
-    () => decorateMissingGroups(workspace, missingDecisions),
-    [workspace, missingDecisions]
+    () => decorateMissingGroups(workspace, missingDecisions, groupCompletion.missing),
+    [workspace, missingDecisions, groupCompletion.missing]
   );
   const duplicateGroups = useMemo(
-    () => decorateDuplicateGroups(workspace, duplicateDecisions),
-    [workspace, duplicateDecisions]
+    () => decorateDuplicateGroups(workspace, duplicateDecisions, groupCompletion.duplicates),
+    [workspace, duplicateDecisions, groupCompletion.duplicates]
   );
 
   useEffect(() => {
     setGroupExpansion(readStoredGroupExpansion());
+    setGroupCompletion(readStoredGroupCompletion());
     setGroupExpansionReady(true);
   }, []);
 
@@ -496,6 +549,17 @@ export default function SourceCurationWorkspace({ workspace }) {
       JSON.stringify(groupExpansion)
     );
   }, [groupExpansion, groupExpansionReady]);
+
+  useEffect(() => {
+    if (!groupExpansionReady || typeof window === "undefined") {
+      return;
+    }
+
+    window.sessionStorage.setItem(
+      GROUP_COMPLETION_STORAGE_KEY,
+      JSON.stringify(groupCompletion)
+    );
+  }, [groupCompletion, groupExpansionReady]);
 
   const missingGroupIdByReviewKey = useMemo(() => {
     const map = new Map();
@@ -559,6 +623,19 @@ export default function SourceCurationWorkspace({ workspace }) {
       [tab]: {
         ...(current[tab] || {}),
         [groupId]: !current[tab]?.[groupId],
+      },
+    }));
+  }
+
+  function setGroupCompleted(tab, groupId, isCompleted) {
+    if (!groupId) {
+      return;
+    }
+    setGroupCompletion((current) => ({
+      ...current,
+      [tab]: {
+        ...(current[tab] || {}),
+        [groupId]: isCompleted,
       },
     }));
   }
@@ -808,7 +885,9 @@ export default function SourceCurationWorkspace({ workspace }) {
         ...current,
         [result.decision.reviewKey]: result.decision,
       }));
-      openGroup("missing", missingGroupIdByReviewKey.get(result.decision.reviewKey));
+      const groupId = missingGroupIdByReviewKey.get(result.decision.reviewKey);
+      setGroupCompleted("missing", groupId, false);
+      openGroup("missing", groupId);
       return;
     }
 
@@ -816,7 +895,24 @@ export default function SourceCurationWorkspace({ workspace }) {
       ...current,
       [result.decision.clusterKey]: result.decision,
     }));
-    openGroup("duplicates", duplicateGroupIdByClusterKey.get(result.decision.clusterKey));
+    const groupId = duplicateGroupIdByClusterKey.get(result.decision.clusterKey);
+    setGroupCompleted("duplicates", groupId, false);
+    openGroup("duplicates", groupId);
+  }
+
+  function confirmGroupCompletion(tab, group) {
+    clearMessages();
+    openGroup(tab, group.id);
+    setConfirmationState({
+      entityType: `${tab}-group`,
+      key: group.id,
+      title: tab === "missing" ? "Confirm group complete" : "Confirm duplicate-review group complete",
+      description:
+        tab === "missing"
+          ? "Confirm that this group is complete. The current record decisions remain editable, but the group will be treated as explicitly completed for this session."
+          : "Confirm that this duplicate-review group is complete. The current cluster decisions remain editable, but the group will be treated as explicitly completed for this session.",
+      payload: null,
+    });
   }
 
   function runConfirmedAction() {
@@ -824,6 +920,18 @@ export default function SourceCurationWorkspace({ workspace }) {
       return;
     }
     clearMessages();
+
+    if (
+      confirmationState.entityType === "missing-group" ||
+      confirmationState.entityType === "duplicates-group"
+    ) {
+      const tab = confirmationState.entityType === "missing-group" ? "missing" : "duplicates";
+      setGroupCompleted(tab, confirmationState.key, true);
+      setConfirmationState(null);
+      setConfirmationChecked(false);
+      setMessage(`${confirmationState.title} recorded for this session.`);
+      return;
+    }
 
     startTransition(async () => {
       try {
@@ -950,12 +1058,12 @@ export default function SourceCurationWorkspace({ workspace }) {
 
                 return (
                   <section key={group.id} className="overflow-hidden rounded border border-[var(--admin-line)] bg-[var(--admin-surface-muted)]">
-                    <button
-                      type="button"
-                      onClick={() => toggleGroup("missing", group.id)}
-                      className="flex w-full flex-wrap items-center justify-between gap-3 border-b border-[var(--admin-line)] bg-[var(--admin-surface-muted)] px-3 py-3 text-left"
-                    >
-                      <div className="min-w-0 flex-1">
+                    <div className="flex w-full flex-wrap items-center justify-between gap-3 border-b border-[var(--admin-line)] bg-[var(--admin-surface-muted)] px-3 py-3 text-left">
+                      <button
+                        type="button"
+                        onClick={() => toggleGroup("missing", group.id)}
+                        className="flex min-w-0 flex-1 flex-col text-left"
+                      >
                         <p className="font-mono text-[10px] uppercase tracking-wide text-[var(--admin-text-muted)]">
                           {group.president_name}
                         </p>
@@ -965,21 +1073,35 @@ export default function SourceCurationWorkspace({ workspace }) {
                         <p className="mt-1 text-[10px] text-[var(--admin-text-muted)]">
                           Import origin: {group.import_origin}
                         </p>
-                      </div>
+                      </button>
                       <div className="flex flex-wrap items-center justify-end gap-2">
                         <CompactBadge>{formatCountLabel(group.completedCount, group.pendingCount, "row(s)")}</CompactBadge>
                         <CompactBadge tone="success">{group.completedCount} completed</CompactBadge>
                         <CompactBadge tone="warning">{group.pendingCount} pending</CompactBadge>
                         <CompactBadge tone={group.group_status_tone}>{group.group_status}</CompactBadge>
+                        {group.isReadyForCompletion && !group.isExplicitlyComplete ? (
+                          <ActionButton
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              confirmGroupCompletion("missing", group);
+                            }}
+                          >
+                            Confirm group complete
+                          </ActionButton>
+                        ) : null}
                         <CompactBadge>{isExpanded ? "collapse" : "expand"}</CompactBadge>
                       </div>
-                    </button>
+                    </div>
 
                     {isExpanded ? (
                       <div className="space-y-3 p-3">
-                        {group.isComplete ? (
+                        {group.isExplicitlyComplete ? (
                           <div className="rounded border border-[var(--admin-success-line)] bg-[var(--admin-success-surface)] p-3 text-[11px] text-[var(--success)]">
-                            Every row in this group has a saved decision. The group stays visible so you can revisit or revise any record before leaving the session.
+                            This group has been explicitly confirmed complete for this session. Records remain visible so you can still revisit them if needed.
+                          </div>
+                        ) : group.isReadyForCompletion ? (
+                          <div className="rounded border border-[var(--admin-warning-line)] bg-[var(--admin-warning-surface)] p-3 text-[11px] text-[var(--warning)]">
+                            Every row currently has a saved decision, but the group is not complete until you confirm the group.
                           </div>
                         ) : null}
 
@@ -1464,6 +1586,47 @@ export default function SourceCurationWorkspace({ workspace }) {
                             </article>
                           );
                         })}
+
+                        {confirmationState?.key === group.id &&
+                        confirmationState?.entityType === "missing-group" ? (
+                          <div className="rounded border border-[var(--admin-info-line)] bg-[var(--admin-info-surface)] p-3">
+                            <p className="font-medium text-[var(--info)]">
+                              {confirmationState.title}
+                            </p>
+                            <p className="mt-1 text-[11px] text-[var(--admin-link)]">
+                              {confirmationState.description}
+                            </p>
+                            <label className="mt-3 flex items-center gap-2 text-[11px] text-[var(--info)]">
+                              <input
+                                type="checkbox"
+                                checked={confirmationChecked}
+                                onChange={(event) =>
+                                  setConfirmationChecked(event.target.checked)
+                                }
+                              />
+                              <span>
+                                I understand this marks the whole group complete for this session.
+                              </span>
+                            </label>
+                            <div className="mt-3 flex justify-end gap-2">
+                              <ActionButton
+                                onClick={() => {
+                                  setConfirmationState(null);
+                                  setConfirmationChecked(false);
+                                }}
+                              >
+                                Cancel
+                              </ActionButton>
+                              <ActionButton
+                                tone="primary"
+                                disabled={!confirmationChecked}
+                                onClick={runConfirmedAction}
+                              >
+                                Confirm
+                              </ActionButton>
+                            </div>
+                          </div>
+                        ) : null}
                       </div>
                     ) : null}
                   </section>
@@ -1490,33 +1653,47 @@ export default function SourceCurationWorkspace({ workspace }) {
 
                 return (
                   <section key={group.id} className="overflow-hidden rounded border border-[var(--admin-line)] bg-[var(--admin-surface-muted)]">
-                    <button
-                      type="button"
-                      onClick={() => toggleGroup("duplicates", group.id)}
-                      className="flex w-full flex-wrap items-center justify-between gap-3 border-b border-[var(--admin-line)] bg-[var(--admin-surface-muted)] px-3 py-3 text-left"
-                    >
-                      <div className="min-w-0 flex-1">
+                    <div className="flex w-full flex-wrap items-center justify-between gap-3 border-b border-[var(--admin-line)] bg-[var(--admin-surface-muted)] px-3 py-3 text-left">
+                      <button
+                        type="button"
+                        onClick={() => toggleGroup("duplicates", group.id)}
+                        className="flex min-w-0 flex-1 flex-col text-left"
+                      >
                         <p className="font-mono text-[10px] uppercase tracking-wide text-[var(--admin-text-muted)]">
                           duplicate review reason
                         </p>
                         <h4 className="mt-1 text-sm font-semibold text-[var(--admin-text)]">
                           {group.reason}
                         </h4>
-                      </div>
+                      </button>
                       <div className="flex flex-wrap items-center justify-end gap-2">
                         <CompactBadge>{formatCountLabel(group.completedCount, group.pendingCount, "cluster(s)")}</CompactBadge>
                         <CompactBadge tone="success">{group.completedCount} completed</CompactBadge>
                         <CompactBadge tone="warning">{group.pendingCount} pending</CompactBadge>
                         <CompactBadge tone={group.group_status_tone}>{group.group_status}</CompactBadge>
+                        {group.isReadyForCompletion && !group.isExplicitlyComplete ? (
+                          <ActionButton
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              confirmGroupCompletion("duplicates", group);
+                            }}
+                          >
+                            Confirm group complete
+                          </ActionButton>
+                        ) : null}
                         <CompactBadge>{isExpanded ? "collapse" : "expand"}</CompactBadge>
                       </div>
-                    </button>
+                    </div>
 
                     {isExpanded ? (
                       <div className="space-y-3 p-3">
-                        {group.isComplete ? (
+                        {group.isExplicitlyComplete ? (
                           <div className="rounded border border-[var(--admin-success-line)] bg-[var(--admin-success-surface)] p-3 text-[11px] text-[var(--success)]">
-                            Every duplicate cluster in this group has a saved decision. The group stays visible so you can revisit or revise any cluster before leaving the session.
+                            This group has been explicitly confirmed complete for this session. Clusters remain visible so you can still revisit them if needed.
+                          </div>
+                        ) : group.isReadyForCompletion ? (
+                          <div className="rounded border border-[var(--admin-warning-line)] bg-[var(--admin-warning-surface)] p-3 text-[11px] text-[var(--warning)]">
+                            Every cluster currently has a saved decision, but the group is not complete until you confirm the group.
                           </div>
                         ) : null}
 
@@ -1831,6 +2008,47 @@ export default function SourceCurationWorkspace({ workspace }) {
                             </article>
                           );
                         })}
+
+                        {confirmationState?.key === group.id &&
+                        confirmationState?.entityType === "duplicates-group" ? (
+                          <div className="rounded border border-[var(--admin-info-line)] bg-[var(--admin-info-surface)] p-3">
+                            <p className="font-medium text-[var(--info)]">
+                              {confirmationState.title}
+                            </p>
+                            <p className="mt-1 text-[11px] text-[var(--admin-link)]">
+                              {confirmationState.description}
+                            </p>
+                            <label className="mt-3 flex items-center gap-2 text-[11px] text-[var(--info)]">
+                              <input
+                                type="checkbox"
+                                checked={confirmationChecked}
+                                onChange={(event) =>
+                                  setConfirmationChecked(event.target.checked)
+                                }
+                              />
+                              <span>
+                                I understand this marks the whole group complete for this session.
+                              </span>
+                            </label>
+                            <div className="mt-3 flex justify-end gap-2">
+                              <ActionButton
+                                onClick={() => {
+                                  setConfirmationState(null);
+                                  setConfirmationChecked(false);
+                                }}
+                              >
+                                Cancel
+                              </ActionButton>
+                              <ActionButton
+                                tone="primary"
+                                disabled={!confirmationChecked}
+                                onClick={runConfirmedAction}
+                              >
+                                Confirm
+                              </ActionButton>
+                            </div>
+                          </div>
+                        ) : null}
                       </div>
                     ) : null}
                   </section>
