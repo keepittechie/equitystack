@@ -1,6 +1,27 @@
 import { NextResponse } from "next/server";
 
-function unauthorizedResponse() {
+function unauthorizedResponse(request) {
+  const pathname = request.nextUrl.pathname || "";
+  const isApiRequest = pathname.startsWith("/api/");
+
+  if (isApiRequest) {
+    return NextResponse.json(
+      {
+        success: false,
+        error: {
+          message: "Authentication required.",
+          code: "admin_auth_required",
+        },
+      },
+      {
+        status: 401,
+        headers: {
+          "WWW-Authenticate": 'Basic realm="Admin Area"',
+        },
+      }
+    );
+  }
+
   return new Response("Authentication required", {
     status: 401,
     headers: {
@@ -13,18 +34,19 @@ export function proxy(request) {
   const { pathname } = request.nextUrl;
 
   const isAdminPage = pathname.startsWith("/admin");
+  const isAdminApi = pathname.startsWith("/api/admin");
   const isProtectedRelationshipWrite =
     pathname.match(/^\/api\/policies\/\d+\/relationships$/) &&
     request.method === "POST";
 
-  if (!isAdminPage && !isProtectedRelationshipWrite) {
+  if (!isAdminPage && !isAdminApi && !isProtectedRelationshipWrite) {
     return NextResponse.next();
   }
 
   const authHeader = request.headers.get("authorization");
 
   if (!authHeader || !authHeader.startsWith("Basic ")) {
-    return unauthorizedResponse();
+    return unauthorizedResponse(request);
   }
 
   const base64Credentials = authHeader.split(" ")[1];
@@ -38,12 +60,12 @@ export function proxy(request) {
     username !== expectedUsername ||
     password !== expectedPassword
   ) {
-    return unauthorizedResponse();
+    return unauthorizedResponse(request);
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/api/policies/:path*/relationships"],
+  matcher: ["/admin/:path*", "/api/admin/:path*", "/api/policies/:path*/relationships"],
 };
