@@ -6,7 +6,45 @@ import { formatAdminDateTime } from "@/app/admin/components/adminDateTime";
 import { readAdminJsonResponse } from "@/app/admin/components/readAdminJsonResponse";
 import { SOURCE_TYPES } from "@/lib/admin/promiseValidation";
 
-const SOURCE_CURATION_ENDPOINT = "/admin/source-curation/api";
+const SOURCE_CURATION_ENDPOINTS = [
+  "/api/admin/source-curation",
+  "/admin/source-curation/api",
+];
+
+async function fetchSourceCurationJson(path = "", init = {}) {
+  let lastError = null;
+
+  for (const endpoint of SOURCE_CURATION_ENDPOINTS) {
+    const url = `${endpoint}${path}`;
+    const headers = {
+      Accept: "application/json",
+      ...(init.headers || {}),
+    };
+
+    try {
+      const response = await fetch(url, {
+        ...init,
+        headers,
+      });
+      const payload = await readAdminJsonResponse(response, url);
+
+      if (
+        !response.ok &&
+        (response.status === 401 || response.status === 403) &&
+        endpoint !== SOURCE_CURATION_ENDPOINTS[SOURCE_CURATION_ENDPOINTS.length - 1]
+      ) {
+        lastError = new Error(payload.error || `Authentication failed for ${url}.`);
+        continue;
+      }
+
+      return { response, payload, endpoint: url };
+    } catch (error) {
+      lastError = error;
+    }
+  }
+
+  throw lastError || new Error("Source-curation request failed.");
+}
 
 function CompactBadge({ tone = "neutral", children }) {
   const classes =
@@ -321,10 +359,8 @@ export default function SourceCurationWorkspace({ workspace }) {
     updateMissingDraft(item.review_key, "duplicateWarning", []);
 
     try {
-      const response = await fetch(
-        `${SOURCE_CURATION_ENDPOINT}?q=${encodeURIComponent(
-          draft.searchQuery || item.suggested_search_query
-        )}&limit=12&promiseId=${item.promise_id}${
+      const { response, payload } = await fetchSourceCurationJson(
+        `?q=${encodeURIComponent(draft.searchQuery || item.suggested_search_query)}&limit=12&promiseId=${item.promise_id}${
           item.related_policy_id ? `&relatedPolicyId=${item.related_policy_id}` : ""
         }`,
         {
@@ -332,7 +368,6 @@ export default function SourceCurationWorkspace({ workspace }) {
           cache: "no-store",
         }
       );
-      const payload = await readAdminJsonResponse(response, SOURCE_CURATION_ENDPOINT);
       if (!response.ok || !payload.success) {
         throw new Error(payload.error || "Failed to search existing sources.");
       }
@@ -528,14 +563,13 @@ export default function SourceCurationWorkspace({ workspace }) {
 
     startTransition(async () => {
       try {
-        const response = await fetch(SOURCE_CURATION_ENDPOINT, {
+        const { response, payload } = await fetchSourceCurationJson("", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(confirmationState.payload),
         });
-        const payload = await readAdminJsonResponse(response, SOURCE_CURATION_ENDPOINT);
         if (!response.ok || !payload.success) {
           if (
             payload.errorDetails?.possibleDuplicates &&

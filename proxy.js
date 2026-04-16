@@ -2,7 +2,13 @@ import { NextResponse } from "next/server";
 
 function unauthorizedResponse(request) {
   const pathname = request.nextUrl.pathname || "";
-  const isApiRequest = pathname.startsWith("/api/");
+  const accept = request.headers.get("accept") || "";
+  const isApiRequest =
+    pathname === "/api" ||
+    pathname.startsWith("/api/") ||
+    pathname.endsWith("/api") ||
+    pathname.includes("/api/") ||
+    accept.includes("application/json");
 
   if (isApiRequest) {
     return NextResponse.json(
