@@ -8,7 +8,7 @@ export default function MainLayout({ children }) {
   const isAdminPath = pathname?.startsWith("/admin");
 
   if (isAdminPath) {
-    return <div className="admin-shell min-h-screen bg-[#F5F7FA] text-[#1F2937]">{children}</div>;
+    return <div className="admin-shell min-h-screen">{children}</div>;
   }
 
   return (

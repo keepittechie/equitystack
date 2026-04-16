@@ -194,9 +194,9 @@ export default function ScheduleManager({ initialSchedules = [], initialActions 
 
   return (
     <div className="space-y-4">
-      <section className="rounded border border-[#E5EAF0] bg-[#EEF2F6] p-4 shadow-sm">
+      <section className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface-muted)] p-4 shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="text-base font-semibold text-[#1F2937]">Schedules</h2>
+          <h2 className="text-base font-semibold text-[var(--admin-text)]">Schedules</h2>
           <button
             type="button"
             onClick={() => {
@@ -209,56 +209,56 @@ export default function ScheduleManager({ initialSchedules = [], initialActions 
                 }
               });
             }}
-            className="rounded border border-[#E5EAF0] bg-white px-3 py-1.5 text-[12px] text-[#1F2937]"
+            className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] px-3 py-1.5 text-[12px] text-[var(--admin-text)]"
           >
             Refresh
           </button>
         </div>
-        <div className="mt-3 overflow-x-auto rounded border border-[#E5EAF0] bg-white">
+        <div className="mt-3 overflow-x-auto rounded border border-[var(--admin-line)] bg-[var(--admin-surface)]">
           {schedules.length ? (
             <table className="min-w-[1220px] w-full text-[11px]">
-              <thead className="bg-[#F9FBFD] text-left text-[11px] uppercase tracking-wide text-[#6B7280]">
+              <thead className="bg-[var(--admin-surface-muted)] text-left text-[11px] uppercase tracking-wide text-[var(--admin-text-muted)]">
                 <tr>
-                  <th className="border-b border-[#E5EAF0] px-2 py-1">Title</th>
-                  <th className="border-b border-[#E5EAF0] px-2 py-1">Action</th>
-                  <th className="border-b border-[#E5EAF0] px-2 py-1">Workflow</th>
-                  <th className="border-b border-[#E5EAF0] px-2 py-1">Mode</th>
-                  <th className="border-b border-[#E5EAF0] px-2 py-1">Status</th>
-                  <th className="border-b border-[#E5EAF0] px-2 py-1">Next Run</th>
-                  <th className="border-b border-[#E5EAF0] px-2 py-1">Last Run</th>
-                  <th className="border-b border-[#E5EAF0] px-2 py-1">Last Result</th>
-                  <th className="border-b border-[#E5EAF0] px-2 py-1">Action</th>
+                  <th className="border-b border-[var(--admin-line)] px-2 py-1">Title</th>
+                  <th className="border-b border-[var(--admin-line)] px-2 py-1">Action</th>
+                  <th className="border-b border-[var(--admin-line)] px-2 py-1">Workflow</th>
+                  <th className="border-b border-[var(--admin-line)] px-2 py-1">Mode</th>
+                  <th className="border-b border-[var(--admin-line)] px-2 py-1">Status</th>
+                  <th className="border-b border-[var(--admin-line)] px-2 py-1">Next Run</th>
+                  <th className="border-b border-[var(--admin-line)] px-2 py-1">Last Run</th>
+                  <th className="border-b border-[var(--admin-line)] px-2 py-1">Last Result</th>
+                  <th className="border-b border-[var(--admin-line)] px-2 py-1">Action</th>
                 </tr>
               </thead>
               <tbody>
                 {schedules.map((schedule) => (
-                  <tr key={schedule.id} className="align-top odd:bg-white even:bg-[#F9FBFD] hover:bg-[#F1F5F9]">
-                    <td className="border-b border-[#E5EAF0] px-2 py-1">
-                      <div className="font-medium text-[#1F2937]">{schedule.title}</div>
-                      <div className="mt-0.5 font-mono text-[10px] text-[#6B7280]">{schedule.id}</div>
+                  <tr key={schedule.id} className="align-top odd:bg-[var(--admin-surface)] even:bg-[var(--admin-surface-muted)] hover:bg-[var(--admin-surface-soft)]">
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1">
+                      <div className="font-medium text-[var(--admin-text)]">{schedule.title}</div>
+                      <div className="mt-0.5 font-mono text-[10px] text-[var(--admin-text-muted)]">{schedule.id}</div>
                     </td>
-                    <td className="border-b border-[#E5EAF0] px-2 py-1">
-                      <div className="text-[#4B5563]">{schedule.action?.title || schedule.actionId}</div>
-                      <div className="mt-0.5 font-mono text-[10px] text-[#6B7280]">
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1">
+                      <div className="text-[var(--admin-text-soft)]">{schedule.action?.title || schedule.actionId}</div>
+                      <div className="mt-0.5 font-mono text-[10px] text-[var(--admin-text-muted)]">
                         {schedule.scheduleType}
                         {schedule.scheduleExpression ? ` / ${schedule.scheduleExpression}` : ""}
                       </div>
                     </td>
-                    <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">{schedule.workflowFamily}</td>
-                    <td className="border-b border-[#E5EAF0] px-2 py-1 font-mono text-[10px] text-[#111827]">
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1 text-[var(--admin-text-soft)]">{schedule.workflowFamily}</td>
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1 font-mono text-[10px] text-[var(--admin-text)]">
                       {schedule.executionMode || "local_cli"}
                     </td>
-                    <td className="border-b border-[#E5EAF0] px-2 py-1">
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1">
                       <JobStatusBadge status={schedule.status} />
                     </td>
-                    <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">{formatAdminDateTime(schedule.nextRunAt)}</td>
-                    <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">{formatAdminDateTime(schedule.lastRunAt)}</td>
-                    <td className="border-b border-[#E5EAF0] px-2 py-1">
-                      <div className="max-w-[260px] truncate text-[#4B5563]" title={schedule.lastJob?.summary || schedule.lastResultSummary || schedule.summary}>
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1 text-[var(--admin-text-soft)]">{formatAdminDateTime(schedule.nextRunAt)}</td>
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1 text-[var(--admin-text-soft)]">{formatAdminDateTime(schedule.lastRunAt)}</td>
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1">
+                      <div className="max-w-[260px] truncate text-[var(--admin-text-soft)]" title={schedule.lastJob?.summary || schedule.lastResultSummary || schedule.summary}>
                         {schedule.lastJob?.summary || schedule.lastResultSummary || schedule.summary}
                       </div>
                     </td>
-                    <td className="border-b border-[#E5EAF0] px-2 py-1">
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1">
                       <div className="flex flex-wrap gap-2">
                         <button
                           type="button"
@@ -269,19 +269,19 @@ export default function ScheduleManager({ initialSchedules = [], initialActions 
                               `${schedule.title} ${schedule.enabled ? "disabled" : "enabled"}.`
                             )
                           }
-                          className="rounded border border-[#E5EAF0] bg-white px-2 py-0.5 text-[11px] text-[#1F2937]"
+                          className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] px-2 py-0.5 text-[11px] text-[var(--admin-text)]"
                         >
                           {schedule.enabled ? "Disable" : "Enable"}
                         </button>
                         <button
                           type="button"
                           onClick={() => handleRunSchedule(schedule.id)}
-                          className="rounded border border-[#E5EAF0] bg-white px-2 py-0.5 text-[11px] text-[#1F2937]"
+                          className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] px-2 py-0.5 text-[11px] text-[var(--admin-text)]"
                         >
                           Run now
                         </button>
                         {schedule.lastJobId ? (
-                          <Link href={`/admin/jobs/${schedule.lastJobId}`} className="rounded border border-[#E5EAF0] bg-white px-2 py-0.5 text-[11px] text-[#1F2937]">
+                          <Link href={`/admin/jobs/${schedule.lastJobId}`} className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] px-2 py-0.5 text-[11px] text-[var(--admin-text)]">
                             Open last job
                           </Link>
                         ) : null}
@@ -292,31 +292,31 @@ export default function ScheduleManager({ initialSchedules = [], initialActions 
               </tbody>
             </table>
           ) : (
-            <p className="p-3 text-[12px] text-[#6B7280]">No schedules are defined yet.</p>
+            <p className="p-3 text-[12px] text-[var(--admin-text-muted)]">No schedules are defined yet.</p>
           )}
         </div>
       </section>
 
-      <section className="rounded border border-[#E5EAF0] bg-[#EEF2F6] p-4 shadow-sm">
-        <h2 className="text-base font-semibold text-[#1F2937]">Create schedule</h2>
+      <section className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface-muted)] p-4 shadow-sm">
+        <h2 className="text-base font-semibold text-[var(--admin-text)]">Create schedule</h2>
         <form onSubmit={handleCreateSchedule} className="mt-3 grid gap-3 xl:grid-cols-2">
           <label className="block space-y-1">
-            <span className="text-[11px] font-medium text-[#1F2937]">Title</span>
+            <span className="text-[11px] font-medium text-[var(--admin-text)]">Title</span>
             <input
               type="text"
               value={title}
               onChange={(event) => setTitle(event.target.value)}
-              className="w-full rounded border border-[#E5EAF0] bg-white px-2 py-1 text-[11px] text-[#1F2937] outline-none placeholder:text-[#6B7280] focus:border-[#3B82F6]"
+              className="w-full rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] px-2 py-1 text-[11px] text-[var(--admin-text)] outline-none placeholder:text-[var(--admin-text-muted)] focus:border-[var(--admin-link)]"
               placeholder={selectedAction?.title || "Morning preparation"}
             />
           </label>
 
           <label className="block space-y-1">
-            <span className="text-[11px] font-medium text-[#1F2937]">Action</span>
+            <span className="text-[11px] font-medium text-[var(--admin-text)]">Action</span>
             <select
               value={actionId}
               onChange={(event) => setActionId(event.target.value)}
-              className="w-full rounded border border-[#E5EAF0] bg-white px-2 py-1 text-[11px] text-[#1F2937] outline-none focus:border-[#3B82F6]"
+              className="w-full rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] px-2 py-1 text-[11px] text-[var(--admin-text)] outline-none focus:border-[var(--admin-link)]"
               >
               {actions.map((action) => (
                 <option key={action.id} value={action.id}>
@@ -327,11 +327,11 @@ export default function ScheduleManager({ initialSchedules = [], initialActions 
           </label>
 
           <label className="block space-y-1">
-            <span className="text-[11px] font-medium text-[#1F2937]">Execution mode</span>
+            <span className="text-[11px] font-medium text-[var(--admin-text)]">Execution mode</span>
             <select
               value={executionMode}
               onChange={(event) => setExecutionMode(event.target.value)}
-              className="w-full rounded border border-[#E5EAF0] bg-white px-2 py-1 text-[11px] text-[#1F2937] outline-none focus:border-[#3B82F6]"
+              className="w-full rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] px-2 py-1 text-[11px] text-[var(--admin-text)] outline-none focus:border-[var(--admin-link)]"
             >
               {(selectedAction?.executionModes?.scheduleAllowedModes || ["local_cli"]).map((mode) => (
                 <option key={`${actionId}-${mode}`} value={mode}>
@@ -342,11 +342,11 @@ export default function ScheduleManager({ initialSchedules = [], initialActions 
           </label>
 
           <label className="block space-y-1">
-            <span className="text-[11px] font-medium text-[#1F2937]">Schedule type</span>
+            <span className="text-[11px] font-medium text-[var(--admin-text)]">Schedule type</span>
             <select
               value={scheduleType}
               onChange={(event) => setScheduleType(event.target.value)}
-              className="w-full rounded border border-[#E5EAF0] bg-white px-2 py-1 text-[11px] text-[#1F2937] outline-none focus:border-[#3B82F6]"
+              className="w-full rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] px-2 py-1 text-[11px] text-[var(--admin-text)] outline-none focus:border-[var(--admin-link)]"
             >
               <option value="manual">Manual</option>
               <option value="daily">Daily</option>
@@ -356,18 +356,18 @@ export default function ScheduleManager({ initialSchedules = [], initialActions 
           </label>
 
           <label className="block space-y-1">
-            <span className="text-[11px] font-medium text-[#1F2937]">Expression</span>
+            <span className="text-[11px] font-medium text-[var(--admin-text)]">Expression</span>
             <input
               type="text"
               value={scheduleType === "manual" ? "" : scheduleExpression}
               onChange={(event) => setScheduleExpression(event.target.value)}
               disabled={scheduleType === "manual"}
-              className="w-full rounded border border-[#E5EAF0] bg-white px-2 py-1 text-[11px] text-[#1F2937] outline-none placeholder:text-[#6B7280] focus:border-[#3B82F6] disabled:bg-[#F3F4F6]"
+              className="w-full rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] px-2 py-1 text-[11px] text-[var(--admin-text)] outline-none placeholder:text-[var(--admin-text-muted)] focus:border-[var(--admin-link)] disabled:bg-[var(--admin-surface-soft)]"
               placeholder={expressionPlaceholder(scheduleType)}
             />
           </label>
 
-          <label className="flex items-center gap-3 rounded border border-[#E5EAF0] bg-white p-2 text-[11px] text-[#1F2937]">
+          <label className="flex items-center gap-3 rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] p-2 text-[11px] text-[var(--admin-text)]">
             <input
               type="checkbox"
               checked={enabled}
@@ -376,7 +376,7 @@ export default function ScheduleManager({ initialSchedules = [], initialActions 
             <span>Enable scheduled execution</span>
           </label>
 
-          <div className="rounded border border-[#E5EAF0] bg-[#F9FBFD] p-2 text-[11px] text-[#4B5563]">
+          <div className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface-muted)] p-2 text-[11px] text-[var(--admin-text-soft)]">
             Only explicitly schedulable actions appear here. Final apply/import paths remain blocked.
           </div>
 
@@ -384,7 +384,7 @@ export default function ScheduleManager({ initialSchedules = [], initialActions 
             <button
               type="submit"
               disabled={isPending || !selectedAction}
-              className="rounded border border-[#3B82F6] bg-[#3B82F6] px-2.5 py-1 text-[11px] font-medium text-white disabled:cursor-not-allowed disabled:opacity-60"
+              className="rounded border border-[var(--admin-link)] bg-[var(--admin-link)] px-2.5 py-1 text-[11px] font-medium text-[var(--background)] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isPending ? "Saving…" : "Create schedule"}
             </button>
@@ -399,7 +399,7 @@ export default function ScheduleManager({ initialSchedules = [], initialActions 
                 setError("");
                 setInfo("");
               }}
-              className="rounded border border-[#E5EAF0] bg-white px-2.5 py-1 text-[11px] text-[#1F2937]"
+              className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] px-2.5 py-1 text-[11px] text-[var(--admin-text)]"
             >
               Reset
             </button>
@@ -407,12 +407,12 @@ export default function ScheduleManager({ initialSchedules = [], initialActions 
         </form>
 
         {error ? (
-          <div className="mt-3 rounded border border-[#FECACA] bg-[#FEF2F2] p-2 text-[11px] text-[#B91C1C]">
+          <div className="mt-3 rounded border border-[var(--admin-danger-line)] bg-[var(--admin-danger-surface)] p-2 text-[11px] text-[var(--danger)]">
             {error}
           </div>
         ) : null}
         {info ? (
-          <div className="mt-3 rounded border border-[#A7F3D0] bg-[#ECFDF5] p-2 text-[11px] text-[#047857]">
+          <div className="mt-3 rounded border border-[var(--admin-success-line)] bg-[var(--admin-success-surface)] p-2 text-[11px] text-[var(--success)]">
             {info}
           </div>
         ) : null}

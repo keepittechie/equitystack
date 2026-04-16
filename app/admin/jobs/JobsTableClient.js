@@ -71,68 +71,68 @@ export default function JobsTableClient({ initialJobs }) {
   }, [jobs]);
 
   return (
-    <section className="rounded border border-[#E5EAF0] bg-[#EEF2F6] p-3 shadow-sm">
+    <section className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface-muted)] p-3 shadow-sm">
       {error ? (
-        <div className="mb-3 rounded border border-[#FECACA] bg-[#FEF2F2] p-3 text-[12px] text-[#B91C1C]">
+        <div className="mb-3 rounded border border-[var(--admin-danger-line)] bg-[var(--admin-danger-surface)] p-3 text-[12px] text-[var(--danger)]">
           {error}
         </div>
       ) : null}
-      <div className="overflow-x-auto rounded border border-[#E5EAF0] bg-white">
+      <div className="overflow-x-auto rounded border border-[var(--admin-line)] bg-[var(--admin-surface)]">
         <table className="min-w-[1320px] w-full text-[11px]">
-          <thead className="bg-[#F9FBFD] text-left text-[11px] uppercase tracking-wide text-[#6B7280]">
+          <thead className="bg-[var(--admin-surface-muted)] text-left text-[11px] uppercase tracking-wide text-[var(--admin-text-muted)]">
             <tr>
-              <th className="border-b border-[#E5EAF0] px-2 py-1">Status</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1">Action</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1">Workflow</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1">Summary</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1">Started</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1">Duration</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1">Mode</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1">Executor</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1">Session</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1">Action</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1">Status</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1">Action</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1">Workflow</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1">Summary</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1">Started</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1">Duration</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1">Mode</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1">Executor</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1">Session</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1">Action</th>
             </tr>
           </thead>
           <tbody>
             {jobs.map((job) => (
-              <tr key={job.id} className="align-top odd:bg-white even:bg-[#F9FBFD] hover:bg-[#F1F5F9]">
-                <td className="border-b border-[#E5EAF0] px-2 py-1">
+              <tr key={job.id} className="align-top odd:bg-[var(--admin-surface)] even:bg-[var(--admin-surface-muted)] hover:bg-[var(--admin-surface-soft)]">
+                <td className="border-b border-[var(--admin-line)] px-2 py-1">
                   <JobStatusBadge status={job.status} />
                 </td>
-                <td className="border-b border-[#E5EAF0] px-2 py-1">
-                  <div className="font-medium text-[#1F2937]">{job.actionTitle}</div>
-                  <div className="mt-0.5 font-mono text-[10px] text-[#6B7280]">{job.id}</div>
+                <td className="border-b border-[var(--admin-line)] px-2 py-1">
+                  <div className="font-medium text-[var(--admin-text)]">{job.actionTitle}</div>
+                  <div className="mt-0.5 font-mono text-[10px] text-[var(--admin-text-muted)]">{job.id}</div>
                 </td>
-                <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">{job.workflowFamily}</td>
-                <td className="border-b border-[#E5EAF0] px-2 py-1">
-                  <div className="max-w-[320px] truncate text-[#4B5563]" title={job.summary || "No summary yet."}>
+                <td className="border-b border-[var(--admin-line)] px-2 py-1 text-[var(--admin-text-soft)]">{job.workflowFamily}</td>
+                <td className="border-b border-[var(--admin-line)] px-2 py-1">
+                  <div className="max-w-[320px] truncate text-[var(--admin-text-soft)]" title={job.summary || "No summary yet."}>
                     {job.summary || "No summary yet."}
                   </div>
                   {job.failure?.likelySource ? (
-                    <div className="mt-0.5 text-[10px] text-[#B91C1C]">failure: {job.failure.likelySource}</div>
+                    <div className="mt-0.5 text-[10px] text-[var(--danger)]">failure: {job.failure.likelySource}</div>
                   ) : null}
                 </td>
-                <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">
+                <td className="border-b border-[var(--admin-line)] px-2 py-1 text-[var(--admin-text-soft)]">
                   {formatAdminDateTime(job.timestamps?.startedAt || job.timestamps?.createdAt)}
                 </td>
-                <td className="border-b border-[#E5EAF0] px-2 py-1 font-mono text-[10px] text-[#111827]">
+                <td className="border-b border-[var(--admin-line)] px-2 py-1 font-mono text-[10px] text-[var(--admin-text)]">
                   {formatDuration(job.timestamps?.startedAt, job.timestamps?.finishedAt)}
                 </td>
-                <td className="border-b border-[#E5EAF0] px-2 py-1 font-mono text-[10px] text-[#111827]">
+                <td className="border-b border-[var(--admin-line)] px-2 py-1 font-mono text-[10px] text-[var(--admin-text)]">
                   {job.execution?.execution_mode || job.metadataJson?.execution_mode || "local_cli"}
                 </td>
-                <td className="border-b border-[#E5EAF0] px-2 py-1 font-mono text-[10px] text-[#111827]">
+                <td className="border-b border-[var(--admin-line)] px-2 py-1 font-mono text-[10px] text-[var(--admin-text)]">
                   <div className="max-w-[180px] truncate" title={`${job.execution?.executor?.executor_host || job.metadataJson?.executor?.executor_host || "localhost"} / ${job.execution?.executor?.executor_model || job.metadataJson?.executor?.executor_model || "-"}`}>
                     {job.execution?.executor?.executor_host || job.metadataJson?.executor?.executor_host || "localhost"} /{" "}
                     {job.execution?.executor?.executor_model || job.metadataJson?.executor?.executor_model || "-"}
                   </div>
                 </td>
-                <td className="border-b border-[#E5EAF0] px-2 py-1 font-mono text-[10px] text-[#111827]">
+                <td className="border-b border-[var(--admin-line)] px-2 py-1 font-mono text-[10px] text-[var(--admin-text)]">
                   {job.sessionIds?.[0] || "—"}
                 </td>
-                <td className="border-b border-[#E5EAF0] px-2 py-1">
+                <td className="border-b border-[var(--admin-line)] px-2 py-1">
                   <div className="flex flex-wrap gap-2">
-                    <Link href={`/admin/jobs/${job.id}`} className="text-[11px] text-[#3B82F6] underline">
+                    <Link href={`/admin/jobs/${job.id}`} className="text-[11px] text-[var(--admin-link)] underline">
                       Open
                     </Link>
                     <JobRerunButton job={job} label={job.rerun?.label || "Retry"} />

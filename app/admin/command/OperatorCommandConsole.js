@@ -35,15 +35,15 @@ function TraceTable({ trace = [] }) {
   }
 
   return (
-    <div className="overflow-x-auto rounded border border-[#E5EAF0] bg-white">
+    <div className="overflow-x-auto rounded border border-[var(--admin-line)] bg-[var(--admin-surface)]">
       <table className="min-w-full text-[11px]">
         <tbody>
           {trace.map((entry) => (
-            <tr key={entry.key} className="odd:bg-white even:bg-[#F9FBFD]">
-              <td className="border-b border-[#E5EAF0] px-2 py-1 font-mono uppercase tracking-wide text-[#6B7280]">
+            <tr key={entry.key} className="odd:bg-[var(--admin-surface)] even:bg-[var(--admin-surface-muted)]">
+              <td className="border-b border-[var(--admin-line)] px-2 py-1 font-mono uppercase tracking-wide text-[var(--admin-text-muted)]">
                 {entry.label}
               </td>
-              <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">{entry.value}</td>
+              <td className="border-b border-[var(--admin-line)] px-2 py-1 text-[var(--admin-text-soft)]">{entry.value}</td>
             </tr>
           ))}
         </tbody>
@@ -57,21 +57,21 @@ function renderInspectResult(result) {
     const sessions = result.data?.sessions || [];
     return (
       <div className="space-y-3">
-        <p className="text-sm text-[#4B5563]">{result.summary}</p>
+        <p className="text-sm text-[var(--admin-text-soft)]">{result.summary}</p>
         {sessions.slice(0, 6).map((session) => (
-          <div key={session.id} className="rounded border border-[#E5EAF0] bg-white p-3">
+          <div key={session.id} className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] p-3">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <p className="text-sm text-[#6B7280]">{session.workflowFamily}</p>
-                <p className="mt-1 font-medium text-[#1F2937]">{session.title}</p>
-                <p className="mt-2 text-sm text-[#4B5563]">{session.summary}</p>
+                <p className="text-sm text-[var(--admin-text-muted)]">{session.workflowFamily}</p>
+                <p className="mt-1 font-medium text-[var(--admin-text)]">{session.title}</p>
+                <p className="mt-2 text-sm text-[var(--admin-text-soft)]">{session.summary}</p>
               </div>
-              <span className="rounded border border-[#E5EAF0] bg-[#F9FBFD] px-3 py-1 text-xs font-medium text-[#4B5563]">
+              <span className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface-muted)] px-3 py-1 text-xs font-medium text-[var(--admin-text-soft)]">
                 {session.canonicalState}
               </span>
             </div>
             <div className="mt-3">
-              <Link href={`/admin/workflows/${encodeURIComponent(session.id)}`} className="text-sm text-[#3B82F6] underline">
+              <Link href={`/admin/workflows/${encodeURIComponent(session.id)}`} className="text-sm text-[var(--admin-link)] underline">
                 Open session inspector
               </Link>
             </div>
@@ -85,17 +85,17 @@ function renderInspectResult(result) {
     const items = result.data?.items || [];
     return (
       <div className="space-y-3">
-        <p className="text-sm text-[#4B5563]">{result.summary}</p>
+        <p className="text-sm text-[var(--admin-text-soft)]">{result.summary}</p>
         {items.slice(0, 6).map((item) => (
-          <div key={item.id} className="rounded border border-[#E5EAF0] bg-white p-3">
-            <p className="text-sm text-[#6B7280]">{item.workflowFamily}</p>
-            <p className="mt-1 font-medium text-[#1F2937]">{item.title}</p>
-            <p className="mt-2 text-sm text-[#4B5563]">{item.detail}</p>
+          <div key={item.id} className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] p-3">
+            <p className="text-sm text-[var(--admin-text-muted)]">{item.workflowFamily}</p>
+            <p className="mt-1 font-medium text-[var(--admin-text)]">{item.title}</p>
+            <p className="mt-2 text-sm text-[var(--admin-text-soft)]">{item.detail}</p>
             <div className="mt-3 flex flex-wrap gap-3">
-              <Link href={`/admin/workflows/${encodeURIComponent(item.sessionId)}`} className="text-sm text-[#3B82F6] underline">
+              <Link href={`/admin/workflows/${encodeURIComponent(item.sessionId)}`} className="text-sm text-[var(--admin-link)] underline">
                 Open session inspector
               </Link>
-              <Link href="/admin/review-queue" className="text-sm text-[#3B82F6] underline">
+              <Link href="/admin/review-queue" className="text-sm text-[var(--admin-link)] underline">
                 Open review queue
               </Link>
             </div>
@@ -109,30 +109,30 @@ function renderInspectResult(result) {
     const summary = result.data?.summary;
     return (
       <div className="space-y-3">
-        <p className="text-sm text-[#4B5563]">{result.summary}</p>
+        <p className="text-sm text-[var(--admin-text-soft)]">{result.summary}</p>
         <div className="grid gap-3 md:grid-cols-4">
-          <div className="rounded border border-[#E5EAF0] bg-white p-3">
-            <p className="text-xs text-[#6B7280]">Sessions</p>
-            <p className="mt-1 text-xl font-semibold text-[#1F2937]">{summary?.sessions?.length || 0}</p>
+          <div className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] p-3">
+            <p className="text-xs text-[var(--admin-text-muted)]">Sessions</p>
+            <p className="mt-1 text-xl font-semibold text-[var(--admin-text)]">{summary?.sessions?.length || 0}</p>
           </div>
-          <div className="rounded border border-[#E5EAF0] bg-white p-3">
-            <p className="text-xs text-[#6B7280]">Review items</p>
-            <p className="mt-1 text-xl font-semibold text-[#1F2937]">{summary?.reviewQueueSummary?.totalItems || 0}</p>
+          <div className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] p-3">
+            <p className="text-xs text-[var(--admin-text-muted)]">Review items</p>
+            <p className="mt-1 text-xl font-semibold text-[var(--admin-text)]">{summary?.reviewQueueSummary?.totalItems || 0}</p>
           </div>
-          <div className="rounded border border-[#E5EAF0] bg-white p-3">
-            <p className="text-xs text-[#6B7280]">Recent failures</p>
-            <p className="mt-1 text-xl font-semibold text-[#1F2937]">{summary?.recentFailures?.length || 0}</p>
+          <div className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] p-3">
+            <p className="text-xs text-[var(--admin-text-muted)]">Recent failures</p>
+            <p className="mt-1 text-xl font-semibold text-[var(--admin-text)]">{summary?.recentFailures?.length || 0}</p>
           </div>
-          <div className="rounded border border-[#E5EAF0] bg-white p-3">
-            <p className="text-xs text-[#6B7280]">Signals</p>
-            <p className="mt-1 text-xl font-semibold text-[#1F2937]">{summary?.signals?.length || 0}</p>
+          <div className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] p-3">
+            <p className="text-xs text-[var(--admin-text-muted)]">Signals</p>
+            <p className="mt-1 text-xl font-semibold text-[var(--admin-text)]">{summary?.signals?.length || 0}</p>
           </div>
         </div>
         <div className="flex flex-wrap gap-3">
-          <Link href="/admin" className="text-sm text-[#3B82F6] underline">
+          <Link href="/admin" className="text-sm text-[var(--admin-link)] underline">
             Open command center
           </Link>
-          <Link href="/admin/workflows" className="text-sm text-[#3B82F6] underline">
+          <Link href="/admin/workflows" className="text-sm text-[var(--admin-link)] underline">
             Open workflows
           </Link>
         </div>
@@ -144,29 +144,29 @@ function renderInspectResult(result) {
     const routine = result.data?.routine;
     return (
       <div className="space-y-3">
-        <p className="text-sm text-[#4B5563]">{result.summary}</p>
+        <p className="text-sm text-[var(--admin-text-soft)]">{result.summary}</p>
         {(routine?.steps || []).slice(0, 6).map((step) => (
-          <div key={step.id} className="rounded border border-[#E5EAF0] bg-white p-3">
+          <div key={step.id} className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] p-3">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <p className="text-sm text-[#6B7280]">
+                <p className="text-sm text-[var(--admin-text-muted)]">
                   {step.sequence}. {step.workflowFamily}
                 </p>
-                <p className="mt-1 font-medium text-[#1F2937]">{step.title}</p>
-                <p className="mt-2 text-sm text-[#4B5563]">{step.explanation}</p>
-                <p className="mt-2 text-xs text-[#6B7280]">Why now: {step.priorityReason}</p>
+                <p className="mt-1 font-medium text-[var(--admin-text)]">{step.title}</p>
+                <p className="mt-2 text-sm text-[var(--admin-text-soft)]">{step.explanation}</p>
+                <p className="mt-2 text-xs text-[var(--admin-text-muted)]">Why now: {step.priorityReason}</p>
               </div>
-              <span className="rounded border border-[#E5EAF0] bg-[#F9FBFD] px-3 py-1 text-xs font-medium text-[#4B5563]">
+              <span className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface-muted)] px-3 py-1 text-xs font-medium text-[var(--admin-text-soft)]">
                 {step.priorityLabel}
               </span>
             </div>
             <div className="mt-3 flex flex-wrap gap-3">
               {step.deepLinkTarget ? (
-                <Link href={step.deepLinkTarget} className="text-sm text-[#3B82F6] underline">
+                <Link href={step.deepLinkTarget} className="text-sm text-[var(--admin-link)] underline">
                   Open step
                 </Link>
               ) : null}
-              <Link href="/admin" className="text-sm text-[#3B82F6] underline">
+              <Link href="/admin" className="text-sm text-[var(--admin-link)] underline">
                 Open daily routine
               </Link>
             </div>
@@ -180,26 +180,26 @@ function renderInspectResult(result) {
     const step = result.data?.step;
     return (
       <div className="space-y-3">
-        <p className="text-sm text-[#4B5563]">{result.summary}</p>
+        <p className="text-sm text-[var(--admin-text-soft)]">{result.summary}</p>
         {step ? (
-          <div className="rounded border border-[#E5EAF0] bg-white p-3">
-            <p className="text-sm text-[#6B7280]">{step.workflowFamily}</p>
-            <p className="mt-1 font-medium text-[#1F2937]">{step.title}</p>
-            <p className="mt-2 text-sm text-[#4B5563]">{step.explanation}</p>
-            <p className="mt-2 text-xs text-[#6B7280]">Why now: {step.priorityReason}</p>
+          <div className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] p-3">
+            <p className="text-sm text-[var(--admin-text-muted)]">{step.workflowFamily}</p>
+            <p className="mt-1 font-medium text-[var(--admin-text)]">{step.title}</p>
+            <p className="mt-2 text-sm text-[var(--admin-text-soft)]">{step.explanation}</p>
+            <p className="mt-2 text-xs text-[var(--admin-text-muted)]">Why now: {step.priorityReason}</p>
             <div className="mt-3 flex flex-wrap gap-3">
               {step.deepLinkTarget ? (
-                <Link href={step.deepLinkTarget} className="text-sm text-[#3B82F6] underline">
+                <Link href={step.deepLinkTarget} className="text-sm text-[var(--admin-link)] underline">
                   Open step
                 </Link>
               ) : null}
-              <Link href="/admin" className="text-sm text-[#3B82F6] underline">
+              <Link href="/admin" className="text-sm text-[var(--admin-link)] underline">
                 Open daily routine
               </Link>
             </div>
           </div>
         ) : (
-          <p className="text-sm text-[#4B5563]">No matching routine step is active right now.</p>
+          <p className="text-sm text-[var(--admin-text-soft)]">No matching routine step is active right now.</p>
         )}
       </div>
     );
@@ -209,24 +209,24 @@ function renderInspectResult(result) {
     const schedules = result.data?.schedules || [];
     return (
       <div className="space-y-3">
-        <p className="text-sm text-[#4B5563]">{result.summary}</p>
+        <p className="text-sm text-[var(--admin-text-soft)]">{result.summary}</p>
         {schedules.slice(0, 6).map((schedule) => (
-            <div key={schedule.id} className="rounded border border-[#E5EAF0] bg-white p-3">
+            <div key={schedule.id} className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] p-3">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                  <p className="text-sm text-[#6B7280]">{schedule.workflowFamily}</p>
-                  <p className="mt-1 font-medium text-[#1F2937]">{schedule.title}</p>
-                  <p className="mt-2 text-sm text-[#4B5563]">{schedule.summary}</p>
-                  <p className="mt-1 text-xs text-[#6B7280]">Mode: {schedule.executionMode || "local_cli"}</p>
+                  <p className="text-sm text-[var(--admin-text-muted)]">{schedule.workflowFamily}</p>
+                  <p className="mt-1 font-medium text-[var(--admin-text)]">{schedule.title}</p>
+                  <p className="mt-2 text-sm text-[var(--admin-text-soft)]">{schedule.summary}</p>
+                  <p className="mt-1 text-xs text-[var(--admin-text-muted)]">Mode: {schedule.executionMode || "local_cli"}</p>
                 </div>
                 <JobStatusBadge status={schedule.status} />
               </div>
             <div className="mt-3 flex flex-wrap gap-3">
-              <Link href="/admin/schedules" className="text-sm text-[#3B82F6] underline">
+              <Link href="/admin/schedules" className="text-sm text-[var(--admin-link)] underline">
                 Open schedules
               </Link>
               {schedule.lastJobId ? (
-                <Link href={`/admin/jobs/${schedule.lastJobId}`} className="text-sm text-[#3B82F6] underline">
+                <Link href={`/admin/jobs/${schedule.lastJobId}`} className="text-sm text-[var(--admin-link)] underline">
                   Open last job
                 </Link>
               ) : null}
@@ -241,13 +241,13 @@ function renderInspectResult(result) {
     const schedule = result.data?.schedule;
     return (
       <div className="space-y-3">
-        <p className="text-sm text-[#4B5563]">{result.summary}</p>
-        <div className="rounded border border-[#E5EAF0] bg-white p-3">
-          <p className="text-sm text-[#6B7280]">{schedule?.workflowFamily}</p>
-          <p className="mt-1 font-medium text-[#1F2937]">{schedule?.title}</p>
-          <p className="mt-2 text-sm text-[#4B5563]">{schedule?.summary}</p>
+        <p className="text-sm text-[var(--admin-text-soft)]">{result.summary}</p>
+        <div className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] p-3">
+          <p className="text-sm text-[var(--admin-text-muted)]">{schedule?.workflowFamily}</p>
+          <p className="mt-1 font-medium text-[var(--admin-text)]">{schedule?.title}</p>
+          <p className="mt-2 text-sm text-[var(--admin-text-soft)]">{schedule?.summary}</p>
           <div className="mt-3 flex flex-wrap gap-3">
-            <Link href="/admin/schedules" className="text-sm text-[#3B82F6] underline">
+            <Link href="/admin/schedules" className="text-sm text-[var(--admin-link)] underline">
               Open schedules
             </Link>
           </div>
@@ -260,16 +260,16 @@ function renderInspectResult(result) {
     const detail = result.data?.detail;
     return (
       <div className="space-y-3">
-        <p className="text-sm text-[#4B5563]">{result.summary}</p>
-        <div className="rounded border border-[#E5EAF0] bg-white p-3">
-          <p className="text-sm text-[#6B7280]">{detail?.session?.workflowFamily}</p>
-          <p className="mt-1 font-medium text-[#1F2937]">{detail?.session?.title}</p>
-          <p className="mt-2 text-sm text-[#4B5563]">{detail?.session?.summary}</p>
+        <p className="text-sm text-[var(--admin-text-soft)]">{result.summary}</p>
+        <div className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] p-3">
+          <p className="text-sm text-[var(--admin-text-muted)]">{detail?.session?.workflowFamily}</p>
+          <p className="mt-1 font-medium text-[var(--admin-text)]">{detail?.session?.title}</p>
+          <p className="mt-2 text-sm text-[var(--admin-text-soft)]">{detail?.session?.summary}</p>
           <div className="mt-3 flex flex-wrap gap-3">
-            <Link href={`/admin/workflows/${encodeURIComponent(detail?.session?.id || "")}`} className="text-sm text-[#3B82F6] underline">
+            <Link href={`/admin/workflows/${encodeURIComponent(detail?.session?.id || "")}`} className="text-sm text-[var(--admin-link)] underline">
               Open session inspector
             </Link>
-            <Link href="/admin/workflows" className="text-sm text-[#3B82F6] underline">
+            <Link href="/admin/workflows" className="text-sm text-[var(--admin-link)] underline">
               Open workflows
             </Link>
           </div>
@@ -282,41 +282,41 @@ function renderInspectResult(result) {
     const report = result.data?.report;
     return (
       <div className="space-y-3">
-        <p className="text-sm text-[#4B5563]">{result.summary}</p>
-        <div className="rounded border border-[#E5EAF0] bg-white p-3">
+        <p className="text-sm text-[var(--admin-text-soft)]">{result.summary}</p>
+        <div className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] p-3">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <p className="text-sm text-[#6B7280]">{report?.scope}</p>
-              <p className="mt-1 font-medium text-[#1F2937]">{report?.title}</p>
-              <p className="mt-2 text-xs text-[#6B7280]">Checked at {formatAdminDateTime(report?.checkedAt)}</p>
+              <p className="text-sm text-[var(--admin-text-muted)]">{report?.scope}</p>
+              <p className="mt-1 font-medium text-[var(--admin-text)]">{report?.title}</p>
+              <p className="mt-2 text-xs text-[var(--admin-text-muted)]">Checked at {formatAdminDateTime(report?.checkedAt)}</p>
             </div>
-            <span className="rounded border border-[#E5EAF0] bg-[#F9FBFD] px-3 py-1 text-xs font-medium text-[#4B5563]">
+            <span className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface-muted)] px-3 py-1 text-xs font-medium text-[var(--admin-text-soft)]">
               {report?.status || "unknown"}
             </span>
           </div>
           <div className="mt-4 space-y-3">
             {(report?.checks || []).map((check) => (
-              <div key={check.id} className="rounded border border-[#E5EAF0] bg-[#F9FBFD] p-3">
+              <div key={check.id} className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface-muted)] p-3">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
-                    <p className="text-sm font-medium text-[#1F2937]">{check.name}</p>
-                    <p className="mt-2 text-sm text-[#4B5563]">{check.summary}</p>
+                    <p className="text-sm font-medium text-[var(--admin-text)]">{check.name}</p>
+                    <p className="mt-2 text-sm text-[var(--admin-text-soft)]">{check.summary}</p>
                   </div>
-                  <span className="rounded border border-[#E5EAF0] bg-white px-3 py-1 text-xs font-medium text-[#4B5563]">
+                  <span className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] px-3 py-1 text-xs font-medium text-[var(--admin-text-soft)]">
                     {check.status}
                   </span>
                 </div>
                 {check.details ? (
-                  <p className="mt-2 text-xs text-[#6B7280]">{check.details}</p>
+                  <p className="mt-2 text-xs text-[var(--admin-text-muted)]">{check.details}</p>
                 ) : null}
                 {check.recommendedNextStep ? (
-                  <p className="mt-2 text-xs text-[#6B7280]">Next step: {check.recommendedNextStep}</p>
+                  <p className="mt-2 text-xs text-[var(--admin-text-muted)]">Next step: {check.recommendedNextStep}</p>
                 ) : null}
               </div>
             ))}
           </div>
           <div className="mt-4 flex flex-wrap gap-3">
-            <Link href="/admin/tools" className="text-sm text-[#3B82F6] underline">
+            <Link href="/admin/tools" className="text-sm text-[var(--admin-link)] underline">
               Open verification tools
             </Link>
           </div>
@@ -325,7 +325,7 @@ function renderInspectResult(result) {
     );
   }
 
-  return <p className="text-sm text-[#4B5563]">No inspection output.</p>;
+  return <p className="text-sm text-[var(--admin-text-soft)]">No inspection output.</p>;
 }
 
 export default function OperatorCommandConsole() {
@@ -607,9 +607,9 @@ export default function OperatorCommandConsole() {
   return (
     <main className="mx-auto max-w-[1700px] space-y-4 px-4 py-4">
       <section className="space-y-2">
-        <p className="font-mono text-[11px] uppercase tracking-wide text-[#6B7280]">Command Interface</p>
-        <h2 className="text-lg font-semibold text-[#1F2937]">Deterministic operator command console</h2>
-        <p className="max-w-5xl text-[12px] text-[#4B5563]">
+        <p className="font-mono text-[11px] uppercase tracking-wide text-[var(--admin-text-muted)]">Command Interface</p>
+        <h2 className="text-lg font-semibold text-[var(--admin-text)]">Deterministic operator command console</h2>
+        <p className="max-w-5xl text-[12px] text-[var(--admin-text-soft)]">
           Commands are structured and deterministic. They do not use AI parsing, do not build raw
           CLI strings in the browser, and still run through the registry, broker, runner, jobs,
           sessions, and canonical workflow artifacts.
@@ -617,15 +617,15 @@ export default function OperatorCommandConsole() {
       </section>
 
       <section className="grid gap-4 xl:grid-cols-[1.05fr_0.95fr]">
-        <div className="rounded border border-[#E5EAF0] bg-[#EEF2F6] p-4 shadow-sm">
+        <div className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface-muted)] p-4 shadow-sm">
           <form onSubmit={handleSubmit} className="space-y-4">
             <label className="block space-y-2">
-              <span className="text-[12px] font-medium text-[#1F2937]">Selected session context</span>
+              <span className="text-[12px] font-medium text-[var(--admin-text)]">Selected session context</span>
               <select
                 value={selectedSessionId}
                 onChange={(event) => setSelectedSessionId(event.target.value)}
                 disabled={commandLocked}
-                className="w-full rounded border border-[#E5EAF0] bg-white px-2 py-1.5 text-[12px] text-[#1F2937] outline-none focus:border-[#3B82F6] disabled:cursor-not-allowed disabled:opacity-60"
+                className="w-full rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] px-2 py-1.5 text-[12px] text-[var(--admin-text)] outline-none focus:border-[var(--admin-link)] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <option value="">No session context</option>
                 {sessions.map((session) => (
@@ -637,26 +637,26 @@ export default function OperatorCommandConsole() {
             </label>
 
             <label className="block space-y-2">
-              <span className="text-[12px] font-medium text-[#1F2937]">Command</span>
+              <span className="text-[12px] font-medium text-[var(--admin-text)]">Command</span>
               <input
                 type="text"
                 value={command}
                 onChange={(event) => setCommand(event.target.value)}
                 disabled={commandLocked}
-                className="w-full rounded border border-[#E5EAF0] bg-white px-2 py-1.5 font-mono text-[12px] text-[#111827] outline-none placeholder:text-[#6B7280] focus:border-[#3B82F6] disabled:cursor-not-allowed disabled:opacity-60"
+                className="w-full rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] px-2 py-1.5 font-mono text-[12px] text-[var(--admin-text)] outline-none placeholder:text-[var(--admin-text-muted)] focus:border-[var(--admin-link)] disabled:cursor-not-allowed disabled:opacity-60"
                 placeholder="run current-admin"
                 spellCheck={false}
               />
             </label>
 
             {selectedSession ? (
-              <div className="rounded border border-[#E5EAF0] bg-white p-3 text-[12px] text-[#4B5563]">
+              <div className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] p-3 text-[12px] text-[var(--admin-text-soft)]">
                 Session context: <span className="font-medium">{selectedSession.title}</span>
               </div>
             ) : null}
 
             {error ? (
-              <div className="rounded border border-[#FECACA] bg-[#FEF2F2] p-3 text-[12px] text-[#EF4444]">
+              <div className="rounded border border-[var(--admin-danger-line)] bg-[var(--admin-danger-surface)] p-3 text-[12px] text-[var(--danger)]">
                 {error}
               </div>
             ) : null}
@@ -665,14 +665,14 @@ export default function OperatorCommandConsole() {
               <button
                 type="submit"
                 disabled={commandLocked}
-                className="rounded border border-[#3B82F6] bg-[#3B82F6] px-3 py-1.5 text-[12px] font-medium text-white disabled:cursor-not-allowed disabled:opacity-60"
+                className="rounded border border-[var(--admin-link)] bg-[var(--admin-link)] px-3 py-1.5 text-[12px] font-medium text-[var(--background)] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {commandLocked ? "Execution locked…" : "Run command"}
               </button>
               <button
                 type="button"
                 onClick={() => setCommand("")}
-                className="rounded border border-[#E5EAF0] bg-white px-3 py-1.5 text-[12px] text-[#1F2937]"
+                className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] px-3 py-1.5 text-[12px] text-[var(--admin-text)]"
               >
                 Clear
               </button>
@@ -680,15 +680,15 @@ export default function OperatorCommandConsole() {
           </form>
         </div>
 
-        <div className="rounded border border-[#E5EAF0] bg-[#EEF2F6] p-4 shadow-sm">
-          <h3 className="text-base font-semibold text-[#1F2937]">Supported commands</h3>
-          <div className="mt-3 overflow-x-auto rounded border border-[#E5EAF0] bg-white">
+        <div className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface-muted)] p-4 shadow-sm">
+          <h3 className="text-base font-semibold text-[var(--admin-text)]">Supported commands</h3>
+          <div className="mt-3 overflow-x-auto rounded border border-[var(--admin-line)] bg-[var(--admin-surface)]">
             <table className="min-w-full text-[12px]">
               <tbody>
                 {supportedCommands.map((item) => (
-                  <tr key={item.syntax} className="odd:bg-white even:bg-[#F9FBFD] hover:bg-[#F1F5F9]">
-                    <td className="border-b border-[#E5EAF0] px-3 py-2 font-mono text-[11px] text-[#111827]">{item.syntax}</td>
-                    <td className="border-b border-[#E5EAF0] px-3 py-2 text-[11px] text-[#4B5563]">{item.description}</td>
+                  <tr key={item.syntax} className="odd:bg-[var(--admin-surface)] even:bg-[var(--admin-surface-muted)] hover:bg-[var(--admin-surface-soft)]">
+                    <td className="border-b border-[var(--admin-line)] px-3 py-2 font-mono text-[11px] text-[var(--admin-text)]">{item.syntax}</td>
+                    <td className="border-b border-[var(--admin-line)] px-3 py-2 text-[11px] text-[var(--admin-text-soft)]">{item.description}</td>
                   </tr>
                 ))}
               </tbody>
@@ -698,15 +698,15 @@ export default function OperatorCommandConsole() {
       </section>
 
       {activeExecution?.job ? (
-        <section className="rounded border border-[#E5EAF0] bg-[#EEF2F6] p-4 shadow-sm">
+        <section className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface-muted)] p-4 shadow-sm">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <p className="font-mono text-[11px] uppercase tracking-wide text-[#6B7280]">Active Execution</p>
-              <h3 className="mt-1 text-base font-semibold text-[#1F2937]">{activeExecution.actionTitle}</h3>
-              <p className="mt-1 text-[11px] text-[#4B5563]">
+              <p className="font-mono text-[11px] uppercase tracking-wide text-[var(--admin-text-muted)]">Active Execution</p>
+              <h3 className="mt-1 text-base font-semibold text-[var(--admin-text)]">{activeExecution.actionTitle}</h3>
+              <p className="mt-1 text-[11px] text-[var(--admin-text-soft)]">
                 {activeLifecycle?.phase === "running" || activeLifecycle?.phase === "queued" ? (
                   <span className="inline-flex items-center gap-2">
-                    <span className="h-2 w-2 animate-spin rounded-full border border-[#3B82F6] border-t-transparent" />
+                    <span className="h-2 w-2 animate-spin rounded-full border border-[var(--admin-link)] border-t-transparent" />
                     {executionPhaseLabel(activeLifecycle.phase)}
                   </span>
                 ) : (
@@ -718,38 +718,38 @@ export default function OperatorCommandConsole() {
           </div>
 
           <div className="mt-3 grid gap-2 md:grid-cols-4">
-            <div className="rounded border border-[#E5EAF0] bg-white px-2 py-1.5">
-              <p className="text-[10px] uppercase tracking-wide text-[#6B7280]">Execution Id</p>
-              <p className="mt-1 font-mono text-[11px] text-[#111827]">{activeExecution.job.id}</p>
+            <div className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] px-2 py-1.5">
+              <p className="text-[10px] uppercase tracking-wide text-[var(--admin-text-muted)]">Execution Id</p>
+              <p className="mt-1 font-mono text-[11px] text-[var(--admin-text)]">{activeExecution.job.id}</p>
             </div>
-            <div className="rounded border border-[#E5EAF0] bg-white px-2 py-1.5">
-              <p className="text-[10px] uppercase tracking-wide text-[#6B7280]">Started</p>
-              <p className="mt-1 text-[11px] text-[#1F2937]">
+            <div className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] px-2 py-1.5">
+              <p className="text-[10px] uppercase tracking-wide text-[var(--admin-text-muted)]">Started</p>
+              <p className="mt-1 text-[11px] text-[var(--admin-text)]">
                 {formatAdminDateTime(activeExecution.job.timestamps?.startedAt || activeExecution.job.timestamps?.createdAt)}
               </p>
             </div>
-            <div className="rounded border border-[#E5EAF0] bg-white px-2 py-1.5">
-              <p className="text-[10px] uppercase tracking-wide text-[#6B7280]">Current State</p>
-              <p className="mt-1 text-[11px] text-[#1F2937]">{activeLifecycle?.workspaceState || activeExecution.job.status}</p>
+            <div className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] px-2 py-1.5">
+              <p className="text-[10px] uppercase tracking-wide text-[var(--admin-text-muted)]">Current State</p>
+              <p className="mt-1 text-[11px] text-[var(--admin-text)]">{activeLifecycle?.workspaceState || activeExecution.job.status}</p>
             </div>
-            <div className="rounded border border-[#E5EAF0] bg-white px-2 py-1.5">
-              <p className="text-[10px] uppercase tracking-wide text-[#6B7280]">Next Step</p>
-              <p className="mt-1 text-[11px] text-[#1F2937]">{activeLifecycle?.nextActionTitle || "Continue polling"}</p>
+            <div className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] px-2 py-1.5">
+              <p className="text-[10px] uppercase tracking-wide text-[var(--admin-text-muted)]">Next Step</p>
+              <p className="mt-1 text-[11px] text-[var(--admin-text)]">{activeLifecycle?.nextActionTitle || "Continue polling"}</p>
             </div>
           </div>
 
-          <div className="mt-3 rounded border border-[#E5EAF0] bg-[#F3F4F6] px-2 py-1.5">
-            <p className="text-[10px] uppercase tracking-wide text-[#6B7280]">Current Command</p>
-            <p className="mt-1 break-all font-mono text-[11px] text-[#111827]">{activeLifecycle?.currentCommand}</p>
+          <div className="mt-3 rounded border border-[var(--admin-line)] bg-[var(--admin-surface-soft)] px-2 py-1.5">
+            <p className="text-[10px] uppercase tracking-wide text-[var(--admin-text-muted)]">Current Command</p>
+            <p className="mt-1 break-all font-mono text-[11px] text-[var(--admin-text)]">{activeLifecycle?.currentCommand}</p>
           </div>
 
-          <div className="mt-3 rounded border border-[#E5EAF0] bg-white px-2 py-1.5">
-            <p className="text-[10px] uppercase tracking-wide text-[#6B7280]">Most Recent Update</p>
-            <p className="mt-1 text-[11px] text-[#4B5563]">{activeLifecycle?.latestLine}</p>
+          <div className="mt-3 rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] px-2 py-1.5">
+            <p className="text-[10px] uppercase tracking-wide text-[var(--admin-text-muted)]">Most Recent Update</p>
+            <p className="mt-1 text-[11px] text-[var(--admin-text-soft)]">{activeLifecycle?.latestLine}</p>
           </div>
 
           {activeLifecycle?.isStopPoint ? (
-            <div className="mt-3 rounded border border-[#FDE68A] bg-[#FFFBEB] px-2 py-2 text-[11px] text-[#B45309]">
+            <div className="mt-3 rounded border border-[var(--admin-warning-line)] bg-[var(--admin-warning-surface)] px-2 py-2 text-[11px] text-[var(--warning)]">
               <div className="font-medium">{activeLifecycle.stopMarker}</div>
               <div className="mt-1">
                 Next required operator action: {activeLifecycle.nextActionTitle || "Open the workflow checkpoint."}
@@ -763,15 +763,15 @@ export default function OperatorCommandConsole() {
 
           <div className="mt-3 flex flex-wrap gap-3">
             {activeLifecycle?.isStopPoint && activeLifecycle.nextHref ? (
-              <Link href={activeLifecycle.nextHref} className="rounded border border-[#FDE68A] bg-[#FFFBEB] px-3 py-1.5 text-[11px] font-medium text-[#B45309]">
+              <Link href={activeLifecycle.nextHref} className="rounded border border-[var(--admin-warning-line)] bg-[var(--admin-warning-surface)] px-3 py-1.5 text-[11px] font-medium text-[var(--warning)]">
                 {activeLifecycle.nextLabel}
               </Link>
             ) : null}
-            <Link href={activeLifecycle?.jobHref || "/admin/jobs"} className="rounded border border-[#E5EAF0] bg-white px-3 py-1.5 text-[11px] text-[#1F2937]">
+            <Link href={activeLifecycle?.jobHref || "/admin/jobs"} className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] px-3 py-1.5 text-[11px] text-[var(--admin-text)]">
               Open job detail
             </Link>
             {activeLifecycle?.sessionHref ? (
-              <Link href={activeLifecycle.sessionHref} className="rounded border border-[#E5EAF0] bg-white px-3 py-1.5 text-[11px] text-[#1F2937]">
+              <Link href={activeLifecycle.sessionHref} className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] px-3 py-1.5 text-[11px] text-[var(--admin-text)]">
                 Open session
               </Link>
             ) : null}
@@ -780,42 +780,42 @@ export default function OperatorCommandConsole() {
       ) : null}
 
       {recentExecutions.length ? (
-        <section className="rounded border border-[#E5EAF0] bg-[#EEF2F6] p-4 shadow-sm">
+        <section className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface-muted)] p-4 shadow-sm">
           <div className="flex items-center justify-between gap-3">
             <div>
-              <p className="font-mono text-[11px] uppercase tracking-wide text-[#6B7280]">Recent Workflow Actions</p>
-              <h3 className="mt-1 text-base font-semibold text-[#1F2937]">Completed or failed workflow executions</h3>
+              <p className="font-mono text-[11px] uppercase tracking-wide text-[var(--admin-text-muted)]">Recent Workflow Actions</p>
+              <h3 className="mt-1 text-base font-semibold text-[var(--admin-text)]">Completed or failed workflow executions</h3>
             </div>
-            <Link href="/admin/jobs" className="text-[11px] text-[#3B82F6] underline underline-offset-2">
+            <Link href="/admin/jobs" className="text-[11px] text-[var(--admin-link)] underline underline-offset-2">
               View jobs
             </Link>
           </div>
-          <div className="mt-3 overflow-x-auto rounded border border-[#E5EAF0] bg-white">
+          <div className="mt-3 overflow-x-auto rounded border border-[var(--admin-line)] bg-[var(--admin-surface)]">
             <table className="min-w-[980px] w-full text-[11px]">
-              <thead className="bg-[#F9FBFD] text-left uppercase tracking-wide text-[#6B7280]">
+              <thead className="bg-[var(--admin-surface-muted)] text-left uppercase tracking-wide text-[var(--admin-text-muted)]">
                 <tr>
-                  <th className="border-b border-[#E5EAF0] px-2 py-1">Status</th>
-                  <th className="border-b border-[#E5EAF0] px-2 py-1">Workflow Action</th>
-                  <th className="border-b border-[#E5EAF0] px-2 py-1">Execution Id</th>
-                  <th className="border-b border-[#E5EAF0] px-2 py-1">Command</th>
-                  <th className="border-b border-[#E5EAF0] px-2 py-1">Finished</th>
-                  <th className="border-b border-[#E5EAF0] px-2 py-1">Action</th>
+                  <th className="border-b border-[var(--admin-line)] px-2 py-1">Status</th>
+                  <th className="border-b border-[var(--admin-line)] px-2 py-1">Workflow Action</th>
+                  <th className="border-b border-[var(--admin-line)] px-2 py-1">Execution Id</th>
+                  <th className="border-b border-[var(--admin-line)] px-2 py-1">Command</th>
+                  <th className="border-b border-[var(--admin-line)] px-2 py-1">Finished</th>
+                  <th className="border-b border-[var(--admin-line)] px-2 py-1">Action</th>
                 </tr>
               </thead>
               <tbody>
                 {recentExecutions.map((entry) => (
-                  <tr key={entry.job.id} className="odd:bg-white even:bg-[#F9FBFD] hover:bg-[#F1F5F9]">
-                    <td className="border-b border-[#E5EAF0] px-2 py-1">
+                  <tr key={entry.job.id} className="odd:bg-[var(--admin-surface)] even:bg-[var(--admin-surface-muted)] hover:bg-[var(--admin-surface-soft)]">
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1">
                       <JobStatusBadge status={entry.job.status} />
                     </td>
-                    <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#1F2937]">{entry.actionTitle}</td>
-                    <td className="border-b border-[#E5EAF0] px-2 py-1 font-mono text-[#111827]">{entry.job.id}</td>
-                    <td className="border-b border-[#E5EAF0] px-2 py-1 font-mono text-[#111827]">{entry.commandText || "—"}</td>
-                    <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1 text-[var(--admin-text)]">{entry.actionTitle}</td>
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1 font-mono text-[var(--admin-text)]">{entry.job.id}</td>
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1 font-mono text-[var(--admin-text)]">{entry.commandText || "—"}</td>
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1 text-[var(--admin-text-soft)]">
                       {formatAdminDateTime(entry.job.timestamps?.finishedAt || entry.job.timestamps?.updatedAt)}
                     </td>
-                    <td className="border-b border-[#E5EAF0] px-2 py-1">
-                      <Link href={`/admin/jobs/${entry.job.id}`} className="text-[#3B82F6] underline underline-offset-2">
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1">
+                      <Link href={`/admin/jobs/${entry.job.id}`} className="text-[var(--admin-link)] underline underline-offset-2">
                         Open
                       </Link>
                     </td>
@@ -828,30 +828,30 @@ export default function OperatorCommandConsole() {
       ) : null}
 
       <section className="grid gap-4 xl:grid-cols-[0.9fr_1.1fr]">
-        <div className="rounded border border-[#E5EAF0] bg-[#EEF2F6] p-4 shadow-sm">
-          <h3 className="text-base font-semibold text-[#1F2937]">Command history</h3>
+        <div className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface-muted)] p-4 shadow-sm">
+          <h3 className="text-base font-semibold text-[var(--admin-text)]">Command history</h3>
           <div className="mt-3 space-y-2">
             {history.length ? (
               history.map((entry) => (
-                <div key={entry.id} className="rounded border border-[#E5EAF0] bg-white p-3">
-                  <p className="font-mono text-[11px] text-[#111827]">{entry.command}</p>
-                  <p className="mt-1 text-[11px] text-[#6B7280]">
+                <div key={entry.id} className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] p-3">
+                  <p className="font-mono text-[11px] text-[var(--admin-text)]">{entry.command}</p>
+                  <p className="mt-1 text-[11px] text-[var(--admin-text-muted)]">
                     {entry.selectedSessionId ? `Session: ${entry.selectedSessionId}` : "No session context"}
                   </p>
                   {entry.resultStatus ? (
-                    <p className="mt-1 text-[11px] text-[#6B7280]">Result: {entry.resultStatus}</p>
+                    <p className="mt-1 text-[11px] text-[var(--admin-text-muted)]">Result: {entry.resultStatus}</p>
                   ) : null}
                   {entry.executionMode ? (
-                    <p className="mt-1 text-[11px] text-[#6B7280]">Mode: {entry.executionMode}</p>
+                    <p className="mt-1 text-[11px] text-[var(--admin-text-muted)]">Mode: {entry.executionMode}</p>
                   ) : null}
                   {entry.summary ? (
-                    <p className="mt-1 text-[12px] text-[#4B5563]">{entry.summary}</p>
+                    <p className="mt-1 text-[12px] text-[var(--admin-text-soft)]">{entry.summary}</p>
                   ) : null}
                   <div className="mt-3 flex flex-wrap gap-3">
                     <button
                       type="button"
                       onClick={() => rerunHistoryEntry(entry)}
-                      className="rounded border border-[#E5EAF0] bg-white px-2.5 py-1 text-[12px] text-[#1F2937]"
+                      className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] px-2.5 py-1 text-[12px] text-[var(--admin-text)]"
                     >
                       Re-run
                     </button>
@@ -861,19 +861,19 @@ export default function OperatorCommandConsole() {
                         setCommand(entry.command);
                         setSelectedSessionId(entry.selectedSessionId || "");
                       }}
-                      className="rounded border border-[#E5EAF0] bg-white px-2.5 py-1 text-[12px] text-[#1F2937]"
+                      className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] px-2.5 py-1 text-[12px] text-[var(--admin-text)]"
                     >
                       Load
                     </button>
                     {entry.relatedJobId ? (
-                      <Link href={`/admin/jobs/${entry.relatedJobId}`} className="rounded border border-[#E5EAF0] bg-white px-2.5 py-1 text-[12px] text-[#1F2937]">
+                      <Link href={`/admin/jobs/${entry.relatedJobId}`} className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] px-2.5 py-1 text-[12px] text-[var(--admin-text)]">
                         Open job
                       </Link>
                     ) : null}
                     {entry.relatedSessionId ? (
                       <Link
                         href={`/admin/workflows/${encodeURIComponent(entry.relatedSessionId)}`}
-                        className="rounded border border-[#E5EAF0] bg-white px-2.5 py-1 text-[12px] text-[#1F2937]"
+                        className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] px-2.5 py-1 text-[12px] text-[var(--admin-text)]"
                       >
                         Open session
                       </Link>
@@ -882,30 +882,30 @@ export default function OperatorCommandConsole() {
                 </div>
               ))
             ) : (
-              <p className="text-[12px] text-[#6B7280]">No command history yet.</p>
+              <p className="text-[12px] text-[var(--admin-text-muted)]">No command history yet.</p>
             )}
           </div>
         </div>
 
-        <div className="rounded border border-[#E5EAF0] bg-[#EEF2F6] p-4 shadow-sm">
-          <h3 className="text-base font-semibold text-[#1F2937]">Result / Output</h3>
+        <div className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface-muted)] p-4 shadow-sm">
+          <h3 className="text-base font-semibold text-[var(--admin-text)]">Result / Output</h3>
           <div className="mt-4">
             {!result ? (
-              <p className="text-[12px] text-[#6B7280]">
+              <p className="text-[12px] text-[var(--admin-text-muted)]">
                 Run a command to inspect sessions, review queue state, or enqueue a broker-backed action.
               </p>
             ) : result.mode === "async" ? (
-              <div className="space-y-3 rounded border border-[#E5EAF0] bg-white p-3 text-[12px] text-[#4B5563]">
+              <div className="space-y-3 rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] p-3 text-[12px] text-[var(--admin-text-soft)]">
                 <p>
                   Async workflow execution is tracked above while it is running or paused at a stop point.
                 </p>
                 {result.result?.job?.output?.workspaceSummary?.state ? (
-                  <p className="text-[#6B7280]">
+                  <p className="text-[var(--admin-text-muted)]">
                     Latest resulting state: {result.result.job.output.workspaceSummary.state}
                   </p>
                 ) : null}
                 {actionResultSessionHref ? (
-                  <Link href={actionResultSessionHref} className="text-[#3B82F6] underline underline-offset-2">
+                  <Link href={actionResultSessionHref} className="text-[var(--admin-link)] underline underline-offset-2">
                     Open session inspector
                   </Link>
                 ) : null}
@@ -919,14 +919,14 @@ export default function OperatorCommandConsole() {
 
       {confirmationState ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-950/50 px-4">
-          <div className="w-full max-w-lg rounded border border-[#E5EAF0] bg-white p-6 shadow-xl">
+          <div className="w-full max-w-lg rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] p-6 shadow-xl">
             <div className="space-y-2">
-              <p className="text-sm text-[#6B7280]">Mutating command confirmation</p>
-              <h3 className="text-xl font-semibold text-[#1F2937]">{confirmationState.confirmation?.title}</h3>
-              <p className="text-sm text-[#4B5563]">{confirmationState.confirmation?.description}</p>
+              <p className="text-sm text-[var(--admin-text-muted)]">Mutating command confirmation</p>
+              <h3 className="text-xl font-semibold text-[var(--admin-text)]">{confirmationState.confirmation?.title}</h3>
+              <p className="text-sm text-[var(--admin-text-soft)]">{confirmationState.confirmation?.description}</p>
             </div>
 
-            <label className="mt-4 flex items-start gap-3 rounded border border-[#E5EAF0] bg-[#F9FBFD] p-3 text-sm text-[#1F2937]">
+            <label className="mt-4 flex items-start gap-3 rounded border border-[var(--admin-line)] bg-[var(--admin-surface-muted)] p-3 text-sm text-[var(--admin-text)]">
               <input
                 type="checkbox"
                 checked={confirmationChecked}
@@ -937,12 +937,12 @@ export default function OperatorCommandConsole() {
 
             {confirmationState.confirmation?.requireTypedYes ? (
               <label className="mt-4 block space-y-2">
-                <span className="text-sm font-medium text-[#1F2937]">Type YES to continue</span>
+                <span className="text-sm font-medium text-[var(--admin-text)]">Type YES to continue</span>
                 <input
                   type="text"
                   value={typedYes}
                   onChange={(event) => setTypedYes(event.target.value)}
-                  className="w-full rounded border border-[#E5EAF0] bg-white px-3 py-2 text-sm text-[#1F2937] outline-none placeholder:text-[#6B7280] focus:border-[#3B82F6]"
+                  className="w-full rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] px-3 py-2 text-sm text-[var(--admin-text)] outline-none placeholder:text-[var(--admin-text-muted)] focus:border-[var(--admin-link)]"
                   placeholder="YES"
                 />
               </label>
@@ -956,7 +956,7 @@ export default function OperatorCommandConsole() {
                   setConfirmationChecked(false);
                   setTypedYes("");
                 }}
-                className="rounded border border-[#E5EAF0] bg-white px-4 py-2 text-sm text-[#1F2937]"
+                className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] px-4 py-2 text-sm text-[var(--admin-text)]"
               >
                 Cancel
               </button>
@@ -964,7 +964,7 @@ export default function OperatorCommandConsole() {
                 type="button"
                 onClick={handleConfirmation}
                 disabled={!confirmationChecked || (confirmationState.confirmation?.requireTypedYes && normalizeString(typedYes) !== "YES") || isPending}
-                className="rounded border border-[#FECACA] bg-[#FEF2F2] px-4 py-2 text-sm font-medium text-[#EF4444] disabled:cursor-not-allowed disabled:opacity-60"
+                className="rounded border border-[var(--admin-danger-line)] bg-[var(--admin-danger-surface)] px-4 py-2 text-sm font-medium text-[var(--danger)] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isPending ? "Running…" : "Confirm command"}
               </button>

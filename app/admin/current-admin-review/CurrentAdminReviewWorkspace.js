@@ -107,7 +107,7 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
 
   if (!batch) {
     return (
-      <section className="rounded border border-zinc-300 bg-white p-4 shadow-sm">
+      <section className="rounded border border-zinc-300 bg-[var(--admin-surface)] p-4 shadow-sm">
         <p>No current-admin review artifact is available yet.</p>
       </section>
     );
@@ -140,18 +140,18 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
       ) : null}
 
       <section className="grid gap-3 lg:grid-cols-5">
-        <div className="rounded border border-zinc-300 bg-white p-3 shadow-sm">
+        <div className="rounded border border-zinc-300 bg-[var(--admin-surface)] p-3 shadow-sm">
           <p className="text-[11px] text-gray-600">Batch</p>
           <p className="mt-1 text-base font-semibold">{batch.batch_name}</p>
           <p className="mt-1 text-[11px] text-gray-600">Stage: {batch.stage}</p>
         </div>
-        <div className="rounded border border-zinc-300 bg-white p-3 shadow-sm">
+        <div className="rounded border border-zinc-300 bg-[var(--admin-surface)] p-3 shadow-sm">
           <p className="text-[11px] text-gray-600">Model / mode</p>
           <p className="mt-1 text-base font-semibold">
             {batch.model || "unknown"} / {batch.review_mode || "standard"}
           </p>
         </div>
-        <div className="rounded border border-zinc-300 bg-white p-3 shadow-sm">
+        <div className="rounded border border-zinc-300 bg-[var(--admin-surface)] p-3 shadow-sm">
           <p className="text-[11px] text-gray-600">Review items</p>
           <p className="mt-1 text-base font-semibold">{workspace.counts.total_items}</p>
           <p className="mt-1 text-[11px] text-gray-600">
@@ -159,7 +159,7 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
             {workspace.counts.pending_review} • Held back: {workspace.counts.held_for_followup}
           </p>
         </div>
-        <div className="rounded border border-zinc-300 bg-white p-3 shadow-sm">
+        <div className="rounded border border-zinc-300 bg-[var(--admin-surface)] p-3 shadow-sm">
           <p className="text-[11px] text-gray-600">Queue import readiness</p>
           <p className="mt-1 text-base font-semibold">
             {importReadiness.readiness_label || "Review In Progress"}
@@ -170,7 +170,7 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
             {importReadiness.queue_pending_count || 0}
           </p>
         </div>
-        <div className="rounded border border-zinc-300 bg-white p-3 shadow-sm">
+        <div className="rounded border border-zinc-300 bg-[var(--admin-surface)] p-3 shadow-sm">
           <p className="text-[11px] text-gray-600">Next recommended action</p>
           <p className="mt-1 font-semibold">{workspace.next_recommended_action.next_step_label}</p>
         </div>
@@ -188,7 +188,7 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
                 {queuePromotionState.operator_hint}
               </p>
             </div>
-            <span className="rounded-full border border-amber-500 bg-white px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-amber-800">
+            <span className="rounded-full border border-amber-500 bg-[var(--admin-surface)] px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-amber-800">
               Impact Pending
             </span>
           </div>
@@ -204,7 +204,7 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
       ) : null}
 
       {batchState ? (
-        <section className="rounded border border-zinc-300 bg-white p-4 shadow-sm">
+        <section className="rounded border border-zinc-300 bg-[var(--admin-surface)] p-4 shadow-sm">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <p className="text-[11px] uppercase tracking-wide text-gray-600">OpenAI Batch readiness</p>
@@ -274,7 +274,7 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
         </section>
       ) : null}
 
-      <section className="rounded border border-zinc-300 bg-white p-4 shadow-sm">
+      <section className="rounded border border-zinc-300 bg-[var(--admin-surface)] p-4 shadow-sm">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <p className="text-[11px] uppercase tracking-wide text-gray-600">Evidence pack</p>
@@ -329,7 +329,7 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
         </div>
       </section>
 
-      <section className="rounded border border-zinc-300 bg-white p-4 shadow-sm">
+      <section className="rounded border border-zinc-300 bg-[var(--admin-surface)] p-4 shadow-sm">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <p className="text-[11px] uppercase tracking-wide text-gray-600">Review quality comparison</p>
@@ -384,7 +384,7 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
         </div>
       </section>
 
-      <section className="rounded border border-zinc-300 bg-white p-4 shadow-sm">
+      <section className="rounded border border-zinc-300 bg-[var(--admin-surface)] p-4 shadow-sm">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <p className="text-[11px] uppercase tracking-wide text-gray-600">Paired evaluation</p>
@@ -422,7 +422,7 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
         </div>
       </section>
 
-      <section className="rounded border border-zinc-300 bg-white p-4 shadow-sm">
+      <section className="rounded border border-zinc-300 bg-[var(--admin-surface)] p-4 shadow-sm">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <p className="text-[11px] uppercase tracking-wide text-gray-600">Manual-review focus</p>
@@ -442,7 +442,7 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
               </p>
             ) : null}
           </div>
-          <a href="#review-items" className="rounded border px-3 py-1.5 text-[12px] font-medium text-[#1F2937]">
+          <a href="#review-items" className="rounded border px-3 py-1.5 text-[12px] font-medium text-[var(--admin-text)]">
             Jump to review table
           </a>
         </div>
@@ -470,7 +470,7 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
               </thead>
               <tbody>
                 {manualReviewItems.slice(0, 8).map((item) => (
-                  <tr key={item.item_id} className="align-top odd:bg-white even:bg-zinc-50/50">
+                  <tr key={item.item_id} className="align-top odd:bg-[var(--admin-surface)] even:bg-zinc-50/50">
                     <td className="border-b border-zinc-200 px-3 py-2">
                       <div className="font-mono text-[11px] text-zinc-500">{item.item_id}</div>
                       <div className="font-medium">{item.title || item.entity_id}</div>
@@ -510,7 +510,7 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
         ) : null}
       </section>
 
-      <section className="rounded border border-zinc-300 bg-white p-4 shadow-sm">
+      <section className="rounded border border-zinc-300 bg-[var(--admin-surface)] p-4 shadow-sm">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <p className="text-[11px] uppercase tracking-wide text-gray-600">Review calibration</p>
@@ -573,7 +573,7 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
         ) : null}
       </section>
 
-      <section className="rounded border border-zinc-300 bg-white p-4 shadow-sm">
+      <section className="rounded border border-zinc-300 bg-[var(--admin-surface)] p-4 shadow-sm">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <p className="text-[11px] uppercase tracking-wide text-gray-600">Threshold simulation sandbox</p>
@@ -634,7 +634,7 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
         ) : null}
       </section>
 
-      <section id="review-actions" className="rounded border border-zinc-300 bg-white p-4 shadow-sm space-y-3">
+      <section id="review-actions" className="rounded border border-zinc-300 bg-[var(--admin-surface)] p-4 shadow-sm space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className="text-[11px] text-gray-600">Review artifact</p>
@@ -647,7 +647,7 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
               type="button"
               onClick={saveDraft}
               disabled={isPending}
-              className="rounded border border-[#CBD5E1] bg-white px-3 py-1.5 text-[12px] font-medium text-[#1F2937] disabled:cursor-not-allowed disabled:bg-[#F3F4F6] disabled:text-[#6B7280]"
+              className="rounded border border-[var(--admin-line-strong)] bg-[var(--admin-surface)] px-3 py-1.5 text-[12px] font-medium text-[var(--admin-text)] disabled:cursor-not-allowed disabled:bg-[var(--admin-surface-soft)] disabled:text-[var(--admin-text-muted)]"
             >
               Save Decisions
             </button>
@@ -655,7 +655,7 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
               type="button"
               onClick={finalize}
               disabled={isPending || !finalizePermission.allowed}
-              className="rounded border border-[#1D4ED8] bg-[#1D4ED8] px-3 py-1.5 text-[12px] font-medium text-white disabled:cursor-not-allowed disabled:border-[#CBD5E1] disabled:bg-[#CBD5E1] disabled:text-[#334155]"
+              className="rounded border border-[var(--admin-link)] bg-[var(--admin-link)] px-3 py-1.5 text-[12px] font-medium text-[var(--background)] disabled:cursor-not-allowed disabled:border-[var(--admin-line-strong)] disabled:bg-[var(--admin-line-strong)] disabled:text-[var(--admin-text-muted)]"
             >
               Finalize
             </button>
@@ -697,7 +697,7 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
       </section>
 
       <section className="grid gap-4 xl:grid-cols-[0.9fr_1.1fr]">
-        <div id="workflow-blockers" className="rounded border border-zinc-300 bg-white p-4 shadow-sm">
+        <div id="workflow-blockers" className="rounded border border-zinc-300 bg-[var(--admin-surface)] p-4 shadow-sm">
           <h2 className="text-base font-semibold">Workflow blockers</h2>
           <p className="mt-1 text-[12px] text-gray-600">
             These are the current reasons the canonical pipeline cannot advance automatically.
@@ -722,7 +722,7 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
           </div>
         </div>
 
-        <div id="artifact-state" className="rounded border border-zinc-300 bg-white p-4 shadow-sm">
+        <div id="artifact-state" className="rounded border border-zinc-300 bg-[var(--admin-surface)] p-4 shadow-sm">
           <h2 className="text-base font-semibold">Artifact state</h2>
           <p className="mt-1 text-[12px] text-gray-600">
             The admin workflow follows these canonical files under `python/reports/current_admin/`.
@@ -749,7 +749,7 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
         </div>
       </section>
 
-      <section id="review-items" className="rounded border border-zinc-300 bg-white p-4 shadow-sm">
+      <section id="review-items" className="rounded border border-zinc-300 bg-[var(--admin-surface)] p-4 shadow-sm">
         <div className="mb-3">
           <h2 className="text-base font-semibold">Review items</h2>
           <p className="mt-1 text-[12px] text-gray-600">
@@ -768,7 +768,7 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
             </thead>
             <tbody>
               {(items || []).map((item) => (
-                <tr key={item.slug} className="align-top odd:bg-white even:bg-zinc-50/50">
+                <tr key={item.slug} className="align-top odd:bg-[var(--admin-surface)] even:bg-zinc-50/50">
                   <td className="border-b border-zinc-200 px-3 py-2">
                     <div className="font-mono text-[11px] text-zinc-500">{item.slug}</div>
                     <div className="font-medium">{item.title}</div>
@@ -804,7 +804,7 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
                     </select>
                   </td>
                   <td className="border-b border-zinc-200 px-3 py-2">
-                    <details className="rounded border bg-white p-2">
+                    <details className="rounded border bg-[var(--admin-surface)] p-2">
                       <summary className="cursor-pointer text-[12px] font-medium">Inspect</summary>
                       <div className="mt-2 space-y-2 text-[11px] text-zinc-700">
                         <div>

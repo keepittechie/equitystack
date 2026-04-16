@@ -103,15 +103,15 @@ function TraceTable({ trace = [] }) {
   }
 
   return (
-    <div className="overflow-x-auto rounded border border-[#E5EAF0] bg-white">
+    <div className="overflow-x-auto rounded border border-[var(--admin-line)] bg-[var(--admin-surface)]">
       <table className="min-w-full text-[11px]">
         <tbody>
           {trace.map((entry) => (
-            <tr key={entry.key} className="odd:bg-white even:bg-[#F9FBFD]">
-              <td className="border-b border-[#E5EAF0] px-2 py-1 font-mono uppercase tracking-wide text-[#6B7280]">
+            <tr key={entry.key} className="odd:bg-[var(--admin-surface)] even:bg-[var(--admin-surface-muted)]">
+              <td className="border-b border-[var(--admin-line)] px-2 py-1 font-mono uppercase tracking-wide text-[var(--admin-text-muted)]">
                 {entry.label}
               </td>
-              <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">{entry.value}</td>
+              <td className="border-b border-[var(--admin-line)] px-2 py-1 text-[var(--admin-text-soft)]">{entry.value}</td>
             </tr>
           ))}
         </tbody>
@@ -407,7 +407,7 @@ export default function ActionLauncher({
   }
 
   return (
-    <section className={`rounded border border-[#E5EAF0] bg-white shadow-sm ${compact ? "p-3" : "p-4"}`}>
+    <section className={`rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] shadow-sm ${compact ? "p-3" : "p-4"}`}>
       <div className="space-y-2">
         <p className="font-mono text-[11px] uppercase tracking-wide text-gray-600">Action Launcher</p>
         <h2 className="text-base font-semibold">{title}</h2>
@@ -435,7 +435,7 @@ export default function ActionLauncher({
                   <p className="mt-1 text-[11px] text-gray-600">
                     {activeLifecycle?.phase === "running" || activeLifecycle?.phase === "queued" ? (
                   <span className="inline-flex items-center gap-2">
-                    <span className="h-2 w-2 animate-spin rounded-full border border-[#3B82F6] border-t-transparent" />
+                    <span className="h-2 w-2 animate-spin rounded-full border border-[var(--admin-link)] border-t-transparent" />
                     {executionPhaseLabel(activeLifecycle.phase)}
                   </span>
                     ) : (
@@ -518,22 +518,22 @@ export default function ActionLauncher({
           {recentExecutions.length ? (
             <section className="space-y-2 rounded border p-3">
               <div className="flex items-center justify-between gap-3">
-                <p className="font-mono text-[11px] uppercase tracking-wide text-[#6B7280]">
+                <p className="font-mono text-[11px] uppercase tracking-wide text-[var(--admin-text-muted)]">
                   Recent Workflow Actions
                 </p>
-                <Link href="/admin/jobs" className="text-[11px] text-[#3B82F6] underline underline-offset-2">
+                <Link href="/admin/jobs" className="text-[11px] text-[var(--admin-link)] underline underline-offset-2">
                   View jobs
                 </Link>
               </div>
-              <div className="overflow-x-auto rounded border border-[#E5EAF0] bg-white">
+              <div className="overflow-x-auto rounded border border-[var(--admin-line)] bg-[var(--admin-surface)]">
                 <table className="min-w-[760px] w-full text-[11px]">
-                  <thead className="bg-[#F9FBFD] text-left uppercase tracking-wide text-[#6B7280]">
+                  <thead className="bg-[var(--admin-surface-muted)] text-left uppercase tracking-wide text-[var(--admin-text-muted)]">
                     <tr>
-                      <th className="border-b border-[#E5EAF0] px-2 py-1">Status</th>
-                      <th className="border-b border-[#E5EAF0] px-2 py-1">Action</th>
-                      <th className="border-b border-[#E5EAF0] px-2 py-1">Execution Id</th>
-                      <th className="border-b border-[#E5EAF0] px-2 py-1">Finished</th>
-                      <th className="border-b border-[#E5EAF0] px-2 py-1">Next</th>
+                      <th className="border-b border-[var(--admin-line)] px-2 py-1">Status</th>
+                      <th className="border-b border-[var(--admin-line)] px-2 py-1">Action</th>
+                      <th className="border-b border-[var(--admin-line)] px-2 py-1">Execution Id</th>
+                      <th className="border-b border-[var(--admin-line)] px-2 py-1">Finished</th>
+                      <th className="border-b border-[var(--admin-line)] px-2 py-1">Next</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -542,21 +542,21 @@ export default function ActionLauncher({
                         commandText: entry.commandText,
                       });
                       return (
-                        <tr key={entry.job.id} className="odd:bg-white even:bg-[#F9FBFD] hover:bg-[#F1F5F9]">
-                          <td className="border-b border-[#E5EAF0] px-2 py-1">
+                        <tr key={entry.job.id} className="odd:bg-[var(--admin-surface)] even:bg-[var(--admin-surface-muted)] hover:bg-[var(--admin-surface-soft)]">
+                          <td className="border-b border-[var(--admin-line)] px-2 py-1">
                             <JobStatusBadge status={lifecycle?.phase || entry.job.status} />
                           </td>
-                          <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#1F2937]">
+                          <td className="border-b border-[var(--admin-line)] px-2 py-1 text-[var(--admin-text)]">
                             {entry.actionTitle}
                           </td>
-                          <td className="border-b border-[#E5EAF0] px-2 py-1 font-mono text-[#6B7280]">
+                          <td className="border-b border-[var(--admin-line)] px-2 py-1 font-mono text-[var(--admin-text-muted)]">
                             {entry.job.id}
                           </td>
-                          <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">
+                          <td className="border-b border-[var(--admin-line)] px-2 py-1 text-[var(--admin-text-soft)]">
                             {formatAdminDateTime(entry.job.timestamps?.finishedAt || entry.job.timestamps?.updatedAt)}
                           </td>
-                          <td className="border-b border-[#E5EAF0] px-2 py-1">
-                            <Link href={`/admin/jobs/${entry.job.id}`} className="text-[#3B82F6] underline underline-offset-2">
+                          <td className="border-b border-[var(--admin-line)] px-2 py-1">
+                            <Link href={`/admin/jobs/${entry.job.id}`} className="text-[var(--admin-link)] underline underline-offset-2">
                               Open
                             </Link>
                           </td>
@@ -589,10 +589,10 @@ export default function ActionLauncher({
 
           {selectedAction ? (
             <div className="rounded border p-3">
-              <p className="text-[11px] uppercase tracking-wide text-[#6B7280]">{selectedAction.workflowFamily}</p>
+              <p className="text-[11px] uppercase tracking-wide text-[var(--admin-text-muted)]">{selectedAction.workflowFamily}</p>
               <p className="mt-1 font-medium">{selectedAction.title}</p>
-              <p className="mt-1 text-[12px] text-[#4B5563]">{selectedAction.description}</p>
-              <p className="mt-2 break-all font-mono text-[11px] text-[#6B7280]">{selectedAction.cliCommandTemplate}</p>
+              <p className="mt-1 text-[12px] text-[var(--admin-text-soft)]">{selectedAction.description}</p>
+              <p className="mt-2 break-all font-mono text-[11px] text-[var(--admin-text-muted)]">{selectedAction.cliCommandTemplate}</p>
             </div>
           ) : null}
 
@@ -609,7 +609,7 @@ export default function ActionLauncher({
               ))}
             </div>
           ) : (
-            <div className="rounded border border-[#E5EAF0] bg-[#EEF2F6] p-3 text-[12px] text-[#4B5563]">
+            <div className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface-muted)] p-3 text-[12px] text-[var(--admin-text-soft)]">
               This action does not require any input fields.
             </div>
           )}
@@ -617,7 +617,7 @@ export default function ActionLauncher({
           <label className="block space-y-2">
             <div className="flex items-center justify-between gap-3">
               <span className="text-[12px] font-medium">Execution mode</span>
-              <span className="text-[11px] text-[#6B7280]">Allowed by registry</span>
+              <span className="text-[11px] text-[var(--admin-text-muted)]">Allowed by registry</span>
             </div>
             <select
               value={executionMode}
@@ -634,9 +634,9 @@ export default function ActionLauncher({
           </label>
 
           {selectedAction?.guardrails?.length ? (
-            <div className="rounded border border-[#FDE68A] bg-[#FFFBEB] p-3">
-              <p className="text-[12px] font-medium text-[#B45309]">Guardrails</p>
-              <ul className="mt-2 space-y-1 text-[12px] text-[#92400E]">
+            <div className="rounded border border-[var(--admin-warning-line)] bg-[var(--admin-warning-surface)] p-3">
+              <p className="text-[12px] font-medium text-[var(--warning)]">Guardrails</p>
+              <ul className="mt-2 space-y-1 text-[12px] text-[var(--warning)]">
                 {selectedAction.guardrails.map((guardrail) => (
                   <li key={`${selectedAction.id}-${guardrail}`}>{guardrail}</li>
                 ))}
@@ -645,7 +645,7 @@ export default function ActionLauncher({
           ) : null}
 
           {formError ? (
-            <div className="rounded border border-[#FECACA] bg-[#FEF2F2] p-3 text-[12px] text-[#EF4444]">
+            <div className="rounded border border-[var(--admin-danger-line)] bg-[var(--admin-danger-surface)] p-3 text-[12px] text-[var(--danger)]">
               {formError}
             </div>
           ) : null}
@@ -654,11 +654,11 @@ export default function ActionLauncher({
             <button
               type="submit"
               disabled={executionLocked || isLoading || !selectedAction}
-              className="rounded border border-[#3B82F6] bg-[#3B82F6] px-3 py-1.5 text-[12px] text-white disabled:cursor-not-allowed disabled:opacity-60"
+              className="rounded border border-[var(--admin-link)] bg-[var(--admin-link)] px-3 py-1.5 text-[12px] text-[var(--background)] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {executionLocked ? "Execution locked…" : buttonLabel}
             </button>
-            <Link href="/admin/jobs" className="rounded border border-[#E5EAF0] bg-white px-3 py-1.5 text-[12px] text-[#1F2937]">
+            <Link href="/admin/jobs" className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] px-3 py-1.5 text-[12px] text-[var(--admin-text)]">
               View jobs
             </Link>
           </div>
@@ -667,16 +667,16 @@ export default function ActionLauncher({
 
       {confirmationOpen ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-950/50 px-4">
-          <div className="w-full max-w-lg rounded border bg-white p-4 shadow-xl">
+          <div className="w-full max-w-lg rounded border bg-[var(--admin-surface)] p-4 shadow-xl">
             <div className="space-y-2">
-              <p className="text-[12px] text-[#6B7280]">{selectedAction?.workflowFamily}</p>
+              <p className="text-[12px] text-[var(--admin-text-muted)]">{selectedAction?.workflowFamily}</p>
               <h3 className="text-lg font-semibold">Confirm mutating action</h3>
-              <p className="text-[12px] text-[#4B5563]">
+              <p className="text-[12px] text-[var(--admin-text-soft)]">
                 This requests the canonical mutating path. Broker and CLI guardrails still apply, and this confirmation does not bypass pre-commit, dry-run, or explicit review requirements.
               </p>
             </div>
 
-            <label className="mt-4 flex items-start gap-3 rounded border border-[#E5EAF0] bg-[#F9FBFD] p-3 text-[12px] text-[#1F2937]">
+            <label className="mt-4 flex items-start gap-3 rounded border border-[var(--admin-line)] bg-[var(--admin-surface-muted)] p-3 text-[12px] text-[var(--admin-text)]">
               <input
                 type="checkbox"
                 checked={confirmationChecked}
@@ -686,12 +686,12 @@ export default function ActionLauncher({
             </label>
 
             <label className="mt-4 block space-y-2">
-              <span className="text-[12px] font-medium text-[#1F2937]">Type YES to continue</span>
+              <span className="text-[12px] font-medium text-[var(--admin-text)]">Type YES to continue</span>
               <input
                 type="text"
                 value={typedYes}
                 onChange={(event) => setTypedYes(event.target.value)}
-                className="w-full rounded border border-[#E5EAF0] bg-white px-2 py-1.5 text-[12px] text-[#1F2937] outline-none focus:border-[#3B82F6]"
+                className="w-full rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] px-2 py-1.5 text-[12px] text-[var(--admin-text)] outline-none focus:border-[var(--admin-link)]"
                 placeholder="YES"
               />
             </label>
@@ -700,7 +700,7 @@ export default function ActionLauncher({
               <button
                 type="button"
                 onClick={resetConfirmation}
-                className="rounded border border-[#E5EAF0] bg-white px-3 py-1.5 text-[12px] text-[#1F2937]"
+                className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] px-3 py-1.5 text-[12px] text-[var(--admin-text)]"
               >
                 Cancel
               </button>
@@ -708,7 +708,7 @@ export default function ActionLauncher({
                 type="button"
                 onClick={handleConfirmAction}
                 disabled={!confirmationChecked || normalizeString(typedYes) !== "YES" || isPending}
-                className="rounded border border-[#FECACA] bg-[#FEF2F2] px-3 py-1.5 text-[12px] font-medium text-[#EF4444] disabled:cursor-not-allowed disabled:opacity-60"
+                className="rounded border border-[var(--admin-danger-line)] bg-[var(--admin-danger-surface)] px-3 py-1.5 text-[12px] font-medium text-[var(--danger)] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isPending ? "Starting…" : "Confirm action"}
               </button>

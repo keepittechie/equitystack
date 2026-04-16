@@ -27,7 +27,7 @@ export default function OperatorAdminNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="border-b border-[#E5EAF0] bg-[#EEF2F6]">
+    <nav className="border-b border-[var(--admin-line)] bg-[var(--admin-surface-muted)]">
       <div className="mx-auto flex max-w-[1700px] flex-wrap items-center justify-between gap-3 px-4 py-2">
         <div className="flex flex-wrap gap-2">
           {NAV_ITEMS.map((item) => {
@@ -40,8 +40,8 @@ export default function OperatorAdminNav() {
                 aria-current={active ? "page" : undefined}
                 className={
                   active
-                    ? "rounded border border-[#BFDBFE] bg-[#DBEAFE] px-2 py-1 text-[12px] font-medium text-[#2563EB]"
-                    : "rounded border border-[#E5EAF0] bg-white px-2 py-1 text-[12px] text-[#4B5563] hover:bg-[#F9FBFD]"
+                    ? "rounded border border-[var(--admin-info-line)] bg-[var(--accent-soft)] px-2 py-1 text-[12px] font-medium text-[var(--admin-link)]"
+                    : "rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] px-2 py-1 text-[12px] text-[var(--admin-text-soft)] hover:bg-[var(--admin-surface-muted)]"
                 }
               >
                 {item.label}
@@ -49,9 +49,9 @@ export default function OperatorAdminNav() {
             );
           })}
         </div>
-        <div className="flex flex-wrap gap-2 text-[11px] text-[#6B7280]">
-          <span className="rounded border border-[#E5EAF0] bg-white px-2 py-1">legacy admin routes hidden from nav</span>
-          <span className="rounded border border-[#E5EAF0] bg-white px-2 py-1">canonical review pages kept for workflow checkpoints</span>
+        <div className="flex flex-wrap gap-2 text-[11px] text-[var(--admin-text-muted)]">
+          <span className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] px-2 py-1">legacy admin routes hidden from nav</span>
+          <span className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] px-2 py-1">canonical review pages kept for workflow checkpoints</span>
         </div>
       </div>
     </nav>

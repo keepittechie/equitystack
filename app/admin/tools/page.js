@@ -21,7 +21,7 @@ function groupActions(actions) {
 
 function StatusBadge({ status }) {
   return (
-    <span className="rounded border border-[#E5EAF0] bg-[#F9FBFD] px-2 py-0.5 text-[11px] font-medium uppercase tracking-wide text-[#4B5563]">
+    <span className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface-muted)] px-2 py-0.5 text-[11px] font-medium uppercase tracking-wide text-[var(--admin-text-soft)]">
       {status}
     </span>
   );
@@ -54,62 +54,62 @@ function buildReasonCounts(clusters = []) {
 
 function IntegrityArtifactCard({ title, artifact, children }) {
   return (
-    <section className="rounded border border-[#E5EAF0] bg-[#EEF2F6] p-3 shadow-sm">
+    <section className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface-muted)] p-3 shadow-sm">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <p className="font-mono text-[11px] uppercase tracking-wide text-[#6B7280]">integrity artifact</p>
-          <h3 className="mt-1 text-base font-semibold text-[#1F2937]">{title}</h3>
+          <p className="font-mono text-[11px] uppercase tracking-wide text-[var(--admin-text-muted)]">integrity artifact</p>
+          <h3 className="mt-1 text-base font-semibold text-[var(--admin-text)]">{title}</h3>
           {artifact ? (
             <>
-              <p className="mt-1 text-[11px] text-[#6B7280]">
+              <p className="mt-1 text-[11px] text-[var(--admin-text-muted)]">
                 Generated at {formatAdminDateTime(artifact.payload.generated_at)}
               </p>
-              <p className="mt-1 font-mono text-[10px] text-[#4B5563]">{artifact.filePath}</p>
+              <p className="mt-1 font-mono text-[10px] text-[var(--admin-text-soft)]">{artifact.filePath}</p>
             </>
           ) : (
-            <p className="mt-1 text-[11px] text-[#6B7280]">
+            <p className="mt-1 text-[11px] text-[var(--admin-text-muted)]">
               No artifact generated yet. Run the source-integrity cleanup script to create it.
             </p>
           )}
         </div>
         <StatusBadge status={artifact ? "available" : "missing"} />
       </div>
-      {artifact ? <div className="mt-3 text-[11px] text-[#4B5563]">{children}</div> : null}
+      {artifact ? <div className="mt-3 text-[11px] text-[var(--admin-text-soft)]">{children}</div> : null}
     </section>
   );
 }
 
 function VerificationReportCard({ report }) {
   return (
-    <section className="rounded border border-[#E5EAF0] bg-[#EEF2F6] p-3 shadow-sm">
+    <section className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface-muted)] p-3 shadow-sm">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <p className="font-mono text-[11px] uppercase tracking-wide text-[#6B7280]">{report.scope}</p>
-          <h3 className="mt-1 text-base font-semibold text-[#1F2937]">{report.title}</h3>
-          <p className="mt-1 text-[11px] text-[#6B7280]">Checked at {formatAdminDateTime(report.checkedAt)}</p>
+          <p className="font-mono text-[11px] uppercase tracking-wide text-[var(--admin-text-muted)]">{report.scope}</p>
+          <h3 className="mt-1 text-base font-semibold text-[var(--admin-text)]">{report.title}</h3>
+          <p className="mt-1 text-[11px] text-[var(--admin-text-muted)]">Checked at {formatAdminDateTime(report.checkedAt)}</p>
         </div>
         <StatusBadge status={report.status} />
       </div>
-      <div className="mt-3 overflow-x-auto rounded border border-[#E5EAF0] bg-white">
+      <div className="mt-3 overflow-x-auto rounded border border-[var(--admin-line)] bg-[var(--admin-surface)]">
         <table className="min-w-full text-[12px]">
-          <thead className="bg-[#F9FBFD] text-left text-[11px] uppercase tracking-wide text-[#6B7280]">
+          <thead className="bg-[var(--admin-surface-muted)] text-left text-[11px] uppercase tracking-wide text-[var(--admin-text-muted)]">
             <tr>
-              <th className="border-b border-[#E5EAF0] px-3 py-2">Check</th>
-              <th className="border-b border-[#E5EAF0] px-3 py-2">Status</th>
-              <th className="border-b border-[#E5EAF0] px-3 py-2">Details</th>
+              <th className="border-b border-[var(--admin-line)] px-3 py-2">Check</th>
+              <th className="border-b border-[var(--admin-line)] px-3 py-2">Status</th>
+              <th className="border-b border-[var(--admin-line)] px-3 py-2">Details</th>
             </tr>
           </thead>
           <tbody>
         {report.checks.map((check) => (
-          <tr key={check.id} className="align-top odd:bg-white even:bg-[#F9FBFD] hover:bg-[#F1F5F9]">
-            <td className="border-b border-[#E5EAF0] px-3 py-2">
-              <div className="font-medium text-[#1F2937]">{check.name}</div>
-              <div className="mt-1 text-[11px] text-[#4B5563]">{check.summary}</div>
+          <tr key={check.id} className="align-top odd:bg-[var(--admin-surface)] even:bg-[var(--admin-surface-muted)] hover:bg-[var(--admin-surface-soft)]">
+            <td className="border-b border-[var(--admin-line)] px-3 py-2">
+              <div className="font-medium text-[var(--admin-text)]">{check.name}</div>
+              <div className="mt-1 text-[11px] text-[var(--admin-text-soft)]">{check.summary}</div>
             </td>
-            <td className="border-b border-[#E5EAF0] px-3 py-2">
+            <td className="border-b border-[var(--admin-line)] px-3 py-2">
               <StatusBadge status={check.status} />
             </td>
-            <td className="border-b border-[#E5EAF0] px-3 py-2 text-[11px] text-[#6B7280]">
+            <td className="border-b border-[var(--admin-line)] px-3 py-2 text-[11px] text-[var(--admin-text-muted)]">
               {check.details ? <div>{check.details}</div> : null}
               {check.recommendedNextStep ? (
                 <div className="mt-1">Next step: {check.recommendedNextStep}</div>
@@ -144,9 +144,9 @@ export default async function AdminToolsPage() {
   return (
     <main className="mx-auto max-w-[1700px] space-y-4 px-4 py-4">
       <section className="space-y-2">
-        <p className="font-mono text-[11px] uppercase tracking-wide text-[#6B7280]">Tools / Registry</p>
-        <h2 className="text-lg font-semibold text-[#1F2937]">Verification and registered operator actions</h2>
-        <p className="max-w-5xl text-[12px] text-[#4B5563]">
+        <p className="font-mono text-[11px] uppercase tracking-wide text-[var(--admin-text-muted)]">Tools / Registry</p>
+        <h2 className="text-lg font-semibold text-[var(--admin-text)]">Verification and registered operator actions</h2>
+        <p className="max-w-5xl text-[12px] text-[var(--admin-text-soft)]">
           Verification checks are read-only and never enqueue broker jobs. Use them to confirm production readiness
           on 10.10.0.13, remote executor health against 10.10.0.60, and control-plane configuration before you rely
           on remote mode in the operator surface. The data-integrity report checks canonical promise, source,
@@ -199,7 +199,7 @@ export default async function AdminToolsPage() {
             </div>
           ) : null}
           <div className="mt-3">
-            <Link href="/admin/source-curation" className="text-[#2563EB] underline">
+            <Link href="/admin/source-curation" className="text-[var(--admin-link)] underline">
               Open duplicate source review
             </Link>
           </div>
@@ -217,16 +217,16 @@ export default async function AdminToolsPage() {
             ))}
           </ul>
           <div className="mt-3">
-            <Link href="/admin/source-curation" className="text-[#2563EB] underline">
+            <Link href="/admin/source-curation" className="text-[var(--admin-link)] underline">
               Open source curation
             </Link>
           </div>
         </IntegrityArtifactCard>
       </section>
 
-      <section className="rounded border border-[#E5EAF0] bg-[#EEF2F6] p-3 shadow-sm">
-        <h3 className="text-base font-semibold text-[#1F2937]">Deterministic verification commands</h3>
-        <div className="mt-3 overflow-x-auto rounded border border-[#E5EAF0] bg-white">
+      <section className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface-muted)] p-3 shadow-sm">
+        <h3 className="text-base font-semibold text-[var(--admin-text)]">Deterministic verification commands</h3>
+        <div className="mt-3 overflow-x-auto rounded border border-[var(--admin-line)] bg-[var(--admin-surface)]">
           <table className="min-w-full text-[12px]">
             <tbody>
           {[
@@ -236,9 +236,9 @@ export default async function AdminToolsPage() {
             "verify data-integrity",
             "verify deep-integrity",
           ].map((command) => (
-            <tr key={command} className="odd:bg-white even:bg-[#F9FBFD] hover:bg-[#F1F5F9]">
-              <td className="border-b border-[#E5EAF0] px-3 py-2 font-mono text-[11px] text-[#111827]">{command}</td>
-              <td className="border-b border-[#E5EAF0] px-3 py-2 text-[11px] text-[#4B5563]">
+            <tr key={command} className="odd:bg-[var(--admin-surface)] even:bg-[var(--admin-surface-muted)] hover:bg-[var(--admin-surface-soft)]">
+              <td className="border-b border-[var(--admin-line)] px-3 py-2 font-mono text-[11px] text-[var(--admin-text)]">{command}</td>
+              <td className="border-b border-[var(--admin-line)] px-3 py-2 text-[11px] text-[var(--admin-text-soft)]">
                 Run this from the command console for the same read-only verification output.
               </td>
             </tr>
@@ -250,64 +250,64 @@ export default async function AdminToolsPage() {
 
       <section className="space-y-4">
         {Object.entries(grouped).map(([group, items]) => (
-          <div key={group} className="rounded border border-[#E5EAF0] bg-[#EEF2F6] p-3 shadow-sm">
-            <h3 className="text-base font-semibold text-[#1F2937]">{group}</h3>
-            <div className="mt-3 overflow-x-auto rounded border border-[#E5EAF0] bg-white">
+          <div key={group} className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface-muted)] p-3 shadow-sm">
+            <h3 className="text-base font-semibold text-[var(--admin-text)]">{group}</h3>
+            <div className="mt-3 overflow-x-auto rounded border border-[var(--admin-line)] bg-[var(--admin-surface)]">
               <table className="min-w-full text-[12px]">
-                <thead className="bg-[#F9FBFD] text-left text-[11px] uppercase tracking-wide text-[#6B7280]">
+                <thead className="bg-[var(--admin-surface-muted)] text-left text-[11px] uppercase tracking-wide text-[var(--admin-text-muted)]">
                   <tr>
-                    <th className="border-b border-[#E5EAF0] px-3 py-2">Action</th>
-                    <th className="border-b border-[#E5EAF0] px-3 py-2">CLI mapping</th>
-                    <th className="border-b border-[#E5EAF0] px-3 py-2">Guardrails / artifacts / follow-up</th>
-                    <th className="border-b border-[#E5EAF0] px-3 py-2">Modes / scheduling</th>
+                    <th className="border-b border-[var(--admin-line)] px-3 py-2">Action</th>
+                    <th className="border-b border-[var(--admin-line)] px-3 py-2">CLI mapping</th>
+                    <th className="border-b border-[var(--admin-line)] px-3 py-2">Guardrails / artifacts / follow-up</th>
+                    <th className="border-b border-[var(--admin-line)] px-3 py-2">Modes / scheduling</th>
                   </tr>
                 </thead>
                 <tbody>
               {items.map((action) => (
-                <tr key={action.id} className="align-top odd:bg-white even:bg-[#F9FBFD] hover:bg-[#F1F5F9]">
-                  <td className="border-b border-[#E5EAF0] px-3 py-2">
-                    <div className="text-[11px] uppercase tracking-wide text-[#6B7280]">{action.workflowFamily}</div>
-                    <div className="font-medium text-[#1F2937]">{action.title}</div>
-                    <div className="mt-1 text-[11px] text-[#4B5563]">{action.description}</div>
-                    <div className="mt-1 text-[11px] text-[#6B7280]">
+                <tr key={action.id} className="align-top odd:bg-[var(--admin-surface)] even:bg-[var(--admin-surface-muted)] hover:bg-[var(--admin-surface-soft)]">
+                  <td className="border-b border-[var(--admin-line)] px-3 py-2">
+                    <div className="text-[11px] uppercase tracking-wide text-[var(--admin-text-muted)]">{action.workflowFamily}</div>
+                    <div className="font-medium text-[var(--admin-text)]">{action.title}</div>
+                    <div className="mt-1 text-[11px] text-[var(--admin-text-soft)]">{action.description}</div>
+                    <div className="mt-1 text-[11px] text-[var(--admin-text-muted)]">
                       {action.execution.mutating ? "mutating" : action.execution.readOnly ? "read-only" : "wrapped"}
                     </div>
                   </td>
-                  <td className="border-b border-[#E5EAF0] px-3 py-2 font-mono text-[11px] text-[#111827]">{action.cliCommandTemplate}</td>
-                  <td className="border-b border-[#E5EAF0] px-3 py-2">
+                  <td className="border-b border-[var(--admin-line)] px-3 py-2 font-mono text-[11px] text-[var(--admin-text)]">{action.cliCommandTemplate}</td>
+                  <td className="border-b border-[var(--admin-line)] px-3 py-2">
                     <div>
-                      <p className="text-[11px] font-medium uppercase tracking-wide text-[#6B7280]">Guardrails</p>
-                      <ul className="mt-1 space-y-1 text-[11px] text-[#4B5563]">
+                      <p className="text-[11px] font-medium uppercase tracking-wide text-[var(--admin-text-muted)]">Guardrails</p>
+                      <ul className="mt-1 space-y-1 text-[11px] text-[var(--admin-text-soft)]">
                         {action.guardrails.map((guardrail) => (
                           <li key={`${action.id}-${guardrail}`}>{guardrail}</li>
                         ))}
                       </ul>
                     </div>
                     <div className="mt-2">
-                      <p className="text-[11px] font-medium uppercase tracking-wide text-[#6B7280]">Expected artifacts</p>
-                      <ul className="mt-1 space-y-1 text-[11px] text-[#4B5563]">
+                      <p className="text-[11px] font-medium uppercase tracking-wide text-[var(--admin-text-muted)]">Expected artifacts</p>
+                      <ul className="mt-1 space-y-1 text-[11px] text-[var(--admin-text-soft)]">
                         {action.artifactExpectations.map((artifact) => (
                           <li key={`${action.id}-${artifact.key}`}>{artifact.label}</li>
                         ))}
                       </ul>
                     </div>
                     <div className="mt-2">
-                      <p className="text-[11px] font-medium uppercase tracking-wide text-[#6B7280]">Follow-up</p>
-                      <p className="mt-1 text-[11px] text-[#4B5563]">
+                      <p className="text-[11px] font-medium uppercase tracking-wide text-[var(--admin-text-muted)]">Follow-up</p>
+                      <p className="mt-1 text-[11px] text-[var(--admin-text-soft)]">
                         {action.recommendedFollowUpActionId || "No fixed follow-up."}
                       </p>
                     </div>
                   </td>
-                  <td className="border-b border-[#E5EAF0] px-3 py-2">
+                  <td className="border-b border-[var(--admin-line)] px-3 py-2">
                     <div>
-                      <p className="text-[11px] font-medium uppercase tracking-wide text-[#6B7280]">Execution modes</p>
-                      <p className="mt-1 text-[11px] text-[#4B5563]">
+                      <p className="text-[11px] font-medium uppercase tracking-wide text-[var(--admin-text-muted)]">Execution modes</p>
+                      <p className="mt-1 text-[11px] text-[var(--admin-text-soft)]">
                         {action.executionModes?.allowedModes?.join(", ") || "local_cli"}
                       </p>
                     </div>
                     <div className="mt-2">
-                      <p className="text-[11px] font-medium uppercase tracking-wide text-[#6B7280]">Scheduling</p>
-                      <p className="mt-1 text-[11px] text-[#4B5563]">
+                      <p className="text-[11px] font-medium uppercase tracking-wide text-[var(--admin-text-muted)]">Scheduling</p>
+                      <p className="mt-1 text-[11px] text-[var(--admin-text-soft)]">
                         {action.scheduling?.schedulable
                           ? action.scheduling.safeAutoRun
                             ? "Schedulable and safe for automatic preparation"

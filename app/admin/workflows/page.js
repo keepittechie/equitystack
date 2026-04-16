@@ -57,12 +57,12 @@ function humanizeToken(value) {
 function SurfaceBadge({ tone = "default", children }) {
   const palette =
     tone === "danger"
-      ? "border-[#FCA5A5] bg-[#FEF2F2] text-[#991B1B]"
+      ? "border-[var(--admin-danger-line)] bg-[var(--admin-danger-surface)] text-[var(--danger)]"
       : tone === "warning"
-        ? "border-[#FDE68A] bg-[#FFFBEB] text-[#92400E]"
+        ? "border-[var(--admin-warning-line)] bg-[var(--admin-warning-surface)] text-[var(--warning)]"
         : tone === "success"
-          ? "border-[#A7F3D0] bg-[#ECFDF5] text-[#166534]"
-          : "border-[#E5EAF0] bg-[#F9FBFD] text-[#4B5563]";
+          ? "border-[var(--admin-success-line)] bg-[var(--admin-success-surface)] text-[var(--success)]"
+          : "border-[var(--admin-line)] bg-[var(--admin-surface-muted)] text-[var(--admin-text-soft)]";
 
   return (
     <span className={`inline-flex rounded border px-1.5 py-0.5 text-[10px] uppercase tracking-wide ${palette}`}>
@@ -234,9 +234,9 @@ export default async function AdminWorkflowsPage() {
       <OperatorPageAutoRefresh />
 
       <section className="space-y-1">
-        <p className="font-mono text-[11px] uppercase tracking-wide text-[#6B7280]">Workflows</p>
-        <h2 className="text-lg font-semibold text-[#1F2937]">Canonical workflow surfaces and sessions</h2>
-        <p className="max-w-5xl text-[12px] text-[#4B5563]">
+        <p className="font-mono text-[11px] uppercase tracking-wide text-[var(--admin-text-muted)]">Workflows</p>
+        <h2 className="text-lg font-semibold text-[var(--admin-text)]">Canonical workflow surfaces and sessions</h2>
+        <p className="max-w-5xl text-[12px] text-[var(--admin-text-soft)]">
           This page owns the full workflow layer. It shows the live canonical current-admin and legislative
           surfaces first, then any persisted active session records underneath.
         </p>
@@ -244,66 +244,66 @@ export default async function AdminWorkflowsPage() {
 
       <section className="space-y-2">
         <div>
-          <p className="font-mono text-[11px] uppercase tracking-wide text-[#6B7280]">Canonical Surfaces</p>
-          <h3 className="text-sm font-semibold text-[#1F2937]">Live workflow state</h3>
-          <p className="mt-1 max-w-5xl text-[11px] text-[#6B7280]">
+          <p className="font-mono text-[11px] uppercase tracking-wide text-[var(--admin-text-muted)]">Canonical Surfaces</p>
+          <h3 className="text-sm font-semibold text-[var(--admin-text)]">Live workflow state</h3>
+          <p className="mt-1 max-w-5xl text-[11px] text-[var(--admin-text-muted)]">
             These rows come directly from the canonical current-admin and legislative workflow surfaces, even when no active session row is persisted.
           </p>
         </div>
-        <div className="overflow-x-auto rounded border border-[#E5EAF0] bg-white">
+        <div className="overflow-x-auto rounded border border-[var(--admin-line)] bg-[var(--admin-surface)]">
           <table className="min-w-[1280px] w-full text-[11px]">
-            <thead className="bg-[#F9FBFD] text-left uppercase tracking-wide text-[#6B7280]">
+            <thead className="bg-[var(--admin-surface-muted)] text-left uppercase tracking-wide text-[var(--admin-text-muted)]">
               <tr>
-                <th className="border-b border-[#E5EAF0] px-2 py-1">Workflow</th>
-                <th className="border-b border-[#E5EAF0] px-2 py-1">Surface</th>
-                <th className="border-b border-[#E5EAF0] px-2 py-1">State</th>
-                <th className="border-b border-[#E5EAF0] px-2 py-1">What It Shows</th>
-                <th className="border-b border-[#E5EAF0] px-2 py-1">Current / Next</th>
-                <th className="border-b border-[#E5EAF0] px-2 py-1">Trust / Review</th>
-                <th className="border-b border-[#E5EAF0] px-2 py-1">Updated</th>
-                <th className="border-b border-[#E5EAF0] px-2 py-1">Action</th>
+                <th className="border-b border-[var(--admin-line)] px-2 py-1">Workflow</th>
+                <th className="border-b border-[var(--admin-line)] px-2 py-1">Surface</th>
+                <th className="border-b border-[var(--admin-line)] px-2 py-1">State</th>
+                <th className="border-b border-[var(--admin-line)] px-2 py-1">What It Shows</th>
+                <th className="border-b border-[var(--admin-line)] px-2 py-1">Current / Next</th>
+                <th className="border-b border-[var(--admin-line)] px-2 py-1">Trust / Review</th>
+                <th className="border-b border-[var(--admin-line)] px-2 py-1">Updated</th>
+                <th className="border-b border-[var(--admin-line)] px-2 py-1">Action</th>
               </tr>
             </thead>
             <tbody>
               {surfaceRows.map((row) => (
-                <tr key={row.id} className="align-top odd:bg-white even:bg-[#F9FBFD] hover:bg-[#F1F5F9]">
-                  <td className="border-b border-[#E5EAF0] px-2 py-1">
-                    <div className="font-medium text-[#1F2937]">{row.workflow}</div>
+                <tr key={row.id} className="align-top odd:bg-[var(--admin-surface)] even:bg-[var(--admin-surface-muted)] hover:bg-[var(--admin-surface-soft)]">
+                  <td className="border-b border-[var(--admin-line)] px-2 py-1">
+                    <div className="font-medium text-[var(--admin-text)]">{row.workflow}</div>
                   </td>
-                  <td className="border-b border-[#E5EAF0] px-2 py-1">
-                    <div className="text-[#4B5563]">{row.surfaceLabel}</div>
+                  <td className="border-b border-[var(--admin-line)] px-2 py-1">
+                    <div className="text-[var(--admin-text-soft)]">{row.surfaceLabel}</div>
                     {row.detailHref ? (
                       <div className="mt-1">
-                        <Link href={row.detailHref} className="text-[11px] text-[#3B82F6] underline">
+                        <Link href={row.detailHref} className="text-[11px] text-[var(--admin-link)] underline">
                           {row.detailLabel}
                         </Link>
                       </div>
                     ) : null}
                   </td>
-                  <td className="border-b border-[#E5EAF0] px-2 py-1">
+                  <td className="border-b border-[var(--admin-line)] px-2 py-1">
                     <SurfaceBadge>{humanizeToken(row.state)}</SurfaceBadge>
                   </td>
-                  <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">
+                  <td className="border-b border-[var(--admin-line)] px-2 py-1 text-[var(--admin-text-soft)]">
                     <div className="max-w-[320px] truncate" title={row.summary}>
                       {row.summary}
                     </div>
                   </td>
-                  <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">
+                  <td className="border-b border-[var(--admin-line)] px-2 py-1 text-[var(--admin-text-soft)]">
                     <div className="max-w-[220px] truncate" title={row.currentNext}>
                       {row.currentNext}
                     </div>
                   </td>
-                  <td className="border-b border-[#E5EAF0] px-2 py-1">
+                  <td className="border-b border-[var(--admin-line)] px-2 py-1">
                     <div className="flex flex-wrap items-center gap-2">
                       <SurfaceBadge tone={row.trustTone}>{row.trustLabel}</SurfaceBadge>
-                      <span className="text-[#4B5563]">{row.aiStatus}</span>
+                      <span className="text-[var(--admin-text-soft)]">{row.aiStatus}</span>
                     </div>
-                    <div className="mt-1 text-[10px] text-[#6B7280]">{row.reviewLoad}</div>
+                    <div className="mt-1 text-[10px] text-[var(--admin-text-muted)]">{row.reviewLoad}</div>
                   </td>
-                  <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">
+                  <td className="border-b border-[var(--admin-line)] px-2 py-1 text-[var(--admin-text-soft)]">
                     {formatAdminDateTime(row.updatedAt)}
                   </td>
-                  <td className="border-b border-[#E5EAF0] px-2 py-1">
+                  <td className="border-b border-[var(--admin-line)] px-2 py-1">
                     {row.action?.action ? (
                       <OperatorActionButton
                         action={row.action.action}
@@ -315,7 +315,7 @@ export default async function AdminWorkflowsPage() {
                         confirmation={row.action.confirmation}
                       />
                     ) : (
-                      <Link href={row.actionHref} className="text-[11px] text-[#3B82F6] underline">
+                      <Link href={row.actionHref} className="text-[11px] text-[var(--admin-link)] underline">
                         {row.actionLabel}
                       </Link>
                     )}
@@ -330,24 +330,24 @@ export default async function AdminWorkflowsPage() {
       <section className="space-y-2">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <p className="font-mono text-[11px] uppercase tracking-wide text-[#6B7280]">Session Table</p>
-            <h3 className="text-sm font-semibold text-[#1F2937]">Persisted active session records</h3>
+            <p className="font-mono text-[11px] uppercase tracking-wide text-[var(--admin-text-muted)]">Session Table</p>
+            <h3 className="text-sm font-semibold text-[var(--admin-text)]">Persisted active session records</h3>
           </div>
         </div>
-        <div className="overflow-x-auto rounded border border-[#E5EAF0] bg-white">
+        <div className="overflow-x-auto rounded border border-[var(--admin-line)] bg-[var(--admin-surface)]">
           <table className="min-w-[1320px] w-full text-[11px]">
-            <thead className="bg-[#F9FBFD] text-left uppercase tracking-wide text-[#6B7280]">
+            <thead className="bg-[var(--admin-surface-muted)] text-left uppercase tracking-wide text-[var(--admin-text-muted)]">
               <tr>
-                <th className="border-b border-[#E5EAF0] px-2 py-1">Workflow</th>
-                <th className="border-b border-[#E5EAF0] px-2 py-1">Session</th>
-                <th className="border-b border-[#E5EAF0] px-2 py-1">State</th>
-                <th className="border-b border-[#E5EAF0] px-2 py-1">Current / Next</th>
-                <th className="border-b border-[#E5EAF0] px-2 py-1">Blocker</th>
-                <th className="border-b border-[#E5EAF0] px-2 py-1">Latest Job</th>
-                <th className="border-b border-[#E5EAF0] px-2 py-1">Mode</th>
-                <th className="border-b border-[#E5EAF0] px-2 py-1">Schedule</th>
-                <th className="border-b border-[#E5EAF0] px-2 py-1">Updated</th>
-                <th className="border-b border-[#E5EAF0] px-2 py-1">Action</th>
+                <th className="border-b border-[var(--admin-line)] px-2 py-1">Workflow</th>
+                <th className="border-b border-[var(--admin-line)] px-2 py-1">Session</th>
+                <th className="border-b border-[var(--admin-line)] px-2 py-1">State</th>
+                <th className="border-b border-[var(--admin-line)] px-2 py-1">Current / Next</th>
+                <th className="border-b border-[var(--admin-line)] px-2 py-1">Blocker</th>
+                <th className="border-b border-[var(--admin-line)] px-2 py-1">Latest Job</th>
+                <th className="border-b border-[var(--admin-line)] px-2 py-1">Mode</th>
+                <th className="border-b border-[var(--admin-line)] px-2 py-1">Schedule</th>
+                <th className="border-b border-[var(--admin-line)] px-2 py-1">Updated</th>
+                <th className="border-b border-[var(--admin-line)] px-2 py-1">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -370,53 +370,53 @@ export default async function AdminWorkflowsPage() {
                   "—";
 
                 return (
-                <tr key={session.id} className="align-top odd:bg-white even:bg-[#F9FBFD] hover:bg-[#F1F5F9]">
-                  <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">{toWorkflowLabel(session.workflowFamily)}</td>
-                  <td className="border-b border-[#E5EAF0] px-2 py-1">
-                    <div className="font-mono text-[10px] text-[#111827]">
+                <tr key={session.id} className="align-top odd:bg-[var(--admin-surface)] even:bg-[var(--admin-surface-muted)] hover:bg-[var(--admin-surface-soft)]">
+                  <td className="border-b border-[var(--admin-line)] px-2 py-1 text-[var(--admin-text-soft)]">{toWorkflowLabel(session.workflowFamily)}</td>
+                  <td className="border-b border-[var(--admin-line)] px-2 py-1">
+                    <div className="font-mono text-[10px] text-[var(--admin-text)]">
                       {session.canonicalSessionKey || session.id}
                     </div>
                   </td>
-                  <td className="border-b border-[#E5EAF0] px-2 py-1">
+                  <td className="border-b border-[var(--admin-line)] px-2 py-1">
                     <JobStatusBadge status={session.canonicalState} />
                   </td>
-                  <td className="border-b border-[#E5EAF0] px-2 py-1">
+                  <td className="border-b border-[var(--admin-line)] px-2 py-1">
                     <div className="space-y-1">
-                      <div className="max-w-[220px] truncate text-[#4B5563]" title={stepLabel}>
+                      <div className="max-w-[220px] truncate text-[var(--admin-text-soft)]" title={stepLabel}>
                         {stepLabel}
                       </div>
                       {tracker?.nextStep?.reason ? (
-                        <div className="max-w-[260px] truncate text-[10px] text-[#6B7280]" title={tracker.nextStep.reason}>
+                        <div className="max-w-[260px] truncate text-[10px] text-[var(--admin-text-muted)]" title={tracker.nextStep.reason}>
                           {tracker.nextStep.reason}
                         </div>
                       ) : null}
                     </div>
                   </td>
-                  <td className="border-b border-[#E5EAF0] px-2 py-1">
-                    <div className="max-w-[240px] truncate text-[#4B5563]" title={session.blocker || "—"}>
+                  <td className="border-b border-[var(--admin-line)] px-2 py-1">
+                    <div className="max-w-[240px] truncate text-[var(--admin-text-soft)]" title={session.blocker || "—"}>
                       {session.blocker || "—"}
                     </div>
                   </td>
-                  <td className="border-b border-[#E5EAF0] px-2 py-1">
+                  <td className="border-b border-[var(--admin-line)] px-2 py-1">
                     {session.latestJob ? (
                       <div className="space-y-1">
                         <JobStatusBadge status={session.latestJob.status} />
-                        <div className="font-mono text-[10px] text-[#6B7280]">{session.latestJob.id}</div>
+                        <div className="font-mono text-[10px] text-[var(--admin-text-muted)]">{session.latestJob.id}</div>
                       </div>
                     ) : (
-                      <span className="text-[#6B7280]">—</span>
+                      <span className="text-[var(--admin-text-muted)]">—</span>
                     )}
                   </td>
-                  <td className="border-b border-[#E5EAF0] px-2 py-1 font-mono text-[10px] text-[#111827]">
+                  <td className="border-b border-[var(--admin-line)] px-2 py-1 font-mono text-[10px] text-[var(--admin-text)]">
                     {session.execution?.execution_mode || "local_cli"}
                   </td>
-                  <td className="border-b border-[#E5EAF0] px-2 py-1 font-mono text-[10px] text-[#111827]">
+                  <td className="border-b border-[var(--admin-line)] px-2 py-1 font-mono text-[10px] text-[var(--admin-text)]">
                     {session.linkedSchedule?.title || "—"}
                   </td>
-                  <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">{formatAdminDateTime(session.updatedAt)}</td>
-                    <td className="border-b border-[#E5EAF0] px-2 py-1">
+                  <td className="border-b border-[var(--admin-line)] px-2 py-1 text-[var(--admin-text-soft)]">{formatAdminDateTime(session.updatedAt)}</td>
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1">
                       <div className="flex flex-wrap gap-2">
-                        <Link href={session.href} className="text-[11px] text-[#3B82F6] underline">
+                        <Link href={session.href} className="text-[11px] text-[var(--admin-link)] underline">
                           Open session inspector
                         </Link>
                       {primaryAction?.action ? (
@@ -432,7 +432,7 @@ export default async function AdminWorkflowsPage() {
                       ) : (
                         <Link
                           href={primaryAction?.href || workflowHref}
-                          className="text-[11px] text-[#3B82F6] underline"
+                          className="text-[11px] text-[var(--admin-link)] underline"
                         >
                           {session.workflowFamily === "current-admin" ? "Open current-admin workflow" : "Open legislative workflow"}
                         </Link>
@@ -443,13 +443,13 @@ export default async function AdminWorkflowsPage() {
               )})}
               {!sessionRows.length ? (
                 <tr>
-                  <td colSpan={10} className="px-2 py-3 text-[11px] text-[#6B7280]">
+                  <td colSpan={10} className="px-2 py-3 text-[11px] text-[var(--admin-text-muted)]">
                     <div>No active workflow sessions are currently persisted.</div>
                     <div className="mt-2 flex flex-wrap gap-3">
-                      <Link href="/admin/current-admin-review" className="text-[#3B82F6] underline">
+                      <Link href="/admin/current-admin-review" className="text-[var(--admin-link)] underline">
                         Open current-admin review
                       </Link>
-                      <Link href="/admin/legislative-workflow" className="text-[#3B82F6] underline">
+                      <Link href="/admin/legislative-workflow" className="text-[var(--admin-link)] underline">
                         Open legislative review
                       </Link>
                     </div>
@@ -464,33 +464,33 @@ export default async function AdminWorkflowsPage() {
       <section className="space-y-2">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <p className="font-mono text-[11px] uppercase tracking-wide text-[#6B7280]">Reference</p>
-            <h3 className="text-sm font-semibold text-[#1F2937]">Workflow registry</h3>
+            <p className="font-mono text-[11px] uppercase tracking-wide text-[var(--admin-text-muted)]">Reference</p>
+            <h3 className="text-sm font-semibold text-[var(--admin-text)]">Workflow registry</h3>
           </div>
         </div>
-        <div className="overflow-x-auto rounded border border-[#E5EAF0] bg-white">
+        <div className="overflow-x-auto rounded border border-[var(--admin-line)] bg-[var(--admin-surface)]">
           <table className="min-w-[960px] w-full text-[11px]">
-            <thead className="bg-[#F9FBFD] text-left uppercase tracking-wide text-[#6B7280]">
+            <thead className="bg-[var(--admin-surface-muted)] text-left uppercase tracking-wide text-[var(--admin-text-muted)]">
               <tr>
-                <th className="border-b border-[#E5EAF0] px-2 py-1">Workflow</th>
-                <th className="border-b border-[#E5EAF0] px-2 py-1">Description</th>
-                <th className="border-b border-[#E5EAF0] px-2 py-1">Steps</th>
-                <th className="border-b border-[#E5EAF0] px-2 py-1">Surface</th>
+                <th className="border-b border-[var(--admin-line)] px-2 py-1">Workflow</th>
+                <th className="border-b border-[var(--admin-line)] px-2 py-1">Description</th>
+                <th className="border-b border-[var(--admin-line)] px-2 py-1">Steps</th>
+                <th className="border-b border-[var(--admin-line)] px-2 py-1">Surface</th>
               </tr>
             </thead>
             <tbody>
               {workflows.map((workflow) => (
-                <tr key={workflow.id} className="align-top odd:bg-white even:bg-[#F9FBFD] hover:bg-[#F1F5F9]">
-                  <td className="border-b border-[#E5EAF0] px-2 py-1">
-                    <div className="font-medium text-[#1F2937]">{workflow.title}</div>
-                    <div className="font-mono text-[10px] text-[#6B7280]">{workflow.id}</div>
+                <tr key={workflow.id} className="align-top odd:bg-[var(--admin-surface)] even:bg-[var(--admin-surface-muted)] hover:bg-[var(--admin-surface-soft)]">
+                  <td className="border-b border-[var(--admin-line)] px-2 py-1">
+                    <div className="font-medium text-[var(--admin-text)]">{workflow.title}</div>
+                    <div className="font-mono text-[10px] text-[var(--admin-text-muted)]">{workflow.id}</div>
                   </td>
-                  <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">{workflow.description}</td>
-                  <td className="border-b border-[#E5EAF0] px-2 py-1 font-mono text-[10px] text-[#6B7280]">
+                  <td className="border-b border-[var(--admin-line)] px-2 py-1 text-[var(--admin-text-soft)]">{workflow.description}</td>
+                  <td className="border-b border-[var(--admin-line)] px-2 py-1 font-mono text-[10px] text-[var(--admin-text-muted)]">
                     {workflow.steps.map((step) => step.actionId).join(", ")}
                   </td>
-                  <td className="border-b border-[#E5EAF0] px-2 py-1">
-                    <Link href={workflow.surfaceHref} className="text-[11px] text-[#3B82F6] underline">
+                  <td className="border-b border-[var(--admin-line)] px-2 py-1">
+                    <Link href={workflow.surfaceHref} className="text-[11px] text-[var(--admin-link)] underline">
                       Open surface
                     </Link>
                   </td>

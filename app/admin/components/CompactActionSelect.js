@@ -77,7 +77,7 @@ export default function CompactActionSelect({ actions = [] }) {
         value={selectedId}
         onChange={(event) => handleSelectChange(event.target.value)}
         disabled={isPending || !actions.length}
-        className="w-full min-w-[9rem] rounded border border-[#E5EAF0] bg-white px-2 py-1 text-[12px] text-[#1F2937] outline-none focus:border-[#3B82F6]"
+        className="w-full min-w-[9rem] rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] px-2 py-1 text-[12px] text-[var(--admin-text)] outline-none focus:border-[var(--admin-link)]"
       >
         <option value="">{actions.length ? "Action…" : "No actions"}</option>
         {actions.map((descriptor) => (
@@ -88,31 +88,31 @@ export default function CompactActionSelect({ actions = [] }) {
       </select>
 
       {job ? (
-        <div className="flex flex-wrap items-center gap-2 text-[11px] text-[#6B7280]">
+        <div className="flex flex-wrap items-center gap-2 text-[11px] text-[var(--admin-text-muted)]">
           <JobStatusBadge status={job.status} />
-          <Link href={`/admin/jobs/${job.id}`} className="text-[#3B82F6] underline">
+          <Link href={`/admin/jobs/${job.id}`} className="text-[var(--admin-link)] underline">
             job
           </Link>
         </div>
       ) : null}
 
-      {error ? <div className="text-[11px] text-[#EF4444]">{error}</div> : null}
+      {error ? <div className="text-[11px] text-[var(--danger)]">{error}</div> : null}
 
       {confirmationAction ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-950/50 px-4">
-          <div className="w-full max-w-lg rounded border border-[#E5EAF0] bg-white p-4 shadow-xl">
+          <div className="w-full max-w-lg rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] p-4 shadow-xl">
             <div className="space-y-2">
-              <p className="text-[12px] text-[#6B7280]">{confirmationAction.action.workflowFamily}</p>
-              <h3 className="text-lg font-semibold text-[#1F2937]">
+              <p className="text-[12px] text-[var(--admin-text-muted)]">{confirmationAction.action.workflowFamily}</p>
+              <h3 className="text-lg font-semibold text-[var(--admin-text)]">
                 {confirmationAction.confirmation?.title || confirmationAction.label}
               </h3>
-              <p className="text-[12px] text-[#4B5563]">
+              <p className="text-[12px] text-[var(--admin-text-soft)]">
                 {confirmationAction.confirmation?.description ||
                   "This action requires explicit confirmation."}
               </p>
             </div>
 
-            <label className="mt-4 flex items-start gap-3 rounded border border-[#E5EAF0] bg-[#F9FBFD] p-3 text-[12px] text-[#1F2937]">
+            <label className="mt-4 flex items-start gap-3 rounded border border-[var(--admin-line)] bg-[var(--admin-surface-muted)] p-3 text-[12px] text-[var(--admin-text)]">
               <input
                 type="checkbox"
                 checked={confirmationChecked}
@@ -126,12 +126,12 @@ export default function CompactActionSelect({ actions = [] }) {
 
             {confirmationAction.confirmation?.requireTypedYes ? (
               <label className="mt-4 block space-y-2">
-                <span className="text-[12px] font-medium text-[#1F2937]">Type YES to continue</span>
+                <span className="text-[12px] font-medium text-[var(--admin-text)]">Type YES to continue</span>
                 <input
                   type="text"
                   value={typedYes}
                   onChange={(event) => setTypedYes(event.target.value)}
-                  className="w-full rounded border border-[#E5EAF0] bg-white px-2 py-1.5 text-[12px] text-[#1F2937] outline-none focus:border-[#3B82F6]"
+                  className="w-full rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] px-2 py-1.5 text-[12px] text-[var(--admin-text)] outline-none focus:border-[var(--admin-link)]"
                   placeholder="YES"
                 />
               </label>
@@ -146,7 +146,7 @@ export default function CompactActionSelect({ actions = [] }) {
                   setTypedYes("");
                   setSelectedId("");
                 }}
-                className="rounded border border-[#E5EAF0] bg-white px-3 py-1.5 text-[12px] text-[#1F2937]"
+                className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] px-3 py-1.5 text-[12px] text-[var(--admin-text)]"
               >
                 Cancel
               </button>
@@ -159,7 +159,7 @@ export default function CompactActionSelect({ actions = [] }) {
                     normalizeString(typedYes) !== "YES") ||
                   isPending
                 }
-                className="rounded border border-[#FECACA] bg-[#FEF2F2] px-3 py-1.5 text-[12px] font-medium text-[#EF4444] disabled:cursor-not-allowed disabled:opacity-60"
+                className="rounded border border-[var(--admin-danger-line)] bg-[var(--admin-danger-surface)] px-3 py-1.5 text-[12px] font-medium text-[var(--danger)] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isPending ? "Starting…" : "Confirm action"}
               </button>

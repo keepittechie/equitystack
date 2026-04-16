@@ -8,12 +8,12 @@ import { readAdminJsonResponse } from "@/app/admin/components/readAdminJsonRespo
 function CompactBadge({ tone = "neutral", children }) {
   const classes =
     tone === "danger"
-      ? "border-[#FCA5A5] bg-[#FEF2F2] text-[#991B1B]"
+      ? "border-[var(--admin-danger-line)] bg-[var(--admin-danger-surface)] text-[var(--danger)]"
       : tone === "warning"
-        ? "border-[#FDE68A] bg-[#FFFBEB] text-[#92400E]"
+        ? "border-[var(--admin-warning-line)] bg-[var(--admin-warning-surface)] text-[var(--warning)]"
         : tone === "success"
-          ? "border-[#BBF7D0] bg-[#F0FDF4] text-[#166534]"
-          : "border-[#E5EAF0] bg-[#F9FBFD] text-[#4B5563]";
+          ? "border-[var(--admin-success-line)] bg-[var(--admin-success-surface)] text-[var(--success)]"
+          : "border-[var(--admin-line)] bg-[var(--admin-surface-muted)] text-[var(--admin-text-soft)]";
 
   return (
     <span className={`rounded border px-1.5 py-0.5 text-[10px] uppercase tracking-wide ${classes}`}>
@@ -24,10 +24,10 @@ function CompactBadge({ tone = "neutral", children }) {
 
 function SectionCard({ title, description, children }) {
   return (
-    <section className="rounded border border-[#E5EAF0] bg-white shadow-sm">
-      <div className="border-b border-[#E5EAF0] bg-[#EEF2F6] px-3 py-2">
-        <h3 className="text-sm font-semibold text-[#1F2937]">{title}</h3>
-        {description ? <p className="mt-1 text-[11px] text-[#4B5563]">{description}</p> : null}
+    <section className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] shadow-sm">
+      <div className="border-b border-[var(--admin-line)] bg-[var(--admin-surface-muted)] px-3 py-2">
+        <h3 className="text-sm font-semibold text-[var(--admin-text)]">{title}</h3>
+        {description ? <p className="mt-1 text-[11px] text-[var(--admin-text-soft)]">{description}</p> : null}
       </div>
       <div className="p-3">{children}</div>
     </section>
@@ -36,10 +36,10 @@ function SectionCard({ title, description, children }) {
 
 function SummaryCard({ label, value, detail }) {
   return (
-    <div className="rounded border border-[#E5EAF0] bg-white p-3 shadow-sm">
-      <p className="text-[11px] text-[#6B7280]">{label}</p>
-      <p className="mt-1 text-base font-semibold text-[#1F2937]">{value}</p>
-      {detail ? <p className="mt-1 text-[11px] text-[#4B5563]">{detail}</p> : null}
+    <div className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] p-3 shadow-sm">
+      <p className="text-[11px] text-[var(--admin-text-muted)]">{label}</p>
+      <p className="mt-1 text-base font-semibold text-[var(--admin-text)]">{value}</p>
+      {detail ? <p className="mt-1 text-[11px] text-[var(--admin-text-soft)]">{detail}</p> : null}
     </div>
   );
 }
@@ -47,10 +47,10 @@ function SummaryCard({ label, value, detail }) {
 function ActionButton({ children, onClick, disabled = false, tone = "neutral", title = "" }) {
   const classes =
     tone === "primary"
-      ? "border-[#1D4ED8] bg-[#1D4ED8] text-white disabled:border-[#CBD5E1] disabled:bg-[#CBD5E1] disabled:text-[#334155]"
+      ? "border-[var(--admin-link)] bg-[var(--admin-link)] text-[var(--background)] disabled:border-[var(--admin-line-strong)] disabled:bg-[var(--admin-line-strong)] disabled:text-[var(--admin-text-muted)]"
       : tone === "danger"
-        ? "border-[#DC2626] bg-[#DC2626] text-white disabled:border-[#FCA5A5] disabled:bg-[#FCA5A5] disabled:text-[#7F1D1D]"
-        : "border-[#CBD5E1] bg-white text-[#1F2937] disabled:bg-[#F3F4F6] disabled:text-[#6B7280]";
+        ? "border-[var(--danger)] bg-[var(--danger)] text-[var(--foreground)] disabled:border-[var(--admin-danger-line)] disabled:bg-[var(--admin-danger-line)] disabled:text-[var(--admin-text-muted)]"
+        : "border-[var(--admin-line-strong)] bg-[var(--admin-surface)] text-[var(--admin-text)] disabled:bg-[var(--admin-surface-soft)] disabled:text-[var(--admin-text-muted)]";
 
   return (
     <button
@@ -185,14 +185,14 @@ function buildVisibleDuplicateGroups(workspace, savedDecisions, resolvedKeys) {
 
 function SourcePreviewList({ sources = [] }) {
   if (!sources.length) {
-    return <span className="text-[#6B7280]">No related source context recorded.</span>;
+    return <span className="text-[var(--admin-text-muted)]">No related source context recorded.</span>;
   }
 
   return (
     <div className="space-y-1">
       {sources.map((source) => (
-        <div key={source.id} className="text-[10px] text-[#4B5563]">
-          <span className="font-medium text-[#1F2937]">#{source.id}</span> {source.source_title}
+        <div key={source.id} className="text-[10px] text-[var(--admin-text-soft)]">
+          <span className="font-medium text-[var(--admin-text)]">#{source.id}</span> {source.source_title}
           {source.publisher ? ` • ${source.publisher}` : ""}
         </div>
       ))}
@@ -593,23 +593,23 @@ export default function SourceCurationWorkspace({ workspace }) {
       </section>
 
       {workspace.loadErrors.missingSource ? (
-        <section className="rounded border border-[#FDE68A] bg-[#FFFBEB] p-3 text-[11px] text-[#92400E]">
+        <section className="rounded border border-[var(--admin-warning-line)] bg-[var(--admin-warning-surface)] p-3 text-[11px] text-[var(--warning)]">
           Missing-source detail warning: {workspace.loadErrors.missingSource}
         </section>
       ) : null}
       {workspace.loadErrors.duplicates ? (
-        <section className="rounded border border-[#FDE68A] bg-[#FFFBEB] p-3 text-[11px] text-[#92400E]">
+        <section className="rounded border border-[var(--admin-warning-line)] bg-[var(--admin-warning-surface)] p-3 text-[11px] text-[var(--warning)]">
           Duplicate-cluster detail warning: {workspace.loadErrors.duplicates}
         </section>
       ) : null}
 
       {message ? (
-        <section className="rounded border border-[#BBF7D0] bg-[#F0FDF4] p-3 text-[11px] text-[#166534]">
+        <section className="rounded border border-[var(--admin-success-line)] bg-[var(--admin-success-surface)] p-3 text-[11px] text-[var(--success)]">
           {message}
         </section>
       ) : null}
       {errorMessage ? (
-        <section className="rounded border border-[#FCA5A5] bg-[#FEF2F2] p-3 text-[11px] text-[#991B1B]">
+        <section className="rounded border border-[var(--admin-danger-line)] bg-[var(--admin-danger-surface)] p-3 text-[11px] text-[var(--danger)]">
           {errorMessage}
         </section>
       ) : null}
@@ -635,21 +635,21 @@ export default function SourceCurationWorkspace({ workspace }) {
           description="Review unresolved action/outcome rows, inspect same-promise evidence, and explicitly attach or draft sources."
         >
           {!visibleMissingGroups.length ? (
-            <p className="text-[12px] text-[#4B5563]">
+            <p className="text-[12px] text-[var(--admin-text-soft)]">
               No unresolved missing-source records are pending.
             </p>
           ) : (
             <div className="space-y-4">
               {visibleMissingGroups.map((group) => (
-                <section key={group.id} className="rounded border border-[#E5EAF0] bg-[#FCFDFE]">
-                  <div className="border-b border-[#E5EAF0] bg-[#EEF2F6] px-3 py-2">
+                <section key={group.id} className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface-muted)]">
+                  <div className="border-b border-[var(--admin-line)] bg-[var(--admin-surface-muted)] px-3 py-2">
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div>
-                        <p className="font-mono text-[10px] uppercase tracking-wide text-[#6B7280]">
+                        <p className="font-mono text-[10px] uppercase tracking-wide text-[var(--admin-text-muted)]">
                           {group.president_name}
                         </p>
-                        <h4 className="text-sm font-semibold text-[#1F2937]">{group.topic}</h4>
-                        <p className="mt-1 text-[10px] text-[#6B7280]">
+                        <h4 className="text-sm font-semibold text-[var(--admin-text)]">{group.topic}</h4>
+                        <p className="mt-1 text-[10px] text-[var(--admin-text-muted)]">
                           Import origin: {group.import_origin}
                         </p>
                       </div>
@@ -666,15 +666,15 @@ export default function SourceCurationWorkspace({ workspace }) {
                   </div>
                   <div className="overflow-x-auto">
                     <table className="min-w-[1720px] w-full text-[11px]">
-                      <thead className="bg-[#F9FBFD] text-left uppercase tracking-wide text-[#6B7280]">
+                      <thead className="bg-[var(--admin-surface-muted)] text-left uppercase tracking-wide text-[var(--admin-text-muted)]">
                         <tr>
-                          <th className="border-b border-[#E5EAF0] px-2 py-1">Promise</th>
-                          <th className="border-b border-[#E5EAF0] px-2 py-1">Record</th>
-                          <th className="border-b border-[#E5EAF0] px-2 py-1">Existing Source Context</th>
-                          <th className="border-b border-[#E5EAF0] px-2 py-1">Reason</th>
-                          <th className="border-b border-[#E5EAF0] px-2 py-1">Suggested Next Step</th>
-                          <th className="border-b border-[#E5EAF0] px-2 py-1">Saved Decision</th>
-                          <th className="border-b border-[#E5EAF0] px-2 py-1">Actions</th>
+                          <th className="border-b border-[var(--admin-line)] px-2 py-1">Promise</th>
+                          <th className="border-b border-[var(--admin-line)] px-2 py-1">Record</th>
+                          <th className="border-b border-[var(--admin-line)] px-2 py-1">Existing Source Context</th>
+                          <th className="border-b border-[var(--admin-line)] px-2 py-1">Reason</th>
+                          <th className="border-b border-[var(--admin-line)] px-2 py-1">Suggested Next Step</th>
+                          <th className="border-b border-[var(--admin-line)] px-2 py-1">Saved Decision</th>
+                          <th className="border-b border-[var(--admin-line)] px-2 py-1">Actions</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -685,50 +685,50 @@ export default function SourceCurationWorkspace({ workspace }) {
 
                           return (
                             <Fragment key={item.review_key}>
-                              <tr key={item.review_key} className="align-top odd:bg-white even:bg-[#F9FBFD] hover:bg-[#F1F5F9]">
-                                <td className="border-b border-[#E5EAF0] px-2 py-2">
-                                  <div className="font-medium text-[#1F2937]">{item.promise_title}</div>
-                                  <div className="mt-0.5 font-mono text-[10px] text-[#6B7280]">
+                              <tr key={item.review_key} className="align-top odd:bg-[var(--admin-surface)] even:bg-[var(--admin-surface-muted)] hover:bg-[var(--admin-surface-soft)]">
+                                <td className="border-b border-[var(--admin-line)] px-2 py-2">
+                                  <div className="font-medium text-[var(--admin-text)]">{item.promise_title}</div>
+                                  <div className="mt-0.5 font-mono text-[10px] text-[var(--admin-text-muted)]">
                                     {item.promise_slug}
                                   </div>
                                   <div className="mt-2 flex flex-wrap gap-2">
-                                    <Link href={`/promises/${item.promise_slug}`} className="text-[#2563EB] underline">
+                                    <Link href={`/promises/${item.promise_slug}`} className="text-[var(--admin-link)] underline">
                                       Open related promise
                                     </Link>
                                   </div>
                                 </td>
-                                <td className="border-b border-[#E5EAF0] px-2 py-2">
+                                <td className="border-b border-[var(--admin-line)] px-2 py-2">
                                   <div className="flex flex-wrap items-center gap-2">
                                     <CompactBadge tone="warning">{item.record_type}</CompactBadge>
                                     <CompactBadge tone="danger">missing source</CompactBadge>
-                                    <span className="font-mono text-[10px] text-[#6B7280]">
+                                    <span className="font-mono text-[10px] text-[var(--admin-text-muted)]">
                                       #{item.record_id}
                                     </span>
                                   </div>
-                                  <div className="mt-1 font-medium text-[#1F2937]">{item.record_text}</div>
+                                  <div className="mt-1 font-medium text-[var(--admin-text)]">{item.record_text}</div>
                                   {item.record_detail ? (
-                                    <div className="mt-1 max-w-[360px] text-[#4B5563]">{item.record_detail}</div>
+                                    <div className="mt-1 max-w-[360px] text-[var(--admin-text-soft)]">{item.record_detail}</div>
                                   ) : null}
                                   {item.related_policy_title ? (
-                                    <div className="mt-1 text-[10px] text-[#6B7280]">
+                                    <div className="mt-1 text-[10px] text-[var(--admin-text-muted)]">
                                       Related policy: {item.related_policy_title}
                                     </div>
                                   ) : null}
                                 </td>
-                                <td className="border-b border-[#E5EAF0] px-2 py-2">
+                                <td className="border-b border-[var(--admin-line)] px-2 py-2">
                                   <div className="space-y-2">
                                     <div>
-                                      <div className="text-[10px] font-medium uppercase tracking-wide text-[#6B7280]">
+                                      <div className="text-[10px] font-medium uppercase tracking-wide text-[var(--admin-text-muted)]">
                                         Same promise
                                       </div>
                                       <SourcePreviewList sources={item.existing_promise_sources || []} />
-                                      <div className="mt-1 text-[10px] text-[#6B7280]">
+                                      <div className="mt-1 text-[10px] text-[var(--admin-text-muted)]">
                                         {item.existing_promise_source_count || 0} total same-promise source(s)
                                       </div>
                                     </div>
                                     {item.existing_policy_source_count ? (
                                       <div>
-                                        <div className="text-[10px] font-medium uppercase tracking-wide text-[#6B7280]">
+                                        <div className="text-[10px] font-medium uppercase tracking-wide text-[var(--admin-text-muted)]">
                                           Same policy
                                         </div>
                                         <SourcePreviewList sources={item.existing_policy_sources || []} />
@@ -736,27 +736,27 @@ export default function SourceCurationWorkspace({ workspace }) {
                                     ) : null}
                                   </div>
                                 </td>
-                                <td className="border-b border-[#E5EAF0] px-2 py-2 text-[#4B5563]">
+                                <td className="border-b border-[var(--admin-line)] px-2 py-2 text-[var(--admin-text-soft)]">
                                   {item.unresolved_reason}
                                 </td>
-                                <td className="border-b border-[#E5EAF0] px-2 py-2 text-[#4B5563]">
+                                <td className="border-b border-[var(--admin-line)] px-2 py-2 text-[var(--admin-text-soft)]">
                                   {item.suggested_next_step}
                                 </td>
-                                <td className="border-b border-[#E5EAF0] px-2 py-2">
+                                <td className="border-b border-[var(--admin-line)] px-2 py-2">
                                   {savedDecision ? (
                                     <div className="space-y-1">
-                                      <div className="font-medium text-[#1F2937]">
+                                      <div className="font-medium text-[var(--admin-text)]">
                                         {decisionSummary(savedDecision)}
                                       </div>
-                                      <div className="text-[10px] text-[#6B7280]">
+                                      <div className="text-[10px] text-[var(--admin-text-muted)]">
                                         {formatAdminDateTime(savedDecision.confirmedAt)}
                                       </div>
                                     </div>
                                   ) : (
-                                    <span className="text-[#6B7280]">No saved decision</span>
+                                    <span className="text-[var(--admin-text-muted)]">No saved decision</span>
                                   )}
                                 </td>
-                                <td className="border-b border-[#E5EAF0] px-2 py-2">
+                                <td className="border-b border-[var(--admin-line)] px-2 py-2">
                                   <div className="flex flex-wrap gap-2">
                                     <ActionButton onClick={() => toggleMissingPanel(item.review_key, "search")}>
                                       Search existing sources
@@ -784,11 +784,11 @@ export default function SourceCurationWorkspace({ workspace }) {
 
                               {panel ? (
                                 <tr key={`${item.review_key}:${panel}`}>
-                                  <td colSpan={7} className="border-b border-[#E5EAF0] bg-[#FCFDFE] px-3 py-3">
+                                  <td colSpan={7} className="border-b border-[var(--admin-line)] bg-[var(--admin-surface-muted)] px-3 py-3">
                                     {panel === "search" ? (
                                       <div className="space-y-3">
                                         <div className="flex flex-wrap gap-3">
-                                          <label className="flex min-w-[360px] flex-1 flex-col gap-1 text-[11px] text-[#4B5563]">
+                                          <label className="flex min-w-[360px] flex-1 flex-col gap-1 text-[11px] text-[var(--admin-text-soft)]">
                                             Search query
                                             <input
                                               value={draft.searchQuery || ""}
@@ -799,17 +799,17 @@ export default function SourceCurationWorkspace({ workspace }) {
                                                   event.target.value
                                                 )
                                               }
-                                              className="rounded border border-[#CBD5E1] bg-white px-2 py-1.5 text-[12px] text-[#111827]"
+                                              className="rounded border border-[var(--admin-line-strong)] bg-[var(--admin-surface)] px-2 py-1.5 text-[12px] text-[var(--admin-text)]"
                                             />
                                           </label>
-                                          <label className="flex min-w-[240px] flex-1 flex-col gap-1 text-[11px] text-[#4B5563]">
+                                          <label className="flex min-w-[240px] flex-1 flex-col gap-1 text-[11px] text-[var(--admin-text-soft)]">
                                             Optional note
                                             <input
                                               value={draft.note || ""}
                                               onChange={(event) =>
                                                 updateMissingDraft(item.review_key, "note", event.target.value)
                                               }
-                                              className="rounded border border-[#CBD5E1] bg-white px-2 py-1.5 text-[12px] text-[#111827]"
+                                              className="rounded border border-[var(--admin-line-strong)] bg-[var(--admin-surface)] px-2 py-1.5 text-[12px] text-[var(--admin-text)]"
                                             />
                                           </label>
                                           <div className="flex items-end gap-2">
@@ -822,24 +822,24 @@ export default function SourceCurationWorkspace({ workspace }) {
                                           </div>
                                         </div>
                                         {draft.searchError ? (
-                                          <p className="text-[11px] text-[#991B1B]">{draft.searchError}</p>
+                                          <p className="text-[11px] text-[var(--danger)]">{draft.searchError}</p>
                                         ) : null}
-                                        <div className="overflow-x-auto rounded border border-[#E5EAF0] bg-white">
+                                        <div className="overflow-x-auto rounded border border-[var(--admin-line)] bg-[var(--admin-surface)]">
                                           <table className="min-w-full text-[11px]">
-                                            <thead className="bg-[#F9FBFD] text-left uppercase tracking-wide text-[#6B7280]">
+                                            <thead className="bg-[var(--admin-surface-muted)] text-left uppercase tracking-wide text-[var(--admin-text-muted)]">
                                               <tr>
-                                                <th className="border-b border-[#E5EAF0] px-2 py-1">Pick</th>
-                                                <th className="border-b border-[#E5EAF0] px-2 py-1">Source</th>
-                                                <th className="border-b border-[#E5EAF0] px-2 py-1">Publisher / Date</th>
-                                                <th className="border-b border-[#E5EAF0] px-2 py-1">Linked Records</th>
-                                                <th className="border-b border-[#E5EAF0] px-2 py-1">Hints</th>
+                                                <th className="border-b border-[var(--admin-line)] px-2 py-1">Pick</th>
+                                                <th className="border-b border-[var(--admin-line)] px-2 py-1">Source</th>
+                                                <th className="border-b border-[var(--admin-line)] px-2 py-1">Publisher / Date</th>
+                                                <th className="border-b border-[var(--admin-line)] px-2 py-1">Linked Records</th>
+                                                <th className="border-b border-[var(--admin-line)] px-2 py-1">Hints</th>
                                               </tr>
                                             </thead>
                                             <tbody>
                                               {(draft.searchResults || []).length ? (
                                                 draft.searchResults.map((result) => (
-                                                  <tr key={result.id} className="odd:bg-white even:bg-[#F9FBFD]">
-                                                    <td className="border-b border-[#E5EAF0] px-2 py-1">
+                                                  <tr key={result.id} className="odd:bg-[var(--admin-surface)] even:bg-[var(--admin-surface-muted)]">
+                                                    <td className="border-b border-[var(--admin-line)] px-2 py-1">
                                                       <input
                                                         type="radio"
                                                         name={`pick-${item.review_key}`}
@@ -853,26 +853,26 @@ export default function SourceCurationWorkspace({ workspace }) {
                                                         }
                                                       />
                                                     </td>
-                                                    <td className="border-b border-[#E5EAF0] px-2 py-1">
-                                                      <div className="font-medium text-[#1F2937]">
+                                                    <td className="border-b border-[var(--admin-line)] px-2 py-1">
+                                                      <div className="font-medium text-[var(--admin-text)]">
                                                         #{result.id} {result.source_title}
                                                       </div>
-                                                      <div className="mt-0.5 max-w-[420px] truncate font-mono text-[10px] text-[#6B7280]" title={result.source_url}>
+                                                      <div className="mt-0.5 max-w-[420px] truncate font-mono text-[10px] text-[var(--admin-text-muted)]" title={result.source_url}>
                                                         {result.source_url}
                                                       </div>
-                                                      <div className="mt-0.5 text-[10px] text-[#6B7280]">
+                                                      <div className="mt-0.5 text-[10px] text-[var(--admin-text-muted)]">
                                                         {result.source_type || "unknown"}
                                                       </div>
                                                     </td>
-                                                    <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">
+                                                    <td className="border-b border-[var(--admin-line)] px-2 py-1 text-[var(--admin-text-soft)]">
                                                       {result.publisher || "publisher unavailable"}
                                                       {result.published_date ? ` • ${result.published_date}` : ""}
                                                     </td>
-                                                    <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">
+                                                    <td className="border-b border-[var(--admin-line)] px-2 py-1 text-[var(--admin-text-soft)]">
                                                       {result.promise_refs} promise / {result.action_refs} action /{" "}
                                                       {result.outcome_refs} outcome
                                                     </td>
-                                                    <td className="border-b border-[#E5EAF0] px-2 py-1">
+                                                    <td className="border-b border-[var(--admin-line)] px-2 py-1">
                                                       <div className="flex flex-wrap gap-1">
                                                         {result.same_promise_refs ? (
                                                           <CompactBadge tone="success">
@@ -890,7 +890,7 @@ export default function SourceCurationWorkspace({ workspace }) {
                                                 ))
                                               ) : (
                                                 <tr>
-                                                  <td colSpan={5} className="px-2 py-3 text-[11px] text-[#6B7280]">
+                                                  <td colSpan={5} className="px-2 py-3 text-[11px] text-[var(--admin-text-muted)]">
                                                     No candidate sources loaded yet.
                                                   </td>
                                                 </tr>
@@ -904,7 +904,7 @@ export default function SourceCurationWorkspace({ workspace }) {
                                     {panel === "new-source" ? (
                                       <div className="space-y-3">
                                         <div className="grid gap-3 lg:grid-cols-2">
-                                          <label className="flex flex-col gap-1 text-[11px] text-[#4B5563]">
+                                          <label className="flex flex-col gap-1 text-[11px] text-[var(--admin-text-soft)]">
                                             Source URL
                                             <input
                                               value={draft.newSourceDraft?.source_url || ""}
@@ -915,10 +915,10 @@ export default function SourceCurationWorkspace({ workspace }) {
                                                   event.target.value
                                                 )
                                               }
-                                              className="rounded border border-[#CBD5E1] bg-white px-2 py-1.5 text-[12px] text-[#111827]"
+                                              className="rounded border border-[var(--admin-line-strong)] bg-[var(--admin-surface)] px-2 py-1.5 text-[12px] text-[var(--admin-text)]"
                                             />
                                           </label>
-                                          <label className="flex flex-col gap-1 text-[11px] text-[#4B5563]">
+                                          <label className="flex flex-col gap-1 text-[11px] text-[var(--admin-text-soft)]">
                                             Title
                                             <input
                                               value={draft.newSourceDraft?.source_title || ""}
@@ -929,10 +929,10 @@ export default function SourceCurationWorkspace({ workspace }) {
                                                   event.target.value
                                                 )
                                               }
-                                              className="rounded border border-[#CBD5E1] bg-white px-2 py-1.5 text-[12px] text-[#111827]"
+                                              className="rounded border border-[var(--admin-line-strong)] bg-[var(--admin-surface)] px-2 py-1.5 text-[12px] text-[var(--admin-text)]"
                                             />
                                           </label>
-                                          <label className="flex flex-col gap-1 text-[11px] text-[#4B5563]">
+                                          <label className="flex flex-col gap-1 text-[11px] text-[var(--admin-text-soft)]">
                                             Source type
                                             <input
                                               value={draft.newSourceDraft?.source_type || ""}
@@ -943,10 +943,10 @@ export default function SourceCurationWorkspace({ workspace }) {
                                                   event.target.value
                                                 )
                                               }
-                                              className="rounded border border-[#CBD5E1] bg-white px-2 py-1.5 text-[12px] text-[#111827]"
+                                              className="rounded border border-[var(--admin-line-strong)] bg-[var(--admin-surface)] px-2 py-1.5 text-[12px] text-[var(--admin-text)]"
                                             />
                                           </label>
-                                          <label className="flex flex-col gap-1 text-[11px] text-[#4B5563]">
+                                          <label className="flex flex-col gap-1 text-[11px] text-[var(--admin-text-soft)]">
                                             Publisher
                                             <input
                                               value={draft.newSourceDraft?.publisher || ""}
@@ -957,10 +957,10 @@ export default function SourceCurationWorkspace({ workspace }) {
                                                   event.target.value
                                                 )
                                               }
-                                              className="rounded border border-[#CBD5E1] bg-white px-2 py-1.5 text-[12px] text-[#111827]"
+                                              className="rounded border border-[var(--admin-line-strong)] bg-[var(--admin-surface)] px-2 py-1.5 text-[12px] text-[var(--admin-text)]"
                                             />
                                           </label>
-                                          <label className="flex flex-col gap-1 text-[11px] text-[#4B5563]">
+                                          <label className="flex flex-col gap-1 text-[11px] text-[var(--admin-text-soft)]">
                                             Published date
                                             <input
                                               type="date"
@@ -972,20 +972,20 @@ export default function SourceCurationWorkspace({ workspace }) {
                                                   event.target.value
                                                 )
                                               }
-                                              className="rounded border border-[#CBD5E1] bg-white px-2 py-1.5 text-[12px] text-[#111827]"
+                                              className="rounded border border-[var(--admin-line-strong)] bg-[var(--admin-surface)] px-2 py-1.5 text-[12px] text-[var(--admin-text)]"
                                             />
                                           </label>
-                                          <label className="flex flex-col gap-1 text-[11px] text-[#4B5563]">
+                                          <label className="flex flex-col gap-1 text-[11px] text-[var(--admin-text-soft)]">
                                             Note
                                             <input
                                               value={draft.note || ""}
                                               onChange={(event) =>
                                                 updateMissingDraft(item.review_key, "note", event.target.value)
                                               }
-                                              className="rounded border border-[#CBD5E1] bg-white px-2 py-1.5 text-[12px] text-[#111827]"
+                                              className="rounded border border-[var(--admin-line-strong)] bg-[var(--admin-surface)] px-2 py-1.5 text-[12px] text-[var(--admin-text)]"
                                             />
                                           </label>
-                                          <label className="lg:col-span-2 flex flex-col gap-1 text-[11px] text-[#4B5563]">
+                                          <label className="lg:col-span-2 flex flex-col gap-1 text-[11px] text-[var(--admin-text-soft)]">
                                             Optional source notes
                                             <textarea
                                               rows={3}
@@ -997,17 +997,17 @@ export default function SourceCurationWorkspace({ workspace }) {
                                                   event.target.value
                                                 )
                                               }
-                                              className="rounded border border-[#CBD5E1] bg-white px-2 py-1.5 text-[12px] text-[#111827]"
+                                              className="rounded border border-[var(--admin-line-strong)] bg-[var(--admin-surface)] px-2 py-1.5 text-[12px] text-[var(--admin-text)]"
                                             />
                                           </label>
                                         </div>
 
                                         {(draft.duplicateWarning || []).length ? (
-                                          <div className="rounded border border-[#FDE68A] bg-[#FFFBEB] p-3">
-                                            <p className="font-medium text-[#92400E]">
+                                          <div className="rounded border border-[var(--admin-warning-line)] bg-[var(--admin-warning-surface)] p-3">
+                                            <p className="font-medium text-[var(--warning)]">
                                               Likely duplicate sources already exist
                                             </p>
-                                            <div className="mt-2 space-y-1 text-[11px] text-[#92400E]">
+                                            <div className="mt-2 space-y-1 text-[11px] text-[var(--warning)]">
                                               {draft.duplicateWarning.map((source) => (
                                                 <div key={source.id}>
                                                   #{source.id} {source.source_title}{" "}
@@ -1015,7 +1015,7 @@ export default function SourceCurationWorkspace({ workspace }) {
                                                 </div>
                                               ))}
                                             </div>
-                                            <label className="mt-3 flex items-center gap-2 text-[11px] text-[#92400E]">
+                                            <label className="mt-3 flex items-center gap-2 text-[11px] text-[var(--warning)]">
                                               <input
                                                 type="checkbox"
                                                 checked={Boolean(draft.overrideDuplicateWarning)}
@@ -1052,7 +1052,7 @@ export default function SourceCurationWorkspace({ workspace }) {
 
                                     {panel === "reviewed" ? (
                                       <div className="space-y-3">
-                                        <label className="flex flex-col gap-1 text-[11px] text-[#4B5563]">
+                                        <label className="flex flex-col gap-1 text-[11px] text-[var(--admin-text-soft)]">
                                           Review note
                                           <textarea
                                             rows={3}
@@ -1060,7 +1060,7 @@ export default function SourceCurationWorkspace({ workspace }) {
                                             onChange={(event) =>
                                               updateMissingDraft(item.review_key, "note", event.target.value)
                                             }
-                                            className="rounded border border-[#CBD5E1] bg-white px-2 py-1.5 text-[12px] text-[#111827]"
+                                            className="rounded border border-[var(--admin-line-strong)] bg-[var(--admin-surface)] px-2 py-1.5 text-[12px] text-[var(--admin-text)]"
                                           />
                                         </label>
                                         <div className="flex justify-end">
@@ -1081,14 +1081,14 @@ export default function SourceCurationWorkspace({ workspace }) {
 
                                     {confirmationState?.key === item.review_key &&
                                     confirmationState?.entityType === "missing-source" ? (
-                                      <div className="mt-4 rounded border border-[#BFDBFE] bg-[#EFF6FF] p-3">
-                                        <p className="font-medium text-[#1E3A8A]">
+                                      <div className="mt-4 rounded border border-[var(--admin-info-line)] bg-[var(--admin-info-surface)] p-3">
+                                        <p className="font-medium text-[var(--info)]">
                                           {confirmationState.title}
                                         </p>
-                                        <p className="mt-1 text-[11px] text-[#1D4ED8]">
+                                        <p className="mt-1 text-[11px] text-[var(--admin-link)]">
                                           {confirmationState.description}
                                         </p>
-                                        <label className="mt-3 flex items-center gap-2 text-[11px] text-[#1E3A8A]">
+                                        <label className="mt-3 flex items-center gap-2 text-[11px] text-[var(--info)]">
                                           <input
                                             type="checkbox"
                                             checked={confirmationChecked}
@@ -1142,20 +1142,20 @@ export default function SourceCurationWorkspace({ workspace }) {
           description="Review unsafe duplicate clusters, compare member rows, keep them separate, or merge a selected compatible subset after confirmation."
         >
           {!visibleDuplicateGroups.length ? (
-            <p className="text-[12px] text-[#4B5563]">
+            <p className="text-[12px] text-[var(--admin-text-soft)]">
               No duplicate source clusters require manual review.
             </p>
           ) : (
             <div className="space-y-4">
               {visibleDuplicateGroups.map((group) => (
-                <section key={group.id} className="rounded border border-[#E5EAF0] bg-[#FCFDFE]">
-                  <div className="border-b border-[#E5EAF0] bg-[#EEF2F6] px-3 py-2">
+                <section key={group.id} className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface-muted)]">
+                  <div className="border-b border-[var(--admin-line)] bg-[var(--admin-surface-muted)] px-3 py-2">
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div>
-                        <p className="font-mono text-[10px] uppercase tracking-wide text-[#6B7280]">
+                        <p className="font-mono text-[10px] uppercase tracking-wide text-[var(--admin-text-muted)]">
                           duplicate review reason
                         </p>
-                        <h4 className="text-sm font-semibold text-[#1F2937]">
+                        <h4 className="text-sm font-semibold text-[var(--admin-text)]">
                           {group.reason}
                         </h4>
                       </div>
@@ -1164,15 +1164,15 @@ export default function SourceCurationWorkspace({ workspace }) {
                   </div>
                   <div className="overflow-x-auto">
                     <table className="min-w-[1560px] w-full text-[11px]">
-                      <thead className="bg-[#F9FBFD] text-left uppercase tracking-wide text-[#6B7280]">
+                      <thead className="bg-[var(--admin-surface-muted)] text-left uppercase tracking-wide text-[var(--admin-text-muted)]">
                         <tr>
-                          <th className="border-b border-[#E5EAF0] px-2 py-1">Cluster</th>
-                          <th className="border-b border-[#E5EAF0] px-2 py-1">Titles / Types</th>
-                          <th className="border-b border-[#E5EAF0] px-2 py-1">Publisher / Date</th>
-                          <th className="border-b border-[#E5EAF0] px-2 py-1">Policy Ownership</th>
-                          <th className="border-b border-[#E5EAF0] px-2 py-1">Rejected Reasons</th>
-                          <th className="border-b border-[#E5EAF0] px-2 py-1">Saved Decision</th>
-                          <th className="border-b border-[#E5EAF0] px-2 py-1">Actions</th>
+                          <th className="border-b border-[var(--admin-line)] px-2 py-1">Cluster</th>
+                          <th className="border-b border-[var(--admin-line)] px-2 py-1">Titles / Types</th>
+                          <th className="border-b border-[var(--admin-line)] px-2 py-1">Publisher / Date</th>
+                          <th className="border-b border-[var(--admin-line)] px-2 py-1">Policy Ownership</th>
+                          <th className="border-b border-[var(--admin-line)] px-2 py-1">Rejected Reasons</th>
+                          <th className="border-b border-[var(--admin-line)] px-2 py-1">Saved Decision</th>
+                          <th className="border-b border-[var(--admin-line)] px-2 py-1">Actions</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -1188,15 +1188,15 @@ export default function SourceCurationWorkspace({ workspace }) {
 
                           return (
                             <Fragment key={cluster.cluster_key}>
-                              <tr key={cluster.cluster_key} className="align-top odd:bg-white even:bg-[#F9FBFD] hover:bg-[#F1F5F9]">
-                                <td className="border-b border-[#E5EAF0] px-2 py-2">
-                                  <div className="font-mono text-[10px] text-[#111827]">
+                              <tr key={cluster.cluster_key} className="align-top odd:bg-[var(--admin-surface)] even:bg-[var(--admin-surface-muted)] hover:bg-[var(--admin-surface-soft)]">
+                                <td className="border-b border-[var(--admin-line)] px-2 py-2">
+                                  <div className="font-mono text-[10px] text-[var(--admin-text)]">
                                     {cluster.cluster_key}
                                   </div>
-                                  <div className="mt-1 max-w-[320px] truncate text-[#4B5563]" title={cluster.source_url}>
+                                  <div className="mt-1 max-w-[320px] truncate text-[var(--admin-text-soft)]" title={cluster.source_url}>
                                     {cluster.source_url}
                                   </div>
-                                  <div className="mt-1 text-[10px] text-[#6B7280]">
+                                  <div className="mt-1 text-[10px] text-[var(--admin-text-muted)]">
                                     source ids: {cluster.rows.map((row) => row.id).join(", ")}
                                   </div>
                                   <div className="mt-2 flex flex-wrap gap-2">
@@ -1204,30 +1204,30 @@ export default function SourceCurationWorkspace({ workspace }) {
                                       href={cluster.source_url}
                                       target="_blank"
                                       rel="noreferrer"
-                                      className="text-[#2563EB] underline"
+                                      className="text-[var(--admin-link)] underline"
                                     >
                                       Open sources
                                     </Link>
                                   </div>
                                 </td>
-                                <td className="border-b border-[#E5EAF0] px-2 py-2 text-[#4B5563]">
+                                <td className="border-b border-[var(--admin-line)] px-2 py-2 text-[var(--admin-text-soft)]">
                                   <div>{cluster.distinct_titles.join(" • ") || "—"}</div>
-                                  <div className="mt-1 text-[10px] text-[#6B7280]">
+                                  <div className="mt-1 text-[10px] text-[var(--admin-text-muted)]">
                                     {cluster.distinct_source_types.join(" • ") || "—"}
                                   </div>
                                 </td>
-                                <td className="border-b border-[#E5EAF0] px-2 py-2 text-[#4B5563]">
+                                <td className="border-b border-[var(--admin-line)] px-2 py-2 text-[var(--admin-text-soft)]">
                                   <div>{cluster.distinct_publishers.join(" • ") || "—"}</div>
-                                  <div className="mt-1 text-[10px] text-[#6B7280]">
+                                  <div className="mt-1 text-[10px] text-[var(--admin-text-muted)]">
                                     {cluster.distinct_published_dates.join(" • ") || "—"}
                                   </div>
                                 </td>
-                                <td className="border-b border-[#E5EAF0] px-2 py-2 text-[#4B5563]">
+                                <td className="border-b border-[var(--admin-line)] px-2 py-2 text-[var(--admin-text-soft)]">
                                   {cluster.distinct_policy_ids.length
                                     ? cluster.distinct_policy_ids.join(", ")
                                     : "none"}
                                 </td>
-                                <td className="border-b border-[#E5EAF0] px-2 py-2">
+                                <td className="border-b border-[var(--admin-line)] px-2 py-2">
                                   <div className="flex flex-wrap gap-1">
                                     {(cluster.auto_merge_rejected_reasons || []).map((reason) => (
                                       <CompactBadge key={reason} tone="warning">
@@ -1236,21 +1236,21 @@ export default function SourceCurationWorkspace({ workspace }) {
                                     ))}
                                   </div>
                                 </td>
-                                <td className="border-b border-[#E5EAF0] px-2 py-2">
+                                <td className="border-b border-[var(--admin-line)] px-2 py-2">
                                   {savedDecision ? (
                                     <div className="space-y-1">
-                                      <div className="font-medium text-[#1F2937]">
+                                      <div className="font-medium text-[var(--admin-text)]">
                                         {decisionSummary(savedDecision)}
                                       </div>
-                                      <div className="text-[10px] text-[#6B7280]">
+                                      <div className="text-[10px] text-[var(--admin-text-muted)]">
                                         {formatAdminDateTime(savedDecision.confirmedAt)}
                                       </div>
                                     </div>
                                   ) : (
-                                    <span className="text-[#6B7280]">No saved decision</span>
+                                    <span className="text-[var(--admin-text-muted)]">No saved decision</span>
                                   )}
                                 </td>
-                                <td className="border-b border-[#E5EAF0] px-2 py-2">
+                                <td className="border-b border-[var(--admin-line)] px-2 py-2">
                                   <div className="flex flex-wrap gap-2">
                                     <ActionButton onClick={() => toggleDuplicatePanel(cluster.cluster_key, "compare")}>
                                       Compare records
@@ -1278,31 +1278,31 @@ export default function SourceCurationWorkspace({ workspace }) {
 
                               {panel ? (
                                 <tr key={`${cluster.cluster_key}:${panel}`}>
-                                  <td colSpan={7} className="border-b border-[#E5EAF0] bg-[#FCFDFE] px-3 py-3">
+                                  <td colSpan={7} className="border-b border-[var(--admin-line)] bg-[var(--admin-surface-muted)] px-3 py-3">
                                     {panel === "compare" || panel === "merge" ? (
                                       <div className="space-y-3">
-                                        <div className="overflow-x-auto rounded border border-[#E5EAF0] bg-white">
+                                        <div className="overflow-x-auto rounded border border-[var(--admin-line)] bg-[var(--admin-surface)]">
                                           <table className="min-w-full text-[11px]">
-                                            <thead className="bg-[#F9FBFD] text-left uppercase tracking-wide text-[#6B7280]">
+                                            <thead className="bg-[var(--admin-surface-muted)] text-left uppercase tracking-wide text-[var(--admin-text-muted)]">
                                               <tr>
                                                 {panel === "merge" ? (
                                                   <>
-                                                    <th className="border-b border-[#E5EAF0] px-2 py-1">Select</th>
-                                                    <th className="border-b border-[#E5EAF0] px-2 py-1">Keep</th>
+                                                    <th className="border-b border-[var(--admin-line)] px-2 py-1">Select</th>
+                                                    <th className="border-b border-[var(--admin-line)] px-2 py-1">Keep</th>
                                                   </>
                                                 ) : null}
-                                                <th className="border-b border-[#E5EAF0] px-2 py-1">Source</th>
-                                                <th className="border-b border-[#E5EAF0] px-2 py-1">Publisher / Date</th>
-                                                <th className="border-b border-[#E5EAF0] px-2 py-1">Policy ID</th>
-                                                <th className="border-b border-[#E5EAF0] px-2 py-1">References</th>
+                                                <th className="border-b border-[var(--admin-line)] px-2 py-1">Source</th>
+                                                <th className="border-b border-[var(--admin-line)] px-2 py-1">Publisher / Date</th>
+                                                <th className="border-b border-[var(--admin-line)] px-2 py-1">Policy ID</th>
+                                                <th className="border-b border-[var(--admin-line)] px-2 py-1">References</th>
                                               </tr>
                                             </thead>
                                             <tbody>
                                               {cluster.rows.map((row) => (
-                                                <tr key={row.id} className="odd:bg-white even:bg-[#F9FBFD]">
+                                                <tr key={row.id} className="odd:bg-[var(--admin-surface)] even:bg-[var(--admin-surface-muted)]">
                                                   {panel === "merge" ? (
                                                     <>
-                                                      <td className="border-b border-[#E5EAF0] px-2 py-1">
+                                                      <td className="border-b border-[var(--admin-line)] px-2 py-1">
                                                         <input
                                                           type="checkbox"
                                                           checked={draft.selectedSourceIds.includes(row.id)}
@@ -1311,7 +1311,7 @@ export default function SourceCurationWorkspace({ workspace }) {
                                                           }
                                                         />
                                                       </td>
-                                                      <td className="border-b border-[#E5EAF0] px-2 py-1">
+                                                      <td className="border-b border-[var(--admin-line)] px-2 py-1">
                                                         <input
                                                           type="radio"
                                                           name={`canonical-${cluster.cluster_key}`}
@@ -1328,25 +1328,25 @@ export default function SourceCurationWorkspace({ workspace }) {
                                                       </td>
                                                     </>
                                                   ) : null}
-                                                  <td className="border-b border-[#E5EAF0] px-2 py-1">
-                                                    <div className="font-medium text-[#1F2937]">
+                                                  <td className="border-b border-[var(--admin-line)] px-2 py-1">
+                                                    <div className="font-medium text-[var(--admin-text)]">
                                                       #{row.id} {row.source_title}
                                                     </div>
-                                                    <div className="mt-0.5 font-mono text-[10px] text-[#6B7280]">
+                                                    <div className="mt-0.5 font-mono text-[10px] text-[var(--admin-text-muted)]">
                                                       {row.source_url}
                                                     </div>
-                                                    <div className="mt-0.5 text-[10px] text-[#6B7280]">
+                                                    <div className="mt-0.5 text-[10px] text-[var(--admin-text-muted)]">
                                                       {row.source_type || "unknown"}
                                                     </div>
                                                   </td>
-                                                  <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">
+                                                  <td className="border-b border-[var(--admin-line)] px-2 py-1 text-[var(--admin-text-soft)]">
                                                     {row.publisher || "publisher unavailable"}
                                                     {row.published_date ? ` • ${row.published_date}` : ""}
                                                   </td>
-                                                  <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">
+                                                  <td className="border-b border-[var(--admin-line)] px-2 py-1 text-[var(--admin-text-soft)]">
                                                     {row.policy_id == null ? "—" : row.policy_id}
                                                   </td>
-                                                  <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">
+                                                  <td className="border-b border-[var(--admin-line)] px-2 py-1 text-[var(--admin-text-soft)]">
                                                     {row.promise_refs} promise / {row.action_refs} action /{" "}
                                                     {row.outcome_refs} outcome
                                                   </td>
@@ -1358,7 +1358,7 @@ export default function SourceCurationWorkspace({ workspace }) {
 
                                         {panel === "merge" ? (
                                           <div className="space-y-3">
-                                            <label className="flex flex-col gap-1 text-[11px] text-[#4B5563]">
+                                            <label className="flex flex-col gap-1 text-[11px] text-[var(--admin-text-soft)]">
                                               Merge note
                                               <textarea
                                                 rows={3}
@@ -1370,7 +1370,7 @@ export default function SourceCurationWorkspace({ workspace }) {
                                                     event.target.value
                                                   )
                                                 }
-                                                className="rounded border border-[#CBD5E1] bg-white px-2 py-1.5 text-[12px] text-[#111827]"
+                                                className="rounded border border-[var(--admin-line-strong)] bg-[var(--admin-surface)] px-2 py-1.5 text-[12px] text-[var(--admin-text)]"
                                               />
                                             </label>
                                             <div className="flex justify-end">
@@ -1393,7 +1393,7 @@ export default function SourceCurationWorkspace({ workspace }) {
 
                                     {panel === "keep-separate" || panel === "reviewed" ? (
                                       <div className="space-y-3">
-                                        <label className="flex flex-col gap-1 text-[11px] text-[#4B5563]">
+                                        <label className="flex flex-col gap-1 text-[11px] text-[var(--admin-text-soft)]">
                                           Review note
                                           <textarea
                                             rows={3}
@@ -1405,7 +1405,7 @@ export default function SourceCurationWorkspace({ workspace }) {
                                                 event.target.value
                                               )
                                             }
-                                            className="rounded border border-[#CBD5E1] bg-white px-2 py-1.5 text-[12px] text-[#111827]"
+                                            className="rounded border border-[var(--admin-line-strong)] bg-[var(--admin-surface)] px-2 py-1.5 text-[12px] text-[var(--admin-text)]"
                                           />
                                         </label>
                                         <div className="flex justify-end">
@@ -1430,14 +1430,14 @@ export default function SourceCurationWorkspace({ workspace }) {
 
                                     {confirmationState?.key === cluster.cluster_key &&
                                     confirmationState?.entityType === "duplicate-cluster" ? (
-                                      <div className="mt-4 rounded border border-[#BFDBFE] bg-[#EFF6FF] p-3">
-                                        <p className="font-medium text-[#1E3A8A]">
+                                      <div className="mt-4 rounded border border-[var(--admin-info-line)] bg-[var(--admin-info-surface)] p-3">
+                                        <p className="font-medium text-[var(--info)]">
                                           {confirmationState.title}
                                         </p>
-                                        <p className="mt-1 text-[11px] text-[#1D4ED8]">
+                                        <p className="mt-1 text-[11px] text-[var(--admin-link)]">
                                           {confirmationState.description}
                                         </p>
-                                        <label className="mt-3 flex items-center gap-2 text-[11px] text-[#1E3A8A]">
+                                        <label className="mt-3 flex items-center gap-2 text-[11px] text-[var(--info)]">
                                           <input
                                             type="checkbox"
                                             checked={confirmationChecked}

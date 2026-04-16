@@ -1,23 +1,23 @@
 function statusClasses(status) {
   if (status === "success") {
-    return "border-[#A7F3D0] bg-[#ECFDF5] text-[#10B981]";
+    return "border-[var(--admin-success-line)] bg-[var(--admin-success-surface)] text-[var(--success)]";
   }
   if (status === "running" || status === "queued") {
-    return "border-[#BFDBFE] bg-[#EFF6FF] text-[#3B82F6]";
+    return "border-[var(--admin-info-line)] bg-[var(--admin-info-surface)] text-[var(--admin-link)]";
   }
   if (status === "stopped_for_operator_review") {
-    return "border-[#FDE68A] bg-[#FFFBEB] text-[#F59E0B]";
+    return "border-[var(--admin-warning-line)] bg-[var(--admin-warning-surface)] text-[var(--warning)]";
   }
   if (status === "stopped_for_admin_approval") {
-    return "border-[#FDE68A] bg-[#FFFBEB] text-[#F59E0B]";
+    return "border-[var(--admin-warning-line)] bg-[var(--admin-warning-surface)] text-[var(--warning)]";
   }
   if (status === "blocked") {
-    return "border-[#FDE68A] bg-[#FFFBEB] text-[#F59E0B]";
+    return "border-[var(--admin-warning-line)] bg-[var(--admin-warning-surface)] text-[var(--warning)]";
   }
   if (status === "failed" || status === "cancelled") {
-    return "border-[#FECACA] bg-[#FEF2F2] text-[#EF4444]";
+    return "border-[var(--admin-danger-line)] bg-[var(--admin-danger-surface)] text-[var(--danger)]";
   }
-  return "border-[#E5EAF0] bg-[#F3F4F6] text-[#1F2937]";
+  return "border-[var(--admin-line)] bg-[var(--admin-surface-soft)] text-[var(--admin-text)]";
 }
 
 export default function JobStatusBadge({ status }) {

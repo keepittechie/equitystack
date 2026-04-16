@@ -34,7 +34,7 @@ function cloneActions(actions) {
 
 function SummaryCard({ title, report, modeLabel }) {
   return (
-    <div className="rounded border border-zinc-300 bg-white p-3 shadow-sm">
+    <div className="rounded border border-zinc-300 bg-[var(--admin-surface)] p-3 shadow-sm">
       <p className="text-[11px] text-gray-600">{title}</p>
       {report ? (
         <div className="mt-2 space-y-1 text-[12px]">
@@ -70,26 +70,26 @@ function getTrustBannerConfig(summary) {
 
   if (summary.severity === "critical") {
     return {
-      border: "border-[#FCA5A5]",
-      bg: "bg-[#FEF2F2]",
-      text: "text-[#991B1B]",
+      border: "border-[var(--admin-danger-line)]",
+      bg: "bg-[var(--admin-danger-surface)]",
+      text: "text-[var(--danger)]",
       label: trustState,
       tone,
     };
   }
   if (summary.severity === "warning") {
     return {
-      border: "border-[#FCD34D]",
-      bg: "bg-[#FFFBEB]",
-      text: "text-[#92400E]",
+      border: "border-[var(--admin-warning-line)]",
+      bg: "bg-[var(--admin-warning-surface)]",
+      text: "text-[var(--warning)]",
       label: trustState,
       tone,
     };
   }
   return {
-    border: "border-[#86EFAC]",
-    bg: "bg-[#F0FDF4]",
-    text: "text-[#166534]",
+    border: "border-[var(--admin-success-line)]",
+    bg: "bg-[var(--admin-success-surface)]",
+    text: "text-[var(--success)]",
     label: trustState,
     tone,
   };
@@ -180,59 +180,59 @@ export default function LegislativeWorkflowWorkspace({ workspace }) {
               <p className={`text-[11px] font-medium uppercase tracking-wide ${trustBanner.text}`}>
                 {trustBanner.label}
               </p>
-              <h2 className="text-base font-semibold text-[#1F2937]">
+              <h2 className="text-base font-semibold text-[var(--admin-text)]">
                 {outcomeSummary.user_message}
               </h2>
-              <p className="max-w-5xl text-[12px] text-[#4B5563]">
+              <p className="max-w-5xl text-[12px] text-[var(--admin-text-soft)]">
                 {outcomeSummary.next_step_message || outcomeSummary.next_step}
               </p>
             </div>
-            <div className="rounded border border-white/60 bg-white/70 px-3 py-2 text-[11px] text-[#4B5563]">
-              <div>AI status: <span className={`font-semibold ${aiStateTone === "danger" ? "text-[#991B1B]" : aiStateTone === "warning" ? "text-[#92400E]" : aiStateTone === "success" ? "text-[#166534]" : "text-[#1F2937]"}`}>{aiState}</span></div>
-              <div>Fallback used: <span className="font-semibold text-[#1F2937]">{outcomeSummary.ai_status?.fallback_used || 0}/{outcomeSummary.ai_status?.total_items || 0}</span></div>
-              <div>Confidence: <span className={`font-semibold ${confidenceTone === "danger" ? "text-[#991B1B]" : confidenceTone === "warning" ? "text-[#92400E]" : confidenceTone === "success" ? "text-[#166534]" : "text-[#1F2937]"}`}>{confidenceLabel}</span></div>
+            <div className="rounded border border-[var(--admin-line)]/60 bg-[var(--admin-surface)]/70 px-3 py-2 text-[11px] text-[var(--admin-text-soft)]">
+              <div>AI status: <span className={`font-semibold ${aiStateTone === "danger" ? "text-[var(--danger)]" : aiStateTone === "warning" ? "text-[var(--warning)]" : aiStateTone === "success" ? "text-[var(--success)]" : "text-[var(--admin-text)]"}`}>{aiState}</span></div>
+              <div>Fallback used: <span className="font-semibold text-[var(--admin-text)]">{outcomeSummary.ai_status?.fallback_used || 0}/{outcomeSummary.ai_status?.total_items || 0}</span></div>
+              <div>Confidence: <span className={`font-semibold ${confidenceTone === "danger" ? "text-[var(--danger)]" : confidenceTone === "warning" ? "text-[var(--warning)]" : confidenceTone === "success" ? "text-[var(--success)]" : "text-[var(--admin-text)]"}`}>{confidenceLabel}</span></div>
             </div>
           </div>
           <div className="mt-3 grid gap-3 md:grid-cols-4 text-[12px]">
-            <div className="rounded border border-[#E5EAF0] bg-white p-3">
-              <p className="text-[11px] text-[#6B7280]">AI review</p>
-              <p className="mt-1 font-semibold text-[#1F2937]">
+            <div className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] p-3">
+              <p className="text-[11px] text-[var(--admin-text-muted)]">AI review</p>
+              <p className="mt-1 font-semibold text-[var(--admin-text)]">
                 {outcomeSummary.ai_status?.ai_success || 0} AI-reviewed / {outcomeSummary.ai_status?.total_items || 0} total
               </p>
-              <p className="mt-1 text-[11px] text-[#4B5563]">
+              <p className="mt-1 text-[11px] text-[var(--admin-text-soft)]">
                 primary {outcomeSummary.ai_status?.primary_model_success || 0}, fallback model {outcomeSummary.ai_status?.fallback_model_success || 0}, heuristic {outcomeSummary.ai_status?.heuristic_fallback || 0}
               </p>
             </div>
-            <div className="rounded border border-[#E5EAF0] bg-white p-3">
-              <p className="text-[11px] text-[#6B7280]">Decisions</p>
-              <p className="mt-1 font-semibold text-[#1F2937]">
+            <div className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] p-3">
+              <p className="text-[11px] text-[var(--admin-text-muted)]">Decisions</p>
+              <p className="mt-1 font-semibold text-[var(--admin-text)]">
                 {outcomeSummary.decisions?.kept || 0} kept, {outcomeSummary.decisions?.modified || 0} modified, {outcomeSummary.decisions?.removed || 0} removed
               </p>
-              <p className="mt-1 text-[11px] text-[#4B5563]">
+              <p className="mt-1 text-[11px] text-[var(--admin-text-soft)]">
                 {reviewQueueCount > 0
                   ? `${reviewQueueCount} actionable item(s) require manual review`
                   : "No actionable legislative items require manual review"}
               </p>
             </div>
-            <div className="rounded border border-[#E5EAF0] bg-white p-3">
-              <p className="text-[11px] text-[#6B7280]">Manual review queue</p>
-              <p className="mt-1 font-semibold text-[#1F2937]">{reviewQueueCount} item(s)</p>
-              <p className="mt-1 break-all font-mono text-[11px] text-[#4B5563]">
+            <div className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] p-3">
+              <p className="text-[11px] text-[var(--admin-text-muted)]">Manual review queue</p>
+              <p className="mt-1 font-semibold text-[var(--admin-text)]">{reviewQueueCount} item(s)</p>
+              <p className="mt-1 break-all font-mono text-[11px] text-[var(--admin-text-soft)]">
                 {workspace.review_bundle?.path || workspace.manual_review_queue?.path || "No canonical review bundle recorded."}
               </p>
             </div>
-            <div className="rounded border border-[#E5EAF0] bg-white p-3">
-              <p className="text-[11px] text-[#6B7280]">Failure reason</p>
-              <p className="mt-1 font-semibold text-[#1F2937]">
+            <div className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] p-3">
+              <p className="text-[11px] text-[var(--admin-text-muted)]">Failure reason</p>
+              <p className="mt-1 font-semibold text-[var(--admin-text)]">
                 {outcomeSummary.ai_status?.ai_failure_reason || "No AI failure recorded"}
               </p>
-              <p className="mt-1 text-[11px] text-[#4B5563]">
+              <p className="mt-1 text-[11px] text-[var(--admin-text-soft)]">
                 Trust state: {trustBanner.label}
               </p>
             </div>
           </div>
           {debugState ? (
-            <p className="mt-3 text-[11px] text-[#4B5563]">
+            <p className="mt-3 text-[11px] text-[var(--admin-text-soft)]">
               Canonical bundle debug: {debugState.total_actions} total actions,{" "}
               {debugState.actionable_manual_review} actionable manual review,{" "}
               {debugState.stale_actions} stale, {debugState.applied_actions} applied, state{" "}
@@ -243,16 +243,16 @@ export default function LegislativeWorkflowWorkspace({ workspace }) {
       ) : null}
 
       {!workspace.review_bundle ? (
-        <section className="rounded border border-zinc-300 bg-white p-4 shadow-sm">
-          <p className="font-semibold text-[#1F2937]">No legislative review bundle is available yet.</p>
-          <p className="mt-2 text-[12px] text-[#4B5563]">
+        <section className="rounded border border-zinc-300 bg-[var(--admin-surface)] p-4 shadow-sm">
+          <p className="font-semibold text-[var(--admin-text)]">No legislative review bundle is available yet.</p>
+          <p className="mt-2 text-[12px] text-[var(--admin-text-soft)]">
             If manual-review items exist, inspect the AI review and manual-review queue artifacts before rerunning the wrapped legislative review step.
           </p>
           <div className="mt-3 flex flex-wrap gap-3 text-[12px]">
-            <Link href="/admin/workflows" className="text-[#3B82F6] underline underline-offset-2">
+            <Link href="/admin/workflows" className="text-[var(--admin-link)] underline underline-offset-2">
               Open workflows
             </Link>
-            <a href="#artifact-state" className="text-[#3B82F6] underline underline-offset-2">
+            <a href="#artifact-state" className="text-[var(--admin-link)] underline underline-offset-2">
               Inspect missing artifact
             </a>
           </div>
@@ -260,30 +260,30 @@ export default function LegislativeWorkflowWorkspace({ workspace }) {
       ) : null}
 
       <section className="grid gap-3 lg:grid-cols-4">
-        <div className="rounded border border-zinc-300 bg-white p-3 shadow-sm">
+        <div className="rounded border border-zinc-300 bg-[var(--admin-surface)] p-3 shadow-sm">
           <p className="text-[11px] text-gray-600">Workflow state</p>
           <p className="mt-1 text-base font-semibold">{workspace.workflow_status}</p>
         </div>
-        <div className="rounded border border-zinc-300 bg-white p-3 shadow-sm">
+        <div className="rounded border border-zinc-300 bg-[var(--admin-surface)] p-3 shadow-sm">
           <p className="text-[11px] text-gray-600">Requested model</p>
           <p className="mt-1 text-base font-semibold">
             {workspace.requested_model || "Unavailable"}
           </p>
         </div>
-        <div className="rounded border border-zinc-300 bg-white p-3 shadow-sm">
+        <div className="rounded border border-zinc-300 bg-[var(--admin-surface)] p-3 shadow-sm">
           <p className="text-[11px] text-gray-600">Actionable approvals</p>
           <p className="mt-1 text-base font-semibold">
             {workspace.counts.approved_pending_actions} approved / {workspace.counts.pending_unreviewed_actions} pending
           </p>
         </div>
-        <div className="rounded border border-zinc-300 bg-white p-3 shadow-sm">
+        <div className="rounded border border-zinc-300 bg-[var(--admin-surface)] p-3 shadow-sm">
           <p className="text-[11px] text-gray-600">Manual review queue</p>
           <p className="mt-1 text-base font-semibold">{reviewQueueCount}</p>
         </div>
       </section>
 
       {workspace.review_bundle ? (
-      <section id="bundle-approval" className="rounded border border-zinc-300 bg-white p-4 shadow-sm space-y-3">
+      <section id="bundle-approval" className="rounded border border-zinc-300 bg-[var(--admin-surface)] p-4 shadow-sm space-y-3">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-[11px] text-gray-600">Canonical review bundle</p>
@@ -298,7 +298,7 @@ export default function LegislativeWorkflowWorkspace({ workspace }) {
               type="button"
               onClick={saveApprovals}
               disabled={isPending || !permissions.save_approvals?.allowed}
-              className="rounded border px-3 py-1.5 bg-white text-[12px]"
+              className="rounded border px-3 py-1.5 bg-[var(--admin-surface)] text-[12px]"
             >
               Save Approvals
             </button>
@@ -312,7 +312,7 @@ export default function LegislativeWorkflowWorkspace({ workspace }) {
                 )
               }
               disabled={isPending || !permissions.run_apply_dry_run?.allowed}
-              className="rounded border px-3 py-1.5 bg-white text-[12px]"
+              className="rounded border px-3 py-1.5 bg-[var(--admin-surface)] text-[12px]"
             >
               Run Apply Dry-Run
             </button>
@@ -329,7 +329,7 @@ export default function LegislativeWorkflowWorkspace({ workspace }) {
                 );
               }}
               disabled={isPending || !permissions.apply_bundle?.allowed}
-              className="rounded border border-[#3B82F6] bg-[#3B82F6] px-3 py-1.5 text-[12px] text-white"
+              className="rounded border border-[var(--admin-link)] bg-[var(--admin-link)] px-3 py-1.5 text-[12px] text-[var(--background)]"
             >
               Apply Approved Actions
             </button>
@@ -343,7 +343,7 @@ export default function LegislativeWorkflowWorkspace({ workspace }) {
                 )
               }
               disabled={isPending || !permissions.run_import_dry_run?.allowed}
-              className="rounded border px-3 py-1.5 bg-white text-[12px]"
+              className="rounded border px-3 py-1.5 bg-[var(--admin-surface)] text-[12px]"
             >
               Run Import Dry-Run
             </button>
@@ -360,7 +360,7 @@ export default function LegislativeWorkflowWorkspace({ workspace }) {
                 );
               }}
               disabled={isPending || !permissions.apply_import?.allowed}
-              className="rounded border border-[#3B82F6] bg-[#3B82F6] px-3 py-1.5 text-[12px] text-white"
+              className="rounded border border-[var(--admin-link)] bg-[var(--admin-link)] px-3 py-1.5 text-[12px] text-[var(--background)]"
             >
               Apply Import
             </button>
@@ -421,7 +421,7 @@ export default function LegislativeWorkflowWorkspace({ workspace }) {
       ) : null}
 
       <section className="grid gap-4 xl:grid-cols-[0.9fr_1.1fr]">
-        <div id="workflow-blockers" className="rounded border border-zinc-300 bg-white p-4 shadow-sm">
+        <div id="workflow-blockers" className="rounded border border-zinc-300 bg-[var(--admin-surface)] p-4 shadow-sm">
           <h2 className="text-base font-semibold">Workflow blockers</h2>
           <div className="mt-3 space-y-2 text-[12px]">
             {(workspace.blockers || []).length ? (
@@ -436,7 +436,7 @@ export default function LegislativeWorkflowWorkspace({ workspace }) {
           </div>
         </div>
 
-        <div className="rounded border border-zinc-300 bg-white p-4 shadow-sm">
+        <div className="rounded border border-zinc-300 bg-[var(--admin-surface)] p-4 shadow-sm">
           <h2 className="text-base font-semibold">Next safe step</h2>
           <p className="mt-3 font-semibold">{workspace.next_step.label}</p>
           <div className="mt-4 space-y-2">
@@ -457,7 +457,7 @@ export default function LegislativeWorkflowWorkspace({ workspace }) {
         <SummaryCard title="Latest import report" report={workspace.import_report} />
       </section>
 
-      <section id="manual-review-queue" className="rounded border border-zinc-300 bg-white p-4 shadow-sm">
+      <section id="manual-review-queue" className="rounded border border-zinc-300 bg-[var(--admin-surface)] p-4 shadow-sm">
         <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
           <div>
             <h2 className="text-base font-semibold">Manual review queue</h2>
@@ -465,9 +465,9 @@ export default function LegislativeWorkflowWorkspace({ workspace }) {
               These are the canonical legislative rows that still need human review before bundle approval or apply can continue.
             </p>
           </div>
-          <div className="rounded border border-[#E5EAF0] bg-[#F9FBFD] px-3 py-2 text-[11px] text-[#4B5563]">
-            <div>Queue items: <span className="font-semibold text-[#1F2937]">{reviewQueueCount}</span></div>
-            <div className="mt-1 break-all font-mono text-[#6B7280]">
+          <div className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface-muted)] px-3 py-2 text-[11px] text-[var(--admin-text-soft)]">
+            <div>Queue items: <span className="font-semibold text-[var(--admin-text)]">{reviewQueueCount}</span></div>
+            <div className="mt-1 break-all font-mono text-[var(--admin-text-muted)]">
               {workspace.review_bundle?.path || workspace.manual_review_queue?.path || "No canonical review bundle recorded."}
             </div>
           </div>
@@ -487,9 +487,9 @@ export default function LegislativeWorkflowWorkspace({ workspace }) {
               </thead>
               <tbody>
                 {manualReviewItems.map((item, index) => (
-                  <tr key={`${item.future_bill_link_id || item.bill_number || item.future_bill_title || "manual"}:${index}`} className="align-top odd:bg-white even:bg-zinc-50/50">
+                  <tr key={`${item.future_bill_link_id || item.bill_number || item.future_bill_title || "manual"}:${index}`} className="align-top odd:bg-[var(--admin-surface)] even:bg-zinc-50/50">
                     <td className="border-b border-zinc-200 px-3 py-2">
-                      <div className="font-medium text-[#1F2937]">
+                      <div className="font-medium text-[var(--admin-text)]">
                         {item.future_bill_title || "Untitled future bill"}
                       </div>
                       <div className="mt-1 text-[11px] text-zinc-700">
@@ -501,7 +501,7 @@ export default function LegislativeWorkflowWorkspace({ workspace }) {
                       <div className="mt-1">risk: {item.original_risk_level || "unknown"}</div>
                     </td>
                     <td className="border-b border-zinc-200 px-3 py-2 text-[11px] text-zinc-700">
-                      <div className="font-medium text-[#1F2937]">{item.final_decision || "review_manually"}</div>
+                      <div className="font-medium text-[var(--admin-text)]">{item.final_decision || "review_manually"}</div>
                       <div className="mt-1">match: {item.match_label || "unknown"}</div>
                       <div className="mt-1">score: {item.total_score ?? "n/a"}</div>
                     </td>
@@ -526,16 +526,16 @@ export default function LegislativeWorkflowWorkspace({ workspace }) {
             </table>
           </div>
         ) : (
-          <div className="rounded border border-[#E5EAF0] bg-[#F9FBFD] p-3 text-[12px] text-[#4B5563]">
-            <p className="font-medium text-[#1F2937]">No actionable legislative items require manual review.</p>
+          <div className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface-muted)] p-3 text-[12px] text-[var(--admin-text-soft)]">
+            <p className="font-medium text-[var(--admin-text)]">No actionable legislative items require manual review.</p>
             <p className="mt-1">
               Next step: run the legislative workflow again if you expected new review work, or continue to bundle approval if the queue is genuinely clear.
             </p>
             <div className="mt-2 flex flex-wrap gap-3">
-              <Link href="/admin/workflows" className="text-[#3B82F6] underline underline-offset-2">
+              <Link href="/admin/workflows" className="text-[var(--admin-link)] underline underline-offset-2">
                 Open workflows
               </Link>
-              <a href="#bundle-approval" className="text-[#3B82F6] underline underline-offset-2">
+              <a href="#bundle-approval" className="text-[var(--admin-link)] underline underline-offset-2">
                 Open bundle approval
               </a>
             </div>
@@ -544,7 +544,7 @@ export default function LegislativeWorkflowWorkspace({ workspace }) {
       </section>
 
       {workspace.review_bundle ? (
-      <section className="rounded border border-zinc-300 bg-white p-4 shadow-sm">
+      <section className="rounded border border-zinc-300 bg-[var(--admin-surface)] p-4 shadow-sm">
         <div className="mb-3">
           <h2 className="text-base font-semibold">Bundle actions</h2>
           <p className="mt-1 text-[12px] text-gray-600">
@@ -563,7 +563,7 @@ export default function LegislativeWorkflowWorkspace({ workspace }) {
             </thead>
             <tbody>
               {(actions || []).map((action) => (
-                <tr key={action.action_id} className="align-top odd:bg-white even:bg-zinc-50/50">
+                <tr key={action.action_id} className="align-top odd:bg-[var(--admin-surface)] even:bg-zinc-50/50">
                   <td className="border-b border-zinc-200 px-3 py-2">
                     <div className="text-[11px] uppercase tracking-wide text-zinc-500">
                       Future bill {action.future_bill_id}
@@ -592,7 +592,7 @@ export default function LegislativeWorkflowWorkspace({ workspace }) {
                     </select>
                   </td>
                   <td className="border-b border-zinc-200 px-3 py-2">
-                    <details className="rounded border bg-white p-2">
+                    <details className="rounded border bg-[var(--admin-surface)] p-2">
                       <summary className="cursor-pointer text-[12px] font-medium">Inspect</summary>
                       <div className="mt-2 space-y-2 text-[11px] text-zinc-700">
                         <div>
@@ -623,9 +623,9 @@ export default function LegislativeWorkflowWorkspace({ workspace }) {
           </table>
         </div>
         {!actions.length ? (
-          <section className="mt-3 rounded border border-zinc-300 bg-white p-4 shadow-sm">
-            <p className="font-medium text-[#1F2937]">No bundle approval items are pending.</p>
-            <p className="mt-1 text-[12px] text-[#4B5563]">
+          <section className="mt-3 rounded border border-zinc-300 bg-[var(--admin-surface)] p-4 shadow-sm">
+            <p className="font-medium text-[var(--admin-text)]">No bundle approval items are pending.</p>
+            <p className="mt-1 text-[12px] text-[var(--admin-text-soft)]">
               Next step: continue with manual review, workflow reports, or the next guarded apply/import checkpoint if the bundle is genuinely clear.
             </p>
           </section>
@@ -633,7 +633,7 @@ export default function LegislativeWorkflowWorkspace({ workspace }) {
       </section>
       ) : null}
 
-      <section id="artifact-state" className="rounded border border-zinc-300 bg-white p-4 shadow-sm">
+      <section id="artifact-state" className="rounded border border-zinc-300 bg-[var(--admin-surface)] p-4 shadow-sm">
         <h2 className="text-base font-semibold">Artifact state</h2>
         <div className="mt-3 grid gap-3 lg:grid-cols-2 text-[12px]">
           {Object.values(workspace.artifact_status).map((artifact) => (

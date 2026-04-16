@@ -86,12 +86,12 @@ function formatDuration(startedAt, finishedAt) {
 function CompactBadge({ children, tone = "default", mono = false }) {
   const palette =
     tone === "danger"
-      ? "border-[#FECACA] bg-[#FEF2F2] text-[#B91C1C]"
+      ? "border-[var(--admin-danger-line)] bg-[var(--admin-danger-surface)] text-[var(--danger)]"
       : tone === "warning"
-        ? "border-[#FDE68A] bg-[#FFFBEB] text-[#B45309]"
+        ? "border-[var(--admin-warning-line)] bg-[var(--admin-warning-surface)] text-[var(--warning)]"
         : tone === "success"
-          ? "border-[#A7F3D0] bg-[#ECFDF5] text-[#047857]"
-          : "border-[#E5EAF0] bg-[#F9FBFD] text-[#4B5563]";
+          ? "border-[var(--admin-success-line)] bg-[var(--admin-success-surface)] text-[var(--success)]"
+          : "border-[var(--admin-line)] bg-[var(--admin-surface-muted)] text-[var(--admin-text-soft)]";
 
   return (
     <span
@@ -120,12 +120,12 @@ function StateBadge({ value }) {
 function AlertBadge({ tone = "default", children }) {
   const palette =
     tone === "danger"
-      ? "border-[#FCA5A5] bg-[#FEF2F2] text-[#991B1B]"
+      ? "border-[var(--admin-danger-line)] bg-[var(--admin-danger-surface)] text-[var(--danger)]"
       : tone === "warning"
-        ? "border-[#FDE68A] bg-[#FFFBEB] text-[#92400E]"
+        ? "border-[var(--admin-warning-line)] bg-[var(--admin-warning-surface)] text-[var(--warning)]"
         : tone === "success"
-          ? "border-[#A7F3D0] bg-[#ECFDF5] text-[#166534]"
-          : "border-[#E5EAF0] bg-[#F9FBFD] text-[#4B5563]";
+          ? "border-[var(--admin-success-line)] bg-[var(--admin-success-surface)] text-[var(--success)]"
+          : "border-[var(--admin-line)] bg-[var(--admin-surface-muted)] text-[var(--admin-text-soft)]";
 
   return (
     <span className={`inline-flex items-center rounded border px-1.5 py-0.5 text-[10px] uppercase tracking-wide ${palette}`}>
@@ -1035,12 +1035,12 @@ function buildAttentionRows(items, workflowOutcomeMap) {
 function TrustBanner({ banner }) {
   const palette =
     banner.tone === "danger"
-      ? "border-[#FCA5A5] bg-[#FEF2F2] text-[#991B1B]"
+      ? "border-[var(--admin-danger-line)] bg-[var(--admin-danger-surface)] text-[var(--danger)]"
       : banner.tone === "warning"
-        ? "border-[#FCD34D] bg-[#FFFBEB] text-[#92400E]"
+        ? "border-[var(--admin-warning-line)] bg-[var(--admin-warning-surface)] text-[var(--warning)]"
         : banner.tone === "success"
-          ? "border-[#86EFAC] bg-[#F0FDF4] text-[#166534]"
-          : "border-[#E5EAF0] bg-[#F9FBFD] text-[#4B5563]";
+          ? "border-[var(--admin-success-line)] bg-[var(--admin-success-surface)] text-[var(--success)]"
+          : "border-[var(--admin-line)] bg-[var(--admin-surface-muted)] text-[var(--admin-text-soft)]";
 
   return (
     <section
@@ -1071,45 +1071,45 @@ function AttentionTable({ rows }) {
       />
       <TableShell>
         <table className="min-w-[1220px] w-full text-[11px]">
-          <thead className="bg-[#F9FBFD] text-left uppercase tracking-wide text-[#6B7280]">
+          <thead className="bg-[var(--admin-surface-muted)] text-left uppercase tracking-wide text-[var(--admin-text-muted)]">
             <tr>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Priority</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Workflow</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Issue</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Why It Matters</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Trust Level</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Next Step</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Action</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Priority</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Workflow</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Issue</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Why It Matters</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Trust Level</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Next Step</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Action</th>
             </tr>
           </thead>
           <tbody>
             {rows.length ? (
               rows.map((row) => (
-                <tr key={row.id} className="align-top odd:bg-white even:bg-[#F9FBFD] hover:bg-[#F1F5F9]">
-                  <td className="border-b border-[#E5EAF0] px-2 py-1 font-mono font-medium text-[#111827]">
+                <tr key={row.id} className="align-top odd:bg-[var(--admin-surface)] even:bg-[var(--admin-surface-muted)] hover:bg-[var(--admin-surface-soft)]">
+                  <td className="border-b border-[var(--admin-line)] px-2 py-1 font-mono font-medium text-[var(--admin-text)]">
                     {toPriorityCode(row.priorityLabel)}
                   </td>
-                  <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">
+                  <td className="border-b border-[var(--admin-line)] px-2 py-1 text-[var(--admin-text-soft)]">
                     {toWorkflowLabel(row.workflowFamily)}
                   </td>
-                  <td className="border-b border-[#E5EAF0] px-2 py-1">
-                    <div className="font-medium text-[#1F2937]">{row.title}</div>
-                    <div className="mt-0.5 font-mono text-[10px] text-[#6B7280]">
+                  <td className="border-b border-[var(--admin-line)] px-2 py-1">
+                    <div className="font-medium text-[var(--admin-text)]">{row.title}</div>
+                    <div className="mt-0.5 font-mono text-[10px] text-[var(--admin-text-muted)]">
                       {row.metadata?.sourceId || row.id}
                     </div>
                   </td>
-                  <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">
+                  <td className="border-b border-[var(--admin-line)] px-2 py-1 text-[var(--admin-text-soft)]">
                     {row.whyItMatters}
                   </td>
-                  <td className="border-b border-[#E5EAF0] px-2 py-1">
+                  <td className="border-b border-[var(--admin-line)] px-2 py-1">
                     <AlertBadge tone={row.trust.tone}>{row.trust.label}</AlertBadge>
                   </td>
-                  <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">
+                  <td className="border-b border-[var(--admin-line)] px-2 py-1 text-[var(--admin-text-soft)]">
                     <div className="max-w-[220px] truncate" title={row.nextStep}>
                       {row.nextStep}
                     </div>
                   </td>
-                  <td className="border-b border-[#E5EAF0] px-2 py-1">
+                  <td className="border-b border-[var(--admin-line)] px-2 py-1">
                     {row.quickAction?.action ? (
                       <OperatorActionButton
                         action={row.quickAction.action}
@@ -1137,7 +1137,7 @@ function AttentionTable({ rows }) {
               ))
             ) : (
               <tr>
-                <td colSpan={7} className="px-2 py-3 text-[11px] text-[#6B7280]">
+                <td colSpan={7} className="px-2 py-3 text-[11px] text-[var(--admin-text-muted)]">
                   No urgent operator attention items are recorded right now.
                 </td>
               </tr>
@@ -1152,27 +1152,27 @@ function AttentionTable({ rows }) {
 function WorkflowSummaryBlock({ outcome, fallbackMessage }) {
   if (!outcome) {
     return (
-      <section className="rounded border border-[#E5EAF0] bg-white px-3 py-3">
+      <section className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] px-3 py-3">
         <div className="space-y-1">
-          <p className="font-mono text-[11px] uppercase tracking-wide text-[#6B7280]">
+          <p className="font-mono text-[11px] uppercase tracking-wide text-[var(--admin-text-muted)]">
             Workflow Summary
           </p>
-          <h3 className="text-sm font-semibold text-[#1F2937]">{fallbackMessage.title}</h3>
-          <p className="text-[11px] text-[#6B7280]">{fallbackMessage.description}</p>
+          <h3 className="text-sm font-semibold text-[var(--admin-text)]">{fallbackMessage.title}</h3>
+          <p className="text-[11px] text-[var(--admin-text-muted)]">{fallbackMessage.description}</p>
         </div>
       </section>
     );
   }
 
   return (
-    <section className="rounded border border-[#E5EAF0] bg-white px-3 py-3">
+    <section className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] px-3 py-3">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="space-y-1">
-          <p className="font-mono text-[11px] uppercase tracking-wide text-[#6B7280]">
+          <p className="font-mono text-[11px] uppercase tracking-wide text-[var(--admin-text-muted)]">
             {outcome.workflow}
           </p>
-          <h3 className="text-sm font-semibold text-[#1F2937]">{outcome.outcome}</h3>
-          <p className="text-[11px] text-[#6B7280]">
+          <h3 className="text-sm font-semibold text-[var(--admin-text)]">{outcome.outcome}</h3>
+          <p className="text-[11px] text-[var(--admin-text-muted)]">
             Last run {formatAdminDateTime(outcome.lastRunAt)}. Technical state: {humanizeToken(outcome.state)}.
           </p>
         </div>
@@ -1188,29 +1188,29 @@ function WorkflowSummaryBlock({ outcome, fallbackMessage }) {
       </div>
 
       <div className="mt-3 grid gap-2 md:grid-cols-3 xl:grid-cols-6">
-        <div className="rounded border border-[#E5EAF0] bg-[#F9FBFD] px-2 py-2">
-          <div className="text-[10px] uppercase tracking-wide text-[#6B7280]">Items</div>
-          <div className="mt-1 text-sm font-semibold text-[#1F2937]">{outcome.itemsProcessed || 0}</div>
+        <div className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface-muted)] px-2 py-2">
+          <div className="text-[10px] uppercase tracking-wide text-[var(--admin-text-muted)]">Items</div>
+          <div className="mt-1 text-sm font-semibold text-[var(--admin-text)]">{outcome.itemsProcessed || 0}</div>
         </div>
-        <div className="rounded border border-[#E5EAF0] bg-[#F9FBFD] px-2 py-2">
-          <div className="text-[10px] uppercase tracking-wide text-[#6B7280]">Manual Review</div>
-          <div className="mt-1 text-sm font-semibold text-[#1F2937]">{outcome.manualReviewCount || 0}</div>
+        <div className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface-muted)] px-2 py-2">
+          <div className="text-[10px] uppercase tracking-wide text-[var(--admin-text-muted)]">Manual Review</div>
+          <div className="mt-1 text-sm font-semibold text-[var(--admin-text)]">{outcome.manualReviewCount || 0}</div>
         </div>
-        <div className="rounded border border-[#E5EAF0] bg-[#F9FBFD] px-2 py-2">
-          <div className="text-[10px] uppercase tracking-wide text-[#6B7280]">{outcome.approvedLabel}</div>
-          <div className="mt-1 text-sm font-semibold text-[#1F2937]">{outcome.approvedCount || 0}</div>
+        <div className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface-muted)] px-2 py-2">
+          <div className="text-[10px] uppercase tracking-wide text-[var(--admin-text-muted)]">{outcome.approvedLabel}</div>
+          <div className="mt-1 text-sm font-semibold text-[var(--admin-text)]">{outcome.approvedCount || 0}</div>
         </div>
-        <div className="rounded border border-[#E5EAF0] bg-[#F9FBFD] px-2 py-2">
-          <div className="text-[10px] uppercase tracking-wide text-[#6B7280]">AI Result</div>
-          <div className="mt-1 text-sm font-semibold text-[#1F2937]">{humanizeAiStatus(outcome.aiStatus)}</div>
+        <div className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface-muted)] px-2 py-2">
+          <div className="text-[10px] uppercase tracking-wide text-[var(--admin-text-muted)]">AI Result</div>
+          <div className="mt-1 text-sm font-semibold text-[var(--admin-text)]">{humanizeAiStatus(outcome.aiStatus)}</div>
         </div>
-        <div className="rounded border border-[#E5EAF0] bg-[#F9FBFD] px-2 py-2">
-          <div className="text-[10px] uppercase tracking-wide text-[#6B7280]">Fallback</div>
-          <div className="mt-1 text-sm font-semibold text-[#1F2937]">{summarizeFallbackStatus(outcome)}</div>
+        <div className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface-muted)] px-2 py-2">
+          <div className="text-[10px] uppercase tracking-wide text-[var(--admin-text-muted)]">Fallback</div>
+          <div className="mt-1 text-sm font-semibold text-[var(--admin-text)]">{summarizeFallbackStatus(outcome)}</div>
         </div>
-        <div className="rounded border border-[#E5EAF0] bg-[#F9FBFD] px-2 py-2">
-          <div className="text-[10px] uppercase tracking-wide text-[#6B7280]">Next Step</div>
-          <div className="mt-1 text-sm font-semibold text-[#1F2937]">
+        <div className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface-muted)] px-2 py-2">
+          <div className="text-[10px] uppercase tracking-wide text-[var(--admin-text-muted)]">Next Step</div>
+          <div className="mt-1 text-sm font-semibold text-[var(--admin-text)]">
             {getExplicitActionLabel(
               outcome.nextActionConfig,
               outcome.nextAction,
@@ -1221,7 +1221,7 @@ function WorkflowSummaryBlock({ outcome, fallbackMessage }) {
       </div>
 
       <div className="mt-3 flex flex-wrap items-start justify-between gap-3">
-        <p className="max-w-4xl text-[11px] text-[#4B5563]">
+        <p className="max-w-4xl text-[11px] text-[var(--admin-text-soft)]">
           {outcome.reason}
         </p>
         <div className="shrink-0">
@@ -1271,14 +1271,14 @@ function OperatorMaintenanceSection({ cleanupAction }) {
   }
 
   return (
-    <section id="operator-maintenance" className="rounded border border-[#E5EAF0] bg-white px-3 py-3">
+    <section id="operator-maintenance" className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] px-3 py-3">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="max-w-3xl space-y-1">
-          <p className="font-mono text-[11px] uppercase tracking-wide text-[#6B7280]">
+          <p className="font-mono text-[11px] uppercase tracking-wide text-[var(--admin-text-muted)]">
             Operator Maintenance
           </p>
-          <h2 className="text-sm font-semibold text-[#1F2937]">Stale workflow cleanup</h2>
-          <p className="text-[11px] text-[#6B7280]">
+          <h2 className="text-sm font-semibold text-[var(--admin-text)]">Stale workflow cleanup</h2>
+          <p className="text-[11px] text-[var(--admin-text-muted)]">
             Preview or archive old unfinished operator sessions. This marks matching session artifacts inactive and
             keeps audit files in place.
           </p>
@@ -1327,19 +1327,19 @@ function RecentWorkflowRunsTable({ jobs, sessionById, workflowOutcomeMap }) {
       />
       <TableShell>
         <table className="min-w-[1380px] w-full text-[11px]">
-          <thead className="bg-[#F9FBFD] text-left uppercase tracking-wide text-[#6B7280]">
+          <thead className="bg-[var(--admin-surface-muted)] text-left uppercase tracking-wide text-[var(--admin-text-muted)]">
             <tr>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Workflow</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Started</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Finished</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Status</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">AI Result</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Fallback</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Items</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Manual Review</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Outcome</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Next Step</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Details</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Workflow</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Started</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Finished</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Status</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">AI Result</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Fallback</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Items</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Manual Review</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Outcome</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Next Step</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Details</th>
             </tr>
           </thead>
           <tbody>
@@ -1408,21 +1408,21 @@ function RecentWorkflowRunsTable({ jobs, sessionById, workflowOutcomeMap }) {
                 );
 
                 return (
-                  <tr key={job.id} className="align-top odd:bg-white even:bg-[#F9FBFD] hover:bg-[#F1F5F9]">
-                    <td className="border-b border-[#E5EAF0] px-2 py-1">
-                      <div className="font-medium text-[#1F2937]">{toWorkflowLabel(job.workflowFamily)}</div>
-                      <div className="font-mono text-[10px] text-[#6B7280]">{job.actionTitle}</div>
+                  <tr key={job.id} className="align-top odd:bg-[var(--admin-surface)] even:bg-[var(--admin-surface-muted)] hover:bg-[var(--admin-surface-soft)]">
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1">
+                      <div className="font-medium text-[var(--admin-text)]">{toWorkflowLabel(job.workflowFamily)}</div>
+                      <div className="font-mono text-[10px] text-[var(--admin-text-muted)]">{job.actionTitle}</div>
                     </td>
-                    <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1 text-[var(--admin-text-soft)]">
                       {formatAdminDateTime(job.startedAt || job.createdAt)}
                     </td>
-                    <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1 text-[var(--admin-text-soft)]">
                       {formatAdminDateTime(job.finishedAt)}
                     </td>
-                    <td className="border-b border-[#E5EAF0] px-2 py-1">
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1">
                       <JobStatusBadge status={job.status} />
                     </td>
-                    <td className="border-b border-[#E5EAF0] px-2 py-1">
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1">
                       <AlertBadge
                         tone={
                           getAiStateTone(aiResult)
@@ -1431,22 +1431,22 @@ function RecentWorkflowRunsTable({ jobs, sessionById, workflowOutcomeMap }) {
                         {aiResult}
                       </AlertBadge>
                     </td>
-                    <td className="border-b border-[#E5EAF0] px-2 py-1 font-mono text-[10px] text-[#111827]">
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1 font-mono text-[10px] text-[var(--admin-text)]">
                       {fallbackText}
                     </td>
-                    <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">{itemsProcessed}</td>
-                    <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">{manualReviewCount}</td>
-                    <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1 text-[var(--admin-text-soft)]">{itemsProcessed}</td>
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1 text-[var(--admin-text-soft)]">{manualReviewCount}</td>
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1 text-[var(--admin-text-soft)]">
                       <div className="max-w-[280px] truncate" title={outcomeText}>
                         {outcomeText}
                       </div>
                     </td>
-                    <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1 text-[var(--admin-text-soft)]">
                       <div className="max-w-[220px] truncate" title={nextStep}>
                         {nextStep}
                       </div>
                     </td>
-                    <td className="border-b border-[#E5EAF0] px-2 py-1">
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1">
                       <TableLink href={detailHref}>{detailLabel}</TableLink>
                     </td>
                   </tr>
@@ -1454,7 +1454,7 @@ function RecentWorkflowRunsTable({ jobs, sessionById, workflowOutcomeMap }) {
               })
             ) : (
               <tr>
-                <td colSpan={11} className="px-2 py-3 text-[11px] text-[#6B7280]">
+                <td colSpan={11} className="px-2 py-3 text-[11px] text-[var(--admin-text-muted)]">
                   <div>No recent workflow runs are recorded.</div>
                   <div className="mt-1">Next step: open workflow surfaces to inspect the current canonical state or start a new safe workflow run.</div>
                   <div className="mt-2 flex flex-wrap gap-3">
@@ -1484,16 +1484,16 @@ function ReviewQueueTable({ items, workflowOutcomeMap }) {
       />
       <TableShell>
         <table className="min-w-[1240px] w-full text-[11px]">
-          <thead className="bg-[#F9FBFD] text-left uppercase tracking-wide text-[#6B7280]">
+          <thead className="bg-[var(--admin-surface-muted)] text-left uppercase tracking-wide text-[var(--admin-text-muted)]">
             <tr>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Workflow</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Queue Type</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Record</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Reason</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Risk</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Trust State</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Action</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Details</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Workflow</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Queue Type</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Record</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Reason</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Risk</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Trust State</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Action</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Details</th>
             </tr>
           </thead>
           <tbody>
@@ -1502,25 +1502,25 @@ function ReviewQueueTable({ items, workflowOutcomeMap }) {
                 const workflowOutcome = workflowOutcomeMap.get(item.workflowFamily) || null;
                 const trust = deriveTrustFromItem(item, workflowOutcome);
                 return (
-                  <tr key={item.id} className="align-top odd:bg-white even:bg-[#F9FBFD] hover:bg-[#F1F5F9]">
-                    <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">
+                  <tr key={item.id} className="align-top odd:bg-[var(--admin-surface)] even:bg-[var(--admin-surface-muted)] hover:bg-[var(--admin-surface-soft)]">
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1 text-[var(--admin-text-soft)]">
                       {toWorkflowLabel(item.workflowFamily)}
                     </td>
-                    <td className="border-b border-[#E5EAF0] px-2 py-1">
-                      <div className="max-w-[180px] truncate text-[#4B5563]" title={reviewQueueTypeLabel(item)}>
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1">
+                      <div className="max-w-[180px] truncate text-[var(--admin-text-soft)]" title={reviewQueueTypeLabel(item)}>
                         {reviewQueueTypeLabel(item)}
                       </div>
                     </td>
-                    <td className="border-b border-[#E5EAF0] px-2 py-1">
-                      <div className="font-medium text-[#1F2937]">{item.title}</div>
-                      <div className="mt-0.5 font-mono text-[10px] text-[#6B7280]">
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1">
+                      <div className="font-medium text-[var(--admin-text)]">{item.title}</div>
+                      <div className="mt-0.5 font-mono text-[10px] text-[var(--admin-text-muted)]">
                         {item.metadata?.sourceId || item.id}
                       </div>
                     </td>
-                    <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1 text-[var(--admin-text-soft)]">
                       {item.summary}
                     </td>
-                    <td className="border-b border-[#E5EAF0] px-2 py-1">
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1">
                       <AlertBadge
                         tone={
                           item.metadata?.riskLevel === "high"
@@ -1533,10 +1533,10 @@ function ReviewQueueTable({ items, workflowOutcomeMap }) {
                         {humanizeToken(item.metadata?.riskLevel || item.priorityLabel || "medium")}
                       </AlertBadge>
                     </td>
-                    <td className="border-b border-[#E5EAF0] px-2 py-1">
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1">
                       <AlertBadge tone={trust.tone}>{trust.label}</AlertBadge>
                     </td>
-                    <td className="border-b border-[#E5EAF0] px-2 py-1">
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1">
                       {item.quickAction?.action ? (
                         <OperatorActionButton
                           action={item.quickAction.action}
@@ -1556,7 +1556,7 @@ function ReviewQueueTable({ items, workflowOutcomeMap }) {
                         )
                       )}
                     </td>
-                    <td className="border-b border-[#E5EAF0] px-2 py-1">
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1">
                       {item.href ? (
                         <TableLink href={item.href}>
                           {getExplicitActionLabel(
@@ -1566,7 +1566,7 @@ function ReviewQueueTable({ items, workflowOutcomeMap }) {
                           )}
                         </TableLink>
                       ) : (
-                        <span className="text-[11px] text-[#6B7280]">—</span>
+                        <span className="text-[11px] text-[var(--admin-text-muted)]">—</span>
                       )}
                     </td>
                   </tr>
@@ -1574,7 +1574,7 @@ function ReviewQueueTable({ items, workflowOutcomeMap }) {
               })
             ) : (
               <tr>
-                <td colSpan={8} className="px-2 py-3 text-[11px] text-[#6B7280]">
+                <td colSpan={8} className="px-2 py-3 text-[11px] text-[var(--admin-text-muted)]">
                   <div>No review work is pending.</div>
                   <div className="mt-1">Next step: open workflow surfaces if you expected review work to be generated.</div>
                   <div className="mt-2 flex flex-wrap gap-3">
@@ -1601,28 +1601,28 @@ function OperationalPagesSection({ links }) {
       />
       <TableShell>
         <table className="min-w-[980px] w-full text-[11px]">
-          <thead className="bg-[#F9FBFD] text-left uppercase tracking-wide text-[#6B7280]">
+          <thead className="bg-[var(--admin-surface-muted)] text-left uppercase tracking-wide text-[var(--admin-text-muted)]">
             <tr>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Page</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Owns</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Current Signal</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Open</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Page</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Owns</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Current Signal</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Open</th>
             </tr>
           </thead>
           <tbody>
             {links.map((link) => (
-              <tr key={link.href} className="align-top odd:bg-white even:bg-[#F9FBFD] hover:bg-[#F1F5F9]">
-                <td className="border-b border-[#E5EAF0] px-2 py-1">
-                  <div className="font-medium text-[#1F2937]">{link.title}</div>
-                  <div className="mt-0.5 text-[10px] text-[#6B7280]">{link.href}</div>
+              <tr key={link.href} className="align-top odd:bg-[var(--admin-surface)] even:bg-[var(--admin-surface-muted)] hover:bg-[var(--admin-surface-soft)]">
+                <td className="border-b border-[var(--admin-line)] px-2 py-1">
+                  <div className="font-medium text-[var(--admin-text)]">{link.title}</div>
+                  <div className="mt-0.5 text-[10px] text-[var(--admin-text-muted)]">{link.href}</div>
                 </td>
-                <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">
+                <td className="border-b border-[var(--admin-line)] px-2 py-1 text-[var(--admin-text-soft)]">
                   {link.description}
                 </td>
-                <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">
+                <td className="border-b border-[var(--admin-line)] px-2 py-1 text-[var(--admin-text-soft)]">
                   {link.signal}
                 </td>
-                <td className="border-b border-[#E5EAF0] px-2 py-1">
+                <td className="border-b border-[var(--admin-line)] px-2 py-1">
                   <TableLink href={link.href}>{link.actionLabel || `Open ${link.title}`}</TableLink>
                 </td>
               </tr>
@@ -1647,14 +1647,14 @@ function AlertsPanel({ alerts }) {
           alerts.map((alert) => (
             <div
               key={alert.id}
-              className="flex min-h-0 items-start justify-between gap-3 rounded border border-[#E5EAF0] bg-white px-3 py-2"
+              className="flex min-h-0 items-start justify-between gap-3 rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] px-3 py-2"
             >
               <div className="min-w-0 space-y-1">
                 <div className="flex flex-wrap items-center gap-2">
                   <AlertBadge tone={alert.tone}>{alert.label}</AlertBadge>
-                  <p className="text-[11px] font-semibold text-[#1F2937]">{alert.title}</p>
+                  <p className="text-[11px] font-semibold text-[var(--admin-text)]">{alert.title}</p>
                 </div>
-                <p className="text-[11px] text-[#4B5563]">{alert.detail}</p>
+                <p className="text-[11px] text-[var(--admin-text-soft)]">{alert.detail}</p>
               </div>
               <div className="shrink-0">
                 <TableLink href={alert.href}>{alert.actionLabel}</TableLink>
@@ -1662,7 +1662,7 @@ function AlertsPanel({ alerts }) {
             </div>
           ))
         ) : (
-          <div className="rounded border border-[#E5EAF0] bg-white px-3 py-2 text-[11px] text-[#6B7280]">
+          <div className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] px-3 py-2 text-[11px] text-[var(--admin-text-muted)]">
             No active alerts are recorded right now.
           </div>
         )}
@@ -1681,50 +1681,50 @@ function WorkflowOutcomeTable({ outcomes }) {
       />
       <TableShell>
         <table className="min-w-[1180px] w-full text-[11px]">
-          <thead className="bg-[#F9FBFD] text-left uppercase tracking-wide text-[#6B7280]">
+          <thead className="bg-[var(--admin-surface-muted)] text-left uppercase tracking-wide text-[var(--admin-text-muted)]">
             <tr>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Workflow</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Pipeline State</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Outcome</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">AI Status</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Fallback</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Trust</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Needs Attention</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Next Action</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Workflow</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Pipeline State</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Outcome</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">AI Status</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Fallback</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Trust</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Needs Attention</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Next Action</th>
             </tr>
           </thead>
           <tbody>
             {outcomes.length ? (
               outcomes.map((outcome) => (
-                <tr key={outcome.workflow} className="align-top odd:bg-white even:bg-[#F9FBFD] hover:bg-[#F1F5F9]">
-                  <td className="border-b border-[#E5EAF0] px-2 py-1 font-medium text-[#1F2937]">
+                <tr key={outcome.workflow} className="align-top odd:bg-[var(--admin-surface)] even:bg-[var(--admin-surface-muted)] hover:bg-[var(--admin-surface-soft)]">
+                  <td className="border-b border-[var(--admin-line)] px-2 py-1 font-medium text-[var(--admin-text)]">
                     {outcome.workflow}
                   </td>
-                  <td className="border-b border-[#E5EAF0] px-2 py-1">
+                  <td className="border-b border-[var(--admin-line)] px-2 py-1">
                     <StateBadge value={outcome.state} />
                   </td>
-                  <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">
+                  <td className="border-b border-[var(--admin-line)] px-2 py-1 text-[var(--admin-text-soft)]">
                     <div className="max-w-[320px] truncate" title={outcome.outcome}>
                       {outcome.outcome}
                     </div>
                   </td>
-                  <td className="border-b border-[#E5EAF0] px-2 py-1">
+                  <td className="border-b border-[var(--admin-line)] px-2 py-1">
                     <AlertBadge tone={outcome.aiStatusTone}>
                       {outcome.aiStatus}
                     </AlertBadge>
                   </td>
-                  <td className="border-b border-[#E5EAF0] px-2 py-1 font-mono text-[10px] text-[#111827]">
+                  <td className="border-b border-[var(--admin-line)] px-2 py-1 font-mono text-[10px] text-[var(--admin-text)]">
                     {outcome.fallbackText}
                   </td>
-                  <td className="border-b border-[#E5EAF0] px-2 py-1">
+                  <td className="border-b border-[var(--admin-line)] px-2 py-1">
                     <AlertBadge tone={outcome.trustTone}>{outcome.trustLabel}</AlertBadge>
                   </td>
-                  <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">
+                  <td className="border-b border-[var(--admin-line)] px-2 py-1 text-[var(--admin-text-soft)]">
                     {outcome.attentionSummary}
                   </td>
-                  <td className="border-b border-[#E5EAF0] px-2 py-1">
+                  <td className="border-b border-[var(--admin-line)] px-2 py-1">
                     <div className="space-y-1">
-                      <div className="max-w-[240px] truncate text-[#1F2937]" title={outcome.nextAction}>
+                      <div className="max-w-[240px] truncate text-[var(--admin-text)]" title={outcome.nextAction}>
                         {outcome.nextAction}
                       </div>
                       <TableLink href={outcome.href}>Open workflow</TableLink>
@@ -1734,7 +1734,7 @@ function WorkflowOutcomeTable({ outcomes }) {
               ))
             ) : (
               <tr>
-                <td colSpan={8} className="px-2 py-3 text-[11px] text-[#6B7280]">
+                <td colSpan={8} className="px-2 py-3 text-[11px] text-[var(--admin-text-muted)]">
                   No workflow outcomes are currently recorded.
                 </td>
               </tr>
@@ -1757,14 +1757,14 @@ function RecentEventsTable({ jobs }) {
       />
       <TableShell>
         <table className="min-w-[1040px] w-full text-[11px]">
-          <thead className="bg-[#F9FBFD] text-left uppercase tracking-wide text-[#6B7280]">
+          <thead className="bg-[var(--admin-surface-muted)] text-left uppercase tracking-wide text-[var(--admin-text-muted)]">
             <tr>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">When</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Workflow</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Action</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Outcome</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Trust / Fallback</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Next</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">When</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Workflow</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Action</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Outcome</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Trust / Fallback</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Next</th>
             </tr>
           </thead>
           <tbody>
@@ -1779,36 +1779,36 @@ function RecentEventsTable({ jobs }) {
                   job.metadataJson?.command_execution_assist?.nextRecommendedAction ||
                   "Inspect job";
                 return (
-                  <tr key={job.id} className="align-top odd:bg-white even:bg-[#F9FBFD] hover:bg-[#F1F5F9]">
-                    <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">
+                  <tr key={job.id} className="align-top odd:bg-[var(--admin-surface)] even:bg-[var(--admin-surface-muted)] hover:bg-[var(--admin-surface-soft)]">
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1 text-[var(--admin-text-soft)]">
                       {formatAdminDateTime(job.startedAt || job.createdAt)}
                     </td>
-                    <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1 text-[var(--admin-text-soft)]">
                       {toWorkflowLabel(job.workflowFamily)}
                     </td>
-                    <td className="border-b border-[#E5EAF0] px-2 py-1">
-                      <div className="font-medium text-[#1F2937]">{job.actionTitle}</div>
-                      <div className="font-mono text-[10px] text-[#6B7280]">{job.id}</div>
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1">
+                      <div className="font-medium text-[var(--admin-text)]">{job.actionTitle}</div>
+                      <div className="font-mono text-[10px] text-[var(--admin-text-muted)]">{job.id}</div>
                     </td>
-                    <td className="border-b border-[#E5EAF0] px-2 py-1">
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1">
                       <div className="flex items-center gap-2">
                         <JobStatusBadge status={job.status} />
-                        <span className="text-[#4B5563]">{job.summary || "Broker-backed run recorded."}</span>
+                        <span className="text-[var(--admin-text-soft)]">{job.summary || "Broker-backed run recorded."}</span>
                       </div>
                     </td>
-                    <td className="border-b border-[#E5EAF0] px-2 py-1">
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1">
                       <div className="space-y-1">
-                        <div className="text-[#4B5563]">{fallbackText}</div>
+                        <div className="text-[var(--admin-text-soft)]">{fallbackText}</div>
                         {job.failure?.message ? (
-                          <div className="max-w-[220px] truncate text-[10px] text-[#6B7280]" title={job.failure.message}>
+                          <div className="max-w-[220px] truncate text-[10px] text-[var(--admin-text-muted)]" title={job.failure.message}>
                             {job.failure.message}
                           </div>
                         ) : null}
                       </div>
                     </td>
-                    <td className="border-b border-[#E5EAF0] px-2 py-1">
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1">
                       <div className="space-y-1">
-                        <div className="max-w-[220px] truncate text-[#4B5563]" title={nextText}>
+                        <div className="max-w-[220px] truncate text-[var(--admin-text-soft)]" title={nextText}>
                           {nextText}
                         </div>
                         <TableLink href={`/admin/jobs/${encodeURIComponent(job.id)}`}>Open job</TableLink>
@@ -1819,7 +1819,7 @@ function RecentEventsTable({ jobs }) {
               })
             ) : (
               <tr>
-                <td colSpan={6} className="px-2 py-3 text-[11px] text-[#6B7280]">
+                <td colSpan={6} className="px-2 py-3 text-[11px] text-[var(--admin-text-muted)]">
                   No recent workflow events are recorded.
                 </td>
               </tr>
@@ -1859,17 +1859,17 @@ function DashboardCounter({ label, value, href }) {
   return (
     <Link
       href={href}
-      className="flex min-h-0 items-center justify-between gap-3 rounded border border-[#E5EAF0] bg-white px-2 py-1.5 text-[11px] hover:bg-[#F1F5F9]"
+      className="flex min-h-0 items-center justify-between gap-3 rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] px-2 py-1.5 text-[11px] hover:bg-[var(--admin-surface-soft)]"
     >
-      <span className="font-mono uppercase tracking-wide text-[#6B7280]">{label}</span>
-      <span className="text-sm font-semibold text-[#1F2937]">{value}</span>
+      <span className="font-mono uppercase tracking-wide text-[var(--admin-text-muted)]">{label}</span>
+      <span className="text-sm font-semibold text-[var(--admin-text)]">{value}</span>
     </Link>
   );
 }
 
 function TableShell({ children }) {
   return (
-    <div className="overflow-x-auto rounded border border-[#E5EAF0] bg-white">
+    <div className="overflow-x-auto rounded border border-[var(--admin-line)] bg-[var(--admin-surface)]">
       {children}
     </div>
   );
@@ -1877,7 +1877,7 @@ function TableShell({ children }) {
 
 function TableLink({ href, children }) {
   return (
-    <Link href={href} className="text-[11px] text-[#3B82F6] underline underline-offset-2">
+    <Link href={href} className="text-[11px] text-[var(--admin-link)] underline underline-offset-2">
       {children}
     </Link>
   );
@@ -1915,16 +1915,16 @@ function renderPrimaryAction(actionConfig, fallbackHref, fallbackLabel = "Inspec
     return <TableLink href={fallbackHref}>{label}</TableLink>;
   }
 
-  return <span className="text-[11px] text-[#6B7280]">—</span>;
+  return <span className="text-[11px] text-[var(--admin-text-muted)]">—</span>;
 }
 
 function SectionHeader({ eyebrow, title, description, href, hrefLabel = "View all" }) {
   return (
     <div className="flex flex-wrap items-end justify-between gap-3">
       <div className="space-y-1">
-        <p className="font-mono text-[11px] uppercase tracking-wide text-[#6B7280]">{eyebrow}</p>
-        <h2 className="text-sm font-semibold text-[#1F2937]">{title}</h2>
-        {description ? <p className="text-[11px] text-[#6B7280]">{description}</p> : null}
+        <p className="font-mono text-[11px] uppercase tracking-wide text-[var(--admin-text-muted)]">{eyebrow}</p>
+        <h2 className="text-sm font-semibold text-[var(--admin-text)]">{title}</h2>
+        {description ? <p className="text-[11px] text-[var(--admin-text-muted)]">{description}</p> : null}
       </div>
       {href ? <TableLink href={href}>{hrefLabel}</TableLink> : null}
     </div>
@@ -1941,16 +1941,16 @@ function DailyRoutineTable({ steps, itemIndex }) {
       />
       <TableShell>
         <table className="min-w-[1160px] w-full text-[11px]">
-          <thead className="bg-[#F9FBFD] text-left uppercase tracking-wide text-[#6B7280]">
+          <thead className="bg-[var(--admin-surface-muted)] text-left uppercase tracking-wide text-[var(--admin-text-muted)]">
             <tr>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Priority</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Type</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Workflow</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Item</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Why Now</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">State</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Source</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Action</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Priority</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Type</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Workflow</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Item</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Why Now</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">State</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Source</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -1958,27 +1958,27 @@ function DailyRoutineTable({ steps, itemIndex }) {
               steps.map((step) => {
                 const sourceItem = itemIndex.get(step.sourceItemId);
                 return (
-                  <tr key={step.id} className="align-top odd:bg-white even:bg-[#F9FBFD] hover:bg-[#F1F5F9]">
-                    <td className="border-b border-[#E5EAF0] px-2 py-1 font-mono font-medium text-[#111827]">
+                  <tr key={step.id} className="align-top odd:bg-[var(--admin-surface)] even:bg-[var(--admin-surface-muted)] hover:bg-[var(--admin-surface-soft)]">
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1 font-mono font-medium text-[var(--admin-text)]">
                       {toPriorityCode(step.priorityLabel)}
                     </td>
-                    <td className="border-b border-[#E5EAF0] px-2 py-1">
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1">
                       <RoutineTypeBadge step={step} />
                     </td>
-                    <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">{toWorkflowLabel(step.workflowFamily)}</td>
-                    <td className="border-b border-[#E5EAF0] px-2 py-1">
-                      <div className="font-medium text-[#1F2937]">{step.title}</div>
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1 text-[var(--admin-text-soft)]">{toWorkflowLabel(step.workflowFamily)}</td>
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1">
+                      <div className="font-medium text-[var(--admin-text)]">{step.title}</div>
                     </td>
-                    <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1 text-[var(--admin-text-soft)]">
                       {step.priorityReason || step.explanation}
                     </td>
-                    <td className="border-b border-[#E5EAF0] px-2 py-1">
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1">
                       <StateBadge value={sourceItem?.status || "pending"} />
                     </td>
-                    <td className="border-b border-[#E5EAF0] px-2 py-1 font-mono text-[10px] text-[#6B7280]">
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1 font-mono text-[10px] text-[var(--admin-text-muted)]">
                       {step.sourceId}
                     </td>
-                    <td className="border-b border-[#E5EAF0] px-2 py-1">
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1">
                       {renderPrimaryAction(step.primaryAction, step.deepLinkTarget, "Open", {
                         workflowFamily: step.workflowFamily,
                         kind: sourceItem?.kind || step.sourceType,
@@ -1994,7 +1994,7 @@ function DailyRoutineTable({ steps, itemIndex }) {
               })
             ) : (
               <tr>
-                <td colSpan={8} className="px-2 py-3 text-[11px] text-[#6B7280]">
+                <td colSpan={8} className="px-2 py-3 text-[11px] text-[var(--admin-text-muted)]">
                   No routine items are active right now.
                 </td>
               </tr>
@@ -2014,33 +2014,33 @@ function BucketTable({ id, title, description, href, items }) {
       <SectionHeader eyebrow={title} title={title} description={description} href={href} />
       <TableShell>
         <table className="min-w-[760px] w-full text-[11px]">
-          <thead className="bg-[#F9FBFD] text-left uppercase tracking-wide text-[#6B7280]">
+          <thead className="bg-[var(--admin-surface-muted)] text-left uppercase tracking-wide text-[var(--admin-text-muted)]">
             <tr>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Workflow</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Item</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Why Now</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">State</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Action</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Workflow</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Item</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Why Now</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">State</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Action</th>
             </tr>
           </thead>
           <tbody>
             {rows.length ? (
               rows.map((item) => (
-                <tr key={item.id} className="align-top odd:bg-white even:bg-[#F9FBFD] hover:bg-[#F1F5F9]">
-                  <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">{toWorkflowLabel(item.workflowFamily)}</td>
-                  <td className="border-b border-[#E5EAF0] px-2 py-1">
-                    <div className="font-medium text-[#1F2937]">{item.title}</div>
-                    <div className="mt-0.5 font-mono text-[10px] text-[#6B7280]">
+                <tr key={item.id} className="align-top odd:bg-[var(--admin-surface)] even:bg-[var(--admin-surface-muted)] hover:bg-[var(--admin-surface-soft)]">
+                  <td className="border-b border-[var(--admin-line)] px-2 py-1 text-[var(--admin-text-soft)]">{toWorkflowLabel(item.workflowFamily)}</td>
+                  <td className="border-b border-[var(--admin-line)] px-2 py-1">
+                    <div className="font-medium text-[var(--admin-text)]">{item.title}</div>
+                    <div className="mt-0.5 font-mono text-[10px] text-[var(--admin-text-muted)]">
                       {item.metadata?.sourceId || item.id}
                     </div>
                   </td>
-                  <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">
+                  <td className="border-b border-[var(--admin-line)] px-2 py-1 text-[var(--admin-text-soft)]">
                     {item.priorityReason || item.summary}
                   </td>
-                  <td className="border-b border-[#E5EAF0] px-2 py-1">
+                  <td className="border-b border-[var(--admin-line)] px-2 py-1">
                     <StateBadge value={item.status || "pending"} />
                   </td>
-                  <td className="border-b border-[#E5EAF0] px-2 py-1">
+                  <td className="border-b border-[var(--admin-line)] px-2 py-1">
                     {item.quickAction?.action ? (
                       <OperatorActionButton
                         action={item.quickAction.action}
@@ -2056,14 +2056,14 @@ function BucketTable({ id, title, description, href, items }) {
                         {getExplicitActionLabel(null, "Inspect", item)}
                       </TableLink>
                     ) : (
-                      <span className="text-[11px] text-[#6B7280]">—</span>
+                      <span className="text-[11px] text-[var(--admin-text-muted)]">—</span>
                     )}
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={5} className="px-2 py-3 text-[11px] text-[#6B7280]">
+                <td colSpan={5} className="px-2 py-3 text-[11px] text-[var(--admin-text-muted)]">
                   Nothing active in this bucket right now.
                 </td>
               </tr>
@@ -2086,19 +2086,19 @@ function SessionSnapshotTable({ sessions }) {
       />
       <TableShell>
         <table className="min-w-[1380px] w-full text-[11px]">
-          <thead className="bg-[#F9FBFD] text-left uppercase tracking-wide text-[#6B7280]">
+          <thead className="bg-[var(--admin-surface-muted)] text-left uppercase tracking-wide text-[var(--admin-text-muted)]">
             <tr>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Workflow</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Session</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">State</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Review</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Blocker</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Next Action</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Latest Job</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Mode</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Schedule</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Fallback</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Action</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Workflow</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Session</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">State</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Review</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Blocker</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Next Action</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Latest Job</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Mode</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Schedule</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Fallback</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -2128,55 +2128,55 @@ function SessionSnapshotTable({ sessions }) {
                   "—";
 
                 return (
-                  <tr key={session.id} className="align-top odd:bg-white even:bg-[#F9FBFD] hover:bg-[#F1F5F9]">
-                    <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">{toWorkflowLabel(session.workflowFamily)}</td>
-                    <td className="border-b border-[#E5EAF0] px-2 py-1">
-                      <div className="font-mono text-[10px] text-[#111827]">
+                  <tr key={session.id} className="align-top odd:bg-[var(--admin-surface)] even:bg-[var(--admin-surface-muted)] hover:bg-[var(--admin-surface-soft)]">
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1 text-[var(--admin-text-soft)]">{toWorkflowLabel(session.workflowFamily)}</td>
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1">
+                      <div className="font-mono text-[10px] text-[var(--admin-text)]">
                         {session.canonicalSessionKey || session.id}
                       </div>
                     </td>
-                    <td className="border-b border-[#E5EAF0] px-2 py-1">
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1">
                       <StateBadge value={session.canonicalState} />
                     </td>
-                    <td className="border-b border-[#E5EAF0] px-2 py-1">
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1">
                       {session.reviewPendingCount > 0 ? (
                         <CompactBadge tone="warning">Yes</CompactBadge>
                       ) : (
                         <CompactBadge>No</CompactBadge>
                       )}
                     </td>
-                    <td className="border-b border-[#E5EAF0] px-2 py-1">
-                      <div className="max-w-[220px] truncate text-[#4B5563]" title={blocker}>
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1">
+                      <div className="max-w-[220px] truncate text-[var(--admin-text-soft)]" title={blocker}>
                         {blocker}
                       </div>
                     </td>
-                    <td className="border-b border-[#E5EAF0] px-2 py-1">
-                      <div className="max-w-[220px] truncate text-[#4B5563]" title={nextActionLabel}>
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1">
+                      <div className="max-w-[220px] truncate text-[var(--admin-text-soft)]" title={nextActionLabel}>
                         {nextActionLabel}
                       </div>
                     </td>
-                    <td className="border-b border-[#E5EAF0] px-2 py-1">
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1">
                       {session.lastJob ? (
                         <div className="space-y-1">
                           <JobStatusBadge status={session.lastJob.status} />
-                          <div className="font-mono text-[10px] text-[#6B7280]">
+                          <div className="font-mono text-[10px] text-[var(--admin-text-muted)]">
                             {session.lastJob.id}
                           </div>
                         </div>
                       ) : (
-                        <span className="text-[#6B7280]">—</span>
+                        <span className="text-[var(--admin-text-muted)]">—</span>
                       )}
                     </td>
-                    <td className="border-b border-[#E5EAF0] px-2 py-1 font-mono text-[10px] text-[#111827]">
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1 font-mono text-[10px] text-[var(--admin-text)]">
                       {session.execution?.execution_mode || "local_cli"}
                     </td>
-                    <td className="border-b border-[#E5EAF0] px-2 py-1 font-mono text-[10px] text-[#111827]">
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1 font-mono text-[10px] text-[var(--admin-text)]">
                       {session.linkedSchedule?.title || "—"}
                     </td>
-                    <td className="border-b border-[#E5EAF0] px-2 py-1">
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1">
                       {session.fallbackPreview ? <CompactBadge tone="warning">Yes</CompactBadge> : <CompactBadge>No</CompactBadge>}
                     </td>
-                    <td className="border-b border-[#E5EAF0] px-2 py-1">
+                    <td className="border-b border-[var(--admin-line)] px-2 py-1">
                       {primaryAction?.action ? (
                         <OperatorActionButton
                           action={primaryAction.action}
@@ -2230,7 +2230,7 @@ function SessionSnapshotTable({ sessions }) {
               })
             ) : (
               <tr>
-                <td colSpan={11} className="px-2 py-3 text-[11px] text-[#6B7280]">
+                <td colSpan={11} className="px-2 py-3 text-[11px] text-[var(--admin-text-muted)]">
                   No active sessions are currently recorded.
                 </td>
               </tr>
@@ -2253,52 +2253,52 @@ function SchedulesTable({ schedules }) {
       />
       <TableShell>
         <table className="min-w-[980px] w-full text-[11px]">
-          <thead className="bg-[#F9FBFD] text-left uppercase tracking-wide text-[#6B7280]">
+          <thead className="bg-[var(--admin-surface-muted)] text-left uppercase tracking-wide text-[var(--admin-text-muted)]">
             <tr>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Title</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Action</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Workflow</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Mode</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Status</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Next Run</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Last Run</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Last Result</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Action</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Title</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Action</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Workflow</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Mode</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Status</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Next Run</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Last Run</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Last Result</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Action</th>
             </tr>
           </thead>
           <tbody>
             {schedules.length ? (
               schedules.slice(0, 5).map((schedule) => (
-                <tr key={schedule.id} className="align-top odd:bg-white even:bg-[#F9FBFD] hover:bg-[#F1F5F9]">
-                  <td className="border-b border-[#E5EAF0] px-2 py-1">
-                    <div className="font-medium text-[#1F2937]">{schedule.title}</div>
-                    <div className="font-mono text-[10px] text-[#6B7280]">{schedule.id}</div>
+                <tr key={schedule.id} className="align-top odd:bg-[var(--admin-surface)] even:bg-[var(--admin-surface-muted)] hover:bg-[var(--admin-surface-soft)]">
+                  <td className="border-b border-[var(--admin-line)] px-2 py-1">
+                    <div className="font-medium text-[var(--admin-text)]">{schedule.title}</div>
+                    <div className="font-mono text-[10px] text-[var(--admin-text-muted)]">{schedule.id}</div>
                   </td>
-                  <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">
+                  <td className="border-b border-[var(--admin-line)] px-2 py-1 text-[var(--admin-text-soft)]">
                     {schedule.action?.title || schedule.actionId}
                   </td>
-                  <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">{toWorkflowLabel(schedule.workflowFamily)}</td>
-                  <td className="border-b border-[#E5EAF0] px-2 py-1 font-mono text-[10px] text-[#111827]">
+                  <td className="border-b border-[var(--admin-line)] px-2 py-1 text-[var(--admin-text-soft)]">{toWorkflowLabel(schedule.workflowFamily)}</td>
+                  <td className="border-b border-[var(--admin-line)] px-2 py-1 font-mono text-[10px] text-[var(--admin-text)]">
                     {schedule.executionMode || "local_cli"}
                   </td>
-                  <td className="border-b border-[#E5EAF0] px-2 py-1">
+                  <td className="border-b border-[var(--admin-line)] px-2 py-1">
                     <StateBadge value={schedule.status} />
                   </td>
-                  <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">{formatAdminDateTime(schedule.nextRunAt)}</td>
-                  <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">{formatAdminDateTime(schedule.lastRunAt)}</td>
-                  <td className="border-b border-[#E5EAF0] px-2 py-1">
-                    <div className="max-w-[220px] truncate text-[#4B5563]" title={schedule.lastJob?.summary || schedule.lastResultSummary || schedule.summary}>
+                  <td className="border-b border-[var(--admin-line)] px-2 py-1 text-[var(--admin-text-soft)]">{formatAdminDateTime(schedule.nextRunAt)}</td>
+                  <td className="border-b border-[var(--admin-line)] px-2 py-1 text-[var(--admin-text-soft)]">{formatAdminDateTime(schedule.lastRunAt)}</td>
+                  <td className="border-b border-[var(--admin-line)] px-2 py-1">
+                    <div className="max-w-[220px] truncate text-[var(--admin-text-soft)]" title={schedule.lastJob?.summary || schedule.lastResultSummary || schedule.summary}>
                       {schedule.lastJob?.summary || schedule.lastResultSummary || schedule.summary}
                     </div>
                   </td>
-                  <td className="border-b border-[#E5EAF0] px-2 py-1">
+                  <td className="border-b border-[var(--admin-line)] px-2 py-1">
                     <TableLink href="/admin/schedules">Open schedule</TableLink>
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={9} className="px-2 py-3 text-[11px] text-[#6B7280]">
+                <td colSpan={9} className="px-2 py-3 text-[11px] text-[var(--admin-text-muted)]">
                   No schedules are currently recorded.
                 </td>
               </tr>
@@ -2321,44 +2321,44 @@ function HealthTable({ banner, signals }) {
       />
       <TableShell>
         <table className="min-w-[860px] w-full text-[11px]">
-          <thead className="bg-[#F9FBFD] text-left uppercase tracking-wide text-[#6B7280]">
+          <thead className="bg-[var(--admin-surface-muted)] text-left uppercase tracking-wide text-[var(--admin-text-muted)]">
             <tr>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Check</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Status</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Summary</th>
-              <th className="border-b border-[#E5EAF0] px-2 py-1 font-medium">Action</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Check</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Status</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Summary</th>
+              <th className="border-b border-[var(--admin-line)] px-2 py-1 font-medium">Action</th>
             </tr>
           </thead>
           <tbody>
             {banner ? (
-              <tr className="align-top odd:bg-white even:bg-[#F9FBFD] hover:bg-[#F1F5F9]">
-                <td className="border-b border-[#E5EAF0] px-2 py-1 font-medium text-[#1F2937]">{banner.title}</td>
-                <td className="border-b border-[#E5EAF0] px-2 py-1">
+              <tr className="align-top odd:bg-[var(--admin-surface)] even:bg-[var(--admin-surface-muted)] hover:bg-[var(--admin-surface-soft)]">
+                <td className="border-b border-[var(--admin-line)] px-2 py-1 font-medium text-[var(--admin-text)]">{banner.title}</td>
+                <td className="border-b border-[var(--admin-line)] px-2 py-1">
                   <StateBadge value={banner.status} />
                 </td>
-                <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">
+                <td className="border-b border-[var(--admin-line)] px-2 py-1 text-[var(--admin-text-soft)]">
                   {banner.summary}
                 </td>
-                <td className="border-b border-[#E5EAF0] px-2 py-1">
+                <td className="border-b border-[var(--admin-line)] px-2 py-1">
                   <TableLink href={banner.href || "/admin/tools"}>Open tools</TableLink>
                 </td>
               </tr>
             ) : null}
             {signals.slice(0, 4).map((signal) => (
-              <tr key={signal.id} className="align-top odd:bg-white even:bg-[#F9FBFD] hover:bg-[#F1F5F9]">
-                <td className="border-b border-[#E5EAF0] px-2 py-1 font-medium text-[#1F2937]">{signal.title}</td>
-                <td className="border-b border-[#E5EAF0] px-2 py-1">
+              <tr key={signal.id} className="align-top odd:bg-[var(--admin-surface)] even:bg-[var(--admin-surface-muted)] hover:bg-[var(--admin-surface-soft)]">
+                <td className="border-b border-[var(--admin-line)] px-2 py-1 font-medium text-[var(--admin-text)]">{signal.title}</td>
+                <td className="border-b border-[var(--admin-line)] px-2 py-1">
                   <StateBadge value={signal.signalType} />
                 </td>
-                <td className="border-b border-[#E5EAF0] px-2 py-1 text-[#4B5563]">{signal.summary}</td>
-                <td className="border-b border-[#E5EAF0] px-2 py-1">
+                <td className="border-b border-[var(--admin-line)] px-2 py-1 text-[var(--admin-text-soft)]">{signal.summary}</td>
+                <td className="border-b border-[var(--admin-line)] px-2 py-1">
                   {signal.href ? <TableLink href={signal.href}>Inspect</TableLink> : <TableLink href="/admin/tools">Open tools</TableLink>}
                 </td>
               </tr>
             ))}
             {!banner && !signals.length ? (
               <tr>
-                <td colSpan={4} className="px-2 py-3 text-[11px] text-[#6B7280]">
+                <td colSpan={4} className="px-2 py-3 text-[11px] text-[var(--admin-text-muted)]">
                   No verification or signal warnings are active right now.
                 </td>
               </tr>
@@ -2486,15 +2486,15 @@ export default async function AdminPage() {
       <OperatorPageAutoRefresh />
 
       <section className="space-y-1">
-        <p className="font-mono text-[11px] uppercase tracking-wide text-[#6B7280]">Operator Command Center</p>
-        <h1 className="text-lg font-semibold text-[#1F2937]">What happened, what is trustworthy, and what needs action next</h1>
-        <p className="text-[11px] text-[#6B7280]">
+        <p className="font-mono text-[11px] uppercase tracking-wide text-[var(--admin-text-muted)]">Operator Command Center</p>
+        <h1 className="text-lg font-semibold text-[var(--admin-text)]">What happened, what is trustworthy, and what needs action next</h1>
+        <p className="text-[11px] text-[var(--admin-text-muted)]">
           This page is optimized for trust, triage, and the single next safe action across broker-backed workflow work.
         </p>
       </section>
 
       {loadError ? (
-        <section className="rounded border border-[#FDE68A] bg-[#FFFBEB] p-3 text-[11px] text-[#B45309]">
+        <section className="rounded border border-[var(--admin-warning-line)] bg-[var(--admin-warning-surface)] p-3 text-[11px] text-[var(--warning)]">
           <div className="font-medium">Dashboard fallback</div>
           <p className="mt-1">{loadError}</p>
           <div className="mt-2 flex flex-wrap gap-3">

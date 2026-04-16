@@ -112,6 +112,54 @@ textarea:focus {
     "Liberation Mono",
     "Courier New",
     monospace;
+  --admin-surface: rgba(8, 14, 24, 0.92);
+  --admin-surface-strong: linear-gradient(145deg, rgba(14, 24, 38, 0.98), rgba(8, 12, 20, 0.98));
+  --admin-surface-muted: rgba(255, 255, 255, 0.04);
+  --admin-surface-soft: rgba(255, 255, 255, 0.06);
+  --admin-line: var(--line);
+  --admin-line-strong: var(--line-strong);
+  --admin-text: var(--foreground);
+  --admin-text-soft: var(--ink-soft);
+  --admin-text-muted: var(--ink-muted);
+  --admin-link: var(--accent);
+  --admin-link-strong: var(--accent-secondary);
+  --admin-success-surface: rgba(132, 247, 198, 0.12);
+  --admin-success-line: rgba(132, 247, 198, 0.3);
+  --admin-warning-surface: rgba(251, 191, 36, 0.12);
+  --admin-warning-line: rgba(251, 191, 36, 0.35);
+  --admin-danger-surface: rgba(255, 138, 138, 0.12);
+  --admin-danger-line: rgba(255, 138, 138, 0.35);
+  --admin-info-surface: rgba(125, 211, 252, 0.12);
+  --admin-info-line: rgba(125, 211, 252, 0.32);
+  background:
+    radial-gradient(circle at top right, rgba(96, 165, 250, 0.14), transparent 24%),
+    radial-gradient(circle at 15% 10%, rgba(132, 247, 198, 0.12), transparent 28%),
+    linear-gradient(180deg, #050b13 0%, #08111d 34%, #050a12 100%);
+  color: var(--admin-text);
+}
+
+.admin-shell ::selection {
+  background: rgba(132, 247, 198, 0.22);
+}
+
+.admin-shell input,
+.admin-shell select,
+.admin-shell textarea {
+  color: var(--admin-text);
+}
+
+.admin-shell input::placeholder,
+.admin-shell textarea::placeholder {
+  color: var(--admin-text-muted);
+}
+
+.admin-shell a:focus-visible,
+.admin-shell button:focus-visible,
+.admin-shell summary:focus-visible,
+.admin-shell input:focus-visible,
+.admin-shell select:focus-visible,
+.admin-shell textarea:focus-visible {
+  box-shadow: 0 0 0 4px rgba(132, 247, 198, 0.18);
 }
 
 .content-shell {

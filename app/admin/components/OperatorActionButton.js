@@ -13,10 +13,10 @@ function buttonClasses(tone, disabled) {
     "inline-flex items-center justify-center rounded border px-2.5 py-1 text-[12px] font-medium transition";
   const palette =
     tone === "danger"
-      ? "border-[#FECACA] bg-[#FEF2F2] text-[#EF4444] hover:bg-[#FEE2E2]"
+      ? "border-[var(--admin-danger-line)] bg-[var(--admin-danger-surface)] text-[var(--danger)] hover:bg-[var(--admin-danger-surface)]"
       : tone === "primary"
-        ? "border-[#3B82F6] bg-[#3B82F6] text-white hover:bg-[#2563EB]"
-        : "border-[#E5EAF0] bg-white text-[#1F2937] hover:bg-[#F9FBFD]";
+        ? "border-[var(--admin-link)] bg-[var(--admin-link)] text-[var(--background)] hover:bg-[var(--admin-link)]"
+        : "border-[var(--admin-line)] bg-[var(--admin-surface)] text-[var(--admin-text)] hover:bg-[var(--admin-surface-muted)]";
   const disabledClasses = disabled ? " cursor-not-allowed opacity-60" : "";
   return `${base} ${palette}${disabledClasses}`;
 }
@@ -170,44 +170,44 @@ export default function OperatorActionButton({
         {isPending ? "Starting…" : label}
       </button>
 
-      {helperText ? <p className="max-w-md text-xs text-[#6B7280]">{helperText}</p> : null}
+      {helperText ? <p className="max-w-md text-xs text-[var(--admin-text-muted)]">{helperText}</p> : null}
 
       {error ? (
-        <div className="rounded border border-[#FECACA] bg-[#FEF2F2] p-2 text-[11px] text-[#EF4444]">
+        <div className="rounded border border-[var(--admin-danger-line)] bg-[var(--admin-danger-surface)] p-2 text-[11px] text-[var(--danger)]">
           {error}
         </div>
       ) : null}
 
       {job ? (
-        <div className="rounded border border-[#E5EAF0] bg-[#EEF2F6] p-2">
+        <div className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface-muted)] p-2">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex flex-wrap items-center gap-2">
               <JobStatusBadge status={job.status} />
-              <span className="font-mono text-[11px] text-[#6B7280]">{job.id}</span>
+              <span className="font-mono text-[11px] text-[var(--admin-text-muted)]">{job.id}</span>
             </div>
-            <Link href={`/admin/jobs/${job.id}`} className="text-[11px] text-[#3B82F6] underline">
+            <Link href={`/admin/jobs/${job.id}`} className="text-[11px] text-[var(--admin-link)] underline">
               Open job
             </Link>
           </div>
-          <p className="mt-2 text-[11px] text-[#4B5563]">{job.summary || `${action.title} queued.`}</p>
+          <p className="mt-2 text-[11px] text-[var(--admin-text-soft)]">{job.summary || `${action.title} queued.`}</p>
           {job.errorJson?.message ? (
-            <p className="mt-2 text-[11px] text-[#EF4444]">{job.errorJson.message}</p>
+            <p className="mt-2 text-[11px] text-[var(--danger)]">{job.errorJson.message}</p>
           ) : null}
         </div>
       ) : null}
 
       {confirmationOpen ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-950/50 px-4">
-          <div className="w-full max-w-lg rounded border border-[#E5EAF0] bg-white p-4 shadow-xl">
+          <div className="w-full max-w-lg rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] p-4 shadow-xl">
             <div className="space-y-2">
-              <p className="text-[12px] text-[#6B7280]">{action.workflowFamily}</p>
-              <h3 className="text-lg font-semibold text-[#1F2937]">{confirmation.title || label}</h3>
-              <p className="text-[12px] text-[#4B5563]">
+              <p className="text-[12px] text-[var(--admin-text-muted)]">{action.workflowFamily}</p>
+              <h3 className="text-lg font-semibold text-[var(--admin-text)]">{confirmation.title || label}</h3>
+              <p className="text-[12px] text-[var(--admin-text-soft)]">
                 {confirmation.description || "This action requires explicit confirmation."}
               </p>
             </div>
 
-            <label className="mt-4 flex items-start gap-3 rounded border border-[#E5EAF0] bg-[#F9FBFD] p-3 text-[12px] text-[#1F2937]">
+            <label className="mt-4 flex items-start gap-3 rounded border border-[var(--admin-line)] bg-[var(--admin-surface-muted)] p-3 text-[12px] text-[var(--admin-text)]">
               <input
                 type="checkbox"
                 checked={confirmationChecked}
@@ -218,12 +218,12 @@ export default function OperatorActionButton({
 
             {confirmation.requireTypedYes ? (
               <label className="mt-4 block space-y-2">
-                <span className="text-[12px] font-medium text-[#1F2937]">Type YES to continue</span>
+                <span className="text-[12px] font-medium text-[var(--admin-text)]">Type YES to continue</span>
                 <input
                   type="text"
                   value={typedYes}
                   onChange={(event) => setTypedYes(event.target.value)}
-                  className="w-full rounded border border-[#E5EAF0] bg-white px-2 py-1.5 text-[12px] text-[#1F2937] outline-none focus:border-[#3B82F6]"
+                  className="w-full rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] px-2 py-1.5 text-[12px] text-[var(--admin-text)] outline-none focus:border-[var(--admin-link)]"
                   placeholder="YES"
                 />
               </label>
@@ -233,7 +233,7 @@ export default function OperatorActionButton({
               <button
                 type="button"
                 onClick={resetConfirmation}
-                className="rounded border border-[#E5EAF0] bg-white px-3 py-1.5 text-[12px] text-[#1F2937]"
+                className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] px-3 py-1.5 text-[12px] text-[var(--admin-text)]"
               >
                 Cancel
               </button>

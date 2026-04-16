@@ -95,22 +95,22 @@ export default async function AdminWorkflowSessionPage({ params }) {
         <OperatorPageAutoRefresh sessionId={session.id} />
 
         <section className="space-y-2">
-          <p className="font-mono text-[11px] uppercase tracking-wide text-[#6B7280]">Workflow Inspector</p>
-          <h1 className="text-lg font-semibold text-[#1F2937]">{toDisplayText(session.title, "Workflow session")}</h1>
-          <p className="max-w-5xl text-[12px] text-[#4B5563]">
+          <p className="font-mono text-[11px] uppercase tracking-wide text-[var(--admin-text-muted)]">Workflow Inspector</p>
+          <h1 className="text-lg font-semibold text-[var(--admin-text)]">{toDisplayText(session.title, "Workflow session")}</h1>
+          <p className="max-w-5xl text-[12px] text-[var(--admin-text-soft)]">
             This inspector reflects canonical workflow state, related broker jobs, attached artifacts,
             and derived review queue items without becoming an editing surface.
           </p>
         </section>
 
-        <section className="rounded border border-[#E5EAF0] bg-[#EEF2F6] p-4 shadow-sm">
+        <section className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface-muted)] p-4 shadow-sm">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <p className="font-mono text-[11px] uppercase tracking-wide text-[#6B7280]">
+              <p className="font-mono text-[11px] uppercase tracking-wide text-[var(--admin-text-muted)]">
                 {toDisplayText(session.workflowFamily)}
               </p>
-              <h2 className="mt-1 text-base font-semibold text-[#1F2937]">{toDisplayText(session.title, "Workflow session")}</h2>
-              <p className="mt-1 text-[12px] text-[#4B5563]">{toDisplayText(session.summary, "No summary recorded.")}</p>
+              <h2 className="mt-1 text-base font-semibold text-[var(--admin-text)]">{toDisplayText(session.title, "Workflow session")}</h2>
+              <p className="mt-1 text-[12px] text-[var(--admin-text-soft)]">{toDisplayText(session.summary, "No summary recorded.")}</p>
             </div>
             <JobStatusBadge status={toDisplayText(session.canonicalState, "unknown")} />
           </div>
@@ -195,9 +195,9 @@ export default async function AdminWorkflowSessionPage({ params }) {
           />
         ) : null}
 
-        <section className="rounded border border-[#E5EAF0] bg-[#EEF2F6] p-4 shadow-sm">
+        <section className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface-muted)] p-4 shadow-sm">
           <h2 className="text-base font-semibold">Session summary</h2>
-          <p className="mt-2 text-[12px] text-[#4B5563]">{toDisplayText(sessionSummary?.narrative, "No summary recorded.")}</p>
+          <p className="mt-2 text-[12px] text-[var(--admin-text-soft)]">{toDisplayText(sessionSummary?.narrative, "No summary recorded.")}</p>
           <div className="mt-3 grid gap-3 xl:grid-cols-2">
             <div className="rounded border p-3">
               <p className="text-[11px] text-gray-500">Completed</p>
@@ -224,7 +224,7 @@ export default async function AdminWorkflowSessionPage({ params }) {
               </div>
             </div>
           </div>
-          <div className="mt-3 rounded border border-[#E5EAF0] bg-[#F9FBFD] p-3 text-[12px] text-[#4B5563]">
+          <div className="mt-3 rounded border border-[var(--admin-line)] bg-[var(--admin-surface-muted)] p-3 text-[12px] text-[var(--admin-text-soft)]">
             <p className="font-medium">Assist mode</p>
             <p className="mt-2">
               {toDisplayText(sessionSummary?.assist?.assistMode, "deterministic")} advisory summary. Model used:{" "}
@@ -246,7 +246,7 @@ export default async function AdminWorkflowSessionPage({ params }) {
         </section>
 
         <section className="grid gap-4 xl:grid-cols-[1.05fr_0.95fr]">
-          <div className="rounded border border-[#E5EAF0] bg-[#EEF2F6] p-4 shadow-sm">
+          <div className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface-muted)] p-4 shadow-sm">
             <h2 className="text-base font-semibold">Related jobs</h2>
             <div className="mt-3 space-y-2">
               {relatedJobs.length ? (
@@ -295,7 +295,7 @@ export default async function AdminWorkflowSessionPage({ params }) {
             </div>
           </div>
 
-          <div className="rounded border border-[#E5EAF0] bg-[#EEF2F6] p-4 shadow-sm">
+          <div className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface-muted)] p-4 shadow-sm">
             <h2 className="text-base font-semibold">Review queue items</h2>
             <div className="mt-3 space-y-2">
               {reviewQueueItems.length ? (
@@ -333,7 +333,7 @@ export default async function AdminWorkflowSessionPage({ params }) {
           </div>
         </section>
 
-        <section className="rounded border border-[#E5EAF0] bg-[#EEF2F6] p-4 shadow-sm">
+        <section className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface-muted)] p-4 shadow-sm">
           <h2 className="text-base font-semibold">Artifacts</h2>
           <div className="mt-3 grid gap-3 xl:grid-cols-2">
             {artifacts.map((artifact) => (
@@ -365,7 +365,7 @@ export default async function AdminWorkflowSessionPage({ params }) {
           </div>
         </section>
 
-        <section id="blocking-issues" className="rounded border border-[#E5EAF0] bg-[#EEF2F6] p-4 shadow-sm">
+        <section id="blocking-issues" className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface-muted)] p-4 shadow-sm">
           <h2 className="text-base font-semibold">Blocking issues</h2>
           <div className="mt-3 space-y-2">
             {blockingIssues.length ? (
@@ -387,7 +387,7 @@ export default async function AdminWorkflowSessionPage({ params }) {
     console.error("admin workflow session page render failed:", error);
     return (
       <main className="mx-auto max-w-[1700px] space-y-4 px-4 py-4">
-        <section className="rounded border border-[#FDE68A] bg-[#FFFBEB] p-4 text-[12px] text-[#B45309]">
+        <section className="rounded border border-[var(--admin-warning-line)] bg-[var(--admin-warning-surface)] p-4 text-[12px] text-[var(--warning)]">
           <p className="font-mono text-[11px] uppercase tracking-wide">Workflow Inspector Fallback</p>
           <h1 className="mt-1 text-lg font-semibold">Session detail could not be fully rendered</h1>
           <p className="mt-2">
