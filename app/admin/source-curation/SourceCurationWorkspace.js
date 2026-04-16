@@ -5,6 +5,8 @@ import { Fragment, useMemo, useState, useTransition } from "react";
 import { formatAdminDateTime } from "@/app/admin/components/adminDateTime";
 import { readAdminJsonResponse } from "@/app/admin/components/readAdminJsonResponse";
 
+const SOURCE_CURATION_ENDPOINT = "/admin/source-curation/api";
+
 function CompactBadge({ tone = "neutral", children }) {
   const classes =
     tone === "danger"
@@ -319,7 +321,7 @@ export default function SourceCurationWorkspace({ workspace }) {
 
     try {
       const response = await fetch(
-        `/api/admin/source-curation?q=${encodeURIComponent(
+        `${SOURCE_CURATION_ENDPOINT}?q=${encodeURIComponent(
           draft.searchQuery || item.suggested_search_query
         )}&limit=12&promiseId=${item.promise_id}${
           item.related_policy_id ? `&relatedPolicyId=${item.related_policy_id}` : ""
@@ -329,7 +331,7 @@ export default function SourceCurationWorkspace({ workspace }) {
           cache: "no-store",
         }
       );
-      const payload = await readAdminJsonResponse(response, "/api/admin/source-curation");
+      const payload = await readAdminJsonResponse(response, SOURCE_CURATION_ENDPOINT);
       if (!response.ok || !payload.success) {
         throw new Error(payload.error || "Failed to search existing sources.");
       }
@@ -525,14 +527,14 @@ export default function SourceCurationWorkspace({ workspace }) {
 
     startTransition(async () => {
       try {
-        const response = await fetch("/api/admin/source-curation", {
+        const response = await fetch(SOURCE_CURATION_ENDPOINT, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(confirmationState.payload),
         });
-        const payload = await readAdminJsonResponse(response, "/api/admin/source-curation");
+        const payload = await readAdminJsonResponse(response, SOURCE_CURATION_ENDPOINT);
         if (!response.ok || !payload.success) {
           if (
             payload.errorDetails?.possibleDuplicates &&
