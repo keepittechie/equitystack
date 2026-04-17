@@ -1,0 +1,23 @@
+CREATE TABLE IF NOT EXISTS source_curation_draft_rows (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  import_file VARCHAR(255) NOT NULL,
+  import_row_number INT UNSIGNED NOT NULL,
+  president_name VARCHAR(255) NOT NULL,
+  bucket_name VARCHAR(255) NOT NULL,
+  record_type ENUM('action', 'outcome') NOT NULL,
+  record_id BIGINT UNSIGNED NOT NULL,
+  source_title TEXT NOT NULL,
+  source_date_raw VARCHAR(32) NULL,
+  source_url TEXT NOT NULL,
+  fit VARCHAR(32) NOT NULL DEFAULT 'unknown',
+  recommended_use VARCHAR(64) NOT NULL DEFAULT 'unspecified',
+  notes TEXT NULL,
+  imported_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  created_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  updated_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+  PRIMARY KEY (id),
+  UNIQUE KEY uniq_source_curation_draft_rows_import (import_file, import_row_number),
+  KEY idx_source_curation_draft_rows_record (record_type, record_id),
+  KEY idx_source_curation_draft_rows_recommended_use (recommended_use),
+  KEY idx_source_curation_draft_rows_fit (fit)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

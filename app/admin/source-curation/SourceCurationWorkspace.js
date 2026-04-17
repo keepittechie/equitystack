@@ -184,6 +184,7 @@ function buildInitialMissingDrafts(workspace) {
           publisher: "",
           published_date: "",
           notes: "",
+          ...(item.suggested_new_source_draft || {}),
         },
         searchResults: [],
         searchLoading: false,
@@ -688,6 +689,32 @@ export default function SourceCurationWorkspace({ workspace }) {
     }));
   }
 
+  function applyImportedDraftRecommendation(item, recommendation) {
+    clearMessages();
+    openGroup("missing", item.group_id);
+    setActiveMissingPanel((current) => ({
+      ...current,
+      [item.review_key]: "new-source",
+    }));
+    setMissingDrafts((current) => ({
+      ...current,
+      [item.review_key]: {
+        ...(current[item.review_key] || {}),
+        duplicateWarning: [],
+        overrideDuplicateWarning: false,
+        newSourceDraft: {
+          ...(current[item.review_key]?.newSourceDraft || {}),
+          source_title: recommendation.source_title || "",
+          source_url: recommendation.source_url || "",
+          source_type: recommendation.source_type || "",
+          publisher: "",
+          published_date: recommendation.published_date || "",
+          notes: recommendation.notes || "",
+        },
+      },
+    }));
+  }
+
   function updateDuplicateDraft(clusterKey, field, value) {
     setDuplicateDrafts((current) => ({
       ...current,
@@ -1147,6 +1174,12 @@ export default function SourceCurationWorkspace({ workspace }) {
                                     <CompactBadge tone={item.ui_status.tone}>{item.ui_status.label}</CompactBadge>
                                     <CompactBadge tone="warning">{item.record_type}</CompactBadge>
                                     <CompactBadge tone="danger">missing source</CompactBadge>
+                                    {item.draft_recommendation_count ? (
+                                      <CompactBadge tone="success">
+                                        {item.draft_recommendation_count} imported draft
+                                        {item.draft_recommendation_count === 1 ? "" : "s"}
+                                      </CompactBadge>
+                                    ) : null}
                                     <span className="font-mono text-[10px] text-[var(--admin-text-muted)]">
                                       #{item.record_id}
                                     </span>
@@ -1251,6 +1284,66 @@ export default function SourceCurationWorkspace({ workspace }) {
                                       </div>
                                     ) : (
                                       <span className="text-[var(--admin-text-muted)]">No saved decision</span>
+                                    )}
+                                  </InfoBlock>
+
+                                  <InfoBlock label="Imported Draft Recommendations">
+                                    {(item.draft_recommendations || []).length ? (
+                                      <div className="space-y-2">
+                                        {(item.draft_recommendations || []).map((recommendation) => (
+                                          <div
+                                            key={`${item.review_key}-${recommendation.import_file}-${recommendation.import_row_number}`}
+                                            className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] p-2"
+                                          >
+                                            <div className="flex flex-wrap items-center gap-2">
+                                              <CompactBadge tone="success">
+                                                {recommendation.recommended_use || "draft"}
+                                              </CompactBadge>
+                                              <CompactBadge>
+                                                fit: {recommendation.fit || "unknown"}
+                                              </CompactBadge>
+                                              {recommendation.source_date ? (
+                                                <span className="text-[10px] text-[var(--admin-text-muted)]">
+                                                  {recommendation.source_date}
+                                                </span>
+                                              ) : null}
+                                            </div>
+                                            <div className="mt-2 font-medium text-[var(--admin-text)]">
+                                              {recommendation.source_title}
+                                            </div>
+                                            <div className="mt-1 break-all font-mono text-[10px] text-[var(--admin-text-muted)]">
+                                              {recommendation.source_url}
+                                            </div>
+                                            {recommendation.notes ? (
+                                              <div className="mt-2 text-[11px] text-[var(--admin-text-soft)]">
+                                                {recommendation.notes}
+                                              </div>
+                                            ) : null}
+                                            <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+                                              <span className="text-[10px] text-[var(--admin-text-muted)]">
+                                                {recommendation.bucket_name}
+                                                {recommendation.import_file
+                                                  ? ` • ${recommendation.import_file}`
+                                                  : ""}
+                                              </span>
+                                              <ActionButton
+                                                onClick={() =>
+                                                  applyImportedDraftRecommendation(
+                                                    item,
+                                                    recommendation
+                                                  )
+                                                }
+                                              >
+                                                Use in new source form
+                                              </ActionButton>
+                                            </div>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    ) : (
+                                      <span className="text-[var(--admin-text-muted)]">
+                                        No imported draft recommendation
+                                      </span>
                                     )}
                                   </InfoBlock>
                                 </div>
