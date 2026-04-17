@@ -481,6 +481,25 @@ function formatCountLabel(completedCount, pendingCount, noun) {
   return `${total} ${noun}`;
 }
 
+function selectedMergePolicyIds(cluster, selectedSourceIds = []) {
+  const selectedSet = new Set(
+    (selectedSourceIds || []).map((value) => Number(value)).filter(Boolean)
+  );
+  return (cluster?.rows || [])
+    .filter((row) => selectedSet.has(Number(row.id)))
+    .map((row) => (row.policy_id == null ? null : Number(row.policy_id)))
+    .filter((value) => value != null)
+    .filter((value, index, values) => values.indexOf(value) === index);
+}
+
+function selectedMergePolicyConflict(cluster, selectedSourceIds = []) {
+  const policyIds = selectedMergePolicyIds(cluster, selectedSourceIds);
+  if (policyIds.length <= 1) {
+    return "";
+  }
+  return `The selected rows span conflicting policy_id values (${policyIds.join(", ")}). Merge a compatible subset or mark this cluster keep separate.`;
+}
+
 export default function SourceCurationWorkspace({ workspace }) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("missing");
@@ -887,6 +906,14 @@ export default function SourceCurationWorkspace({ workspace }) {
       }
       if (!draft.canonicalSourceId) {
         setErrorMessage("Select one of the chosen rows as the canonical source to keep.");
+        return;
+      }
+      const mergeConflictMessage = selectedMergePolicyConflict(
+        cluster,
+        draft.selectedSourceIds
+      );
+      if (mergeConflictMessage) {
+        setErrorMessage(mergeConflictMessage);
         return;
       }
       setConfirmationState({
@@ -1816,6 +1843,10 @@ export default function SourceCurationWorkspace({ workspace }) {
                             canonicalSourceId: null,
                           };
                           const panel = activeDuplicatePanel[cluster.cluster_key] || "";
+                          const mergeConflictMessage =
+                            panel === "merge"
+                              ? selectedMergePolicyConflict(cluster, draft.selectedSourceIds)
+                              : "";
 
                           return (
                             <article
@@ -2006,6 +2037,11 @@ export default function SourceCurationWorkspace({ workspace }) {
 
                                       {panel === "merge" ? (
                                         <div className="space-y-3">
+                                          {mergeConflictMessage ? (
+                                            <div className="rounded border border-[var(--admin-warning-line)] bg-[var(--admin-warning-surface)] p-3 text-[11px] text-[var(--warning)]">
+                                              {mergeConflictMessage}
+                                            </div>
+                                          ) : null}
                                           <label className="flex flex-col gap-1 text-[11px] text-[var(--admin-text-soft)]">
                                             Merge note
                                             <textarea
@@ -2024,6 +2060,7 @@ export default function SourceCurationWorkspace({ workspace }) {
                                           <div className="flex justify-end">
                                             <ActionButton
                                               tone="danger"
+                                              disabled={Boolean(mergeConflictMessage)}
                                               onClick={() =>
                                                 prepareDuplicateAction(cluster, "merge_duplicate_sources")
                                               }
