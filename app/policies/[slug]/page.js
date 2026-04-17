@@ -494,7 +494,7 @@ export default async function PolicyDetailPage({ params }) {
         </div>
       </section>
 
-      <section className="public-two-col-rail grid gap-6 xl:grid-cols-[1.08fr_0.92fr]">
+      <section className="grid items-start gap-6 xl:grid-cols-[1.08fr_0.92fr]">
         <div className="space-y-5">
           <SectionIntro
             eyebrow="Evidence"
