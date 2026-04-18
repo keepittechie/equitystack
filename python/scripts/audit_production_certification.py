@@ -16,6 +16,7 @@ from current_admin_common import (
     utc_timestamp,
     write_json_file,
 )
+from policy_systemic_common import SYSTEMIC_MULTIPLIERS, normalize_systemic_impact_category, systemic_multiplier_for
 
 
 TARGET_CATEGORIES = {
@@ -44,7 +45,7 @@ INTENT_MODIFIERS = {
     "equity_expanding": 1.1,
     "equity_restricting": 0.9,
     "neutral_administrative": 1.0,
-    "mixed_or_competing": 1.0,
+    "mixed_or_competing": 0.95,
     "unclear": 1.0,
 }
 
@@ -169,6 +170,24 @@ def historical_policy_score(row: dict[str, Any]) -> int:
 
 def fetch_policy_outcomes(cursor, columns: set[str]) -> list[dict[str, Any]]:
     impact_score_expr = "po.impact_score" if "impact_score" in columns else "NULL"
+    systemic_rank_expr = """
+              CASE matched.systemic_impact_category
+                WHEN 'limited' THEN 1
+                WHEN 'standard' THEN 2
+                WHEN 'strong' THEN 3
+                WHEN 'transformational' THEN 4
+                ELSE 0
+              END
+    """.strip()
+    systemic_rank_to_category_expr = f"""
+              CASE MAX({systemic_rank_expr})
+                WHEN 4 THEN 'transformational'
+                WHEN 3 THEN 'strong'
+                WHEN 2 THEN 'standard'
+                WHEN 1 THEN 'limited'
+                ELSE 'standard'
+              END
+    """.strip()
     cursor.execute(
         f"""
         SELECT
@@ -220,9 +239,14 @@ def fetch_policy_outcomes(cursor, columns: set[str]) -> list[dict[str, Any]]:
           END AS term_end,
           CASE
             WHEN po.policy_type = 'current_admin' THEN related_intent.policy_intent_category
-            WHEN po.policy_type = 'judicial_impact' THEN jp.policy_intent_category
-            ELSE NULL
+            WHEN po.policy_type = 'judicial_impact' THEN COALESCE(jp.policy_intent_category, 'unclear')
+            ELSE 'unclear'
           END AS policy_intent_category,
+          CASE
+            WHEN po.policy_type = 'current_admin' THEN related_intent.systemic_impact_category
+            WHEN po.policy_type = 'judicial_impact' THEN COALESCE(jp.systemic_impact_category, 'standard')
+            ELSE 'standard'
+          END AS systemic_impact_category,
           tb.bill_status,
           tb.last_action,
           tb.bill_number
@@ -244,16 +268,50 @@ def fetch_policy_outcomes(cursor, columns: set[str]) -> list[dict[str, Any]]:
         ) actual_sources ON actual_sources.policy_outcome_id = po.id
         LEFT JOIN (
           SELECT
-            pa.promise_id,
+            pr.id AS promise_id,
             CASE
-              WHEN COUNT(DISTINCT pol.policy_intent_category) = 1 THEN MAX(pol.policy_intent_category)
-              ELSE NULL
+              WHEN COUNT(DISTINCT matched.policy_intent_category) = 0 THEN 'unclear'
+              WHEN COUNT(DISTINCT matched.policy_intent_category) = 1 THEN MAX(matched.policy_intent_category)
+              ELSE 'mixed_or_competing'
             END AS policy_intent_category
-          FROM promise_actions pa
-          JOIN policies pol
-            ON pol.id = pa.related_policy_id
-           AND pol.policy_intent_category IS NOT NULL
-          GROUP BY pa.promise_id
+            ,
+            CASE
+              WHEN COUNT(DISTINCT matched.systemic_impact_category) = 0 THEN 'standard'
+              WHEN COUNT(DISTINCT matched.systemic_impact_category) = 1 THEN MAX(matched.systemic_impact_category)
+              ELSE {systemic_rank_to_category_expr}
+            END AS systemic_impact_category
+          FROM promises pr
+          LEFT JOIN (
+            SELECT DISTINCT
+              pa.promise_id,
+              pol.policy_intent_category,
+              pol.systemic_impact_category
+            FROM promise_actions pa
+            JOIN policies pol
+              ON pol.id = pa.related_policy_id
+             AND (
+               pol.policy_intent_category IS NOT NULL
+               OR pol.systemic_impact_category IS NOT NULL
+             )
+            UNION DISTINCT
+            SELECT DISTINCT
+              pa.promise_id,
+              pol.policy_intent_category,
+              pol.systemic_impact_category
+            FROM promise_actions pa
+            JOIN policies pol
+              ON pa.related_policy_id IS NULL
+             AND (
+               pol.policy_intent_category IS NOT NULL
+               OR pol.systemic_impact_category IS NOT NULL
+             )
+             AND (
+               CONVERT(pa.title USING utf8mb4) COLLATE utf8mb4_unicode_ci LIKE CONCAT('%', CONVERT(pol.title USING utf8mb4) COLLATE utf8mb4_unicode_ci, '%')
+               OR CONVERT(pa.description USING utf8mb4) COLLATE utf8mb4_unicode_ci LIKE CONCAT('%', CONVERT(pol.title USING utf8mb4) COLLATE utf8mb4_unicode_ci, '%')
+             )
+          ) matched
+            ON matched.promise_id = pr.id
+          GROUP BY pr.id
         ) related_intent
           ON po.policy_type = 'current_admin'
          AND related_intent.promise_id = po.policy_id
@@ -273,6 +331,8 @@ def fetch_policies(cursor) -> list[dict[str, Any]]:
           p.impact_direction,
           p.policy_intent_category,
           p.policy_intent_summary,
+          p.systemic_impact_category,
+          p.systemic_impact_summary,
           p.status,
           p.is_archived,
           GROUP_CONCAT(DISTINCT pc.name ORDER BY pc.name SEPARATOR ', ') AS categories,
@@ -294,6 +354,8 @@ def fetch_policies(cursor) -> list[dict[str, Any]]:
           p.impact_direction,
           p.policy_intent_category,
           p.policy_intent_summary,
+          p.systemic_impact_category,
+          p.systemic_impact_summary,
           p.status,
           p.is_archived,
           ps.directness_score,
@@ -333,10 +395,12 @@ def score_outcome(row: dict[str, Any], has_impact_score: bool) -> dict[str, Any]
     confidence = confidence_multiplier(row.get("source_count"))
     intent = normalize_intent(row.get("policy_intent_category"))
     intent_modifier = INTENT_MODIFIERS.get(intent, 1.0)
+    systemic_category = normalize_systemic_impact_category(row.get("systemic_impact_category")) or "standard"
+    systemic_multiplier = systemic_multiplier_for(systemic_category)
     policy_type = normalize_nullable_text(row.get("policy_type"))
     policy_type_weight = POLICY_TYPE_WEIGHTS.get(policy_type, 1.0)
     excluded_from_president_score = row.get("president_id") is None
-    final_score = impact_score * direction_weight * confidence * intent_modifier * policy_type_weight
+    final_score = impact_score * direction_weight * confidence * intent_modifier * systemic_multiplier * policy_type_weight
     return {
         "policy_outcome_id": int(row["policy_outcome_id"]),
         "policy_type": policy_type,
@@ -364,6 +428,8 @@ def score_outcome(row: dict[str, Any], has_impact_score: bool) -> dict[str, Any]
         "confidence_multiplier": confidence,
         "policy_intent_category": intent,
         "intent_modifier": intent_modifier,
+        "systemic_impact_category": systemic_category,
+        "systemic_multiplier": systemic_multiplier,
         "policy_type_weight": policy_type_weight,
         "final_outcome_score": round(final_score, 4),
         "source_count": int(number(row.get("source_count"), 0)),
@@ -562,6 +628,35 @@ def policy_intent_audit(policies: list[dict[str, Any]], limit: int) -> dict[str,
                 "categories": row["categories"],
             }
             for row in unclassified[:limit]
+        ],
+    }
+
+
+def policy_systemic_audit(policies: list[dict[str, Any]], limit: int) -> dict[str, Any]:
+    classified = [row for row in policies if normalize_systemic_impact_category(row.get("systemic_impact_category"))]
+    distribution = Counter(
+        normalize_systemic_impact_category(row.get("systemic_impact_category")) or "standard" for row in policies
+    )
+    classified_sorted = sorted(
+        classified,
+        key=lambda row: (-row["impact_score"], int(row.get("year_enacted") or 9999), int(row["policy_id"])),
+    )
+    return {
+        "status": "PASS" if classified else "WARN",
+        "classified_policy_count": len(classified),
+        "classified_policy_pct": round(len(classified) / len(policies), 4) if policies else 0,
+        "distribution": dict(sorted(distribution.items())),
+        "high_impact_classified_policies": [
+            {
+                "policy_id": int(row["policy_id"]),
+                "title": row.get("title"),
+                "year": int(row["year_enacted"]) if row.get("year_enacted") is not None else None,
+                "impact_direction": row.get("impact_direction"),
+                "impact_score": row["impact_score"],
+                "systemic_impact_category": row.get("systemic_impact_category"),
+                "systemic_impact_summary": row.get("systemic_impact_summary"),
+            }
+            for row in classified_sorted[:limit]
         ],
     }
 
@@ -768,6 +863,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     duplicates = duplicate_audit(outcomes, scored, args.top_limit)
     sources = source_coverage_audit(outcomes, args.top_limit)
     intent = policy_intent_audit(policies, args.top_limit)
+    systemic = policy_systemic_audit(policies, args.top_limit)
     legislative = legislative_pipeline_audit(outcomes, tracked_bills, args.top_limit)
     president = president_score_audit(scored, args.top_limit)
     temporal = temporal_coverage_audit(policies)
@@ -778,6 +874,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         duplicates["status"],
         sources["status"],
         intent["status"],
+        systemic["status"],
         legislative["status"],
         president["status"],
         temporal["status"],
@@ -831,6 +928,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
             "duplicate_and_collision_detection": duplicates,
             "source_coverage_and_confidence_audit": sources,
             "policy_intent_coverage_audit": intent,
+            "policy_systemic_impact_audit": systemic,
             "legislative_pipeline_validation": legislative,
             "president_score_validation": president,
             "temporal_coverage_audit": temporal,

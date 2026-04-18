@@ -17,6 +17,11 @@ from current_admin_common import (
     utc_timestamp,
     write_json_file,
 )
+from policy_systemic_common import (
+    SYSTEMIC_MULTIPLIERS,
+    resolve_systemic_impact_category,
+    systemic_multiplier_for,
+)
 
 
 DIRECTION_WEIGHTS = {
@@ -299,6 +304,24 @@ def build_policy_outcomes_sql(policy_outcomes_columns: set[str]) -> str:
     appointing_presidents_expr = column_expr("appointing_presidents" in policy_outcomes_columns, "po.appointing_presidents", "appointing_presidents")
     judicial_attribution_expr = column_expr("judicial_attribution" in policy_outcomes_columns, "po.judicial_attribution", "judicial_attribution")
     judicial_weight_expr = column_expr("judicial_weight" in policy_outcomes_columns, "po.judicial_weight", "judicial_weight")
+    systemic_rank_expr = """
+              CASE matched.systemic_impact_category
+                WHEN 'limited' THEN 1
+                WHEN 'standard' THEN 2
+                WHEN 'strong' THEN 3
+                WHEN 'transformational' THEN 4
+                ELSE 0
+              END
+    """.strip()
+    systemic_rank_to_category_expr = f"""
+              CASE MAX({systemic_rank_expr})
+                WHEN 4 THEN 'transformational'
+                WHEN 3 THEN 'strong'
+                WHEN 2 THEN 'standard'
+                WHEN 1 THEN 'limited'
+                ELSE 'standard'
+              END
+    """.strip()
     return f"""
         SELECT
           po.id AS policy_outcome_id,
@@ -350,13 +373,33 @@ def build_policy_outcomes_sql(policy_outcomes_columns: set[str]) -> str:
             ELSE 'unclear'
           END AS policy_intent_category,
           CASE
+            WHEN po.policy_type = 'current_admin' THEN related_intent.systemic_impact_category
+            WHEN po.policy_type = 'judicial_impact' THEN COALESCE(jp.systemic_impact_category, 'standard')
+            ELSE 'standard'
+          END AS systemic_impact_category,
+          CASE
+            WHEN po.policy_type = 'current_admin' THEN related_intent.systemic_impact_summary
+            WHEN po.policy_type = 'judicial_impact' THEN jp.systemic_impact_summary
+            ELSE NULL
+          END AS systemic_impact_summary,
+          CASE
             WHEN po.policy_type = 'current_admin' THEN related_intent.related_policy_intent_policy_count
             ELSE 0
           END AS related_policy_intent_policy_count,
           CASE
             WHEN po.policy_type = 'current_admin' THEN related_intent.related_policy_intent_category_count
             ELSE 0
-          END AS related_policy_intent_category_count
+          END AS related_policy_intent_category_count,
+          CASE
+            WHEN po.policy_type = 'current_admin' THEN related_intent.related_policy_systemic_policy_count
+            WHEN po.policy_type = 'judicial_impact' AND jp.systemic_impact_category IS NOT NULL THEN 1
+            ELSE 0
+          END AS related_policy_systemic_policy_count,
+          CASE
+            WHEN po.policy_type = 'current_admin' THEN related_intent.related_policy_systemic_category_count
+            WHEN po.policy_type = 'judicial_impact' AND jp.systemic_impact_category IS NOT NULL THEN 1
+            ELSE 0
+          END AS related_policy_systemic_category_count
         FROM policy_outcomes po
         LEFT JOIN promises p
           ON po.policy_type = 'current_admin'
@@ -377,27 +420,48 @@ def build_policy_outcomes_sql(policy_outcomes_columns: set[str]) -> str:
               WHEN COUNT(DISTINCT matched.policy_intent_category) = 1 THEN MAX(matched.policy_intent_category)
               ELSE 'mixed_or_competing'
             END AS policy_intent_category,
+            CASE
+              WHEN COUNT(DISTINCT matched.systemic_impact_category) = 0 THEN 'standard'
+              WHEN COUNT(DISTINCT matched.systemic_impact_category) = 1 THEN MAX(matched.systemic_impact_category)
+              ELSE {systemic_rank_to_category_expr}
+            END AS systemic_impact_category,
+            CASE
+              WHEN COUNT(DISTINCT matched.systemic_impact_summary) = 1 THEN MAX(matched.systemic_impact_summary)
+              ELSE NULL
+            END AS systemic_impact_summary,
             COUNT(DISTINCT matched.policy_id) AS related_policy_intent_policy_count,
-            COUNT(DISTINCT matched.policy_intent_category) AS related_policy_intent_category_count
+            COUNT(DISTINCT matched.policy_intent_category) AS related_policy_intent_category_count,
+            COUNT(DISTINCT CASE WHEN matched.systemic_impact_category IS NOT NULL THEN matched.policy_id END) AS related_policy_systemic_policy_count,
+            COUNT(DISTINCT matched.systemic_impact_category) AS related_policy_systemic_category_count
           FROM promises pr
           LEFT JOIN (
             SELECT DISTINCT
               pa.promise_id,
               pol.id AS policy_id,
-              pol.policy_intent_category
+              pol.policy_intent_category,
+              pol.systemic_impact_category,
+              pol.systemic_impact_summary
             FROM promise_actions pa
             JOIN policies pol
               ON pol.id = pa.related_policy_id
-             AND pol.policy_intent_category IS NOT NULL
+             AND (
+               pol.policy_intent_category IS NOT NULL
+               OR pol.systemic_impact_category IS NOT NULL
+             )
             UNION DISTINCT
             SELECT DISTINCT
               pa.promise_id,
               pol.id AS policy_id,
-              pol.policy_intent_category
+              pol.policy_intent_category,
+              pol.systemic_impact_category,
+              pol.systemic_impact_summary
             FROM promise_actions pa
             JOIN policies pol
               ON pa.related_policy_id IS NULL
-             AND pol.policy_intent_category IS NOT NULL
+             AND (
+               pol.policy_intent_category IS NOT NULL
+               OR pol.systemic_impact_category IS NOT NULL
+             )
              AND (
                CONVERT(pa.title USING utf8mb4) COLLATE utf8mb4_unicode_ci LIKE CONCAT('%', CONVERT(pol.title USING utf8mb4) COLLATE utf8mb4_unicode_ci, '%')
                OR CONVERT(pa.description USING utf8mb4) COLLATE utf8mb4_unicode_ci LIKE CONCAT('%', CONVERT(pol.title USING utf8mb4) COLLATE utf8mb4_unicode_ci, '%')
@@ -426,6 +490,8 @@ def contribution_for_row(row: dict[str, Any], has_impact_score: bool) -> dict[st
     confidence = confidence_multiplier(row.get("source_count"))
     intent_category = normalize_intent(row.get("policy_intent_category"))
     intent_modifier = INTENT_MODIFIERS.get(intent_category, 1.0)
+    systemic_category = resolve_systemic_impact_category(row.get("systemic_impact_category"))
+    systemic_multiplier = systemic_multiplier_for(systemic_category)
     policy_type = normalize_nullable_text(row.get("policy_type"))
     policy_type_weight = POLICY_TYPE_WEIGHTS.get(policy_type, 1.0)
     excluded_from_president_score = row.get("president_id") is None
@@ -439,7 +505,8 @@ def contribution_for_row(row: dict[str, Any], has_impact_score: bool) -> dict[st
     adjusted_outcome_score = impact_score * direction_weight
     confidence_adjusted_score = adjusted_outcome_score * confidence
     intent_adjusted_score = confidence_adjusted_score * intent_modifier
-    final_outcome_score = intent_adjusted_score * policy_type_weight
+    systemic_adjusted_score = intent_adjusted_score * systemic_multiplier
+    final_outcome_score = systemic_adjusted_score * policy_type_weight
     judicial_weight = numeric(row.get("judicial_weight"), JUDICIAL_WEIGHT if policy_type == "judicial_impact" else 1.0)
 
     return {
@@ -463,6 +530,14 @@ def contribution_for_row(row: dict[str, Any], has_impact_score: bool) -> dict[st
         "policy_intent_category": intent_category,
         "intent_modifier": intent_modifier,
         "intent_adjusted_score": round(intent_adjusted_score, 4),
+        "systemic_impact_category": systemic_category,
+        "systemic_impact_summary": row.get("systemic_impact_summary"),
+        "systemic_multiplier": systemic_multiplier,
+        "systemic_adjusted_score": round(systemic_adjusted_score, 4),
+        "systemic_score_delta": round(systemic_adjusted_score - intent_adjusted_score, 4),
+        "systemic_weight_applied": not math.isclose(systemic_multiplier, 1.0, rel_tol=0.0, abs_tol=1e-9),
+        "related_policy_systemic_policy_count": int(numeric(row.get("related_policy_systemic_policy_count"), 0)),
+        "related_policy_systemic_category_count": int(numeric(row.get("related_policy_systemic_category_count"), 0)),
         "related_policy_intent_policy_count": int(numeric(row.get("related_policy_intent_policy_count"), 0)),
         "related_policy_intent_category_count": int(numeric(row.get("related_policy_intent_category_count"), 0)),
         "policy_type_weight": policy_type_weight,
@@ -476,6 +551,7 @@ def contribution_for_row(row: dict[str, Any], has_impact_score: bool) -> dict[st
             "direction_weight": direction_weight,
             "confidence_multiplier": confidence,
             "intent_modifier": intent_modifier,
+            "systemic_multiplier": systemic_multiplier,
             "policy_type_weight": policy_type_weight,
             "judicial_weight": judicial_weight if policy_type == "judicial_impact" else 1.0,
         },
@@ -536,7 +612,7 @@ def contributions_for_row(
                 "appointing_presidents": [president.get("president_name") if president else attribution.get("president_name")],
                 "policy_type_weight": 1.0,
                 "judicial_weight": judicial_weight,
-                "final_outcome_score": round(base["intent_adjusted_score"] * fraction * judicial_weight, 4),
+                "final_outcome_score": round(base["systemic_adjusted_score"] * fraction * judicial_weight, 4),
             }
         )
         contribution["weighting_applied"] = {
@@ -565,6 +641,8 @@ def empty_president_bucket(row: dict[str, Any]) -> dict[str, Any]:
             "source_quality_counts": Counter(),
             "policy_type_counts": Counter(),
             "intent_modifier_counts": Counter(),
+            "systemic_impact_counts": Counter(),
+            "systemic_weighted_outcomes": 0,
             "contributions": [],
         }
 
@@ -601,6 +679,9 @@ def add_contribution_to_family(bucket: dict[str, Any], contribution: dict[str, A
     bucket["source_quality_counts"][contribution.get("source_quality") or "unknown"] += 1
     bucket["policy_type_counts"][contribution.get("policy_type") or "unknown"] += 1
     bucket["intent_modifier_counts"][contribution.get("policy_intent_category") or "unclear"] += 1
+    bucket["systemic_impact_counts"][contribution.get("systemic_impact_category") or "standard"] += 1
+    if contribution.get("systemic_weight_applied"):
+        bucket["systemic_weighted_outcomes"] += 1
     bucket["contributions"].append(contribution)
 
 
@@ -636,6 +717,8 @@ def summarize_family_bucket(bucket: dict[str, Any], years: float) -> dict[str, A
         "source_quality_counts": dict(sorted(bucket["source_quality_counts"].items())),
         "policy_type_counts": dict(sorted(bucket["policy_type_counts"].items())),
         "intent_modifier_counts": dict(sorted(bucket["intent_modifier_counts"].items())),
+        "systemic_impact_counts": dict(sorted(bucket["systemic_impact_counts"].items())),
+        "systemic_weighted_outcomes": bucket["systemic_weighted_outcomes"],
         "confidence_flag": "low confidence" if total_outcomes < LOW_CONFIDENCE_OUTCOME_THRESHOLD else "standard",
     }
 
@@ -644,7 +727,7 @@ def prefix_summary(summary: dict[str, Any], prefix: str) -> dict[str, Any]:
     return {
         f"{prefix}_{key}": value
         for key, value in summary.items()
-        if key not in {"source_quality_counts", "policy_type_counts", "intent_modifier_counts"}
+        if key not in {"source_quality_counts", "policy_type_counts", "intent_modifier_counts", "systemic_impact_counts"}
     }
 
 
@@ -700,6 +783,8 @@ def aggregate_scores(contributions: list[dict[str, Any]]) -> tuple[list[dict[str
                 "source_quality_counts": Counter(),
                 "policy_type_counts": Counter(),
                 "intent_modifier_counts": Counter(),
+                "systemic_impact_counts": Counter(),
+                "systemic_weighted_outcomes": 0,
                 "contributions": [],
             }
         add_contribution_to_family(bucket["families"][family], contribution)
@@ -729,9 +814,12 @@ def aggregate_scores(contributions: list[dict[str, Any]]) -> tuple[list[dict[str
                 "source_quality_counts": direct["source_quality_counts"],
                 "policy_type_counts": direct["policy_type_counts"],
                 "intent_modifier_counts": direct["intent_modifier_counts"],
+                "systemic_impact_counts": direct["systemic_impact_counts"],
+                "systemic_weighted_outcome_count": direct["systemic_weighted_outcomes"] + systemic["systemic_weighted_outcomes"],
                 "systemic_source_quality_counts": systemic["source_quality_counts"],
                 "systemic_policy_type_counts": systemic["policy_type_counts"],
                 "systemic_intent_modifier_counts": systemic["intent_modifier_counts"],
+                "systemic_family_impact_counts": systemic["systemic_impact_counts"],
                 "combined_context_score": round(combined_raw_score, 4),
                 "combined_context_normalized_score": round(combined_normalized_score, 4),
                 "combined_context_display_score": round(combined_raw_score * combined_confidence_factor, 4),
@@ -783,6 +871,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     duplicate_ids = duplicate_outcome_ids(contributions)
     policy_type_counts = Counter(row.get("policy_type") or "unknown" for row in contributions)
     intent_modifier_counts = Counter(row.get("policy_intent_category") or "unclear" for row in contributions)
+    systemic_category_counts = Counter(row.get("systemic_impact_category") or "standard" for row in contributions)
     warnings = []
     if not has_impact_score:
         warnings.append(
@@ -829,6 +918,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
                 "mixed_or_competing": 0.95,
                 "neutral_or_unclear": 1.0,
             },
+            "systemic_multipliers": SYSTEMIC_MULTIPLIERS,
             "policy_type_weights": POLICY_TYPE_WEIGHTS,
             "judicial_attribution": {
                 "judicial_weight": JUDICIAL_WEIGHT,
@@ -845,11 +935,12 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
                 "raw_scores_preserved": True,
             },
             "president_normalization": "SUM(final_outcome_score) / years_in_office, applied separately to direct and systemic score families",
-            "final_outcome_score": "ABS(impact_score) * direction_weight * confidence_multiplier * intent_modifier * policy_type_weight; judicial rows instead use ABS(impact_score) * direction_weight * confidence_multiplier * intent_modifier * attribution_fraction * judicial_weight",
+            "final_outcome_score": "ABS(impact_score) * direction_weight * confidence_multiplier * intent_modifier * systemic_multiplier * policy_type_weight; judicial rows instead use ABS(impact_score) * direction_weight * confidence_multiplier * intent_modifier * systemic_multiplier * attribution_fraction * judicial_weight",
         },
         "join_contract": {
             "current_admin": "policy_outcomes.policy_id -> promises.id -> presidents.id",
             "intent_modifier": "current_admin outcomes resolve policy intent at runtime from linked promise_actions.related_policy_id records and exact policy-title mentions already present in promise action text. Missing links fall back to neutral unclear intent, and competing linked categories resolve to mixed_or_competing.",
+            "systemic_multiplier": "Systemic impact metadata is curated on policies and resolved at runtime for current_admin outcomes through linked historical policy records. Missing systemic metadata defaults to standard / 1.0.",
             "legislative": "policy_outcomes.policy_id -> tracked_bills.id; no president attribution is available in current schema, so rows are explicitly excluded with excluded_from_president_score=true until attribution exists",
             "judicial_impact": "policy_outcomes.policy_id -> policies.id. President attribution is allowed only through explicit judicial_attribution or majority_justices metadata that maps justices to appointing presidents.",
             "historical_policies": "Historical policies are not stored as policy_outcomes rows in production, so they are not counted in this unified-outcome report.",
@@ -861,6 +952,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
             "duplicate_outcome_id_count": len(duplicate_ids),
             "policy_type_counts": dict(sorted(policy_type_counts.items())),
             "intent_modifier_counts": dict(sorted(intent_modifier_counts.items())),
+            "systemic_category_counts": dict(sorted(systemic_category_counts.items())),
             "impact_score_column_present": has_impact_score,
             "low_confidence_president_count": sum(
                 1 for row in president_scores if row["confidence_flag"] == "low confidence"
@@ -868,7 +960,11 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
             "direct_outcome_contribution_count": sum(
                 1 for row in contributions if row.get("score_family") == SCORE_FAMILY_DIRECT and row.get("president_id") is not None
             ),
+            "systemic_multiplier_usage_count": sum(1 for row in contributions if row.get("systemic_weight_applied")),
             "systemic_outcome_contribution_count": sum(
+                1 for row in contributions if row.get("systemic_weight_applied")
+            ),
+            "systemic_score_family_contribution_count": sum(
                 1 for row in contributions if row.get("score_family") == SCORE_FAMILY_SYSTEMIC and row.get("president_id") is not None
             ),
         },
@@ -878,6 +974,9 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
             row for row in president_scores if row["confidence_flag"] == "low confidence"
         ],
         "unassigned_outcome_samples": unassigned[: args.sample_limit],
+        "systemic_weighted_contribution_samples": [
+            row for row in contributions if row.get("systemic_weight_applied")
+        ][: args.sample_limit],
         "outcome_contribution_samples": contributions[: args.sample_limit],
         "sql": {
             "policy_outcomes_query": build_policy_outcomes_sql(

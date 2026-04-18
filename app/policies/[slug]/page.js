@@ -11,6 +11,12 @@ import {
   takeLabels,
 } from "@/lib/editorial-depth";
 import { getFlagshipPolicyEditorial } from "@/lib/flagship-editorial";
+import {
+  formatSystemicImpactLabel,
+  isNonStandardSystemicImpact,
+  shouldRenderSystemicImpact,
+  systemicMultiplierFor,
+} from "@/lib/systemicImpact";
 import StructuredData from "@/app/components/public/StructuredData";
 import { Breadcrumbs } from "@/app/components/public/chrome";
 import {
@@ -41,6 +47,28 @@ function formatScore(value) {
     return "—";
   }
   return numeric.toFixed(2);
+}
+
+function formatSystemicMultiplier(value) {
+  return `${Number(value || 1).toFixed(2)}x`;
+}
+
+function buildSystemicImpactCard(policy) {
+  if (!shouldRenderSystemicImpact(policy?.systemic_impact_category, policy?.systemic_impact_summary)) {
+    return null;
+  }
+
+  const category = policy?.systemic_impact_category || "standard";
+  const label = formatSystemicImpactLabel(category);
+  const multiplier = systemicMultiplierFor(category);
+
+  return {
+    label,
+    multiplier,
+    summary:
+      policy?.systemic_impact_summary ||
+      "This record carries a documented systemic weighting because its effects extended beyond the immediate outcome into durable institutions, doctrine, or enforcement capacity.",
+  };
 }
 
 function computePolicyScore(policy) {
@@ -332,6 +360,7 @@ export default async function PolicyDetailPage({ params }) {
   const thinSummary = isThinText(policy.summary, 140);
   const thinOutcome = isThinText(policy.outcome_summary, 140);
   const contextParagraphs = buildPolicyContextParagraphs(policy, flagshipEditorial);
+  const systemicImpact = buildSystemicImpactCard(policy);
   const badges = [
     policy.year_enacted ? `Year ${policy.year_enacted}` : null,
     policy.president ? `President: ${policy.president}` : null,
@@ -339,6 +368,9 @@ export default async function PolicyDetailPage({ params }) {
     policy.primary_party ? `Party: ${policy.primary_party}` : null,
     policy.policy_type,
     policy.impact_direction,
+    isNonStandardSystemicImpact(policy.systemic_impact_category)
+      ? `Systemic: ${formatSystemicImpactLabel(policy.systemic_impact_category)}`
+      : null,
   ].filter(Boolean);
 
   return (
@@ -484,6 +516,27 @@ export default async function PolicyDetailPage({ params }) {
             summary="Policy pages keep score, evidence, and completeness side by side so users can evaluate what is known, what is sourced, and what still needs work."
           />
           <ScoreExplanation title="How to interpret this policy record" />
+          {systemicImpact ? (
+            <div className="rounded-[1.6rem] border border-[rgba(132,247,198,0.18)] bg-[linear-gradient(145deg,rgba(14,36,33,0.72),rgba(8,14,24,0.96))] p-6">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--accent)]">
+                Systemic impact
+              </p>
+              <h3 className="mt-3 text-lg font-semibold text-white">
+                {systemicImpact.label} structural weight
+              </h3>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-[var(--ink-soft)]">
+                  {systemicImpact.label}
+                </span>
+                <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-[var(--ink-soft)]">
+                  Systemic multiplier {formatSystemicMultiplier(systemicImpact.multiplier)}
+                </span>
+              </div>
+              <p className="mt-4 text-sm leading-7 text-[var(--ink-soft)]">
+                {systemicImpact.summary}
+              </p>
+            </div>
+          ) : null}
           <CitationNote
             description={
               flagshipEditorial?.citationDescription ||

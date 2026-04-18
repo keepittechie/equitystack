@@ -1,6 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { resolvePresidentImageSrc } from "@/lib/president-image-paths";
+import {
+  formatSystemicImpactLabel,
+  isNonStandardSystemicImpact,
+  systemicMultiplierFor,
+} from "@/lib/systemicImpact";
 import { ScoreBadge } from "./core";
 
 function formatRenderableDate(value) {
@@ -38,6 +43,24 @@ function summarizeDirectionLeader(breakdown = {}) {
   ].sort((left, right) => right[1] - left[1]);
 
   return rows[0]?.[1] ? `${rows[0][0]}-leaning mix` : "Direction mix unavailable";
+}
+
+function getSystemicRecordMeta(item = {}) {
+  const category = item.systemic_impact_category;
+  const summary =
+    typeof item.systemic_impact_summary === "string" ? item.systemic_impact_summary.trim() : "";
+
+  if (!isNonStandardSystemicImpact(category) && !summary) {
+    return null;
+  }
+
+  const resolvedMultiplier = Number(item.systemic_multiplier || systemicMultiplierFor(category));
+
+  return {
+    label: formatSystemicImpactLabel(category),
+    multiplier: `${resolvedMultiplier.toFixed(2)}x`,
+    summary: summary || null,
+  };
 }
 
 function RecordTypeBadge({ label }) {
@@ -577,21 +600,41 @@ export function PresidentPolicyTable({ items = [], buildHref }) {
             </tr>
           </thead>
           <tbody>
-            {items.map((item, index) => (
-              <tr key={`${item.id || item.slug}-${index}`} className="border-b border-white/6 last:border-b-0">
-                <td className="px-5 py-4">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <RecordTypeBadge label={item.record_type || (item.slug ? "Promise" : "Policy")} />
-                  </div>
-                  <Link href={buildHref(item)} className="font-medium text-white hover:text-[var(--accent)]">
-                    {item.title}
-                  </Link>
-                </td>
-                <td className="px-5 py-4 text-[var(--ink-soft)]">{item.topic || item.category || "—"}</td>
-                <td className="px-5 py-4 text-[var(--ink-soft)]">{item.status || item.impact_direction || "—"}</td>
-                <td className="px-5 py-4 text-white">{item.score ?? item.impact_score ?? "—"}</td>
-              </tr>
-            ))}
+            {items.map((item, index) => {
+              const systemicMeta = getSystemicRecordMeta(item);
+
+              return (
+                <tr key={`${item.id || item.slug}-${index}`} className="border-b border-white/6 last:border-b-0">
+                  <td className="px-5 py-4">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <RecordTypeBadge label={item.record_type || (item.slug ? "Promise" : "Policy")} />
+                      {systemicMeta ? (
+                        <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-soft)]">
+                          Systemic {systemicMeta.label} • {systemicMeta.multiplier}
+                        </span>
+                      ) : null}
+                    </div>
+                    <Link href={buildHref(item)} className="font-medium text-white hover:text-[var(--accent)]">
+                      {item.title}
+                    </Link>
+                    {systemicMeta?.summary ? (
+                      <p className="mt-1 text-xs leading-6 text-[var(--ink-soft)]">
+                        {systemicMeta.summary}
+                      </p>
+                    ) : null}
+                  </td>
+                  <td className="px-5 py-4 text-[var(--ink-soft)]">
+                    {item.topic || item.category || "—"}
+                  </td>
+                  <td className="px-5 py-4 text-[var(--ink-soft)]">
+                    {item.status || item.impact_direction || "—"}
+                  </td>
+                  <td className="px-5 py-4 text-white">
+                    {item.score ?? item.impact_score ?? "—"}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

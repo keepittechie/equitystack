@@ -15,6 +15,11 @@ import {
 } from "@/lib/labels";
 import { aggregatePresidentFromOutcomes } from "@/lib/black-impact-score/presidentAggregation.js";
 import { buildPresidentComparison } from "@/lib/black-impact-score/presidentComparison.js";
+import {
+  formatSystemicImpactLabel,
+  isNonStandardSystemicImpact,
+  systemicMultiplierFor,
+} from "@/lib/systemicImpact";
 import { fetchPromiseTimelineRelationshipMap } from "@/lib/services/promiseService";
 import { aggregatePromiseScoresByPresident } from "@/lib/promise-tracker-scoring";
 import {
@@ -595,6 +600,7 @@ function CredibilityNote({
     metadata.score_change.change_summary.trim()
       ? metadata.score_change
       : null;
+  const systemicWeightedCount = Number(metadata?.systemic_impact?.weighted_outcome_count || 0);
 
   return (
     <section className="card-muted rounded-[1.25rem] p-4">
@@ -619,6 +625,9 @@ function CredibilityNote({
           ) : null}
           {!usingLegacyModel && Number.isFinite(excludedCount) ? (
             <MetaPill>{excludedCount} excluded</MetaPill>
+          ) : null}
+          {!usingLegacyModel && systemicWeightedCount > 0 ? (
+            <MetaPill>{systemicWeightedCount} systemic-weighted outcomes</MetaPill>
           ) : null}
           {trendDirection ? <MetaPill>Trend: {trendDirection}</MetaPill> : null}
           {scoreChange?.has_prior_snapshot ? (
@@ -766,6 +775,64 @@ function getPrimaryImpactDirection(promise) {
   return null;
 }
 
+function getPromiseSystemicMetadata(promise) {
+  if (!promise || typeof promise !== "object") {
+    return null;
+  }
+
+  const summary =
+    typeof promise.systemic_impact_summary === "string"
+      ? promise.systemic_impact_summary.trim()
+      : "";
+  const category = promise.systemic_impact_category;
+
+  if (!isNonStandardSystemicImpact(category) && !summary) {
+    return null;
+  }
+
+  const multiplier = Number(promise.systemic_multiplier || systemicMultiplierFor(category));
+  const outcomeCount = Number(promise.systemic_outcome_count || 0);
+
+  return {
+    label: formatSystemicImpactLabel(category),
+    multiplier: Number.isFinite(multiplier) ? multiplier.toFixed(2) : "1.00",
+    summary: summary || null,
+    policyTitle:
+      typeof promise.systemic_policy_title === "string" && promise.systemic_policy_title.trim()
+        ? promise.systemic_policy_title.trim()
+        : null,
+    outcomeCount,
+  };
+}
+
+function SystemicPromiseDetails({ promise }) {
+  const systemicMeta = getPromiseSystemicMetadata(promise);
+
+  if (!systemicMeta) {
+    return null;
+  }
+
+  return (
+    <div className="mt-3 rounded-[0.95rem] border border-white/8 bg-white/5 px-3 py-3">
+      <div className="flex flex-wrap gap-2">
+        <MetaPill>Systemic {systemicMeta.label}</MetaPill>
+        <MetaPill>{systemicMeta.multiplier}x multiplier</MetaPill>
+        {systemicMeta.outcomeCount > 0 ? (
+          <MetaPill>
+            {systemicMeta.outcomeCount} linked outcome{systemicMeta.outcomeCount === 1 ? "" : "s"}
+          </MetaPill>
+        ) : null}
+        {systemicMeta.policyTitle ? <MetaPill>{systemicMeta.policyTitle}</MetaPill> : null}
+      </div>
+      {systemicMeta.summary ? (
+        <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+          {systemicMeta.summary}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
 function CountBarGroup({ title, counts }) {
   const entries = Object.entries(counts || {});
   const max = Math.max(...entries.map(([, count]) => Number(count || 0)), 0);
@@ -871,6 +938,7 @@ function PromiseDriverList({ title, items, emptyMessage, linkToPromises = true }
                 <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
                   {promise.explanation_summary || "No explanation is available for this record yet."}
                 </p>
+                <SystemicPromiseDetails promise={promise} />
 
                 <div className="mt-3 flex flex-wrap gap-2">
                   <MetaPill>{promise.outcome_count || 0} outcomes</MetaPill>
@@ -915,6 +983,7 @@ function StrongestDriverCard({ title, promise, linkToPromises = true }) {
           <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
             {promise.explanation_summary || "No explanation is available for this record yet."}
           </p>
+          <SystemicPromiseDetails promise={promise} />
           <div className="mt-4">
             <EvidencePanelTrigger
               promise={promise}
@@ -966,6 +1035,7 @@ function EvidencePanelContent({ promise, linkToPromises = true }) {
       <p className="text-sm text-[var(--ink-soft)] leading-7">
         {promise.explanation_summary || "No explanation summary is available for this record."}
       </p>
+      <SystemicPromiseDetails promise={promise} />
 
       <p className="text-sm text-[var(--ink-soft)] leading-7">
         This score view is built from the documented outcomes attached to this record and the linked source support visible on its Promise Tracker page.
