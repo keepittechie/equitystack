@@ -339,20 +339,20 @@ export default async function DashboardPage({ searchParams }) {
             buildHref={(item) => `/presidents/${item.slug}`}
             limit={5}
           />
-        </DashboardPanel>
-        <div className="space-y-5">
-          <PresidentScoreMethodologyNote />
-          <DashboardPanel>
-            <h2 className="text-lg font-semibold text-white">
+          <div className="rounded-[1.2rem] border border-white/8 bg-white/5 p-4">
+            <h3 className="text-base font-semibold text-white">
               How to interpret this block
-            </h2>
-            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+            </h3>
+            <p className="mt-2 text-sm leading-6 text-[var(--ink-soft)]">
               Scores reflect measured policy impact in the EquityStack dataset,
               not a complete judgment of a presidency. Confidence, direction
               mix, and profile-level drivers matter when reading differences
               between presidents.
             </p>
-          </DashboardPanel>
+          </div>
+        </DashboardPanel>
+        <div>
+          <PresidentScoreMethodologyNote />
         </div>
       </section>
 
