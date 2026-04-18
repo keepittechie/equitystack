@@ -540,7 +540,16 @@ export function PresidentRankingBoard({ items = [], buildHref, limit = 10, title
   );
 }
 
-export function PresidentHero({ name, party, termLabel, summary, score, systemicScore, imageSrc }) {
+export function PresidentHero({
+  name,
+  party,
+  termLabel,
+  summary,
+  score,
+  systemicScore,
+  systemicContextLabel,
+  imageSrc,
+}) {
   return (
     <section className="rounded-[2rem] border border-white/8 bg-[linear-gradient(140deg,rgba(8,14,24,0.98),rgba(9,19,33,0.96))] p-8 md:p-10">
       <div className="flex flex-wrap items-start justify-between gap-8">
@@ -556,7 +565,13 @@ export function PresidentHero({ name, party, termLabel, summary, score, systemic
           <PresidentPortrait imageSrc={imageSrc} alt={name} context="hero" />
           <div className="flex flex-wrap gap-3 sm:justify-end">
             <ScoreBadge value={score} label="Black Impact Score" size="lg" />
-            {systemicScore != null ? <ScoreBadge value={systemicScore} label="Systemic context" /> : null}
+            {systemicScore != null ? (
+              <ScoreBadge
+                value={systemicScore}
+                label="Systemic context"
+                context={systemicContextLabel || undefined}
+              />
+            ) : null}
           </div>
         </div>
       </div>

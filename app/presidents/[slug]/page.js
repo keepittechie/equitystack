@@ -48,6 +48,25 @@ function formatScore(value) {
   return numeric.toFixed(2);
 }
 
+function formatSystemicIndex(value) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) {
+    return null;
+  }
+  return `${numeric.toFixed(2)}x`;
+}
+
+function formatSystemicContextLabel(value) {
+  const label = String(value || "").trim();
+  if (!label) {
+    return null;
+  }
+  if (label === "Standard" || label === "Moderate" || label === "Strong") {
+    return `${label} impact`;
+  }
+  return label;
+}
+
 function formatTermLabel(start, end) {
   const startYear = start ? new Date(start).getFullYear() : null;
   const endYear = end ? new Date(end).getFullYear() : null;
@@ -382,7 +401,10 @@ export default async function PresidentProfilePage({ params }) {
               "The final Black Impact Score stays anchored in outcome-based evidence, then adds a bounded bill-informed signal when current legislative lineage is strong enough to support it."
         }
         score={formatScore(president.normalized_score_total ?? president.score ?? president.direct_normalized_score)}
-        systemicScore={formatScore(president.systemic_normalized_score)}
+        systemicScore={formatSystemicIndex(
+          president.systemic_index ?? president.systemic_normalized_score
+        )}
+        systemicContextLabel={formatSystemicContextLabel(president.systemic_category_label)}
         imageSrc={imageSrc}
       />
 
