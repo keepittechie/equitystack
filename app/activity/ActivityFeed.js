@@ -71,7 +71,7 @@ function SelectField({ label, value, onChange, options }) {
       <select
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="mt-2 w-full border rounded-xl px-3 py-2 bg-[rgba(255,252,247,0.88)]"
+        className="mt-2 w-full border border-white/8 rounded-xl px-3 py-2 bg-white/5 text-white"
       >
         {options.map((option) => (
           <option key={option.value} value={option.value}>
@@ -126,7 +126,7 @@ function ActivityCard({ item }) {
           ) : null}
         </div>
 
-        <div className="rounded-[1.2rem] border bg-[rgba(255,252,247,0.72)] p-4">
+        <div className="rounded-[1.2rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-4">
           <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Tracked Bill</p>
           <h3 className="font-semibold mt-2">{item.billTitle}</h3>
           <p className="text-sm text-[var(--ink-soft)] mt-2">
@@ -177,7 +177,7 @@ function ActivityCard({ item }) {
             href={item.billUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="px-4 py-2 rounded-full border border-[var(--line-strong)] bg-white/80 text-sm font-medium"
+            className="px-4 py-2 rounded-full border border-white/10 bg-white/5 text-sm font-medium text-white hover:border-white/20 hover:bg-white/8"
           >
             View the original bill source
           </a>
@@ -382,7 +382,7 @@ export default function ActivityFeed({ bills }) {
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Search ideas, bills, actions, or legislators"
-              className="mt-2 w-full border rounded-xl px-3 py-2 bg-[rgba(255,252,247,0.88)]"
+        className="mt-2 w-full border border-white/8 rounded-xl px-3 py-2 bg-white/5 text-white"
             />
           </label>
 

@@ -26,7 +26,7 @@ function SummaryBadge({ label, tone = "neutral" }) {
 
 function SummaryRow({ label, value, badgeTone = "neutral", valueNode = null }) {
   return (
-    <div className="rounded-[0.95rem] border border-[var(--line)] bg-white/80 px-3 py-2">
+    <div className="rounded-[0.95rem] border border-white/8 bg-white/5 px-3 py-2">
       <p className="text-xs uppercase tracking-[0.14em] text-[var(--ink-soft)]">{label}</p>
       <div className="mt-2">
         {valueNode || <SummaryBadge label={value} tone={badgeTone} />}
@@ -46,7 +46,7 @@ export default function TrustImpactSummaryCard({
   const trustIndicator = getRecordTrustStateLabel(record);
 
   return (
-    <div className="mt-4 rounded-[1rem] border border-[var(--line)] bg-[rgba(255,252,247,0.92)] p-3">
+    <div className="mt-4 rounded-[1rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-3">
       <div className="flex items-start justify-between gap-3 flex-wrap">
         <div>
           <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">

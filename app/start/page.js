@@ -209,7 +209,7 @@ export default function StartPage() {
             className="panel-link block rounded-[1.5rem] p-6"
           >
             <div className="flex items-start gap-4">
-              <div className="w-10 h-10 rounded-full border flex items-center justify-center text-sm font-semibold text-[var(--accent)] bg-[rgba(255,252,247,0.9)] shrink-0">
+              <div className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-sm font-semibold text-[var(--accent)] bg-white/5 shrink-0">
                 {index + 1}
               </div>
               <div>

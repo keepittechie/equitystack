@@ -843,10 +843,10 @@ function PromiseDriverList({ title, items, emptyMessage, linkToPromises = true }
             return (
               <div
                 key={promise.slug || promise.id || promise.title}
-                className={`rounded-[1rem] border bg-white/85 p-4 ${
+                className={`rounded-[1rem] border bg-[rgba(8,14,24,0.92)] p-4 ${
                   impactDirection === "Mixed"
-                    ? "border-[rgba(180,83,9,0.14)] bg-[linear-gradient(180deg,rgba(255,251,235,0.86),rgba(255,255,255,0.98))]"
-                    : "border-[rgba(120,53,15,0.1)]"
+                    ? "border-[rgba(251,191,36,0.22)] bg-[linear-gradient(180deg,rgba(70,46,10,0.5),rgba(8,14,24,0.96))]"
+                    : "border-white/8"
                 }`}
               >
                 <div className="flex items-start justify-between gap-3 flex-wrap">
@@ -903,7 +903,7 @@ function StrongestDriverCard({ title, promise, linkToPromises = true }) {
       {!promise ? (
         <p className="text-sm text-[var(--ink-soft)] mt-3">No driver is currently available for this category.</p>
       ) : (
-        <div className="mt-3 rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 p-4">
+        <div className="mt-3 rounded-[1rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-4">
           <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">{promise.topic || "No topic"}</p>
           {promise.slug && linkToPromises ? (
             <Link href={`/promises/${promise.slug}`} className="accent-link text-base font-semibold mt-2 inline-block">
@@ -986,11 +986,11 @@ function EvidencePanelContent({ promise, linkToPromises = true }) {
 
 function EvidencePanelTrigger({ promise, label = "Open underlying evidence", linkToPromises = true }) {
   return (
-    <details className="rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-[rgba(255,252,247,0.92)]">
+    <details className="rounded-[1rem] border border-white/8 bg-[rgba(8,14,24,0.92)]">
       <summary className="cursor-pointer list-none px-4 py-3 text-sm font-medium text-[var(--ink)]">
         {label}
       </summary>
-      <div className="border-t border-[rgba(120,53,15,0.08)] px-4 py-4">
+      <div className="border-t border-white/8 px-4 py-4">
         <EvidencePanelContent promise={promise} linkToPromises={linkToPromises} />
       </div>
     </details>
@@ -1015,7 +1015,7 @@ function EvidencePanelGroup({
           visibleItems.map((item) => (
             <div
               key={item.slug || item.id || item.title}
-              className="rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 p-4"
+              className="rounded-[1rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-4"
             >
               <EvidencePanelContent promise={item} linkToPromises={linkToPromises} />
             </div>
@@ -1168,7 +1168,7 @@ function PresidentInsightPanel({ president }) {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-3 mt-5">
-        <div className="rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 p-4">
+        <div className="rounded-[1rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-4">
           <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Primary Impact Area</p>
           <p className="text-base font-semibold mt-2">{primaryImpactArea?.topic || "Unavailable"}</p>
           <p className="text-sm text-[var(--ink-soft)] mt-2">
@@ -1178,7 +1178,7 @@ function PresidentInsightPanel({ president }) {
           </p>
         </div>
 
-        <div className="rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 p-4 lg:col-span-2">
+        <div className="rounded-[1rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-4 lg:col-span-2">
           <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Insight Summary</p>
           {insightLines.length ? (
             <ul className="mt-3 space-y-2 text-sm text-[var(--ink-soft)] leading-7">
@@ -1278,7 +1278,7 @@ function TopSummarySection({ presidents }) {
             {summary.top.map((president) => (
               <div
                 key={`top-${president.president_slug}`}
-                className="rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 p-4"
+                className="rounded-[1rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-4"
               >
                 <div className="flex items-start justify-between gap-3 flex-wrap">
                   <div className="flex items-center gap-3">
@@ -1307,7 +1307,7 @@ function TopSummarySection({ presidents }) {
             {summary.bottom.map((president) => (
               <div
                 key={`bottom-${president.president_slug}`}
-                className="rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 p-4"
+                className="rounded-[1rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-4"
               >
                 <div className="flex items-start justify-between gap-3 flex-wrap">
                   <div className="flex items-center gap-3">
@@ -1353,7 +1353,7 @@ function MethodologySection({ methodology, metadata, usingLegacyModel, isLegacyF
         </div>
         <a
           href="#methodology"
-          className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
+          className="rounded-full border border-white/10 bg-white/5 px-5 py-2 text-sm font-medium text-white hover:border-white/20 hover:bg-white/8"
         >
           Open Full Methodology
         </a>
@@ -1556,7 +1556,7 @@ function ScoringReadyFilterSection({
       <div className="flex flex-wrap gap-3 mt-4">
         <Link
           href={isActive ? clearHref : filterHref}
-          className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
+          className="rounded-full border border-white/10 bg-white/5 px-5 py-2 text-sm font-medium text-white hover:border-white/20 hover:bg-white/8"
         >
           {isActive ? "Show All Visible Records" : "Show Only Scoring-Ready Records"}
         </Link>
@@ -1598,7 +1598,7 @@ function ShareHeader({ shareUrl }) {
           }}
         />
       </div>
-      <div className="mt-4 rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 px-4 py-3 text-sm text-[var(--ink-soft)] break-all">
+      <div className="mt-4 rounded-[1rem] border border-white/8 bg-[rgba(8,14,24,0.92)] px-4 py-3 text-sm text-[var(--ink-soft)] break-all">
         {shareUrl}
       </div>
     </section>
@@ -1627,7 +1627,7 @@ function PermalinkSection({ permalinkUrl }) {
           }}
         />
       </div>
-      <div className="mt-4 rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 px-4 py-3 text-sm text-[var(--ink-soft)] break-all">
+      <div className="mt-4 rounded-[1rem] border border-white/8 bg-[rgba(8,14,24,0.92)] px-4 py-3 text-sm text-[var(--ink-soft)] break-all">
         {permalinkUrl}
       </div>
     </section>
@@ -1819,7 +1819,7 @@ function SourceAwareShareHeader({
         <MetaPill>{effectiveScoringModel}</MetaPill>
         <MetaPill>{modeLabel}</MetaPill>
       </div>
-      <div className="mt-4 rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 px-4 py-3 text-sm text-[var(--ink-soft)] break-all">
+      <div className="mt-4 rounded-[1rem] border border-white/8 bg-[rgba(8,14,24,0.92)] px-4 py-3 text-sm text-[var(--ink-soft)] break-all">
         {shareUrl}
       </div>
     </section>
@@ -1873,7 +1873,7 @@ function AdvancedReportToolsSection({
             entityType="impact-score"
             entityKey="black-impact-score"
             metadata={{ target_view: "topic-compare" }}
-            className="rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
+            className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:border-white/20 hover:bg-white/8 hover:text-white"
           >
             Topic Comparison
           </TrackedLink>
@@ -1885,7 +1885,7 @@ function AdvancedReportToolsSection({
             entityType="impact-score"
             entityKey="black-impact-score"
             metadata={{ target_view: "president-compare" }}
-            className="rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
+            className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:border-white/20 hover:bg-white/8 hover:text-white"
           >
             President Comparison
           </TrackedLink>
@@ -1897,7 +1897,7 @@ function AdvancedReportToolsSection({
             entityType="impact-score"
             entityKey="black-impact-score"
             metadata={{ target_view: "debate" }}
-            className="rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
+            className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:border-white/20 hover:bg-white/8 hover:text-white"
           >
             Debate View
           </TrackedLink>
@@ -1909,7 +1909,7 @@ function AdvancedReportToolsSection({
             entityType="impact-score"
             entityKey="black-impact-score"
             metadata={{ target_view: "experimental" }}
-            className="rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
+            className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:border-white/20 hover:bg-white/8 hover:text-white"
           >
             Experimental Views
           </TrackedLink>
@@ -1921,7 +1921,7 @@ function AdvancedReportToolsSection({
             entityType="impact-score"
             entityKey="black-impact-score"
             metadata={{ target_view: "public-share" }}
-            className="rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
+            className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:border-white/20 hover:bg-white/8 hover:text-white"
           >
             Share Report
           </TrackedLink>
@@ -2042,7 +2042,7 @@ function SourceAwareEvidenceTrail({ items, isPublicView }) {
           {items.map((item) => (
             <div key={item.key} className="card-muted rounded-[1.25rem] p-4">
               <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">{item.label}</p>
-              <div className="mt-3 rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 p-4">
+              <div className="mt-3 rounded-[1rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-4">
                 <EvidencePanelContent promise={item.promise} linkToPromises={true} />
                 {!getPromiseEvidenceSourceCount(item.promise) ? (
                   <p className="text-sm text-[var(--ink-soft)] mt-4 leading-7">
@@ -2053,7 +2053,7 @@ function SourceAwareEvidenceTrail({ items, isPublicView }) {
                   <div className="mt-4">
                     <Link
                       href={`/promises/${item.promise.slug}`}
-                      className="rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
+                      className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:border-white/20 hover:bg-white/8 hover:text-white"
                     >
                       Open Promise Tracker record
                     </Link>
@@ -2102,7 +2102,7 @@ function TopicFilterSection({
             className={`rounded-full border px-4 py-2 text-sm font-medium ${
               !selectedTopic
                 ? "border-[rgba(120,53,15,0.2)] bg-[rgba(120,53,15,0.08)] text-[var(--ink)]"
-                : "border-[rgba(120,53,15,0.12)] bg-white/80 text-[var(--ink-soft)] hover:text-[var(--accent)]"
+                : "border-white/10 bg-white/5 text-[var(--ink-soft)] hover:border-white/20 hover:bg-white/8 hover:text-white"
             }`}
           >
             All topics
@@ -2114,7 +2114,7 @@ function TopicFilterSection({
               className={`rounded-full border px-4 py-2 text-sm font-medium ${
                 selectedTopic?.value === topic.value
                   ? "border-[rgba(120,53,15,0.2)] bg-[rgba(120,53,15,0.08)] text-[var(--ink)]"
-                  : "border-[rgba(120,53,15,0.12)] bg-white/80 text-[var(--ink-soft)] hover:text-[var(--accent)]"
+                  : "border-white/10 bg-white/5 text-[var(--ink-soft)] hover:border-white/20 hover:bg-white/8 hover:text-white"
               }`}
             >
               {topic.label}
@@ -2148,7 +2148,7 @@ function ViewToggleSection({ standardHref, timelineHref, isTimelineView }) {
             className={`rounded-full border px-4 py-2 text-sm font-medium ${
               !isTimelineView
                 ? "border-[rgba(120,53,15,0.2)] bg-[rgba(120,53,15,0.08)] text-[var(--ink)]"
-                : "border-[rgba(120,53,15,0.12)] bg-white/80 text-[var(--ink-soft)] hover:text-[var(--accent)]"
+                : "border-white/10 bg-white/5 text-[var(--ink-soft)] hover:border-white/20 hover:bg-white/8 hover:text-white"
             }`}
           >
             Standard Report
@@ -2164,7 +2164,7 @@ function ViewToggleSection({ standardHref, timelineHref, isTimelineView }) {
             className={`rounded-full border px-4 py-2 text-sm font-medium ${
               isTimelineView
                 ? "border-[rgba(120,53,15,0.2)] bg-[rgba(120,53,15,0.08)] text-[var(--ink)]"
-                : "border-[rgba(120,53,15,0.12)] bg-white/80 text-[var(--ink-soft)] hover:text-[var(--accent)]"
+                : "border-white/10 bg-white/5 text-[var(--ink-soft)] hover:border-white/20 hover:bg-white/8 hover:text-white"
             }`}
           >
             Timeline
@@ -2193,7 +2193,7 @@ function TimelineShortcutSection({ timelineHref }) {
           entityType="impact-score"
           entityKey="black-impact-score"
           metadata={{ target_view: "timeline" }}
-          className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
+          className="rounded-full border border-white/10 bg-white/5 px-5 py-2 text-sm font-medium text-white hover:border-white/20 hover:bg-white/8"
         >
           Open Timeline
         </TrackedLink>
@@ -2250,7 +2250,7 @@ function TimelineConnector({ relationshipType, crossesPresident }) {
   return (
     <div className="flex items-center gap-3 px-3 py-1 text-sm text-[var(--ink-soft)]">
       <div className="h-px flex-1 bg-[rgba(120,53,15,0.12)]" />
-      <span className="rounded-full border border-[rgba(120,53,15,0.14)] bg-[rgba(255,252,247,0.92)] px-3 py-1 text-xs font-medium text-[var(--ink)]">
+      <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-[var(--ink-soft)]">
         {getTimelineRelationshipLabel(relationshipType)}
       </span>
       {crossesPresident ? (
@@ -2301,10 +2301,10 @@ function TimelineModeSection({ entries, isPublicView, effectiveScoringModel, sel
               return (
                 <div key={entry.slug || entry.id || `${entry.title}-${index}`}>
                   <article
-                    className={`relative rounded-[1.35rem] border bg-white/90 p-5 md:p-6 ${
+                    className={`relative rounded-[1.35rem] border bg-[rgba(8,14,24,0.92)] p-5 md:p-6 ${
                       entry.impact_direction === "Mixed"
-                        ? "border-[rgba(180,83,9,0.14)] bg-[linear-gradient(180deg,rgba(255,251,235,0.9),rgba(255,255,255,0.98))]"
-                        : "border-[rgba(120,53,15,0.1)]"
+                        ? "border-[rgba(251,191,36,0.22)] bg-[linear-gradient(180deg,rgba(70,46,10,0.55),rgba(8,14,24,0.96))]"
+                        : "border-white/8"
                     }`}
                   >
                     {showPresidentDivider ? (
@@ -2371,7 +2371,7 @@ function TimelineModeSection({ entries, isPublicView, effectiveScoringModel, sel
                         </div>
 
                         {entry.causal_link?.promise ? (
-                          <div className="mt-5 rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-[rgba(255,252,247,0.92)] px-4 py-3 text-sm text-[var(--ink-soft)]">
+                          <div className="mt-5 rounded-[1rem] border border-white/8 bg-[rgba(8,14,24,0.92)] px-4 py-3 text-sm text-[var(--ink-soft)]">
                             <span className="font-medium text-[var(--ink)]">
                               {getTimelineRelationshipLabel(entry.causal_link.relationship_type)}:{" "}
                             </span>
@@ -2594,7 +2594,7 @@ function PresidentCompareSelectorSection({
                 className={`rounded-full border px-4 py-2 text-sm font-medium ${
                   selectedPresidentASlug === option.slug
                     ? "border-[rgba(120,53,15,0.2)] bg-[rgba(120,53,15,0.08)] text-[var(--ink)]"
-                    : "border-[rgba(120,53,15,0.12)] bg-white/80 text-[var(--ink-soft)] hover:text-[var(--accent)]"
+                    : "border-white/10 bg-white/5 text-[var(--ink-soft)] hover:border-white/20 hover:bg-white/8 hover:text-white"
                 }`}
               >
                 {option.name}
@@ -2612,7 +2612,7 @@ function PresidentCompareSelectorSection({
                 className={`rounded-full border px-4 py-2 text-sm font-medium ${
                   selectedPresidentBSlug === option.slug
                     ? "border-[rgba(120,53,15,0.2)] bg-[rgba(120,53,15,0.08)] text-[var(--ink)]"
-                    : "border-[rgba(120,53,15,0.12)] bg-white/80 text-[var(--ink-soft)] hover:text-[var(--accent)]"
+                    : "border-white/10 bg-white/5 text-[var(--ink-soft)] hover:border-white/20 hover:bg-white/8 hover:text-white"
                 }`}
               >
                 {option.name}
@@ -2661,15 +2661,15 @@ function PresidentCompareCard({ president, primaryImpactArea }) {
       </div>
 
       <div className="grid gap-4 md:grid-cols-3 mt-5">
-        <div className="rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 p-4">
+        <div className="rounded-[1rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-4">
           <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Primary Impact Area</p>
           <p className="text-base font-semibold mt-2">{primaryImpactArea?.topic || "Unavailable"}</p>
         </div>
-        <div className="rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 p-4">
+        <div className="rounded-[1rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-4">
           <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Top Positive Driver</p>
           <p className="text-base font-semibold mt-2">{topPositive?.title || "Unavailable"}</p>
         </div>
-        <div className="rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 p-4">
+        <div className="rounded-[1rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-4">
           <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Top Negative Driver</p>
           <p className="text-base font-semibold mt-2">{topNegative?.title || "Unavailable"}</p>
         </div>
@@ -3439,13 +3439,13 @@ export default async function BlackImpactScorePage({ searchParams }) {
         <div className="flex flex-wrap gap-3 print:hidden">
           <Link
             href="/promises"
-            className="inline-flex items-center rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
+            className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:border-white/20 hover:bg-white/8 hover:text-white"
           >
             Open Promise Tracker
           </Link>
           <Link
             href="/reports"
-            className="inline-flex items-center rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
+            className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:border-white/20 hover:bg-white/8 hover:text-white"
           >
             Back to Reports
           </Link>
@@ -3497,7 +3497,7 @@ export default async function BlackImpactScorePage({ searchParams }) {
       ) : null}
 
       {isLegacyFallbackActive ? (
-        <section className="card-surface rounded-[1.6rem] p-5 border border-[rgba(120,53,15,0.12)]">
+        <section className="card-surface rounded-[1.6rem] border border-white/8 p-5">
           <h2 className="text-lg font-semibold">Outcome-Based Scoring Is Temporarily Unavailable</h2>
           <p className="text-sm text-[var(--ink-soft)] leading-7 mt-2">
             This page has temporarily fallen back to the previous legacy model so score access remains available.
@@ -3611,7 +3611,7 @@ export default async function BlackImpactScorePage({ searchParams }) {
                   {!isPublicView ? (
                     <Link
                       href={`/promises/president/${president.president_slug}`}
-                      className="rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
+                      className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:border-white/20 hover:bg-white/8 hover:text-white"
                     >
                       Open this president in Promise Tracker
                     </Link>
@@ -3809,7 +3809,7 @@ export default async function BlackImpactScorePage({ searchParams }) {
             </div>
             <Link
               href="/promises"
-              className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
+              className="rounded-full border border-white/10 bg-white/5 px-5 py-2 text-sm font-medium text-white hover:border-white/20 hover:bg-white/8"
             >
               Open Promise Tracker
             </Link>

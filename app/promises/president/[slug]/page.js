@@ -110,7 +110,7 @@ function getVisiblePromiseSourceCount(president) {
 
 function promiseCardClasses(promise) {
   if (promise.impact_direction_for_curation === "Mixed") {
-    return "panel-link block rounded-[1.35rem] p-5 border-[rgba(180,83,9,0.14)] bg-[linear-gradient(180deg,rgba(255,251,235,0.86),rgba(255,255,255,0.98))]";
+    return "panel-link block rounded-[1.35rem] border-[rgba(251,191,36,0.22)] bg-[linear-gradient(180deg,rgba(70,46,10,0.5),rgba(8,14,24,0.96))] p-5";
   }
 
   return "panel-link block rounded-[1.35rem] p-5";
@@ -171,25 +171,25 @@ export default async function PromisePresidentPage({ params, searchParams }) {
       <div className="mb-4 flex flex-wrap gap-3">
         <Link
           href="/promises"
-          className="inline-flex items-center rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
+          className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:border-white/20 hover:bg-white/8 hover:text-white"
         >
           Back to Presidency Terms
         </Link>
         <Link
           href={showAll ? "/promises/all" : "/promises/all?show_all=0"}
-          className="inline-flex items-center rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
+          className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:border-white/20 hover:bg-white/8 hover:text-white"
         >
           Browse All Promise Records
         </Link>
         <Link
           href={showAll ? `/promises/president/${slug}?show_all=0` : `/promises/president/${slug}`}
-          className="inline-flex items-center rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
+          className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:border-white/20 hover:bg-white/8 hover:text-white"
         >
           {showAll ? "Show Prioritized View" : "Show All Promises"}
         </Link>
         <Link
           href="/reports/black-impact-score"
-          className="inline-flex items-center rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
+          className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:border-white/20 hover:bg-white/8 hover:text-white"
         >
           View Black Impact Score
         </Link>
@@ -261,7 +261,7 @@ export default async function PromisePresidentPage({ params, searchParams }) {
         <div className="mt-4">
           <Link
             href="/reports/black-impact-score"
-            className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
+            className="rounded-full border border-white/10 bg-white/5 px-5 py-2 text-sm font-medium text-white hover:border-white/20 hover:bg-white/8"
           >
             Explore Black Impact Score
           </Link>
@@ -271,7 +271,7 @@ export default async function PromisePresidentPage({ params, searchParams }) {
       <section className="grid gap-4 md:grid-cols-3 mb-8">
         <Link
           href={`/presidents/${slug}`}
-          className="rounded-[1.4rem] border border-[rgba(120,53,15,0.12)] bg-white/80 p-5 hover:border-[rgba(120,53,15,0.22)]"
+          className="rounded-[1.4rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 hover:border-white/16"
         >
           <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Presidential profile</p>
           <h2 className="mt-3 text-lg font-semibold">Read the full presidential record</h2>
@@ -281,7 +281,7 @@ export default async function PromisePresidentPage({ params, searchParams }) {
         </Link>
         <Link
           href={`/policies?president=${encodeURIComponent(president.president)}`}
-          className="rounded-[1.4rem] border border-[rgba(120,53,15,0.12)] bg-white/80 p-5 hover:border-[rgba(120,53,15,0.22)]"
+          className="rounded-[1.4rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 hover:border-white/16"
         >
           <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Policy context</p>
           <h2 className="mt-3 text-lg font-semibold">Browse policy records under this president</h2>
@@ -291,7 +291,7 @@ export default async function PromisePresidentPage({ params, searchParams }) {
         </Link>
         <Link
           href="/explainers"
-          className="rounded-[1.4rem] border border-[rgba(120,53,15,0.12)] bg-white/80 p-5 hover:border-[rgba(120,53,15,0.22)]"
+          className="rounded-[1.4rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 hover:border-white/16"
         >
           <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Historical context</p>
           <h2 className="mt-3 text-lg font-semibold">Read explainers connected to this record</h2>
@@ -347,7 +347,7 @@ export default async function PromisePresidentPage({ params, searchParams }) {
                           routeKind="page"
                           entityType="promise"
                           entityKey={promise.slug}
-                          className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-3 py-1 text-xs font-medium"
+                          className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-white hover:border-white/20 hover:bg-white/8"
                         >
                           Share Card
                         </TrackedLink>

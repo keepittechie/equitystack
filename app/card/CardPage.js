@@ -65,7 +65,7 @@ export default function CardPage({ card, backHref, backLabel }) {
       <div className="flex flex-wrap items-center gap-3">
         <Link
           href={backHref}
-          className="inline-flex items-center rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
+          className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:border-white/20 hover:bg-white/8 hover:text-white"
         >
           {backLabel}
         </Link>
@@ -132,7 +132,7 @@ export default function CardPage({ card, backHref, backLabel }) {
             </div>
             <CardShareActions path={card.sharePath} title={card.title} />
           </div>
-          <div className="rounded-[1rem] border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-3 text-sm text-[var(--ink-soft)] break-all">
+          <div className="rounded-[1rem] border border-white/8 bg-[rgba(8,14,24,0.92)] px-4 py-3 text-sm text-[var(--ink-soft)] break-all">
             {absoluteUrl}
           </div>
         </section>

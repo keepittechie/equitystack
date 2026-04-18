@@ -20,7 +20,7 @@ export default function CardShareActions({ path, title }) {
         href={`https://x.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`}
         target="_blank"
         rel="noopener noreferrer"
-        className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-4 py-2 text-sm font-medium"
+        className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white hover:border-white/20 hover:bg-white/8"
       >
         Share to X
       </Link>
@@ -28,7 +28,7 @@ export default function CardShareActions({ path, title }) {
         href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`}
         target="_blank"
         rel="noopener noreferrer"
-        className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-4 py-2 text-sm font-medium"
+        className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white hover:border-white/20 hover:bg-white/8"
       >
         Share to LinkedIn
       </Link>

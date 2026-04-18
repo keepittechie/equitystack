@@ -303,7 +303,7 @@ function RankingList({ title, items, emptyMessage }) {
           {items.map((item, index) => (
             <li
               key={`${title}-${item.president_slug || item.president}-${index}`}
-              className="rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 p-4"
+              className="rounded-[1rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-4"
             >
               <div className="flex items-start justify-between gap-3 flex-wrap">
                 <div>
@@ -369,7 +369,7 @@ function LargestShiftList({ items }) {
           {items.map((item) => (
             <div
               key={`shift-${item.key}`}
-              className="rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 p-4"
+              className="rounded-[1rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-4"
             >
               <div className="flex items-start justify-between gap-3 flex-wrap">
                 <div>
@@ -381,14 +381,14 @@ function LargestShiftList({ items }) {
                 <MetaPill>Delta {formatNormalizedDelta(item.normalized_delta)}</MetaPill>
               </div>
               <div className="mt-3 grid gap-3 md:grid-cols-2">
-                <div className="rounded-[0.9rem] border border-[rgba(120,53,15,0.08)] bg-[rgba(255,252,247,0.8)] p-3">
+                <div className="rounded-[0.9rem] border border-white/8 bg-white/5 p-3">
                   <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Legacy Promise Model</p>
                   <p className="text-sm mt-2">Raw {formatRawScore(item.legacy?.raw_score)}</p>
                   <p className="text-sm text-[var(--ink-soft)] mt-1">
                     Normalized {formatNormalizedScore(item.legacy?.normalized_score)}
                   </p>
                 </div>
-                <div className="rounded-[0.9rem] border border-[rgba(120,53,15,0.08)] bg-[rgba(255,252,247,0.8)] p-3">
+                <div className="rounded-[0.9rem] border border-white/8 bg-white/5 p-3">
                   <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Outcome-Based Model</p>
                   <p className="text-sm mt-2">Raw {formatRawScore(item.outcome?.raw_score)}</p>
                   <p className="text-sm text-[var(--ink-soft)] mt-1">
@@ -426,7 +426,7 @@ function ComparisonTable({ rows }) {
         <div className="mt-5 overflow-x-auto">
           <table className="min-w-full text-sm">
             <thead>
-              <tr className="border-b border-[rgba(120,53,15,0.12)] text-left">
+              <tr className="border-b border-white/8 text-left">
                 <th scope="col" className="py-3 pr-4 font-semibold">President</th>
                 <th scope="col" className="py-3 pr-4 font-semibold">Legacy Raw</th>
                 <th scope="col" className="py-3 pr-4 font-semibold">Legacy Normalized</th>
@@ -486,7 +486,7 @@ function RecordReviewTable({ title, rows, emptyMessage }) {
         <div className="mt-3 overflow-x-auto">
           <table className="min-w-full text-sm">
             <thead>
-              <tr className="border-b border-[rgba(120,53,15,0.12)] text-left">
+              <tr className="border-b border-white/8 text-left">
                 <th scope="col" className="py-3 pr-4 font-semibold">Promise</th>
                 <th scope="col" className="py-3 pr-4 font-semibold">Legacy</th>
                 <th scope="col" className="py-3 pr-4 font-semibold">Outcome</th>
@@ -702,19 +702,19 @@ export default async function PromiseScorePreviewPage() {
       <section className="mb-6 flex flex-wrap gap-3">
         <Link
           href="/promises"
-          className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
+          className="rounded-full border border-white/10 bg-white/5 px-5 py-2 text-sm font-medium text-white hover:border-white/20 hover:bg-white/8"
         >
           View Presidents
         </Link>
         <Link
           href="/promises/all"
-          className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
+          className="rounded-full border border-white/10 bg-white/5 px-5 py-2 text-sm font-medium text-white hover:border-white/20 hover:bg-white/8"
         >
           Browse All Promise Records
         </Link>
         <Link
           href="/reports/black-impact-score"
-          className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
+          className="rounded-full border border-white/10 bg-white/5 px-5 py-2 text-sm font-medium text-white hover:border-white/20 hover:bg-white/8"
         >
           View Current Public Report
         </Link>

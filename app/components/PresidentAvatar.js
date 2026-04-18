@@ -17,7 +17,7 @@ export default function PresidentAvatar({
   return (
     <div
       className={[
-        "relative shrink-0 overflow-hidden border border-[rgba(120,53,15,0.14)] bg-[rgba(247,242,234,0.9)] shadow-[0_8px_18px_rgba(120,53,15,0.08)]",
+        "relative shrink-0 overflow-hidden border border-white/10 bg-white/5 shadow-[0_8px_18px_rgba(0,0,0,0.22)]",
         shape === "rounded" ? "rounded-[0.95rem]" : "rounded-full",
         className,
       ]

@@ -29,7 +29,7 @@ export default function GlobalError({ error, reset }) {
               </button>
               <Link
                 href="/"
-                className="border rounded-lg px-4 py-2 font-medium bg-[rgba(255,252,247,0.85)] hover:bg-[rgba(255,252,247,1)] transition"
+                className="border border-white/10 rounded-lg px-4 py-2 font-medium bg-white/5 text-white hover:border-white/20 hover:bg-white/8 transition"
               >
                 Go Home
               </Link>

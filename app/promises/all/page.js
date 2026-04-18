@@ -168,13 +168,13 @@ export default async function AllPromisesPage({ searchParams }) {
       <section className="mb-6 flex flex-wrap gap-3">
         <Link
           href="/promises"
-          className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
+          className="rounded-full border border-white/10 bg-white/5 px-5 py-2 text-sm font-medium text-white hover:border-white/20 hover:bg-white/8"
         >
           View Presidents
         </Link>
         <Link
           href={buildShowAllHref(resolvedSearchParams, !showAll)}
-          className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
+          className="rounded-full border border-white/10 bg-white/5 px-5 py-2 text-sm font-medium text-white hover:border-white/20 hover:bg-white/8"
         >
           {showAll ? "Show Prioritized View" : "Show All Promises"}
         </Link>
@@ -207,7 +207,7 @@ export default async function AllPromisesPage({ searchParams }) {
             <select
               name="president"
               defaultValue={resolvedSearchParams.president || ""}
-              className="w-full border rounded-xl px-3 py-2 bg-white/80"
+              className="w-full border border-white/8 rounded-xl px-3 py-2 bg-white/5 text-white"
             >
               <option value="">All</option>
               {filters.presidents.map((name) => (
@@ -222,7 +222,7 @@ export default async function AllPromisesPage({ searchParams }) {
             <select
               name="status"
               defaultValue={resolvedSearchParams.status || ""}
-              className="w-full border rounded-xl px-3 py-2 bg-white/80"
+              className="w-full border border-white/8 rounded-xl px-3 py-2 bg-white/5 text-white"
             >
               <option value="">All</option>
               {filters.statuses.map((label) => (
@@ -237,7 +237,7 @@ export default async function AllPromisesPage({ searchParams }) {
             <select
               name="topic"
               defaultValue={resolvedSearchParams.topic || ""}
-              className="w-full border rounded-xl px-3 py-2 bg-white/80"
+              className="w-full border border-white/8 rounded-xl px-3 py-2 bg-white/5 text-white"
             >
               <option value="">All</option>
               {filters.topics.map((label) => (
@@ -252,7 +252,7 @@ export default async function AllPromisesPage({ searchParams }) {
             <select
               name="sort"
               defaultValue={resolvedSearchParams.sort || "promise_date_desc"}
-              className="w-full border rounded-xl px-3 py-2 bg-white/80"
+              className="w-full border border-white/8 rounded-xl px-3 py-2 bg-white/5 text-white"
             >
               <option value="promise_date_desc">Newest Promise Date</option>
               <option value="promise_date_asc">Oldest Promise Date</option>
@@ -281,7 +281,7 @@ export default async function AllPromisesPage({ searchParams }) {
             </button>
             <Link
               href="/promises/all"
-              className="rounded-full border border-[rgba(120,53,15,0.18)] px-5 py-2 text-sm font-medium"
+              className="rounded-full border border-white/10 bg-white/5 px-5 py-2 text-sm font-medium text-[var(--ink-soft)] hover:border-white/20 hover:bg-white/8 hover:text-white"
             >
               Reset
             </Link>
@@ -295,7 +295,7 @@ export default async function AllPromisesPage({ searchParams }) {
             <Link
               key={filter.key}
               href={buildResetHref(resolvedSearchParams, filter.key)}
-              className="inline-flex items-center rounded-full border border-[rgba(120,53,15,0.12)] px-3 py-2 text-sm bg-white/75 hover:bg-white"
+              className="inline-flex items-center rounded-full border border-white/10 px-3 py-2 text-sm bg-white/5 text-[var(--ink-soft)] hover:border-white/20 hover:bg-white/8 hover:text-white"
             >
               {filter.label} ×
             </Link>
@@ -355,7 +355,7 @@ export default async function AllPromisesPage({ searchParams }) {
                     routeKind="page"
                     entityType="promise"
                     entityKey={promise.slug}
-                    className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-3 py-1 text-xs font-medium"
+                    className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-white hover:border-white/20 hover:bg-white/8"
                   >
                     Share Card
                   </TrackedLink>
@@ -403,7 +403,7 @@ export default async function AllPromisesPage({ searchParams }) {
           {pagination.has_prev ? (
             <Link
               href={buildPageHref(resolvedSearchParams, pagination.page - 1)}
-              className="rounded-full border border-[rgba(120,53,15,0.18)] px-4 py-2 text-sm font-medium"
+              className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:border-white/20 hover:bg-white/8 hover:text-white"
             >
               Previous
             </Link>
@@ -418,7 +418,7 @@ export default async function AllPromisesPage({ searchParams }) {
           {pagination.has_next ? (
             <Link
               href={buildPageHref(resolvedSearchParams, pagination.page + 1)}
-              className="rounded-full border border-[rgba(120,53,15,0.18)] px-4 py-2 text-sm font-medium"
+              className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:border-white/20 hover:bg-white/8 hover:text-white"
             >
               Next
             </Link>

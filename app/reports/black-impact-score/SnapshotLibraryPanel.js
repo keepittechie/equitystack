@@ -202,21 +202,21 @@ export default function SnapshotLibraryPanel({ currentSnapshot }) {
           <button
             type="button"
             onClick={handleSaveSnapshot}
-            className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
+            className="rounded-full border border-white/10 bg-white/5 px-5 py-2 text-sm font-medium text-white hover:border-white/20 hover:bg-white/8"
           >
             Save Current View
           </button>
           <button
             type="button"
             onClick={handlePrint}
-            className="rounded-full border border-[rgba(120,53,15,0.18)] bg-white/80 px-5 py-2 text-sm font-medium"
+            className="rounded-full border border-white/10 bg-white/5 px-5 py-2 text-sm font-medium text-white hover:border-white/20 hover:bg-white/8"
           >
             Print or Save PDF
           </button>
         </div>
       </div>
 
-      <div className="mt-4 rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 p-4">
+      <div className="mt-4 rounded-[1rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-4">
         <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Current Snapshot</p>
         <p className="text-base font-semibold mt-2">{currentSnapshot.label}</p>
         <p className="text-sm text-[var(--ink-soft)] mt-2 leading-7">{currentSnapshot.modeSummary}</p>
@@ -239,7 +239,7 @@ export default function SnapshotLibraryPanel({ currentSnapshot }) {
           {snapshots.map((snapshot) => (
             <div
               key={snapshot.permalinkUrl}
-              className="rounded-[1rem] border border-[rgba(120,53,15,0.1)] bg-white/85 p-4"
+              className="rounded-[1rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-4"
             >
               <div className="flex items-start justify-between gap-4 flex-wrap">
                 <div className="max-w-3xl">
@@ -250,7 +250,7 @@ export default function SnapshotLibraryPanel({ currentSnapshot }) {
                 <div className="flex flex-wrap gap-2">
                   <Link
                     href={snapshot.permalinkUrl}
-                    className="rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
+                    className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:border-white/20 hover:bg-white/8 hover:text-white"
                   >
                     Open
                   </Link>
@@ -262,7 +262,7 @@ export default function SnapshotLibraryPanel({ currentSnapshot }) {
                   <button
                     type="button"
                     onClick={() => handleDeleteSnapshot(snapshot.permalinkUrl)}
-                    className="rounded-full border border-[rgba(120,53,15,0.12)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--accent)]"
+                    className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:border-white/20 hover:bg-white/8 hover:text-white"
                   >
                     Delete
                   </button>

@@ -79,7 +79,7 @@ export function getMostRecentAction(trackedBills) {
 
 export function SponsorLine({ sponsor }) {
   return (
-    <div className="flex items-center justify-between gap-3 flex-wrap rounded-xl border bg-[rgba(255,252,247,0.82)] px-3 py-2">
+    <div className="flex items-center justify-between gap-3 flex-wrap rounded-xl border border-white/8 bg-[rgba(8,14,24,0.92)] px-3 py-2">
       <div>
         <p className="font-medium">{sponsor.name}</p>
         <p className="text-xs text-[var(--ink-soft)] mt-1">
@@ -94,7 +94,7 @@ export function LegislatorLine({ legislator }) {
   return (
     <Link
       href={`/scorecards/${legislator.id}`}
-      className="panel-link flex items-center justify-between gap-3 flex-wrap rounded-xl border bg-[rgba(255,252,247,0.82)] px-3 py-2"
+      className="panel-link flex items-center justify-between gap-3 flex-wrap rounded-xl border border-white/8 bg-[rgba(8,14,24,0.92)] px-3 py-2"
     >
       <div>
         <p className="font-medium">{legislator.full_name}</p>
@@ -116,7 +116,7 @@ export function LegislatorLine({ legislator }) {
 
 export function ActionLine({ action }) {
   return (
-    <div className="rounded-xl border bg-[rgba(255,252,247,0.82)] px-3 py-3">
+    <div className="rounded-xl border border-white/8 bg-[rgba(8,14,24,0.92)] px-3 py-3">
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">
           {action.type || "Action"}
