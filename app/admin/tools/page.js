@@ -164,6 +164,22 @@ export default async function AdminToolsPage() {
         <VerificationReportCard report={deepIntegrityReport} />
       </section>
 
+      <section className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface-muted)] p-3 shadow-sm">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <p className="font-mono text-[11px] uppercase tracking-wide text-[var(--admin-text-muted)]">operator report</p>
+            <h3 className="mt-1 text-base font-semibold text-[var(--admin-text)]">Systemic linkage coverage</h3>
+            <p className="mt-1 max-w-4xl text-[11px] text-[var(--admin-text-soft)]">
+              Read-only report for policies with non-default systemic classifications. It shows whether each policy is active in live
+              scoring, whether the current path is canonical, and which grounded curation step is next for inactive rows.
+            </p>
+          </div>
+          <Link href="/admin/systemic-linkage" className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] px-3 py-2 text-[12px] text-[var(--admin-link)] hover:bg-[var(--admin-surface-muted)]">
+            Open systemic linkage report
+          </Link>
+        </div>
+      </section>
+
       <section className="grid gap-4 xl:grid-cols-3">
         <IntegrityArtifactCard title="Source integrity cleanup report" artifact={cleanupArtifact}>
           <div>Mode: {cleanupArtifact?.payload?.mode || "unknown"}</div>
