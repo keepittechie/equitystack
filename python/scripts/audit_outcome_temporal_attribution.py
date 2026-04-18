@@ -172,17 +172,23 @@ def fetch_outcome_source_dates(cursor, outcome_ids: list[int]) -> dict[int, list
     cursor.execute(
         f"""
         SELECT
-          pos.promise_outcome_id,
+          pout.id AS promise_outcome_id,
           s.id AS source_id,
           s.source_title,
           s.source_url,
           s.publisher,
           s.published_date
-        FROM promise_outcome_sources pos
+        FROM promise_outcomes pout
+        JOIN policy_outcomes po
+          ON po.policy_type = 'current_admin'
+         AND po.policy_id = pout.promise_id
+         AND po.outcome_summary_hash = SHA2(TRIM(pout.outcome_summary), 256)
+        JOIN policy_outcome_sources pos
+          ON pos.policy_outcome_id = po.id
         JOIN sources s ON s.id = pos.source_id
-        WHERE pos.promise_outcome_id IN ({placeholders})
+        WHERE pout.id IN ({placeholders})
           AND s.published_date IS NOT NULL
-        ORDER BY pos.promise_outcome_id ASC, s.published_date ASC, s.id ASC
+        ORDER BY pout.id ASC, s.published_date ASC, s.id ASC
         """,
         outcome_ids,
     )
@@ -297,7 +303,7 @@ def source_date_candidates(sources: list[dict[str, Any]]) -> list[dict[str, Any]
             {
                 "date": published_date,
                 "candidate_date_type": "source_published_date",
-                "source": "promise_outcome_sources",
+                "source": "policy_outcome_sources",
                 "source_record_id": safe_int(source.get("source_id")),
                 "source_title": normalize_nullable_text(source.get("source_title")),
                 "source_url": normalize_nullable_text(source.get("source_url")),
@@ -595,7 +601,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
                     "source_tables": [
                         "promise_outcomes",
                         "promise_actions",
-                        "promise_outcome_sources",
+                        "policy_outcome_sources",
                         "sources",
                         "policy_outcomes",
                     ],

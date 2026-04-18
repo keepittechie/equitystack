@@ -16,6 +16,13 @@ from current_admin_common import (
     utc_timestamp,
     write_json_file,
 )
+from policy_outcome_source_common import (
+    create_source,
+    ensure_policy_outcome_sources_table,
+    find_source_by_url,
+    link_policy_outcome_source,
+    sync_policy_outcome_source_metadata,
+)
 
 
 POLICY_TYPE = "legislative"
@@ -42,7 +49,6 @@ NOT_ENACTED_STATUSES = {
     "passed house",
     "passed senate",
 }
-SOURCE_QUALITY_RANK = {None: 0, "low": 1, "medium": 2, "high": 3}
 
 
 def parse_args() -> argparse.Namespace:
@@ -154,12 +160,6 @@ def source_quality_for_bill(row: dict[str, Any], actions: list[dict[str, Any]]) 
     if "secondary" in labels:
         return "medium"
     return "low"
-
-
-def stronger_source_quality(left: Any, right: Any) -> str | None:
-    current = normalize_nullable_text(left)
-    incoming = normalize_nullable_text(right)
-    return incoming if SOURCE_QUALITY_RANK.get(incoming, 0) > SOURCE_QUALITY_RANK.get(current, 0) else current
 
 
 def evidence_strength_for_bill(row: dict[str, Any], source_count: int) -> str | None:
@@ -479,35 +479,6 @@ def insert_policy_outcome(cursor, payload: dict[str, Any]) -> int:
     return int(cursor.lastrowid)
 
 
-def sync_existing_source_metadata(cursor, existing: dict[str, Any], payload: dict[str, Any]) -> dict[str, Any] | None:
-    existing_count = int(existing.get("source_count") or 0)
-    incoming_count = int(payload.get("source_count") or 0)
-    existing_quality = normalize_nullable_text(existing.get("source_quality"))
-    incoming_quality = normalize_nullable_text(payload.get("source_quality"))
-    next_count = max(existing_count, incoming_count)
-    next_quality = stronger_source_quality(existing_quality, incoming_quality)
-    if next_count == existing_count and next_quality == existing_quality:
-        return None
-    cursor.execute(
-        """
-        UPDATE policy_outcomes
-        SET source_count = %s,
-            source_quality = %s
-        WHERE id = %s
-          AND policy_type = 'legislative'
-        """,
-        (next_count, next_quality, existing["id"]),
-    )
-    return {
-        "policy_outcome_id": int(existing["id"]),
-        "previous_source_count": existing_count,
-        "new_source_count": next_count,
-        "previous_source_quality": existing_quality,
-        "new_source_quality": next_quality,
-        "reason": "refreshed_legislative_source_metadata_without_downgrading",
-    }
-
-
 def sanitize_payload(payload: dict[str, Any]) -> dict[str, Any]:
     return {
         key: payload.get(key)
@@ -531,6 +502,44 @@ def sanitize_payload(payload: dict[str, Any]) -> dict[str, Any]:
             "tracked_bill",
             "source_snapshot",
         ]
+    }
+
+
+def materialize_source_links(cursor, policy_outcome_id: int, payload: dict[str, Any], generated_at: str) -> dict[str, Any]:
+    sources_created = 0
+    links_created = 0
+    linked_source_ids: list[int] = []
+    for source in payload.get("source_snapshot") or []:
+        source_url = normalize_nullable_text(source.get("source_url"))
+        if not source_url:
+            continue
+        source_id = find_source_by_url(cursor, source_url)
+        if source_id is None:
+            source_id = create_source(
+                cursor,
+                source_title=normalize_nullable_text(source.get("source_title"))
+                or f"{payload['tracked_bill']['bill_number']} - Congress.gov source",
+                source_url=source_url,
+                source_type="Government",
+                publisher=normalize_nullable_text(source.get("publisher")) or "Congress.gov",
+                published_date=normalize_nullable_text(source.get("action_date"))
+                or normalize_nullable_text(payload["tracked_bill"].get("latest_action_date")),
+                notes=(
+                    f"EquityStack legislative policy outcome source materialization at {generated_at}"
+                    f" | policy_outcome_id={policy_outcome_id}"
+                    f" | tracked_bill_id={payload['tracked_bill']['tracked_bill_id']}"
+                ),
+            )
+            sources_created += 1
+        links_created += link_policy_outcome_source(cursor, policy_outcome_id, int(source_id))
+        linked_source_ids.append(int(source_id))
+    metadata = sync_policy_outcome_source_metadata(cursor, policy_outcome_id)
+    return {
+        "policy_outcome_id": policy_outcome_id,
+        "sources_created": sources_created,
+        "links_created": links_created,
+        "linked_source_ids": linked_source_ids,
+        "metadata": metadata,
     }
 
 
@@ -564,6 +573,20 @@ def integrity_checks(cursor) -> dict[str, Any]:
         }
         for row in list(cursor.fetchall() or [])
     ]
+    cursor.execute(
+        """
+        SELECT COUNT(*) AS total
+        FROM policy_outcomes po
+        LEFT JOIN (
+          SELECT policy_outcome_id, COUNT(DISTINCT source_id) AS actual_source_count
+          FROM policy_outcome_sources
+          GROUP BY policy_outcome_id
+        ) actual ON actual.policy_outcome_id = po.id
+        WHERE po.policy_type = 'legislative'
+          AND po.source_count <> COALESCE(actual.actual_source_count, 0)
+        """
+    )
+    source_count_mismatches = int((cursor.fetchone() or {}).get("total") or 0)
     cursor.execute(
         """
         SELECT COUNT(*) AS total
@@ -604,11 +627,18 @@ def integrity_checks(cursor) -> dict[str, Any]:
     validation_error_count = int((cursor.fetchone() or {}).get("total") or 0)
     return {
         "legislative_policy_id_orphans": orphan_count,
+        "legislative_source_count_mismatches": source_count_mismatches,
         "duplicate_legislative_outcome_groups": duplicates,
         "invalid_legislative_date_ranges": invalid_date_ranges,
         "legislative_scoring_ready_outcomes": scoring_ready_count,
         "post_workflow_validation": {
-            "ok": validation_error_count == 0 and orphan_count == 0 and invalid_date_ranges == 0 and not duplicates,
+            "ok": (
+                validation_error_count == 0
+                and orphan_count == 0
+                and invalid_date_ranges == 0
+                and source_count_mismatches == 0
+                and not duplicates
+            ),
             "invalid_legislative_policy_outcome_count": validation_error_count,
             "checks": [
                 "impact_score_present_and_bounded",
@@ -618,6 +648,7 @@ def integrity_checks(cursor) -> dict[str, Any]:
                 "no_duplicate_legislative_outcomes",
                 "no_legislative_policy_id_orphans",
                 "valid_legislative_date_ranges",
+                "source_count_matches_policy_outcome_sources",
             ],
         },
     }
@@ -632,6 +663,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     connection = get_db_connection()
     try:
         with connection.cursor() as cursor:
+            ensure_policy_outcome_sources_table(cursor)
             bills = fetch_tracked_bills(cursor, args)
             action_map = fetch_actions(cursor, [int(row["id"]) for row in bills])
             eligible: list[dict[str, Any]] = []
@@ -651,7 +683,9 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
                 existing, duplicate_reason = find_existing_policy_outcome(cursor, payload)
                 if existing:
                     if args.apply:
-                        metadata_update = sync_existing_source_metadata(cursor, existing, payload)
+                        metadata_update = materialize_source_links(
+                            cursor, int(existing["id"]), payload, generated_at
+                        )
                         if metadata_update:
                             source_metadata_updates.append(metadata_update)
                     skipped_duplicates.append(
@@ -665,6 +699,9 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
                 eligible.append(payload)
                 if args.apply:
                     inserted_id = insert_policy_outcome(cursor, payload)
+                    source_metadata_updates.append(
+                        materialize_source_links(cursor, inserted_id, payload, generated_at)
+                    )
                     inserted.append({**sanitize_payload(payload), "policy_outcome_id": inserted_id})
 
             checks = integrity_checks(cursor)
@@ -684,11 +721,8 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
                     "source_tables": ["tracked_bills", "tracked_bill_actions", "future_bill_links"],
                     "target_table": "policy_outcomes",
                     "policy_type": POLICY_TYPE,
-                    "mutation_policy": "insert_only_for_new_outcomes; existing legislative source metadata may be refreshed only when the official source signal is stronger",
-                    "source_linkage_note": (
-                        "policy_outcomes has source_count/source_quality metadata but no legislative source junction. "
-                        "This workflow uses official bill/action URLs as a source signal and stores source counts, not source rows."
-                    ),
+                    "mutation_policy": "insert_only_for_new_outcomes; source links are materialized canonically in policy_outcome_sources for both new and existing legislative rows",
+                    "source_linkage_note": "Legislative official bill/action URLs are persisted as canonical source rows and linked through policy_outcome_sources.",
                     "impact_claim_guardrail": (
                         "Non-enacted tracked bills are materialized as neutral Blocked procedural outcomes. "
                         "Positive outcomes require explicit enacted/signed/public-law status text."

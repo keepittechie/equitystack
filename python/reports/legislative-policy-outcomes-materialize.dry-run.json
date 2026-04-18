@@ -1,0 +1,817 @@
+{
+  "workflow": "legislative_policy_outcomes_materialization",
+  "mode": "dry_run",
+  "generated_at": "2026-04-18T02:04:06+00:00",
+  "scope": {
+    "source_tables": [
+      "tracked_bills",
+      "tracked_bill_actions",
+      "future_bill_links"
+    ],
+    "target_table": "policy_outcomes",
+    "policy_type": "legislative",
+    "mutation_policy": "insert_only_for_new_outcomes; source links are materialized canonically in policy_outcome_sources for both new and existing legislative rows",
+    "source_linkage_note": "Legislative official bill/action URLs are persisted as canonical source rows and linked through policy_outcome_sources.",
+    "impact_claim_guardrail": "Non-enacted tracked bills are materialized as neutral Blocked procedural outcomes. Positive outcomes require explicit enacted/signed/public-law status text."
+  },
+  "summary": {
+    "tracked_bills_evaluated": 19,
+    "rows_eligible_to_insert": 0,
+    "rows_skipped_as_duplicates": 19,
+    "rows_skipped_missing_required_fields": 0,
+    "rows_inserted": 0,
+    "source_metadata_rows_updated": 0,
+    "eligible_scoring_ready_count": 0,
+    "status_counts": {
+      "In Committee": 17,
+      "Introduced": 2
+    }
+  },
+  "sample_inserted_mappings": [],
+  "inserted_rows": [],
+  "source_metadata_updates": [],
+  "skipped_duplicates": [
+    {
+      "policy_type": "legislative",
+      "policy_id": 13,
+      "record_key": "H.R. 7973-Federal-119th Congress",
+      "outcome_summary": "H.R. 7973 (Momnibus Act) remains at legislative status 'In Committee'. Latest recorded action: Referred to the Committee on Energy and Commerce, and in addition to the Committees on Education and Workforce, Veterans' Affairs, Natural Resources, and the Judiciary, for a period to be subsequently determined by the Speaker, in each case for consideration of such provisions as fall within the jurisdiction of the committee concerned.",
+      "outcome_type": "Legislative Status Outcome",
+      "measurable_impact": "This is a procedural legislative outcome, not a measured downstream community impact. It records that the tracked bill has not reached enacted law status in the current legislative tracker.",
+      "impact_direction": "Blocked",
+      "impact_score": 0.0,
+      "impact_score_source": "direction_fallback",
+      "evidence_strength": "Strong",
+      "source_count": 1,
+      "source_quality": "high",
+      "status": "In Committee",
+      "impact_start_date": "2026-03-18",
+      "impact_duration_estimate": "action_date_only",
+      "black_community_impact_note": "Neutral blocked-status outcome: the bill remains tracked but not enacted. This prevents legislative proposals from being interpreted as realized policy impact.",
+      "tracked_bill": {
+        "tracked_bill_id": 13,
+        "bill_number": "H.R. 7973",
+        "title": "Momnibus Act",
+        "jurisdiction": "Federal",
+        "session_label": "119th Congress",
+        "bill_status": "In Committee",
+        "introduced_date": "2026-03-18",
+        "latest_action_date": "2026-03-18",
+        "match_confidence": "High",
+        "action_count": 7,
+        "future_bill_link_count": 0
+      },
+      "source_snapshot": [
+        {
+          "source_kind": "official_bill_url",
+          "source_url": "https://www.congress.gov/bill/119th-congress/hr-bill/7973",
+          "publisher": "Congress.gov"
+        }
+      ],
+      "existing_policy_outcome_id": 95,
+      "reason": "exact_summary_hash"
+    },
+    {
+      "policy_type": "legislative",
+      "policy_id": 16,
+      "record_key": "H.R. 7660-Federal-119th Congress",
+      "outcome_summary": "H.R. 7660 (HBCU Empowerment and Reform Act) remains at legislative status 'In Committee'. Latest recorded action: Referred to the House Committee on Education and Workforce.",
+      "outcome_type": "Legislative Status Outcome",
+      "measurable_impact": "This is a procedural legislative outcome, not a measured downstream community impact. It records that the tracked bill has not reached enacted law status in the current legislative tracker.",
+      "impact_direction": "Blocked",
+      "impact_score": 0.0,
+      "impact_score_source": "direction_fallback",
+      "evidence_strength": "Strong",
+      "source_count": 1,
+      "source_quality": "high",
+      "status": "In Committee",
+      "impact_start_date": "2026-02-24",
+      "impact_duration_estimate": "action_date_only",
+      "black_community_impact_note": "Neutral blocked-status outcome: the bill remains tracked but not enacted. This prevents legislative proposals from being interpreted as realized policy impact.",
+      "tracked_bill": {
+        "tracked_bill_id": 16,
+        "bill_number": "H.R. 7660",
+        "title": "HBCU Empowerment and Reform Act",
+        "jurisdiction": "Federal",
+        "session_label": "119th Congress",
+        "bill_status": "In Committee",
+        "introduced_date": "2026-02-24",
+        "latest_action_date": "2026-02-24",
+        "match_confidence": "High",
+        "action_count": 3,
+        "future_bill_link_count": 0
+      },
+      "source_snapshot": [
+        {
+          "source_kind": "official_bill_url",
+          "source_url": "https://www.congress.gov/bill/119th-congress/hr-bill/7660",
+          "publisher": "Congress.gov"
+        }
+      ],
+      "existing_policy_outcome_id": 96,
+      "reason": "exact_summary_hash"
+    },
+    {
+      "policy_type": "legislative",
+      "policy_id": 20,
+      "record_key": "H.R. 7341-Federal-119th Congress",
+      "outcome_summary": "H.R. 7341 (GRAD Act) remains at legislative status 'In Committee'. Latest recorded action: Referred to the House Committee on Education and Workforce.",
+      "outcome_type": "Legislative Status Outcome",
+      "measurable_impact": "This is a procedural legislative outcome, not a measured downstream community impact. It records that the tracked bill has not reached enacted law status in the current legislative tracker.",
+      "impact_direction": "Blocked",
+      "impact_score": 0.0,
+      "impact_score_source": "direction_fallback",
+      "evidence_strength": "Strong",
+      "source_count": 1,
+      "source_quality": "high",
+      "status": "In Committee",
+      "impact_start_date": "2026-02-04",
+      "impact_duration_estimate": "action_date_only",
+      "black_community_impact_note": "Neutral blocked-status outcome: the bill remains tracked but not enacted. This prevents legislative proposals from being interpreted as realized policy impact.",
+      "tracked_bill": {
+        "tracked_bill_id": 20,
+        "bill_number": "H.R. 7341",
+        "title": "GRAD Act",
+        "jurisdiction": "Federal",
+        "session_label": "119th Congress",
+        "bill_status": "In Committee",
+        "introduced_date": "2026-02-04",
+        "latest_action_date": "2026-02-04",
+        "match_confidence": "High",
+        "action_count": 3,
+        "future_bill_link_count": 0
+      },
+      "source_snapshot": [
+        {
+          "source_kind": "official_bill_url",
+          "source_url": "https://www.congress.gov/bill/119th-congress/hr-bill/7341",
+          "publisher": "Congress.gov"
+        }
+      ],
+      "existing_policy_outcome_id": 97,
+      "reason": "exact_summary_hash"
+    },
+    {
+      "policy_type": "legislative",
+      "policy_id": 15,
+      "record_key": "H.R. 5975-Federal-119th Congress",
+      "outcome_summary": "H.R. 5975 (Appraisal Modernization Act) remains at legislative status 'In Committee'. Latest recorded action: Referred to the Committee on Financial Services, and in addition to the Committee on Rules, for a period to be subsequently determined by the Speaker, in each case for consideration of such provisions as fall within the jurisdiction of the committee concerned.",
+      "outcome_type": "Legislative Status Outcome",
+      "measurable_impact": "This is a procedural legislative outcome, not a measured downstream community impact. It records that the tracked bill has not reached enacted law status in the current legislative tracker.",
+      "impact_direction": "Blocked",
+      "impact_score": 0.0,
+      "impact_score_source": "direction_fallback",
+      "evidence_strength": "Strong",
+      "source_count": 1,
+      "source_quality": "high",
+      "status": "In Committee",
+      "impact_start_date": "2025-11-07",
+      "impact_duration_estimate": "action_date_only",
+      "black_community_impact_note": "Neutral blocked-status outcome: the bill remains tracked but not enacted. This prevents legislative proposals from being interpreted as realized policy impact.",
+      "tracked_bill": {
+        "tracked_bill_id": 15,
+        "bill_number": "H.R. 5975",
+        "title": "Appraisal Modernization Act",
+        "jurisdiction": "Federal",
+        "session_label": "119th Congress",
+        "bill_status": "In Committee",
+        "introduced_date": "2025-11-07",
+        "latest_action_date": "2025-11-07",
+        "match_confidence": "High",
+        "action_count": 4,
+        "future_bill_link_count": 0
+      },
+      "source_snapshot": [
+        {
+          "source_kind": "official_bill_url",
+          "source_url": "https://www.congress.gov/bill/119th-congress/hr-bill/5975",
+          "publisher": "Congress.gov"
+        }
+      ],
+      "existing_policy_outcome_id": 98,
+      "reason": "exact_summary_hash"
+    },
+    {
+      "policy_type": "legislative",
+      "policy_id": 12,
+      "record_key": "S. 2523-Federal-119th Congress",
+      "outcome_summary": "S. 2523 (John R. Lewis Voting Rights Advancement Act of 2025) remains at legislative status 'In Committee'. Latest recorded action: Read twice and referred to the Committee on the Judiciary. (text: CR S4821)",
+      "outcome_type": "Legislative Status Outcome",
+      "measurable_impact": "This is a procedural legislative outcome, not a measured downstream community impact. It records that the tracked bill has not reached enacted law status in the current legislative tracker.",
+      "impact_direction": "Blocked",
+      "impact_score": 0.0,
+      "impact_score_source": "direction_fallback",
+      "evidence_strength": "Strong",
+      "source_count": 1,
+      "source_quality": "high",
+      "status": "In Committee",
+      "impact_start_date": "2025-07-29",
+      "impact_duration_estimate": "action_date_only",
+      "black_community_impact_note": "Neutral blocked-status outcome: the bill remains tracked but not enacted. This prevents legislative proposals from being interpreted as realized policy impact.",
+      "tracked_bill": {
+        "tracked_bill_id": 12,
+        "bill_number": "S. 2523",
+        "title": "John R. Lewis Voting Rights Advancement Act of 2025",
+        "jurisdiction": "Federal",
+        "session_label": "119th Congress",
+        "bill_status": "In Committee",
+        "introduced_date": "2025-07-29",
+        "latest_action_date": "2025-07-29",
+        "match_confidence": "High",
+        "action_count": 2,
+        "future_bill_link_count": 1
+      },
+      "source_snapshot": [
+        {
+          "source_kind": "official_bill_url",
+          "source_url": "https://www.congress.gov/bill/119th-congress/s-bill/2523",
+          "publisher": "Congress.gov"
+        }
+      ],
+      "existing_policy_outcome_id": 99,
+      "reason": "exact_summary_hash"
+    },
+    {
+      "policy_type": "legislative",
+      "policy_id": 14,
+      "record_key": "S. 2322-Federal-119th Congress",
+      "outcome_summary": "S. 2322 (Appraisal Modernization Act) remains at legislative status 'In Committee'. Latest recorded action: Read twice and referred to the Committee on Banking, Housing, and Urban Affairs.",
+      "outcome_type": "Legislative Status Outcome",
+      "measurable_impact": "This is a procedural legislative outcome, not a measured downstream community impact. It records that the tracked bill has not reached enacted law status in the current legislative tracker.",
+      "impact_direction": "Blocked",
+      "impact_score": 0.0,
+      "impact_score_source": "direction_fallback",
+      "evidence_strength": "Strong",
+      "source_count": 1,
+      "source_quality": "high",
+      "status": "In Committee",
+      "impact_start_date": "2025-07-17",
+      "impact_duration_estimate": "action_date_only",
+      "black_community_impact_note": "Neutral blocked-status outcome: the bill remains tracked but not enacted. This prevents legislative proposals from being interpreted as realized policy impact.",
+      "tracked_bill": {
+        "tracked_bill_id": 14,
+        "bill_number": "S. 2322",
+        "title": "Appraisal Modernization Act",
+        "jurisdiction": "Federal",
+        "session_label": "119th Congress",
+        "bill_status": "In Committee",
+        "introduced_date": "2025-07-17",
+        "latest_action_date": "2025-07-17",
+        "match_confidence": "High",
+        "action_count": 2,
+        "future_bill_link_count": 0
+      },
+      "source_snapshot": [
+        {
+          "source_kind": "official_bill_url",
+          "source_url": "https://www.congress.gov/bill/119th-congress/s-bill/2322",
+          "publisher": "Congress.gov"
+        }
+      ],
+      "existing_policy_outcome_id": 100,
+      "reason": "exact_summary_hash"
+    },
+    {
+      "policy_type": "legislative",
+      "policy_id": 32,
+      "record_key": "H.R. 4069-Federal-119th Congress",
+      "outcome_summary": "H.R. 4069 (Downpayment Toward Equity Act of 2025) remains at legislative status 'In Committee'. Latest recorded action: Referred to the House Committee on Financial Services.",
+      "outcome_type": "Legislative Status Outcome",
+      "measurable_impact": "This is a procedural legislative outcome, not a measured downstream community impact. It records that the tracked bill has not reached enacted law status in the current legislative tracker.",
+      "impact_direction": "Blocked",
+      "impact_score": 0.0,
+      "impact_score_source": "direction_fallback",
+      "evidence_strength": "Strong",
+      "source_count": 1,
+      "source_quality": "high",
+      "status": "In Committee",
+      "impact_start_date": "2025-06-23",
+      "impact_duration_estimate": "action_date_only",
+      "black_community_impact_note": "Neutral blocked-status outcome: the bill remains tracked but not enacted. This prevents legislative proposals from being interpreted as realized policy impact.",
+      "tracked_bill": {
+        "tracked_bill_id": 32,
+        "bill_number": "H.R. 4069",
+        "title": "Downpayment Toward Equity Act of 2025",
+        "jurisdiction": "Federal",
+        "session_label": "119th Congress",
+        "bill_status": "In Committee",
+        "introduced_date": "2025-06-23",
+        "latest_action_date": "2025-06-23",
+        "match_confidence": "High",
+        "action_count": 3,
+        "future_bill_link_count": 0
+      },
+      "source_snapshot": [
+        {
+          "source_kind": "official_bill_url",
+          "source_url": "https://www.congress.gov/bill/119th-congress/hr-bill/4069",
+          "publisher": "Congress.gov"
+        }
+      ],
+      "existing_policy_outcome_id": 101,
+      "reason": "exact_summary_hash"
+    },
+    {
+      "policy_type": "legislative",
+      "policy_id": 18,
+      "record_key": "H.R. 3793-Federal-119th Congress",
+      "outcome_summary": "H.R. 3793 (Minority Entrepreneurship Grant Program Act of 2025) remains at legislative status 'In Committee'. Latest recorded action: Referred to the House Committee on Small Business.",
+      "outcome_type": "Legislative Status Outcome",
+      "measurable_impact": "This is a procedural legislative outcome, not a measured downstream community impact. It records that the tracked bill has not reached enacted law status in the current legislative tracker.",
+      "impact_direction": "Blocked",
+      "impact_score": 0.0,
+      "impact_score_source": "direction_fallback",
+      "evidence_strength": "Strong",
+      "source_count": 1,
+      "source_quality": "high",
+      "status": "In Committee",
+      "impact_start_date": "2025-06-05",
+      "impact_duration_estimate": "action_date_only",
+      "black_community_impact_note": "Neutral blocked-status outcome: the bill remains tracked but not enacted. This prevents legislative proposals from being interpreted as realized policy impact.",
+      "tracked_bill": {
+        "tracked_bill_id": 18,
+        "bill_number": "H.R. 3793",
+        "title": "Minority Entrepreneurship Grant Program Act of 2025",
+        "jurisdiction": "Federal",
+        "session_label": "119th Congress",
+        "bill_status": "In Committee",
+        "introduced_date": "2025-06-05",
+        "latest_action_date": "2025-06-05",
+        "match_confidence": "High",
+        "action_count": 3,
+        "future_bill_link_count": 0
+      },
+      "source_snapshot": [
+        {
+          "source_kind": "official_bill_url",
+          "source_url": "https://www.congress.gov/bill/119th-congress/hr-bill/3793",
+          "publisher": "Congress.gov"
+        }
+      ],
+      "existing_policy_outcome_id": 102,
+      "reason": "exact_summary_hash"
+    },
+    {
+      "policy_type": "legislative",
+      "policy_id": 19,
+      "record_key": "H.R. 3281-Federal-119th Congress",
+      "outcome_summary": "H.R. 3281 (To prohibit the reduction, elimination, or suspension of funding for land-grant colleges and universities.) remains at legislative status 'In Committee'. Latest recorded action: Referred to the Committee on Agriculture, and in addition to the Committee on Education and Workforce, for a period to be subsequently determined by the Speaker, in each case for consideration of such provisions as fall within the jurisdiction of the committee concerned.",
+      "outcome_type": "Legislative Status Outcome",
+      "measurable_impact": "This is a procedural legislative outcome, not a measured downstream community impact. It records that the tracked bill has not reached enacted law status in the current legislative tracker.",
+      "impact_direction": "Blocked",
+      "impact_score": 0.0,
+      "impact_score_source": "direction_fallback",
+      "evidence_strength": "Strong",
+      "source_count": 1,
+      "source_quality": "high",
+      "status": "In Committee",
+      "impact_start_date": "2025-05-08",
+      "impact_duration_estimate": "action_date_only",
+      "black_community_impact_note": "Neutral blocked-status outcome: the bill remains tracked but not enacted. This prevents legislative proposals from being interpreted as realized policy impact.",
+      "tracked_bill": {
+        "tracked_bill_id": 19,
+        "bill_number": "H.R. 3281",
+        "title": "To prohibit the reduction, elimination, or suspension of funding for land-grant colleges and universities.",
+        "jurisdiction": "Federal",
+        "session_label": "119th Congress",
+        "bill_status": "In Committee",
+        "introduced_date": "2025-05-08",
+        "latest_action_date": "2025-05-08",
+        "match_confidence": "High",
+        "action_count": 4,
+        "future_bill_link_count": 0
+      },
+      "source_snapshot": [
+        {
+          "source_kind": "official_bill_url",
+          "source_url": "https://www.congress.gov/bill/119th-congress/hr-bill/3281",
+          "publisher": "Congress.gov"
+        }
+      ],
+      "existing_policy_outcome_id": 103,
+      "reason": "exact_summary_hash"
+    },
+    {
+      "policy_type": "legislative",
+      "policy_id": 17,
+      "record_key": "H.R. 2664-Federal-119th Congress",
+      "outcome_summary": "H.R. 2664 (To amend the Higher Education Act of 1965 to provide for additional uses of funds for grants to strengthen historically Black colleges and universities, and for other purposes.) remains at legislative status 'In Committee'. Latest recorded action: Referred to the House Committee on Education and Workforce.",
+      "outcome_type": "Legislative Status Outcome",
+      "measurable_impact": "This is a procedural legislative outcome, not a measured downstream community impact. It records that the tracked bill has not reached enacted law status in the current legislative tracker.",
+      "impact_direction": "Blocked",
+      "impact_score": 0.0,
+      "impact_score_source": "direction_fallback",
+      "evidence_strength": "Strong",
+      "source_count": 1,
+      "source_quality": "high",
+      "status": "In Committee",
+      "impact_start_date": "2025-04-07",
+      "impact_duration_estimate": "action_date_only",
+      "black_community_impact_note": "Neutral blocked-status outcome: the bill remains tracked but not enacted. This prevents legislative proposals from being interpreted as realized policy impact.",
+      "tracked_bill": {
+        "tracked_bill_id": 17,
+        "bill_number": "H.R. 2664",
+        "title": "To amend the Higher Education Act of 1965 to provide for additional uses of funds for grants to strengthen historically Black colleges and universities, and for other purposes.",
+        "jurisdiction": "Federal",
+        "session_label": "119th Congress",
+        "bill_status": "In Committee",
+        "introduced_date": "2025-04-07",
+        "latest_action_date": "2025-04-07",
+        "match_confidence": "High",
+        "action_count": 3,
+        "future_bill_link_count": 1
+      },
+      "source_snapshot": [
+        {
+          "source_kind": "official_bill_url",
+          "source_url": "https://www.congress.gov/bill/119th-congress/hr-bill/2664",
+          "publisher": "Congress.gov"
+        }
+      ],
+      "existing_policy_outcome_id": 104,
+      "reason": "exact_summary_hash"
+    },
+    {
+      "policy_type": "legislative",
+      "policy_id": 1,
+      "record_key": "H.R. 14-Federal-119th Congress",
+      "outcome_summary": "H.R. 14 (John R. Lewis Voting Rights Advancement Act of 2025) remains at legislative status 'In Committee'. Latest recorded action: Referred to the House Committee on the Judiciary.",
+      "outcome_type": "Legislative Status Outcome",
+      "measurable_impact": "This is a procedural legislative outcome, not a measured downstream community impact. It records that the tracked bill has not reached enacted law status in the current legislative tracker.",
+      "impact_direction": "Blocked",
+      "impact_score": 0.0,
+      "impact_score_source": "direction_fallback",
+      "evidence_strength": "Strong",
+      "source_count": 1,
+      "source_quality": "high",
+      "status": "In Committee",
+      "impact_start_date": "2025-03-05",
+      "impact_duration_estimate": "action_date_only",
+      "black_community_impact_note": "Neutral blocked-status outcome: the bill remains tracked but not enacted. This prevents legislative proposals from being interpreted as realized policy impact.",
+      "tracked_bill": {
+        "tracked_bill_id": 1,
+        "bill_number": "H.R. 14",
+        "title": "John R. Lewis Voting Rights Advancement Act of 2025",
+        "jurisdiction": "Federal",
+        "session_label": "119th Congress",
+        "bill_status": "In Committee",
+        "introduced_date": "2025-03-05",
+        "latest_action_date": "2025-03-05",
+        "match_confidence": "High",
+        "action_count": 3,
+        "future_bill_link_count": 1
+      },
+      "source_snapshot": [
+        {
+          "source_kind": "official_bill_url",
+          "source_url": "https://www.congress.gov/bill/119th-congress/hr-bill/14",
+          "publisher": "Congress.gov"
+        }
+      ],
+      "existing_policy_outcome_id": 105,
+      "reason": "exact_summary_hash"
+    },
+    {
+      "policy_type": "legislative",
+      "policy_id": 35,
+      "record_key": "S. 120-Federal-119th Congress",
+      "outcome_summary": "S. 120 (Disaster Housing Reform for American Families Act) remains at legislative status 'In Committee'. Latest recorded action: Read twice and referred to the Committee on Homeland Security and Governmental Affairs.",
+      "outcome_type": "Legislative Status Outcome",
+      "measurable_impact": "This is a procedural legislative outcome, not a measured downstream community impact. It records that the tracked bill has not reached enacted law status in the current legislative tracker.",
+      "impact_direction": "Blocked",
+      "impact_score": 0.0,
+      "impact_score_source": "direction_fallback",
+      "evidence_strength": "Moderate",
+      "source_count": 1,
+      "source_quality": "high",
+      "status": "In Committee",
+      "impact_start_date": "2025-01-16",
+      "impact_duration_estimate": "action_date_only",
+      "black_community_impact_note": "Neutral blocked-status outcome: the bill remains tracked but not enacted. This prevents legislative proposals from being interpreted as realized policy impact.",
+      "tracked_bill": {
+        "tracked_bill_id": 35,
+        "bill_number": "S. 120",
+        "title": "Disaster Housing Reform for American Families Act",
+        "jurisdiction": "Federal",
+        "session_label": "119th Congress",
+        "bill_status": "In Committee",
+        "introduced_date": "2025-01-16",
+        "latest_action_date": "2025-01-16",
+        "match_confidence": "Medium",
+        "action_count": 2,
+        "future_bill_link_count": 2
+      },
+      "source_snapshot": [
+        {
+          "source_kind": "official_bill_url",
+          "source_url": "https://www.congress.gov/bill/119th-congress/s-bill/120",
+          "publisher": "Congress.gov"
+        }
+      ],
+      "existing_policy_outcome_id": 106,
+      "reason": "exact_summary_hash"
+    },
+    {
+      "policy_type": "legislative",
+      "policy_id": 28,
+      "record_key": "H.R. 3305-Federal-118th Congress",
+      "outcome_summary": "H.R. 3305 (Black Maternal Health Momnibus Act) remains at legislative status 'In Committee'. Latest recorded action: Referred to the Subcommittee on Health.",
+      "outcome_type": "Legislative Status Outcome",
+      "measurable_impact": "This is a procedural legislative outcome, not a measured downstream community impact. It records that the tracked bill has not reached enacted law status in the current legislative tracker.",
+      "impact_direction": "Blocked",
+      "impact_score": 0.0,
+      "impact_score_source": "direction_fallback",
+      "evidence_strength": "Strong",
+      "source_count": 1,
+      "source_quality": "high",
+      "status": "In Committee",
+      "impact_start_date": "2023-05-19",
+      "impact_duration_estimate": "action_date_only",
+      "black_community_impact_note": "Neutral blocked-status outcome: the bill remains tracked but not enacted. This prevents legislative proposals from being interpreted as realized policy impact.",
+      "tracked_bill": {
+        "tracked_bill_id": 28,
+        "bill_number": "H.R. 3305",
+        "title": "Black Maternal Health Momnibus Act",
+        "jurisdiction": "Federal",
+        "session_label": "118th Congress",
+        "bill_status": "In Committee",
+        "introduced_date": "2023-05-15",
+        "latest_action_date": "2023-05-19",
+        "match_confidence": "High",
+        "action_count": 8,
+        "future_bill_link_count": 2
+      },
+      "source_snapshot": [
+        {
+          "source_kind": "official_bill_url",
+          "source_url": "https://www.congress.gov/bill/118th-congress/hr-bill/3305",
+          "publisher": "Congress.gov"
+        }
+      ],
+      "existing_policy_outcome_id": 107,
+      "reason": "exact_summary_hash"
+    },
+    {
+      "policy_type": "legislative",
+      "policy_id": 33,
+      "record_key": "H.R. 1041-Federal-118th Congress",
+      "outcome_summary": "H.R. 1041 (American Opportunity Accounts Act) remains at legislative status 'In Committee'. Latest recorded action: Referred to the House Committee on Ways and Means.",
+      "outcome_type": "Legislative Status Outcome",
+      "measurable_impact": "This is a procedural legislative outcome, not a measured downstream community impact. It records that the tracked bill has not reached enacted law status in the current legislative tracker.",
+      "impact_direction": "Blocked",
+      "impact_score": 0.0,
+      "impact_score_source": "direction_fallback",
+      "evidence_strength": "Strong",
+      "source_count": 1,
+      "source_quality": "high",
+      "status": "In Committee",
+      "impact_start_date": "2023-02-14",
+      "impact_duration_estimate": "action_date_only",
+      "black_community_impact_note": "Neutral blocked-status outcome: the bill remains tracked but not enacted. This prevents legislative proposals from being interpreted as realized policy impact.",
+      "tracked_bill": {
+        "tracked_bill_id": 33,
+        "bill_number": "H.R. 1041",
+        "title": "American Opportunity Accounts Act",
+        "jurisdiction": "Federal",
+        "session_label": "118th Congress",
+        "bill_status": "In Committee",
+        "introduced_date": "2023-02-14",
+        "latest_action_date": "2023-02-14",
+        "match_confidence": "High",
+        "action_count": 3,
+        "future_bill_link_count": 1
+      },
+      "source_snapshot": [
+        {
+          "source_kind": "official_bill_url",
+          "source_url": "https://www.congress.gov/bill/118th-congress/hr-bill/1041",
+          "publisher": "Congress.gov"
+        }
+      ],
+      "existing_policy_outcome_id": 108,
+      "reason": "exact_summary_hash"
+    },
+    {
+      "policy_type": "legislative",
+      "policy_id": 36,
+      "record_key": "S. 13-Federal-118th Congress",
+      "outcome_summary": "S. 13 (Protect Funding for Women's Health Care Act) remains at legislative status 'In Committee'. Latest recorded action: Read twice and referred to the Committee on Health, Education, Labor, and Pensions.",
+      "outcome_type": "Legislative Status Outcome",
+      "measurable_impact": "This is a procedural legislative outcome, not a measured downstream community impact. It records that the tracked bill has not reached enacted law status in the current legislative tracker.",
+      "impact_direction": "Blocked",
+      "impact_score": 0.0,
+      "impact_score_source": "direction_fallback",
+      "evidence_strength": "Moderate",
+      "source_count": 1,
+      "source_quality": "high",
+      "status": "In Committee",
+      "impact_start_date": "2023-01-23",
+      "impact_duration_estimate": "action_date_only",
+      "black_community_impact_note": "Neutral blocked-status outcome: the bill remains tracked but not enacted. This prevents legislative proposals from being interpreted as realized policy impact.",
+      "tracked_bill": {
+        "tracked_bill_id": 36,
+        "bill_number": "S. 13",
+        "title": "Protect Funding for Women's Health Care Act",
+        "jurisdiction": "Federal",
+        "session_label": "118th Congress",
+        "bill_status": "In Committee",
+        "introduced_date": "2023-01-23",
+        "latest_action_date": "2023-01-23",
+        "match_confidence": "Medium",
+        "action_count": 2,
+        "future_bill_link_count": 1
+      },
+      "source_snapshot": [
+        {
+          "source_kind": "official_bill_url",
+          "source_url": "https://www.congress.gov/bill/118th-congress/s-bill/13",
+          "publisher": "Congress.gov"
+        }
+      ],
+      "existing_policy_outcome_id": 109,
+      "reason": "exact_summary_hash"
+    },
+    {
+      "policy_type": "legislative",
+      "policy_id": 21,
+      "record_key": "H.R. 40-Federal-118th Congress",
+      "outcome_summary": "H.R. 40 (Commission to Study and Develop Reparation Proposals for African Americans Act) remains at legislative status 'In Committee'. Latest recorded action: Referred to the House Committee on the Judiciary.",
+      "outcome_type": "Legislative Status Outcome",
+      "measurable_impact": "This is a procedural legislative outcome, not a measured downstream community impact. It records that the tracked bill has not reached enacted law status in the current legislative tracker.",
+      "impact_direction": "Blocked",
+      "impact_score": 0.0,
+      "impact_score_source": "direction_fallback",
+      "evidence_strength": "Strong",
+      "source_count": 1,
+      "source_quality": "high",
+      "status": "In Committee",
+      "impact_start_date": "2023-01-09",
+      "impact_duration_estimate": "action_date_only",
+      "black_community_impact_note": "Neutral blocked-status outcome: the bill remains tracked but not enacted. This prevents legislative proposals from being interpreted as realized policy impact.",
+      "tracked_bill": {
+        "tracked_bill_id": 21,
+        "bill_number": "H.R. 40",
+        "title": "Commission to Study and Develop Reparation Proposals for African Americans Act",
+        "jurisdiction": "Federal",
+        "session_label": "118th Congress",
+        "bill_status": "In Committee",
+        "introduced_date": "2023-01-09",
+        "latest_action_date": "2023-01-09",
+        "match_confidence": "High",
+        "action_count": 4,
+        "future_bill_link_count": 3
+      },
+      "source_snapshot": [
+        {
+          "source_kind": "official_bill_url",
+          "source_url": "https://www.congress.gov/bill/118th-congress/hr-bill/40",
+          "publisher": "Congress.gov"
+        }
+      ],
+      "existing_policy_outcome_id": 110,
+      "reason": "exact_summary_hash"
+    },
+    {
+      "policy_type": "legislative",
+      "policy_id": 34,
+      "record_key": "S. 2068-Federal-117th Congress",
+      "outcome_summary": "S. 2068 (Minority Business Development Act of 2021) remains at legislative status 'Introduced'. Latest recorded action: Placed on Senate Legislative Calendar under General Orders. Calendar No. 228.",
+      "outcome_type": "Legislative Status Outcome",
+      "measurable_impact": "This is a procedural legislative outcome, not a measured downstream community impact. It records that the tracked bill has not reached enacted law status in the current legislative tracker.",
+      "impact_direction": "Blocked",
+      "impact_score": 0.0,
+      "impact_score_source": "direction_fallback",
+      "evidence_strength": "Strong",
+      "source_count": 1,
+      "source_quality": "high",
+      "status": "Introduced",
+      "impact_start_date": "2021-12-17",
+      "impact_duration_estimate": "action_date_only",
+      "black_community_impact_note": "Neutral blocked-status outcome: the bill remains tracked but not enacted. This prevents legislative proposals from being interpreted as realized policy impact.",
+      "tracked_bill": {
+        "tracked_bill_id": 34,
+        "bill_number": "S. 2068",
+        "title": "Minority Business Development Act of 2021",
+        "jurisdiction": "Federal",
+        "session_label": "117th Congress",
+        "bill_status": "Introduced",
+        "introduced_date": "2021-06-15",
+        "latest_action_date": "2021-12-17",
+        "match_confidence": "High",
+        "action_count": 6,
+        "future_bill_link_count": 2
+      },
+      "source_snapshot": [
+        {
+          "source_kind": "official_bill_url",
+          "source_url": "https://www.congress.gov/bill/117th-congress/s-bill/2068",
+          "publisher": "Congress.gov"
+        }
+      ],
+      "existing_policy_outcome_id": 111,
+      "reason": "exact_summary_hash"
+    },
+    {
+      "policy_type": "legislative",
+      "policy_id": 29,
+      "record_key": "H.R. 1693-Federal-117th Congress",
+      "outcome_summary": "H.R. 1693 (EQUAL Act of 2021) remains at legislative status 'In Committee'. Latest recorded action: Received in the Senate and Read twice and referred to the Committee on the Judiciary.",
+      "outcome_type": "Legislative Status Outcome",
+      "measurable_impact": "This is a procedural legislative outcome, not a measured downstream community impact. It records that the tracked bill has not reached enacted law status in the current legislative tracker.",
+      "impact_direction": "Blocked",
+      "impact_score": 0.0,
+      "impact_score_source": "direction_fallback",
+      "evidence_strength": "Strong",
+      "source_count": 1,
+      "source_quality": "high",
+      "status": "In Committee",
+      "impact_start_date": "2021-09-29",
+      "impact_duration_estimate": "action_date_only",
+      "black_community_impact_note": "Neutral blocked-status outcome: the bill remains tracked but not enacted. This prevents legislative proposals from being interpreted as realized policy impact.",
+      "tracked_bill": {
+        "tracked_bill_id": 29,
+        "bill_number": "H.R. 1693",
+        "title": "EQUAL Act of 2021",
+        "jurisdiction": "Federal",
+        "session_label": "117th Congress",
+        "bill_status": "In Committee",
+        "introduced_date": "2021-03-09",
+        "latest_action_date": "2021-09-29",
+        "match_confidence": "High",
+        "action_count": 23,
+        "future_bill_link_count": 1
+      },
+      "source_snapshot": [
+        {
+          "source_kind": "official_bill_url",
+          "source_url": "https://www.congress.gov/bill/117th-congress/hr-bill/1693",
+          "publisher": "Congress.gov"
+        }
+      ],
+      "existing_policy_outcome_id": 112,
+      "reason": "exact_summary_hash"
+    },
+    {
+      "policy_type": "legislative",
+      "policy_id": 24,
+      "record_key": "H.R. 2486-Federal-116th Congress",
+      "outcome_summary": "H.R. 2486 (FUTURE Act) remains at legislative status 'Introduced'. Latest recorded action: Message on House action received in Senate and at desk: House amendments to Senate amendment.",
+      "outcome_type": "Legislative Status Outcome",
+      "measurable_impact": "This is a procedural legislative outcome, not a measured downstream community impact. It records that the tracked bill has not reached enacted law status in the current legislative tracker.",
+      "impact_direction": "Blocked",
+      "impact_score": 0.0,
+      "impact_score_source": "direction_fallback",
+      "evidence_strength": "Strong",
+      "source_count": 1,
+      "source_quality": "high",
+      "status": "Introduced",
+      "impact_start_date": "2020-07-23",
+      "impact_duration_estimate": "action_date_only",
+      "black_community_impact_note": "Neutral blocked-status outcome: the bill remains tracked but not enacted. This prevents legislative proposals from being interpreted as realized policy impact.",
+      "tracked_bill": {
+        "tracked_bill_id": 24,
+        "bill_number": "H.R. 2486",
+        "title": "FUTURE Act",
+        "jurisdiction": "Federal",
+        "session_label": "116th Congress",
+        "bill_status": "Introduced",
+        "introduced_date": "2019-05-02",
+        "latest_action_date": "2020-07-23",
+        "match_confidence": "High",
+        "action_count": 31,
+        "future_bill_link_count": 1
+      },
+      "source_snapshot": [
+        {
+          "source_kind": "official_bill_url",
+          "source_url": "https://www.congress.gov/bill/116th-congress/hr-bill/2486",
+          "publisher": "Congress.gov"
+        }
+      ],
+      "existing_policy_outcome_id": 113,
+      "reason": "exact_summary_hash"
+    }
+  ],
+  "skipped_missing_required_fields": [],
+  "integrity_checks": {
+    "legislative_policy_id_orphans": 0,
+    "legislative_source_count_mismatches": 0,
+    "duplicate_legislative_outcome_groups": [],
+    "invalid_legislative_date_ranges": 0,
+    "legislative_scoring_ready_outcomes": 19,
+    "post_workflow_validation": {
+      "ok": true,
+      "invalid_legislative_policy_outcome_count": 0,
+      "checks": [
+        "impact_score_present_and_bounded",
+        "impact_direction_valid",
+        "source_count_non_negative",
+        "policy_type_valid",
+        "no_duplicate_legislative_outcomes",
+        "no_legislative_policy_id_orphans",
+        "valid_legislative_date_ranges",
+        "source_count_matches_policy_outcome_sources"
+      ]
+    }
+  }
+}

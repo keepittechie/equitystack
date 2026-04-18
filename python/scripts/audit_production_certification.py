@@ -183,7 +183,8 @@ def fetch_policy_outcomes(cursor, columns: set[str]) -> list[dict[str, Any]]:
           po.impact_direction,
           po.evidence_strength,
           po.confidence_score,
-          po.source_count,
+          COALESCE(actual_sources.actual_source_count, 0) AS source_count,
+          po.source_count AS stored_source_count,
           po.source_quality,
           {impact_score_expr} AS impact_score,
           po.status,
@@ -236,6 +237,11 @@ def fetch_policy_outcomes(cursor, columns: set[str]) -> list[dict[str, Any]]:
         LEFT JOIN policies jp
           ON po.policy_type = 'judicial_impact'
          AND jp.id = po.policy_id
+        LEFT JOIN (
+          SELECT policy_outcome_id, COUNT(DISTINCT source_id) AS actual_source_count
+          FROM policy_outcome_sources
+          GROUP BY policy_outcome_id
+        ) actual_sources ON actual_sources.policy_outcome_id = po.id
         LEFT JOIN (
           SELECT
             pa.promise_id,

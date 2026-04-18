@@ -183,7 +183,7 @@ def fetch_sources(cursor) -> list[dict[str, Any]]:
         ) pas_counts ON pas_counts.source_id = s.id
         LEFT JOIN (
           SELECT source_id, COUNT(*) AS outcome_refs
-          FROM promise_outcome_sources
+          FROM policy_outcome_sources
           GROUP BY source_id
         ) pos_counts ON pos_counts.source_id = s.id
         ORDER BY s.id ASC
@@ -196,16 +196,23 @@ def fetch_outcome_source_rows(cursor) -> list[dict[str, Any]]:
     cursor.execute(
         """
         SELECT
-          po.id AS promise_outcome_id,
-          p.slug AS promise_slug,
+          po.id AS policy_outcome_id,
+          po.policy_type,
+          po.policy_id,
+          CASE WHEN po.policy_type = 'current_admin' THEN p.slug ELSE tb.bill_number END AS policy_reference,
           s.id AS source_id,
           s.source_title,
           s.source_url,
           s.source_type,
           s.publisher
-        FROM promise_outcomes po
-        JOIN promises p ON p.id = po.promise_id
-        LEFT JOIN promise_outcome_sources pos ON pos.promise_outcome_id = po.id
+        FROM policy_outcomes po
+        LEFT JOIN promises p
+          ON po.policy_type = 'current_admin'
+         AND p.id = po.policy_id
+        LEFT JOIN tracked_bills tb
+          ON po.policy_type = 'legislative'
+         AND tb.id = po.policy_id
+        LEFT JOIN policy_outcome_sources pos ON pos.policy_outcome_id = po.id
         LEFT JOIN sources s ON s.id = pos.source_id
         ORDER BY po.id ASC, s.id ASC
         """
@@ -253,18 +260,18 @@ def outcome_quality_summary(rows: list[dict[str, Any]]) -> dict[str, Any]:
     rows_by_outcome: dict[int, list[dict[str, Any]]] = defaultdict(list)
     promise_slug_by_outcome: dict[int, str | None] = {}
     for row in rows:
-        outcome_id = int(row["promise_outcome_id"])
-        promise_slug_by_outcome[outcome_id] = normalize_nullable_text(row.get("promise_slug"))
+        outcome_id = int(row["policy_outcome_id"])
+        promise_slug_by_outcome[outcome_id] = normalize_nullable_text(row.get("policy_reference"))
         if row.get("source_id") is not None:
             rows_by_outcome[outcome_id].append(row)
 
-    total_outcomes = len({int(row["promise_outcome_id"]) for row in rows})
+    total_outcomes = len({int(row["policy_outcome_id"]) for row in rows})
     outcomes_with_any_sources = 0
     outcomes_with_high_authority_sources = 0
     outcomes_by_quality = Counter()
     samples = []
 
-    for outcome_id in sorted({int(row["promise_outcome_id"]) for row in rows}):
+    for outcome_id in sorted({int(row["policy_outcome_id"]) for row in rows}):
         source_rows = rows_by_outcome.get(outcome_id, [])
         if not source_rows:
             outcomes_by_quality["no_sources"] += 1
@@ -283,15 +290,15 @@ def outcome_quality_summary(rows: list[dict[str, Any]]) -> dict[str, Any]:
         if len(samples) < 20:
             samples.append(
                 {
-                    "promise_outcome_id": outcome_id,
-                    "promise_slug": promise_slug_by_outcome.get(outcome_id),
+                    "policy_outcome_id": outcome_id,
+                    "policy_reference": promise_slug_by_outcome.get(outcome_id),
                     "source_count": len(source_rows),
                     "quality_labels": sorted(set(labels)),
                 }
             )
 
     return {
-        "total_promise_outcomes": total_outcomes,
+        "total_policy_outcomes": total_outcomes,
         "outcomes_with_any_sources": outcomes_with_any_sources,
         "outcomes_with_high_authority_sources": outcomes_with_high_authority_sources,
         "pct_sourced_outcomes_with_high_authority_sources": (
@@ -345,8 +352,8 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
                     "sources",
                     "promise_sources",
                     "promise_action_sources",
-                    "promise_outcome_sources",
-                    "promise_outcomes",
+                    "policy_outcome_sources",
+                    "policy_outcomes",
                 ],
                 "mutation_policy": "read_only_no_source_edits_no_duplicate_merges",
             },

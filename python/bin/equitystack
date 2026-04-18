@@ -2714,7 +2714,7 @@ Current-admin workflow subcommands:
 Impact maturation commands:
   evaluate   Build a read-only impact maturation review artifact
   promote    Promote approved safe forward impact transitions
-  backfill-outcome-sources  Audit optional safe promise_outcome_sources links
+  backfill-outcome-sources  Audit optional safe canonical policy_outcome_sources links
   sync-current-admin-outcomes  Sync promise_outcomes into policy_outcomes
   audit-historical-duplicates  Audit likely duplicate/variant historical policies
   audit-policy-coverage-gaps  Generate Missing Policy Report by decade/category
@@ -2770,7 +2770,7 @@ Commands:
   evaluate   Build reports/impact_maturation_review.json from pending/review-ready artifacts
   promote    Validate and promote approved safe forward transitions
   backfill-outcome-sources
-             Audit and optionally insert safe promise_outcome_sources links
+             Audit and optionally insert safe canonical policy_outcome_sources links
   sync-current-admin-outcomes
              Dry-run or apply current-admin promise_outcomes into policy_outcomes
   audit-historical-duplicates

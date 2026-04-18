@@ -13,6 +13,7 @@ from current_admin_common import (
     utc_timestamp,
     write_json_file,
 )
+from policy_outcome_source_common import ensure_policy_outcome_sources_table
 
 
 POLICY_TYPE = "current_admin"
@@ -164,11 +165,7 @@ def fetch_candidate_outcomes(cursor, only_ids: list[int] | None, limit: int | No
           p.slug AS promise_slug,
           p.title AS promise_title,
           p.status AS promise_status,
-          (
-            SELECT COUNT(DISTINCT pos.source_id)
-            FROM promise_outcome_sources pos
-            WHERE pos.promise_outcome_id = po.id
-          ) AS source_count,
+          COALESCE(existing_source_counts.source_count, 0) AS source_count,
           (
             SELECT CASE
               WHEN COUNT(DISTINCT pa.related_policy_id) = 1 THEN MAX(
@@ -187,6 +184,16 @@ def fetch_candidate_outcomes(cursor, only_ids: list[int] | None, limit: int | No
           ) AS related_historical_policy_score
         FROM promise_outcomes po
         JOIN promises p ON p.id = po.promise_id
+        LEFT JOIN policy_outcomes existing_unified
+          ON existing_unified.policy_type = 'current_admin'
+         AND existing_unified.policy_id = po.promise_id
+         AND existing_unified.outcome_summary_hash = SHA2(TRIM(po.outcome_summary), 256)
+        LEFT JOIN (
+          SELECT policy_outcome_id, COUNT(DISTINCT source_id) AS source_count
+          FROM policy_outcome_sources
+          GROUP BY policy_outcome_id
+        ) existing_source_counts
+          ON existing_source_counts.policy_outcome_id = existing_unified.id
         {where}
         ORDER BY p.id ASC, po.id ASC
     """
@@ -307,8 +314,8 @@ def sync_existing_source_metadata(cursor, existing: dict[str, Any], payload: dic
     incoming_count = int(payload.get("source_count") or 0)
     existing_quality = normalize_nullable_text(existing.get("source_quality"))
     incoming_quality = normalize_nullable_text(payload.get("source_quality"))
-    next_count = max(existing_count, incoming_count)
-    next_quality = stronger_source_quality(existing_quality, incoming_quality)
+    next_count = incoming_count
+    next_quality = incoming_quality
     if next_count == existing_count and next_quality == existing_quality:
         return None
     cursor.execute(
@@ -327,7 +334,7 @@ def sync_existing_source_metadata(cursor, existing: dict[str, Any], payload: dic
         "new_source_count": next_count,
         "previous_source_quality": existing_quality,
         "new_source_quality": next_quality,
-        "reason": "refreshed_current_admin_source_metadata_without_downgrading",
+        "reason": "refreshed_current_admin_source_metadata_from_canonical_policy_outcome_sources",
     }
 
 
@@ -365,14 +372,11 @@ def integrity_checks(cursor) -> dict[str, Any]:
         """
         SELECT COUNT(*) AS total
         FROM policy_outcomes po
-        JOIN promise_outcomes src
-          ON src.promise_id = po.policy_id
-         AND SHA2(TRIM(src.outcome_summary), 256) = po.outcome_summary_hash
         LEFT JOIN (
-          SELECT promise_outcome_id, COUNT(DISTINCT source_id) AS source_count
-          FROM promise_outcome_sources
-          GROUP BY promise_outcome_id
-        ) src_counts ON src_counts.promise_outcome_id = src.id
+          SELECT policy_outcome_id, COUNT(DISTINCT source_id) AS source_count
+          FROM policy_outcome_sources
+          GROUP BY policy_outcome_id
+        ) src_counts ON src_counts.policy_outcome_id = po.id
         WHERE po.policy_type = 'current_admin'
           AND po.source_count <> COALESCE(src_counts.source_count, 0)
         """
@@ -430,7 +434,7 @@ def integrity_checks(cursor) -> dict[str, Any]:
                 "policy_type_valid",
                 "no_duplicate_current_admin_outcomes",
                 "no_current_admin_policy_id_orphans",
-                "source_count_matches_promise_outcome_sources",
+                "source_count_matches_policy_outcome_sources",
             ],
         },
     }
@@ -440,6 +444,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     connection = get_db_connection()
     try:
         with connection.cursor() as cursor:
+            ensure_policy_outcome_sources_table(cursor)
             ensure_policy_outcomes_table_exists(cursor)
             rows = fetch_candidate_outcomes(cursor, args.only_outcome_id, args.limit)
             eligible = []
@@ -494,10 +499,10 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
                 "mode": "apply" if args.apply else "dry_run",
                 "generated_at": utc_timestamp(),
                 "scope": {
-                    "source_tables": ["promise_outcomes", "promise_outcome_sources", "promises"],
+                    "source_tables": ["promise_outcomes", "policy_outcome_sources", "promises"],
                     "target_table": "policy_outcomes",
                     "policy_type": POLICY_TYPE,
-                    "mutation_policy": "insert_only_for_new_outcomes; existing current-admin source metadata may be refreshed only when the linked source signal is stronger",
+                    "mutation_policy": "insert_only_for_new_outcomes; existing current-admin source metadata is refreshed from canonical policy_outcome_sources",
                 },
                 "summary": {
                     "total_candidate_outcomes": len(rows),

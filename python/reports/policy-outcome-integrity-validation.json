@@ -1,0 +1,174 @@
+{
+  "workflow": "policy_outcome_integrity_validation",
+  "generated_at": "2026-04-18T02:04:06+00:00",
+  "mode": "read_only",
+  "database_mutated": false,
+  "status": "WARN",
+  "summary": {
+    "total_policy_outcomes": 113,
+    "policy_type_distribution": {
+      "current_admin": 94,
+      "legislative": 19
+    },
+    "source_count_zero": 0,
+    "judicial_impact_outcome_count": 0
+  },
+  "validation_rules": [
+    "policy_type must be one of current_admin, legislative, judicial_impact",
+    "impact_direction must be one of Positive, Negative, Mixed, Blocked",
+    "impact_score must be present and bounded between -100 and 100",
+    "source_count must be non-negative",
+    "duplicate rows by policy_type + policy_id + outcome_summary_hash are invalid",
+    "judicial_impact rows must include explicit judicial_attribution entries with attribution_fraction values",
+    "judicial_impact rows must include majority_justices and appointing_presidents metadata",
+    "impact_end_date must be on or after impact_start_date when both are present"
+  ],
+  "warnings_generated_for": [
+    "missing sources",
+    "low president outcome coverage",
+    "high policy_type imbalance",
+    "high directional imbalance within a policy_type"
+  ],
+  "violations": {
+    "status": "PASS",
+    "violation_count": 0,
+    "violations": [],
+    "duplicate_group_count": 0
+  },
+  "warnings": {
+    "status": "WARN",
+    "warning_count": 3,
+    "warnings": [
+      {
+        "warning": "policy_type_imbalance",
+        "severity": "medium",
+        "dominant_policy_type": "current_admin",
+        "dominant_share": 0.8319,
+        "distribution": {
+          "current_admin": 94,
+          "legislative": 19
+        }
+      },
+      {
+        "warning": "directional_imbalance",
+        "severity": "low",
+        "policy_type": "legislative",
+        "dominant_direction": "Blocked",
+        "dominant_share": 1.0,
+        "distribution": {
+          "Blocked": 19
+        }
+      },
+      {
+        "warning": "low_president_coverage",
+        "severity": "medium",
+        "threshold": 5,
+        "affected_president_count": 17,
+        "presidents": [
+          {
+            "president_name": "Benjamin Harrison",
+            "outcome_count": 1,
+            "positive": 0,
+            "negative": 1
+          },
+          {
+            "president_name": "Calvin Coolidge",
+            "outcome_count": 1,
+            "positive": 0,
+            "negative": 1
+          },
+          {
+            "president_name": "Chester A. Arthur",
+            "outcome_count": 1,
+            "positive": 0,
+            "negative": 1
+          },
+          {
+            "president_name": "Dwight D. Eisenhower",
+            "outcome_count": 2,
+            "positive": 2,
+            "negative": 0
+          },
+          {
+            "president_name": "Franklin D. Roosevelt",
+            "outcome_count": 2,
+            "positive": 0,
+            "negative": 0
+          },
+          {
+            "president_name": "George W. Bush",
+            "outcome_count": 1,
+            "positive": 1,
+            "negative": 0
+          },
+          {
+            "president_name": "Grover Cleveland",
+            "outcome_count": 1,
+            "positive": 0,
+            "negative": 1
+          },
+          {
+            "president_name": "Harry S. Truman",
+            "outcome_count": 2,
+            "positive": 1,
+            "negative": 0
+          },
+          {
+            "president_name": "Jimmy Carter",
+            "outcome_count": 1,
+            "positive": 1,
+            "negative": 0
+          },
+          {
+            "president_name": "John F. Kennedy",
+            "outcome_count": 2,
+            "positive": 2,
+            "negative": 0
+          },
+          {
+            "president_name": "Richard Nixon",
+            "outcome_count": 1,
+            "positive": 1,
+            "negative": 0
+          },
+          {
+            "president_name": "Ronald Reagan",
+            "outcome_count": 1,
+            "positive": 1,
+            "negative": 0
+          },
+          {
+            "president_name": "Rutherford B. Hayes",
+            "outcome_count": 1,
+            "positive": 0,
+            "negative": 1
+          },
+          {
+            "president_name": "Theodore Roosevelt",
+            "outcome_count": 1,
+            "positive": 0,
+            "negative": 1
+          },
+          {
+            "president_name": "Ulysses S. Grant",
+            "outcome_count": 3,
+            "positive": 2,
+            "negative": 1
+          },
+          {
+            "president_name": "William McKinley",
+            "outcome_count": 1,
+            "positive": 0,
+            "negative": 1
+          },
+          {
+            "president_name": "Woodrow Wilson",
+            "outcome_count": 3,
+            "positive": 2,
+            "negative": 0
+          }
+        ]
+      }
+    ]
+  }
+}

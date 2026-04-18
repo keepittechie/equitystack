@@ -16,7 +16,11 @@ from current_admin_common import (
     utc_timestamp,
     write_json_file,
 )
-from sync_current_admin_policy_outcomes import normalize_evidence_strength, source_quality_from_evidence
+from policy_outcome_source_common import (
+    ensure_policy_outcome_sources_table,
+    link_policy_outcome_source,
+    sync_policy_outcome_source_metadata,
+)
 
 
 VALID_SOURCE_TYPES = {"Government", "Academic", "News", "Archive", "Nonprofit", "Other"}
@@ -27,7 +31,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
             "Manually curate and attach sources to current-admin policy outcomes through "
-            "the canonical promise_outcome_sources junction."
+            "the canonical policy_outcome_sources junction."
         )
     )
     parser.add_argument("--output", type=Path, help="Curation report JSON path")
@@ -171,7 +175,11 @@ def fetch_policy_outcome_targets(cursor, args: argparse.Namespace) -> list[dict[
           po.status_override,
           COUNT(DISTINCT pos.source_id) AS live_source_count
         FROM promise_outcomes po
-        LEFT JOIN promise_outcome_sources pos ON pos.promise_outcome_id = po.id
+        LEFT JOIN policy_outcomes uo
+          ON uo.policy_type = 'current_admin'
+         AND uo.policy_id = po.promise_id
+         AND uo.outcome_summary_hash = SHA2(TRIM(po.outcome_summary), 256)
+        LEFT JOIN policy_outcome_sources pos ON pos.policy_outcome_id = uo.id
         WHERE {" AND ".join(outcome_filters)}
         GROUP BY
           po.id,
@@ -267,16 +275,16 @@ def find_sources_by_url(cursor, url: str) -> list[dict[str, Any]]:
     return list(cursor.fetchall() or [])
 
 
-def source_already_attached(cursor, promise_outcome_id: int, source_id: int) -> bool:
+def source_already_attached(cursor, policy_outcome_id: int, source_id: int) -> bool:
     cursor.execute(
         """
         SELECT 1
-        FROM promise_outcome_sources
-        WHERE promise_outcome_id = %s
+        FROM policy_outcome_sources
+        WHERE policy_outcome_id = %s
           AND source_id = %s
         LIMIT 1
         """,
-        (promise_outcome_id, source_id),
+        (policy_outcome_id, source_id),
     )
     return cursor.fetchone() is not None
 
@@ -369,7 +377,7 @@ def build_plan_for_target(cursor, target: dict[str, Any], draft: dict[str, Any])
         storage_action = "reuse_existing_source_and_link"
         if len(existing_sources) > 1:
             warnings.append("duplicate URL already exists in sources; using earliest source row and creating no new duplicate")
-        if source_already_attached(cursor, int(target["promise_outcome_id"]), source_id):
+        if source_already_attached(cursor, int(target["policy_outcome_id"]), source_id):
             status = "skipped"
             warnings.append("source URL is already attached to this outcome")
 
@@ -469,59 +477,14 @@ def create_source(cursor, plan: dict[str, Any], generated_at: str) -> int:
     return int(cursor.lastrowid)
 
 
-def sync_policy_outcome_source_metadata(cursor, plan: dict[str, Any]) -> dict[str, Any]:
-    cursor.execute(
-        """
-        SELECT COUNT(DISTINCT pos.source_id) AS source_count
-        FROM promise_outcome_sources pos
-        WHERE pos.promise_outcome_id = %s
-        """,
-        (plan["promise_outcome_id"],),
-    )
-    source_count = int((cursor.fetchone() or {}).get("source_count") or 0)
-    evidence = normalize_evidence_strength(plan["source_draft"].get("evidence_strength"))
-    if evidence is None:
-        cursor.execute(
-            """
-            SELECT evidence_strength
-            FROM policy_outcomes
-            WHERE id = %s
-            LIMIT 1
-            """,
-            (plan["policy_outcome_id"],),
-        )
-        evidence = normalize_evidence_strength((cursor.fetchone() or {}).get("evidence_strength"))
-    source_quality = source_quality_from_evidence(evidence, source_count)
-    cursor.execute(
-        """
-        UPDATE policy_outcomes
-        SET source_count = %s,
-            source_quality = %s
-        WHERE id = %s
-        """,
-        (source_count, source_quality, plan["policy_outcome_id"]),
-    )
-    return {
-        "source_count": source_count,
-        "source_quality": source_quality,
-    }
-
-
 def apply_plan(cursor, plan: dict[str, Any], generated_at: str) -> dict[str, Any]:
     if plan["status"] != "ready":
         return {"status": "not_applied", "reason": plan["status"]}
     source_id = plan.get("existing_source_id")
     if source_id is None:
         source_id = create_source(cursor, plan, generated_at)
-    cursor.execute(
-        """
-        INSERT IGNORE INTO promise_outcome_sources (promise_outcome_id, source_id)
-        VALUES (%s, %s)
-        """,
-        (plan["promise_outcome_id"], source_id),
-    )
-    link_inserted = int(cursor.rowcount or 0)
-    metadata = sync_policy_outcome_source_metadata(cursor, plan)
+    link_inserted = link_policy_outcome_source(cursor, int(plan["policy_outcome_id"]), source_id)
+    metadata = sync_policy_outcome_source_metadata(cursor, int(plan["policy_outcome_id"]))
     return {
         "status": "applied",
         "source_id": source_id,
@@ -546,6 +509,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     applied: list[dict[str, Any]] = []
     try:
         with connection.cursor() as cursor:
+            ensure_policy_outcome_sources_table(cursor)
             before_coverage = add_coverage_pct(fetch_coverage(cursor))
             targets = fetch_policy_outcome_targets(cursor, args)
             for target in targets:
@@ -581,12 +545,9 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "mode": "apply" if args.apply else "dry_run",
         "storage": {
             "source_table": "sources",
-            "junction_table": "promise_outcome_sources",
+            "junction_table": "policy_outcome_sources",
             "unified_metadata_table": "policy_outcomes",
-            "note": (
-                "Production has no policy_outcome_sources table; current-admin scoring reads promise_outcome_sources. "
-                "The workflow updates policy_outcomes.source_count/source_quality after linking."
-            ),
+            "note": "Source curation writes canonical outcome evidence links directly to policy_outcome_sources.",
         },
         "summary": {
             "target_count": len(plans) + len(skipped_targets),

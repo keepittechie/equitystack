@@ -1,0 +1,363 @@
+{
+  "workflow": "policy_outcome_source_linkage_migration",
+  "generated_at": "2026-04-18T02:01:30+00:00",
+  "mode": "apply",
+  "canonical_storage": {
+    "source_table": "sources",
+    "junction_table": "policy_outcome_sources",
+    "metadata_table": "policy_outcomes"
+  },
+  "before": {
+    "total_policy_outcomes": 113,
+    "with_sources": 99,
+    "without_sources": 14
+  },
+  "after": {
+    "total_policy_outcomes": 113,
+    "with_sources": 113,
+    "without_sources": 0
+  },
+  "migration": {
+    "current_admin_legacy_pairs_found": 112,
+    "current_admin_links_created": 112,
+    "legislative_policy_outcomes_processed": 19,
+    "legislative_sources_created": 19,
+    "legislative_links_created": 19,
+    "metadata_sync": {
+      "policy_outcomes_processed": 113,
+      "with_sources": 113,
+      "without_sources": 0
+    }
+  },
+  "legislative_plans": [
+    {
+      "policy_outcome_id": 95,
+      "tracked_bill_id": 13,
+      "bill_number": "H.R. 7973",
+      "planned_sources": [
+        {
+          "source_title": "H.R. 7973 - Congress.gov bill record",
+          "source_url": "https://www.congress.gov/bill/119th-congress/hr-bill/7973",
+          "source_type": "Government",
+          "publisher": "Congress.gov",
+          "published_date": "2026-03-18",
+          "source_id": 531,
+          "created_source_row": true,
+          "link_inserted": true
+        }
+      ]
+    },
+    {
+      "policy_outcome_id": 96,
+      "tracked_bill_id": 16,
+      "bill_number": "H.R. 7660",
+      "planned_sources": [
+        {
+          "source_title": "H.R. 7660 - Congress.gov bill record",
+          "source_url": "https://www.congress.gov/bill/119th-congress/hr-bill/7660",
+          "source_type": "Government",
+          "publisher": "Congress.gov",
+          "published_date": "2026-02-24",
+          "source_id": 532,
+          "created_source_row": true,
+          "link_inserted": true
+        }
+      ]
+    },
+    {
+      "policy_outcome_id": 97,
+      "tracked_bill_id": 20,
+      "bill_number": "H.R. 7341",
+      "planned_sources": [
+        {
+          "source_title": "H.R. 7341 - Congress.gov bill record",
+          "source_url": "https://www.congress.gov/bill/119th-congress/hr-bill/7341",
+          "source_type": "Government",
+          "publisher": "Congress.gov",
+          "published_date": "2026-02-04",
+          "source_id": 533,
+          "created_source_row": true,
+          "link_inserted": true
+        }
+      ]
+    },
+    {
+      "policy_outcome_id": 98,
+      "tracked_bill_id": 15,
+      "bill_number": "H.R. 5975",
+      "planned_sources": [
+        {
+          "source_title": "H.R. 5975 - Congress.gov bill record",
+          "source_url": "https://www.congress.gov/bill/119th-congress/hr-bill/5975",
+          "source_type": "Government",
+          "publisher": "Congress.gov",
+          "published_date": "2025-11-07",
+          "source_id": 534,
+          "created_source_row": true,
+          "link_inserted": true
+        }
+      ]
+    },
+    {
+      "policy_outcome_id": 99,
+      "tracked_bill_id": 12,
+      "bill_number": "S. 2523",
+      "planned_sources": [
+        {
+          "source_title": "S. 2523 - Congress.gov bill record",
+          "source_url": "https://www.congress.gov/bill/119th-congress/s-bill/2523",
+          "source_type": "Government",
+          "publisher": "Congress.gov",
+          "published_date": "2025-07-29",
+          "source_id": 535,
+          "created_source_row": true,
+          "link_inserted": true
+        }
+      ]
+    },
+    {
+      "policy_outcome_id": 100,
+      "tracked_bill_id": 14,
+      "bill_number": "S. 2322",
+      "planned_sources": [
+        {
+          "source_title": "S. 2322 - Congress.gov bill record",
+          "source_url": "https://www.congress.gov/bill/119th-congress/s-bill/2322",
+          "source_type": "Government",
+          "publisher": "Congress.gov",
+          "published_date": "2025-07-17",
+          "source_id": 536,
+          "created_source_row": true,
+          "link_inserted": true
+        }
+      ]
+    },
+    {
+      "policy_outcome_id": 101,
+      "tracked_bill_id": 32,
+      "bill_number": "H.R. 4069",
+      "planned_sources": [
+        {
+          "source_title": "H.R. 4069 - Congress.gov bill record",
+          "source_url": "https://www.congress.gov/bill/119th-congress/hr-bill/4069",
+          "source_type": "Government",
+          "publisher": "Congress.gov",
+          "published_date": "2025-06-23",
+          "source_id": 537,
+          "created_source_row": true,
+          "link_inserted": true
+        }
+      ]
+    },
+    {
+      "policy_outcome_id": 102,
+      "tracked_bill_id": 18,
+      "bill_number": "H.R. 3793",
+      "planned_sources": [
+        {
+          "source_title": "H.R. 3793 - Congress.gov bill record",
+          "source_url": "https://www.congress.gov/bill/119th-congress/hr-bill/3793",
+          "source_type": "Government",
+          "publisher": "Congress.gov",
+          "published_date": "2025-06-05",
+          "source_id": 538,
+          "created_source_row": true,
+          "link_inserted": true
+        }
+      ]
+    },
+    {
+      "policy_outcome_id": 103,
+      "tracked_bill_id": 19,
+      "bill_number": "H.R. 3281",
+      "planned_sources": [
+        {
+          "source_title": "H.R. 3281 - Congress.gov bill record",
+          "source_url": "https://www.congress.gov/bill/119th-congress/hr-bill/3281",
+          "source_type": "Government",
+          "publisher": "Congress.gov",
+          "published_date": "2025-05-08",
+          "source_id": 539,
+          "created_source_row": true,
+          "link_inserted": true
+        }
+      ]
+    },
+    {
+      "policy_outcome_id": 104,
+      "tracked_bill_id": 17,
+      "bill_number": "H.R. 2664",
+      "planned_sources": [
+        {
+          "source_title": "H.R. 2664 - Congress.gov bill record",
+          "source_url": "https://www.congress.gov/bill/119th-congress/hr-bill/2664",
+          "source_type": "Government",
+          "publisher": "Congress.gov",
+          "published_date": "2025-04-07",
+          "source_id": 540,
+          "created_source_row": true,
+          "link_inserted": true
+        }
+      ]
+    },
+    {
+      "policy_outcome_id": 105,
+      "tracked_bill_id": 1,
+      "bill_number": "H.R. 14",
+      "planned_sources": [
+        {
+          "source_title": "H.R. 14 - Congress.gov bill record",
+          "source_url": "https://www.congress.gov/bill/119th-congress/hr-bill/14",
+          "source_type": "Government",
+          "publisher": "Congress.gov",
+          "published_date": "2025-03-05",
+          "source_id": 541,
+          "created_source_row": true,
+          "link_inserted": true
+        }
+      ]
+    },
+    {
+      "policy_outcome_id": 106,
+      "tracked_bill_id": 35,
+      "bill_number": "S. 120",
+      "planned_sources": [
+        {
+          "source_title": "S. 120 - Congress.gov bill record",
+          "source_url": "https://www.congress.gov/bill/119th-congress/s-bill/120",
+          "source_type": "Government",
+          "publisher": "Congress.gov",
+          "published_date": "2025-01-16",
+          "source_id": 542,
+          "created_source_row": true,
+          "link_inserted": true
+        }
+      ]
+    },
+    {
+      "policy_outcome_id": 107,
+      "tracked_bill_id": 28,
+      "bill_number": "H.R. 3305",
+      "planned_sources": [
+        {
+          "source_title": "H.R. 3305 - Congress.gov bill record",
+          "source_url": "https://www.congress.gov/bill/118th-congress/hr-bill/3305",
+          "source_type": "Government",
+          "publisher": "Congress.gov",
+          "published_date": "2023-05-19",
+          "source_id": 543,
+          "created_source_row": true,
+          "link_inserted": true
+        }
+      ]
+    },
+    {
+      "policy_outcome_id": 108,
+      "tracked_bill_id": 33,
+      "bill_number": "H.R. 1041",
+      "planned_sources": [
+        {
+          "source_title": "H.R. 1041 - Congress.gov bill record",
+          "source_url": "https://www.congress.gov/bill/118th-congress/hr-bill/1041",
+          "source_type": "Government",
+          "publisher": "Congress.gov",
+          "published_date": "2023-02-14",
+          "source_id": 544,
+          "created_source_row": true,
+          "link_inserted": true
+        }
+      ]
+    },
+    {
+      "policy_outcome_id": 109,
+      "tracked_bill_id": 36,
+      "bill_number": "S. 13",
+      "planned_sources": [
+        {
+          "source_title": "S. 13 - Congress.gov bill record",
+          "source_url": "https://www.congress.gov/bill/118th-congress/s-bill/13",
+          "source_type": "Government",
+          "publisher": "Congress.gov",
+          "published_date": "2023-01-23",
+          "source_id": 545,
+          "created_source_row": true,
+          "link_inserted": true
+        }
+      ]
+    },
+    {
+      "policy_outcome_id": 110,
+      "tracked_bill_id": 21,
+      "bill_number": "H.R. 40",
+      "planned_sources": [
+        {
+          "source_title": "H.R. 40 - Congress.gov bill record",
+          "source_url": "https://www.congress.gov/bill/118th-congress/hr-bill/40",
+          "source_type": "Government",
+          "publisher": "Congress.gov",
+          "published_date": "2023-01-09",
+          "source_id": 546,
+          "created_source_row": true,
+          "link_inserted": true
+        }
+      ]
+    },
+    {
+      "policy_outcome_id": 111,
+      "tracked_bill_id": 34,
+      "bill_number": "S. 2068",
+      "planned_sources": [
+        {
+          "source_title": "S. 2068 - Congress.gov bill record",
+          "source_url": "https://www.congress.gov/bill/117th-congress/s-bill/2068",
+          "source_type": "Government",
+          "publisher": "Congress.gov",
+          "published_date": "2021-12-17",
+          "source_id": 547,
+          "created_source_row": true,
+          "link_inserted": true
+        }
+      ]
+    },
+    {
+      "policy_outcome_id": 112,
+      "tracked_bill_id": 29,
+      "bill_number": "H.R. 1693",
+      "planned_sources": [
+        {
+          "source_title": "H.R. 1693 - Congress.gov bill record",
+          "source_url": "https://www.congress.gov/bill/117th-congress/hr-bill/1693",
+          "source_type": "Government",
+          "publisher": "Congress.gov",
+          "published_date": "2021-09-29",
+          "source_id": 548,
+          "created_source_row": true,
+          "link_inserted": true
+        }
+      ]
+    },
+    {
+      "policy_outcome_id": 113,
+      "tracked_bill_id": 24,
+      "bill_number": "H.R. 2486",
+      "planned_sources": [
+        {
+          "source_title": "H.R. 2486 - Congress.gov bill record",
+          "source_url": "https://www.congress.gov/bill/116th-congress/hr-bill/2486",
+          "source_type": "Government",
+          "publisher": "Congress.gov",
+          "published_date": "2020-07-23",
+          "source_id": 549,
+          "created_source_row": true,
+          "link_inserted": true
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "source_count_mismatches": 0,
+    "join_orphans": 0,
+    "duplicate_links": 0,
+    "ok": true
+  }
+}

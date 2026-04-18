@@ -85,7 +85,15 @@ def priority_rationale(row: dict[str, Any], score: int) -> str:
 
 def fetch_missing_source_outcomes(cursor, policy_type: str | None) -> list[dict[str, Any]]:
     params: list[Any] = []
-    filters = ["po.source_count = 0"]
+    filters = [
+        """
+        NOT EXISTS (
+          SELECT 1
+          FROM policy_outcome_sources pos
+          WHERE pos.policy_outcome_id = po.id
+        )
+        """
+    ]
     if policy_type:
         filters.append("po.policy_type = %s")
         params.append(policy_type)
@@ -245,7 +253,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         },
         "grouped_by_policy_type": summarize_by_policy_type(rows),
         "top_missing_source_outcomes": top_rows,
-        "operator_next_step": "Use impact curate-sources for current_admin rows. Legislative rows need a future legislative source-link workflow if/when legislative policy_outcomes are applied.",
+        "operator_next_step": "Use impact curate-sources to attach canonical policy_outcome_sources rows for any sampled gaps.",
     }
 
 

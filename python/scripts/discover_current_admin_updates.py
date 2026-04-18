@@ -233,7 +233,11 @@ def fetch_promises(president_slug: str, max_promises: int | None) -> list[dict[s
                   po.status_override,
                   COUNT(DISTINCT pos.source_id) AS outcome_source_count
                 FROM promise_outcomes po
-                LEFT JOIN promise_outcome_sources pos ON pos.promise_outcome_id = po.id
+                LEFT JOIN policy_outcomes uo
+                  ON uo.policy_type = 'current_admin'
+                 AND uo.policy_id = po.promise_id
+                 AND uo.outcome_summary_hash = SHA2(TRIM(po.outcome_summary), 256)
+                LEFT JOIN policy_outcome_sources pos ON pos.policy_outcome_id = uo.id
                 WHERE po.promise_id IN ({placeholders})
                 GROUP BY
                   po.id, po.promise_id, po.outcome_summary, po.outcome_type, po.impact_direction, po.evidence_strength, po.status_override

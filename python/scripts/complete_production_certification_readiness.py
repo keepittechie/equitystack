@@ -15,6 +15,11 @@ from current_admin_common import (
     utc_timestamp,
     write_json_file,
 )
+from policy_outcome_source_common import (
+    ensure_policy_outcome_sources_table,
+    link_policy_outcome_source,
+    sync_policy_outcome_source_metadata,
+)
 
 
 DIRECTION_FALLBACK_IMPACT_SCORE = {
@@ -354,71 +359,18 @@ def insert_or_get_source(cursor, seed: dict[str, Any], policy_outcome_id: int, g
     return int(cursor.lastrowid), True
 
 
-def find_promise_outcome_id(cursor, policy_outcome_id: int) -> int | None:
-    cursor.execute(
-        """
-        SELECT po.policy_id, po.outcome_summary
-        FROM policy_outcomes po
-        WHERE po.id = %s
-          AND po.policy_type = 'current_admin'
-        """,
-        (policy_outcome_id,),
-    )
-    target = cursor.fetchone()
-    if not target:
-        return None
-    cursor.execute(
-        """
-        SELECT id
-        FROM promise_outcomes
-        WHERE promise_id = %s
-          AND TRIM(outcome_summary) = TRIM(%s)
-        ORDER BY id ASC
-        """,
-        (target["policy_id"], target["outcome_summary"]),
-    )
-    rows = list(cursor.fetchall() or [])
-    if len(rows) != 1:
-        return None
-    return int(rows[0]["id"])
-
-
-def link_exists(cursor, promise_outcome_id: int, source_id: int) -> bool:
+def link_exists(cursor, policy_outcome_id: int, source_id: int) -> bool:
     cursor.execute(
         """
         SELECT 1
-        FROM promise_outcome_sources
-        WHERE promise_outcome_id = %s
+        FROM policy_outcome_sources
+        WHERE policy_outcome_id = %s
           AND source_id = %s
         LIMIT 1
         """,
-        (promise_outcome_id, source_id),
+        (policy_outcome_id, source_id),
     )
     return cursor.fetchone() is not None
-
-
-def sync_policy_outcome_source_count(cursor, policy_outcome_id: int, promise_outcome_id: int, apply: bool) -> dict[str, Any]:
-    cursor.execute(
-        """
-        SELECT COUNT(DISTINCT source_id) AS source_count
-        FROM promise_outcome_sources
-        WHERE promise_outcome_id = %s
-        """,
-        (promise_outcome_id,),
-    )
-    source_count = int((cursor.fetchone() or {}).get("source_count") or 0)
-    source_quality = "high" if source_count > 0 else None
-    if apply:
-        cursor.execute(
-            """
-            UPDATE policy_outcomes
-            SET source_count = %s,
-                source_quality = %s
-            WHERE id = %s
-            """,
-            (source_count, source_quality, policy_outcome_id),
-        )
-    return {"source_count": source_count, "source_quality": source_quality}
 
 
 def fetch_source_targets(cursor, limit: int, has_impact_score: bool) -> list[dict[str, Any]]:
@@ -474,14 +426,9 @@ def attach_official_sources(cursor, apply: bool, generated_at: str, limit: int) 
         if not allowed_official_source(seed["url"]):
             skipped.append(json_safe({**target, "skip_reason": "source_domain_not_allowed", "source_url": seed["url"]}))
             continue
-        promise_outcome_id = find_promise_outcome_id(cursor, policy_outcome_id)
-        if promise_outcome_id is None:
-            skipped.append(json_safe({**target, "skip_reason": "no_unique_promise_outcome_match", "source_url": seed["url"]}))
-            continue
         existing_source_id = find_source_by_url(cursor, seed["url"])
         plan = {
             "policy_outcome_id": policy_outcome_id,
-            "promise_outcome_id": promise_outcome_id,
             "policy_title": target.get("policy_title"),
             "impact_score": float(target.get("impact_score") or 0),
             "impact_direction": target.get("impact_direction"),
@@ -497,16 +444,9 @@ def attach_official_sources(cursor, apply: bool, generated_at: str, limit: int) 
             continue
         if created:
             sources_added += 1
-        if not link_exists(cursor, promise_outcome_id, source_id):
-            cursor.execute(
-                """
-                INSERT INTO promise_outcome_sources (promise_outcome_id, source_id)
-                VALUES (%s, %s)
-                """,
-                (promise_outcome_id, source_id),
-            )
-            links_created += 1
-        metadata = sync_policy_outcome_source_count(cursor, policy_outcome_id, promise_outcome_id, apply=True)
+        if not link_exists(cursor, policy_outcome_id, source_id):
+            links_created += link_policy_outcome_source(cursor, policy_outcome_id, source_id)
+        metadata = sync_policy_outcome_source_metadata(cursor, policy_outcome_id) if apply else {}
         applied.append({**plan, "source_id": source_id, "metadata": metadata})
 
     return {
@@ -556,6 +496,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     connection = get_db_connection()
     try:
         with connection.cursor() as cursor:
+            ensure_policy_outcome_sources_table(cursor)
             before_columns = table_columns(cursor, "policy_outcomes")
             before_row_count = count_policy_outcomes(cursor)
             before_source_coverage = source_coverage(cursor)

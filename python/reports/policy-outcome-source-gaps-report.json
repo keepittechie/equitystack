@@ -1,0 +1,38 @@
+{
+  "workflow": "policy_outcome_source_gap_audit",
+  "generated_at": "2026-04-18T02:01:56+00:00",
+  "mode": "read_only",
+  "summary": {
+    "missing_source_outcome_count": 0,
+    "top_rows_returned": 0,
+    "policy_type_counts": {},
+    "impact_score_kind": "derived_source_curation_priority",
+    "impact_score_formula": {
+      "impact_direction": {
+        "Negative": 50,
+        "Positive": 50,
+        "Mixed": 30,
+        "Blocked": 25
+      },
+      "evidence_strength": {
+        "Strong": 30,
+        "Moderate": 20,
+        "Weak": 10
+      },
+      "status": {
+        "Complete": 15,
+        "Delivered": 15,
+        "Failed": 12,
+        "Partial": 10,
+        "Blocked": 8,
+        "In Progress": 5
+      },
+      "measurable_impact_present": 3,
+      "black_community_impact_note_present": 2
+    },
+    "database_mutated": false
+  },
+  "grouped_by_policy_type": {},
+  "top_missing_source_outcomes": [],
+  "operator_next_step": "Use impact curate-sources to attach canonical policy_outcome_sources rows for any sampled gaps."
+}

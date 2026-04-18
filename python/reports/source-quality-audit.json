@@ -1,14 +1,14 @@
 {
   "workflow": "source_quality_audit",
   "mode": "read_only",
-  "generated_at": "2026-04-07T10:34:10+00:00",
+  "generated_at": "2026-04-18T02:04:06+00:00",
   "scope": {
     "source_tables": [
       "sources",
       "promise_sources",
       "promise_action_sources",
-      "promise_outcome_sources",
-      "promise_outcomes"
+      "policy_outcome_sources",
+      "policy_outcomes"
     ],
     "mutation_policy": "read_only_no_source_edits_no_duplicate_merges"
   },
@@ -32,34 +32,34 @@
     ]
   },
   "summary": {
-    "total_sources": 340,
+    "total_sources": 482,
     "quality_distribution": {
-      "high_authority": 283,
-      "institutional": 29,
-      "low_unverified": 27,
-      "secondary": 1
+      "high_authority": 403,
+      "institutional": 37,
+      "low_unverified": 38,
+      "secondary": 4
     },
-    "domain_count": 66,
-    "duplicate_source_url_cluster_count": 23,
-    "duplicate_source_row_count": 54,
-    "source_quality_high_authority_count": 283,
-    "source_quality_institutional_count": 29,
-    "source_quality_secondary_count": 1,
-    "source_quality_low_unverified_count": 27
+    "domain_count": 88,
+    "duplicate_source_url_cluster_count": 22,
+    "duplicate_source_row_count": 52,
+    "source_quality_high_authority_count": 403,
+    "source_quality_institutional_count": 37,
+    "source_quality_secondary_count": 4,
+    "source_quality_low_unverified_count": 38
   },
   "top_domains": [
     {
       "domain": "congress.gov",
-      "source_count": 55,
+      "source_count": 98,
       "quality_distribution": {
-        "high_authority": 55
+        "high_authority": 98
       }
     },
     {
       "domain": "archives.gov",
-      "source_count": 41,
+      "source_count": 43,
       "quality_distribution": {
-        "high_authority": 41
+        "high_authority": 43
       }
     },
     {
@@ -71,33 +71,61 @@
       }
     },
     {
-      "domain": "justice.gov",
-      "source_count": 22,
+      "domain": "govinfo.gov",
+      "source_count": 30,
       "quality_distribution": {
-        "high_authority": 22
+        "high_authority": 30
       }
     },
     {
-      "domain": "govinfo.gov",
-      "source_count": 20,
+      "domain": "justice.gov",
+      "source_count": 23,
       "quality_distribution": {
-        "high_authority": 20
+        "high_authority": 23
+      }
+    },
+    {
+      "domain": "bidenwhitehouse.archives.gov",
+      "source_count": 18,
+      "quality_distribution": {
+        "high_authority": 18
       }
     },
     {
       "domain": "whitehouse.gov",
-      "source_count": 12,
+      "source_count": 16,
       "quality_distribution": {
-        "high_authority": 12
+        "high_authority": 16
+      }
+    },
+    {
+      "domain": "loc.gov",
+      "source_count": 11,
+      "quality_distribution": {
+        "high_authority": 11
+      }
+    },
+    {
+      "domain": "trumpwhitehouse.archives.gov",
+      "source_count": 11,
+      "quality_distribution": {
+        "high_authority": 11
+      }
+    },
+    {
+      "domain": "presidency.ucsb.edu",
+      "source_count": 10,
+      "quality_distribution": {
+        "institutional": 10
       }
     },
     {
       "domain": "oyez.org",
-      "source_count": 10,
+      "source_count": 9,
       "quality_distribution": {
         "high_authority": 2,
         "institutional": 5,
-        "low_unverified": 3
+        "low_unverified": 2
       }
     },
     {
@@ -115,7 +143,7 @@
       }
     },
     {
-      "domain": "loc.gov",
+      "domain": "senate.gov",
       "source_count": 8,
       "quality_distribution": {
         "high_authority": 8
@@ -129,13 +157,6 @@
       }
     },
     {
-      "domain": "senate.gov",
-      "source_count": 7,
-      "quality_distribution": {
-        "high_authority": 7
-      }
-    },
-    {
       "domain": "aspe.hhs.gov",
       "source_count": 6,
       "quality_distribution": {
@@ -144,6 +165,13 @@
     },
     {
       "domain": "dol.gov",
+      "source_count": 6,
+      "quality_distribution": {
+        "high_authority": 6
+      }
+    },
+    {
+      "domain": "federalregister.gov",
       "source_count": 6,
       "quality_distribution": {
         "high_authority": 6
@@ -171,6 +199,13 @@
       }
     },
     {
+      "domain": "obamawhitehouse.archives.gov",
+      "source_count": 5,
+      "quality_distribution": {
+        "high_authority": 5
+      }
+    },
+    {
       "domain": "constitution.congress.gov",
       "source_count": 4,
       "quality_distribution": {
@@ -185,70 +220,36 @@
       }
     },
     {
-      "domain": "usda.gov",
+      "domain": "trumanlibrary.gov",
       "source_count": 4,
       "quality_distribution": {
-        "high_authority": 4
-      }
-    },
-    {
-      "domain": "va.gov",
-      "source_count": 3,
-      "quality_distribution": {
-        "high_authority": 3
-      }
-    },
-    {
-      "domain": "consumerfinance.gov",
-      "source_count": 3,
-      "quality_distribution": {
-        "high_authority": 3
-      }
-    },
-    {
-      "domain": "usccr.gov",
-      "source_count": 3,
-      "quality_distribution": {
-        "high_authority": 3
-      }
-    },
-    {
-      "domain": "brennancenter.org",
-      "source_count": 3,
-      "quality_distribution": {
-        "low_unverified": 3
-      }
-    },
-    {
-      "domain": "brookings.edu",
-      "source_count": 3,
-      "quality_distribution": {
-        "institutional": 3
+        "high_authority": 3,
+        "institutional": 1
       }
     }
   ],
   "source_type_quality_distribution": {
     "Academic": {
       "high_authority": 1,
-      "institutional": 9
+      "institutional": 17
     },
     "Archive": {
-      "high_authority": 18,
+      "high_authority": 29,
       "institutional": 16
     },
     "Government": {
-      "high_authority": 264
+      "high_authority": 373
     },
     "News": {
-      "secondary": 1
+      "secondary": 4
     },
     "Nonprofit": {
       "institutional": 3,
-      "low_unverified": 9
+      "low_unverified": 11
     },
     "Other": {
       "institutional": 1,
-      "low_unverified": 18
+      "low_unverified": 27
     }
   },
   "duplicate_source_url_clusters": [
@@ -339,6 +340,24 @@
       "total_refs": 0
     },
     {
+      "source_url": "https://www.archives.gov/research/african-americans/vote/laws-and-courts",
+      "duplicate_count": 2,
+      "source_ids": [
+        179,
+        192
+      ],
+      "distinct_titles": [
+        "Laws and Court Cases: Black Americans and the Vote"
+      ],
+      "distinct_source_types": [
+        "Archive"
+      ],
+      "distinct_publishers": [
+        "National Archives"
+      ],
+      "total_refs": 3
+    },
+    {
       "source_url": "https://www.congress.gov/bill/117th-congress/house-bill/4",
       "duplicate_count": 2,
       "source_ids": [
@@ -392,6 +411,24 @@
       ],
       "distinct_publishers": [
         "U.S. Department of Justice"
+      ],
+      "total_refs": 1
+    },
+    {
+      "source_url": "https://www.senate.gov/artandhistory/history/common/generic/enforcementacts.htm",
+      "duplicate_count": 2,
+      "source_ids": [
+        180,
+        183
+      ],
+      "distinct_titles": [
+        "The Enforcement Acts of 1870 and 1871"
+      ],
+      "distinct_source_types": [
+        "Government"
+      ],
+      "distinct_publishers": [
+        "U.S. Senate"
       ],
       "total_refs": 1
     },
@@ -472,25 +509,6 @@
       "total_refs": 0
     },
     {
-      "source_url": "https://www.oyez.org/cases/2012/12-96",
-      "duplicate_count": 2,
-      "source_ids": [
-        17,
-        64
-      ],
-      "distinct_titles": [
-        "Shelby County v. Holder"
-      ],
-      "distinct_source_types": [
-        "Archive",
-        "Other"
-      ],
-      "distinct_publishers": [
-        "Oyez"
-      ],
-      "total_refs": 0
-    },
-    {
       "source_url": "https://www.govinfo.gov",
       "duplicate_count": 2,
       "source_ids": [
@@ -542,42 +560,6 @@
       ],
       "distinct_publishers": [
         "U.S. Department of Justice"
-      ],
-      "total_refs": 0
-    },
-    {
-      "source_url": "https://www.archives.gov/research/african-americans/vote/laws-and-courts",
-      "duplicate_count": 2,
-      "source_ids": [
-        179,
-        192
-      ],
-      "distinct_titles": [
-        "Laws and Court Cases: Black Americans and the Vote"
-      ],
-      "distinct_source_types": [
-        "Archive"
-      ],
-      "distinct_publishers": [
-        "National Archives"
-      ],
-      "total_refs": 0
-    },
-    {
-      "source_url": "https://www.senate.gov/artandhistory/history/common/generic/enforcementacts.htm",
-      "duplicate_count": 2,
-      "source_ids": [
-        180,
-        183
-      ],
-      "distinct_titles": [
-        "The Enforcement Acts of 1870 and 1871"
-      ],
-      "distinct_source_types": [
-        "Government"
-      ],
-      "distinct_publishers": [
-        "U.S. Senate"
       ],
       "total_refs": 0
     },
@@ -691,172 +673,172 @@
     }
   ],
   "outcome_source_quality": {
-    "total_promise_outcomes": 94,
-    "outcomes_with_any_sources": 30,
-    "outcomes_with_high_authority_sources": 30,
-    "pct_sourced_outcomes_with_high_authority_sources": 1.0,
+    "total_policy_outcomes": 113,
+    "outcomes_with_any_sources": 113,
+    "outcomes_with_high_authority_sources": 110,
+    "pct_sourced_outcomes_with_high_authority_sources": 0.9735,
     "outcomes_by_best_quality": {
-      "high_authority": 30,
-      "no_sources": 64
+      "high_authority": 110,
+      "institutional": 1,
+      "low_unverified": 2
     },
     "samples": [
       {
-        "promise_outcome_id": 1,
-        "promise_slug": "obama-crack-sentencing-disparity",
+        "policy_outcome_id": 1,
+        "policy_reference": "obama-crack-sentencing-disparity",
         "source_count": 1,
         "quality_labels": [
           "high_authority"
         ]
       },
       {
-        "promise_outcome_id": 2,
-        "promise_slug": "biden-advance-racial-equity",
+        "policy_outcome_id": 2,
+        "policy_reference": "biden-advance-racial-equity",
         "source_count": 1,
         "quality_labels": [
           "high_authority"
         ]
       },
       {
-        "promise_outcome_id": 3,
-        "promise_slug": "biden-voting-rights-restoration",
+        "policy_outcome_id": 3,
+        "policy_reference": "biden-voting-rights-restoration",
         "source_count": 1,
         "quality_labels": [
           "high_authority"
         ]
       },
       {
-        "promise_outcome_id": 4,
-        "promise_slug": "trump-black-homeownership-anti-redlining",
+        "policy_outcome_id": 4,
+        "policy_reference": "trump-black-homeownership-anti-redlining",
         "source_count": 1,
         "quality_labels": [
           "high_authority"
         ]
       },
       {
-        "promise_outcome_id": 5,
-        "promise_slug": "biden-policing-accountability",
+        "policy_outcome_id": 5,
+        "policy_reference": "biden-policing-accountability",
         "source_count": 1,
         "quality_labels": [
           "high_authority"
         ]
       },
       {
-        "promise_outcome_id": 61,
-        "promise_slug": "roosevelt-establish-federal-minimum-wage-maximum-hours",
+        "policy_outcome_id": 6,
+        "policy_reference": "obama-close-guantanamo-bay",
         "source_count": 2,
         "quality_labels": [
           "high_authority"
         ]
       },
       {
-        "promise_outcome_id": 62,
-        "promise_slug": "roosevelt-create-social-security-old-age-unemployment-system",
-        "source_count": 2,
-        "quality_labels": [
-          "high_authority"
-        ]
-      },
-      {
-        "promise_outcome_id": 86,
-        "promise_slug": "plessy-v-ferguson-separate-but-equal",
-        "source_count": 2,
-        "quality_labels": [
-          "high_authority"
-        ]
-      },
-      {
-        "promise_outcome_id": 87,
-        "promise_slug": "williams-v-mississippi-upholds-voting-restrictions",
-        "source_count": 2,
+        "policy_outcome_id": 7,
+        "policy_reference": "obama-end-combat-brigade-deployment-iraq",
+        "source_count": 3,
         "quality_labels": [
           "high_authority",
-          "institutional"
+          "low_unverified"
         ]
       },
       {
-        "promise_outcome_id": 89,
-        "promise_slug": "myers-v-anderson-invalidates-maryland-grandfather-clause-voting-law",
-        "source_count": 2,
-        "quality_labels": [
-          "high_authority"
-        ]
-      },
-      {
-        "promise_outcome_id": 90,
-        "promise_slug": "buchanan-v-warley-invalidates-louisville-residential-segregation-ordinance",
-        "source_count": 2,
-        "quality_labels": [
-          "high_authority"
-        ]
-      },
-      {
-        "promise_outcome_id": 91,
-        "promise_slug": "giles-v-harris-denies-relief-against-alabama-voter-disfranchisement",
-        "source_count": 2,
-        "quality_labels": [
-          "high_authority"
-        ]
-      },
-      {
-        "promise_outcome_id": 92,
-        "promise_slug": "guinn-v-united-states-strikes-down-oklahoma-grandfather-clause",
-        "source_count": 2,
-        "quality_labels": [
-          "high_authority"
-        ]
-      },
-      {
-        "promise_outcome_id": 93,
-        "promise_slug": "corrigan-v-buckley-lets-enforcement-of-racially-restrictive-housing-covenant-stand",
+        "policy_outcome_id": 8,
+        "policy_reference": "obama-repeal-dont-ask-dont-tell",
         "source_count": 1,
         "quality_labels": [
           "high_authority"
         ]
       },
       {
-        "promise_outcome_id": 94,
-        "promise_slug": "shelley-v-kraemer-bars-judicial-enforcement-of-racially-restrictive-covenants",
-        "source_count": 2,
+        "policy_outcome_id": 9,
+        "policy_reference": "obama-ban-preexisting-condition-exclusions",
+        "source_count": 1,
         "quality_labels": [
           "high_authority"
         ]
       },
       {
-        "promise_outcome_id": 95,
-        "promise_slug": "jones-v-alfred-h-mayer-co-holds-that-42-usc-1982-bars-private-racial-discrimination-in-property-transactions",
-        "source_count": 2,
+        "policy_outcome_id": 10,
+        "policy_reference": "obama-credit-card-bill-of-rights",
+        "source_count": 1,
         "quality_labels": [
           "high_authority"
         ]
       },
       {
-        "promise_outcome_id": 96,
-        "promise_slug": "fair-housing-act-of-1968-enacted",
-        "source_count": 2,
+        "policy_outcome_id": 11,
+        "policy_reference": "obama-lilly-ledbetter-fair-pay",
+        "source_count": 1,
         "quality_labels": [
           "high_authority"
         ]
       },
       {
-        "promise_outcome_id": 97,
-        "promise_slug": "fair-housing-amendments-act-of-1988-enacted",
-        "source_count": 2,
+        "policy_outcome_id": 12,
+        "policy_reference": "obama-making-work-pay-tax-credit",
+        "source_count": 1,
         "quality_labels": [
           "high_authority"
         ]
       },
       {
-        "promise_outcome_id": 98,
-        "promise_slug": "inclusive-communities-project-holds-that-disparate-impact-claims-are-cognizable-under-the-fair-housing-act",
-        "source_count": 2,
+        "policy_outcome_id": 13,
+        "policy_reference": "obama-expand-chip-coverage",
+        "source_count": 1,
         "quality_labels": [
-          "high_authority",
-          "institutional"
+          "high_authority"
         ]
       },
       {
-        "promise_outcome_id": 99,
-        "promise_slug": "donald-j-trump-2025-paying-our-great-transportation-security-administration-officers-and-employees",
+        "policy_outcome_id": 14,
+        "policy_reference": "obama-expand-stem-cell-research",
+        "source_count": 1,
+        "quality_labels": [
+          "high_authority"
+        ]
+      },
+      {
+        "policy_outcome_id": 15,
+        "policy_reference": "obama-repeal-bush-tax-cuts-for-higher-incomes",
+        "source_count": 1,
+        "quality_labels": [
+          "high_authority"
+        ]
+      },
+      {
+        "policy_outcome_id": 16,
+        "policy_reference": "trump-stop-tpp",
+        "source_count": 1,
+        "quality_labels": [
+          "high_authority"
+        ]
+      },
+      {
+        "policy_outcome_id": 17,
+        "policy_reference": "trump-build-border-wall-mexico-pay",
+        "source_count": 1,
+        "quality_labels": [
+          "high_authority"
+        ]
+      },
+      {
+        "policy_outcome_id": 18,
+        "policy_reference": "trump-withdraw-paris-climate-accord",
+        "source_count": 1,
+        "quality_labels": [
+          "high_authority"
+        ]
+      },
+      {
+        "policy_outcome_id": 19,
+        "policy_reference": "trump-move-embassy-jerusalem",
+        "source_count": 1,
+        "quality_labels": [
+          "high_authority"
+        ]
+      },
+      {
+        "policy_outcome_id": 20,
+        "policy_reference": "trump-replace-nafta-usmca",
         "source_count": 1,
         "quality_labels": [
           "high_authority"
@@ -1042,17 +1024,6 @@
       "rationale": "official government/legal source"
     },
     {
-      "source_id": 17,
-      "source_title": "Shelby County v. Holder",
-      "source_url": "https://www.oyez.org/cases/2012/12-96",
-      "source_type": "Other",
-      "publisher": "Oyez",
-      "source_quality_label": "low_unverified",
-      "source_quality_score": 0.25,
-      "domain": "oyez.org",
-      "rationale": "unverified or uncategorized source authority"
-    },
-    {
       "source_id": 18,
       "source_title": "Fair Sentencing Act of 2010",
       "source_url": "https://www.congress.gov/bill/111th-congress/senate-bill/1789",
@@ -1133,6 +1104,17 @@
       "source_id": 28,
       "source_title": "Smith v. Allwright",
       "source_url": "https://supreme.justia.com/cases/federal/us/321/649/",
+      "source_type": "Government",
+      "publisher": "Supreme Court / Justia",
+      "source_quality_label": "high_authority",
+      "source_quality_score": 1.0,
+      "domain": "supreme.justia.com",
+      "rationale": "official government/legal source"
+    },
+    {
+      "source_id": 29,
+      "source_title": "Shelley v. Kraemer",
+      "source_url": "https://supreme.justia.com/cases/federal/us/334/1/",
       "source_type": "Government",
       "publisher": "Supreme Court / Justia",
       "source_quality_label": "high_authority",

@@ -86,7 +86,7 @@ def fetch_duplicate_source_rows(cursor) -> list[dict[str, Any]]:
         ) pas_counts ON pas_counts.source_id = s.id
         LEFT JOIN (
           SELECT source_id, COUNT(*) AS outcome_refs
-          FROM promise_outcome_sources
+          FROM policy_outcome_sources
           GROUP BY source_id
         ) pos_counts ON pos_counts.source_id = s.id
         ORDER BY s.source_url ASC, s.id ASC
@@ -190,9 +190,10 @@ def fetch_deterministic_action_backfill_candidates(cursor) -> list[dict[str, Any
           SELECT ps.promise_id, ps.source_id
           FROM promise_sources ps
           UNION ALL
-          SELECT po.promise_id, pos.source_id
-          FROM promise_outcomes po
-          JOIN promise_outcome_sources pos ON pos.promise_outcome_id = po.id
+          SELECT po.policy_id AS promise_id, pos.source_id
+          FROM policy_outcomes po
+          JOIN policy_outcome_sources pos ON pos.policy_outcome_id = po.id
+          WHERE po.policy_type = 'current_admin'
           UNION ALL
           SELECT pa2.promise_id, pas2.source_id
           FROM promise_actions pa2
@@ -237,12 +238,14 @@ def fetch_unresolved_source_groups(cursor, table_kind: str) -> list[dict[str, An
         owner_table = "promise_actions"
         owner_id_field = "id"
         created_field = "created_at"
+        promise_join_condition = "p.id = o.promise_id"
     else:
-        source_join_table = "promise_outcome_sources"
-        source_join_field = "promise_outcome_id"
-        owner_table = "promise_outcomes"
+        source_join_table = "policy_outcome_sources"
+        source_join_field = "policy_outcome_id"
+        owner_table = "policy_outcomes"
         owner_id_field = "id"
         created_field = "created_at"
+        promise_join_condition = "o.policy_type = 'current_admin' AND p.id = o.policy_id"
 
     cursor.execute(
         f"""
@@ -254,7 +257,7 @@ def fetch_unresolved_source_groups(cursor, table_kind: str) -> list[dict[str, An
           COUNT(*) AS row_count,
           GROUP_CONCAT(DISTINCT p.slug ORDER BY p.slug SEPARATOR ', ') AS promise_slugs
         FROM {owner_table} o
-        JOIN promises p ON p.id = o.promise_id
+        JOIN promises p ON {promise_join_condition}
         JOIN presidents pr ON pr.id = p.president_id
         WHERE NOT EXISTS (
           SELECT 1
@@ -299,22 +302,26 @@ def fetch_unresolved_source_rows(cursor, table_kind: str) -> list[dict[str, Any]
         owner_date_field = "action_date"
         created_field = "created_at"
         record_type = "action"
+        promise_id_field = "o.promise_id"
+        promise_join_condition = "p.id = o.promise_id"
     else:
-        source_join_table = "promise_outcome_sources"
-        source_join_field = "promise_outcome_id"
-        owner_table = "promise_outcomes"
+        source_join_table = "policy_outcome_sources"
+        source_join_field = "policy_outcome_id"
+        owner_table = "policy_outcomes"
         owner_id_field = "id"
         owner_text_field = "outcome_summary"
         owner_detail_field = "measurable_impact"
-        owner_date_field = "NULL"
+        owner_date_field = "impact_start_date"
         created_field = "created_at"
         record_type = "outcome"
+        promise_id_field = "o.policy_id"
+        promise_join_condition = "o.policy_type = 'current_admin' AND p.id = o.policy_id"
 
     cursor.execute(
         f"""
         SELECT
           o.{owner_id_field} AS record_id,
-          o.promise_id,
+          {promise_id_field} AS promise_id,
           o.{owner_text_field} AS record_text,
           o.{owner_detail_field} AS record_detail,
           {owner_date_field} AS record_date,
@@ -325,7 +332,7 @@ def fetch_unresolved_source_rows(cursor, table_kind: str) -> list[dict[str, Any]
           pr.slug AS president_slug,
           pr.full_name AS president_name
         FROM {owner_table} o
-        JOIN promises p ON p.id = o.promise_id
+        JOIN promises p ON {promise_join_condition}
         JOIN presidents pr ON pr.id = p.president_id
         WHERE NOT EXISTS (
           SELECT 1
@@ -381,11 +388,11 @@ def fetch_missing_source_counts(cursor) -> dict[str, int]:
     cursor.execute(
         """
         SELECT COUNT(*) AS total
-        FROM promise_outcomes po
+        FROM policy_outcomes po
         WHERE NOT EXISTS (
           SELECT 1
-          FROM promise_outcome_sources pos
-          WHERE pos.promise_outcome_id = po.id
+          FROM policy_outcome_sources pos
+          WHERE pos.policy_outcome_id = po.id
         )
         """
     )
@@ -431,7 +438,7 @@ def merge_duplicate_cluster(cursor, cluster: dict[str, Any]) -> dict[str, Any]:
     join_tables = [
         ("promise_sources", "promise_id"),
         ("promise_action_sources", "promise_action_id"),
-        ("promise_outcome_sources", "promise_outcome_id"),
+        ("policy_outcome_sources", "policy_outcome_id"),
     ]
     join_updates: dict[str, dict[str, int]] = {}
     placeholders = ", ".join(["%s"] * len(duplicate_source_ids))
@@ -507,7 +514,7 @@ def verify_no_orphan_source_joins(cursor) -> dict[str, int]:
     checks = [
         ("promise_sources", "promise_id", "promises"),
         ("promise_action_sources", "promise_action_id", "promise_actions"),
-        ("promise_outcome_sources", "promise_outcome_id", "promise_outcomes"),
+        ("policy_outcome_sources", "policy_outcome_id", "policy_outcomes"),
     ]
     for join_table, owner_field, owner_table in checks:
         cursor.execute(

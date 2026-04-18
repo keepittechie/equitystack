@@ -21,6 +21,17 @@ from current_admin_common import (
     write_json_file,
 )
 from current_admin_openai_batch_guardrails import require_review_batch_safe
+from policy_outcome_source_common import (
+    ensure_policy_outcome_sources_table,
+    link_policy_outcome_source,
+    sync_policy_outcome_source_metadata,
+)
+from sync_current_admin_policy_outcomes import (
+    build_payload as build_policy_outcome_payload,
+    find_existing_policy_outcome,
+    insert_policy_outcome,
+    sync_existing_source_metadata,
+)
 
 IMPACT_PENDING_STATUS = "impact_pending"
 
@@ -417,6 +428,67 @@ def find_existing_outcome(cursor, promise_id: int, outcome: dict[str, Any]) -> d
     return None
 
 
+def related_historical_policy_score(cursor, promise_id: int) -> float | None:
+    cursor.execute(
+        """
+        SELECT CASE
+          WHEN COUNT(DISTINCT pa.related_policy_id) = 1 THEN MAX(
+            COALESCE(ps.directness_score, 0) * 2
+            + COALESCE(ps.material_impact_score, 0) * 2
+            + COALESCE(ps.evidence_score, 0)
+            + COALESCE(ps.durability_score, 0)
+            + COALESCE(ps.equity_score, 0) * 2
+            - COALESCE(ps.harm_offset_score, 0)
+          )
+          ELSE NULL
+        END AS score
+        FROM promise_actions pa
+        JOIN policy_scores ps ON ps.policy_id = pa.related_policy_id
+        WHERE pa.promise_id = %s
+        """,
+        (promise_id,),
+    )
+    row = cursor.fetchone() or {}
+    value = row.get("score")
+    return float(value) if value is not None else None
+
+
+def upsert_current_admin_policy_outcome(
+    cursor,
+    *,
+    promise_id: int,
+    promise_slug: str,
+    promise_title: str,
+    promise_status: str,
+    outcome_id: int,
+    outcome: dict[str, Any],
+) -> int:
+    row = {
+        "promise_outcome_id": outcome_id,
+        "promise_id": promise_id,
+        "outcome_summary": outcome.get("outcome_summary"),
+        "outcome_type": outcome.get("outcome_type"),
+        "measurable_impact": outcome.get("measurable_impact"),
+        "impact_direction": outcome.get("impact_direction"),
+        "evidence_strength": map_evidence_strength(outcome.get("evidence_strength")),
+        "status_override": outcome.get("status_override"),
+        "black_community_impact_note": outcome.get("black_community_impact_note"),
+        "promise_slug": promise_slug,
+        "promise_title": promise_title,
+        "promise_status": promise_status,
+        "source_count": 0,
+        "related_historical_policy_score": related_historical_policy_score(cursor, promise_id),
+    }
+    payload, reason = build_policy_outcome_payload(row)
+    if payload is None:
+        raise RuntimeError(f"Unable to build canonical policy_outcome payload after import: {reason}")
+    existing = find_existing_policy_outcome(cursor, payload)
+    if existing:
+        sync_existing_source_metadata(cursor, existing, payload)
+        return int(existing["id"])
+    return insert_policy_outcome(cursor, payload)
+
+
 def validate_post_import(cursor, promise_ids: list[int]) -> dict[str, Any]:
     if not promise_ids:
         return {
@@ -528,6 +600,7 @@ def main() -> None:
 
     try:
         with connection.cursor() as cursor:
+            ensure_policy_outcome_sources_table(cursor)
             president = get_president(cursor, payload.get("president_slug"))
 
             for record in payload.get("records") or []:
@@ -707,9 +780,24 @@ def main() -> None:
                             outcome_id = int(cursor.lastrowid)
                             report["outcomes_created"] += 1
 
+                        outcome_source_ids = []
                         for source in outcome.get("outcome_sources") or []:
                             source_id = upsert_source(cursor, source, report, source_cache)
-                            link_join_table(cursor, "promise_outcome_sources", "promise_outcome_id", outcome_id, source_id)
+                            outcome_source_ids.append(source_id)
+
+                        policy_outcome_id = upsert_current_admin_policy_outcome(
+                            cursor,
+                            promise_id=promise_id,
+                            promise_slug=record.get("slug"),
+                            promise_title=record.get("title"),
+                            promise_status=record.get("status"),
+                            outcome_id=outcome_id,
+                            outcome=outcome,
+                        )
+                        if outcome_source_ids:
+                            for source_id in outcome_source_ids:
+                                link_policy_outcome_source(cursor, policy_outcome_id, source_id)
+                        sync_policy_outcome_source_metadata(cursor, policy_outcome_id)
 
                 csv_rows.append(
                     {

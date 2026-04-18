@@ -112,6 +112,7 @@ def fetch_outcomes(cursor, columns: set[str]) -> list[dict[str, Any]]:
           {column_expr(columns, "appointing_presidents")},
           {column_expr(columns, "judicial_attribution")},
           {column_expr(columns, "judicial_weight")},
+          COALESCE(actual_sources.actual_source_count, 0) AS canonical_source_count,
           CASE
             WHEN po.policy_type = 'current_admin' THEN p.title
             WHEN po.policy_type = 'legislative' THEN tb.title
@@ -133,6 +134,11 @@ def fetch_outcomes(cursor, columns: set[str]) -> list[dict[str, Any]]:
         LEFT JOIN policies jp
           ON po.policy_type = 'judicial_impact'
          AND jp.id = po.policy_id
+        LEFT JOIN (
+          SELECT policy_outcome_id, COUNT(DISTINCT source_id) AS actual_source_count
+          FROM policy_outcome_sources
+          GROUP BY policy_outcome_id
+        ) actual_sources ON actual_sources.policy_outcome_id = po.id
         ORDER BY po.policy_type, po.policy_id, po.id
         """
     )
@@ -218,6 +224,7 @@ def validation_violations(outcomes: list[dict[str, Any]], columns: set[str], lim
         direction = normalize_nullable_text(row.get("impact_direction"))
         impact_score = row.get("impact_score")
         source_count = number(row.get("source_count"), 0)
+        canonical_source_count = number(row.get("canonical_source_count"), 0)
 
         if policy_type not in VALID_POLICY_TYPES:
             violations.append(sample_outcome(row, "invalid_policy_type"))
@@ -229,6 +236,8 @@ def validation_violations(outcomes: list[dict[str, Any]], columns: set[str], lim
             violations.append(sample_outcome(row, "impact_score_out_of_bounds"))
         if source_count < 0:
             violations.append(sample_outcome(row, "negative_source_count"))
+        if source_count != canonical_source_count:
+            violations.append(sample_outcome(row, "source_count_canonical_mismatch"))
         if row.get("impact_start_date") and row.get("impact_end_date") and row["impact_end_date"] < row["impact_start_date"]:
             violations.append(sample_outcome(row, "invalid_impact_date_range"))
 
