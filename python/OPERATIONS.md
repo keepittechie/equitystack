@@ -53,6 +53,8 @@ They are not allowed to invent data that the canonical artifacts or DB do not co
 - `/admin/source-curation`
   - unresolved source attribution follow-up
   - confirmed curation drafts and review notes only
+- `/admin/systemic-linkage`
+  - read-only report for non-default systemic policies and score-path coverage
 - `/admin/artifacts`
   - Canonical artifact catalog
 - `/admin/schedules`
@@ -219,6 +221,17 @@ Check:
 - no validation failures
 
 If `weekly-run` says `No urgent action needed this week.`, stop. That is the intended safe do-nothing path.
+
+### Systemic Linkage Follow-Up
+
+When systemic policy metadata exists but score-path coverage is incomplete, use `/admin/systemic-linkage` to review:
+
+- which systemically classified policies are already active in live scoring
+- which ones are active only through runtime title fallback
+- which ones are inactive because a canonical `promise_actions.related_policy_id` link is missing
+- which ones are outside the current score family and should be left alone
+
+This is an operator visibility surface. It should drive deliberate canonical-link cleanup, not bulk auto-linking or numeric-id shortcuts.
 
 ### Legislative Repair Case
 

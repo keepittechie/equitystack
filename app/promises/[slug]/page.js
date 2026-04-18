@@ -249,12 +249,12 @@ export default async function PromiseDetailPage({ params }) {
         ].filter(Boolean)}
       />
 
-      <section className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
+      <section className="grid gap-6 2xl:grid-cols-[1.05fr_0.95fr]">
         <PromiseSystemExplanation />
         <PromiseStatusLegend statuses={["Delivered", "In Progress", "Partial", "Blocked", "Failed"]} />
       </section>
 
-      <section className="grid items-start gap-6 xl:grid-cols-[1.05fr_0.95fr]">
+      <section className="grid items-start gap-6 2xl:grid-cols-[1.05fr_0.95fr]">
         <PageContextBlock
           description="This page is the landing point for a single promise record: the original commitment, the current status, the linked policy actions, and the evidence used to justify the classification."
           detail="Use it when you want to move from a broad question about campaign promises to Black Americans into the specific public record behind one promise."
@@ -300,7 +300,7 @@ export default async function PromiseDetailPage({ params }) {
         </div>
       </section>
 
-      <section className="public-two-col-rail grid gap-6 xl:grid-cols-[1.08fr_0.92fr]">
+      <section className="public-two-col-rail grid gap-6 2xl:grid-cols-[1.08fr_0.92fr]">
         <div className="space-y-5">
           <SectionIntro
             eyebrow="What this means"
@@ -407,7 +407,7 @@ export default async function PromiseDetailPage({ params }) {
         </div>
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[1fr_1fr]">
+      <section className="grid gap-6 2xl:grid-cols-[1fr_1fr]">
         <div className="space-y-5">
           <SectionIntro
             eyebrow="Evidence"

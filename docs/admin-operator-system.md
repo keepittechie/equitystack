@@ -139,6 +139,10 @@ The preferred maintenance entry point is the CLI operator layer:
   - human-in-the-loop source attribution follow-up
   - loads unresolved source gaps from `source_attribution_manual_review.json`
   - saves confirmed curation decisions as audit artifacts only
+- `/admin/systemic-linkage`
+  - read-only operator report for non-default systemic policies
+  - shows whether each policy is active in live scoring, runtime-fallback only, canonically linked, or outside the current score family
+  - gives a grounded inactive reason and next safe operator action
 - `/admin/artifacts`
   - artifact catalog and session linkage
 - `/admin/schedules`
@@ -177,7 +181,7 @@ Additional human review surface:
   - attach an existing source candidate
   - draft a new source candidate
   - mark unresolved source gaps as reviewed
-  - does not mutate canonical source joins directly
+  - mutates canonical source joins only after explicit operator confirmation
 
 ## Operator Mental Model
 
@@ -214,6 +218,8 @@ The data-integrity scope checks canonical promise, source, relationship, and fut
 - duplicate source URLs
 - missing source attribution on actions and outcomes
 - invalid unified outcome rows, including missing `impact_score`, invalid `impact_direction`, negative `source_count`, invalid `policy_type`, and duplicate `(policy_type, policy_id, outcome_summary_hash)` groups
+
+`/admin/systemic-linkage` complements these checks with score-path visibility for policy-level systemic metadata. It is intentionally read-only and does not treat numeric `policy_id` overlap as a real link.
 
 The deep-integrity scope adds:
 
@@ -374,7 +380,13 @@ Only deterministic rows may be repaired automatically.
 Current automatic repair policy:
 
 - missing `promise_action_sources` rows may be backfilled only when the same promise already resolves to exactly one canonical source across promise, action, and outcome source joins
-- missing `promise_outcome_sources` rows remain manual-only unless the same deterministic condition is eventually proven
+- missing `policy_outcome_sources` rows remain manual-only unless the same deterministic condition is eventually proven
+
+Canonical outcome evidence now lives on:
+
+```text
+sources + policy_outcome_sources
+```
 
 When cleanup runs, it writes:
 
@@ -394,6 +406,37 @@ The tracker resolves the next step automatically:
 - if final apply is ready, it exposes the existing confirmed apply path
 
 This is guidance only. It does not auto-run any step or bypass confirmation.
+
+## Systemic Linkage Coverage Surface
+
+`/admin/systemic-linkage` is the operator view for systemic-impact coverage cleanup.
+
+For every policy with a non-default `systemic_impact_category`, it shows:
+
+- policy identity and systemic metadata
+- whether the policy is active in live scoring
+- current score-path type: `current_admin`, `judicial`, `mixed`, or `none`
+- canonical link status
+- inactive reason when the policy is not canonically active
+- recommended next operator action
+
+Typical grounded statuses include:
+
+- `explicit_promise_action_link`
+- `runtime_title_match_only`
+- `judicial_direct_link`
+- `unsafe_numeric_id_overlap_only`
+- `multiple_title_match_candidates`
+
+Typical recommended actions include:
+
+- `leave as-is; already active in live scoring`
+- `add related_policy_id to matching promise_action`
+- `manual review of ambiguous linkage`
+- `verify whether this policy should have a scored outcome`
+- `leave as-is; currently outside score family`
+
+This surface exists to make linkage debt explicit without auto-mutating production data.
 
 ## Legislative Guided Workflow
 

@@ -115,6 +115,32 @@ function LinkedBillCard({ item }) {
   );
 }
 
+function ProfilePanel({ children, className = "" }) {
+  return (
+    <section
+      className={`rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 md:p-6 ${className}`}
+    >
+      {children}
+    </section>
+  );
+}
+
+function humanizeToken(value) {
+  return String(value || "")
+    .split("_")
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+function BreakdownPill({ label, value }) {
+  return (
+    <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-[var(--ink-soft)]">
+      {label} {value}
+    </span>
+  );
+}
+
 function buildPresidentOverview(profile, editorial = null) {
   const { president, promiseTracker, scoreDrivers } = profile;
   const topicLabels = takeLabels(
@@ -264,7 +290,16 @@ export default async function PresidentProfilePage({ params }) {
     notFound();
   }
 
-  const { president, promiseTracker, trend, topPolicies, promises, promiseStatusSnapshot, scoreDrivers } = profile;
+  const {
+    president,
+    promiseTracker,
+    trend,
+    topPolicies,
+    promises,
+    promiseStatusSnapshot,
+    scoreDrivers,
+    scoreComposition,
+  } = profile;
   const presidentName = president.president || president.president_name || "Unknown president";
   const billInputs = president.bill_impact_inputs || {};
   const imageSrc = resolvePresidentImageSrc({
@@ -383,6 +418,79 @@ export default async function PresidentProfilePage({ params }) {
         ]}
       />
 
+      <ProfilePanel className="space-y-5">
+        <SectionIntro
+          eyebrow="Score breakdown"
+          title="Why this president has this score"
+          description={scoreComposition.summary_line}
+          actions={
+            <Link href="/research/how-black-impact-score-works" className="public-button-secondary">
+              Read the full scoring methodology
+            </Link>
+          }
+        />
+        <div className="grid gap-4 xl:grid-cols-3">
+          <div className="rounded-[1.4rem] border border-white/8 bg-white/5 p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--accent)]">
+              Direct impact
+            </p>
+            <p className="mt-3 text-2xl font-semibold text-white">
+              {scoreComposition.direct.outcome_count} outcomes
+            </p>
+            <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
+              Direct impact reflects what actually happened in the scored outcome record before broader interpretation.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {Object.entries(scoreComposition.direct.direction_counts).map(([label, value]) => (
+                <BreakdownPill key={label} label={label} value={value} />
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-[1.4rem] border border-white/8 bg-white/5 p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--accent)]">
+              Intent
+            </p>
+            <p className="mt-3 text-2xl font-semibold text-white">
+              {scoreComposition.intent.classified_outcome_count} classified
+            </p>
+            <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
+              Intent modifies interpretation, not historical reality. These counts show how the linked policies behind scored outcomes are classified.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {Object.entries(scoreComposition.intent.counts).map(([label, value]) => (
+                <BreakdownPill key={label} label={humanizeToken(label)} value={value} />
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-[1.4rem] border border-white/8 bg-white/5 p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--accent)]">
+              Systemic effect
+            </p>
+            <p className="mt-3 text-2xl font-semibold text-white">
+              {scoreComposition.systemic.weighted_outcome_count} weighted
+            </p>
+            <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
+              Systemic weighting captures long-run institutional effect. Most rows remain standard unless a stronger structural case has been curated.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {Object.entries(scoreComposition.systemic.counts).map(([label, value]) => (
+                <BreakdownPill key={label} label={humanizeToken(label)} value={value} />
+              ))}
+            </div>
+          </div>
+        </div>
+        <div className="rounded-[1.2rem] border border-[rgba(132,247,198,0.16)] bg-[rgba(7,32,52,0.45)] px-4 py-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--accent)]">
+            What this means
+          </p>
+          <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
+            {scoreComposition.interpretation}
+          </p>
+        </div>
+      </ProfilePanel>
+
       <section className="grid gap-4 md:grid-cols-3">
         {buildPresidentGuideCards(profile, flagshipEditorial).map((item) => (
           <div
@@ -398,7 +506,7 @@ export default async function PresidentProfilePage({ params }) {
         ))}
       </section>
 
-      <section className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6">
+      <ProfilePanel>
         <SectionIntro
           eyebrow="Context and background"
           title="What this presidential page shows in practice"
@@ -411,10 +519,10 @@ export default async function PresidentProfilePage({ params }) {
             </p>
           ))}
         </div>
-      </section>
+      </ProfilePanel>
 
-      <section className="public-two-col-rail grid items-start gap-6 xl:grid-cols-[1.05fr_0.95fr]">
-        <div className="space-y-5 xl:self-start">
+      <section className="public-two-col-rail grid items-start gap-6 2xl:grid-cols-[1.05fr_0.95fr]">
+        <div className="space-y-5 2xl:self-start">
           <SectionIntro
             eyebrow="Bill-informed signals"
             title="Legislation linked to this presidential record"
@@ -482,8 +590,8 @@ export default async function PresidentProfilePage({ params }) {
         </div>
       </section>
 
-      <section className="grid items-start gap-6 xl:grid-cols-[1.1fr_0.9fr]">
-        <div className="space-y-5 xl:self-start">
+      <section className="grid items-start gap-6 2xl:grid-cols-[1.1fr_0.9fr]">
+        <div className="space-y-5 2xl:self-start">
           <ImpactTrendChart
             data={trend?.score_by_year || []}
             title="Impact over time"
@@ -509,8 +617,8 @@ export default async function PresidentProfilePage({ params }) {
         </div>
       </section>
 
-      <section className="public-two-col-rail grid items-start gap-6 xl:grid-cols-[1.08fr_0.92fr]">
-        <div className="space-y-5 xl:self-start">
+      <section className="public-two-col-rail grid items-start gap-6 2xl:grid-cols-[1.08fr_0.92fr]">
+        <div className="space-y-5 2xl:self-start">
           <SectionIntro
             eyebrow="Top records"
             title="Policies and promises shaping this record"
@@ -558,8 +666,8 @@ export default async function PresidentProfilePage({ params }) {
         </div>
       </section>
 
-      <section className="public-two-col-rail grid items-start gap-6 xl:grid-cols-[1.15fr_0.85fr]">
-        <div className="space-y-5 xl:self-start">
+      <section className="public-two-col-rail grid items-start gap-6 2xl:grid-cols-[1.15fr_0.85fr]">
+        <div className="space-y-5 2xl:self-start">
           <SectionIntro
             eyebrow="What shaped this score"
             title="Driver visibility"
@@ -640,8 +748,8 @@ export default async function PresidentProfilePage({ params }) {
         </div>
       </section>
 
-      <section className="public-two-col-rail grid items-start gap-6 xl:grid-cols-[0.95fr_1.05fr]">
-        <div className="space-y-5 xl:self-start">
+      <section className="public-two-col-rail grid items-start gap-6 2xl:grid-cols-[0.95fr_1.05fr]">
+        <ProfilePanel className="space-y-5 2xl:self-start">
           <SectionIntro
             eyebrow="Promise tracker snapshot"
             title="Promise tracker context for this president"
@@ -688,8 +796,8 @@ export default async function PresidentProfilePage({ params }) {
               Promise outcomes provide context for how stated goals translated into documented policy action. They help explain implementation, but they are not the same thing as presidential Impact Score.
             </p>
           </div>
-        </div>
-        <div className="space-y-5">
+        </ProfilePanel>
+        <ProfilePanel className="space-y-5">
           <SectionIntro
             eyebrow="Continue exploring"
             title="Where to go next from this presidential record"
@@ -735,11 +843,11 @@ export default async function PresidentProfilePage({ params }) {
               </p>
             </Link>
           </div>
-        </div>
+        </ProfilePanel>
       </section>
 
-      <section className="public-two-col-rail grid items-start gap-6 xl:grid-cols-[0.95fr_1.05fr]">
-        <div className="space-y-5 xl:self-start">
+      <section className="public-two-col-rail grid items-start gap-6 2xl:grid-cols-[0.95fr_1.05fr]">
+        <ProfilePanel className="space-y-5 2xl:self-start">
           <SectionIntro
             eyebrow="Timeline"
             title="Promise and policy chronology"
@@ -752,8 +860,8 @@ export default async function PresidentProfilePage({ params }) {
               No dated promise records are attached to this profile yet.
             </div>
           )}
-        </div>
-        <div className="space-y-5">
+        </ProfilePanel>
+        <ProfilePanel className="space-y-5">
           <SectionIntro
             eyebrow="Related routes"
             title="Keep researching this president through linked records"
@@ -779,7 +887,7 @@ export default async function PresidentProfilePage({ params }) {
               </p>
             </Link>
           </div>
-        </div>
+        </ProfilePanel>
       </section>
     </main>
   );

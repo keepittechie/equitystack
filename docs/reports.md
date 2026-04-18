@@ -33,6 +33,30 @@ Score families are intentionally separate:
 
 Legislative rows are explicit exclusions from president scoring unless a deterministic president attribution model is added later. Judicial rows can contribute only when explicit majority-justice appointment attribution metadata is present.
 
+Inside the direct headline score, the final report now also applies two explicit policy-level modifiers when they are available:
+
+- `intent_modifier`
+  - derived from curated `policies.policy_intent_category`
+  - changes interpretation, not the recorded outcome itself
+- `systemic_multiplier`
+  - derived from curated `policies.systemic_impact_category`
+  - captures durable structural or institutional effects for a smaller set of high-confidence policies
+
+Current systemic multiplier tiers are:
+
+```text
+limited           -> 0.90
+standard          -> 1.00
+strong            -> 1.15
+transformational  -> 1.30
+unclear / null    -> 1.00
+```
+
+That means two different ideas now coexist intentionally:
+
+- the direct score can include a policy-level systemic multiplier on a direct outcome
+- the separate systemic score family still remains reserved for `judicial_impact` and future explicitly indirect/systemic outcome families
+
 President comparison uses the same score-family contract. Comparison output may include `direct_normalized_score`, `systemic_normalized_score`, outcome counts, confidence labels, topic differences, and directional contrast summaries, but the direct score remains the headline comparison value.
 
 Time-based analysis uses `impact_start_date` and `impact_end_date` when they are present on unified outcomes. Open-ended rows are anchored to `impact_start_date` only; bounded ranges are distributed across yearly buckets. Report metadata may expose `score_by_year`, `cumulative_score`, `trend_direction`, and one concise interpretation line.
@@ -86,6 +110,7 @@ Black Impact Score now exposes that publicly through:
 
 - visible evidence panels that link back to Promise Tracker
 - a plain-language scoring explanation
+- a dedicated methodology page at `/research/how-black-impact-score-works`
 - `Build` and `Verify` sections with visible record, outcome, and source-reference totals
 - share links that preserve the current public report state without exposing internal review data
 
@@ -114,6 +139,7 @@ Unified outcome write paths enforce the same baseline used by the final score re
 - every new `policy_outcomes` row from canonical workflows gets `impact_score` at insert time
 - current-admin, legislative, and impact-maturation writes run post-workflow validation gates
 - intent modifiers are applied only when a current-admin outcome has deterministic related historical-policy intent
+- systemic multipliers are applied only when a scored outcome resolves to curated policy-level systemic metadata
 - legislative outcomes are materialized into `policy_outcomes` but explicitly excluded from president scoring until deterministic attribution exists
 - judicial outcomes use fractional appointment attribution and a `0.5` judicial weight when explicit majority metadata exists
 - president score rows expose a coverage-aware `display_score` and `score_confidence` label so one- or two-outcome presidents are not presented as absolute

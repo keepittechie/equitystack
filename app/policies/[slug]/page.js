@@ -406,7 +406,7 @@ export default async function PolicyDetailPage({ params }) {
 
       <TrustBar />
 
-      <section className="grid items-start gap-6 xl:grid-cols-[1.05fr_0.95fr]">
+      <section className="grid items-start gap-6 2xl:grid-cols-[1.05fr_0.95fr]">
         <PageContextBlock
           description="Policy detail pages are the core evidence layer of EquityStack. Each one is meant to answer what happened, how the record is classified, and why it matters for Black Americans."
           detail="Use this page when you want to verify a law, executive action, or court decision directly before moving into broader presidential, legislative, or historical comparisons."
@@ -452,7 +452,7 @@ export default async function PolicyDetailPage({ params }) {
         </div>
       </section>
 
-      <section className="public-two-col-rail grid gap-6 xl:grid-cols-[1.08fr_0.92fr]">
+      <section className="public-two-col-rail grid gap-6 2xl:grid-cols-[1.08fr_0.92fr]">
         <div className="space-y-5">
           <SectionIntro
             eyebrow="Plain-language summary"
@@ -547,7 +547,7 @@ export default async function PolicyDetailPage({ params }) {
         </div>
       </section>
 
-      <section className="grid items-start gap-6 xl:grid-cols-[1.08fr_0.92fr]">
+      <section className="grid items-start gap-6 2xl:grid-cols-[1.08fr_0.92fr]">
         <div className="space-y-5">
           <SectionIntro
             eyebrow="Evidence"

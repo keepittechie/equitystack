@@ -176,6 +176,14 @@ Use these read-only checks after new imports or deployments:
 
 Legislative outcomes are materialized into `policy_outcomes`, but are explicitly excluded from president scoring until a deterministic president attribution model exists. See `../docs/workflow-hardening.md`.
 
+The final score report now reads:
+
+- canonical outcome evidence from `policy_outcome_sources`
+- policy intent from `policies.policy_intent_category`
+- policy systemic metadata from `policies.systemic_impact_category` and `policies.systemic_impact_summary`
+
+For current-admin rows, intent and systemic metadata should resolve through canonical `promise_actions.related_policy_id` links. Read-side exact-title fallback still exists for a small number of legacy rows, but operators should treat those as cleanup work surfaced on `/admin/systemic-linkage`, not as the preferred linkage model.
+
 ## Manual Curation Path
 
 When `weekly-run` or `review` reports coverage gaps:

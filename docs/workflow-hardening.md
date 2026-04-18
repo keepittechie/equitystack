@@ -161,19 +161,64 @@ For current-admin outcomes, the report checks:
 policy_outcomes -> promises -> promise_actions.related_policy_id -> policies.policy_intent_category
 ```
 
-The modifier is applied only when all related classified historical policies resolve to one category. If multiple intent categories exist or no classified related policy exists, the modifier defaults to `1.0`.
+The canonical path is the explicit `promise_actions.related_policy_id` link. The score path may still use a grounded exact-title fallback for a small number of legacy rows when the action title or description clearly names one historical policy, but operators should treat that as cleanup work rather than the preferred steady state.
 
-Legislative outcomes currently default to unknown intent in president scoring because they are excluded from president totals.
+The modifier is applied only when all resolved related classified historical policies land on one category. If multiple related intent categories conflict, the report uses `mixed_or_competing -> 0.95`. If no related classified policy exists or the classification is missing, the report falls back to `unclear -> 1.0`.
+
+Legislative outcomes still do not affect president totals because they are excluded from president scoring until deterministic attribution exists.
+
+## Systemic Impact Layer
+
+The final Black Impact Score now applies a separate systemic multiplier on top of direct impact and intent.
+
+Storage is policy-level, not outcome-level:
+
+```text
+policies.systemic_impact_category
+policies.systemic_impact_summary
+```
+
+Resolved categories map to conservative multipliers:
+
+```text
+limited           -> 0.90
+standard          -> 1.00
+strong            -> 1.15
+transformational  -> 1.30
+unclear / null    -> 1.00
+```
+
+For current-admin outcomes, the report resolves systemic metadata through the same canonical relationship family used for policy intent:
+
+```text
+policy_outcomes -> promises -> promise_actions.related_policy_id -> policies.systemic_impact_category
+```
+
+For judicial outcomes, the report reads systemic metadata directly from the linked `policies` row:
+
+```text
+policy_outcomes(policy_type=judicial_impact).policy_id -> policies.id
+```
+
+This systemic multiplier does not replace the direct score. It is an explicit additional layer:
+
+```text
+ABS(impact_score) * direction_weight * confidence_multiplier * intent_modifier * systemic_multiplier * policy_type_weight
+```
+
+Rows without curated systemic metadata remain `standard / 1.0`.
 
 ## Source Handling
 
-Current-admin source curation uses:
+Canonical source linkage now uses:
 
 ```text
-promise_outcome_sources -> policy_outcomes.source_count/source_quality
+sources + policy_outcome_sources -> policy_outcomes.source_count/source_quality
 ```
 
-Legislative materialization uses official bill/action URLs from `tracked_bills` and `tracked_bill_actions` as source signals and stores them in `policy_outcomes.source_count/source_quality`.
+Current-admin source curation writes directly to `policy_outcome_sources`, then refreshes derived `policy_outcomes.source_count` and `source_quality` from that canonical join table.
+
+Legislative materialization persists official bill/action URLs as canonical `sources` rows and links them through `policy_outcome_sources`, then refreshes `policy_outcomes.source_count/source_quality`.
 
 Existing source metadata may be refreshed only when the new source signal is stronger. The workflows do not downgrade source quality or reduce source counts.
 
@@ -235,6 +280,7 @@ Workflow drift is guarded, but data completeness still depends on operator curat
 
 - curate remaining `source_count = 0` outcomes with `impact curate-sources`
 - classify remaining historical policy intent with `impact curate-policy-intent`
+- audit systemic-classified policies that are still inactive or runtime-fallback-only on `/admin/systemic-linkage`
 - define a future legislative attribution model only if the schema gains a reliable attribution field
 
 Do not use ad hoc SQL inserts into `policy_outcomes`. Use the canonical workflows so validation gates run.

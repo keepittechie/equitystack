@@ -28,6 +28,12 @@ const RESEARCH_NAV_ITEMS = [
     description: item.navDescription,
   })),
   {
+    href: "/research/how-black-impact-score-works",
+    label: "How the Score Works",
+    description:
+      "Read the public explanation of what the Black Impact Score measures, how it is calculated, and what it excludes.",
+  },
+  {
     href: "/reports/civil-rights-timeline",
     label: "Civil-Rights Timeline",
     description:
@@ -36,8 +42,8 @@ const RESEARCH_NAV_ITEMS = [
 ];
 
 const RESEARCH_HUB_ITEM = RESEARCH_NAV_ITEMS[0];
-const IMPACT_ANALYSIS_ITEMS = RESEARCH_NAV_ITEMS.slice(1, -1);
-const RESEARCH_EXTRA_ITEMS = RESEARCH_NAV_ITEMS.slice(-1);
+const IMPACT_ANALYSIS_ITEMS = RESEARCH_NAV_ITEMS.slice(1, -2);
+const RESEARCH_EXTRA_ITEMS = RESEARCH_NAV_ITEMS.slice(-2);
 
 const HEADER_UTILITY_LINKS = [
   { href: "/about", label: "About" },
@@ -59,6 +65,7 @@ const FOOTER_RESEARCH_LINKS = [
 
 const FOOTER_GUIDE_LINKS = [
   { href: "/start", label: "How to Use EquityStack" },
+  { href: "/research/how-black-impact-score-works", label: "How the Black Impact Score Works" },
   { href: "/methodology", label: "Methodology" },
   { href: "/glossary", label: "Glossary" },
   { href: "/sources", label: "Sources" },
@@ -267,7 +274,7 @@ export function PrimaryNav({ mobile = false }) {
                 </div>
                 <div className="grid gap-2">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
-                    Historical tools
+                    Reference pages
                   </p>
                   {RESEARCH_EXTRA_ITEMS.map((item) => {
                     const active = isActive(pathname, item.href);
@@ -364,7 +371,7 @@ export function PrimaryNav({ mobile = false }) {
                   </div>
                   <div className="grid gap-2">
                     <p className="px-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
-                      Historical tools
+                      Reference pages
                     </p>
                     {RESEARCH_EXTRA_ITEMS.map((item) => {
                       const active = isActive(pathname, item.href);

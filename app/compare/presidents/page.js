@@ -77,7 +77,7 @@ export default async function ComparePresidentsPage({ searchParams }) {
 
       <TrustBar />
 
-      <section className="grid items-start gap-6 xl:grid-cols-[0.92fr_1.08fr]">
+      <section className="grid items-start gap-6 2xl:grid-cols-[0.92fr_1.08fr]">
         <form action="/compare/presidents" method="GET" className="space-y-4">
           <CompareSelector
             options={data.options || []}
@@ -88,7 +88,7 @@ export default async function ComparePresidentsPage({ searchParams }) {
             Compare selected presidents
           </button>
         </form>
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-1">
+        <div className="grid gap-4 md:grid-cols-2 2xl:grid-cols-1">
           <PageContextBlock
             description="This page compares up to four presidential records using direct Impact Score first, then systemic context, outcome counts, and Confidence."
             detail="Use it to identify meaningful differences, then open each profile for trend lines, evidence footprint, and record-level detail."
@@ -137,7 +137,7 @@ export default async function ComparePresidentsPage({ searchParams }) {
             ]}
           />
 
-          <section className="grid items-start gap-6 xl:grid-cols-[1.08fr_0.92fr]">
+          <section className="grid items-start gap-6 2xl:grid-cols-[1.08fr_0.92fr]">
             <div className="space-y-5">
               <SectionIntro
                 eyebrow="Interpretation"

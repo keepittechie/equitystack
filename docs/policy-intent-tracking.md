@@ -80,10 +80,20 @@ The intent modifier is applied only when all related classified historical polic
 ```text
 equity_expanding     -> 1.1
 equity_restricting   -> 0.9
-neutral/unknown      -> 1.0
+neutral_administrative -> 1.0
+mixed_or_competing     -> 0.95
+unclear                -> 1.0
 ```
 
-If no related classified policy exists, or if multiple related intent categories conflict, the modifier remains `1.0`.
+The preferred score path is explicit canonical linkage:
+
+```text
+policy_outcomes -> promises -> promise_actions.related_policy_id -> policies.policy_intent_category
+```
+
+A small number of legacy current-admin rows may still resolve through a grounded exact-title fallback when the matching action clearly names one historical policy and the canonical relation has not been curated yet. That fallback is read-side only and should be cleaned up through operator linkage work rather than treated as the steady-state model.
+
+If no related classified policy exists, the modifier remains `unclear -> 1.0`. If multiple related intent categories conflict, the modifier becomes `mixed_or_competing -> 0.95`.
 
 Intent is never inferred during scoring. Use the manual curation workflow for new classifications:
 

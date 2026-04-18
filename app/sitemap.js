@@ -69,6 +69,7 @@ export default async function sitemap() {
     "/administrations",
     "/reports",
     "/research",
+    "/research/how-black-impact-score-works",
     "/explainers",
     "/scorecards",
     "/start",

@@ -35,6 +35,7 @@ Core public routes:
 - [`/promises`](app/promises/page.js) for the Promise Tracker
 - [`/reports`](app/reports/page.js) for curated report entry points
 - [`/reports/black-impact-score`](app/reports/black-impact-score/page.js) for the Black Impact Score system
+- [`/research/how-black-impact-score-works`](app/research/how-black-impact-score-works/page.js) for the public scoring-methodology explainer
 - [`/reports/civil-rights-timeline`](app/reports/civil-rights-timeline/page.js) for the curated civil-rights timeline
 
 The current database source of truth is:
@@ -53,7 +54,19 @@ Active Promise Tracker and operator reference docs now live in:
 
 ## Black Impact Score in Plain Language
 
-Black Impact Score is the site’s accountability layer. It takes Promise Tracker records and summarizes them into president-level score views using documented outcomes rather than campaign rhetoric alone.
+Black Impact Score is the site’s accountability layer. It summarizes documented policy outcomes into president-level score views using the current unified `policy_outcomes` model rather than campaign rhetoric alone.
+
+The current production model combines:
+
+- direct outcome impact
+- confidence from evidence coverage
+- policy intent modifiers when the related policy intent is deterministic
+- systemic impact multipliers when a policy has curated long-run structural significance
+- policy-type weighting
+
+The public methodology explainer lives at:
+
+- [`/research/how-black-impact-score-works`](app/research/how-black-impact-score-works/page.js)
 
 Primary report modes:
 
@@ -139,6 +152,10 @@ Common lower-level operator commands:
 ./python/bin/equitystack impact certify-production-data
 ./python/bin/equitystack impact validate-integrity
 ```
+
+Current operator/admin scoring-linkage visibility lives at:
+
+- [`/admin/systemic-linkage`](app/admin/systemic-linkage/page.js) for systemically classified policies that are active, inactive, runtime-fallback only, or missing canonical links
 
 The server wrapper command is `~/bin/equitystack`, which runs the same Python workflow from the deployed environment. For current-admin commands, path flags accept both python-rooted paths like `data/current_admin_batches/...` and repo-rooted paths like `python/data/current_admin_batches/...`.
 

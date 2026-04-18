@@ -146,7 +146,7 @@ export default async function ReportsPage({ searchParams }) {
 
       <TrustBar />
 
-      <section className="grid items-start gap-6 xl:grid-cols-[1.05fr_0.95fr]">
+      <section className="grid items-start gap-6 2xl:grid-cols-[1.05fr_0.95fr]">
         <PageContextBlock
           description="This page organizes EquityStack’s analytical outputs, from flagship score views to historical and category-based report paths."
           detail="Reports summarize structured policy data. They are designed to help users move from synthesis into the underlying records, sources, and methodology."
@@ -154,7 +154,7 @@ export default async function ReportsPage({ searchParams }) {
         <ScoreExplanation title="How to read report score language" />
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
+      <section className="grid gap-6 2xl:grid-cols-[1.05fr_0.95fr]">
         <CitationNote
           title="Why this hub is worth citing"
           description="The reports hub is the strongest page to share when someone needs a curated entry point into EquityStack&apos;s analysis layer. It organizes flagship reports, score interpretation, and related record pathways in one place instead of forcing readers to start with a raw table."
@@ -331,7 +331,7 @@ export default async function ReportsPage({ searchParams }) {
         </div>
       </section>
 
-      <section className="grid items-start gap-6 xl:grid-cols-2">
+      <section className="grid items-start gap-6 2xl:grid-cols-2">
         <CategoryImpactChart
           data={categoryChartData}
           title="Category impact snapshot"
@@ -348,7 +348,7 @@ export default async function ReportsPage({ searchParams }) {
         Charts reflect underlying policy data in the EquityStack database.
       </div>
 
-      <section className="public-two-col-rail grid items-start gap-6 xl:grid-cols-[1.15fr_0.85fr]">
+      <section className="public-two-col-rail grid items-start gap-6 2xl:grid-cols-[1.15fr_0.85fr]">
         <div className="space-y-5">
           <SectionIntro
             eyebrow="All reports"
@@ -357,7 +357,7 @@ export default async function ReportsPage({ searchParams }) {
           />
           <ReportCardGrid items={reports} />
         </div>
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-1">
+        <div className="grid gap-4 md:grid-cols-2 2xl:grid-cols-1">
           <MethodologyCallout description="Reports summarize. They do not replace the underlying record. Each report should send users back into policies, promises, timeline entries, and source context when they need to verify a claim." />
           <CitationNote description="When referencing an EquityStack report externally, cite the report title, EquityStack, the page URL, and your access date. Reports summarize the current structured dataset and should be read alongside underlying records and methodology." />
           <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">

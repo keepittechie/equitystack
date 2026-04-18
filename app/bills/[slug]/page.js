@@ -291,7 +291,7 @@ export default async function BillDetailPage({ params }) {
         </div>
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
+      <section className="grid gap-6 2xl:grid-cols-[0.95fr_1.05fr]">
         <SummaryPanel label="Impact panel">
           <div className="flex items-start justify-between gap-5 flex-wrap">
             <div>
@@ -327,7 +327,7 @@ export default async function BillDetailPage({ params }) {
         </div>
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[1.08fr_0.92fr]">
+      <section className="grid gap-6 2xl:grid-cols-[1.08fr_0.92fr]">
         <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6">
           <SectionIntro
             eyebrow="Why this matters"
@@ -344,7 +344,7 @@ export default async function BillDetailPage({ params }) {
         />
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[0.92fr_1.08fr]">
+      <section className="grid gap-6 2xl:grid-cols-[0.92fr_1.08fr]">
         <div className="space-y-5">
           <SectionIntro
             eyebrow="Legislative details"
@@ -484,7 +484,7 @@ export default async function BillDetailPage({ params }) {
         )}
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[1.08fr_0.92fr]">
+      <section className="grid gap-6 2xl:grid-cols-[1.08fr_0.92fr]">
         <div className="space-y-5">
           <SectionIntro
             eyebrow="Sources"

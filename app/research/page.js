@@ -90,6 +90,13 @@ const RESEARCH_PATHS = [
       "Use methodology and the source library when you need to understand how records are organized, how metrics are interpreted, and how evidence remains visible.",
     cta: "Review methods and evidence rules",
   },
+  {
+    href: "/research/how-black-impact-score-works",
+    title: "How the Black Impact Score works",
+    description:
+      "Use this page when the question is specifically how the score is built: what it measures, what it excludes, how intent and systemic impact work, and where uncertainty still matters.",
+    cta: "Read the score methodology page",
+  },
 ];
 
 const FLAGSHIP_REPORTS = [
@@ -243,6 +250,11 @@ const CONTINUE_EXPLORING = [
     href: "/methodology",
     title: "Methodology",
     description: "Review how EquityStack organizes and interprets records.",
+  },
+  {
+    href: "/research/how-black-impact-score-works",
+    title: "How the Black Impact Score Works",
+    description: "See the score formula, inclusion rules, and known limitations in one public page.",
   },
   {
     href: "/glossary",
