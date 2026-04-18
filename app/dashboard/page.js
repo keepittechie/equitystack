@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { buildPageMetadata } from "@/lib/metadata";
-import { fetchDashboardData, buildPolicySlug } from "@/lib/public-site-data";
+import { fetchDashboardData } from "@/lib/public-site-data";
 import { CategoryImpactChart, DirectionBreakdownChart, ImpactTrendChart } from "@/app/components/public/charts";
 import {
   DashboardFilterBar,
@@ -270,11 +270,7 @@ export default async function DashboardPage({ searchParams }) {
             </Link>
           </div>
           <RecentPolicyChangesTable
-            items={data.topPositivePolicies.map((item) => ({
-              ...item,
-              record_type: "Policy",
-            }))}
-            buildHref={(item) => `/policies/${buildPolicySlug(item)}`}
+            items={data.topPositivePolicies}
           />
         </div>
 
@@ -291,11 +287,7 @@ export default async function DashboardPage({ searchParams }) {
             </Link>
           </div>
           <RecentPolicyChangesTable
-            items={data.topNegativePolicies.map((item) => ({
-              ...item,
-              record_type: "Policy",
-            }))}
-            buildHref={(item) => `/policies/${buildPolicySlug(item)}`}
+            items={data.topNegativePolicies}
           />
         </div>
       </section>
@@ -314,11 +306,7 @@ export default async function DashboardPage({ searchParams }) {
             </Link>
           </div>
           <RecentPolicyChangesTable
-            items={data.topMixedPolicies.map((item) => ({
-              ...item,
-              record_type: "Policy",
-            }))}
-            buildHref={(item) => `/policies/${buildPolicySlug(item)}`}
+            items={data.topMixedPolicies}
           />
         </section>
       ) : null}
@@ -326,13 +314,7 @@ export default async function DashboardPage({ searchParams }) {
       <section className="public-two-col-rail grid items-start gap-6 xl:grid-cols-[1.1fr_0.9fr]">
         <div className="space-y-4 xl:self-start">
           <h2 className="text-2xl font-semibold text-white">Latest policy updates</h2>
-          <RecentPolicyChangesTable
-            items={data.latestPolicyUpdates.map((item) => ({
-              ...item,
-              record_type: "Policy",
-            }))}
-            buildHref={(item) => `/policies/${buildPolicySlug(item)}`}
-          />
+          <RecentPolicyChangesTable items={data.latestPolicyUpdates} />
         </div>
 
         <div className="space-y-4">

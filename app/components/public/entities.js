@@ -959,6 +959,14 @@ export function ComparisonMetricsTable({
 }
 
 export function RecentPolicyChangesTable({ items = [], buildHref }) {
+  if (!items.length) {
+    return (
+      <div className="rounded-[1.6rem] border border-dashed border-white/12 bg-white/4 p-6 text-sm leading-7 text-[var(--ink-soft)]">
+        No policy updates are available in this view yet.
+      </div>
+    );
+  }
+
   return (
     <div className="overflow-hidden rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)]">
       <div className="overflow-x-auto">
@@ -972,28 +980,49 @@ export function RecentPolicyChangesTable({ items = [], buildHref }) {
             </tr>
           </thead>
           <tbody>
-            {items.map((item, index) => (
-              <tr key={`${item.slug || item.id}-${index}`} className="border-b border-white/6 last:border-b-0">
-                <td className="px-5 py-4">
-                  {item.record_type ? (
-                    <div className="mb-2">
-                      <RecordTypeBadge label={item.record_type} />
-                    </div>
-                  ) : null}
-                  <p className="font-medium text-white">{item.title}</p>
-                  {item.summary ? <p className="mt-1 text-xs leading-6 text-[var(--ink-soft)]">{item.summary}</p> : null}
-                </td>
-                <td className="px-5 py-4 text-[var(--ink-soft)]">
-                  {formatRenderableDate(item.date) || formatRenderableDate(item.latest_action_date) || "—"}
-                </td>
-                <td className="px-5 py-4 text-[var(--ink-soft)]">{item.impact_direction || item.status || "—"}</td>
-                <td className="px-5 py-4">
-                  <Link href={buildHref(item)} className="text-[var(--accent)] hover:text-white">
-                    {`Read ${(item.record_type || "record").toLowerCase()}`}
-                  </Link>
-                </td>
-              </tr>
-            ))}
+            {items.map((item, index) => {
+              const href =
+                item.linked_record_href ||
+                item.href ||
+                (typeof buildHref === "function" ? buildHref(item) : null);
+              const linkedRecordTitle =
+                item.linked_record_title ||
+                item.linked_record ||
+                item.title ||
+                `${item.record_type || "Record"}`;
+
+              return (
+                <tr key={`${item.slug || item.id}-${index}`} className="border-b border-white/6 last:border-b-0">
+                  <td className="px-5 py-4">
+                    {item.record_type ? (
+                      <div className="mb-2">
+                        <RecordTypeBadge label={item.record_type} />
+                      </div>
+                    ) : null}
+                    <p className="font-medium text-white">{item.title}</p>
+                    {item.summary ? <p className="mt-1 text-xs leading-6 text-[var(--ink-soft)]">{item.summary}</p> : null}
+                  </td>
+                  <td className="px-5 py-4 text-[var(--ink-soft)]">
+                    {formatRenderableDate(item.date) || formatRenderableDate(item.latest_action_date) || "—"}
+                  </td>
+                  <td className="px-5 py-4 text-[var(--ink-soft)]">{item.impact_direction || item.status || "—"}</td>
+                  <td className="px-5 py-4">
+                    {href ? (
+                      <Link href={href} className="font-medium text-[var(--accent)] hover:text-white">
+                        {linkedRecordTitle}
+                      </Link>
+                    ) : (
+                      <span className="font-medium text-white">{linkedRecordTitle}</span>
+                    )}
+                    {item.linked_record_type ? (
+                      <p className="mt-1 text-xs leading-6 text-[var(--ink-muted)]">
+                        {item.linked_record_type}
+                      </p>
+                    ) : null}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
