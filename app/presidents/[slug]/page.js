@@ -521,14 +521,14 @@ export default async function PresidentProfilePage({ params }) {
         </div>
       </ProfilePanel>
 
-      <section className="public-two-col-rail grid items-start gap-6 2xl:grid-cols-[1.05fr_0.95fr]">
-        <div className="space-y-5 2xl:self-start">
-          <SectionIntro
-            eyebrow="Bill-informed signals"
-            title="Legislation linked to this presidential record"
-            description="These bill-linked inputs help connect the presidency to legislation, promises, and the wider historical record affecting Black Americans."
-          />
-          {Number(billInputs.linked_bill_count || 0) > 0 ? (
+      <ProfilePanel className="space-y-5">
+        <SectionIntro
+          eyebrow="Bill-informed signals"
+          title="Legislation linked to this presidential record"
+          description="These bill-linked inputs help connect the presidency to legislation, promises, and the wider historical record affecting Black Americans."
+        />
+        {Number(billInputs.linked_bill_count || 0) > 0 ? (
+          <>
             <div className="grid gap-4 md:grid-cols-2">
               <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
                 <h3 className="text-lg font-semibold text-white">Bill input summary</h3>
@@ -562,33 +562,30 @@ export default async function PresidentProfilePage({ params }) {
                 </div>
               </div>
             </div>
-          ) : (
-            <div className="rounded-[1.4rem] border border-dashed border-white/12 bg-white/4 p-5 text-sm leading-7 text-[var(--ink-soft)]">
-              No tracked bills currently reach this president through supported promise lineage, so no bill-informed inputs are shown yet.
+            <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+              <h3 className="text-lg font-semibold text-white">Top linked bills</h3>
+              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+                These are the strongest currently linked bills by bill-level BIS contribution within this president’s existing promise-linked legislative context.
+              </p>
+              <div className="mt-4 grid gap-3 md:grid-cols-2">
+                {(billInputs.top_linked_bills || []).length ? (
+                  billInputs.top_linked_bills.slice(0, 4).map((item) => (
+                    <LinkedBillCard key={item.slug || item.id} item={item} />
+                  ))
+                ) : (
+                  <div className="rounded-[1.1rem] border border-dashed border-white/12 bg-white/4 px-4 py-4 text-sm leading-7 text-[var(--ink-soft)] md:col-span-2">
+                    No linked bills are available to rank for this profile yet.
+                  </div>
+                )}
+              </div>
             </div>
-          )}
-        </div>
-
-        <div className="space-y-5">
-          <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
-            <h3 className="text-lg font-semibold text-white">Top linked bills</h3>
-            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-              These are the strongest currently linked bills by bill-level BIS contribution within this president’s existing promise-linked legislative context.
-            </p>
-            <div className="mt-4 grid gap-3">
-              {(billInputs.top_linked_bills || []).length ? (
-                billInputs.top_linked_bills.slice(0, 4).map((item) => (
-                  <LinkedBillCard key={item.slug || item.id} item={item} />
-                ))
-              ) : (
-                <div className="rounded-[1.1rem] border border-dashed border-white/12 bg-white/4 px-4 py-4 text-sm leading-7 text-[var(--ink-soft)]">
-                  No linked bills are available to rank for this profile yet.
-                </div>
-              )}
-            </div>
+          </>
+        ) : (
+          <div className="rounded-[1.4rem] border border-dashed border-white/12 bg-white/4 p-5 text-sm leading-7 text-[var(--ink-soft)]">
+            No tracked bills currently reach this president through supported promise lineage, so no bill-informed inputs are shown yet.
           </div>
-        </div>
-      </section>
+        )}
+      </ProfilePanel>
 
       <section className="grid items-start gap-6 2xl:grid-cols-[1.1fr_0.9fr]">
         <div className="space-y-5 2xl:self-start">
@@ -617,27 +614,25 @@ export default async function PresidentProfilePage({ params }) {
         </div>
       </section>
 
-      <section className="public-two-col-rail grid items-start gap-6 2xl:grid-cols-[1.08fr_0.92fr]">
-        <div className="space-y-5 2xl:self-start">
-          <SectionIntro
-            eyebrow="Top records"
-            title="Policies and promises shaping this record"
-            description="Open the most consequential underlying policies and promises instead of treating the presidential score as self-explanatory."
+      <ProfilePanel className="space-y-5">
+        <SectionIntro
+          eyebrow="Top records"
+          title="Policies and promises shaping this record"
+          description="Open the most consequential underlying policies and promises instead of treating the presidential score as self-explanatory."
+        />
+        {topPolicies.length ? (
+          <PresidentPolicyTable
+            items={topPolicies}
+            buildHref={(item) =>
+              item.slug ? `/promises/${item.slug}` : `/policies/${buildPolicySlug(item)}`
+            }
           />
-          {topPolicies.length ? (
-            <PresidentPolicyTable
-              items={topPolicies}
-              buildHref={(item) =>
-                item.slug ? `/promises/${item.slug}` : `/policies/${buildPolicySlug(item)}`
-              }
-            />
-          ) : (
-            <div className="rounded-[1.4rem] border border-dashed border-white/12 bg-white/4 p-5 text-sm leading-7 text-[var(--ink-soft)]">
-              No top contributing policy records are attached to this profile yet.
-            </div>
-          )}
-        </div>
-        <div className="space-y-5">
+        ) : (
+          <div className="rounded-[1.4rem] border border-dashed border-white/12 bg-white/4 p-5 text-sm leading-7 text-[var(--ink-soft)]">
+            No top contributing policy records are attached to this profile yet.
+          </div>
+        )}
+        <div className="grid gap-4 md:grid-cols-2">
           <SourceTrustPanel
             sourceCount={promiseTracker.visible_source_count}
             sourceQuality="Profile evidence references"
@@ -664,57 +659,55 @@ export default async function PresidentProfilePage({ params }) {
             linkLabel="Read score architecture"
           />
         </div>
-      </section>
+      </ProfilePanel>
 
-      <section className="public-two-col-rail grid items-start gap-6 2xl:grid-cols-[1.15fr_0.85fr]">
-        <div className="space-y-5 2xl:self-start">
-          <SectionIntro
-            eyebrow="What shaped this score"
-            title="Driver visibility"
-            description="The presidential score should be readable as a structured result, not a mystery number. These drivers show where the strongest movement came from in the available dataset."
-          />
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
-              <h3 className="text-lg font-semibold text-white">Strongest positive drivers</h3>
-              {(scoreDrivers?.strongest_positive || []).length ? (
-                <div className="mt-4 grid gap-3">
-                  {scoreDrivers.strongest_positive.map((item, index) => (
-                    <div key={`${item.slug || item.title}-${index}`} className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
-                      <p className="text-sm font-medium text-white">{item.title}</p>
-                      <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
-                        {item.topic || item.category || "Policy record"} • {item.status || item.impact_direction || "Scored record"}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="mt-4 text-sm leading-7 text-[var(--ink-soft)]">
-                  {scoreDrivers?.score_scope_note || "This score is based on available policy records in the current EquityStack dataset."}
-                </p>
-              )}
-            </div>
-            <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
-              <h3 className="text-lg font-semibold text-white">Strongest negative drivers</h3>
-              {(scoreDrivers?.strongest_negative || []).length ? (
-                <div className="mt-4 grid gap-3">
-                  {scoreDrivers.strongest_negative.map((item, index) => (
-                    <div key={`${item.slug || item.title}-${index}`} className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
-                      <p className="text-sm font-medium text-white">{item.title}</p>
-                      <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
-                        {item.topic || item.category || "Policy record"} • {item.status || item.impact_direction || "Scored record"}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="mt-4 text-sm leading-7 text-[var(--ink-soft)]">
-                  {scoreDrivers?.score_scope_note || "This score is based on available policy records in the current EquityStack dataset."}
-                </p>
-              )}
-            </div>
+      <ProfilePanel className="space-y-5">
+        <SectionIntro
+          eyebrow="What shaped this score"
+          title="Driver visibility"
+          description="The presidential score should be readable as a structured result, not a mystery number. These drivers show where the strongest movement came from in the available dataset."
+        />
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+            <h3 className="text-lg font-semibold text-white">Strongest positive drivers</h3>
+            {(scoreDrivers?.strongest_positive || []).length ? (
+              <div className="mt-4 grid gap-3">
+                {scoreDrivers.strongest_positive.map((item, index) => (
+                  <div key={`${item.slug || item.title}-${index}`} className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+                    <p className="text-sm font-medium text-white">{item.title}</p>
+                    <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
+                      {item.topic || item.category || "Policy record"} • {item.status || item.impact_direction || "Scored record"}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="mt-4 text-sm leading-7 text-[var(--ink-soft)]">
+                {scoreDrivers?.score_scope_note || "This score is based on available policy records in the current EquityStack dataset."}
+              </p>
+            )}
+          </div>
+          <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+            <h3 className="text-lg font-semibold text-white">Strongest negative drivers</h3>
+            {(scoreDrivers?.strongest_negative || []).length ? (
+              <div className="mt-4 grid gap-3">
+                {scoreDrivers.strongest_negative.map((item, index) => (
+                  <div key={`${item.slug || item.title}-${index}`} className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+                    <p className="text-sm font-medium text-white">{item.title}</p>
+                    <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
+                      {item.topic || item.category || "Policy record"} • {item.status || item.impact_direction || "Scored record"}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="mt-4 text-sm leading-7 text-[var(--ink-soft)]">
+                {scoreDrivers?.score_scope_note || "This score is based on available policy records in the current EquityStack dataset."}
+              </p>
+            )}
           </div>
         </div>
-        <div className="space-y-5">
+        <div className="grid gap-4 md:grid-cols-2">
           <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
             <h3 className="text-lg font-semibold text-white">Topic contributions</h3>
             {(scoreDrivers?.topic_drivers || []).length ? (
@@ -746,10 +739,9 @@ export default async function PresidentProfilePage({ params }) {
             </p>
           </div>
         </div>
-      </section>
+      </ProfilePanel>
 
-      <section className="public-two-col-rail grid items-start gap-6 2xl:grid-cols-[0.95fr_1.05fr]">
-        <ProfilePanel className="space-y-5 2xl:self-start">
+      <ProfilePanel className="space-y-5">
           <SectionIntro
             eyebrow="Promise tracker snapshot"
             title="Promise tracker context for this president"
@@ -796,58 +788,57 @@ export default async function PresidentProfilePage({ params }) {
               Promise outcomes provide context for how stated goals translated into documented policy action. They help explain implementation, but they are not the same thing as presidential Impact Score.
             </p>
           </div>
-        </ProfilePanel>
-        <ProfilePanel className="space-y-5">
-          <SectionIntro
-            eyebrow="Continue exploring"
-            title="Where to go next from this presidential record"
-            description="Profiles should lead naturally into compare, methodology, and underlying record detail."
-          />
-          <div className="grid gap-4">
-            {(flagshipEditorial?.priorityLinks || []).map((item) => (
-              <Link key={item.href} href={item.href} className="panel-link rounded-[1.5rem] p-5">
-                <h3 className="text-lg font-semibold text-white">{item.title}</h3>
-                <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-                  {item.description}
-                </p>
-              </Link>
-            ))}
-            <Link href="/research" className="panel-link rounded-[1.5rem] p-5">
-              <h3 className="text-lg font-semibold text-white">Return to the research hub</h3>
-              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-                Use the curated research hub when this profile opens into a larger question about civil-rights law, thematic analysis, explainers, or public methods.
-              </p>
-            </Link>
-            <Link href="/analysis/presidential-impact-on-black-americans" className="panel-link rounded-[1.5rem] p-5">
-              <h3 className="text-lg font-semibold text-white">Explore presidential impact on Black Americans</h3>
-              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-                Move into the broader synthesis page when you want to compare this presidency against the wider historical impact question rather than this profile alone.
-              </p>
-            </Link>
-            <Link href={`/compare/presidents?compare=${slug}`} className="panel-link rounded-[1.5rem] p-5">
-              <h3 className="text-lg font-semibold text-white">Compare this president</h3>
-              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-                Add other presidents to compare direct score, systemic score, topic differences, and directional contrast.
-              </p>
-            </Link>
-            <Link href="/methodology" className="panel-link rounded-[1.5rem] p-5">
-              <h3 className="text-lg font-semibold text-white">Review the methodology</h3>
-              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-                Read how low-coverage damping, confidence, evidence, and score-family separation work before drawing conclusions.
-              </p>
-            </Link>
-            <Link href="/reports/black-impact-score" className="panel-link rounded-[1.5rem] p-5">
-              <h3 className="text-lg font-semibold text-white">Open the flagship report</h3>
-              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-                Use the report view when you want broader ranking context or public-facing interpretation across presidents.
-              </p>
-            </Link>
-          </div>
-        </ProfilePanel>
-      </section>
+      </ProfilePanel>
 
-      <section className="public-two-col-rail grid items-start gap-6 2xl:grid-cols-[0.95fr_1.05fr]">
-        <ProfilePanel className="space-y-5 2xl:self-start">
+      <ProfilePanel className="space-y-5">
+        <SectionIntro
+          eyebrow="Continue exploring"
+          title="Where to go next from this presidential record"
+          description="Profiles should lead naturally into compare, methodology, and underlying record detail."
+        />
+        <div className="grid gap-4 md:grid-cols-2">
+          {(flagshipEditorial?.priorityLinks || []).map((item) => (
+            <Link key={item.href} href={item.href} className="panel-link rounded-[1.5rem] p-5">
+              <h3 className="text-lg font-semibold text-white">{item.title}</h3>
+              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+                {item.description}
+              </p>
+            </Link>
+          ))}
+          <Link href="/research" className="panel-link rounded-[1.5rem] p-5">
+            <h3 className="text-lg font-semibold text-white">Return to the research hub</h3>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+              Use the curated research hub when this profile opens into a larger question about civil-rights law, thematic analysis, explainers, or public methods.
+            </p>
+          </Link>
+          <Link href="/analysis/presidential-impact-on-black-americans" className="panel-link rounded-[1.5rem] p-5">
+            <h3 className="text-lg font-semibold text-white">Explore presidential impact on Black Americans</h3>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+              Move into the broader synthesis page when you want to compare this presidency against the wider historical impact question rather than this profile alone.
+            </p>
+          </Link>
+          <Link href={`/compare/presidents?compare=${slug}`} className="panel-link rounded-[1.5rem] p-5">
+            <h3 className="text-lg font-semibold text-white">Compare this president</h3>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+              Add other presidents to compare direct score, systemic score, topic differences, and directional contrast.
+            </p>
+          </Link>
+          <Link href="/methodology" className="panel-link rounded-[1.5rem] p-5">
+            <h3 className="text-lg font-semibold text-white">Review the methodology</h3>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+              Read how low-coverage damping, confidence, evidence, and score-family separation work before drawing conclusions.
+            </p>
+          </Link>
+          <Link href="/reports/black-impact-score" className="panel-link rounded-[1.5rem] p-5">
+            <h3 className="text-lg font-semibold text-white">Open the flagship report</h3>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+              Use the report view when you want broader ranking context or public-facing interpretation across presidents.
+            </p>
+          </Link>
+        </div>
+      </ProfilePanel>
+
+      <ProfilePanel className="space-y-5">
           <SectionIntro
             eyebrow="Timeline"
             title="Promise and policy chronology"
@@ -860,35 +851,35 @@ export default async function PresidentProfilePage({ params }) {
               No dated promise records are attached to this profile yet.
             </div>
           )}
-        </ProfilePanel>
-        <ProfilePanel className="space-y-5">
-          <SectionIntro
-            eyebrow="Related routes"
-            title="Keep researching this president through linked records"
-            description="Every presidential profile should make it easy to move from summary into promises, legislation, comparison tools, and methodology."
-          />
-          <div className="grid gap-4">
-            <Link href={`/promises/president/${slug}`} className="panel-link rounded-[1.5rem] p-5">
-              <h3 className="text-lg font-semibold text-white">Open this president&apos;s promise tracker</h3>
-              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-                Review delivered, partial, failed, and blocked promises for this presidency term in one place.
-              </p>
-            </Link>
-            <Link href={presidentPoliciesHref} className="panel-link rounded-[1.5rem] p-5">
-              <h3 className="text-lg font-semibold text-white">Browse policies under {presidentName}</h3>
-              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-                Open the policy index filtered to this president to study legislation, executive actions, and court-era context tied to this record.
-              </p>
-            </Link>
-            <Link href="/explainers" className="panel-link rounded-[1.5rem] p-5">
-              <h3 className="text-lg font-semibold text-white">Read related Black history explainers</h3>
-              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-                Use explainers when you need more historical or legal context before returning to the president, promise, or policy detail pages.
-              </p>
-            </Link>
-          </div>
-        </ProfilePanel>
-      </section>
+      </ProfilePanel>
+
+      <ProfilePanel className="space-y-5">
+        <SectionIntro
+          eyebrow="Related routes"
+          title="Keep researching this president through linked records"
+          description="Every presidential profile should make it easy to move from summary into promises, legislation, comparison tools, and methodology."
+        />
+        <div className="grid gap-4 md:grid-cols-2">
+          <Link href={`/promises/president/${slug}`} className="panel-link rounded-[1.5rem] p-5">
+            <h3 className="text-lg font-semibold text-white">Open this president&apos;s promise tracker</h3>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+              Review delivered, partial, failed, and blocked promises for this presidency term in one place.
+            </p>
+          </Link>
+          <Link href={presidentPoliciesHref} className="panel-link rounded-[1.5rem] p-5">
+            <h3 className="text-lg font-semibold text-white">Browse policies under {presidentName}</h3>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+              Open the policy index filtered to this president to study legislation, executive actions, and court-era context tied to this record.
+            </p>
+          </Link>
+          <Link href="/explainers" className="panel-link rounded-[1.5rem] p-5">
+            <h3 className="text-lg font-semibold text-white">Read related Black history explainers</h3>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+              Use explainers when you need more historical or legal context before returning to the president, promise, or policy detail pages.
+            </p>
+          </Link>
+        </div>
+      </ProfilePanel>
     </main>
   );
 }

@@ -40,6 +40,16 @@ function formatTermLabel(start, end) {
   return null;
 }
 
+function PromisePanel({ children, className = "" }) {
+  return (
+    <section
+      className={`rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6 ${className}`}
+    >
+      {children}
+    </section>
+  );
+}
+
 function flattenPromiseSources(promise) {
   const items = [];
   for (const action of promise.actions || []) {
@@ -249,26 +259,21 @@ export default async function PromiseDetailPage({ params }) {
         ].filter(Boolean)}
       />
 
-      <section className="grid gap-6 2xl:grid-cols-[1.05fr_0.95fr]">
+      <PromisePanel className="space-y-5">
         <PromiseSystemExplanation />
         <PromiseStatusLegend statuses={["Delivered", "In Progress", "Partial", "Blocked", "Failed"]} />
-      </section>
+      </PromisePanel>
 
-      <section className="grid items-start gap-6 2xl:grid-cols-[1.05fr_0.95fr]">
+      <PromisePanel className="space-y-5">
         <PageContextBlock
           description="This page is the landing point for a single promise record: the original commitment, the current status, the linked policy actions, and the evidence used to justify the classification."
           detail="Use it when you want to move from a broad question about campaign promises to Black Americans into the specific public record behind one promise."
         />
-        <div className="rounded-[1.6rem] border border-[rgba(132,247,198,0.18)] bg-[linear-gradient(145deg,rgba(14,36,33,0.72),rgba(8,14,24,0.96))] p-6">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--accent)]">
-            Why this promise matters
-          </p>
-          <h2 className="mt-4 text-2xl font-semibold text-white">Intent, follow-through, and evidence</h2>
-          <p className="mt-4 text-sm leading-7 text-[var(--ink-soft)]">
-            {buildWhyPromiseMatters(promise)}
-          </p>
-        </div>
-      </section>
+        <PageContextBlock
+          title="Why this promise matters"
+          description={buildWhyPromiseMatters(promise)}
+        />
+      </PromisePanel>
 
       <section className="grid gap-4 md:grid-cols-3">
         {guideCards.map((item) => (
@@ -285,7 +290,7 @@ export default async function PromiseDetailPage({ params }) {
         ))}
       </section>
 
-      <section className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6">
+      <PromisePanel>
         <SectionIntro
           eyebrow="Context and background"
           title="How to interpret this promise when the narrative is brief"
@@ -298,221 +303,216 @@ export default async function PromiseDetailPage({ params }) {
             </p>
           ))}
         </div>
-      </section>
+      </PromisePanel>
 
-      <section className="public-two-col-rail grid gap-6 2xl:grid-cols-[1.08fr_0.92fr]">
-        <div className="space-y-5">
-          <SectionIntro
-            eyebrow="What this means"
-            title="Status and rationale"
-            description={
-              promise.summary ||
-              "This promise record does not yet have a long-form rationale summary."
-            }
-          />
-          <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6">
-            <h2 className="text-lg font-semibold text-white">What was promised</h2>
+      <PromisePanel className="space-y-5">
+        <SectionIntro
+          eyebrow="What this means"
+          title="Status and rationale"
+          description={
+            promise.summary ||
+            "This promise record does not yet have a long-form rationale summary."
+          }
+        />
+        <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6">
+          <h2 className="text-lg font-semibold text-white">What was promised</h2>
+          <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+            {promise.promise_text || promise.summary || "No promise statement is currently available."}
+          </p>
+          {thinSummary ? (
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-              {promise.promise_text || promise.summary || "No promise statement is currently available."}
+              {buildPromiseOverview(promise)}
             </p>
-            {thinSummary ? (
-              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-                {buildPromiseOverview(promise)}
-              </p>
-            ) : null}
-            <div className="mt-6 grid gap-3 md:grid-cols-2">
-              <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
-                  Current Status
-                </p>
-                <p className="mt-2 text-lg font-medium text-white">{promise.status || "Unknown"}</p>
-              </div>
-              <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
-                  Confidence
-                </p>
-                <p className="mt-2 text-lg font-medium text-white">{promise.confidence_label || "Not yet available"}</p>
-              </div>
-              <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
-                  Linked policy actions
-                </p>
-                <p className="mt-2 text-lg font-medium text-white">{linkedPolicyCount}</p>
-              </div>
-              <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
-                  Policy Outcomes
-                </p>
-                <p className="mt-2 text-lg font-medium text-white">{policyOutcomeCount}</p>
-              </div>
-            </div>
-            <h2 className="mt-6 text-lg font-semibold text-white">What actually happened</h2>
-            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-              {promise.summary || "No status narrative is currently available."}
-            </p>
-            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-              This Promise currently has {actionCount} documented action record{actionCount === 1 ? "" : "s"} and {policyOutcomeCount} linked Policy Outcome{policyOutcomeCount === 1 ? "" : "s"} in the current EquityStack dataset.
-            </p>
-            {thinSummary ? (
-              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-                {buildPromiseComparisonNote(promise)}
-              </p>
-            ) : null}
-            <h2 className="mt-6 text-lg font-semibold text-white">Linked policy actions</h2>
-            {(promise.related_policies || []).length ? (
-              <div className="mt-3 grid gap-3">
-                {(promise.related_policies || []).slice(0, 3).map((item) => (
-                  <Link
-                    key={item.id || item.slug}
-                    href={`/policies/${buildPolicySlug(item)}`}
-                    className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4 text-sm leading-7 text-[var(--ink-soft)] hover:border-[rgba(132,247,198,0.24)]"
-                  >
-                    <span className="font-medium text-white">{item.title}</span>
-                    {item.summary ? <span className="mt-2 block">{item.summary}</span> : null}
-                  </Link>
-                ))}
-              </div>
-            ) : (
-              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-                No confirmed policy action is linked to this promise in the current EquityStack dataset.
-              </p>
-            )}
-            <h2 className="mt-6 text-lg font-semibold text-white">Why this status was assigned</h2>
-            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-              {whyStatus}
-            </p>
-            {thinRationale ? (
-              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-                The current rationale is still short, so the most reliable way to read this status is to compare the promise language with the linked policy actions, outcome evidence, and the president&apos;s broader record below.
-              </p>
-            ) : null}
-          </div>
-          {timelineItems.length ? (
-            <PromiseTimeline items={timelineItems} />
-          ) : (
-            <div className="rounded-[1.4rem] border border-dashed border-white/12 bg-white/4 p-5 text-sm leading-7 text-[var(--ink-soft)]">
-              No status history or dated action timeline is attached to this promise yet.
-            </div>
-          )}
-        </div>
-        <div className="space-y-5">
-          <SourceTrustPanel
-            sourceCount={(promise.source_summary?.action_sources || 0) + (promise.source_summary?.outcome_sources || 0)}
-            sourceQuality={promise.latest_outcome?.source_quality || "Promise evidence trail"}
-            confidenceLabel={promise.confidence_label || undefined}
-            completenessLabel={`${(promise.actions || []).length} actions / ${(promise.outcomes || []).length} outcomes`}
-            summary="Promise pages separate the statement from the underlying action and outcome evidence so users can inspect both."
-          />
-          <MethodologyCallout description="Promise grading and Black Impact Score are related but distinct. A promise can be delivered with mixed or limited downstream impact, and the site keeps those layers separate." />
-        </div>
-      </section>
-
-      <section className="grid gap-6 2xl:grid-cols-[1fr_1fr]">
-        <div className="space-y-5">
-          <SectionIntro
-            eyebrow="Evidence"
-            title="Source trail"
-            description="This list pulls together action and outcome sources linked to the promise record."
-          />
-          {evidence.length ? (
-            <EvidenceSourceList items={evidence} />
-          ) : (
-            <div className="rounded-[1.4rem] border border-dashed border-white/12 bg-white/4 p-5 text-sm leading-7 text-[var(--ink-soft)]">
-              No evidence sources are attached to this promise record yet.
-            </div>
-          )}
-        </div>
-        <div className="space-y-5">
-          <SectionIntro
-            eyebrow="Continue exploring"
-            title="Policies and context connected to this promise"
-            description="Policy links help users move from campaign or governing statements into administrative records, legislation, and broader historical context."
-          />
-          {(promise.related_policies || []).length ? (
-            <PolicyCardList
-              items={promise.related_policies || []}
-              buildHref={(item) => `/policies/${buildPolicySlug(item)}`}
-            />
-          ) : (
-            <div className="rounded-[1.4rem] border border-dashed border-white/12 bg-white/4 p-5 text-sm leading-7 text-[var(--ink-soft)]">
-              No confirmed policy action is linked to this promise in the current EquityStack dataset.
-            </div>
-          )}
-          <div className="grid gap-4">
-            {presidentPromiseHref ? (
-              <Link href={presidentPromiseHref} className="panel-link rounded-[1.4rem] p-5">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
-                  Presidency term
-                </p>
-                <h3 className="mt-3 text-lg font-semibold text-white">
-                  Read {promise.president}&apos;s full promise tracker
-                </h3>
-                <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-                  See how this promise fits into the wider record of delivered, partial, failed, and blocked promises for the same president.
-                </p>
-              </Link>
-            ) : null}
-            {presidentProfileHref ? (
-              <Link href={presidentProfileHref} className="panel-link rounded-[1.4rem] p-5">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
-                  President profile
-                </p>
-                <h3 className="mt-3 text-lg font-semibold text-white">
-                  Read {promise.president}&apos;s presidential record
-                </h3>
-                <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-                  Move from this single promise into the wider presidential profile, including score context, policy drivers, and broader historical framing.
-                </p>
-              </Link>
-            ) : null}
-            <Link href={presidentPoliciesHref} className="panel-link rounded-[1.4rem] p-5">
+          ) : null}
+          <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+            <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
               <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
-                Policy context
+                Current Status
+              </p>
+              <p className="mt-2 text-lg font-medium text-white">{promise.status || "Unknown"}</p>
+            </div>
+            <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+                Confidence
+              </p>
+              <p className="mt-2 text-lg font-medium text-white">{promise.confidence_label || "Not yet available"}</p>
+            </div>
+            <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+                Linked policy actions
+              </p>
+              <p className="mt-2 text-lg font-medium text-white">{linkedPolicyCount}</p>
+            </div>
+            <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+                Policy Outcomes
+              </p>
+              <p className="mt-2 text-lg font-medium text-white">{policyOutcomeCount}</p>
+            </div>
+          </div>
+          <h2 className="mt-6 text-lg font-semibold text-white">What actually happened</h2>
+          <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+            {promise.summary || "No status narrative is currently available."}
+          </p>
+          <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+            This Promise currently has {actionCount} documented action record{actionCount === 1 ? "" : "s"} and {policyOutcomeCount} linked Policy Outcome{policyOutcomeCount === 1 ? "" : "s"} in the current EquityStack dataset.
+          </p>
+          {thinSummary ? (
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+              {buildPromiseComparisonNote(promise)}
+            </p>
+          ) : null}
+          <h2 className="mt-6 text-lg font-semibold text-white">Linked policy actions</h2>
+          {(promise.related_policies || []).length ? (
+            <div className="mt-3 grid gap-3">
+              {(promise.related_policies || []).slice(0, 3).map((item) => (
+                <Link
+                  key={item.id || item.slug}
+                  href={`/policies/${buildPolicySlug(item)}`}
+                  className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4 text-sm leading-7 text-[var(--ink-soft)] hover:border-[rgba(132,247,198,0.24)]"
+                >
+                  <span className="font-medium text-white">{item.title}</span>
+                  {item.summary ? <span className="mt-2 block">{item.summary}</span> : null}
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+              No confirmed policy action is linked to this promise in the current EquityStack dataset.
+            </p>
+          )}
+          <h2 className="mt-6 text-lg font-semibold text-white">Why this status was assigned</h2>
+          <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+            {whyStatus}
+          </p>
+          {thinRationale ? (
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+              The current rationale is still short, so the most reliable way to read this status is to compare the promise language with the linked policy actions, outcome evidence, and the president&apos;s broader record below.
+            </p>
+          ) : null}
+        </div>
+        {timelineItems.length ? (
+          <PromiseTimeline items={timelineItems} />
+        ) : (
+          <div className="rounded-[1.4rem] border border-dashed border-white/12 bg-white/4 p-5 text-sm leading-7 text-[var(--ink-soft)]">
+            No status history or dated action timeline is attached to this promise yet.
+          </div>
+        )}
+        <SourceTrustPanel
+          sourceCount={(promise.source_summary?.action_sources || 0) + (promise.source_summary?.outcome_sources || 0)}
+          sourceQuality={promise.latest_outcome?.source_quality || "Promise evidence trail"}
+          confidenceLabel={promise.confidence_label || undefined}
+          completenessLabel={`${(promise.actions || []).length} actions / ${(promise.outcomes || []).length} outcomes`}
+          summary="Promise pages separate the statement from the underlying action and outcome evidence so users can inspect both."
+        />
+        <MethodologyCallout description="Promise grading and Black Impact Score are related but distinct. A promise can be delivered with mixed or limited downstream impact, and the site keeps those layers separate." />
+      </PromisePanel>
+
+      <section className="space-y-5">
+        <SectionIntro
+          eyebrow="Evidence"
+          title="Source trail"
+          description="This list pulls together action and outcome sources linked to the promise record."
+        />
+        {evidence.length ? (
+          <EvidenceSourceList items={evidence} />
+        ) : (
+          <div className="rounded-[1.4rem] border border-dashed border-white/12 bg-white/4 p-5 text-sm leading-7 text-[var(--ink-soft)]">
+            No evidence sources are attached to this promise record yet.
+          </div>
+        )}
+      </section>
+
+      <section className="space-y-5">
+        <SectionIntro
+          eyebrow="Continue exploring"
+          title="Policies and context connected to this promise"
+          description="Policy links help users move from campaign or governing statements into administrative records, legislation, and broader historical context."
+        />
+        {(promise.related_policies || []).length ? (
+          <PolicyCardList
+            items={promise.related_policies || []}
+            buildHref={(item) => `/policies/${buildPolicySlug(item)}`}
+          />
+        ) : (
+          <div className="rounded-[1.4rem] border border-dashed border-white/12 bg-white/4 p-5 text-sm leading-7 text-[var(--ink-soft)]">
+            No confirmed policy action is linked to this promise in the current EquityStack dataset.
+          </div>
+        )}
+        <div className="grid gap-4 md:grid-cols-2">
+          {presidentPromiseHref ? (
+            <Link href={presidentPromiseHref} className="panel-link rounded-[1.4rem] p-5">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+                Presidency term
               </p>
               <h3 className="mt-3 text-lg font-semibold text-white">
-                Browse related policy records
+                Read {promise.president}&apos;s full promise tracker
               </h3>
               <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-                Open the policy explorer to see the legislation, executive actions, and court decisions that help explain this promise record.
+                See how this promise fits into the wider record of delivered, partial, failed, and blocked promises for the same president.
               </p>
             </Link>
-            {(promise.related_explainers || []).map((item) => (
-              <Link key={item.slug} href={`/explainers/${item.slug}`} className="panel-link rounded-[1.4rem] p-5">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
-                  {item.category || "Explainer"}
-                </p>
-                <h3 className="mt-3 text-lg font-semibold text-white">{item.title}</h3>
-                <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item.summary}</p>
-              </Link>
-            ))}
-            <Link href="/reports/black-impact-score" className="panel-link rounded-[1.4rem] p-5">
+          ) : null}
+          {presidentProfileHref ? (
+            <Link href={presidentProfileHref} className="panel-link rounded-[1.4rem] p-5">
               <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
-                Related report
+                President profile
               </p>
-              <h3 className="mt-3 text-lg font-semibold text-white">Black Impact Score</h3>
+              <h3 className="mt-3 text-lg font-semibold text-white">
+                Read {promise.president}&apos;s presidential record
+              </h3>
               <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-                Read the flagship report when you want to place this promise record inside the wider presidential score and historical policy context.
+                Move from this single promise into the wider presidential profile, including score context, policy drivers, and broader historical framing.
               </p>
             </Link>
-            <Link href="/analysis/campaign-promises-to-black-americans" className="panel-link rounded-[1.4rem] p-5">
+          ) : null}
+          <Link href={presidentPoliciesHref} className="panel-link rounded-[1.4rem] p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+              Policy context
+            </p>
+            <h3 className="mt-3 text-lg font-semibold text-white">
+              Browse related policy records
+            </h3>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+              Open the policy explorer to see the legislation, executive actions, and court decisions that help explain this promise record.
+            </p>
+          </Link>
+          {(promise.related_explainers || []).map((item) => (
+            <Link key={item.slug} href={`/explainers/${item.slug}`} className="panel-link rounded-[1.4rem] p-5">
               <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
-                Thematic guide
+                {item.category || "Explainer"}
               </p>
-              <h3 className="mt-3 text-lg font-semibold text-white">Compare campaign promises and outcomes</h3>
-              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-                Use the thematic landing page when you need the broader question behind this one record: what was promised, what followed, and how those paths diverged across administrations.
-              </p>
+              <h3 className="mt-3 text-lg font-semibold text-white">{item.title}</h3>
+              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item.summary}</p>
             </Link>
-            <Link href="/research" className="panel-link rounded-[1.4rem] p-5">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
-                Research hub
-              </p>
-              <h3 className="mt-3 text-lg font-semibold text-white">Return to the curated research hub</h3>
-              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-                Move back into the wider research hub when this promise opens into a larger question about presidents, policies, reports, or historical context.
-              </p>
-            </Link>
-          </div>
+          ))}
+          <Link href="/reports/black-impact-score" className="panel-link rounded-[1.4rem] p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+              Related report
+            </p>
+            <h3 className="mt-3 text-lg font-semibold text-white">Black Impact Score</h3>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+              Read the flagship report when you want to place this promise record inside the wider presidential score and historical policy context.
+            </p>
+          </Link>
+          <Link href="/analysis/campaign-promises-to-black-americans" className="panel-link rounded-[1.4rem] p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+              Thematic guide
+            </p>
+            <h3 className="mt-3 text-lg font-semibold text-white">Compare campaign promises and outcomes</h3>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+              Use the thematic landing page when you need the broader question behind this one record: what was promised, what followed, and how those paths diverged across administrations.
+            </p>
+          </Link>
+          <Link href="/research" className="panel-link rounded-[1.4rem] p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+              Research hub
+            </p>
+            <h3 className="mt-3 text-lg font-semibold text-white">Return to the curated research hub</h3>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+              Move back into the wider research hub when this promise opens into a larger question about presidents, policies, reports, or historical context.
+            </p>
+          </Link>
         </div>
       </section>
     </main>

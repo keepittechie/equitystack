@@ -60,6 +60,16 @@ function SummaryPanel({ label, children }) {
   );
 }
 
+function BillPanel({ children, className = "" }) {
+  return (
+    <section
+      className={`rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6 ${className}`}
+    >
+      {children}
+    </section>
+  );
+}
+
 function DetailLine({ label, value }) {
   return (
     <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
@@ -291,7 +301,7 @@ export default async function BillDetailPage({ params }) {
         </div>
       </section>
 
-      <section className="grid gap-6 2xl:grid-cols-[0.95fr_1.05fr]">
+      <BillPanel className="space-y-5">
         <SummaryPanel label="Impact panel">
           <div className="flex items-start justify-between gap-5 flex-wrap">
             <div>
@@ -319,48 +329,42 @@ export default async function BillDetailPage({ params }) {
           </div>
         </SummaryPanel>
 
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           <DetailLine label="Review status" value={bill.reviewProxy} />
           <DetailLine label="Source count" value={String(bill.sourceCount || 0)} />
           <DetailLine label="Linked reform concepts" value={String(bill.linkedFutureBills.length || 0)} />
           <DetailLine label="Tracked sponsors" value={String(bill.sponsorCount || 0)} />
         </div>
-      </section>
+      </BillPanel>
 
-      <section className="grid gap-6 2xl:grid-cols-[1.08fr_0.92fr]">
-        <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6">
-          <SectionIntro
-            eyebrow="Why this matters"
-            title="Why EquityStack is surfacing this bill"
-            description="The goal here is to make the legislative layer readable: why the bill matters, what it is connected to, and how far the public record goes right now."
-          />
-          <p className="mt-5 text-sm leading-8 text-[var(--ink-soft)]">{bill.whyItMatters}</p>
-        </div>
-
+      <BillPanel className="space-y-5">
+        <SectionIntro
+          eyebrow="Why this matters"
+          title="Why EquityStack is surfacing this bill"
+          description="The goal here is to make the legislative layer readable: why the bill matters, what it is connected to, and how far the public record goes right now."
+        />
+        <p className="text-sm leading-8 text-[var(--ink-soft)]">{bill.whyItMatters}</p>
         <PageContextBlock
           title="What this page can and cannot tell you"
           description="This is a public bill detail page built from tracked bill records, actions, sponsors, and linked future-bill context already in EquityStack."
           detail="The bill BIS model is deterministic and explainable, but still limited by the public tracked-bill dataset. Missing source depth or thin legislative context can keep a bill closer to mixed or low-confidence readings."
         />
-      </section>
+      </BillPanel>
 
-      <section className="grid gap-6 2xl:grid-cols-[0.92fr_1.08fr]">
-        <div className="space-y-5">
-          <SectionIntro
-            eyebrow="Legislative details"
-            title="Current bill record"
-            description="This section stays close to the tracked legislative fields already exposed publicly."
-          />
-          <div className="grid gap-4">
-            <DetailLine label="Congress" value={bill.sessionLabel || "Not surfaced"} />
-            <DetailLine label="Chamber" value={bill.chamber || "Not surfaced"} />
-            <DetailLine label="Sponsor" value={bill.sponsor || "Not surfaced"} />
-            <DetailLine label="Jurisdiction" value={bill.jurisdiction || "Not surfaced"} />
-            <DetailLine label="Introduced" value={formatBillDate(bill.introducedDate) || "Not surfaced"} />
-            <DetailLine label="Latest action" value={bill.latestAction || "No public action text yet"} />
-          </div>
+      <BillPanel className="space-y-5">
+        <SectionIntro
+          eyebrow="Legislative details"
+          title="Current bill record"
+          description="This section stays close to the tracked legislative fields already exposed publicly."
+        />
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <DetailLine label="Congress" value={bill.sessionLabel || "Not surfaced"} />
+          <DetailLine label="Chamber" value={bill.chamber || "Not surfaced"} />
+          <DetailLine label="Sponsor" value={bill.sponsor || "Not surfaced"} />
+          <DetailLine label="Jurisdiction" value={bill.jurisdiction || "Not surfaced"} />
+          <DetailLine label="Introduced" value={formatBillDate(bill.introducedDate) || "Not surfaced"} />
+          <DetailLine label="Latest action" value={bill.latestAction || "No public action text yet"} />
         </div>
-
         <div className="space-y-5">
           <SectionIntro
             eyebrow="Timeline"
@@ -369,7 +373,7 @@ export default async function BillDetailPage({ params }) {
           />
           <PolicyTimeline items={bill.timeline} />
         </div>
-      </section>
+      </BillPanel>
 
       <section className="space-y-5">
         <SectionIntro
@@ -484,66 +488,64 @@ export default async function BillDetailPage({ params }) {
         )}
       </section>
 
-      <section className="grid gap-6 2xl:grid-cols-[1.08fr_0.92fr]">
-        <div className="space-y-5">
-          <SectionIntro
-            eyebrow="Sources"
-            title={`${bill.sourceCount} source${bill.sourceCount === 1 ? "" : "s"} linked to this bill`}
-            description="Sources come from the tracked bill record itself plus the public action-history links attached to it."
-          />
-          {bill.sources.length ? (
-            <EvidenceSourceList items={bill.sources} />
-          ) : (
-            <div className="rounded-[1.4rem] border border-dashed border-white/12 bg-white/4 p-5 text-sm leading-7 text-[var(--ink-soft)]">
-              No public source links are attached to this bill yet.
-            </div>
-          )}
-        </div>
-
-        <div className="space-y-5">
-          <MethodologyCallout
-            title="Why the bill detail page is cautious"
-            description="This page is designed to help users inspect tracked legislation without pretending the bill layer is more complete than it is. Source links, impact confidence, and the BIS breakdown stay visible so uncertainty is not hidden."
-            href="/methodology"
-            linkLabel="Open methodology"
-          />
-
-          <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
-            <h2 className="text-lg font-semibold text-white">External record</h2>
-            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-              Congress.gov remains the fastest external verification surface for the bill text, actions, and broader legislative record.
-            </p>
-            <a
-              href={bill.congressUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-4 inline-flex rounded-full border border-white/10 px-4 py-2.5 text-sm font-medium text-white hover:border-white/20 hover:bg-white/6"
-            >
-              Open Congress.gov
-            </a>
+      <section className="space-y-5">
+        <SectionIntro
+          eyebrow="Sources"
+          title={`${bill.sourceCount} source${bill.sourceCount === 1 ? "" : "s"} linked to this bill`}
+          description="Sources come from the tracked bill record itself plus the public action-history links attached to it."
+        />
+        {bill.sources.length ? (
+          <EvidenceSourceList items={bill.sources} />
+        ) : (
+          <div className="rounded-[1.4rem] border border-dashed border-white/12 bg-white/4 p-5 text-sm leading-7 text-[var(--ink-soft)]">
+            No public source links are attached to this bill yet.
           </div>
-
-          {bill.linkedLegislators.length ? (
-            <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
-              <h2 className="text-lg font-semibold text-white">Linked scorecards</h2>
-              <div className="mt-4 grid gap-3">
-                {bill.linkedLegislators.map((item) => (
-                  <Link
-                    key={item.id}
-                    href={`/scorecards/${item.id}`}
-                    className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4 hover:border-[rgba(132,247,198,0.24)]"
-                  >
-                    <p className="font-medium text-white">{item.full_name}</p>
-                    <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
-                      {[item.role, item.chamber, item.party, item.state].filter(Boolean).join(" • ")}
-                    </p>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          ) : null}
-        </div>
+        )}
       </section>
+
+      <BillPanel className="space-y-5">
+        <MethodologyCallout
+          title="Why the bill detail page is cautious"
+          description="This page is designed to help users inspect tracked legislation without pretending the bill layer is more complete than it is. Source links, impact confidence, and the BIS breakdown stay visible so uncertainty is not hidden."
+          href="/methodology"
+          linkLabel="Open methodology"
+        />
+
+        <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+          <h2 className="text-lg font-semibold text-white">External record</h2>
+          <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+            Congress.gov remains the fastest external verification surface for the bill text, actions, and broader legislative record.
+          </p>
+          <a
+            href={bill.congressUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-4 inline-flex rounded-full border border-white/10 px-4 py-2.5 text-sm font-medium text-white hover:border-white/20 hover:bg-white/6"
+          >
+            Open Congress.gov
+          </a>
+        </div>
+
+        {bill.linkedLegislators.length ? (
+          <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+            <h2 className="text-lg font-semibold text-white">Linked scorecards</h2>
+            <div className="mt-4 grid gap-3 md:grid-cols-2">
+              {bill.linkedLegislators.map((item) => (
+                <Link
+                  key={item.id}
+                  href={`/scorecards/${item.id}`}
+                  className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4 hover:border-[rgba(132,247,198,0.24)]"
+                >
+                  <p className="font-medium text-white">{item.full_name}</p>
+                  <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
+                    {[item.role, item.chamber, item.party, item.state].filter(Boolean).join(" • ")}
+                  </p>
+                </Link>
+              ))}
+            </div>
+          </div>
+        ) : null}
+      </BillPanel>
 
       <section className="space-y-5">
         <SectionIntro

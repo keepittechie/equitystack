@@ -53,6 +53,16 @@ function formatSystemicMultiplier(value) {
   return `${Number(value || 1).toFixed(2)}x`;
 }
 
+function PolicyPanel({ children, className = "" }) {
+  return (
+    <section
+      className={`rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6 ${className}`}
+    >
+      {children}
+    </section>
+  );
+}
+
 function buildSystemicImpactCard(policy) {
   if (!shouldRenderSystemicImpact(policy?.systemic_impact_category, policy?.systemic_impact_summary)) {
     return null;
@@ -406,21 +416,16 @@ export default async function PolicyDetailPage({ params }) {
 
       <TrustBar />
 
-      <section className="grid items-start gap-6 2xl:grid-cols-[1.05fr_0.95fr]">
+      <PolicyPanel className="space-y-5">
         <PageContextBlock
           description="Policy detail pages are the core evidence layer of EquityStack. Each one is meant to answer what happened, how the record is classified, and why it matters for Black Americans."
           detail="Use this page when you want to verify a law, executive action, or court decision directly before moving into broader presidential, legislative, or historical comparisons."
         />
-        <div className="rounded-[1.6rem] border border-[rgba(132,247,198,0.18)] bg-[linear-gradient(145deg,rgba(14,36,33,0.72),rgba(8,14,24,0.96))] p-6">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--accent)]">
-            Why this page matters
-          </p>
-          <h2 className="mt-4 text-2xl font-semibold text-white">Policy history with public evidence attached</h2>
-          <p className="mt-4 text-sm leading-7 text-[var(--ink-soft)]">
-            Search visitors often arrive with a broad question about civil-rights law, presidential impact, or historical harm. This page is where that question should become concrete through summary, score, sources, and related records.
-          </p>
-        </div>
-      </section>
+        <PageContextBlock
+          title="Why this page matters"
+          description="Search visitors often arrive with a broad question about civil-rights law, presidential impact, or historical harm. This page is where that question should become concrete through summary, score, sources, and related records."
+        />
+      </PolicyPanel>
 
       <section className="grid gap-4 md:grid-cols-3">
         {guideCards.map((item) => (
@@ -437,7 +442,7 @@ export default async function PolicyDetailPage({ params }) {
         ))}
       </section>
 
-      <section className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6">
+      <PolicyPanel>
         <SectionIntro
           eyebrow="Context and background"
           title="What this policy page adds beyond the headline summary"
@@ -450,15 +455,15 @@ export default async function PolicyDetailPage({ params }) {
             </p>
           ))}
         </div>
-      </section>
+      </PolicyPanel>
 
-      <section className="public-two-col-rail grid gap-6 2xl:grid-cols-[1.08fr_0.92fr]">
+      <PolicyPanel className="space-y-5">
+        <SectionIntro
+          eyebrow="Plain-language summary"
+          title="What happened and why it matters"
+          description="This page is the proof layer of the public site. It should let a reader move from score into explanation, evidence, and related records without guessing."
+        />
         <div className="space-y-5">
-          <SectionIntro
-            eyebrow="Plain-language summary"
-            title="What happened and why it matters"
-            description="This page is the proof layer of the public site. It should let a reader move from score into explanation, evidence, and related records without guessing."
-          />
           <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6">
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--accent)]">What happened</p>
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
@@ -506,9 +511,7 @@ export default async function PolicyDetailPage({ params }) {
           </div>
 
           {timeline.length ? <PolicyTimeline items={timeline} /> : null}
-        </div>
 
-        <div className="space-y-5">
           <SourceTrustPanel
             sourceCount={policy.evidence_summary?.total_sources}
             sourceQuality={policy.evidence_summary?.evidence_strength}
@@ -545,63 +548,62 @@ export default async function PolicyDetailPage({ params }) {
           />
           <MethodologyCallout description="Impact Score is a structured record-level metric. The presidential Black Impact Score is a separate aggregate model built from outcomes, confidence, and time normalization." />
         </div>
+      </PolicyPanel>
+
+      <section className="space-y-5">
+        <SectionIntro
+          eyebrow="Evidence"
+          title="Source trail"
+          description="Evidence should be visible immediately, not hidden behind a second click. Open the source list first if you want to verify the record before reading related content."
+        />
+        {policy.sources?.length ? (
+          <EvidenceSourceList items={policy.sources} />
+        ) : (
+          <div className="rounded-[1.4rem] border border-dashed border-white/12 bg-white/4 p-5 text-sm leading-7 text-[var(--ink-soft)]">
+            No evidence sources are attached to this policy record yet. Use related records or methodology for broader context.
+          </div>
+        )}
       </section>
 
-      <section className="grid items-start gap-6 2xl:grid-cols-[1.08fr_0.92fr]">
-        <div className="space-y-5">
-          <SectionIntro
-            eyebrow="Evidence"
-            title="Source trail"
-            description="Evidence should be visible immediately, not hidden behind a second click. Open the source list first if you want to verify the record before reading related content."
-          />
-          {policy.sources?.length ? (
-            <EvidenceSourceList items={policy.sources} />
-          ) : (
-            <div className="rounded-[1.4rem] border border-dashed border-white/12 bg-white/4 p-5 text-sm leading-7 text-[var(--ink-soft)]">
-              No evidence sources are attached to this policy record yet. Use related records or methodology for broader context.
-            </div>
-          )}
-        </div>
-        <div className="space-y-5">
-          <SectionIntro
-            eyebrow="Continue exploring"
-            title="Promises, explainers, reports, and research paths"
-            description="Related records make it easier to move from a single policy into campaign promises, Black history explainers, and broader presidential or administrative context."
-          />
-          {(policy.related_promises || []).length ? (
-            <PromiseResultsTable items={policy.related_promises} buildHref={(item) => `/promises/${item.slug}`} />
-          ) : (
-            <div className="rounded-[1.4rem] border border-dashed border-white/12 bg-white/4 p-5 text-sm leading-7 text-[var(--ink-soft)]">
-              No related promise records are linked to this policy yet.
-            </div>
-          )}
-          <div className="grid gap-4">
-            {(policy.related_explainers || []).map((item) => (
-              <Link key={item.slug} href={`/explainers/${item.slug}`} className="panel-link rounded-[1.4rem] p-5">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
-                  {item.category || "Explainer"}
-                </p>
-                <h3 className="mt-3 text-lg font-semibold text-white">{item.title}</h3>
-                <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item.summary}</p>
-              </Link>
-            ))}
-            <Link href="/reports/black-impact-score" className="panel-link rounded-[1.4rem] p-5">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">Related report</p>
-              <h3 className="mt-3 text-lg font-semibold text-white">Black Impact Score</h3>
-              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-                Move from this policy proof page into the flagship report when you want presidential or historical comparison context.
-              </p>
-            </Link>
-            {researchPaths.map((item) => (
-              <Link key={item.href} href={item.href} className="panel-link rounded-[1.4rem] p-5">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
-                  {item.label}
-                </p>
-                <h3 className="mt-3 text-lg font-semibold text-white">{item.title}</h3>
-                <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item.description}</p>
-              </Link>
-            ))}
+      <section className="space-y-5">
+        <SectionIntro
+          eyebrow="Continue exploring"
+          title="Promises, explainers, reports, and research paths"
+          description="Related records make it easier to move from a single policy into campaign promises, Black history explainers, and broader presidential or administrative context."
+        />
+        {(policy.related_promises || []).length ? (
+          <PromiseResultsTable items={policy.related_promises} buildHref={(item) => `/promises/${item.slug}`} />
+        ) : (
+          <div className="rounded-[1.4rem] border border-dashed border-white/12 bg-white/4 p-5 text-sm leading-7 text-[var(--ink-soft)]">
+            No related promise records are linked to this policy yet.
           </div>
+        )}
+        <div className="grid gap-4 md:grid-cols-2">
+          {(policy.related_explainers || []).map((item) => (
+            <Link key={item.slug} href={`/explainers/${item.slug}`} className="panel-link rounded-[1.4rem] p-5">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+                {item.category || "Explainer"}
+              </p>
+              <h3 className="mt-3 text-lg font-semibold text-white">{item.title}</h3>
+              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item.summary}</p>
+            </Link>
+          ))}
+          <Link href="/reports/black-impact-score" className="panel-link rounded-[1.4rem] p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">Related report</p>
+            <h3 className="mt-3 text-lg font-semibold text-white">Black Impact Score</h3>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+              Move from this policy proof page into the flagship report when you want presidential or historical comparison context.
+            </p>
+          </Link>
+          {researchPaths.map((item) => (
+            <Link key={item.href} href={item.href} className="panel-link rounded-[1.4rem] p-5">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+                {item.label}
+              </p>
+              <h3 className="mt-3 text-lg font-semibold text-white">{item.title}</h3>
+              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item.description}</p>
+            </Link>
+          ))}
         </div>
       </section>
 
