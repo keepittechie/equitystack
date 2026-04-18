@@ -124,12 +124,21 @@ export function PolicySearchBar({ defaultValue = "", action = "/policies" }) {
   );
 }
 
-export function PolicyFilterSidebar({ filters = {}, options = {}, action = "/policies" }) {
+export function PolicyFilterSidebar({
+  filters = {},
+  options = {},
+  action = "/policies",
+  layout = "stacked",
+}) {
   const fieldClass =
     "w-full rounded-xl border border-white/8 bg-white/5 px-3 py-2.5 text-sm text-white outline-none";
+  const isSplitLayout = layout === "split";
+  const formClass = isSplitLayout
+    ? "grid gap-4 rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 xl:grid-cols-2"
+    : "grid gap-4 rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5";
 
   return (
-    <form action={action} method="GET" className="grid gap-4 rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+    <form action={action} method="GET" className={formClass}>
       <div>
         <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
           Search
@@ -197,7 +206,12 @@ export function PolicyFilterSidebar({ filters = {}, options = {}, action = "/pol
         </select>
       </div>
 
-      <button type="submit" className="rounded-full bg-[var(--accent)] px-4 py-2.5 text-sm font-medium text-[#051019]">
+      <button
+        type="submit"
+        className={`rounded-full bg-[var(--accent)] px-4 py-2.5 text-sm font-medium text-[#051019] ${
+          isSplitLayout ? "xl:col-span-2" : ""
+        }`}
+      >
         Apply filters
       </button>
     </form>

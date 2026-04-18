@@ -153,7 +153,11 @@ export default async function PoliciesPage({ searchParams }) {
 
       <section className="space-y-5">
         <div className="hidden xl:block">
-          <PolicyFilterSidebar filters={resolvedSearchParams} options={data.filterOptions} />
+          <PolicyFilterSidebar
+            filters={resolvedSearchParams}
+            options={data.filterOptions}
+            layout="split"
+          />
         </div>
         <PolicyPanel className="space-y-5">
           <div className="flex flex-wrap items-center justify-between gap-4 rounded-[1.5rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
