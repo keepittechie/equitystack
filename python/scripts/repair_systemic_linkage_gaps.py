@@ -23,6 +23,39 @@ SYSTEMIC_LINKAGE_REPAIRS = [
         "alias_phrase": "Ku Klux Klan Act",
         "reason": "The promise action clearly names the classified policy but still has a NULL related_policy_id, so systemic metadata cannot flow into the active current-admin score path.",
     }
+    ,
+    {
+        "policy_id": 40,
+        "policy_title": "Shelley v. Kraemer",
+        "promise_action_id": 202,
+        "expected_action_title": "Supreme Court decides Shelley v. Kraemer",
+        "alias_phrase": "Shelley v. Kraemer",
+        "reason": "The promise action explicitly names Shelley v. Kraemer and already drives the active scoring row through runtime title matching, so the missing related_policy_id should be canonicalized.",
+    },
+    {
+        "policy_id": 6,
+        "policy_title": "Voting Rights Act of 1965",
+        "promise_action_id": 123,
+        "expected_action_title": "Johnson signs the Voting Rights Act of 1965",
+        "alias_phrase": "Voting Rights Act of 1965",
+        "reason": "The action title and description explicitly identify the Voting Rights Act of 1965, making the current runtime-only systemic linkage safe to convert into a canonical promise-action link.",
+    },
+    {
+        "policy_id": 7,
+        "policy_title": "Fair Housing Act of 1968",
+        "promise_action_id": 204,
+        "expected_action_title": "Fair Housing Act of 1968 becomes law",
+        "alias_phrase": "Fair Housing Act of 1968",
+        "reason": "The promise action directly describes enactment of the Fair Housing Act of 1968 and is a single grounded candidate, so the missing related_policy_id should be filled canonically.",
+    },
+    {
+        "policy_id": 9,
+        "policy_title": "Affordable Care Act",
+        "promise_action_id": 15,
+        "expected_action_title": "Affordable Care Act enacted",
+        "alias_phrase": "Affordable Care Act",
+        "reason": "The action title and description explicitly refer to the Affordable Care Act itself, so the active runtime-title match can be safely converted into a canonical related_policy_id link.",
+    },
 ]
 
 
