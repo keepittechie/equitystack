@@ -28,6 +28,16 @@ import {
 
 export const dynamic = "force-dynamic";
 
+function PresidentPanel({ children, className = "" }) {
+  return (
+    <section
+      className={`rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 md:p-6 ${className}`}
+    >
+      {children}
+    </section>
+  );
+}
+
 export async function generateMetadata({ searchParams }) {
   const resolvedSearchParams = (await searchParams) || {};
 
@@ -182,12 +192,14 @@ export default async function PresidentsPage({ searchParams }) {
 
       <TrustBar />
 
-      <section className="grid items-start gap-6 xl:grid-cols-[1.05fr_0.95fr]">
-        <PageContextBlock
-          description="This page ranks presidential records using the final Black Impact Score, anchored by documented policy outcomes and supported by promise and legislative context."
-          detail="Use it to answer questions like which presidents most affected Black Americans, how civil-rights policy differed across administrations, and where the current evidence base is strongest or thinnest."
-        />
-        <ScoreExplanation title="How to read presidential Impact Scores" />
+      <section className="space-y-5">
+        <PresidentPanel className="space-y-5">
+          <PageContextBlock
+            description="This page ranks presidential records using the final Black Impact Score, anchored by documented policy outcomes and supported by promise and legislative context."
+            detail="Use it to answer questions like which presidents most affected Black Americans, how civil-rights policy differed across administrations, and where the current evidence base is strongest or thinnest."
+          />
+          <ScoreExplanation title="How to read presidential Impact Scores" />
+        </PresidentPanel>
       </section>
 
       <DashboardFilterBar helpText="Filter by name, party, confidence, or score order. The goal is quick ranking scan first, then profile-level reading.">
@@ -286,8 +298,8 @@ export default async function PresidentsPage({ searchParams }) {
         ]}
       />
 
-      <section className="public-two-col-rail grid items-start gap-6 xl:grid-cols-[1.15fr_0.85fr]">
-        <div className="space-y-5 xl:self-start">
+      <section className="space-y-5">
+        <PresidentPanel className="space-y-5">
           <SectionIntro
             eyebrow="Flagship ranking"
             title="Black Impact Score ranking"
@@ -298,12 +310,14 @@ export default async function PresidentsPage({ searchParams }) {
             buildHref={(item) => `/presidents/${item.slug}`}
             title="Ranked presidential records"
           />
-        </div>
-        <div className="space-y-5">
-          <PresidentScoreMethodologyNote />
-          <CitationNote description="When referencing the presidential ranking externally, cite the page title, EquityStack, the page URL, and your access date. Treat the ranking as a structured summary of the current dataset rather than a complete historical judgment." />
+          <div className="rounded-[1.3rem] border border-white/8 bg-white/5 p-5">
+            <PresidentScoreMethodologyNote />
+          </div>
+          <div className="rounded-[1.3rem] border border-white/8 bg-white/5 p-5">
+            <CitationNote description="When referencing the presidential ranking externally, cite the page title, EquityStack, the page URL, and your access date. Treat the ranking as a structured summary of the current dataset rather than a complete historical judgment." />
+          </div>
           <MethodologyCallout description="Scores reflect measured policy impact in the EquityStack dataset, not a complete judgment of a presidency. Low-coverage presidents are visibly dampened for display so one or two outcomes do not look absolute." />
-        </div>
+        </PresidentPanel>
       </section>
 
       <section className="space-y-5">

@@ -28,6 +28,16 @@ import {
 
 export const dynamic = "force-dynamic";
 
+function PolicyPanel({ children, className = "" }) {
+  return (
+    <section
+      className={`rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 md:p-6 ${className}`}
+    >
+      {children}
+    </section>
+  );
+}
+
 export async function generateMetadata({ searchParams }) {
   const resolvedSearchParams = (await searchParams) || {};
 
@@ -125,12 +135,14 @@ export default async function PoliciesPage({ searchParams }) {
 
       <TrustBar />
 
-      <section className="grid items-start gap-6 xl:grid-cols-[1.05fr_0.95fr]">
-        <PageContextBlock
-          description="This explorer shows individual policy records, their Impact Score, Impact Direction, and evidence footprint across time."
-          detail="Use it to research civil-rights laws by president, compare executive actions and court decisions, and move from broad search intent into record-level proof."
-        />
-        <ScoreExplanation title="How to read policy Impact Scores" />
+      <section className="space-y-5">
+        <PolicyPanel className="space-y-5">
+          <PageContextBlock
+            description="This explorer shows individual policy records, their Impact Score, Impact Direction, and evidence footprint across time."
+            detail="Use it to research civil-rights laws by president, compare executive actions and court decisions, and move from broad search intent into record-level proof."
+          />
+          <ScoreExplanation title="How to read policy Impact Scores" />
+        </PolicyPanel>
       </section>
 
       <PolicySearchBar defaultValue={resolvedSearchParams.q || ""} />
@@ -139,11 +151,11 @@ export default async function PoliciesPage({ searchParams }) {
         <PolicyFilterSidebar filters={resolvedSearchParams} options={data.filterOptions} />
       </FilterDrawer>
 
-      <section className="grid items-start gap-6 xl:grid-cols-[300px_minmax(0,1fr)]">
-        <div className="hidden xl:self-start xl:block">
+      <section className="space-y-5">
+        <div className="hidden xl:block">
           <PolicyFilterSidebar filters={resolvedSearchParams} options={data.filterOptions} />
         </div>
-        <div className="space-y-5">
+        <PolicyPanel className="space-y-5">
           <div className="flex flex-wrap items-center justify-between gap-4 rounded-[1.5rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">Results</p>
@@ -180,7 +192,7 @@ export default async function PoliciesPage({ searchParams }) {
           )}
 
           <MethodologyCallout description="Impact direction, score, and source presence appear together so users can filter quickly without hiding uncertainty or incomplete classification." />
-        </div>
+        </PolicyPanel>
       </section>
     </main>
   );

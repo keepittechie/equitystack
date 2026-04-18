@@ -24,6 +24,16 @@ import {
 
 export const dynamic = "force-dynamic";
 
+function PromisePanel({ children, className = "" }) {
+  return (
+    <section
+      className={`rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 md:p-6 ${className}`}
+    >
+      {children}
+    </section>
+  );
+}
+
 export async function generateMetadata({ searchParams }) {
   const resolvedSearchParams = (await searchParams) || {};
 
@@ -118,9 +128,11 @@ export default async function PromisesPage({ searchParams }) {
         detail="Use it to research campaign promises related to Black communities, compare presidents by follow-through, and move from a statement into the linked policy history and evidence."
       />
 
-      <section className="grid items-start gap-6 xl:grid-cols-[1.05fr_0.95fr]">
-        <PromiseSystemExplanation />
-        <PromiseStatusLegend />
+      <section className="space-y-5">
+        <PromisePanel className="space-y-5">
+          <PromiseSystemExplanation />
+          <PromiseStatusLegend />
+        </PromisePanel>
       </section>
 
       <section className="grid gap-4 md:grid-cols-2">
@@ -219,17 +231,15 @@ export default async function PromisesPage({ searchParams }) {
         ]}
       />
 
-      <section className="public-two-col-rail grid items-start gap-6 xl:grid-cols-[1.1fr_0.9fr]">
-        <div className="space-y-5 xl:self-start">
+      <section className="space-y-5">
+        <PromisePanel className="space-y-5">
           <SectionIntro
             eyebrow="Results table"
             title="Searchable public promise records"
             description="Open any row for the promise statement, current rationale, linked policies, evidence, and the status history timeline."
           />
           <PromiseResultsTable items={data.items || []} buildHref={(item) => `/promises/${item.slug}`} />
-        </div>
-        <div className="space-y-5">
-          <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+          <div className="rounded-[1.3rem] border border-white/8 bg-white/5 p-5">
             <h2 className="text-lg font-semibold text-white">Promise Tracker interpretation</h2>
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
               Promise Status shows what happened to a documented commitment. Linked policy action and Policy Outcomes show whether that commitment produced visible implementation in the current EquityStack dataset.
@@ -250,7 +260,7 @@ export default async function PromisesPage({ searchParams }) {
             }))}
             buildHref={(item) => `/promises/${item.slug}`}
           />
-        </div>
+        </PromisePanel>
       </section>
     </main>
   );

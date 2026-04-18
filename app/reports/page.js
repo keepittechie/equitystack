@@ -31,6 +31,16 @@ import {
 
 export const dynamic = "force-dynamic";
 
+function ReportPanel({ children, className = "" }) {
+  return (
+    <section
+      className={`rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 md:p-6 ${className}`}
+    >
+      {children}
+    </section>
+  );
+}
+
 export async function generateMetadata({ searchParams }) {
   const resolvedSearchParams = (await searchParams) || {};
 
@@ -146,20 +156,23 @@ export default async function ReportsPage({ searchParams }) {
 
       <TrustBar />
 
-      <section className="grid items-start gap-6 2xl:grid-cols-[1.05fr_0.95fr]">
-        <PageContextBlock
-          description="This page organizes EquityStack’s analytical outputs, from flagship score views to historical and category-based report paths."
-          detail="Reports summarize structured policy data. They are designed to help users move from synthesis into the underlying records, sources, and methodology."
-        />
-        <ScoreExplanation title="How to read report score language" />
+      <section className="space-y-5">
+        <ReportPanel className="space-y-5">
+          <PageContextBlock
+            description="This page organizes EquityStack’s analytical outputs, from flagship score views to historical and category-based report paths."
+            detail="Reports summarize structured policy data. They are designed to help users move from synthesis into the underlying records, sources, and methodology."
+          />
+          <ScoreExplanation title="How to read report score language" />
+        </ReportPanel>
       </section>
 
-      <section className="grid gap-6 2xl:grid-cols-[1.05fr_0.95fr]">
-        <CitationNote
-          title="Why this hub is worth citing"
-          description="The reports hub is the strongest page to share when someone needs a curated entry point into EquityStack&apos;s analysis layer. It organizes flagship reports, score interpretation, and related record pathways in one place instead of forcing readers to start with a raw table."
-        />
-        <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6">
+      <section className="space-y-5">
+        <ReportPanel className="space-y-5">
+          <CitationNote
+            title="Why this hub is worth citing"
+            description="The reports hub is the strongest page to share when someone needs a curated entry point into EquityStack&apos;s analysis layer. It organizes flagship reports, score interpretation, and related record pathways in one place instead of forcing readers to start with a raw table."
+          />
+          <div className="rounded-[1.3rem] border border-white/8 bg-white/5 p-5">
           <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--accent)]">
             Best external use cases
           </p>
@@ -175,7 +188,8 @@ export default async function ReportsPage({ searchParams }) {
               Use the flagship reports below when you need the most shareable pages for historical comparison, score context, or timeline framing.
             </div>
           </div>
-        </div>
+          </div>
+        </ReportPanel>
       </section>
 
       <DashboardFilterBar helpText="Browse reports by category or keyword. Flagship reports stay visible, but the hub is designed to move you into the right analysis path fast.">
@@ -348,25 +362,25 @@ export default async function ReportsPage({ searchParams }) {
         Charts reflect underlying policy data in the EquityStack database.
       </div>
 
-      <section className="public-two-col-rail grid items-start gap-6 2xl:grid-cols-[1.15fr_0.85fr]">
-        <div className="space-y-5">
+      <section className="space-y-5">
+        <ReportPanel className="space-y-5">
           <SectionIntro
             eyebrow="All reports"
             title={`${reports.length} reports currently visible`}
             description="Use report cards as the jump layer into deeper analysis of presidents, legislation, civil-rights policy, and historical policy impact."
           />
           <ReportCardGrid items={reports} />
-        </div>
-        <div className="grid gap-4 md:grid-cols-2 2xl:grid-cols-1">
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           <MethodologyCallout description="Reports summarize. They do not replace the underlying record. Each report should send users back into policies, promises, timeline entries, and source context when they need to verify a claim." />
           <CitationNote description="When referencing an EquityStack report externally, cite the report title, EquityStack, the page URL, and your access date. Reports summarize the current structured dataset and should be read alongside underlying records and methodology." />
-          <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+          <div className="rounded-[1.3rem] border border-white/8 bg-white/5 p-5">
             <h2 className="text-lg font-semibold text-white">About these reports</h2>
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
               Reports are generated from structured policy data in EquityStack. They are not opinion pieces. Each report aggregates policy-level analysis, evidence, and score context into a readable public summary.
             </p>
           </div>
-        </div>
+          </div>
+        </ReportPanel>
       </section>
 
       <section className="space-y-5">

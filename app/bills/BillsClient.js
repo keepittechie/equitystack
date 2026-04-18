@@ -17,6 +17,16 @@ import { formatBillDate } from "@/lib/public-bills";
 const FILTER_FIELD_CLASS =
   "min-w-0 rounded-xl border border-white/8 bg-white/5 px-3 py-2.5 text-sm text-white outline-none";
 
+function BillsPanel({ children, className = "" }) {
+  return (
+    <section
+      className={`rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 md:p-6 ${className}`}
+    >
+      {children}
+    </section>
+  );
+}
+
 function getBillScoreTone(direction) {
   if (direction === "Positive") {
     return "positive";
@@ -505,16 +515,18 @@ export default function BillsClient({ bills }) {
         )}
       </section>
 
-      <section className="grid items-start gap-6 xl:grid-cols-[1.1fr_0.9fr]">
-        <PageContextBlock
-          title="How to read this bill layer"
-          description="The public bill cards are built from tracked-bill records already linked into EquityStack’s legislative dataset."
-          detail="Use this page as a search-friendly entry point for current legislation affecting Black Americans, then open the bill detail page for legislative history, linked promises, related presidents, and source-backed context."
-        />
-        <MethodologyCallout
-          title="Why the score is marked estimated"
-          description="EquityStack now computes a structured bill-level BIS from the public tracked-bill dataset. The score is explainable and deterministic, but it remains bounded by the current depth of publicly surfaced sources, actions, and linked reform context."
-        />
+      <section className="space-y-5">
+        <BillsPanel className="space-y-5">
+          <PageContextBlock
+            title="How to read this bill layer"
+            description="The public bill cards are built from tracked-bill records already linked into EquityStack’s legislative dataset."
+            detail="Use this page as a search-friendly entry point for current legislation affecting Black Americans, then open the bill detail page for legislative history, linked promises, related presidents, and source-backed context."
+          />
+          <MethodologyCallout
+            title="Why the score is marked estimated"
+            description="EquityStack now computes a structured bill-level BIS from the public tracked-bill dataset. The score is explainable and deterministic, but it remains bounded by the current depth of publicly surfaced sources, actions, and linked reform context."
+          />
+        </BillsPanel>
       </section>
     </main>
   );
