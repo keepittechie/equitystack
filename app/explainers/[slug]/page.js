@@ -35,6 +35,16 @@ import {
 
 export const dynamic = "force-dynamic";
 
+function ExplainerPanel({ children, className = "" }) {
+  return (
+    <section
+      className={`rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 md:p-6 ${className}`}
+    >
+      {children}
+    </section>
+  );
+}
+
 function buildStructuredSectionTitle(title) {
   const map = {
     "Common claim": "Claim or misconception",
@@ -390,8 +400,8 @@ export default async function ExplainerDetailPage({ params }) {
         />
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
-        <div className="space-y-5">
+      <section className="space-y-5">
+        <ExplainerPanel className="space-y-5">
           <SectionIntro
             eyebrow={editorial.lens || "Read this for"}
             title="What this explainer helps clarify"
@@ -410,8 +420,8 @@ export default async function ExplainerDetailPage({ params }) {
               </div>
             ))}
           </div>
-        </div>
-        <MethodologyCallout description={buildPageMethodNote()} />
+          <MethodologyCallout description={buildPageMethodNote()} />
+        </ExplainerPanel>
       </section>
 
       {flagshipCards.length ? (
@@ -481,10 +491,10 @@ export default async function ExplainerDetailPage({ params }) {
         </section>
       ) : null}
 
-      <section className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
-        <div className="space-y-5">
+      <section className="space-y-5">
+        <ExplainerPanel className="space-y-5">
           {explainer.intro_text ? (
-            <article className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6">
+            <article className="rounded-[1.3rem] border border-white/8 bg-white/5 p-5">
               <h2 className="text-2xl font-semibold text-white">Historical framing</h2>
               <p className="mt-4 whitespace-pre-line text-sm leading-8 text-[var(--ink-soft)]">
                 {explainer.intro_text}
@@ -495,7 +505,7 @@ export default async function ExplainerDetailPage({ params }) {
           {(explainer.structured_sections || []).map((section) => (
             <article
               key={section.title}
-              className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6"
+              className="rounded-[1.3rem] border border-white/8 bg-white/5 p-5"
             >
               <h2 className="text-2xl font-semibold text-white">
                 {buildStructuredSectionTitle(section.title)}
@@ -505,10 +515,8 @@ export default async function ExplainerDetailPage({ params }) {
               </p>
             </article>
           ))}
-        </div>
 
-        <div className="space-y-5">
-          <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6">
+          <div className="rounded-[1.3rem] border border-white/8 bg-white/5 p-5">
             <h2 className="text-xl font-semibold text-white">Connected records on this page</h2>
             <div className="mt-4 grid gap-3 text-sm leading-7 text-[var(--ink-soft)]">
               <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
@@ -523,10 +531,10 @@ export default async function ExplainerDetailPage({ params }) {
             </div>
           </div>
 
-          <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6">
+          <div className="rounded-[1.3rem] border border-white/8 bg-white/5 p-5">
             <h2 className="text-xl font-semibold text-white">How to use this page well</h2>
             <div className="mt-4 grid gap-3">
-              {genericResourceLinks.map((item) => (
+              {genericResourceLinks.slice(0, 3).map((item) => (
                 <Link key={item.href} href={item.href} className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4 hover:border-[rgba(132,247,198,0.24)]">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
                     {item.eyebrow}
@@ -537,7 +545,7 @@ export default async function ExplainerDetailPage({ params }) {
               ))}
             </div>
           </div>
-        </div>
+        </ExplainerPanel>
       </section>
 
       <section className="space-y-5">
@@ -555,13 +563,13 @@ export default async function ExplainerDetailPage({ params }) {
         )}
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
-        <div className="space-y-5">
-          <SectionIntro
-            eyebrow="Evidence"
-            title="Sources and verification"
-            description="The explainer layer should never hide the source layer. Use these citations to check the narrative against the record."
-          />
+      <section className="space-y-5">
+        <SectionIntro
+          eyebrow="Evidence"
+          title="Sources and verification"
+          description="The explainer layer should never hide the source layer. Use these citations to check the narrative against the record."
+        />
+        <ExplainerPanel className="space-y-5">
           {explainer.sources?.length ? (
             <EvidenceSourceList items={explainer.sources} />
           ) : (
@@ -569,9 +577,6 @@ export default async function ExplainerDetailPage({ params }) {
               No structured explainer sources are attached yet.
             </div>
           )}
-        </div>
-
-        <div className="space-y-5">
           <SectionIntro
             eyebrow="Related promises"
             title="Promise records tied to this topic"
@@ -587,12 +592,12 @@ export default async function ExplainerDetailPage({ params }) {
               No related promise records were attached to this explainer.
             </div>
           )}
-        </div>
+        </ExplainerPanel>
       </section>
 
       {(relatedFutureBills.length || connectedPresidents.length) ? (
-        <section className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
-          <div className="space-y-5">
+        <section className="space-y-5">
+          <ExplainerPanel className="space-y-5">
             <SectionIntro
               eyebrow="Bills and proposals"
               title="Legislation and reform context linked from this explainer"
@@ -609,9 +614,6 @@ export default async function ExplainerDetailPage({ params }) {
                 No reform-proposal or future-bill records are attached to this explainer yet.
               </div>
             )}
-          </div>
-
-          <div className="space-y-5">
             <SectionIntro
               eyebrow="Related presidents"
               title="Presidents connected through the linked record"
@@ -641,17 +643,17 @@ export default async function ExplainerDetailPage({ params }) {
                 No presidency-specific promise links are attached to this explainer yet.
               </div>
             )}
-          </div>
+          </ExplainerPanel>
         </section>
       ) : null}
 
-      <section className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
-        <div className="space-y-5">
-          <SectionIntro
-            eyebrow="Related policies"
-            title="Policy records linked from this topic"
-            description="These records are usually the fastest route from narrative framing into the underlying policy evidence."
-          />
+      <section className="space-y-5">
+        <SectionIntro
+          eyebrow="Related policies"
+          title="Policy records linked from this topic"
+          description="These records are usually the fastest route from narrative framing into the underlying policy evidence."
+        />
+        <ExplainerPanel className="space-y-5">
           {relatedPolicies.length ? (
             <div className="grid gap-3">
               {relatedPolicies.map((item) => (
@@ -677,16 +679,13 @@ export default async function ExplainerDetailPage({ params }) {
               No linked policy records are attached to this explainer yet.
             </div>
           )}
-        </div>
-
-        <div className="space-y-5">
           <SectionIntro
             eyebrow="Keep reading"
             title="Related explainers"
             description="Use related explainers when you need adjacent context instead of reopening the same topic from scratch."
           />
           <ExplainerIndexGrid items={relatedExplainers} />
-        </div>
+        </ExplainerPanel>
       </section>
 
       <section className="space-y-5">

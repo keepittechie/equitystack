@@ -18,6 +18,16 @@ import {
 
 export const dynamic = "force-dynamic";
 
+function ExplainerPanel({ children, className = "" }) {
+  return (
+    <section
+      className={`rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 md:p-6 ${className}`}
+    >
+      {children}
+    </section>
+  );
+}
+
 export async function generateMetadata({ searchParams }) {
   const resolvedSearchParams = (await searchParams) || {};
 
@@ -173,18 +183,16 @@ export default async function ExplainersPage({ searchParams }) {
         ]}
       />
 
-      <section className="grid items-start gap-6 md:grid-cols-2 xl:grid-cols-[1.15fr_0.85fr]">
-        <div className="space-y-5">
+      <section className="space-y-5">
+        <ExplainerPanel className="space-y-5">
           <SectionIntro
             eyebrow="Library"
             title="Browse the explainer archive"
             description="Each explainer should make the next step obvious: open the linked policy, promise, report, or source page rather than stopping at narrative alone."
           />
           <ExplainerIndexGrid items={explainers} />
-        </div>
-        <div className="space-y-5">
           <MethodologyCallout description="Explainers help interpret the public record, but the evidence hierarchy still matters. Use them as context pages that route you into primary records and linked sources." />
-          <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+          <div className="rounded-[1.3rem] border border-white/8 bg-white/5 p-5">
             <h2 className="text-lg font-semibold text-white">How to use explainers</h2>
             <div className="mt-4 grid gap-3 text-sm leading-7 text-[var(--ink-soft)]">
               <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
@@ -198,7 +206,7 @@ export default async function ExplainersPage({ searchParams }) {
               </div>
             </div>
           </div>
-        </div>
+        </ExplainerPanel>
       </section>
     </main>
   );
