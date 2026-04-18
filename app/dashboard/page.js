@@ -420,64 +420,74 @@ export default async function DashboardPage({ searchParams }) {
         </DashboardPanel>
       ) : null}
 
-      <section className="grid gap-6 2xl:grid-cols-[minmax(0,1.1fr)_minmax(360px,0.9fr)]">
-        <DashboardPanel className="space-y-5 xl:self-start">
-          <DashboardPanelHeader
-            title="Latest policy updates"
-            description="The most recent visible outcome records, kept separate from the ranked strongest-positive and strongest-negative lists."
-          />
-          <RecentPolicyChangesTable items={data.latestPolicyUpdates} />
-        </DashboardPanel>
+      <DashboardPanel className="space-y-5">
+        <DashboardPanelHeader
+          title="Latest policy updates"
+          description="The most recent visible outcome records, kept separate from the ranked strongest-positive and strongest-negative lists."
+        />
+        <RecentPolicyChangesTable items={data.latestPolicyUpdates} />
+      </DashboardPanel>
 
-        <DashboardPanel className="space-y-5">
-          <DashboardPanelHeader
-            title="Promise Tracker Overview"
-            description="Promise tracking matters because it shows what was promised, what action followed, and whether that produced visible policy outcomes in the current dataset."
-          />
-          <div className="grid gap-3 sm:grid-cols-2">
-            <div className="rounded-[1.2rem] border border-white/8 bg-white/5 p-4">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
-                Delivered
-              </p>
-              <p className="mt-2 text-2xl font-semibold text-white">
-                {promiseStatusCounts.Delivered || 0}
-              </p>
-            </div>
-            <div className="rounded-[1.2rem] border border-white/8 bg-white/5 p-4">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
-                Partial
-              </p>
-              <p className="mt-2 text-2xl font-semibold text-white">
-                {promiseStatusCounts.Partial || 0}
-              </p>
-            </div>
-            <div className="rounded-[1.2rem] border border-white/8 bg-white/5 p-4">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
-                In Progress
-              </p>
-              <p className="mt-2 text-2xl font-semibold text-white">
-                {promiseStatusCounts["In Progress"] || 0}
-              </p>
-            </div>
-            <div className="rounded-[1.2rem] border border-white/8 bg-white/5 p-4">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
-                Blocked
-              </p>
-              <p className="mt-2 text-2xl font-semibold text-white">
-                {promiseStatusCounts.Blocked || 0}
-              </p>
-            </div>
-            <div className="rounded-[1.2rem] border border-white/8 bg-white/5 p-4 sm:col-span-2">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
-                Failed
-              </p>
-              <p className="mt-2 text-2xl font-semibold text-white">
-                {promiseStatusCounts.Failed || 0}
-              </p>
-            </div>
+      <DashboardPanel className="space-y-6">
+        <DashboardPanelHeader
+          title="Promise Tracker Overview"
+          description="Promise tracking matters because it shows what was promised, what action followed, and whether that produced visible policy outcomes in the current dataset."
+          action={
+            <Link href="/promises" className="public-button-secondary">
+              Open the full promise tracker
+            </Link>
+          }
+        />
+
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+          <div className="rounded-[1.2rem] border border-white/8 bg-white/5 p-4">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+              Delivered
+            </p>
+            <p className="mt-2 text-2xl font-semibold text-white">
+              {promiseStatusCounts.Delivered || 0}
+            </p>
           </div>
+          <div className="rounded-[1.2rem] border border-white/8 bg-white/5 p-4">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+              Partial
+            </p>
+            <p className="mt-2 text-2xl font-semibold text-white">
+              {promiseStatusCounts.Partial || 0}
+            </p>
+          </div>
+          <div className="rounded-[1.2rem] border border-white/8 bg-white/5 p-4">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+              In Progress
+            </p>
+            <p className="mt-2 text-2xl font-semibold text-white">
+              {promiseStatusCounts["In Progress"] || 0}
+            </p>
+          </div>
+          <div className="rounded-[1.2rem] border border-white/8 bg-white/5 p-4">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+              Blocked
+            </p>
+            <p className="mt-2 text-2xl font-semibold text-white">
+              {promiseStatusCounts.Blocked || 0}
+            </p>
+          </div>
+          <div className="rounded-[1.2rem] border border-white/8 bg-white/5 p-4 sm:col-span-2 xl:col-span-1">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+              Failed
+            </p>
+            <p className="mt-2 text-2xl font-semibold text-white">
+              {promiseStatusCounts.Failed || 0}
+            </p>
+          </div>
+        </div>
+
+        <section className="grid gap-6 2xl:grid-cols-[minmax(0,1.1fr)_minmax(320px,0.9fr)]">
           <PromiseSystemExplanation />
           <PromiseStatusLegend />
+        </section>
+
+        <section className="grid gap-6 2xl:grid-cols-2">
           <div className="space-y-4">
             <div>
               <h3 className="text-lg font-semibold text-white">
@@ -499,17 +509,25 @@ export default async function DashboardPage({ searchParams }) {
               buildHref={(item) => `/promises/${item.slug}`}
             />
           </div>
-          <PromiseResultsTable
-            items={(data.promiseSnapshot.items || []).slice(0, 6)}
-            buildHref={(item) => `/promises/${item.slug}`}
-          />
-          <div className="flex flex-wrap gap-2">
-            <Link href="/promises" className="public-button-secondary">
-              Open the full promise tracker
-            </Link>
+
+          <div className="space-y-4">
+            <div>
+              <h3 className="text-lg font-semibold text-white">
+                Current filtered promises
+              </h3>
+              <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
+                This table follows the dashboard filter bar, so users can narrow
+                the active promise slice without losing the sitewide score and
+                coverage context above.
+              </p>
+            </div>
+            <PromiseResultsTable
+              items={(data.promiseSnapshot.items || []).slice(0, 6)}
+              buildHref={(item) => `/promises/${item.slug}`}
+            />
           </div>
-        </DashboardPanel>
-      </section>
+        </section>
+      </DashboardPanel>
 
       <section className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6">
         <h2 className="text-2xl font-semibold text-white">How to read this</h2>
