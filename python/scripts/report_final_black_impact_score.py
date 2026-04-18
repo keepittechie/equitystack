@@ -30,7 +30,7 @@ INTENT_MODIFIERS = {
     "equity_expanding": 1.1,
     "equity_restricting": 0.9,
     "neutral_administrative": 1.0,
-    "mixed_or_competing": 1.0,
+    "mixed_or_competing": 0.95,
     "unclear": 1.0,
     None: 1.0,
 }
@@ -144,12 +144,12 @@ def normalize_direction(value: Any) -> str | None:
     return None
 
 
-def normalize_intent(value: Any) -> str | None:
+def normalize_intent(value: Any) -> str:
     text = normalize_nullable_text(value)
     if text is None:
-        return None
+        return "unclear"
     normalized = text.lower()
-    return normalized if normalized in INTENT_MODIFIERS else None
+    return normalized if normalized in INTENT_MODIFIERS else "unclear"
 
 
 def parse_json_value(value: Any) -> Any:
@@ -346,8 +346,8 @@ def build_policy_outcomes_sql(policy_outcomes_columns: set[str]) -> str:
           END AS policy_title,
           CASE
             WHEN po.policy_type = 'current_admin' THEN related_intent.policy_intent_category
-            WHEN po.policy_type = 'judicial_impact' THEN jp.policy_intent_category
-            ELSE NULL
+            WHEN po.policy_type = 'judicial_impact' THEN COALESCE(jp.policy_intent_category, 'unclear')
+            ELSE 'unclear'
           END AS policy_intent_category,
           CASE
             WHEN po.policy_type = 'current_admin' THEN related_intent.related_policy_intent_policy_count
@@ -371,18 +371,40 @@ def build_policy_outcomes_sql(policy_outcomes_columns: set[str]) -> str:
          AND jp.id = po.policy_id
         LEFT JOIN (
           SELECT
-            pa.promise_id,
+            pr.id AS promise_id,
             CASE
-              WHEN COUNT(DISTINCT pol.policy_intent_category) = 1 THEN MAX(pol.policy_intent_category)
-              ELSE NULL
+              WHEN COUNT(DISTINCT matched.policy_intent_category) = 0 THEN 'unclear'
+              WHEN COUNT(DISTINCT matched.policy_intent_category) = 1 THEN MAX(matched.policy_intent_category)
+              ELSE 'mixed_or_competing'
             END AS policy_intent_category,
-            COUNT(DISTINCT pol.id) AS related_policy_intent_policy_count,
-            COUNT(DISTINCT pol.policy_intent_category) AS related_policy_intent_category_count
-          FROM promise_actions pa
-          JOIN policies pol
-            ON pol.id = pa.related_policy_id
-           AND pol.policy_intent_category IS NOT NULL
-          GROUP BY pa.promise_id
+            COUNT(DISTINCT matched.policy_id) AS related_policy_intent_policy_count,
+            COUNT(DISTINCT matched.policy_intent_category) AS related_policy_intent_category_count
+          FROM promises pr
+          LEFT JOIN (
+            SELECT DISTINCT
+              pa.promise_id,
+              pol.id AS policy_id,
+              pol.policy_intent_category
+            FROM promise_actions pa
+            JOIN policies pol
+              ON pol.id = pa.related_policy_id
+             AND pol.policy_intent_category IS NOT NULL
+            UNION DISTINCT
+            SELECT DISTINCT
+              pa.promise_id,
+              pol.id AS policy_id,
+              pol.policy_intent_category
+            FROM promise_actions pa
+            JOIN policies pol
+              ON pa.related_policy_id IS NULL
+             AND pol.policy_intent_category IS NOT NULL
+             AND (
+               CONVERT(pa.title USING utf8mb4) COLLATE utf8mb4_unicode_ci LIKE CONCAT('%', CONVERT(pol.title USING utf8mb4) COLLATE utf8mb4_unicode_ci, '%')
+               OR CONVERT(pa.description USING utf8mb4) COLLATE utf8mb4_unicode_ci LIKE CONCAT('%', CONVERT(pol.title USING utf8mb4) COLLATE utf8mb4_unicode_ci, '%')
+             )
+          ) matched
+            ON matched.promise_id = pr.id
+          GROUP BY pr.id
         ) related_intent
           ON po.policy_type = 'current_admin'
          AND related_intent.promise_id = po.policy_id
@@ -578,7 +600,7 @@ def add_contribution_to_family(bucket: dict[str, Any], contribution: dict[str, A
     bucket["confidence_total"] += contribution["confidence_multiplier"]
     bucket["source_quality_counts"][contribution.get("source_quality") or "unknown"] += 1
     bucket["policy_type_counts"][contribution.get("policy_type") or "unknown"] += 1
-    bucket["intent_modifier_counts"][contribution.get("policy_intent_category") or "unknown"] += 1
+    bucket["intent_modifier_counts"][contribution.get("policy_intent_category") or "unclear"] += 1
     bucket["contributions"].append(contribution)
 
 
@@ -760,7 +782,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     president_scores, unassigned = aggregate_scores(contributions)
     duplicate_ids = duplicate_outcome_ids(contributions)
     policy_type_counts = Counter(row.get("policy_type") or "unknown" for row in contributions)
-    intent_modifier_counts = Counter(row.get("policy_intent_category") or "unknown" for row in contributions)
+    intent_modifier_counts = Counter(row.get("policy_intent_category") or "unclear" for row in contributions)
     warnings = []
     if not has_impact_score:
         warnings.append(
@@ -804,7 +826,8 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
             "intent_modifiers": {
                 "equity_expanding": 1.1,
                 "equity_restricting": 0.9,
-                "neutral_or_unknown": 1.0,
+                "mixed_or_competing": 0.95,
+                "neutral_or_unclear": 1.0,
             },
             "policy_type_weights": POLICY_TYPE_WEIGHTS,
             "judicial_attribution": {
@@ -826,7 +849,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         },
         "join_contract": {
             "current_admin": "policy_outcomes.policy_id -> promises.id -> presidents.id",
-            "intent_modifier": "current_admin promise actions may point to historical policies through promise_actions.related_policy_id; intent modifier is applied only when all related historical policies with intent have one deterministic category",
+            "intent_modifier": "current_admin outcomes resolve policy intent at runtime from linked promise_actions.related_policy_id records and exact policy-title mentions already present in promise action text. Missing links fall back to neutral unclear intent, and competing linked categories resolve to mixed_or_competing.",
             "legislative": "policy_outcomes.policy_id -> tracked_bills.id; no president attribution is available in current schema, so rows are explicitly excluded with excluded_from_president_score=true until attribution exists",
             "judicial_impact": "policy_outcomes.policy_id -> policies.id. President attribution is allowed only through explicit judicial_attribution or majority_justices metadata that maps justices to appointing presidents.",
             "historical_policies": "Historical policies are not stored as policy_outcomes rows in production, so they are not counted in this unified-outcome report.",
