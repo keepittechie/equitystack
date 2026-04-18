@@ -39,7 +39,7 @@ function pct(value) {
 function DashboardPanel({ children, className = "" }) {
   return (
     <section
-      className={`rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 md:p-6 ${className}`}
+      className={`rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-4 md:p-5 ${className}`}
     >
       {children}
     </section>
@@ -60,9 +60,11 @@ function DashboardPanelHeader({
             {eyebrow}
           </p>
         ) : null}
-        <h2 className="text-2xl font-semibold text-white">{title}</h2>
+        <h2 className="text-[1.4rem] font-semibold text-white md:text-[1.55rem]">
+          {title}
+        </h2>
         {description ? (
-          <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
+          <p className="mt-2 text-sm leading-6 text-[var(--ink-soft)] md:leading-7">
             {description}
           </p>
         ) : null}
@@ -96,16 +98,16 @@ export default async function DashboardPage({ searchParams }) {
   const promiseStatusCounts = data.promiseSnapshot?.status_counts || {};
 
   return (
-    <main className="space-y-8">
-      <section className="hero-panel p-8 md:p-10">
-        <div className="max-w-4xl">
+    <main className="space-y-6">
+      <section className="hero-panel p-6 md:p-8">
+        <div className="max-w-3xl">
           <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[var(--accent)]">
             Public data center
           </p>
-          <h1 className="mt-4 text-[clamp(2.2rem,5vw,4.4rem)] font-semibold leading-[0.96] tracking-[-0.05em] text-white">
+          <h1 className="mt-3 text-[clamp(2rem,4.6vw,4rem)] font-semibold leading-[0.97] tracking-[-0.05em] text-white">
             Command Center view of Black policy impact.
           </h1>
-          <p className="mt-5 text-base leading-8 text-[var(--ink-soft)] md:text-lg">
+          <p className="mt-4 text-sm leading-7 text-[var(--ink-soft)] md:text-base md:leading-8">
             Use this page the way you would use a civic research dashboard: scan
             the headline measures, see where Black policy impact is moving, and
             then open the relevant president, promise, legislation, or source
@@ -114,13 +116,13 @@ export default async function DashboardPage({ searchParams }) {
         </div>
       </section>
 
-      <section className="grid gap-4 xl:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)]">
-        <div className="grid gap-4 md:grid-cols-2">
+      <section className="grid gap-3 xl:grid-cols-[minmax(0,1.2fr)_minmax(300px,0.8fr)]">
+        <div className="grid gap-3 md:grid-cols-2">
           <DashboardPanel>
             <h2 className="text-lg font-semibold text-white">
               What this page contains
             </h2>
-            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+            <p className="mt-2 text-sm leading-6 text-[var(--ink-soft)]">
               The dashboard combines presidential score context, promise-tracker
               movement, policy direction, and source coverage into one public
               overview.
@@ -128,7 +130,7 @@ export default async function DashboardPage({ searchParams }) {
           </DashboardPanel>
           <DashboardPanel>
             <h2 className="text-lg font-semibold text-white">How to use it</h2>
-            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+            <p className="mt-2 text-sm leading-6 text-[var(--ink-soft)]">
               Start here when you want a fast read on historical progress,
               current movement, and where to click next for evidence-backed
               detail.
@@ -142,7 +144,7 @@ export default async function DashboardPage({ searchParams }) {
           <h2 className="mt-3 text-lg font-semibold text-white">
             What stays fixed vs filtered
           </h2>
-          <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+          <p className="mt-2 text-sm leading-6 text-[var(--ink-soft)]">
             Headline score, coverage, and evidence sections stay sitewide. The
             promise-tracker blocks below respond to the filter bar so you can
             narrow active records without changing the overall public score
@@ -186,7 +188,7 @@ export default async function DashboardPage({ searchParams }) {
         </form>
       </DashboardFilterBar>
 
-      <section className="grid gap-4 2xl:grid-cols-[minmax(0,1.25fr)_minmax(320px,0.75fr)]">
+      <section className="grid gap-3 2xl:grid-cols-[minmax(0,1.25fr)_minmax(300px,0.75fr)]">
         <ImpactOverviewCards
           items={[
             {
@@ -221,7 +223,7 @@ export default async function DashboardPage({ searchParams }) {
           <h2 className="mt-3 text-lg font-semibold text-white">
             How to scan the dashboard
           </h2>
-          <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+          <p className="mt-2 text-sm leading-6 text-[var(--ink-soft)]">
             Read the KPI row first, then the direction and trend charts, then
             the ranked policy and promise tables. That keeps the page moving
             from big-picture context into record-level evidence instead of
@@ -231,13 +233,13 @@ export default async function DashboardPage({ searchParams }) {
       </section>
 
       {data.insights?.length ? (
-        <section className="space-y-5">
+        <section className="space-y-4">
           <SectionIntro
             eyebrow="Key insights"
             title="Key insights from the data"
             description="These observations are derived from the current public dataset and are meant to help readers identify broad historical or policy patterns before opening the underlying records."
           />
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
             {data.insights.map((item, index) => (
               <InsightCard
                 key={`${item.title}-${index}`}
@@ -249,7 +251,7 @@ export default async function DashboardPage({ searchParams }) {
         </section>
       ) : null}
 
-      <section className="grid gap-4 md:grid-cols-3">
+      <section className="grid gap-3 md:grid-cols-3">
         {[
           {
             title: "Positive movement",
@@ -272,22 +274,22 @@ export default async function DashboardPage({ searchParams }) {
         ].map((item) => (
           <div
             key={item.title}
-            className="rounded-[1.5rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5"
+            className="rounded-[1.5rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-4"
           >
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
               {item.title}
             </p>
-            <p className="mt-3 text-3xl font-semibold tracking-[-0.05em] text-white">
+            <p className="mt-2 text-[2rem] font-semibold tracking-[-0.05em] text-white">
               {item.value}
             </p>
-            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+            <p className="mt-2 text-sm leading-6 text-[var(--ink-soft)]">
               {item.summary}
             </p>
           </div>
         ))}
       </section>
 
-      <section className="grid gap-6 2xl:grid-cols-[minmax(0,1.15fr)_minmax(360px,0.85fr)]">
+      <section className="grid gap-4 2xl:grid-cols-[minmax(0,1.15fr)_minmax(340px,0.85fr)]">
         <ImpactTrendChart
           data={trend.score_by_year || []}
           title="Score movement over time"
@@ -303,7 +305,7 @@ export default async function DashboardPage({ searchParams }) {
         />
       </section>
 
-      <section className="grid gap-6 2xl:grid-cols-[minmax(0,1.1fr)_minmax(320px,0.9fr)]">
+      <section className="grid gap-4 2xl:grid-cols-[minmax(0,1.1fr)_minmax(300px,0.9fr)]">
         <CategoryImpactChart
           data={categoryData}
           title="Category distribution"
@@ -312,7 +314,7 @@ export default async function DashboardPage({ searchParams }) {
         <MethodologyCallout description="The dashboard is a reading surface, not a black box. Every metric should lead you to a policy page, promise page, source, or methodology explanation." />
       </section>
 
-      <section className="grid gap-6 2xl:grid-cols-[minmax(0,1.15fr)_minmax(340px,0.85fr)]">
+      <section className="grid gap-4 2xl:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)]">
         <DashboardPanel className="space-y-5 xl:self-start">
           <DashboardPanelHeader
             eyebrow="Flagship score feature"
