@@ -54,6 +54,97 @@ export function getStatusDotClass(tone = "default") {
   return STATUS_TONE_CLASSES[resolveTone(tone)].dot;
 }
 
+function normalizedLabel(value) {
+  return String(value || "").toLowerCase();
+}
+
+export function getPromiseStatusTone(status) {
+  const label = normalizedLabel(status);
+  if (label.includes("delivered")) return "success";
+  if (label.includes("progress")) return "info";
+  if (label.includes("partial")) return "warning";
+  if (label.includes("blocked")) return "contested";
+  if (label.includes("failed")) return "danger";
+  return "default";
+}
+
+export function getConfidenceTone(value) {
+  const label = normalizedLabel(value);
+  if (label.includes("high") || label.includes("strong")) return "verified";
+  if (label.includes("medium") || label.includes("moderate")) return "warning";
+  if (label.includes("low") || label.includes("weak")) return "danger";
+  return "default";
+}
+
+export function getImpactDirectionTone(value) {
+  const label = normalizedLabel(value);
+  if (
+    label.includes("positive") ||
+    label.includes("delivered") ||
+    label.includes("expanded") ||
+    label.includes("protective")
+  ) {
+    return "success";
+  }
+  if (
+    label.includes("negative") ||
+    label.includes("failed") ||
+    label.includes("harm") ||
+    label.includes("rollback")
+  ) {
+    return "danger";
+  }
+  if (
+    label.includes("mixed") ||
+    label.includes("blocked") ||
+    label.includes("partial") ||
+    label.includes("contested")
+  ) {
+    return "contested";
+  }
+  return "default";
+}
+
+export function getEvidenceTone(value) {
+  const label = normalizedLabel(value);
+  if (label.includes("strong") || label.includes("high")) return "verified";
+  if (label.includes("moderate") || label.includes("medium")) return "info";
+  if (label.includes("limited") || label.includes("partial")) return "warning";
+  if (label.includes("weak") || label.includes("low")) return "danger";
+  return "default";
+}
+
+export function getCompletenessTone(value) {
+  const label = normalizedLabel(value);
+  if (label.includes("complete") || label.includes("verified")) return "verified";
+  if (label.includes("review") || label.includes("draft") || label.includes("pending")) {
+    return "info";
+  }
+  if (label.includes("partial") || label.includes("needs")) return "warning";
+  if (label.includes("missing") || label.includes("thin")) return "danger";
+  return "default";
+}
+
+export function getBillStatusTone(status) {
+  const label = normalizedLabel(status);
+  if (
+    label.includes("enacted") ||
+    label.includes("became law") ||
+    label.includes("passed")
+  ) {
+    return "success";
+  }
+  if (
+    label.includes("introduced") ||
+    label.includes("referred") ||
+    label.includes("pending")
+  ) {
+    return "info";
+  }
+  if (label.includes("failed") || label.includes("vetoed")) return "danger";
+  return "default";
+}
+
 export function Panel({
   children,
   className = "",
@@ -65,9 +156,8 @@ export function Panel({
 }) {
   const paddingClass = {
     none: "",
-    sm: "p-3 md:p-4",
+    sm: "p-3",
     md: "p-4",
-    lg: "p-5 md:p-6",
   }[padding];
   const prominenceClass =
     prominence === "primary"
@@ -93,13 +183,12 @@ export function SectionHeader({
   action = null,
   eyebrow = null,
   bordered = true,
-  className = "",
 }) {
   return (
     <div
       className={`flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between ${
         bordered ? "border-b border-[var(--line)] px-4 py-3" : ""
-      } ${className}`}
+      }`}
     >
       <div className="min-w-0 max-w-full md:max-w-3xl">
         {eyebrow ? (
@@ -124,18 +213,12 @@ export function SectionHeader({
 export function StatusPill({
   children,
   tone = "default",
-  selected = false,
-  className = "",
 }) {
   return (
     <span
       className={`inline-flex min-h-6 items-center gap-1.5 rounded-full border px-2.5 text-[10px] font-semibold uppercase tracking-[0.14em] ${getStatusSurfaceClass(
         tone
-      )} ${getStatusTextClass(tone)} ${
-        selected
-          ? "shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)]"
-          : ""
-      } ${className}`}
+      )} ${getStatusTextClass(tone)}`}
     >
       <span className={`h-1.5 w-1.5 rounded-full ${getStatusDotClass(tone)}`} />
       {children}
@@ -169,7 +252,6 @@ export function MetricCard({
   density = "default",
   prominence = "default",
   showDot = false,
-  className = "",
 }) {
   const isCompact = density === "compact";
   const isPrimary = prominence === "primary";
@@ -180,7 +262,7 @@ export function MetricCard({
         tone
       )} ${isCompact ? "px-3 py-2.5" : "p-4"} ${
         isPrimary ? "border-[var(--line-strong)] bg-[rgba(18,31,49,0.7)]" : ""
-      } ${className}`}
+      }`}
     >
       <div className="flex items-center gap-2">
         {showDot ? (

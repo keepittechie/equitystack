@@ -8,13 +8,13 @@ import {
 } from "@/app/components/public/charts";
 import {
   FilterChip,
+  getPromiseStatusTone,
   getStatusDotClass,
   getStatusSurfaceClass,
   getStatusTextClass,
   MetricCard,
   Panel,
   SectionHeader,
-  StatusPill,
 } from "@/app/components/dashboard/primitives";
 import {
   MethodologyCallout,
@@ -106,25 +106,6 @@ function DashboardActionLink({ href, children, variant = "secondary" }) {
       {children}
     </Link>
   );
-}
-
-function getPromiseStatusTone(status) {
-  if (status === "Delivered") {
-    return "success";
-  }
-  if (status === "Partial") {
-    return "warning";
-  }
-  if (status === "In Progress") {
-    return "info";
-  }
-  if (status === "Blocked") {
-    return "contested";
-  }
-  if (status === "Failed") {
-    return "danger";
-  }
-  return "default";
 }
 
 function DashboardStatusTabs({ counts = {}, currentStatus, searchParams }) {
@@ -230,23 +211,26 @@ function ActiveFilterBar({ searchParams, currentStatus }) {
 
 function PromiseStatusStat({ label, value, tone = "default" }) {
   return (
-    <div className={`rounded-md border px-3 py-3 ${getStatusSurfaceClass(tone)}`}>
-      <StatusPill tone={tone}>{label}</StatusPill>
-      <p className="mt-3 text-xl font-semibold text-white">{value}</p>
-    </div>
+    <MetricCard
+      label={label}
+      value={value}
+      tone={tone}
+      density="compact"
+      showDot
+    />
   );
 }
 
 function InsightTile({ title, text }) {
   return (
-    <article className="min-w-0 rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4 transition-[background-color,border-color] hover:border-[var(--line-strong)] hover:bg-[rgba(18,31,49,0.76)]">
+    <Panel as="article" padding="md" interactive>
       <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
         {title}
       </p>
       <p className="mt-3 break-words text-sm leading-6 text-[var(--ink-soft)]">
         {text}
       </p>
-    </article>
+    </Panel>
   );
 }
 
@@ -314,7 +298,7 @@ export default async function DashboardPage({ searchParams }) {
     <main className="w-[calc(100vw-2.5rem)] max-w-full space-y-4 overflow-hidden">
       <Panel className="overflow-hidden" prominence="primary">
         <div className="grid gap-0 xl:grid-cols-[minmax(0,1fr)_360px]">
-          <div className="min-w-0 border-b border-[var(--line)] p-5 md:p-6 xl:border-b-0 xl:border-r">
+          <div className="min-w-0 border-b border-[var(--line)] p-4 xl:border-b-0 xl:border-r">
             <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
               Public data center
             </p>

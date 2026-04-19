@@ -32,6 +32,10 @@ import {
   PromiseTimeline,
 } from "@/app/components/public/entities";
 import {
+  getBillStatusTone,
+  getConfidenceTone,
+  getImpactDirectionTone,
+  getPromiseStatusTone,
   MetricCard,
   Panel,
   SectionHeader,
@@ -94,68 +98,6 @@ function formatBillRelationshipType(type) {
     .split("_")
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(" ");
-}
-
-function getConfidenceTone(value) {
-  const label = String(value || "").toLowerCase();
-  if (label.includes("high") || label.includes("strong")) {
-    return "verified";
-  }
-  if (label.includes("medium") || label.includes("moderate")) {
-    return "warning";
-  }
-  if (label.includes("low") || label.includes("weak")) {
-    return "danger";
-  }
-  return "default";
-}
-
-function getDirectionTone(value) {
-  const label = String(value || "").toLowerCase();
-  if (label.includes("positive") || label.includes("delivered")) {
-    return "success";
-  }
-  if (label.includes("negative") || label.includes("failed")) {
-    return "danger";
-  }
-  if (label.includes("mixed") || label.includes("blocked") || label.includes("partial")) {
-    return "contested";
-  }
-  return "default";
-}
-
-function getPromiseStatusTone(status) {
-  const label = String(status || "").toLowerCase();
-  if (label.includes("delivered")) {
-    return "success";
-  }
-  if (label.includes("progress")) {
-    return "info";
-  }
-  if (label.includes("partial")) {
-    return "warning";
-  }
-  if (label.includes("blocked")) {
-    return "contested";
-  }
-  if (label.includes("failed")) {
-    return "danger";
-  }
-  return "default";
-}
-
-function getBillStatusTone(status) {
-  const label = String(status || "").toLowerCase();
-  if (label.includes("enacted") || label.includes("became law") || label.includes("passed")) {
-    return "success";
-  }
-  if (label.includes("introduced") || label.includes("referred") || label.includes("pending")) {
-    return "info";
-  }
-  if (label.includes("failed") || label.includes("vetoed")) {
-    return "danger";
-  }
-  return "default";
 }
 
 function LinkedBillCard({ item }) {
@@ -397,7 +339,7 @@ export default async function PresidentProfilePage({ params }) {
     }));
 
   return (
-    <main className="space-y-10">
+    <main className="space-y-4">
       <StructuredData
         data={[
           buildBreadcrumbJsonLd(
@@ -495,7 +437,7 @@ export default async function PresidentProfilePage({ params }) {
         />
       </section>
 
-      <Panel padding="lg" prominence="primary" className="space-y-5">
+      <Panel padding="md" prominence="primary" className="space-y-4">
         <SectionHeader
           eyebrow="Score breakdown"
           title="Why this president has this score"
@@ -517,7 +459,7 @@ export default async function PresidentProfilePage({ params }) {
           >
             <div className="flex flex-wrap gap-2">
               {Object.entries(scoreComposition.direct.direction_counts || {}).map(([label, value]) => (
-                <StatusPill key={label} tone={getDirectionTone(label)}>
+                <StatusPill key={label} tone={getImpactDirectionTone(label)}>
                   {humanizeToken(label)} {value}
                 </StatusPill>
               ))}
@@ -566,7 +508,7 @@ export default async function PresidentProfilePage({ params }) {
         {buildPresidentGuideCards(profile, flagshipEditorial).map((item) => (
           <Panel
             key={item.title}
-            padding="lg"
+            padding="md"
             className="space-y-3"
           >
             <StatusPill tone="info">{item.eyebrow}</StatusPill>
@@ -576,7 +518,7 @@ export default async function PresidentProfilePage({ params }) {
         ))}
       </section>
 
-      <Panel padding="lg">
+      <Panel padding="md">
         <SectionHeader
           eyebrow="Context and background"
           title="What this presidential page shows in practice"
@@ -592,7 +534,7 @@ export default async function PresidentProfilePage({ params }) {
         </div>
       </Panel>
 
-      <Panel padding="lg" className="space-y-5">
+      <Panel padding="md" className="space-y-4">
         <SectionHeader
           eyebrow="Bill-informed signals"
           title="Legislation linked to this presidential record"
@@ -602,7 +544,7 @@ export default async function PresidentProfilePage({ params }) {
         {Number(billInputs.linked_bill_count || 0) > 0 ? (
           <>
             <div className="grid gap-4 md:grid-cols-2">
-              <Panel padding="lg" className="space-y-4">
+              <Panel padding="md" className="space-y-4">
                 <h3 className="text-lg font-semibold text-white">Bill input summary</h3>
                 <p className="text-sm leading-7 text-[var(--ink-soft)]">
                   {president.bill_input_summary} The final Black Impact Score blends this bill-informed layer in as a capped modifier rather than letting bill links override the outcome-based record.
@@ -632,7 +574,7 @@ export default async function PresidentProfilePage({ params }) {
                   />
                 </div>
               </Panel>
-              <Panel padding="lg" className="space-y-4">
+              <Panel padding="md" className="space-y-4">
                 <h3 className="text-lg font-semibold text-white">Evidence and domains</h3>
                 <p className="text-sm leading-7 text-[var(--ink-soft)]">
                   Join confidence stays bounded by the existing promise lineage and the bill’s own evidence depth.
@@ -652,7 +594,7 @@ export default async function PresidentProfilePage({ params }) {
                 </div>
               </Panel>
             </div>
-            <Panel padding="lg">
+            <Panel padding="md">
               <h3 className="text-lg font-semibold text-white">Top linked bills</h3>
               <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
                 These are the strongest currently linked bills by bill-level BIS contribution within this president’s existing promise-linked legislative context.
@@ -671,40 +613,40 @@ export default async function PresidentProfilePage({ params }) {
             </Panel>
           </>
         ) : (
-          <Panel padding="lg" className="border-dashed text-sm leading-7 text-[var(--ink-soft)]">
+          <Panel padding="md" className="border-dashed text-sm leading-7 text-[var(--ink-soft)]">
             No tracked bills currently reach this president through supported promise lineage, so no bill-informed inputs are shown yet.
           </Panel>
         )}
       </Panel>
 
-      <section className="grid items-start gap-6 2xl:grid-cols-[1.1fr_0.9fr]">
-        <div className="space-y-5 2xl:self-start">
+      <section className="grid items-start gap-4 2xl:grid-cols-[1.1fr_0.9fr]">
+        <div className="space-y-4 2xl:self-start">
           <ImpactTrendChart
             data={trend?.score_by_year || []}
             title="Impact over time"
             description={trend?.interpretation || "Read the yearly score path, cumulative movement, and strongest shifts over time."}
           />
           {!trend?.score_by_year?.length ? (
-            <Panel padding="lg" className="border-dashed text-sm leading-7 text-[var(--ink-soft)]">
+            <Panel padding="md" className="border-dashed text-sm leading-7 text-[var(--ink-soft)]">
               No dated outcome series are available for this profile yet.
             </Panel>
           ) : null}
         </div>
-        <div className="space-y-5">
+        <div className="space-y-4">
           <CategoryImpactChart
             data={topicData}
             title="Top contributing topics"
             description="Topic contributions explain where the score is actually coming from."
           />
           {!topicData.length ? (
-            <Panel padding="lg" className="border-dashed text-sm leading-7 text-[var(--ink-soft)]">
+            <Panel padding="md" className="border-dashed text-sm leading-7 text-[var(--ink-soft)]">
               Topic-level contribution data is not available for this presidential record yet.
             </Panel>
           ) : null}
         </div>
       </section>
 
-      <Panel padding="lg" className="space-y-5">
+      <Panel padding="md" className="space-y-4">
         <SectionHeader
           eyebrow="Top records"
           title="Policies and promises shaping this record"
@@ -719,7 +661,7 @@ export default async function PresidentProfilePage({ params }) {
             }
           />
         ) : (
-          <Panel padding="lg" className="border-dashed text-sm leading-7 text-[var(--ink-soft)]">
+          <Panel padding="md" className="border-dashed text-sm leading-7 text-[var(--ink-soft)]">
             No top contributing policy records are attached to this profile yet.
           </Panel>
         )}
@@ -752,7 +694,7 @@ export default async function PresidentProfilePage({ params }) {
         </div>
       </Panel>
 
-      <Panel padding="lg" className="space-y-5">
+      <Panel padding="md" className="space-y-4">
         <SectionHeader
           eyebrow="What shaped this score"
           title="Driver visibility"
@@ -760,7 +702,7 @@ export default async function PresidentProfilePage({ params }) {
           bordered={false}
         />
         <div className="grid gap-4 md:grid-cols-2">
-          <Panel padding="lg">
+          <Panel padding="md">
             <h3 className="text-lg font-semibold text-white">Strongest positive drivers</h3>
             {(scoreDrivers?.strongest_positive || []).length ? (
               <div className="mt-4 grid gap-3">
@@ -771,7 +713,7 @@ export default async function PresidentProfilePage({ params }) {
                       <StatusPill tone="default">
                         {item.topic || item.category || "Policy record"}
                       </StatusPill>
-                      <StatusPill tone={getDirectionTone(item.status || item.impact_direction)}>
+                      <StatusPill tone={getImpactDirectionTone(item.status || item.impact_direction)}>
                         {item.status || item.impact_direction || "Scored record"}
                       </StatusPill>
                     </div>
@@ -784,7 +726,7 @@ export default async function PresidentProfilePage({ params }) {
               </p>
             )}
           </Panel>
-          <Panel padding="lg">
+          <Panel padding="md">
             <h3 className="text-lg font-semibold text-white">Strongest negative drivers</h3>
             {(scoreDrivers?.strongest_negative || []).length ? (
               <div className="mt-4 grid gap-3">
@@ -795,7 +737,7 @@ export default async function PresidentProfilePage({ params }) {
                       <StatusPill tone="default">
                         {item.topic || item.category || "Policy record"}
                       </StatusPill>
-                      <StatusPill tone={getDirectionTone(item.status || item.impact_direction)}>
+                      <StatusPill tone={getImpactDirectionTone(item.status || item.impact_direction)}>
                         {item.status || item.impact_direction || "Scored record"}
                       </StatusPill>
                     </div>
@@ -810,7 +752,7 @@ export default async function PresidentProfilePage({ params }) {
           </Panel>
         </div>
         <div className="grid gap-4 md:grid-cols-2">
-          <Panel padding="lg">
+          <Panel padding="md">
             <h3 className="text-lg font-semibold text-white">Topic contributions</h3>
             {(scoreDrivers?.topic_drivers || []).length ? (
               <div className="mt-4 grid gap-3">
@@ -831,7 +773,7 @@ export default async function PresidentProfilePage({ params }) {
               </p>
             )}
           </Panel>
-          <Panel padding="lg" className="space-y-4">
+          <Panel padding="md" className="space-y-4">
             <h3 className="text-lg font-semibold text-white">Impact Direction mix</h3>
             <div className="flex flex-wrap gap-2">
               {Object.entries({
@@ -840,7 +782,7 @@ export default async function PresidentProfilePage({ params }) {
                 Mixed: scoreDrivers?.direction_breakdown?.Mixed || 0,
                 Blocked: scoreDrivers?.direction_breakdown?.Blocked || 0,
               }).map(([label, value]) => (
-                <StatusPill key={label} tone={getDirectionTone(label)}>
+                <StatusPill key={label} tone={getImpactDirectionTone(label)}>
                   {humanizeToken(label)} {value}
                 </StatusPill>
               ))}
@@ -852,7 +794,7 @@ export default async function PresidentProfilePage({ params }) {
         </div>
       </Panel>
 
-      <Panel padding="lg" className="space-y-5">
+      <Panel padding="md" className="space-y-4">
         <SectionHeader
           eyebrow="Promise tracker snapshot"
           title="Promise tracker context for this president"
@@ -885,7 +827,7 @@ export default async function PresidentProfilePage({ params }) {
             />
           ))}
         </div>
-        <Panel padding="lg" className="space-y-3">
+        <Panel padding="md" className="space-y-3">
           <h3 className="text-lg font-semibold text-white">How to interpret promise outcomes</h3>
           <p className="text-sm leading-7 text-[var(--ink-soft)]">
             Promise outcomes provide context for how stated goals translated into documented policy action. They help explain implementation, but they are not the same thing as presidential Impact Score.
@@ -893,7 +835,7 @@ export default async function PresidentProfilePage({ params }) {
         </Panel>
       </Panel>
 
-      <Panel padding="lg" className="space-y-5">
+      <Panel padding="md" className="space-y-4">
         <SectionHeader
           eyebrow="Continue exploring"
           title="Where to go next from this presidential record"
@@ -906,7 +848,7 @@ export default async function PresidentProfilePage({ params }) {
               key={item.href}
               as={Link}
               href={item.href}
-              padding="lg"
+              padding="md"
               interactive
             >
               <h3 className="text-lg font-semibold text-white">{item.title}</h3>
@@ -915,31 +857,31 @@ export default async function PresidentProfilePage({ params }) {
               </p>
             </Panel>
           ))}
-          <Panel as={Link} href="/research" padding="lg" interactive>
+          <Panel as={Link} href="/research" padding="md" interactive>
             <h3 className="text-lg font-semibold text-white">Return to the research hub</h3>
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
               Use the curated research hub when this profile opens into a larger question about civil-rights law, thematic analysis, explainers, or public methods.
             </p>
           </Panel>
-          <Panel as={Link} href="/analysis/presidential-impact-on-black-americans" padding="lg" interactive>
+          <Panel as={Link} href="/analysis/presidential-impact-on-black-americans" padding="md" interactive>
             <h3 className="text-lg font-semibold text-white">Explore presidential impact on Black Americans</h3>
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
               Move into the broader synthesis page when you want to compare this presidency against the wider historical impact question rather than this profile alone.
             </p>
           </Panel>
-          <Panel as={Link} href={`/compare/presidents?compare=${slug}`} padding="lg" interactive>
+          <Panel as={Link} href={`/compare/presidents?compare=${slug}`} padding="md" interactive>
             <h3 className="text-lg font-semibold text-white">Compare this president</h3>
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
               Add other presidents to compare direct score, systemic score, topic differences, and directional contrast.
             </p>
           </Panel>
-          <Panel as={Link} href="/methodology" padding="lg" interactive>
+          <Panel as={Link} href="/methodology" padding="md" interactive>
             <h3 className="text-lg font-semibold text-white">Review the methodology</h3>
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
               Read how low-coverage damping, confidence, evidence, and score-family separation work before drawing conclusions.
             </p>
           </Panel>
-          <Panel as={Link} href="/reports/black-impact-score" padding="lg" interactive>
+          <Panel as={Link} href="/reports/black-impact-score" padding="md" interactive>
             <h3 className="text-lg font-semibold text-white">Open the flagship report</h3>
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
               Use the report view when you want broader ranking context or public-facing interpretation across presidents.
@@ -948,7 +890,7 @@ export default async function PresidentProfilePage({ params }) {
         </div>
       </Panel>
 
-      <Panel padding="lg" className="space-y-5">
+      <Panel padding="md" className="space-y-4">
         <SectionHeader
           eyebrow="Timeline"
           title="Promise and policy chronology"
@@ -958,13 +900,13 @@ export default async function PresidentProfilePage({ params }) {
         {timelineItems.length ? (
           <PromiseTimeline items={timelineItems} />
         ) : (
-          <Panel padding="lg" className="border-dashed text-sm leading-7 text-[var(--ink-soft)]">
+          <Panel padding="md" className="border-dashed text-sm leading-7 text-[var(--ink-soft)]">
             No dated promise records are attached to this profile yet.
           </Panel>
         )}
       </Panel>
 
-      <Panel padding="lg" className="space-y-5">
+      <Panel padding="md" className="space-y-4">
         <SectionHeader
           eyebrow="Related routes"
           title="Keep researching this president through linked records"
@@ -972,19 +914,19 @@ export default async function PresidentProfilePage({ params }) {
           bordered={false}
         />
         <div className="grid gap-4 md:grid-cols-2">
-          <Panel as={Link} href={`/promises/president/${slug}`} padding="lg" interactive>
+          <Panel as={Link} href={`/promises/president/${slug}`} padding="md" interactive>
             <h3 className="text-lg font-semibold text-white">Open this president&apos;s promise tracker</h3>
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
               Review delivered, partial, failed, and blocked promises for this presidency term in one place.
             </p>
           </Panel>
-          <Panel as={Link} href={presidentPoliciesHref} padding="lg" interactive>
+          <Panel as={Link} href={presidentPoliciesHref} padding="md" interactive>
             <h3 className="text-lg font-semibold text-white">Browse policies under {presidentName}</h3>
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
               Open the policy index filtered to this president to study legislation, executive actions, and court-era context tied to this record.
             </p>
           </Panel>
-          <Panel as={Link} href="/explainers" padding="lg" interactive>
+          <Panel as={Link} href="/explainers" padding="md" interactive>
             <h3 className="text-lg font-semibold text-white">Read related Black history explainers</h3>
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
               Use explainers when you need more historical or legal context before returning to the president, promise, or policy detail pages.

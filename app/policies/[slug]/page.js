@@ -34,6 +34,9 @@ import {
   PromiseResultsTable,
 } from "@/app/components/public/entities";
 import {
+  getCompletenessTone,
+  getEvidenceTone,
+  getImpactDirectionTone,
   MetricCard,
   Panel,
   SectionHeader,
@@ -74,54 +77,6 @@ function buildSystemicImpactCard(policy) {
       policy?.systemic_impact_summary ||
       "This record carries a documented systemic weighting because its effects extended beyond the immediate outcome into durable institutions, doctrine, or enforcement capacity.",
   };
-}
-
-function getImpactDirectionTone(value) {
-  const label = String(value || "").toLowerCase();
-  if (label.includes("positive") || label.includes("expanded") || label.includes("protective")) {
-    return "success";
-  }
-  if (label.includes("negative") || label.includes("harm") || label.includes("rollback")) {
-    return "danger";
-  }
-  if (label.includes("mixed") || label.includes("blocked") || label.includes("contested")) {
-    return "contested";
-  }
-  return "default";
-}
-
-function getEvidenceTone(value) {
-  const label = String(value || "").toLowerCase();
-  if (label.includes("strong") || label.includes("high")) {
-    return "verified";
-  }
-  if (label.includes("moderate") || label.includes("medium")) {
-    return "info";
-  }
-  if (label.includes("limited") || label.includes("partial")) {
-    return "warning";
-  }
-  if (label.includes("weak") || label.includes("low")) {
-    return "danger";
-  }
-  return "default";
-}
-
-function getCompletenessTone(value) {
-  const label = String(value || "").toLowerCase();
-  if (label.includes("complete") || label.includes("verified")) {
-    return "verified";
-  }
-  if (label.includes("review") || label.includes("draft") || label.includes("pending")) {
-    return "info";
-  }
-  if (label.includes("partial") || label.includes("needs")) {
-    return "warning";
-  }
-  if (label.includes("missing") || label.includes("thin")) {
-    return "danger";
-  }
-  return "default";
 }
 
 function computePolicyScore(policy) {
@@ -427,7 +382,7 @@ export default async function PolicyDetailPage({ params }) {
   ].filter(Boolean);
 
   return (
-    <main className="space-y-10">
+    <main className="space-y-4">
       <StructuredData
         data={[
           buildBreadcrumbJsonLd(
@@ -459,7 +414,7 @@ export default async function PolicyDetailPage({ params }) {
 
       <TrustBar />
 
-      <Panel padding="lg" prominence="primary" className="space-y-5">
+      <Panel padding="md" prominence="primary" className="space-y-4">
         <SectionHeader
           eyebrow="Policy takeaway"
           title="The record, classification, and evidence in one view"
@@ -509,7 +464,7 @@ export default async function PolicyDetailPage({ params }) {
         {guideCards.map((item) => (
           <Panel
             key={item.title}
-            padding="lg"
+            padding="md"
             className="space-y-3"
           >
             <StatusPill tone="info">{item.eyebrow}</StatusPill>
@@ -519,7 +474,7 @@ export default async function PolicyDetailPage({ params }) {
         ))}
       </section>
 
-      <Panel padding="lg">
+      <Panel padding="md">
         <SectionHeader
           eyebrow="Context and background"
           title="What this policy page adds beyond the headline summary"
@@ -535,15 +490,15 @@ export default async function PolicyDetailPage({ params }) {
         </div>
       </Panel>
 
-      <Panel padding="lg" className="space-y-5">
+      <Panel padding="md" className="space-y-4">
         <SectionHeader
           eyebrow="Plain-language summary"
           title="What happened and why it matters"
           description="This page is the proof layer of the public site. It should let a reader move from score into explanation, evidence, and related records without guessing."
           bordered={false}
         />
-        <div className="space-y-5">
-          <Panel padding="lg">
+        <div className="space-y-4">
+          <Panel padding="md">
             <StatusPill tone="info">What happened</StatusPill>
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
               {policy.summary || "A plain-language summary has not been published for this record yet."}
@@ -577,7 +532,7 @@ export default async function PolicyDetailPage({ params }) {
             ) : null}
           </Panel>
 
-          <Panel padding="lg" prominence="primary" className="space-y-4">
+          <Panel padding="md" prominence="primary" className="space-y-4">
             <StatusPill tone={getImpactDirectionTone(policy.impact_direction)}>
               What this means
             </StatusPill>
@@ -605,7 +560,7 @@ export default async function PolicyDetailPage({ params }) {
           />
           <ScoreExplanation title="How to interpret this policy record" />
           {systemicImpact ? (
-            <Panel padding="lg" className="space-y-4">
+            <Panel padding="md" className="space-y-4">
               <StatusPill tone="verified">Systemic impact</StatusPill>
               <h3 className="mt-3 text-lg font-semibold text-white">
                 {systemicImpact.label} structural weight
@@ -633,7 +588,7 @@ export default async function PolicyDetailPage({ params }) {
         </div>
       </Panel>
 
-      <Panel padding="lg" className="space-y-5">
+      <Panel padding="md" className="space-y-4">
         <SectionHeader
           eyebrow="Evidence"
           title="Source trail"
@@ -643,13 +598,13 @@ export default async function PolicyDetailPage({ params }) {
         {policy.sources?.length ? (
           <EvidenceSourceList items={policy.sources} />
         ) : (
-          <Panel padding="lg" className="border-dashed text-sm leading-7 text-[var(--ink-soft)]">
+          <Panel padding="md" className="border-dashed text-sm leading-7 text-[var(--ink-soft)]">
             No evidence sources are attached to this policy record yet. Use related records or methodology for broader context.
           </Panel>
         )}
       </Panel>
 
-      <Panel padding="lg" className="space-y-5">
+      <Panel padding="md" className="space-y-4">
         <SectionHeader
           eyebrow="Continue exploring"
           title="Promises, explainers, reports, and research paths"
@@ -659,7 +614,7 @@ export default async function PolicyDetailPage({ params }) {
         {(policy.related_promises || []).length ? (
           <PromiseResultsTable items={policy.related_promises} buildHref={(item) => `/promises/${item.slug}`} />
         ) : (
-          <Panel padding="lg" className="border-dashed text-sm leading-7 text-[var(--ink-soft)]">
+          <Panel padding="md" className="border-dashed text-sm leading-7 text-[var(--ink-soft)]">
             No related promise records are linked to this policy yet.
           </Panel>
         )}
@@ -669,7 +624,7 @@ export default async function PolicyDetailPage({ params }) {
               key={item.slug}
               as={Link}
               href={`/explainers/${item.slug}`}
-              padding="lg"
+              padding="md"
               interactive
             >
               <StatusPill tone="info">
@@ -679,7 +634,7 @@ export default async function PolicyDetailPage({ params }) {
               <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item.summary}</p>
             </Panel>
           ))}
-          <Panel as={Link} href="/reports/black-impact-score" padding="lg" interactive>
+          <Panel as={Link} href="/reports/black-impact-score" padding="md" interactive>
             <StatusPill tone="info">Related report</StatusPill>
             <h3 className="mt-3 text-lg font-semibold text-white">Black Impact Score</h3>
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
@@ -691,7 +646,7 @@ export default async function PolicyDetailPage({ params }) {
               key={item.href}
               as={Link}
               href={item.href}
-              padding="lg"
+              padding="md"
               interactive
             >
               <StatusPill tone="default">
@@ -705,7 +660,7 @@ export default async function PolicyDetailPage({ params }) {
       </Panel>
 
       {(policy.relationships || []).length ? (
-        <Panel padding="lg" className="space-y-5">
+        <Panel padding="md" className="space-y-4">
           <SectionHeader
             eyebrow="Policy lineage"
             title="Related policies in the same historical thread"
@@ -718,7 +673,7 @@ export default async function PolicyDetailPage({ params }) {
                 as={Link}
                 key={`${item.related_policy_id}-${item.relationship_type}`}
                 href={`/policies/${buildPolicySlug({ id: item.related_policy_id, title: item.related_policy_title })}`}
-                padding="lg"
+                padding="md"
                 interactive
               >
                 <div className="flex flex-wrap gap-2">
