@@ -19,6 +19,7 @@ import {
 } from "@/lib/systemicImpact";
 import StructuredData from "@/app/components/public/StructuredData";
 import { Breadcrumbs } from "@/app/components/public/chrome";
+import EquityStackTabbar from "@/app/components/dashboard/EquityStackTabbar";
 import {
   MethodologyCallout,
   SourceTrustPanel,
@@ -367,6 +368,25 @@ export default async function PolicyDetailPage({ params }) {
   const thinOutcome = isThinText(policy.outcome_summary, 140);
   const contextParagraphs = buildPolicyContextParagraphs(policy, flagshipEditorial);
   const systemicImpact = buildSystemicImpactCard(policy);
+  const localNavigationItems = [
+    { href: "#overview", label: "Overview" },
+    ...(timeline.length
+      ? [{ href: "#timeline", label: "Timeline", count: timeline.length }]
+      : []),
+    {
+      href: "#evidence",
+      label: "Evidence",
+      count: Number(policy.sources?.length || 0),
+    },
+    {
+      href: "#related",
+      label: "Related",
+      count:
+        Number(policy.related_promises?.length || 0) +
+        Number(policy.related_explainers?.length || 0) +
+        Number(policy.relationships?.length || 0),
+    },
+  ];
   const badges = [
     policy.year_enacted ? `Year ${policy.year_enacted}` : null,
     policy.president ? `President: ${policy.president}` : null,
@@ -449,7 +469,13 @@ export default async function PolicyDetailPage({ params }) {
 
       <TrustBar />
 
-      <Panel prominence="primary" className="overflow-hidden">
+      <EquityStackTabbar
+        items={localNavigationItems}
+        ariaLabel="Policy page sections"
+        defaultHref="#overview"
+      />
+
+      <Panel id="overview" prominence="primary" className="scroll-mt-24 overflow-hidden">
         <SectionHeader
           eyebrow="Policy takeaway"
           title="The record, classification, and evidence in one view"
@@ -542,7 +568,7 @@ export default async function PolicyDetailPage({ params }) {
         </div>
       </Panel>
 
-      <Panel className="overflow-hidden">
+      <Panel id="summary" className="scroll-mt-24 overflow-hidden">
         <SectionHeader
           eyebrow="Plain-language summary"
           title="What happened and why it matters"
@@ -601,7 +627,11 @@ export default async function PolicyDetailPage({ params }) {
             ) : null}
           </Panel>
 
-          {timeline.length ? <PolicyTimeline items={timeline} /> : null}
+          {timeline.length ? (
+            <div id="timeline" className="scroll-mt-24">
+              <PolicyTimeline items={timeline} />
+            </div>
+          ) : null}
 
           <SourceTrustPanel
             sourceCount={policy.evidence_summary?.total_sources}
@@ -639,7 +669,7 @@ export default async function PolicyDetailPage({ params }) {
         </div>
       </Panel>
 
-      <Panel className="overflow-hidden">
+      <Panel id="evidence" className="scroll-mt-24 overflow-hidden">
         <SectionHeader
           eyebrow="Evidence"
           title="Source trail"
@@ -656,7 +686,7 @@ export default async function PolicyDetailPage({ params }) {
         </div>
       </Panel>
 
-      <Panel className="overflow-hidden">
+      <Panel id="related" className="scroll-mt-24 overflow-hidden">
         <SectionHeader
           eyebrow="Continue exploring"
           title="Promises, explainers, reports, and research paths"
