@@ -7,14 +7,20 @@ import {
   ImpactTrendChart,
 } from "@/app/components/public/charts";
 import {
-  DashboardFilterBar,
-  ImpactOverviewCards,
+  FilterChip,
+  getStatusDotClass,
+  getStatusSurfaceClass,
+  getStatusTextClass,
+  MetricCard,
+  Panel,
+  SectionHeader,
+  StatusPill,
+} from "@/app/components/dashboard/primitives";
+import {
   MethodologyCallout,
   PresidentScoreMethodologyNote,
-  SectionIntro,
   SourceTrustPanel,
 } from "@/app/components/public/core";
-import InsightCard from "@/app/components/public/InsightCard";
 import {
   PresidentRankingBoard,
   PromiseResultsTable,
@@ -32,50 +38,231 @@ export const metadata = buildPageMetadata({
   path: "/dashboard",
 });
 
+const FILTER_FIELD_CLASS =
+  "min-h-9 rounded-md border border-[var(--line)] bg-[rgba(18,31,49,0.5)] px-3 text-sm text-white placeholder:text-[var(--ink-muted)] hover:border-[var(--line-strong)] focus:border-[rgba(132,247,198,0.38)] focus:bg-[rgba(18,31,49,0.76)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(132,247,198,0.28)] focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(11,20,33)]";
+
+const SECONDARY_TEXT_LINK_CLASS =
+  "text-sm font-semibold text-[var(--ink-soft)] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(132,247,198,0.28)]";
+
+const PROMISE_STATUS_FILTERS = [
+  { label: "All", value: "", tone: "default" },
+  { label: "Delivered", value: "Delivered", tone: "success" },
+  { label: "Partial", value: "Partial", tone: "warning" },
+  { label: "In Progress", value: "In Progress", tone: "info" },
+  { label: "Blocked", value: "Blocked", tone: "contested" },
+  { label: "Failed", value: "Failed", tone: "danger" },
+];
+
 function pct(value) {
   return `${Math.round(Number(value || 0) * 100)}%`;
 }
 
-function DashboardPanel({ children, className = "" }) {
-  return (
-    <section
-      className={`rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-4 md:p-5 ${className}`}
-    >
-      {children}
-    </section>
+function formatCount(value) {
+  return new Intl.NumberFormat("en-US").format(Number(value || 0));
+}
+
+function sumValues(values = {}) {
+  return Object.values(values).reduce(
+    (total, value) => total + Number(value || 0),
+    0
   );
 }
 
-function DashboardPanelHeader({
-  title,
-  description,
-  action = null,
-  eyebrow = null,
-}) {
+function dashboardHref(searchParams = {}, updates = {}) {
+  const params = new URLSearchParams();
+
+  Object.entries(searchParams).forEach(([key, value]) => {
+    const resolvedValue = Array.isArray(value) ? value[0] : value;
+
+    if (resolvedValue) {
+      params.set(key, resolvedValue);
+    }
+  });
+
+  Object.entries(updates).forEach(([key, value]) => {
+    if (value) {
+      params.set(key, value);
+    } else {
+      params.delete(key);
+    }
+  });
+
+  const query = params.toString();
+
+  return query ? `/dashboard?${query}` : "/dashboard";
+}
+
+function DashboardActionLink({ href, children, variant = "secondary" }) {
+  const classes =
+    variant === "primary"
+      ? "border-[rgba(132,247,198,0.72)] bg-[var(--accent)] text-[#051019] hover:border-[var(--accent)] hover:bg-[rgba(132,247,198,0.9)]"
+      : "border-[var(--line-strong)] bg-[rgba(18,31,49,0.58)] text-white hover:border-[var(--line-strong)] hover:bg-[rgba(18,31,49,0.86)]";
+
   return (
-    <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-      <div className="max-w-3xl">
-        {eyebrow ? (
-          <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--accent)]">
-            {eyebrow}
-          </p>
-        ) : null}
-        <h2 className="text-[1.4rem] font-semibold text-white md:text-[1.55rem]">
-          {title}
-        </h2>
-        {description ? (
-          <p className="mt-2 text-sm leading-6 text-[var(--ink-soft)] md:leading-7">
-            {description}
-          </p>
-        ) : null}
+    <Link
+      href={href}
+      className={`inline-flex min-h-9 items-center justify-center rounded-md border px-3 text-[12px] font-semibold transition-[background-color,border-color,box-shadow] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(132,247,198,0.28)] ${classes}`}
+    >
+      {children}
+    </Link>
+  );
+}
+
+function getPromiseStatusTone(status) {
+  if (status === "Delivered") {
+    return "success";
+  }
+  if (status === "Partial") {
+    return "warning";
+  }
+  if (status === "In Progress") {
+    return "info";
+  }
+  if (status === "Blocked") {
+    return "contested";
+  }
+  if (status === "Failed") {
+    return "danger";
+  }
+  return "default";
+}
+
+function DashboardStatusTabs({ counts = {}, currentStatus, searchParams }) {
+  const total = sumValues(counts);
+
+  return (
+    <div className="max-w-full overflow-x-auto pb-1">
+      <div className="flex w-max min-w-full gap-1 rounded-lg border border-[var(--line)] bg-[rgba(5,11,19,0.34)] p-1">
+        {PROMISE_STATUS_FILTERS.map((item) => {
+          const isActive = (currentStatus || "") === item.value;
+          const count = item.value ? counts[item.value] || 0 : total;
+
+          return (
+            <Link
+              key={item.label}
+              href={dashboardHref(searchParams, { status: item.value })}
+              aria-current={isActive ? "page" : undefined}
+              className={`inline-flex min-h-8 shrink-0 items-center gap-2 rounded-md border px-3 text-[12px] font-semibold transition-[background-color,border-color,box-shadow] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(132,247,198,0.28)] focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(11,20,33)] ${
+                isActive
+                  ? `${getStatusSurfaceClass(item.tone)} ${getStatusTextClass(item.tone)} border-[var(--line-strong)]`
+                  : "border-transparent text-[var(--ink-soft)] hover:border-[var(--line)] hover:bg-[rgba(18,31,49,0.58)] hover:text-white"
+              }`}
+            >
+              {item.value ? (
+                <span
+                  className={`h-1.5 w-1.5 rounded-full ${getStatusDotClass(
+                    item.tone
+                  )}`}
+                />
+              ) : null}
+              <span>{item.label}</span>
+              <span className="font-mono text-[11px] text-[var(--ink-muted)]">
+                {formatCount(count)}
+              </span>
+            </Link>
+          );
+        })}
       </div>
-      {action ? <div className="shrink-0">{action}</div> : null}
     </div>
+  );
+}
+
+function ActiveFilterBar({ searchParams, currentStatus }) {
+  const activeFilters = [
+    searchParams.q
+      ? {
+          key: "q",
+          label: "Search",
+          value: searchParams.q,
+          tone: "info",
+        }
+      : null,
+    searchParams.president
+      ? {
+          key: "president",
+          label: "President",
+          value: searchParams.president,
+          tone: "default",
+        }
+      : null,
+    currentStatus
+      ? {
+          key: "status",
+          label: "Status",
+          value: currentStatus,
+          tone: getPromiseStatusTone(currentStatus),
+        }
+      : null,
+  ].filter(Boolean);
+
+  if (!activeFilters.length) {
+    return (
+      <div className="rounded-md border border-dashed border-[var(--line)] bg-[rgba(18,31,49,0.32)] px-3 py-2 text-[12px] text-[var(--ink-muted)]">
+        No promise filters selected. Showing all tracked promise records in the
+        dashboard slice.
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--ink-muted)]">
+        Active filters
+      </span>
+      {activeFilters.map((item) => (
+        <FilterChip
+          key={item.key}
+          label={item.label}
+          value={item.value}
+          tone={item.tone}
+          href={dashboardHref(searchParams, { [item.key]: "" })}
+        />
+      ))}
+      <Link
+        href="/dashboard"
+        className="inline-flex min-h-7 items-center rounded-full border border-[var(--line)] bg-[rgba(18,31,49,0.4)] px-2.5 text-[11px] font-semibold text-[var(--ink-soft)] hover:border-[var(--line-strong)] hover:bg-[rgba(18,31,49,0.72)] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(132,247,198,0.28)] focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(11,20,33)]"
+      >
+        Clear all
+      </Link>
+    </div>
+  );
+}
+
+function PromiseStatusStat({ label, value, tone = "default" }) {
+  return (
+    <div className={`rounded-md border px-3 py-3 ${getStatusSurfaceClass(tone)}`}>
+      <StatusPill tone={tone}>{label}</StatusPill>
+      <p className="mt-3 text-xl font-semibold text-white">{value}</p>
+    </div>
+  );
+}
+
+function InsightTile({ title, text }) {
+  return (
+    <article className="min-w-0 rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4 transition-[background-color,border-color] hover:border-[var(--line-strong)] hover:bg-[rgba(18,31,49,0.76)]">
+      <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
+        {title}
+      </p>
+      <p className="mt-3 break-words text-sm leading-6 text-[var(--ink-soft)]">
+        {text}
+      </p>
+    </article>
   );
 }
 
 export default async function DashboardPage({ searchParams }) {
   const resolvedSearchParams = (await searchParams) || {};
+  const dashboardSearchParams = {
+    q: Array.isArray(resolvedSearchParams.q)
+      ? resolvedSearchParams.q[0]
+      : resolvedSearchParams.q || "",
+    president: Array.isArray(resolvedSearchParams.president)
+      ? resolvedSearchParams.president[0]
+      : resolvedSearchParams.president || "",
+    status: Array.isArray(resolvedSearchParams.status)
+      ? resolvedSearchParams.status[0]
+      : resolvedSearchParams.status || "",
+  };
   const data = await fetchDashboardData(resolvedSearchParams);
   const trend = data.scores.metadata?.impact_trend || { score_by_year: [] };
   const trust = data.scores.metadata?.trust || {};
@@ -96,213 +283,249 @@ export default async function DashboardPage({ searchParams }) {
     score: Number(item.avg_policy_impact_score || 0),
   }));
   const promiseStatusCounts = data.promiseSnapshot?.status_counts || {};
+  const totalPromiseSnapshot = sumValues(promiseStatusCounts);
+  const currentPromiseStatus = dashboardSearchParams.status;
+  const headlineStats = [
+    {
+      label: "Outcomes in score",
+      value: formatCount(data.scores.metadata?.outcomes_included_in_score),
+      description: `${formatCount(
+        data.scores.metadata?.outcomes_excluded_from_score
+      )} excluded but still visible`,
+    },
+    {
+      label: "High-confidence share",
+      value: pct(trust.high_confidence_outcome_percentage),
+      description: `${pct(trust.low_confidence_outcome_percentage)} low-confidence outcomes`,
+    },
+    {
+      label: "Source coverage",
+      value: pct(data.readiness.source_coverage_pct),
+      description: `${formatCount(data.readiness.unsourced_outcomes)} unsourced outcomes visible`,
+    },
+    {
+      label: "Intent coverage",
+      value: pct(data.readiness.intent_coverage_pct),
+      description: `${data.readiness.certification_status} certification status`,
+    },
+  ];
 
   return (
-    <main className="space-y-6">
-      <section className="hero-panel p-6 md:p-8">
-        <div className="max-w-3xl">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[var(--accent)]">
-            Public data center
-          </p>
-          <h1 className="mt-3 text-[clamp(2rem,4.6vw,4rem)] font-semibold leading-[0.97] tracking-[-0.05em] text-white">
-            Command Center view of Black policy impact.
-          </h1>
-          <p className="mt-4 text-sm leading-7 text-[var(--ink-soft)] md:text-base md:leading-8">
-            Use this page the way you would use a civic research dashboard: scan
-            the headline measures, see where Black policy impact is moving, and
-            then open the relevant president, promise, legislation, or source
-            page for detail.
-          </p>
+    <main className="w-[calc(100vw-2.5rem)] max-w-full space-y-4 overflow-hidden">
+      <Panel className="overflow-hidden" prominence="primary">
+        <div className="grid gap-0 xl:grid-cols-[minmax(0,1fr)_360px]">
+          <div className="min-w-0 border-b border-[var(--line)] p-5 md:p-6 xl:border-b-0 xl:border-r">
+            <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+              Public data center
+            </p>
+            <h1 className="mt-3 max-w-[17.5rem] break-words text-[clamp(1.7rem,7.2vw,3.7rem)] font-semibold leading-[1] tracking-[-0.04em] text-white sm:max-w-[calc(100vw-5rem)] md:max-w-4xl">
+              Black policy impact, promises, and evidence in one operating view.
+            </h1>
+            <p className="mt-4 max-w-[18.5rem] text-sm leading-6 text-[var(--ink-soft)] sm:max-w-[calc(100vw-5rem)] md:max-w-3xl md:text-base md:leading-7">
+              Scan score coverage, impact direction, presidential ranking,
+              promise movement, and the underlying records that explain the
+              public dataset.
+            </p>
+            <div className="mt-5 flex flex-wrap gap-2">
+              <DashboardActionLink href="/reports/black-impact-score" variant="primary">
+                Open flagship score report
+              </DashboardActionLink>
+              <DashboardActionLink href="/compare/presidents">
+                Compare presidents
+              </DashboardActionLink>
+              <DashboardActionLink href="/sources">
+                Inspect sources
+              </DashboardActionLink>
+            </div>
+          </div>
+          <aside className="grid min-w-0 content-start gap-3 p-4">
+            <MetricCard
+              label="Primary read"
+              value="Score coverage and direction mix"
+              description="Start here before drilling into records."
+              density="compact"
+              showDot
+            />
+            <MetricCard
+              label="Promise snapshot"
+              value={`${formatCount(totalPromiseSnapshot)} tracked records`}
+              description="Responds to the filters below."
+              tone="info"
+              density="compact"
+              showDot
+            />
+            <MetricCard
+              label="Evidence posture"
+              value={`${pct(trust.high_confidence_outcome_percentage)} high confidence`}
+              description={`${pct(trust.incomplete_outcome_percentage || 0)} incomplete outcomes`}
+              tone="verified"
+              density="compact"
+              showDot
+            />
+          </aside>
         </div>
+      </Panel>
+
+      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        {headlineStats.map((item) => (
+          <MetricCard
+            key={item.label}
+            label={item.label}
+            value={item.value}
+            description={item.description}
+            tone={item.tone}
+            prominence={item.prominence}
+          />
+        ))}
       </section>
 
-      <section className="grid gap-3 xl:grid-cols-[minmax(0,1.2fr)_minmax(300px,0.8fr)]">
-        <div className="grid gap-3 md:grid-cols-2">
-          <DashboardPanel>
-            <h2 className="text-lg font-semibold text-white">
-              What this page contains
+      <Panel className="overflow-hidden" padding="sm">
+        <div className="mb-3 flex flex-col gap-1 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
+              Promise filters
+            </p>
+            <h2 className="text-base font-semibold text-white">
+              Narrow the promise-tracker panels
             </h2>
-            <p className="mt-2 text-sm leading-6 text-[var(--ink-soft)]">
-              The dashboard combines presidential score context, promise-tracker
-              movement, policy direction, and source coverage into one public
-              overview.
-            </p>
-          </DashboardPanel>
-          <DashboardPanel>
-            <h2 className="text-lg font-semibold text-white">How to use it</h2>
-            <p className="mt-2 text-sm leading-6 text-[var(--ink-soft)]">
-              Start here when you want a fast read on historical progress,
-              current movement, and where to click next for evidence-backed
-              detail.
-            </p>
-          </DashboardPanel>
+          </div>
+          <p className="min-w-0 max-w-[calc(100vw-4rem)] break-words text-[12px] leading-5 text-[var(--ink-soft)] md:max-w-2xl">
+            Score, coverage, and evidence sections remain sitewide. These
+            controls only change the promise lists and status counts.
+          </p>
         </div>
-        <DashboardPanel className="h-full">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--accent)]">
-            Page logic
-          </p>
-          <h2 className="mt-3 text-lg font-semibold text-white">
-            What stays fixed vs filtered
-          </h2>
-          <p className="mt-2 text-sm leading-6 text-[var(--ink-soft)]">
-            Headline score, coverage, and evidence sections stay sitewide. The
-            promise-tracker blocks below respond to the filter bar so you can
-            narrow active records without changing the overall public score
-            context.
-          </p>
-        </DashboardPanel>
-      </section>
-
-      <DashboardFilterBar helpText="These filters narrow the Promise Tracker sections on this page. The larger score and coverage summaries remain sitewide context, not query-specific totals.">
+        <div className="mb-3">
+          <DashboardStatusTabs
+            counts={promiseStatusCounts}
+            currentStatus={currentPromiseStatus}
+            searchParams={dashboardSearchParams}
+          />
+        </div>
         <form
           action="/dashboard"
-          className="grid flex-1 gap-3 md:grid-cols-2 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,0.9fr)_minmax(0,0.9fr)_auto]"
+          className="grid gap-2 md:grid-cols-2 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)_minmax(0,0.8fr)_auto]"
         >
           <input
             type="search"
             name="q"
-            defaultValue={resolvedSearchParams.q || ""}
+            defaultValue={dashboardSearchParams.q}
             placeholder="Search tracked promises"
-            className="rounded-xl border border-white/8 bg-white/5 px-3 py-2.5 text-sm text-white"
+            className={FILTER_FIELD_CLASS}
           />
           <input
             type="text"
             name="president"
-            defaultValue={resolvedSearchParams.president || ""}
+            defaultValue={dashboardSearchParams.president}
             placeholder="President"
-            className="rounded-xl border border-white/8 bg-white/5 px-3 py-2.5 text-sm text-white"
+            className={FILTER_FIELD_CLASS}
           />
           <input
             type="text"
             name="status"
-            defaultValue={resolvedSearchParams.status || ""}
+            defaultValue={currentPromiseStatus}
             placeholder="Promise status"
-            className="rounded-xl border border-white/8 bg-white/5 px-3 py-2.5 text-sm text-white"
+            className={FILTER_FIELD_CLASS}
           />
           <button
             type="submit"
-            className="rounded-full bg-[var(--accent)] px-4 py-2.5 text-sm font-medium text-[#051019] xl:self-stretch"
+            className="min-h-9 rounded-md border border-[rgba(132,247,198,0.72)] bg-[var(--accent)] px-4 text-sm font-semibold text-[#051019] transition-[background-color,border-color,box-shadow] hover:bg-[rgba(132,247,198,0.9)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(132,247,198,0.28)] focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(11,20,33)] xl:self-stretch"
           >
-            Update dashboard
+            Update
           </button>
         </form>
-      </DashboardFilterBar>
-
-      <section className="grid gap-3 2xl:grid-cols-[minmax(0,1.25fr)_minmax(300px,0.75fr)]">
-        <ImpactOverviewCards
-          items={[
-            {
-              label: "Outcomes in score",
-              value: data.scores.metadata?.outcomes_included_in_score ?? 0,
-              description: `${data.scores.metadata?.outcomes_excluded_from_score ?? 0} excluded from the current model`,
-              tone: "accent",
-            },
-            {
-              label: "High-confidence share",
-              value: pct(trust.high_confidence_outcome_percentage),
-              description: `${pct(
-                trust.low_confidence_outcome_percentage
-              )} low-confidence`,
-            },
-            {
-              label: "Source coverage",
-              value: pct(data.readiness.source_coverage_pct),
-              description: `${data.readiness.unsourced_outcomes} unsourced outcomes still visible`,
-            },
-            {
-              label: "Intent coverage",
-              value: pct(data.readiness.intent_coverage_pct),
-              description: `${data.readiness.certification_status} certification status`,
-            },
-          ]}
-        />
-        <DashboardPanel className="h-full">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--accent)]">
-            Quick read
-          </p>
-          <h2 className="mt-3 text-lg font-semibold text-white">
-            How to scan the dashboard
-          </h2>
-          <p className="mt-2 text-sm leading-6 text-[var(--ink-soft)]">
-            Read the KPI row first, then the direction and trend charts, then
-            the ranked policy and promise tables. That keeps the page moving
-            from big-picture context into record-level evidence instead of
-            bouncing between unrelated blocks.
-          </p>
-        </DashboardPanel>
-      </section>
+        <div className="mt-3">
+          <ActiveFilterBar
+            searchParams={dashboardSearchParams}
+            currentStatus={currentPromiseStatus}
+          />
+        </div>
+      </Panel>
 
       {data.insights?.length ? (
-        <section className="space-y-4">
-          <SectionIntro
+        <Panel className="overflow-hidden">
+          <SectionHeader
             eyebrow="Key insights"
             title="Key insights from the data"
-            description="These observations are derived from the current public dataset and are meant to help readers identify broad historical or policy patterns before opening the underlying records."
+            description="Current public-dataset observations meant to guide the next click into presidents, policies, promises, or sources."
           />
-          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          <div className="grid gap-3 p-4 md:grid-cols-2 xl:grid-cols-4">
             {data.insights.map((item, index) => (
-              <InsightCard
+              <InsightTile
                 key={`${item.title}-${index}`}
                 title={item.title}
                 text={item.text}
               />
             ))}
           </div>
-        </section>
+        </Panel>
       ) : null}
 
-      <section className="grid gap-3 md:grid-cols-3">
+      <section className="grid gap-4 md:grid-cols-3">
         {[
           {
             title: "Positive movement",
             value: data.topPositivePolicies.length,
             summary:
               "High-scoring policies with documented positive contribution in the current dataset.",
+            tone: "success",
           },
           {
             title: "Negative movement",
             value: data.topNegativePolicies.length,
             summary:
               "Records pulling the score downward remain visible instead of being averaged away.",
+            tone: "danger",
           },
           {
             title: "Mixed movement",
             value: data.topMixedPolicies.length,
             summary:
               "Mixed-impact records signal contested or uneven policy effects that still matter for interpretation.",
+            tone: "contested",
           },
         ].map((item) => (
-          <div
+          <MetricCard
             key={item.title}
-            className="rounded-[1.5rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-4"
-          >
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
-              {item.title}
-            </p>
-            <p className="mt-2 text-[2rem] font-semibold tracking-[-0.05em] text-white">
-              {item.value}
-            </p>
-            <p className="mt-2 text-sm leading-6 text-[var(--ink-soft)]">
-              {item.summary}
-            </p>
-          </div>
+            label={item.title}
+            value={item.value}
+            description={item.summary}
+            tone={item.tone}
+            showDot
+          />
         ))}
       </section>
 
-      <section className="grid gap-4 2xl:grid-cols-[minmax(0,1.15fr)_minmax(340px,0.85fr)]">
-        <ImpactTrendChart
-          data={trend.score_by_year || []}
-          title="Score movement over time"
-          description={
-            trend.interpretation ||
-            "Grouped into yearly buckets using the outcome time dimension."
-          }
-        />
-        <DirectionBreakdownChart
-          data={directionData}
-          title="Outcome direction mix"
-          description="Positive and negative movement stay visible alongside mixed and blocked outcomes."
-        />
+      <section className="grid gap-4 2xl:grid-cols-[minmax(0,1.18fr)_minmax(340px,0.82fr)]">
+        <div className="2xl:min-h-[420px]">
+          <ImpactTrendChart
+            data={trend.score_by_year || []}
+            title="Primary signal: score movement over time"
+            description={
+              trend.interpretation ||
+              "Grouped into yearly buckets using the outcome time dimension."
+            }
+          />
+        </div>
+        <div className="grid gap-4">
+          <DirectionBreakdownChart
+            data={directionData}
+            title="Outcome direction mix"
+            description="Positive, negative, mixed, and blocked outcomes remain separate so the score does not flatten conflict."
+          />
+          <Panel padding="md">
+            <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
+              Reading order
+            </p>
+            <h2 className="mt-2 text-base font-semibold text-white">
+              From aggregate score to records
+            </h2>
+            <p className="mt-2 text-[12px] leading-5 text-[var(--ink-soft)]">
+              Read the KPI row, direction mix, and trend first. Then use the
+              presidential ranking and policy tables to open the evidence behind
+              the movement.
+            </p>
+          </Panel>
+        </div>
       </section>
 
       <section className="grid gap-4 2xl:grid-cols-[minmax(0,1.1fr)_minmax(300px,0.9fr)]">
@@ -315,42 +538,41 @@ export default async function DashboardPage({ searchParams }) {
       </section>
 
       <section className="grid gap-4 2xl:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)]">
-        <DashboardPanel className="space-y-5 xl:self-start">
-          <DashboardPanelHeader
+        <Panel className="overflow-hidden xl:self-start">
+          <SectionHeader
             eyebrow="Flagship score feature"
             title="Black Impact Score by president"
             description="This ranking summarizes how presidents compare on measured policy impact in the current EquityStack dataset. Open the full presidents index for broader Black history by president, or compare presidents directly when you need a tighter read."
             action={
               <div className="flex flex-wrap gap-2">
-                <Link href="/presidents" className="public-button-primary">
+                <DashboardActionLink href="/presidents" variant="primary">
                   Open the presidents index
-                </Link>
-                <Link
-                  href="/compare/presidents"
-                  className="public-button-secondary"
-                >
-                  Compare presidents side by side
-                </Link>
+                </DashboardActionLink>
+                <DashboardActionLink href="/compare/presidents">
+                  Compare presidents
+                </DashboardActionLink>
               </div>
             }
           />
-          <PresidentRankingBoard
-            items={data.presidentRanking || []}
-            buildHref={(item) => `/presidents/${item.slug}`}
-            limit={5}
-          />
-          <div className="rounded-[1.2rem] border border-white/8 bg-white/5 p-4">
-            <h3 className="text-base font-semibold text-white">
-              How to interpret this block
-            </h3>
-            <p className="mt-2 text-sm leading-6 text-[var(--ink-soft)]">
-              Scores reflect measured policy impact in the EquityStack dataset,
-              not a complete judgment of a presidency. Confidence, direction
-              mix, and profile-level drivers matter when reading differences
-              between presidents.
-            </p>
+          <div className="p-4">
+            <PresidentRankingBoard
+              items={data.presidentRanking || []}
+              buildHref={(item) => `/presidents/${item.slug}`}
+              limit={5}
+            />
+            <div className="mt-4 rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4">
+              <h3 className="text-sm font-semibold text-white">
+                Interpret the score with confidence and drivers nearby
+              </h3>
+              <p className="mt-2 text-[12px] leading-5 text-[var(--ink-soft)]">
+                Scores reflect measured policy impact in the EquityStack
+                dataset, not a complete judgment of a presidency. Confidence,
+                direction mix, and profile-level drivers matter when reading
+                differences between presidents.
+              </p>
+            </div>
           </div>
-        </DashboardPanel>
+        </Panel>
         <div>
           <PresidentScoreMethodologyNote />
         </div>
@@ -370,197 +592,161 @@ export default async function DashboardPage({ searchParams }) {
         summary="How to read this: included outcomes are currently usable in the score, excluded outcomes remain visible so missing data cannot silently disappear."
       />
 
-      <section className="grid gap-6 2xl:grid-cols-2">
-        <DashboardPanel className="space-y-5">
-          <DashboardPanelHeader
+      <section className="grid gap-4 2xl:grid-cols-2">
+        <Panel className="overflow-hidden">
+          <SectionHeader
             title="Top positive policies"
             description="Highest-scoring policy records currently pushing the dataset upward for Black Americans."
             action={
               <Link
                 href="/policies?impact_direction=Positive&sort=impact_score_desc"
-                className="accent-link text-sm"
+                className={SECONDARY_TEXT_LINK_CLASS}
               >
-                Browse all positive-impact policies
+                Browse positive policies
               </Link>
             }
           />
-          <RecentPolicyChangesTable items={data.topPositivePolicies} />
-        </DashboardPanel>
+          <div className="p-4">
+            <RecentPolicyChangesTable items={data.topPositivePolicies} />
+          </div>
+        </Panel>
 
-        <DashboardPanel className="space-y-5">
-          <DashboardPanelHeader
+        <Panel className="overflow-hidden">
+          <SectionHeader
             title="Top negative policies"
             description="Policy records producing the strongest downward pull in the documented dataset."
             action={
               <Link
                 href="/policies?impact_direction=Negative&sort=impact_score_desc"
-                className="accent-link text-sm"
+                className={SECONDARY_TEXT_LINK_CLASS}
               >
-                Browse all negative-impact policies
+                Browse negative policies
               </Link>
             }
           />
-          <RecentPolicyChangesTable items={data.topNegativePolicies} />
-        </DashboardPanel>
+          <div className="p-4">
+            <RecentPolicyChangesTable items={data.topNegativePolicies} />
+          </div>
+        </Panel>
       </section>
 
       {data.topMixedPolicies.length ? (
-        <DashboardPanel className="space-y-5">
-          <DashboardPanelHeader
+        <Panel className="overflow-hidden">
+          <SectionHeader
             title="Top mixed-impact policies"
             description="Mixed records deserve their own lane because they often explain why a period looks more complicated than a single headline score suggests."
             action={
               <Link
                 href="/policies?impact_direction=Mixed&sort=impact_score_desc"
-                className="accent-link text-sm"
+                className={SECONDARY_TEXT_LINK_CLASS}
               >
                 Browse all mixed-impact policies
               </Link>
             }
           />
-          <RecentPolicyChangesTable items={data.topMixedPolicies} />
-        </DashboardPanel>
+          <div className="p-4">
+            <RecentPolicyChangesTable items={data.topMixedPolicies} />
+          </div>
+        </Panel>
       ) : null}
 
-      <DashboardPanel className="space-y-5">
-        <DashboardPanelHeader
+      <Panel className="overflow-hidden">
+        <SectionHeader
           title="Latest policy updates"
           description="The most recent visible outcome records, kept separate from the ranked strongest-positive and strongest-negative lists."
         />
-        <RecentPolicyChangesTable items={data.latestPolicyUpdates} />
-      </DashboardPanel>
+        <div className="p-4">
+          <RecentPolicyChangesTable items={data.latestPolicyUpdates} />
+        </div>
+      </Panel>
 
-      <DashboardPanel className="space-y-6">
-        <DashboardPanelHeader
+      <Panel className="overflow-hidden">
+        <SectionHeader
           title="Promise Tracker Overview"
           description="Promise tracking matters because it shows what was promised, what action followed, and whether that produced visible policy outcomes in the current dataset."
           action={
-            <Link href="/promises" className="public-button-secondary">
+            <DashboardActionLink href="/promises">
               Open the full promise tracker
-            </Link>
+            </DashboardActionLink>
           }
         />
 
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
-          <div className="rounded-[1.2rem] border border-white/8 bg-white/5 p-4">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
-              Delivered
-            </p>
-            <p className="mt-2 text-2xl font-semibold text-white">
-              {promiseStatusCounts.Delivered || 0}
-            </p>
-          </div>
-          <div className="rounded-[1.2rem] border border-white/8 bg-white/5 p-4">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
-              Partial
-            </p>
-            <p className="mt-2 text-2xl font-semibold text-white">
-              {promiseStatusCounts.Partial || 0}
-            </p>
-          </div>
-          <div className="rounded-[1.2rem] border border-white/8 bg-white/5 p-4">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
-              In Progress
-            </p>
-            <p className="mt-2 text-2xl font-semibold text-white">
-              {promiseStatusCounts["In Progress"] || 0}
-            </p>
-          </div>
-          <div className="rounded-[1.2rem] border border-white/8 bg-white/5 p-4">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
-              Blocked
-            </p>
-            <p className="mt-2 text-2xl font-semibold text-white">
-              {promiseStatusCounts.Blocked || 0}
-            </p>
-          </div>
-          <div className="rounded-[1.2rem] border border-white/8 bg-white/5 p-4 sm:col-span-2 xl:col-span-1">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
-              Failed
-            </p>
-            <p className="mt-2 text-2xl font-semibold text-white">
-              {promiseStatusCounts.Failed || 0}
-            </p>
-          </div>
-        </div>
-
-        <section className="grid gap-6 2xl:grid-cols-[minmax(0,1.1fr)_minmax(320px,0.9fr)]">
-          <PromiseSystemExplanation />
-          <PromiseStatusLegend />
-        </section>
-
-        <section className="grid gap-6 2xl:grid-cols-2">
-          <div className="space-y-4">
-            <div>
-              <h3 className="text-lg font-semibold text-white">
-                Recent Promise Status changes
-              </h3>
-              <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
-                Recent updates help users move from the Promise Tracker summary
-                into the most recently changed records and then into the fuller
-                president or promise pages.
-              </p>
-            </div>
-            <RecentPolicyChangesTable
-              items={(data.promiseLatestChanges || []).map((item) => ({
-                ...item,
-                date: item.latest_action_date || item.promise_date,
-                impact_direction: item.status,
-                record_type: "Promise",
-              }))}
-              buildHref={(item) => `/promises/${item.slug}`}
+        <div className="space-y-4 p-4">
+          <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-5">
+            <PromiseStatusStat
+              label="Delivered"
+              value={promiseStatusCounts.Delivered || 0}
+              tone="success"
+            />
+            <PromiseStatusStat
+              label="Partial"
+              value={promiseStatusCounts.Partial || 0}
+              tone="warning"
+            />
+            <PromiseStatusStat
+              label="In progress"
+              value={promiseStatusCounts["In Progress"] || 0}
+              tone="info"
+            />
+            <PromiseStatusStat
+              label="Blocked"
+              value={promiseStatusCounts.Blocked || 0}
+              tone="contested"
+            />
+            <PromiseStatusStat
+              label="Failed"
+              value={promiseStatusCounts.Failed || 0}
+              tone="danger"
             />
           </div>
 
-          <div className="space-y-4">
-            <div>
-              <h3 className="text-lg font-semibold text-white">
-                Current filtered promises
-              </h3>
-              <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
-                This table follows the dashboard filter bar, so users can narrow
-                the active promise slice without losing the sitewide score and
-                coverage context above.
-              </p>
-            </div>
-            <PromiseResultsTable
-              items={(data.promiseSnapshot.items || []).slice(0, 6)}
-              buildHref={(item) => `/promises/${item.slug}`}
-            />
-          </div>
-        </section>
-      </DashboardPanel>
+          <section className="grid gap-4 2xl:grid-cols-[minmax(0,1.1fr)_minmax(320px,0.9fr)]">
+            <PromiseSystemExplanation />
+            <PromiseStatusLegend />
+          </section>
 
-      <section className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6">
-        <h2 className="text-2xl font-semibold text-white">How to read this</h2>
-        <div className="mt-4 grid gap-4 md:grid-cols-3">
-          <div className="rounded-[1.2rem] border border-white/8 bg-white/5 p-4">
-            <p className="text-sm font-medium text-white">Start with summary</p>
-            <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
-              Scan the KPI row and score movement before drilling into any
-              individual claim.
-            </p>
-          </div>
-          <div className="rounded-[1.2rem] border border-white/8 bg-white/5 p-4">
-            <p className="text-sm font-medium text-white">
-              Open the underlying record
-            </p>
-            <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
-              Every major item here should send you to a policy, promise,
-              president, or report page with more context.
-            </p>
-          </div>
-          <div className="rounded-[1.2rem] border border-white/8 bg-white/5 p-4">
-            <p className="text-sm font-medium text-white">
-              Read evidence nearby
-            </p>
-            <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
-              Source counts, confidence, completeness, and methodology stay
-              close to the metrics so trust never becomes a separate screen.
-            </p>
-          </div>
+          <section className="grid gap-4 2xl:grid-cols-2">
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-base font-semibold text-white">
+                  Recent Promise Status changes
+                </h3>
+                <p className="mt-2 text-sm leading-6 text-[var(--ink-soft)]">
+                  Recent updates help users move from the Promise Tracker
+                  summary into the most recently changed records and then into
+                  the fuller president or promise pages.
+                </p>
+              </div>
+              <RecentPolicyChangesTable
+                items={(data.promiseLatestChanges || []).map((item) => ({
+                  ...item,
+                  date: item.latest_action_date || item.promise_date,
+                  impact_direction: item.status,
+                  record_type: "Promise",
+                }))}
+                buildHref={(item) => `/promises/${item.slug}`}
+              />
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-base font-semibold text-white">
+                  Current filtered promises
+                </h3>
+                <p className="mt-2 text-sm leading-6 text-[var(--ink-soft)]">
+                  This table follows the dashboard filter bar, so users can
+                  narrow the active promise slice without losing the sitewide
+                  score and coverage context above.
+                </p>
+              </div>
+              <PromiseResultsTable
+                items={(data.promiseSnapshot.items || []).slice(0, 6)}
+                buildHref={(item) => `/promises/${item.slug}`}
+              />
+            </div>
+          </section>
         </div>
-      </section>
+      </Panel>
     </main>
   );
 }
