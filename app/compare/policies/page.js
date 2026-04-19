@@ -3,8 +3,6 @@ import { fetchComparePoliciesData } from "@/lib/public-site-data";
 import { Breadcrumbs } from "@/app/components/public/chrome";
 import {
   KpiCard,
-  MethodologyCallout,
-  PageContextBlock,
   SectionIntro,
 } from "@/app/components/public/core";
 import {
@@ -13,7 +11,6 @@ import {
   PolicyCardList,
 } from "@/app/components/public/entities";
 import TrustBar from "@/app/components/public/TrustBar";
-import ScoreExplanation from "@/app/components/public/ScoreExplanation";
 
 export const dynamic = "force-dynamic";
 
@@ -77,7 +74,7 @@ export default async function ComparePoliciesPage({ searchParams }) {
 
       <TrustBar />
 
-      <section className="grid gap-6 xl:grid-cols-[0.92fr_1.08fr]">
+      <section className="space-y-4">
         <form action="/compare/policies" method="GET" className="space-y-4">
           <CompareSelector
             options={data.options || []}
@@ -88,14 +85,10 @@ export default async function ComparePoliciesPage({ searchParams }) {
             Compare selected policies
           </button>
         </form>
-        <div className="space-y-5">
-          <PageContextBlock
-            description="This page compares selected policy records by Impact Score, Impact Direction, source depth, topic, and Confidence."
-            detail="It is most useful when the policies are meaningfully comparable and when you open the detail pages afterward to inspect evidence and plain-language summaries."
-          />
-          <MethodologyCallout description="Policy comparison should be read alongside the detail pages. Impact score is only one part of the record; source depth, direction, timing, and category all matter." />
-          <ScoreExplanation title="How to read policy comparison scores" />
-        </div>
+        <p className="max-w-4xl text-sm leading-7 text-[var(--ink-soft)]">
+          Choose records that actually belong in the same conversation. Score, direction, confidence,
+          and source count are most useful when the policies share topic, era, or historical context.
+        </p>
       </section>
 
       {data.items?.length >= 2 ? (

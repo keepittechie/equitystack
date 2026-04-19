@@ -8,7 +8,6 @@ import {
   DashboardFilterBar,
   ImpactOverviewCards,
   MethodologyCallout,
-  PageContextBlock,
   PresidentScoreMethodologyNote,
   SectionIntro,
 } from "@/app/components/public/core";
@@ -19,7 +18,6 @@ import {
   PresidentRankingBoard,
 } from "@/app/components/public/entities";
 import TrustBar from "@/app/components/public/TrustBar";
-import ScoreExplanation from "@/app/components/public/ScoreExplanation";
 import {
   buildBreadcrumbJsonLd,
   buildCollectionPageJsonLd,
@@ -183,16 +181,6 @@ export default async function PresidentsPage({ searchParams }) {
 
       <TrustBar />
 
-      <section className="space-y-4">
-        <Panel padding="md" className="space-y-4">
-          <PageContextBlock
-            description="This page ranks presidential records using the final Black Impact Score, anchored by documented policy outcomes and supported by promise and legislative context."
-            detail="Use it to answer questions like which presidents most affected Black Americans, how civil-rights policy differed across administrations, and where the current evidence base is strongest or thinnest."
-          />
-          <ScoreExplanation title="How to read presidential Impact Scores" />
-        </Panel>
-      </section>
-
       <DashboardFilterBar helpText="Filter by name, party, confidence, or score order. The goal is quick ranking scan first, then profile-level reading.">
         <form action="/presidents" method="GET" className="flex flex-1 flex-wrap items-end gap-4">
           <label className="grid gap-2">
@@ -236,27 +224,6 @@ export default async function PresidentsPage({ searchParams }) {
           </button>
         </form>
       </DashboardFilterBar>
-
-      <section className="grid gap-4 md:grid-cols-3">
-        <Link href="/promises" className="panel-link p-4">
-          <h2 className="text-lg font-semibold text-white">Open campaign promises by president</h2>
-          <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-            Use the Promise Tracker to see what presidents said they would do for Black Americans and how those commitments were later graded.
-          </p>
-        </Link>
-        <Link href="/reports/black-impact-score" className="panel-link p-4">
-          <h2 className="text-lg font-semibold text-white">Read the Black Impact Score report</h2>
-          <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-            The flagship report adds ranking context, score interpretation, and broader historical framing beyond the profile cards on this page.
-          </p>
-        </Link>
-        <Link href="/analysis/presidents-and-black-americans" className="panel-link p-4">
-          <h2 className="text-lg font-semibold text-white">Read the presidents and Black Americans guide</h2>
-          <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-            Start with the thematic guide when the question is broader than one president and you want the best research paths across profiles, policies, promises, and reports.
-          </p>
-        </Link>
-      </section>
 
       <ImpactOverviewCards
         items={[
@@ -347,6 +314,27 @@ export default async function PresidentsPage({ searchParams }) {
             { key: "confidence", label: "Confidence" },
           ]}
         />
+      </section>
+
+      <section className="grid gap-4 md:grid-cols-3">
+        <Link href="/promises" className="panel-link p-4">
+          <h2 className="text-lg font-semibold text-white">Open campaign promises by president</h2>
+          <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+            Use the Promise Tracker to see what presidents said they would do for Black Americans and how those commitments were later graded.
+          </p>
+        </Link>
+        <Link href="/reports/black-impact-score" className="panel-link p-4">
+          <h2 className="text-lg font-semibold text-white">Read the Black Impact Score report</h2>
+          <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+            The flagship report adds ranking context, score interpretation, and broader historical framing beyond the profile cards on this page.
+          </p>
+        </Link>
+        <Link href="/analysis/presidents-and-black-americans" className="panel-link p-4">
+          <h2 className="text-lg font-semibold text-white">Read the presidents and Black Americans guide</h2>
+          <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+            Start with the thematic guide when the question is broader than one president and you want the best research paths across profiles, policies, promises, and reports.
+          </p>
+        </Link>
       </section>
 
       <section className="space-y-4">

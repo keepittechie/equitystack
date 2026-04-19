@@ -7,7 +7,6 @@ import {
   DashboardFilterBar,
   ImpactOverviewCards,
   MethodologyCallout,
-  PageContextBlock,
   SectionIntro,
 } from "@/app/components/public/core";
 import { Panel } from "@/app/components/dashboard/primitives";
@@ -114,33 +113,6 @@ export default async function PromisesPage({ searchParams }) {
         />
       </section>
 
-      <PageContextBlock
-        description="This page tracks public promises, their current status, and the documented actions or outcomes used to justify that status."
-        detail="Use it to research campaign promises related to Black communities, compare presidents by follow-through, and move from a statement into the linked policy history and evidence."
-      />
-
-      <section className="space-y-4">
-        <Panel padding="md" className="space-y-4">
-          <PromiseSystemExplanation />
-          <PromiseStatusLegend />
-        </Panel>
-      </section>
-
-      <section className="grid gap-4 md:grid-cols-2">
-        <Link href="/presidents" className="panel-link p-4">
-          <h2 className="text-lg font-semibold text-white">Compare presidents by linked promise records</h2>
-          <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-            Move from the promise tracker into presidential profiles when you want score context, policy drivers, and Black history by administration.
-          </p>
-        </Link>
-        <Link href="/current-administration" className="panel-link p-4">
-          <h2 className="text-lg font-semibold text-white">Follow the current administration</h2>
-          <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-            The current-administration overview highlights recent promise movement, actions, and outcomes inside the live public record.
-          </p>
-        </Link>
-      </section>
-
       <DashboardFilterBar helpText="Promise status remains separate from the Black Impact Score. Use filters to narrow by president, topic, or status before opening a record.">
         <form action="/promises" method="GET" className="flex flex-1 flex-wrap items-end gap-4">
           <label className="grid gap-2">
@@ -230,6 +202,10 @@ export default async function PromisesPage({ searchParams }) {
             description="Open any row for the promise statement, current rationale, linked policies, evidence, and the status history timeline."
           />
           <PromiseResultsTable items={data.items || []} buildHref={(item) => `/promises/${item.slug}`} />
+          <Panel padding="md" className="space-y-4 bg-[rgba(18,31,49,0.52)]">
+            <PromiseSystemExplanation />
+            <PromiseStatusLegend />
+          </Panel>
           <Panel padding="md" className="bg-[rgba(18,31,49,0.52)]">
             <h2 className="text-lg font-semibold text-white">Promise Tracker interpretation</h2>
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
@@ -252,6 +228,21 @@ export default async function PromisesPage({ searchParams }) {
             buildHref={(item) => `/promises/${item.slug}`}
           />
         </Panel>
+      </section>
+
+      <section className="grid gap-4 md:grid-cols-2">
+        <Link href="/presidents" className="panel-link p-4">
+          <h2 className="text-lg font-semibold text-white">Compare presidents by linked promise records</h2>
+          <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+            Move from the promise tracker into presidential profiles when you want score context, policy drivers, and Black history by administration.
+          </p>
+        </Link>
+        <Link href="/current-administration" className="panel-link p-4">
+          <h2 className="text-lg font-semibold text-white">Follow the current administration</h2>
+          <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+            The current-administration overview highlights recent promise movement, actions, and outcomes inside the live public record.
+          </p>
+        </Link>
       </section>
     </main>
   );

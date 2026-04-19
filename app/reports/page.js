@@ -8,7 +8,6 @@ import {
   DashboardFilterBar,
   ImpactOverviewCards,
   MethodologyCallout,
-  PageContextBlock,
   SectionIntro,
 } from "@/app/components/public/core";
 import { Panel } from "@/app/components/dashboard/primitives";
@@ -21,7 +20,6 @@ import {
   DirectionBreakdownChart,
 } from "@/app/components/public/charts";
 import TrustBar from "@/app/components/public/TrustBar";
-import ScoreExplanation from "@/app/components/public/ScoreExplanation";
 import InsightCard from "@/app/components/public/InsightCard";
 import {
   buildBreadcrumbJsonLd,
@@ -146,42 +144,6 @@ export default async function ReportsPage({ searchParams }) {
       </section>
 
       <TrustBar />
-
-      <section className="space-y-4">
-        <Panel padding="md" className="space-y-4">
-          <PageContextBlock
-            description="This page organizes EquityStack’s analytical outputs, from flagship score views to historical and category-based report paths."
-            detail="Reports summarize structured policy data. They are designed to help users move from synthesis into the underlying records, sources, and methodology."
-          />
-          <ScoreExplanation title="How to read report score language" />
-        </Panel>
-      </section>
-
-      <section className="space-y-4">
-        <Panel padding="md" className="space-y-4">
-          <CitationNote
-            title="Why this hub is worth citing"
-            description="The reports hub is the strongest page to share when someone needs a curated entry point into EquityStack&apos;s analysis layer. It organizes flagship reports, score interpretation, and related record pathways in one place instead of forcing readers to start with a raw table."
-          />
-          <Panel padding="md" className="bg-[rgba(18,31,49,0.52)]">
-          <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
-            Best external use cases
-          </p>
-          <h2 className="mt-3 text-2xl font-semibold text-white">Where this page helps most</h2>
-          <div className="mt-4 grid gap-3 text-sm leading-7 text-[var(--ink-soft)]">
-            <Panel padding="md" className="bg-[rgba(18,31,49,0.52)]">
-              Share this page when a reader needs a summary-level entry into EquityStack before opening presidents, policies, or promises.
-            </Panel>
-            <Panel padding="md" className="bg-[rgba(18,31,49,0.52)]">
-              Link here when a story or class discussion needs a report library rather than one isolated chart or one isolated record.
-            </Panel>
-            <Panel padding="md" className="bg-[rgba(18,31,49,0.52)]">
-              Use the flagship reports below when you need the most shareable pages for historical comparison, score context, or timeline framing.
-            </Panel>
-          </div>
-          </Panel>
-        </Panel>
-      </section>
 
       <DashboardFilterBar helpText="Browse reports by category or keyword. Flagship reports stay visible, but the hub is designed to move you into the right analysis path fast.">
         <form action="/reports" method="GET" className="flex flex-1 flex-wrap items-end gap-4">

@@ -218,12 +218,6 @@ export default async function CurrentAdministrationPage() {
       </section>
 
       <section className="card-surface p-4">
-        <div className="max-w-3xl mb-5">
-          <h2 className="text-2xl font-semibold">How to read the current administration overview</h2>
-          <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
-            This page is a landing view for the live presidency record. It helps users see recent promise movement, documented actions, and early outcome patterns before moving into individual promise pages.
-          </p>
-        </div>
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div className="max-w-3xl">
             <h3 className="text-2xl font-semibold">Current term summary</h3>
@@ -234,6 +228,9 @@ export default async function CurrentAdministrationPage() {
             </p>
             <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
               {impactPattern}
+            </p>
+            <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
+              Use this landing view to scan recent promise movement, actions, and early outcome direction before opening individual Promise Tracker records.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">

@@ -9,9 +9,7 @@ import { getFlagshipReportEditorial } from "@/lib/flagship-editorial";
 import StructuredData from "@/app/components/public/StructuredData";
 import { Breadcrumbs } from "@/app/components/public/chrome";
 import {
-  CitationNote,
   KpiCard,
-  MethodologyCallout,
   SectionIntro,
 } from "@/app/components/public/core";
 import TrustBar from "@/app/components/public/TrustBar";
@@ -31,7 +29,7 @@ import {
   buildBreadcrumbJsonLd,
   buildReportJsonLd,
 } from "@/lib/structured-data";
-import { Panel, SectionHeader } from "@/app/components/dashboard/primitives";
+import { Panel } from "@/app/components/dashboard/primitives";
 
 export const dynamic = "force-dynamic";
 
@@ -267,64 +265,6 @@ export default async function ReportDetailPage({ params }) {
 
       <TrustBar />
 
-      <Panel prominence="primary" className="overflow-hidden">
-        <SectionHeader
-          eyebrow="How to use this report"
-          title="Interpretation, citation, and verification stay together"
-          description="Report pages synthesize patterns across the dataset, but they still need to route readers back into policies, presidents, promises, sources, and methodology."
-        />
-        <div className="grid gap-4 p-4 xl:grid-cols-[minmax(0,1.05fr)_minmax(20rem,0.95fr)]">
-          <div className="grid gap-4">
-            <div className="rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4 text-sm leading-7 text-[var(--ink-soft)]">
-              Use this page when you want a higher-level answer first, then drill down into the underlying public record without losing the audit trail.
-            </div>
-            <div className="rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4 text-sm leading-7 text-[var(--ink-soft)]">
-              Search visitors often need more than a single policy page but less than a raw database view. This report is designed to bridge that gap, turning many records into a readable analytical frame while keeping the underlying evidence close by.
-            </div>
-          </div>
-          <div className="grid gap-4">
-            <CitationNote
-              title="Why readers cite this report"
-              description={
-                reportEditorial?.citationDescription ||
-                "This page is best used as a reference when someone needs a concise analytical summary that still links back into the underlying records. Cite the report title, EquityStack, the report URL, and your access date, then link to the related policies, sources, or methodology page when precision matters."
-              }
-            />
-            <MethodologyCallout description="This report is a structured reading layer, not a standalone claim. Use the related links, policies, and methodology access below to validate what the report is summarizing." />
-          </div>
-        </div>
-      </Panel>
-
-      <section className="grid gap-4 md:grid-cols-3">
-        {(reportEditorial?.cards || [
-          {
-            title: "What this report does",
-            description:
-              "Use the report layer when the first question is comparative or interpretive and the reader needs a concise synthesis before opening individual policy pages.",
-          },
-          {
-            title: "What it does not do",
-            description:
-              "A report summarizes the current public dataset. It should still be paired with linked policy pages, the source library, or methodology when the topic is contested or highly specific.",
-          },
-          {
-            title: "Best next step",
-            description:
-              "Read the findings first, then move into the linked records, charts, and trust pages rather than treating the report summary as self-sufficient.",
-          },
-        ]).map((item) => (
-          <div key={item.title} className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--accent)]">
-              Flagship note
-            </p>
-            <h2 className="mt-3 text-lg font-semibold text-white">{item.title}</h2>
-            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-              {item.description}
-            </p>
-          </div>
-        ))}
-      </section>
-
       {report.metrics?.length ? (
         <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {report.metrics.map((item) => (
@@ -439,6 +379,36 @@ export default async function ReportDetailPage({ params }) {
           />
         </section>
       ) : null}
+
+      <section className="grid gap-4 md:grid-cols-3">
+        {(reportEditorial?.cards || [
+          {
+            title: "What this report does",
+            description:
+              "Use the report layer when the first question is comparative or interpretive and the reader needs a concise synthesis before opening individual policy pages.",
+          },
+          {
+            title: "What it does not do",
+            description:
+              "A report summarizes the current public dataset. It should still be paired with linked policy pages, the source library, or methodology when the topic is contested or highly specific.",
+          },
+          {
+            title: "Best next step",
+            description:
+              "Read the findings first, then move into the linked records, charts, and trust pages rather than treating the report summary as self-sufficient.",
+          },
+        ]).map((item) => (
+          <div key={item.title} className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--accent)]">
+              Flagship note
+            </p>
+            <h2 className="mt-3 text-lg font-semibold text-white">{item.title}</h2>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+              {item.description}
+            </p>
+          </div>
+        ))}
+      </section>
 
       <section className="space-y-5">
         <SectionIntro

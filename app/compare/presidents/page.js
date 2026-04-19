@@ -5,9 +5,6 @@ import { fetchComparePresidentsData } from "@/lib/public-site-data";
 import { Breadcrumbs } from "@/app/components/public/chrome";
 import {
   KpiCard,
-  MethodologyCallout,
-  PageContextBlock,
-  PresidentScoreMethodologyNote,
   ScoreBadge,
   SectionIntro,
 } from "@/app/components/public/core";
@@ -17,7 +14,6 @@ import {
   PresidentPortrait,
 } from "@/app/components/public/entities";
 import TrustBar from "@/app/components/public/TrustBar";
-import ScoreExplanation from "@/app/components/public/ScoreExplanation";
 
 export const dynamic = "force-dynamic";
 
@@ -77,7 +73,7 @@ export default async function ComparePresidentsPage({ searchParams }) {
 
       <TrustBar />
 
-      <section className="grid items-start gap-6 2xl:grid-cols-[0.92fr_1.08fr]">
+      <section className="space-y-4">
         <form action="/compare/presidents" method="GET" className="space-y-4">
           <CompareSelector
             options={data.options || []}
@@ -88,15 +84,11 @@ export default async function ComparePresidentsPage({ searchParams }) {
             Compare selected presidents
           </button>
         </form>
-        <div className="grid gap-4 md:grid-cols-2 2xl:grid-cols-1">
-          <PageContextBlock
-            description="This page compares up to four presidential records using direct Impact Score first, then systemic context, outcome counts, and Confidence."
-            detail="Use it to identify meaningful differences, then open each profile for trend lines, evidence footprint, and record-level detail."
-          />
-          <PresidentScoreMethodologyNote />
-          <MethodologyCallout description="Use direct score as the main read. Systemic score helps show appointment-driven downstream effects, but it is not the primary headline metric." />
-          <ScoreExplanation title="How to read presidential comparison scores" />
-        </div>
+        <p className="max-w-4xl text-sm leading-7 text-[var(--ink-soft)]">
+          Select 2–4 presidents, then read direct score first. Systemic score, confidence, outcomes,
+          and topic gaps help explain whether the visible difference is broad-based or coming from a
+          narrower slice of the current record.
+        </p>
       </section>
 
       {data.comparison_ready ? (

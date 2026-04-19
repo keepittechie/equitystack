@@ -9,7 +9,6 @@ import { Breadcrumbs } from "@/app/components/public/chrome";
 import {
   FilterDrawer,
   MethodologyCallout,
-  PageContextBlock,
   SectionIntro,
 } from "@/app/components/public/core";
 import { Panel } from "@/app/components/dashboard/primitives";
@@ -20,7 +19,6 @@ import {
   PolicySearchBar,
 } from "@/app/components/public/entities";
 import TrustBar from "@/app/components/public/TrustBar";
-import ScoreExplanation from "@/app/components/public/ScoreExplanation";
 import {
   buildBreadcrumbJsonLd,
   buildCollectionPageJsonLd,
@@ -136,16 +134,6 @@ export default async function PoliciesPage({ searchParams }) {
       </section>
 
       <TrustBar />
-
-      <section className="space-y-5">
-        <PolicyPanel className="space-y-5">
-          <PageContextBlock
-            description="This explorer shows individual policy records, their Impact Score, Impact Direction, and evidence footprint across time."
-            detail="Use it to research civil-rights laws by president, compare executive actions and court decisions, and move from broad search intent into record-level proof."
-          />
-          <ScoreExplanation title="How to read policy Impact Scores" />
-        </PolicyPanel>
-      </section>
 
       <PolicySearchBar defaultValue={resolvedSearchParams.q || ""} />
 
