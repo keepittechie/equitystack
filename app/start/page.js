@@ -158,8 +158,8 @@ export default function StartPage() {
         </p>
       </section>
 
-      <section className="grid gap-6 md:grid-cols-2">
-        <div className="card-surface rounded-[1.6rem] p-6">
+      <section className="grid gap-6 border-t border-[var(--line)] pt-6 md:grid-cols-2">
+        <div>
           <h2 className="text-2xl font-semibold mb-3">What this guide covers</h2>
           <p className="text-sm text-[var(--ink-soft)] leading-7">
             The sequence below moves from constitutional foundations to political
@@ -167,7 +167,7 @@ export default function StartPage() {
             Each explainer links back into the larger policy, promise, report, and historical research database.
           </p>
         </div>
-        <div className="card-surface rounded-[1.6rem] p-6">
+        <div>
           <h2 className="text-2xl font-semibold mb-3">Why readers use this page</h2>
           <p className="text-sm text-[var(--ink-soft)] leading-7">
             This page is useful when someone needs a concise introduction to EquityStack&apos;s strongest historical explainers before moving into presidents, policies, reports, methodology, or sources.
@@ -186,9 +186,9 @@ export default function StartPage() {
           title="Use this guide when the audience needs orientation before evidence"
           description="The start page is most useful when the reader needs a guided path through the site’s strongest public explainers before they begin citing reports, records, or methods."
         />
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-x-8 gap-y-5 md:grid-cols-2 xl:grid-cols-4">
           {audienceStartPoints.map((item) => (
-            <article key={item.title} className="card-surface rounded-[1.6rem] p-5">
+            <article key={item.title}>
               <h2 className="text-lg font-semibold">{item.title}</h2>
               <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">{item.description}</p>
             </article>
@@ -206,7 +206,7 @@ export default function StartPage() {
           <Link
             key={item.slug}
             href={`/explainers/${item.slug}`}
-            className="panel-link block rounded-[1.5rem] p-6"
+            className="panel-link p-4"
           >
             <div className="flex items-start gap-4">
               <div className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-sm font-semibold text-[var(--accent)] bg-white/5 shrink-0">
@@ -223,37 +223,37 @@ export default function StartPage() {
         ))}
       </section>
 
-      <section className="card-surface rounded-[1.6rem] p-6">
+      <section className="card-surface p-4">
         <h2 className="text-2xl font-semibold mb-3">Companion pages for verification</h2>
         <p className="text-sm text-[var(--ink-soft)] leading-7 max-w-3xl">
           After the explainers, the strongest next step is usually a report, the methodology page, or the source library. Those pages make the site easier to verify, teach from, and reference externally.
         </p>
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5 mt-5">
-          <Link href="/research" className="panel-link block rounded-[1.25rem] p-5">
+          <Link href="/research" className="panel-link p-4">
             <h3 className="text-lg font-semibold">Research Hub</h3>
             <p className="text-sm text-[var(--ink-soft)] mt-2 leading-7">
               Use the research hub when someone needs one curated page that bundles thematic guides, flagship reports, explainers, methodology, and sources.
             </p>
           </Link>
-          <Link href="/glossary" className="panel-link block rounded-[1.25rem] p-5">
+          <Link href="/glossary" className="panel-link p-4">
             <h3 className="text-lg font-semibold">Glossary</h3>
             <p className="text-sm text-[var(--ink-soft)] mt-2 leading-7">
               Use the glossary when a reader needs quick definitions for the site’s main terms, page types, and research concepts.
             </p>
           </Link>
-          <Link href="/reports" className="panel-link block rounded-[1.25rem] p-5">
+          <Link href="/reports" className="panel-link p-4">
             <h3 className="text-lg font-semibold">Reports and analysis</h3>
             <p className="text-sm text-[var(--ink-soft)] mt-2 leading-7">
               Use reports when you need a summarized analytical page that still links back into the underlying public record.
             </p>
           </Link>
-          <Link href="/methodology" className="panel-link block rounded-[1.25rem] p-5">
+          <Link href="/methodology" className="panel-link p-4">
             <h3 className="text-lg font-semibold">Methodology</h3>
             <p className="text-sm text-[var(--ink-soft)] mt-2 leading-7">
               Read the methodology when a teacher, editor, or researcher needs to understand how scores and statuses are constructed.
             </p>
           </Link>
-          <Link href="/sources" className="panel-link block rounded-[1.25rem] p-5">
+          <Link href="/sources" className="panel-link p-4">
             <h3 className="text-lg font-semibold">Sources</h3>
             <p className="text-sm text-[var(--ink-soft)] mt-2 leading-7">
               Open the source library when a claim needs direct verification or a reader wants to inspect the evidence base.
@@ -262,25 +262,25 @@ export default function StartPage() {
         </div>
       </section>
 
-      <section className="card-surface rounded-[1.6rem] p-6">
+      <section className="card-surface p-4">
         <h2 className="text-2xl font-semibold mb-3">Where to go next</h2>
         <p className="text-sm text-[var(--ink-soft)] leading-7 max-w-3xl">
           After the guided explainers, move into the tracked record layer first, then use the report system for summary, comparison, and timeline views.
         </p>
         <div className="grid gap-4 md:grid-cols-3 mt-5">
-          <Link href="/promises" className="panel-link block rounded-[1.25rem] p-5">
+          <Link href="/promises" className="panel-link p-4">
             <h3 className="text-lg font-semibold">Promise Tracker</h3>
             <p className="text-sm text-[var(--ink-soft)] mt-2 leading-7">
               Review promises, actions, outcomes, and source-backed detail at the record level.
             </p>
           </Link>
-          <Link href="/reports/black-impact-score" className="panel-link block rounded-[1.25rem] p-5">
+          <Link href="/reports/black-impact-score" className="panel-link p-4">
             <h3 className="text-lg font-semibold">Black Impact Score</h3>
             <p className="text-sm text-[var(--ink-soft)] mt-2 leading-7">
               Move from individual records to a president-level accountability summary built from the tracker.
             </p>
           </Link>
-          <Link href="/reports/civil-rights-timeline" className="panel-link block rounded-[1.25rem] p-5">
+          <Link href="/reports/civil-rights-timeline" className="panel-link p-4">
             <h3 className="text-lg font-semibold">Timeline</h3>
             <p className="text-sm text-[var(--ink-soft)] mt-2 leading-7">
               Follow the broader civil-rights arc when you want historical continuity beyond a single report state.

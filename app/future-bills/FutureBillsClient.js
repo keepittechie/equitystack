@@ -197,13 +197,13 @@ export default function FutureBillsClient({ bills, focusId }) {
       </section>
 
       <section className="grid gap-4 md:grid-cols-2">
-        <div className="card-surface rounded-[1.6rem] p-5">
+        <div className="card-surface p-4">
           <h2 className="text-lg font-semibold">Why future-bill tracking matters</h2>
           <p className="mt-3 text-sm text-[var(--ink-soft)] leading-7">
             Some search visitors are not looking for a passed law. They are trying to understand proposed reforms, unresolved harms, and which legislative ideas are meant to address Black communities more directly. This page makes that proposal layer readable.
           </p>
         </div>
-        <div className="card-surface rounded-[1.6rem] p-5">
+        <div className="card-surface p-4">
           <h2 className="text-lg font-semibold">Best research paths from here</h2>
           <div className="mt-3 flex flex-wrap gap-3 text-sm">
             <Link href="/bills" className="accent-link">
@@ -228,7 +228,7 @@ export default function FutureBillsClient({ bills, focusId }) {
         <StatCard title="Bills With Timelines" value={historyCount} />
       </section>
 
-      <section className="card-surface rounded-[1.6rem] p-5">
+      <section className="card-surface p-4">
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div className="max-w-3xl">
             <h2 className="text-lg font-semibold mb-2">Accountability Connections</h2>
@@ -248,7 +248,7 @@ export default function FutureBillsClient({ bills, focusId }) {
         </div>
       </section>
 
-      <section className="card-surface rounded-[1.6rem] p-5 md:p-6 space-y-5">
+      <section className="card-surface p-4 md:p-6 space-y-5">
         <div className="section-intro">
           <h2 className="text-2xl font-semibold">Browse Future Bills</h2>
           <p className="text-sm text-[var(--ink-soft)] mt-2">
@@ -393,7 +393,7 @@ export default function FutureBillsClient({ bills, focusId }) {
         </div>
 
         {filteredBills.length === 0 && (
-          <div className="card-surface rounded-[1.6rem] p-5">
+          <div className="card-surface p-4">
             <p>No future bills match the current filters.</p>
           </div>
         )}
@@ -406,7 +406,7 @@ export default function FutureBillsClient({ bills, focusId }) {
               <section
                 key={bill.id}
                 id={`future-bill-${bill.id}`}
-                className={`card-surface rounded-[1.6rem] p-6 scroll-mt-24 ${
+                className={`card-surface p-4 scroll-mt-24 ${
                   isFocused ? "ring-2 ring-black border-black" : ""
                 }`}
               >
@@ -484,7 +484,7 @@ export default function FutureBillsClient({ bills, focusId }) {
                           target_path: buildFutureBillCardHref(bill),
                         })
                       }
-                      className="public-button-secondary"
+                      className="dashboard-button-secondary"
                     >
                       Share Card
                     </Link>
@@ -500,7 +500,7 @@ export default function FutureBillsClient({ bills, focusId }) {
                           target_path: buildFutureBillDetailHref(bill),
                         })
                       }
-                      className="public-button-secondary"
+                      className="dashboard-button-secondary"
                     >
                       Read proposal detail
                     </Link>

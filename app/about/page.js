@@ -78,10 +78,10 @@ export default function AboutPage() {
           description="EquityStack is built to make policy impact readable, evidence-linked, and methodologically transparent. It helps users understand what the data shows, what it does not show, and how to interpret it responsibly."
           actions={
             <>
-              <Link href="/methodology" className="public-button-primary">
+              <Link href="/methodology" className="dashboard-button-primary">
                 Read methodology
               </Link>
-              <Link href="/sources" className="public-button-secondary">
+              <Link href="/sources" className="dashboard-button-secondary">
                 Browse sources
               </Link>
             </>
@@ -115,14 +115,14 @@ export default function AboutPage() {
         />
       </section>
 
-      <section className="grid gap-4 md:grid-cols-2">
-        <div className="rounded-[1.5rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+      <section className="grid gap-6 border-t border-[var(--line)] pt-6 md:grid-cols-2">
+        <div>
           <h2 className="text-lg font-semibold text-white">What you can do on EquityStack</h2>
           <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
             Browse presidents, campaign promises, legislation, executive actions, explainers, reports, and sources through one connected public record.
           </p>
         </div>
-        <div className="rounded-[1.5rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+        <div>
           <h2 className="text-lg font-semibold text-white">Who it is useful for</h2>
           <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
             The platform is designed for researchers, students, journalists, voters, and historically curious readers who want a clearer view of policy impact on Black Americans.
@@ -135,29 +135,26 @@ export default function AboutPage() {
         description="Use the About page when someone needs a concise description of what EquityStack is, what it studies, and what it does not claim to do. Pair it with the methodology page or source library when the audience needs verification detail beyond the platform description."
       />
 
-      <section className="grid gap-5 md:grid-cols-2">
+      <section className="grid gap-x-8 gap-y-6 border-t border-[var(--line)] pt-6 md:grid-cols-2">
         {ABOUT_SECTIONS.map((item) => (
-          <article
-            key={item.title}
-            className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6"
-          >
+          <article key={item.title}>
             <h2 className="text-2xl font-semibold text-white">{item.title}</h2>
-            <p className="mt-4 text-sm leading-7 text-[var(--ink-soft)]">{item.body}</p>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item.body}</p>
           </article>
         ))}
       </section>
 
       <section className="grid gap-6 xl:grid-cols-[1fr_1fr]">
-        <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6">
+        <div className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4">
           <h2 className="text-2xl font-semibold text-white">What to read next</h2>
           <div className="mt-4 grid gap-3">
-            <Link href="/dashboard" className="panel-link rounded-[1.2rem] p-4">
+            <Link href="/dashboard" className="panel-link p-4">
               <h3 className="text-lg font-semibold text-white">Open the public dashboard</h3>
               <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
                 Start with the high-level view of scores, policies, promises, and current dataset coverage.
               </p>
             </Link>
-            <Link href="/presidents" className="panel-link rounded-[1.2rem] p-4">
+            <Link href="/presidents" className="panel-link p-4">
               <h3 className="text-lg font-semibold text-white">Browse presidents and Black history</h3>
               <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
                 Use the presidential ranking and profile pages to inspect score drivers, trend lines, and historical policy impact on Black Americans.
@@ -165,16 +162,16 @@ export default function AboutPage() {
             </Link>
           </div>
         </div>
-        <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6">
+        <div className="border-l-0 border-t border-[var(--line)] pt-6 xl:border-l xl:border-t-0 xl:pl-6 xl:pt-0">
           <h2 className="text-2xl font-semibold text-white">How to use the platform responsibly</h2>
-          <ul className="mt-4 grid gap-3 text-sm leading-7 text-[var(--ink-soft)]">
-            <li className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+          <ul className="mt-4 grid gap-4 text-sm leading-7 text-[var(--ink-soft)]">
+            <li className="border-l border-[var(--line)] pl-4">
               Treat scores and promise statuses as structured summaries of the current dataset.
             </li>
-            <li className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+            <li className="border-l border-[var(--line)] pl-4">
               Open sources and methodology when a claim needs verification.
             </li>
-            <li className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+            <li className="border-l border-[var(--line)] pl-4">
               Expect historical gaps, attribution limits, and uneven coverage across eras.
             </li>
           </ul>
@@ -182,19 +179,19 @@ export default function AboutPage() {
       </section>
 
       <section className="grid gap-4 md:grid-cols-3">
-        <Link href="/methodology" className="panel-link rounded-[1.4rem] p-5">
+        <Link href="/methodology" className="panel-link p-4">
           <h2 className="text-lg font-semibold text-white">Methodology</h2>
           <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
             Share the methodology page when a reader needs to understand the rules behind scores, statuses, and confidence labels.
           </p>
         </Link>
-        <Link href="/sources" className="panel-link rounded-[1.4rem] p-5">
+        <Link href="/sources" className="panel-link p-4">
           <h2 className="text-lg font-semibold text-white">Sources</h2>
           <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
             Use the source library when someone wants to inspect the public evidence base behind EquityStack&apos;s summaries.
           </p>
         </Link>
-        <Link href="/start" className="panel-link rounded-[1.4rem] p-5">
+        <Link href="/start" className="panel-link p-4">
           <h2 className="text-lg font-semibold text-white">Guided research path</h2>
           <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
             Link the research guide when a first-time visitor needs a structured introduction to the strongest public explainers and themes.

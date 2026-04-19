@@ -15,12 +15,12 @@ import {
 import { formatBillDate } from "@/lib/public-bills";
 
 const FILTER_FIELD_CLASS =
-  "min-w-0 rounded-xl border border-white/8 bg-white/5 px-3 py-2.5 text-sm text-white outline-none";
+  "min-w-0 dashboard-field outline-none";
 
 function BillsPanel({ children, className = "" }) {
   return (
     <section
-      className={`rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 md:p-6 ${className}`}
+      className={`rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4 md:p-6 ${className}`}
     >
       {children}
     </section>
@@ -112,10 +112,10 @@ function MovingBillCard({ bill }) {
       </Link>
 
       <div className="mt-5 flex flex-wrap gap-3">
-        <Link href={bill.detailHref} className="public-button-secondary">
+        <Link href={bill.detailHref} className="dashboard-button-secondary">
           Open bill
         </Link>
-        <Link href={bill.primaryContextHref} className="public-button-secondary">
+        <Link href={bill.primaryContextHref} className="dashboard-button-secondary">
           Open bill context
         </Link>
         {bill.sourceUrl ? (
@@ -123,7 +123,7 @@ function MovingBillCard({ bill }) {
             href={bill.sourceUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="public-button-secondary"
+            className="dashboard-button-secondary"
           >
             View source
           </a>
@@ -220,10 +220,10 @@ function BillCard({ bill }) {
       </Link>
 
       <div className="mt-5 flex flex-wrap gap-3 pt-1">
-        <Link href={bill.detailHref} className="public-button-secondary">
+        <Link href={bill.detailHref} className="dashboard-button-secondary">
           Open bill
         </Link>
-        <Link href={bill.primaryContextHref} className="public-button-secondary">
+        <Link href={bill.primaryContextHref} className="dashboard-button-secondary">
           Open bill context
         </Link>
         {bill.sourceUrl ? (
@@ -231,7 +231,7 @@ function BillCard({ bill }) {
             href={bill.sourceUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="public-button-secondary"
+            className="dashboard-button-secondary"
           >
             View source
           </a>
@@ -362,10 +362,10 @@ export default function BillsClient({ bills }) {
           description="Browse the tracked bills EquityStack is watching, see where they sit in the legislative process, and open the context behind why they matter for Black Americans, civil-rights policy, and related public outcomes."
           actions={
             <>
-              <Link href="/activity" className="public-button-primary">
+              <Link href="/activity" className="dashboard-button-primary">
                 Open activity feed
               </Link>
-              <Link href="/future-bills" className="public-button-secondary">
+              <Link href="/future-bills" className="dashboard-button-secondary">
                 Browse future-bill context
               </Link>
             </>
@@ -470,7 +470,7 @@ export default function BillsClient({ bills }) {
           </FilterField>
         </div>
         {hasActiveFilters ? (
-          <button type="button" onClick={clearFilters} className="public-button-secondary">
+          <button type="button" onClick={clearFilters} className="dashboard-button-secondary">
             Clear filters
           </button>
         ) : null}
@@ -501,13 +501,13 @@ export default function BillsClient({ bills }) {
             ))}
           </div>
         ) : (
-          <div className="rounded-[1.6rem] border border-dashed border-white/12 bg-white/4 p-6 text-sm leading-7 text-[var(--ink-soft)]">
+          <div className="dashboard-empty-state text-sm leading-7 text-[var(--ink-soft)]">
             <p>
               No bills match the current filters. Try widening the search, changing the
               topic, or clearing the impact filter.
             </p>
             {hasActiveFilters ? (
-              <button type="button" onClick={clearFilters} className="public-button-secondary mt-4">
+              <button type="button" onClick={clearFilters} className="dashboard-button-secondary mt-4">
                 Clear filters
               </button>
             ) : null}

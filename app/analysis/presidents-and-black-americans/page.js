@@ -271,10 +271,10 @@ export default function PresidentsAndBlackAmericansPage() {
           description="This is the broad entry guide for readers starting with the overall question of presidents and Black Americans. It helps users orient themselves across presidential profiles, policies, promises, legislation, reports, and historical context before moving into narrower specialist pages."
           actions={
             <>
-              <Link href="/presidents" className="public-button-primary">
+              <Link href="/presidents" className="dashboard-button-primary">
                 Explore presidential records
               </Link>
-              <Link href="/reports/black-impact-score" className="public-button-secondary">
+              <Link href="/reports/black-impact-score" className="dashboard-button-secondary">
                 Read the Black Impact Score report
               </Link>
             </>
@@ -300,7 +300,7 @@ export default function PresidentsAndBlackAmericansPage() {
         {FLAGSHIP_SUPPORT.map((item) => (
           <article
             key={item.title}
-            className="rounded-[1.4rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5"
+            className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4"
           >
             <h2 className="text-lg font-semibold text-white">{item.title}</h2>
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item.description}</p>
@@ -338,7 +338,7 @@ export default function PresidentsAndBlackAmericansPage() {
           {WHY_IT_MATTERS.map((item) => (
             <article
               key={item.title}
-              className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6"
+              className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4"
             >
               <h2 className="text-xl font-semibold text-white">{item.title}</h2>
               <p className="mt-4 text-sm leading-7 text-[var(--ink-soft)]">{item.body}</p>
@@ -357,7 +357,7 @@ export default function PresidentsAndBlackAmericansPage() {
           {HOW_TO_USE.map((item) => (
             <article
               key={item.title}
-              className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6"
+              className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4"
             >
               <h2 className="text-xl font-semibold text-white">{item.title}</h2>
               <p className="mt-4 text-sm leading-7 text-[var(--ink-soft)]">{item.body}</p>

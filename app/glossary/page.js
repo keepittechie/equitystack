@@ -265,10 +265,10 @@ export default function GlossaryPage() {
           description="This page defines common terms, page types, and research concepts used across the public site. It is designed to help first-time readers understand how the platform is organized and how its major categories relate to one another."
           actions={
             <>
-              <Link href="/methodology" className="public-button-primary">
+              <Link href="/methodology" className="dashboard-button-primary">
                 Read methodology
               </Link>
-              <Link href="/research" className="public-button-secondary">
+              <Link href="/research" className="dashboard-button-secondary">
                 Open the research hub
               </Link>
             </>
@@ -281,19 +281,19 @@ export default function GlossaryPage() {
           title="Why this page is useful"
           description="Use the glossary when a reader needs quick clarification about how EquityStack uses terms like policy, promise, report, record, source, explainer, or thematic page before moving deeper into the site."
         />
-        <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6">
+        <div className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4">
           <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--accent)]">
             What this page does
           </p>
           <h2 className="mt-3 text-2xl font-semibold text-white">A practical reference, not a jargon list</h2>
           <div className="mt-4 grid gap-3 text-sm leading-7 text-[var(--ink-soft)]">
-            <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+            <div className="rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4">
               It explains the site’s main categories in plain language.
             </div>
-            <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+            <div className="rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4">
               It clarifies how page types differ so users can choose the right starting point.
             </div>
-            <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+            <div className="rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4">
               It links outward to the pages that actually use these concepts in practice.
             </div>
           </div>
@@ -310,7 +310,7 @@ export default function GlossaryPage() {
           {GLOSSARY_USE_CASES.map((item) => (
             <article
               key={item.title}
-              className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5"
+              className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4"
             >
               <h2 className="text-lg font-semibold text-white">{item.title}</h2>
               <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item.description}</p>
@@ -330,7 +330,7 @@ export default function GlossaryPage() {
             <Link
               key={item.title}
               href={item.href}
-              className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 hover:border-[rgba(132,247,198,0.24)]"
+              className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4 hover:border-[rgba(132,247,198,0.24)]"
             >
               <h2 className="text-lg font-semibold text-white">{item.title}</h2>
               <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item.description}</p>
@@ -349,7 +349,7 @@ export default function GlossaryPage() {
           {PAGE_TYPE_GUIDE.map((item) => (
             <article
               key={item.title}
-              className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5"
+              className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4"
             >
               <h2 className="text-lg font-semibold text-white">{item.title}</h2>
               <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item.description}</p>
@@ -368,7 +368,7 @@ export default function GlossaryPage() {
           {BROWSING_GUIDE.map((item) => (
             <article
               key={item.title}
-              className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5"
+              className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4"
             >
               <h2 className="text-lg font-semibold text-white">{item.title}</h2>
               <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item.description}</p>
@@ -388,7 +388,7 @@ export default function GlossaryPage() {
             <Link
               key={item.href}
               href={item.href}
-              className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 hover:border-[rgba(132,247,198,0.24)]"
+              className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4 hover:border-[rgba(132,247,198,0.24)]"
             >
               <h2 className="text-lg font-semibold text-white">{item.title}</h2>
               <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item.description}</p>

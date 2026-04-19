@@ -236,7 +236,7 @@ export default async function PromisePresidentPage({ params, searchParams }) {
         <MiniStat label="Blocked" value={showAll ? president.blocked_count : president.visible_blocked_count} />
       </section>
 
-      <section className="card-surface rounded-[1.6rem] p-5 mb-8">
+      <section className="card-surface p-4 mb-8">
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div className="max-w-3xl">
             <h2 className="text-lg font-semibold mb-2">Build, Interpret, Verify</h2>
@@ -271,7 +271,7 @@ export default async function PromisePresidentPage({ params, searchParams }) {
       <section className="grid gap-4 md:grid-cols-3 mb-8">
         <Link
           href={`/presidents/${slug}`}
-          className="rounded-[1.4rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 hover:border-white/16"
+          className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4 hover:border-white/16"
         >
           <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Presidential profile</p>
           <h2 className="mt-3 text-lg font-semibold">Read the full presidential record</h2>
@@ -281,7 +281,7 @@ export default async function PromisePresidentPage({ params, searchParams }) {
         </Link>
         <Link
           href={`/policies?president=${encodeURIComponent(president.president)}`}
-          className="rounded-[1.4rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 hover:border-white/16"
+          className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4 hover:border-white/16"
         >
           <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Policy context</p>
           <h2 className="mt-3 text-lg font-semibold">Browse policy records under this president</h2>
@@ -291,7 +291,7 @@ export default async function PromisePresidentPage({ params, searchParams }) {
         </Link>
         <Link
           href="/explainers"
-          className="rounded-[1.4rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 hover:border-white/16"
+          className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4 hover:border-white/16"
         >
           <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Historical context</p>
           <h2 className="mt-3 text-lg font-semibold">Read explainers connected to this record</h2>
@@ -303,7 +303,7 @@ export default async function PromisePresidentPage({ params, searchParams }) {
 
       <div className="space-y-8">
         {president.status_sections?.map((section) => (
-          <section key={section.status} className="card-surface rounded-[1.6rem] p-5">
+          <section key={section.status} className="card-surface p-4">
             <div className="flex items-center justify-between gap-4 flex-wrap mb-4">
               <div>
                 <h2 className="text-2xl font-semibold">{section.status}</h2>

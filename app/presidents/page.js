@@ -12,6 +12,7 @@ import {
   PresidentScoreMethodologyNote,
   SectionIntro,
 } from "@/app/components/public/core";
+import { Panel } from "@/app/components/dashboard/primitives";
 import {
   ComparisonMetricsTable,
   PresidentCardGrid,
@@ -27,16 +28,6 @@ import {
 } from "@/lib/structured-data";
 
 export const dynamic = "force-dynamic";
-
-function PresidentPanel({ children, className = "" }) {
-  return (
-    <section
-      className={`rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 md:p-6 ${className}`}
-    >
-      {children}
-    </section>
-  );
-}
 
 export async function generateMetadata({ searchParams }) {
   const resolvedSearchParams = (await searchParams) || {};
@@ -118,7 +109,7 @@ export default async function PresidentsPage({ searchParams }) {
   );
 
   return (
-    <main className="space-y-10">
+    <main className="space-y-8">
       <StructuredData
         data={[
           buildBreadcrumbJsonLd(
@@ -179,10 +170,10 @@ export default async function PresidentsPage({ searchParams }) {
           description="Use this index to research Black history by president, compare civil-rights policy records, and see how presidential score, promises, legislation, and evidence fit together."
           actions={
             <>
-              <Link href="/dashboard" className="public-button-primary">
+              <Link href="/dashboard" className="dashboard-button-primary">
                 Open the public data dashboard
               </Link>
-              <Link href="/methodology" className="public-button-secondary">
+              <Link href="/methodology" className="dashboard-button-secondary">
                 Read the presidential scoring method
               </Link>
             </>
@@ -192,14 +183,14 @@ export default async function PresidentsPage({ searchParams }) {
 
       <TrustBar />
 
-      <section className="space-y-5">
-        <PresidentPanel className="space-y-5">
+      <section className="space-y-4">
+        <Panel padding="md" className="space-y-4">
           <PageContextBlock
             description="This page ranks presidential records using the final Black Impact Score, anchored by documented policy outcomes and supported by promise and legislative context."
             detail="Use it to answer questions like which presidents most affected Black Americans, how civil-rights policy differed across administrations, and where the current evidence base is strongest or thinnest."
           />
           <ScoreExplanation title="How to read presidential Impact Scores" />
-        </PresidentPanel>
+        </Panel>
       </section>
 
       <DashboardFilterBar helpText="Filter by name, party, confidence, or score order. The goal is quick ranking scan first, then profile-level reading.">
@@ -211,12 +202,12 @@ export default async function PresidentsPage({ searchParams }) {
               name="q"
               defaultValue={query}
               placeholder="President name"
-              className="rounded-xl border border-white/8 bg-white/5 px-3 py-2.5 text-sm text-white"
+              className="dashboard-field"
             />
           </label>
           <label className="grid gap-2">
             <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">Party</span>
-            <select name="party" defaultValue={partyFilter} className="rounded-xl border border-white/8 bg-white/5 px-3 py-2.5 text-sm text-white">
+            <select name="party" defaultValue={partyFilter} className="dashboard-field">
               <option value="">All parties</option>
               {[...new Set(presidents.map((item) => item.party).filter(Boolean))].map((item) => (
                 <option key={item} value={item}>{item}</option>
@@ -225,7 +216,7 @@ export default async function PresidentsPage({ searchParams }) {
           </label>
           <label className="grid gap-2">
             <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">Confidence</span>
-            <select name="confidence" defaultValue={confidenceFilter} className="rounded-xl border border-white/8 bg-white/5 px-3 py-2.5 text-sm text-white">
+            <select name="confidence" defaultValue={confidenceFilter} className="dashboard-field">
               <option value="">All confidence levels</option>
               {["very low", "low", "medium", "high"].map((item) => (
                 <option key={item} value={item}>{item}</option>
@@ -234,32 +225,32 @@ export default async function PresidentsPage({ searchParams }) {
           </label>
           <label className="grid gap-2">
             <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">Sort</span>
-            <select name="sort" defaultValue={sort} className="rounded-xl border border-white/8 bg-white/5 px-3 py-2.5 text-sm text-white">
+            <select name="sort" defaultValue={sort} className="dashboard-field">
               <option value="score_desc">Highest final score</option>
               <option value="name_asc">Name A-Z</option>
               <option value="term_asc">Oldest term first</option>
             </select>
           </label>
-          <button type="submit" className="public-button-secondary">
+          <button type="submit" className="dashboard-button-secondary">
             Apply filters
           </button>
         </form>
       </DashboardFilterBar>
 
       <section className="grid gap-4 md:grid-cols-3">
-        <Link href="/promises" className="panel-link rounded-[1.5rem] p-5">
+        <Link href="/promises" className="panel-link p-4">
           <h2 className="text-lg font-semibold text-white">Open campaign promises by president</h2>
           <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
             Use the Promise Tracker to see what presidents said they would do for Black Americans and how those commitments were later graded.
           </p>
         </Link>
-        <Link href="/reports/black-impact-score" className="panel-link rounded-[1.5rem] p-5">
+        <Link href="/reports/black-impact-score" className="panel-link p-4">
           <h2 className="text-lg font-semibold text-white">Read the Black Impact Score report</h2>
           <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
             The flagship report adds ranking context, score interpretation, and broader historical framing beyond the profile cards on this page.
           </p>
         </Link>
-        <Link href="/analysis/presidents-and-black-americans" className="panel-link rounded-[1.5rem] p-5">
+        <Link href="/analysis/presidents-and-black-americans" className="panel-link p-4">
           <h2 className="text-lg font-semibold text-white">Read the presidents and Black Americans guide</h2>
           <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
             Start with the thematic guide when the question is broader than one president and you want the best research paths across profiles, policies, promises, and reports.
@@ -298,8 +289,8 @@ export default async function PresidentsPage({ searchParams }) {
         ]}
       />
 
-      <section className="space-y-5">
-        <PresidentPanel className="space-y-5">
+      <section className="space-y-4">
+        <Panel padding="md" className="space-y-4">
           <SectionIntro
             eyebrow="Flagship ranking"
             title="Black Impact Score ranking"
@@ -310,24 +301,24 @@ export default async function PresidentsPage({ searchParams }) {
             buildHref={(item) => `/presidents/${item.slug}`}
             title="Ranked presidential records"
           />
-          <div className="rounded-[1.3rem] border border-white/8 bg-white/5 p-5">
+          <Panel padding="md" className="bg-[rgba(18,31,49,0.52)]">
             <PresidentScoreMethodologyNote />
-          </div>
-          <div className="rounded-[1.3rem] border border-white/8 bg-white/5 p-5">
+          </Panel>
+          <Panel padding="md" className="bg-[rgba(18,31,49,0.52)]">
             <CitationNote description="When referencing the presidential ranking externally, cite the page title, EquityStack, the page URL, and your access date. Treat the ranking as a structured summary of the current dataset rather than a complete historical judgment." />
-          </div>
+          </Panel>
           <MethodologyCallout description="Scores reflect measured policy impact in the EquityStack dataset, not a complete judgment of a presidency. Low-coverage presidents are visibly dampened for display so one or two outcomes do not look absolute." />
-        </PresidentPanel>
+        </Panel>
       </section>
 
-      <section className="space-y-5">
+      <section className="space-y-4">
         <SectionIntro
           eyebrow="Comparison table"
           title="Read the ranking in compact form"
           description="Use the table when you want a fast side-by-side view of headline score, confidence, and tracked record counts before opening profiles."
         />
-        <div className="rounded-[1.45rem] border border-white/8 bg-[rgba(8,14,24,0.86)] p-4 md:p-5">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--accent)]">
+        <Panel padding="md" className="bg-[rgba(18,31,49,0.52)]">
+          <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
             How to read this ranking
           </p>
           <p className="mt-3 max-w-4xl text-sm leading-7 text-[var(--ink-soft)]">
@@ -338,7 +329,7 @@ export default async function PresidentsPage({ searchParams }) {
               Bill-linked inputs remain bounded. The outcome-based score stays the anchor, while linked bills add a smaller supporting signal when current promise-backed legislative lineage is strong enough to support it.
             </p>
           ) : null}
-        </div>
+        </Panel>
         <ComparisonMetricsTable
           rows={comparisonRows}
           scrollClassName="thin-scrollbar"
@@ -358,7 +349,7 @@ export default async function PresidentsPage({ searchParams }) {
         />
       </section>
 
-      <section className="space-y-5">
+      <section className="space-y-4">
         <SectionIntro
           eyebrow="Profile cards"
           title={`${filteredPresidents.length} presidential records ready to explore`}

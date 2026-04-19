@@ -278,7 +278,7 @@ function mergeRecordScores(legacyRecords = [], outcomeRecords = []) {
 
 function MethodologyPanel({ title, label, methodology, children }) {
   return (
-    <section className="card-surface rounded-[1.6rem] p-6">
+    <section className="card-surface p-4">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">{label}</p>
@@ -406,7 +406,7 @@ function LargestShiftList({ items }) {
 
 function ComparisonTable({ rows }) {
   return (
-    <section className="card-surface rounded-[1.6rem] p-6">
+    <section className="card-surface p-4">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <h2 className="text-2xl font-semibold">President Comparison</h2>
@@ -722,7 +722,7 @@ export default async function PromiseScorePreviewPage() {
 
       {outcome.error ? (
         <section
-          className="card-surface rounded-[1.6rem] p-6 mb-8 border border-[rgba(185,28,28,0.18)] bg-[linear-gradient(180deg,rgba(254,242,242,0.9),rgba(255,255,255,0.98))]"
+          className="card-surface p-4 mb-8 border border-[rgba(185,28,28,0.18)] bg-[linear-gradient(180deg,rgba(254,242,242,0.9),rgba(255,255,255,0.98))]"
           aria-live="polite"
         >
           <h2 className="text-xl font-semibold">Outcome-Based Model Unavailable</h2>
@@ -790,7 +790,7 @@ export default async function PromiseScorePreviewPage() {
         )}
       </section>
 
-      <section className="card-surface rounded-[1.6rem] p-6 mt-8">
+      <section className="card-surface p-4 mt-8">
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div>
             <h2 className="text-2xl font-semibold">Record-Level Comparison Review</h2>

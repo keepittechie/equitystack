@@ -190,7 +190,7 @@ export default function SnapshotLibraryPanel({ currentSnapshot }) {
   }
 
   return (
-    <section className="card-surface rounded-[1.6rem] p-5 print:hidden">
+    <section className="card-surface p-4 print:hidden">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="max-w-3xl">
           <h2 className="text-lg font-semibold mb-2">Saved Snapshots</h2>

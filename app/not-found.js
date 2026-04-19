@@ -14,16 +14,16 @@ export default function NotFound() {
           EquityStack.
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
-          <Link href="/" className="public-button-primary">
+          <Link href="/" className="dashboard-button-primary">
             Home
           </Link>
-          <Link href="/dashboard" className="public-button-secondary">
+          <Link href="/dashboard" className="dashboard-button-secondary">
             Open dashboard
           </Link>
-          <Link href="/policies" className="public-button-secondary">
+          <Link href="/policies" className="dashboard-button-secondary">
             Browse policies
           </Link>
-          <Link href="/search" className="public-button-secondary">
+          <Link href="/search" className="dashboard-button-secondary">
             Search records
           </Link>
         </div>

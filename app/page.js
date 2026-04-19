@@ -6,6 +6,7 @@ import StructuredData from "@/app/components/public/StructuredData";
 import { SectionIntro, KpiCard, MethodologyCallout, SourceTrustPanel } from "@/app/components/public/core";
 import { CategoryImpactChart, DirectionBreakdownChart, ImpactTrendChart } from "@/app/components/public/charts";
 import { PolicyCardList, PresidentCardGrid, RecentPolicyChangesTable } from "@/app/components/public/entities";
+import { Panel, SectionHeader, StatusPill } from "@/app/components/dashboard/primitives";
 import TrustBar from "@/app/components/public/TrustBar";
 import {
   buildCollectionPageJsonLd,
@@ -56,7 +57,7 @@ export default async function HomePage() {
     }));
 
   return (
-    <main className="space-y-10">
+    <main className="space-y-4">
       <StructuredData
         data={[
           buildCollectionPageJsonLd({
@@ -150,66 +151,73 @@ export default async function HomePage() {
 
       <TrustBar />
 
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {[
-          {
-            title: "For researchers",
-            summary:
-              "Use the site to move from a broad question about Black history or presidential records into linked policies, promises, sources, and methodology.",
-          },
-          {
-            title: "For students",
-            summary:
-              "Start with explainers and reports, then open the underlying policies and timelines to see how legal and administrative change unfolded over time.",
-          },
-          {
-            title: "For journalists",
-            summary:
-              "Trace a claim about a president, civil-rights policy, or campaign promise back to the structured public record and visible evidence trail.",
-          },
-          {
-            title: "For curious readers",
-            summary:
-              "Browse presidents, legislation, and promise tracking without needing to know the database structure in advance.",
-          },
-        ].map((item) => (
-          <article key={item.title} className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--accent)]">
-              Audience
-            </p>
-            <h2 className="mt-4 text-2xl font-semibold text-white">{item.title}</h2>
-            <p className="mt-4 text-sm leading-7 text-[var(--ink-soft)]">{item.summary}</p>
-          </article>
-        ))}
+      <section>
+        <Panel className="overflow-hidden">
+          <SectionHeader
+            eyebrow="Start here"
+            title="Use the homepage as a handoff into the public record"
+            description="The hero introduces EquityStack. The sections below are the product path: choose the audience lens that fits your question, then move into the records, evidence, and score logic the site actually tracks."
+          />
+          <div className="grid gap-6 p-4 xl:grid-cols-[1.08fr_0.92fr]">
+            <div className="grid gap-x-6 gap-y-5 md:grid-cols-2">
+              {[
+                {
+                  title: "For researchers",
+                  summary:
+                    "Move from a broad question about Black history or presidential records into linked policies, promises, sources, and methodology.",
+                },
+                {
+                  title: "For students",
+                  summary:
+                    "Start with explainers and reports, then open the underlying policies and timelines to see how legal and administrative change unfolded over time.",
+                },
+                {
+                  title: "For journalists",
+                  summary:
+                    "Trace a claim about a president, civil-rights policy, or campaign promise back to the structured public record and visible evidence trail.",
+                },
+                {
+                  title: "For curious readers",
+                  summary:
+                    "Browse presidents, legislation, and promise tracking without needing to know the database structure in advance.",
+                },
+              ].map((item) => (
+                <article key={item.title} className="border-l border-[var(--line)] pl-4">
+                  <h2 className="text-base font-semibold text-white">{item.title}</h2>
+                  <p className="mt-2 text-sm leading-6 text-[var(--ink-soft)]">{item.summary}</p>
+                </article>
+              ))}
+            </div>
+            <div className="grid gap-4 border-t border-[var(--line)] pt-5 xl:border-t-0 xl:border-l xl:pl-6 xl:pt-0">
+              {[
+                {
+                  title: "Tracks real policy records",
+                  summary:
+                    "EquityStack organizes federal laws, executive actions, court decisions, and related outcomes into a searchable public record instead of a generic issue feed.",
+                },
+                {
+                  title: "Measures policy impact",
+                  summary:
+                    "Scores, direction labels, time windows, and trend summaries keep the focus on documented effects on Black Americans rather than rhetoric alone.",
+                },
+                {
+                  title: "Shows the evidence",
+                  summary:
+                    "Sources, confidence, completeness, and methodology remain close to every major metric so users can inspect trust directly.",
+                },
+              ].map((item) => (
+                <article key={item.title} className="border-l border-[var(--line)] pl-4">
+                  <StatusPill tone="default">Platform logic</StatusPill>
+                  <h3 className="mt-3 text-base font-semibold text-white">{item.title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-[var(--ink-soft)]">{item.summary}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </Panel>
       </section>
 
-      <section className="grid gap-4 md:grid-cols-3">
-        {[
-          {
-            title: "Tracks real policy records",
-            summary:
-              "EquityStack organizes federal laws, executive actions, court decisions, and related outcomes into a searchable public record instead of a generic issue feed.",
-          },
-          {
-            title: "Measures policy impact",
-            summary:
-              "Scores, direction labels, time windows, and trend summaries keep the focus on documented effects on Black Americans rather than rhetoric alone.",
-          },
-          {
-            title: "Shows the evidence",
-            summary:
-              "Sources, confidence, completeness, and methodology remain close to every major metric so users can inspect trust directly.",
-          },
-        ].map((item) => (
-          <article key={item.title} className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--accent)]">Platform logic</p>
-            <h2 className="mt-4 text-2xl font-semibold text-white">{item.title}</h2>
-            <p className="mt-4 text-sm leading-7 text-[var(--ink-soft)]">{item.summary}</p>
-          </article>
-        ))}
-      </section>
-
-      <section className="space-y-5">
+      <section className="space-y-4">
         <SectionIntro
           eyebrow="Key Questions"
           title="Start with the major historical questions EquityStack can help you explore"
@@ -239,25 +247,25 @@ export default async function HomePage() {
               cta: "Trace civil-rights laws across administrations",
             },
           ].map((item) => (
-            <Link
+            <Panel
               key={item.href}
+              as={Link}
               href={item.href}
-              className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 hover:border-[rgba(132,247,198,0.24)]"
+              padding="md"
+              interactive
             >
-              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--accent)]">
-                Research guide
-              </p>
-              <h2 className="mt-4 text-xl font-semibold text-white">{item.title}</h2>
-              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item.summary}</p>
-              <span className="mt-5 inline-flex text-sm font-medium text-[var(--accent)]">
+              <StatusPill tone="info">Research guide</StatusPill>
+              <h2 className="mt-3 text-lg font-semibold text-white">{item.title}</h2>
+              <p className="mt-3 text-sm leading-6 text-[var(--ink-soft)]">{item.summary}</p>
+              <span className="mt-4 inline-flex text-[12px] font-semibold text-[var(--ink-soft)]">
                 {item.cta}
               </span>
-            </Link>
+            </Panel>
           ))}
         </div>
       </section>
 
-      <section className="space-y-5">
+      <section className="space-y-4">
         <SectionIntro
           eyebrow="Reference Pages"
           title="Start with the site&apos;s strongest citation and reference pages"
@@ -301,85 +309,92 @@ export default async function HomePage() {
               cta: "Open the research guide",
             },
           ].map((item) => (
-            <Link
+            <Panel
               key={item.href}
+              as={Link}
               href={item.href}
-              className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 hover:border-[rgba(132,247,198,0.24)]"
+              padding="md"
+              interactive
             >
-              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--accent)]">
-                Citation-friendly
-              </p>
-              <h2 className="mt-4 text-xl font-semibold text-white">{item.title}</h2>
-              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item.summary}</p>
-              <span className="mt-5 inline-flex text-sm font-medium text-[var(--accent)]">
+              <StatusPill tone="verified">Citation-friendly</StatusPill>
+              <h2 className="mt-3 text-lg font-semibold text-white">{item.title}</h2>
+              <p className="mt-3 text-sm leading-6 text-[var(--ink-soft)]">{item.summary}</p>
+              <span className="mt-4 inline-flex text-[12px] font-semibold text-[var(--ink-soft)]">
                 {item.cta}
               </span>
-            </Link>
+            </Panel>
           ))}
         </div>
       </section>
 
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <KpiCard
-          label="Tracked outcomes"
-          value={readiness.total_policy_outcomes}
-          delta={`${readiness.current_admin_outcomes} current-admin / ${readiness.legislative_outcomes} legislative`}
-          description="The public scoring and evidence layer runs on unified policy outcomes rather than disconnected record silos."
-          tone="accent"
+      <section className="space-y-4">
+        <SectionIntro
+          eyebrow="Dataset readout"
+          title="See what the public record currently measures"
+          description="These readouts show coverage, trust, and the patterns shaping the current dataset. They are the quickest transition from the homepage into the dashboard-style analytical layer."
         />
-        <KpiCard
-          label="Source coverage"
-          value={pct(readiness.source_coverage_pct)}
-          delta={`${readiness.sourced_outcomes} sourced`}
-          description="Source coverage is visible up front so users know how much of the dataset is evidence-backed."
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <KpiCard
+            label="Tracked outcomes"
+            value={readiness.total_policy_outcomes}
+            delta={`${readiness.current_admin_outcomes} current-admin / ${readiness.legislative_outcomes} legislative`}
+            description="The public scoring and evidence layer runs on unified policy outcomes rather than disconnected record silos."
+            tone="accent"
+          />
+          <KpiCard
+            label="Source coverage"
+            value={pct(readiness.source_coverage_pct)}
+            delta={`${readiness.sourced_outcomes} sourced`}
+            description="Source coverage is visible up front so users know how much of the dataset is evidence-backed."
+          />
+          <KpiCard
+            label="Intent coverage"
+            value={pct(readiness.intent_coverage_pct)}
+            delta={`${readiness.intent_classified_policies} classified`}
+            description="Policy intent remains distinct from outcome, and missing classifications stay visible rather than guessed."
+          />
+          <KpiCard
+            label="Certification status"
+            value={readiness.certification_status}
+            delta={`${pct(readiness.high_confidence_outcome_pct)} high confidence`}
+            description="Trust status reflects whether the public dataset is complete, sourced, and internally consistent."
+          />
+        </div>
+
+        <SourceTrustPanel
+          sourceCount={readiness.sourced_outcomes}
+          sourceQuality="System-wide coverage"
+          confidenceLabel={`${pct(readiness.high_confidence_outcome_pct)} high confidence`}
+          completenessLabel={`${pct(trust.incomplete_outcome_percentage || 0)} incomplete`}
+          includedCount={scores.metadata?.outcomes_included_in_score}
+          excludedCount={scores.metadata?.outcomes_excluded_from_score}
+          summary={scores.metadata?.summary_interpretation}
         />
-        <KpiCard
-          label="Intent coverage"
-          value={pct(readiness.intent_coverage_pct)}
-          delta={`${readiness.intent_classified_policies} classified`}
-          description="Policy intent remains distinct from outcome, and missing classifications stay visible rather than guessed."
-        />
-        <KpiCard
-          label="Certification status"
-          value={readiness.certification_status}
-          delta={`${pct(readiness.high_confidence_outcome_pct)} high confidence`}
-          description="Trust status reflects whether the public dataset is complete, sourced, and internally consistent."
-        />
+
+        <div className="grid gap-4 xl:grid-cols-[1.15fr_0.85fr]">
+          <ImpactTrendChart
+            data={trend.score_by_year || []}
+            title="How impact changed over time"
+            description={trend.interpretation || "Track yearly change and cumulative movement across scored outcomes."}
+          />
+          <DirectionBreakdownChart
+            data={directionData}
+            title="Direction of documented outcomes"
+            description="Positive, negative, mixed, and blocked outcomes are counted separately so the headline score never hides distribution."
+          />
+        </div>
+
+        <div className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
+          <CategoryImpactChart
+            data={topicData}
+            title="Leading category contributions"
+            description="Top policy categories currently shaping the measured dataset-wide impact."
+          />
+          <MethodologyCallout description="The Black Impact Score is always paired with inclusion counts, confidence, source coverage, and limitations. Read the method before treating a number as a conclusion." />
+        </div>
       </section>
 
-      <SourceTrustPanel
-        sourceCount={readiness.sourced_outcomes}
-        sourceQuality="System-wide coverage"
-        confidenceLabel={`${pct(readiness.high_confidence_outcome_pct)} high confidence`}
-        completenessLabel={`${pct(trust.incomplete_outcome_percentage || 0)} incomplete`}
-        includedCount={scores.metadata?.outcomes_included_in_score}
-        excludedCount={scores.metadata?.outcomes_excluded_from_score}
-        summary={scores.metadata?.summary_interpretation}
-      />
-
-      <section className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
-        <ImpactTrendChart
-          data={trend.score_by_year || []}
-          title="How impact changed over time"
-          description={trend.interpretation || "Track yearly change and cumulative movement across scored outcomes."}
-        />
-        <DirectionBreakdownChart
-          data={directionData}
-          title="Direction of documented outcomes"
-          description="Positive, negative, mixed, and blocked outcomes are counted separately so the headline score never hides distribution."
-        />
-      </section>
-
-      <section className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
-        <CategoryImpactChart
-          data={topicData}
-          title="Leading category contributions"
-          description="Top policy categories currently shaping the measured dataset-wide impact."
-        />
-        <MethodologyCallout description="The Black Impact Score is always paired with inclusion counts, confidence, source coverage, and limitations. Read the method before treating a number as a conclusion." />
-      </section>
-
-      <section className="space-y-5">
+      <section className="space-y-4">
         <SectionIntro
           eyebrow="What changed recently"
           title="Latest promise and policy movement"
@@ -400,17 +415,24 @@ export default async function HomePage() {
         />
       </section>
 
-      <section className="space-y-5">
+      <section className="space-y-4">
         <SectionIntro
           eyebrow="Policy explorer"
           title="Start with the highest-impact documented records"
           description="Open a policy record to read the summary, score, evidence, time window, related promises, and sources without losing context."
-          actions={<Link href="/policies" className="public-button-secondary">Browse all policies</Link>}
+          actions={
+            <Link
+              href="/policies"
+              className="dashboard-button-secondary"
+            >
+              Browse all policies
+            </Link>
+          }
         />
         <PolicyCardList items={featuredPolicies.slice(0, 6)} buildHref={(item) => `/policies/${buildPolicySlug(item)}`} />
       </section>
 
-      <section className="space-y-5">
+      <section className="space-y-4">
         <SectionIntro
           eyebrow="Entity hubs"
           title="Navigate by president, promise, legislation, or report"
@@ -423,20 +445,27 @@ export default async function HomePage() {
             { href: "/promises", title: "Campaign promises and delivery", summary: "Track presidential promises, status changes, rationale, and linked policy outcomes affecting Black communities." },
             { href: "/methodology", title: "Methodology and evidence", summary: "Read how the Black Impact Score, promise grading, confidence, and source rules are defined." },
           ].map((item) => (
-            <Link key={item.href} href={item.href} className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 hover:border-[rgba(132,247,198,0.24)]">
+            <Panel key={item.href} as={Link} href={item.href} padding="md" interactive>
               <h3 className="text-xl font-semibold text-white">{item.title}</h3>
-              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item.summary}</p>
-            </Link>
+              <p className="mt-3 text-sm leading-6 text-[var(--ink-soft)]">{item.summary}</p>
+            </Panel>
           ))}
         </div>
       </section>
 
-      <section className="space-y-5">
+      <section className="space-y-4">
         <SectionIntro
           eyebrow="Presidential records"
           title="Who drives the score"
           description="President profiles combine direct impact scoring, confidence, promise-tracker context, and evidence-linked policy records."
-          actions={<Link href="/presidents" className="public-button-secondary">View ranking</Link>}
+          actions={
+            <Link
+              href="/presidents"
+              className="dashboard-button-secondary"
+            >
+              View ranking
+            </Link>
+          }
         />
         <PresidentCardGrid items={presidents.slice(0, 6)} buildHref={(item) => `/presidents/${item.slug}`} />
       </section>

@@ -63,7 +63,7 @@ function SummaryPanel({ label, children }) {
 function BillPanel({ children, className = "" }) {
   return (
     <section
-      className={`rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6 ${className}`}
+      className={`rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4 ${className}`}
     >
       {children}
     </section>
@@ -72,7 +72,7 @@ function BillPanel({ children, className = "" }) {
 
 function DetailLine({ label, value }) {
   return (
-    <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+    <div className="rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4">
       <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
         {label}
       </p>
@@ -89,7 +89,7 @@ function RelatedPromiseCard({ item }) {
   return (
     <Link
       href={item.href}
-      className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4 hover:border-[rgba(132,247,198,0.24)]"
+      className="rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4 hover:border-[rgba(132,247,198,0.24)]"
     >
       <p className="font-medium text-white">{item.title}</p>
       <div className="mt-3 flex flex-wrap gap-2">
@@ -108,7 +108,7 @@ function RelatedPresidentCard({ item }) {
   return (
     <Link
       href={item.href}
-      className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4 hover:border-[rgba(132,247,198,0.24)]"
+      className="rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4 hover:border-[rgba(132,247,198,0.24)]"
     >
       <p className="font-medium text-white">{item.name}</p>
       <div className="mt-3 flex flex-wrap gap-2">
@@ -283,17 +283,17 @@ export default async function BillDetailPage({ params }) {
           </div>
 
           <div className="flex flex-wrap gap-3">
-            <Link href="/bills" className="public-button-secondary">
+            <Link href="/bills" className="dashboard-button-secondary">
               Back to bills
             </Link>
-            <Link href={bill.primaryContextHref} className="public-button-secondary">
+            <Link href={bill.primaryContextHref} className="dashboard-button-secondary">
               Open bill context
             </Link>
             <a
               href={bill.congressUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="public-button-secondary"
+              className="dashboard-button-secondary"
             >
               View on Congress.gov
             </a>
@@ -395,7 +395,7 @@ export default async function BillDetailPage({ params }) {
           description="This section only surfaces joins supported by existing explainer, policy, promise, and president lineage already modeled in EquityStack."
         />
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          <div className="rounded-[1.4rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+          <div className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4">
             <h3 className="text-lg font-semibold text-white">Related promises</h3>
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
               Promise links are only surfaced when the bill reaches a promise through existing explainer context or policy lineage already stored in the repo.
@@ -417,7 +417,7 @@ export default async function BillDetailPage({ params }) {
               </Link>
             ) : null}
           </div>
-          <div className="rounded-[1.4rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+          <div className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4">
             <h3 className="text-lg font-semibold text-white">Related presidents</h3>
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
               Presidential context is derived from linked promises first, then from connected policy lineage when no stronger promise path is available.
@@ -439,7 +439,7 @@ export default async function BillDetailPage({ params }) {
               </Link>
             ) : null}
           </div>
-          <div className="rounded-[1.4rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+          <div className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4">
             <h3 className="text-lg font-semibold text-white">Related policy history</h3>
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
               EquityStack surfaces policy-history context here through linked policy records, future-bill concepts, and explainers already attached to this bill’s public context.
@@ -450,7 +450,7 @@ export default async function BillDetailPage({ params }) {
                   <Link
                     key={`${item.kind}-${item.title}`}
                     href={item.href}
-                    className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4 hover:border-[rgba(132,247,198,0.24)]"
+                    className="rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4 hover:border-[rgba(132,247,198,0.24)]"
                   >
                     <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
                       {item.kind}
@@ -482,7 +482,7 @@ export default async function BillDetailPage({ params }) {
             ))}
           </div>
         ) : (
-          <div className="rounded-[1.4rem] border border-dashed border-white/12 bg-white/4 p-5 text-sm leading-7 text-[var(--ink-soft)]">
+          <div className="dashboard-empty-state text-sm leading-7 text-[var(--ink-soft)]">
             No related bills share enough topic overlap to surface here yet.
           </div>
         )}
@@ -497,7 +497,7 @@ export default async function BillDetailPage({ params }) {
         {bill.sources.length ? (
           <EvidenceSourceList items={bill.sources} />
         ) : (
-          <div className="rounded-[1.4rem] border border-dashed border-white/12 bg-white/4 p-5 text-sm leading-7 text-[var(--ink-soft)]">
+          <div className="dashboard-empty-state text-sm leading-7 text-[var(--ink-soft)]">
             No public source links are attached to this bill yet.
           </div>
         )}
@@ -511,7 +511,7 @@ export default async function BillDetailPage({ params }) {
           linkLabel="Open methodology"
         />
 
-        <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+        <div className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4">
           <h2 className="text-lg font-semibold text-white">External record</h2>
           <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
             Congress.gov remains the fastest external verification surface for the bill text, actions, and broader legislative record.
@@ -527,14 +527,14 @@ export default async function BillDetailPage({ params }) {
         </div>
 
         {bill.linkedLegislators.length ? (
-          <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+          <div className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4">
             <h2 className="text-lg font-semibold text-white">Linked scorecards</h2>
             <div className="mt-4 grid gap-3 md:grid-cols-2">
               {bill.linkedLegislators.map((item) => (
                 <Link
                   key={item.id}
                   href={`/scorecards/${item.id}`}
-                  className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4 hover:border-[rgba(132,247,198,0.24)]"
+                  className="rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4 hover:border-[rgba(132,247,198,0.24)]"
                 >
                   <p className="font-medium text-white">{item.full_name}</p>
                   <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
@@ -554,7 +554,7 @@ export default async function BillDetailPage({ params }) {
           description="Bill pages are strongest when they lead outward into the surrounding legal history, related records, and trust pages that help users verify what the bill record can and cannot show."
         />
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <Link href="/analysis/civil-rights-laws-by-president" className="panel-link rounded-[1.4rem] p-5">
+          <Link href="/analysis/civil-rights-laws-by-president" className="panel-link p-4">
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
               Legislation lens
             </p>
@@ -563,7 +563,7 @@ export default async function BillDetailPage({ params }) {
               Use the legislation guide when this bill belongs in a longer administration-level legal history affecting Black Americans.
             </p>
           </Link>
-          <Link href="/policies" className="panel-link rounded-[1.4rem] p-5">
+          <Link href="/policies" className="panel-link p-4">
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
               Policy explorer
             </p>
@@ -572,7 +572,7 @@ export default async function BillDetailPage({ params }) {
               Move into policy records when you need laws, executive actions, or court decisions that sit next to this bill in the broader public record.
             </p>
           </Link>
-          <Link href="/future-bills" className="panel-link rounded-[1.4rem] p-5">
+          <Link href="/future-bills" className="panel-link p-4">
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
               Reform proposals
             </p>
@@ -581,7 +581,7 @@ export default async function BillDetailPage({ params }) {
               Use the proposal layer when this bill opens into unresolved reform paths, newer proposals, or legislative follow-on context.
             </p>
           </Link>
-          <Link href="/research" className="panel-link rounded-[1.4rem] p-5">
+          <Link href="/research" className="panel-link p-4">
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
               Research hub
             </p>

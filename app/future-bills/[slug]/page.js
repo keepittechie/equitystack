@@ -174,7 +174,7 @@ export default async function FutureBillDetailPage({ params }) {
       <div className="flex flex-wrap gap-3">
         <Link
           href="/future-bills"
-          className="public-button-secondary"
+          className="dashboard-button-secondary"
         >
           Back to Future Bills
         </Link>
@@ -184,7 +184,7 @@ export default async function FutureBillDetailPage({ params }) {
           routeKind="detail"
           entityType="future-bill"
           entityKey={bill.slug}
-          className="public-button-secondary"
+          className="dashboard-button-secondary"
         >
           Open Card Page
         </TrackedLink>
@@ -223,7 +223,7 @@ export default async function FutureBillDetailPage({ params }) {
               routeKind="detail"
               entityType="future-bill"
               entityKey={bill.slug}
-              className="public-button-secondary"
+              className="dashboard-button-secondary"
             >
               Share Card
             </TrackedLink>
@@ -284,7 +284,7 @@ export default async function FutureBillDetailPage({ params }) {
         {guideCards.map((item) => (
           <div
             key={item.title}
-            className="rounded-[1.4rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5"
+            className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4"
           >
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--accent)]">
               {item.eyebrow}
@@ -296,7 +296,7 @@ export default async function FutureBillDetailPage({ params }) {
       </section>
 
       <section className="grid gap-4 md:grid-cols-3">
-        <Link href="/bills" className="panel-link rounded-[1.4rem] p-5">
+        <Link href="/bills" className="panel-link p-4">
           <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
             Legislative tracking
           </p>
@@ -305,7 +305,7 @@ export default async function FutureBillDetailPage({ params }) {
             Open the bill tracker when you want current congressional status, bill-level impact estimates, and deeper legislative timelines.
           </p>
         </Link>
-        <Link href="/explainers" className="panel-link rounded-[1.4rem] p-5">
+        <Link href="/explainers" className="panel-link p-4">
           <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
             Historical context
           </p>
@@ -345,7 +345,7 @@ export default async function FutureBillDetailPage({ params }) {
           description="Proposal pages work best when they lead outward into the bill tracker, historical context, analytical summaries, and the trust pages that explain how EquityStack organizes the record."
         />
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <Link href="/bills" className="panel-link rounded-[1.4rem] p-5">
+          <Link href="/bills" className="panel-link p-4">
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
               Bill tracker
             </p>
@@ -354,7 +354,7 @@ export default async function FutureBillDetailPage({ params }) {
               Move from proposal language into current or historical legislation when you need chamber activity, sponsor history, and bill-level impact context.
             </p>
           </Link>
-          <Link href="/explainers" className="panel-link rounded-[1.4rem] p-5">
+          <Link href="/explainers" className="panel-link p-4">
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
               Historical context
             </p>
@@ -363,7 +363,7 @@ export default async function FutureBillDetailPage({ params }) {
               Use explainers when the proposal depends on longer histories of rights, exclusion, enforcement, or unfinished policy repair.
             </p>
           </Link>
-          <Link href="/reports" className="panel-link rounded-[1.4rem] p-5">
+          <Link href="/reports" className="panel-link p-4">
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
               Reports
             </p>
@@ -372,7 +372,7 @@ export default async function FutureBillDetailPage({ params }) {
               Reports help place one proposal inside larger patterns across administrations, issue areas, and tracked outcomes.
             </p>
           </Link>
-          <Link href="/research" className="panel-link rounded-[1.4rem] p-5">
+          <Link href="/research" className="panel-link p-4">
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
               Research hub
             </p>

@@ -43,7 +43,7 @@ function formatTermLabel(start, end) {
 function PromisePanel({ children, className = "" }) {
   return (
     <section
-      className={`rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6 ${className}`}
+      className={`rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4 ${className}`}
     >
       {children}
     </section>
@@ -279,7 +279,7 @@ export default async function PromiseDetailPage({ params }) {
         {guideCards.map((item) => (
           <div
             key={item.title}
-            className="rounded-[1.4rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5"
+            className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4"
           >
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--accent)]">
               {item.eyebrow}
@@ -314,7 +314,7 @@ export default async function PromiseDetailPage({ params }) {
             "This promise record does not yet have a long-form rationale summary."
           }
         />
-        <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6">
+        <div className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4">
           <h2 className="text-lg font-semibold text-white">What was promised</h2>
           <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
             {promise.promise_text || promise.summary || "No promise statement is currently available."}
@@ -325,25 +325,25 @@ export default async function PromiseDetailPage({ params }) {
             </p>
           ) : null}
           <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-            <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+            <div className="rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4">
               <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
                 Current Status
               </p>
               <p className="mt-2 text-lg font-medium text-white">{promise.status || "Unknown"}</p>
             </div>
-            <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+            <div className="rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4">
               <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
                 Confidence
               </p>
               <p className="mt-2 text-lg font-medium text-white">{promise.confidence_label || "Not yet available"}</p>
             </div>
-            <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+            <div className="rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4">
               <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
                 Linked policy actions
               </p>
               <p className="mt-2 text-lg font-medium text-white">{linkedPolicyCount}</p>
             </div>
-            <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+            <div className="rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4">
               <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
                 Policy Outcomes
               </p>
@@ -369,7 +369,7 @@ export default async function PromiseDetailPage({ params }) {
                 <Link
                   key={item.id || item.slug}
                   href={`/policies/${buildPolicySlug(item)}`}
-                  className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4 text-sm leading-7 text-[var(--ink-soft)] hover:border-[rgba(132,247,198,0.24)]"
+                  className="rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4 text-sm leading-7 text-[var(--ink-soft)] hover:border-[rgba(132,247,198,0.24)]"
                 >
                   <span className="font-medium text-white">{item.title}</span>
                   {item.summary ? <span className="mt-2 block">{item.summary}</span> : null}
@@ -394,7 +394,7 @@ export default async function PromiseDetailPage({ params }) {
         {timelineItems.length ? (
           <PromiseTimeline items={timelineItems} />
         ) : (
-          <div className="rounded-[1.4rem] border border-dashed border-white/12 bg-white/4 p-5 text-sm leading-7 text-[var(--ink-soft)]">
+          <div className="dashboard-empty-state text-sm leading-7 text-[var(--ink-soft)]">
             No status history or dated action timeline is attached to this promise yet.
           </div>
         )}
@@ -417,7 +417,7 @@ export default async function PromiseDetailPage({ params }) {
         {evidence.length ? (
           <EvidenceSourceList items={evidence} />
         ) : (
-          <div className="rounded-[1.4rem] border border-dashed border-white/12 bg-white/4 p-5 text-sm leading-7 text-[var(--ink-soft)]">
+          <div className="dashboard-empty-state text-sm leading-7 text-[var(--ink-soft)]">
             No evidence sources are attached to this promise record yet.
           </div>
         )}
@@ -435,13 +435,13 @@ export default async function PromiseDetailPage({ params }) {
             buildHref={(item) => `/policies/${buildPolicySlug(item)}`}
           />
         ) : (
-          <div className="rounded-[1.4rem] border border-dashed border-white/12 bg-white/4 p-5 text-sm leading-7 text-[var(--ink-soft)]">
+          <div className="dashboard-empty-state text-sm leading-7 text-[var(--ink-soft)]">
             No confirmed policy action is linked to this promise in the current EquityStack dataset.
           </div>
         )}
         <div className="grid gap-4 md:grid-cols-2">
           {presidentPromiseHref ? (
-            <Link href={presidentPromiseHref} className="panel-link rounded-[1.4rem] p-5">
+            <Link href={presidentPromiseHref} className="panel-link p-4">
               <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
                 Presidency term
               </p>
@@ -454,7 +454,7 @@ export default async function PromiseDetailPage({ params }) {
             </Link>
           ) : null}
           {presidentProfileHref ? (
-            <Link href={presidentProfileHref} className="panel-link rounded-[1.4rem] p-5">
+            <Link href={presidentProfileHref} className="panel-link p-4">
               <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
                 President profile
               </p>
@@ -466,7 +466,7 @@ export default async function PromiseDetailPage({ params }) {
               </p>
             </Link>
           ) : null}
-          <Link href={presidentPoliciesHref} className="panel-link rounded-[1.4rem] p-5">
+          <Link href={presidentPoliciesHref} className="panel-link p-4">
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
               Policy context
             </p>
@@ -478,7 +478,7 @@ export default async function PromiseDetailPage({ params }) {
             </p>
           </Link>
           {(promise.related_explainers || []).map((item) => (
-            <Link key={item.slug} href={`/explainers/${item.slug}`} className="panel-link rounded-[1.4rem] p-5">
+            <Link key={item.slug} href={`/explainers/${item.slug}`} className="panel-link p-4">
               <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
                 {item.category || "Explainer"}
               </p>
@@ -486,7 +486,7 @@ export default async function PromiseDetailPage({ params }) {
               <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item.summary}</p>
             </Link>
           ))}
-          <Link href="/reports/black-impact-score" className="panel-link rounded-[1.4rem] p-5">
+          <Link href="/reports/black-impact-score" className="panel-link p-4">
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
               Related report
             </p>
@@ -495,7 +495,7 @@ export default async function PromiseDetailPage({ params }) {
               Read the flagship report when you want to place this promise record inside the wider presidential score and historical policy context.
             </p>
           </Link>
-          <Link href="/analysis/campaign-promises-to-black-americans" className="panel-link rounded-[1.4rem] p-5">
+          <Link href="/analysis/campaign-promises-to-black-americans" className="panel-link p-4">
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
               Thematic guide
             </p>
@@ -504,7 +504,7 @@ export default async function PromiseDetailPage({ params }) {
               Use the thematic landing page when you need the broader question behind this one record: what was promised, what followed, and how those paths diverged across administrations.
             </p>
           </Link>
-          <Link href="/research" className="panel-link rounded-[1.4rem] p-5">
+          <Link href="/research" className="panel-link p-4">
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
               Research hub
             </p>

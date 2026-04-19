@@ -262,10 +262,10 @@ export default function CampaignPromisesToBlackAmericansPage() {
           description="This is the promises-and-follow-through guide for readers asking what presidents or campaigns promised Black Americans and what the documented record shows afterward. It focuses on commitments, promise grading, linked policy action, and later evidence."
           actions={
             <>
-              <Link href="/promises" className="public-button-primary">
+              <Link href="/promises" className="dashboard-button-primary">
                 Review promise records
               </Link>
-              <Link href="/presidents" className="public-button-secondary">
+              <Link href="/presidents" className="dashboard-button-secondary">
                 Explore presidential context
               </Link>
             </>
@@ -298,7 +298,7 @@ export default function CampaignPromisesToBlackAmericansPage() {
           {WHY_PROMISES_MATTER.map((item) => (
             <article
               key={item.title}
-              className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6"
+              className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4"
             >
               <h2 className="text-xl font-semibold text-white">{item.title}</h2>
               <p className="mt-4 text-sm leading-7 text-[var(--ink-soft)]">{item.body}</p>
@@ -317,7 +317,7 @@ export default function CampaignPromisesToBlackAmericansPage() {
           {HOW_TO_USE.map((item) => (
             <article
               key={item.title}
-              className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6"
+              className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4"
             >
               <h2 className="text-xl font-semibold text-white">{item.title}</h2>
               <p className="mt-4 text-sm leading-7 text-[var(--ink-soft)]">{item.body}</p>

@@ -238,7 +238,7 @@ export default async function NarrativesPage() {
 
         <div className="space-y-8">
           {Object.entries(harmfulByEraGrouped).map(([era, policies]) => (
-            <div key={era} className="card-surface rounded-[1.6rem] p-5">
+            <div key={era} className="card-surface p-4">
               <h3 className="text-xl font-semibold mb-4">{era}</h3>
 
               <div className="grid gap-4 md:grid-cols-2">

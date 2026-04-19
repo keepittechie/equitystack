@@ -298,10 +298,10 @@ export default function PresidentialImpactOnBlackAmericansPage() {
           description="This is the top-level synthesis hub for readers asking how presidents affected Black Americans. It brings together the major research lenses on the site, including rights, policy, legislation, enforcement, promises, opportunity, and historical change."
           actions={
             <>
-              <Link href="/presidents" className="public-button-primary">
+              <Link href="/presidents" className="dashboard-button-primary">
                 Explore presidential impact records
               </Link>
-              <Link href="/reports" className="public-button-secondary">
+              <Link href="/reports" className="dashboard-button-secondary">
                 Read historical context and report analysis
               </Link>
             </>
@@ -328,7 +328,7 @@ export default function PresidentialImpactOnBlackAmericansPage() {
         {FLAGSHIP_SUPPORT.map((item) => (
           <article
             key={item.title}
-            className="rounded-[1.4rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5"
+            className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4"
           >
             <h2 className="text-lg font-semibold text-white">{item.title}</h2>
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item.description}</p>
@@ -346,7 +346,7 @@ export default function PresidentialImpactOnBlackAmericansPage() {
           {WHAT_IMPACT_MEANS.map((item) => (
             <article
               key={item.title}
-              className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6"
+              className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4"
             >
               <h2 className="text-xl font-semibold text-white">{item.title}</h2>
               <p className="mt-4 text-sm leading-7 text-[var(--ink-soft)]">{item.body}</p>
@@ -365,7 +365,7 @@ export default function PresidentialImpactOnBlackAmericansPage() {
           {WHY_ADMINISTRATIONS_MATTER.map((item) => (
             <article
               key={item.title}
-              className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6"
+              className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4"
             >
               <h2 className="text-xl font-semibold text-white">{item.title}</h2>
               <p className="mt-4 text-sm leading-7 text-[var(--ink-soft)]">{item.body}</p>
@@ -384,7 +384,7 @@ export default function PresidentialImpactOnBlackAmericansPage() {
           {HOW_TO_USE.map((item) => (
             <article
               key={item.title}
-              className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6"
+              className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4"
             >
               <h2 className="text-xl font-semibold text-white">{item.title}</h2>
               <p className="mt-4 text-sm leading-7 text-[var(--ink-soft)]">{item.body}</p>

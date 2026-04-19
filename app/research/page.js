@@ -332,10 +332,10 @@ export default function ResearchHubPage() {
           description="This page brings together the site’s strongest thematic guides, flagship reports, historical explainers, and core research paths across presidents, promises, policies, legislation, and evidence. It is designed as a serious starting point for readers who want the clearest route into the public record."
           actions={
             <>
-              <Link href="/reports" className="public-button-primary">
+              <Link href="/reports" className="dashboard-button-primary">
                 Open flagship reports
               </Link>
-              <Link href="/methodology" className="public-button-secondary">
+              <Link href="/methodology" className="dashboard-button-secondary">
                 Review methodology
               </Link>
             </>
@@ -348,19 +348,19 @@ export default function ResearchHubPage() {
           title="Why this page is worth sharing"
           description="Use the Research Hub when someone needs one serious entry point into EquityStack’s strongest public pages. It is designed for teachers, journalists, researchers, students, and skeptical first-time visitors who need a curated path into the site rather than a raw archive."
         />
-        <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6">
+        <div className="border-l-0 border-t border-[var(--line)] pt-5 md:border-t-0 md:pt-0 md:pl-2">
           <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--accent)]">
             What this hub does
           </p>
           <h2 className="mt-3 text-2xl font-semibold text-white">Use it to choose the right research path quickly</h2>
-          <div className="mt-4 grid gap-3 text-sm leading-7 text-[var(--ink-soft)]">
-            <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+          <div className="mt-4 grid gap-4 text-sm leading-7 text-[var(--ink-soft)]">
+            <div className="border-l border-[var(--line)] pl-4">
               Start with a major thematic question if the topic is broad and historical.
             </div>
-            <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+            <div className="border-l border-[var(--line)] pl-4">
               Move into reports when you need synthesis, comparison, or a more shareable analytical page.
             </div>
-            <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+            <div className="border-l border-[var(--line)] pl-4">
               Use explainers, sources, and methodology when context, verification, and interpretation matter more than speed.
             </div>
           </div>
@@ -378,7 +378,7 @@ export default function ResearchHubPage() {
             <Link
               key={item.href}
               href={item.href}
-              className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 hover:border-[rgba(132,247,198,0.24)]"
+              className="panel-link p-4"
             >
               <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--accent)]">
                 {item.audience}
@@ -401,7 +401,7 @@ export default function ResearchHubPage() {
             <Link
               key={item.path}
               href={item.path}
-              className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 hover:border-[rgba(132,247,198,0.24)]"
+              className="panel-link p-4"
             >
               <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--accent)]">
                 {item.clusterEyebrow || "Research guide"}
@@ -429,7 +429,7 @@ export default function ResearchHubPage() {
             <Link
               key={item.href}
               href={item.href}
-              className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 hover:border-[rgba(132,247,198,0.24)]"
+              className="panel-link p-4"
             >
               <h2 className="text-xl font-semibold text-white">{item.title}</h2>
               <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item.description}</p>
@@ -452,7 +452,7 @@ export default function ResearchHubPage() {
             <Link
               key={item.href}
               href={item.href}
-              className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 hover:border-[rgba(132,247,198,0.24)]"
+              className="panel-link p-4"
             >
               <h2 className="text-xl font-semibold text-white">{item.title}</h2>
               <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item.description}</p>
@@ -475,7 +475,7 @@ export default function ResearchHubPage() {
             <Link
               key={item.href}
               href={item.href}
-              className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 hover:border-[rgba(132,247,198,0.24)]"
+              className="panel-link p-4"
             >
               <h2 className="text-xl font-semibold text-white">{item.title}</h2>
               <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item.description}</p>
@@ -497,7 +497,7 @@ export default function ResearchHubPage() {
           {USER_START_POINTS.map((item) => (
             <article
               key={item.title}
-              className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5"
+              className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4"
             >
               <h2 className="text-lg font-semibold text-white">{item.title}</h2>
               <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item.description}</p>
@@ -517,7 +517,7 @@ export default function ResearchHubPage() {
             <Link
               key={item.href}
               href={item.href}
-              className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 hover:border-[rgba(132,247,198,0.24)]"
+              className="panel-link p-4"
             >
               <h2 className="text-lg font-semibold text-white">{item.title}</h2>
               <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item.description}</p>

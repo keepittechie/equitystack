@@ -21,7 +21,7 @@ function Pill({ children }) {
 
 function SectionCard({ title, children }) {
   return (
-    <section className="card-surface rounded-[1.6rem] p-6 space-y-4">
+    <section className="card-surface p-4 space-y-4">
       <h2 className="text-2xl font-semibold">{title}</h2>
       <div className="text-[var(--ink-soft)] leading-7 space-y-3">{children}</div>
     </section>
@@ -111,7 +111,7 @@ export default async function ScorecardsPage({ searchParams }) {
       </section>
 
       <section className="grid gap-4 md:grid-cols-2">
-        <section className="card-surface rounded-[1.6rem] p-6 space-y-4">
+        <section className="card-surface p-4 space-y-4">
           <h2 className="text-2xl font-semibold">What this section is for</h2>
           <div className="text-[var(--ink-soft)] leading-7 space-y-3">
             <p>
@@ -119,7 +119,7 @@ export default async function ScorecardsPage({ searchParams }) {
             </p>
           </div>
         </section>
-        <section className="card-surface rounded-[1.6rem] p-6 space-y-4">
+        <section className="card-surface p-4 space-y-4">
           <h2 className="text-2xl font-semibold">How to use it</h2>
           <div className="text-[var(--ink-soft)] leading-7 space-y-3">
             <p>

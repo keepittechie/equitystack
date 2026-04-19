@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Panel, StatusPill } from "@/app/components/dashboard/primitives";
 import { SectionIntro } from "@/app/components/public/core";
 
 export function ThematicHubCard({
@@ -11,33 +12,33 @@ export function ThematicHubCard({
   const content = (
     <>
       {eyebrow ? (
-        <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--accent)]">
-          {eyebrow}
-        </p>
+        <StatusPill tone="info">{eyebrow}</StatusPill>
       ) : null}
-      <h3 className="mt-4 text-xl font-semibold text-white">{title}</h3>
+      <h3 className="mt-3 text-lg font-semibold text-white">{title}</h3>
       <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{description}</p>
       {note ? (
-        <p className="mt-4 text-xs leading-6 text-[var(--ink-muted)]">{note}</p>
+        <p className="mt-3 text-[12px] leading-5 text-[var(--ink-muted)]">{note}</p>
       ) : null}
     </>
   );
 
   if (!href) {
     return (
-      <article className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+      <Panel as="article" padding="md">
         {content}
-      </article>
+      </Panel>
     );
   }
 
   return (
-    <Link
+    <Panel
+      as={Link}
       href={href}
-      className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 hover:border-[rgba(132,247,198,0.24)]"
+      padding="md"
+      interactive
     >
       {content}
-    </Link>
+    </Panel>
   );
 }
 
@@ -49,12 +50,13 @@ export function ThematicQuestionList({ items = [] }) {
   return (
     <div className="grid gap-3">
       {items.map((item) => (
-        <div
+        <Panel
           key={item}
-          className="rounded-[1.2rem] border border-white/8 bg-[rgba(8,14,24,0.92)] px-4 py-4 text-sm leading-7 text-[var(--ink-soft)]"
+          padding="md"
+          className="text-sm leading-7 text-[var(--ink-soft)]"
         >
           {item}
-        </div>
+        </Panel>
       ))}
     </div>
   );

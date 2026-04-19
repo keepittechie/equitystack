@@ -50,7 +50,7 @@ function TooltipShell({ active, payload, label }) {
 
 export function ReportChartBlock({ title, description, children }) {
   return (
-    <section className="flex h-full flex-col rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 md:p-6">
+    <section className="flex h-full flex-col rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4 md:p-6">
       <div className="mb-5 flex-none">
         <h3 className="text-base font-semibold text-white md:text-lg">{title}</h3>
         {description ? (

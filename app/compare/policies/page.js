@@ -84,7 +84,7 @@ export default async function ComparePoliciesPage({ searchParams }) {
             selected={data.selected_ids || []}
             name="compare"
           />
-          <button type="submit" className="public-button-primary">
+          <button type="submit" className="dashboard-button-primary">
             Compare selected policies
           </button>
         </form>
@@ -164,16 +164,16 @@ export default async function ComparePoliciesPage({ searchParams }) {
               />
             </div>
             <div className="space-y-5">
-              <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+              <div className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4">
                 <h2 className="text-lg font-semibold text-white">Quick read</h2>
                 <div className="mt-4 grid gap-3 text-sm leading-7 text-[var(--ink-soft)]">
-                  <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+                  <div className="rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4">
                     Policies with higher impact scores are not automatically more trustworthy if source coverage is thin.
                   </div>
-                  <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+                  <div className="rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4">
                     Direction matters: mixed and blocked records should not be flattened into positive/negative shorthand.
                   </div>
-                  <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+                  <div className="rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4">
                     Category overlap helps determine whether a comparison is substantive or just convenient.
                   </div>
                 </div>
@@ -182,7 +182,7 @@ export default async function ComparePoliciesPage({ searchParams }) {
           </section>
         </>
       ) : (
-        <section className="rounded-[1.6rem] border border-dashed border-white/12 bg-white/4 p-6 text-sm leading-7 text-[var(--ink-soft)]">
+        <section className="dashboard-empty-state text-sm leading-7 text-[var(--ink-soft)]">
           Select at least two policies to generate a comparison. Choose records with shared topic or historical context for the clearest read.
         </section>
       )}

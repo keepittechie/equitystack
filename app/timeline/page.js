@@ -9,6 +9,7 @@ import {
   MethodologyCallout,
   SectionIntro,
 } from "@/app/components/public/core";
+import { Panel } from "@/app/components/dashboard/primitives";
 import { TimelineEventCard } from "@/app/components/public/entities";
 import {
   buildBreadcrumbJsonLd,
@@ -34,7 +35,7 @@ export default async function TimelinePage({ searchParams }) {
   const lastYear = items.length ? items[0]?.year : null;
 
   return (
-    <main className="space-y-10">
+    <main className="space-y-8">
       <StructuredData
         data={[
           buildBreadcrumbJsonLd(
@@ -70,10 +71,10 @@ export default async function TimelinePage({ searchParams }) {
           description="The timeline is a discovery layer for readers who want sequence before synthesis. It mixes policies and promises in one public chronology so civil-rights gains, reversals, and continuity become easier to follow."
           actions={
             <>
-              <Link href="/reports/civil-rights-timeline" className="public-button-primary">
+              <Link href="/reports/civil-rights-timeline" className="dashboard-button-primary">
                 Open the civil-rights timeline report
               </Link>
-              <Link href="/dashboard" className="public-button-secondary">
+              <Link href="/dashboard" className="dashboard-button-secondary">
                 Return to the public dashboard
               </Link>
             </>
@@ -82,18 +83,18 @@ export default async function TimelinePage({ searchParams }) {
       </section>
 
       <section className="grid gap-4 md:grid-cols-2">
-        <div className="rounded-[1.5rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+        <Panel padding="md">
           <h2 className="text-lg font-semibold text-white">What this timeline covers</h2>
           <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
             This page combines historical policy records and promise records so users can see when major shifts affecting Black Americans took place.
           </p>
-        </div>
-        <div className="rounded-[1.5rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+        </Panel>
+        <Panel padding="md">
           <h2 className="text-lg font-semibold text-white">What to look for</h2>
           <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
             Use the timeline to identify turning points, then open the linked policy or promise pages for the evidence, explanation, and historical context behind each entry.
           </p>
-        </div>
+        </Panel>
       </section>
 
       <DashboardFilterBar helpText="Use the timeline as a discovery and context surface. Filter by record type or visible direction/status when you want a narrower slice of Black policy history.">
@@ -107,7 +108,7 @@ export default async function TimelinePage({ searchParams }) {
               name="q"
               defaultValue={resolvedSearchParams.q || ""}
               placeholder="Topic, title, or president"
-              className="rounded-xl border border-white/8 bg-white/5 px-3 py-2.5 text-sm text-white"
+              className="dashboard-field"
             />
           </label>
           <label className="grid gap-2">
@@ -117,7 +118,7 @@ export default async function TimelinePage({ searchParams }) {
             <select
               name="type"
               defaultValue={resolvedSearchParams.type || ""}
-              className="rounded-xl border border-white/8 bg-white/5 px-3 py-2.5 text-sm text-white"
+              className="dashboard-field"
             >
               <option value="">All types</option>
               {(data.filterOptions?.types || []).map((item) => (
@@ -134,7 +135,7 @@ export default async function TimelinePage({ searchParams }) {
             <select
               name="direction"
               defaultValue={resolvedSearchParams.direction || ""}
-              className="rounded-xl border border-white/8 bg-white/5 px-3 py-2.5 text-sm text-white"
+              className="dashboard-field"
             >
               <option value="">All directions / statuses</option>
               {(data.filterOptions?.directions || []).map((item) => (
@@ -144,7 +145,7 @@ export default async function TimelinePage({ searchParams }) {
               ))}
             </select>
           </label>
-          <button type="submit" className="public-button-secondary">
+          <button type="submit" className="dashboard-button-secondary">
             Apply filters
           </button>
         </form>
@@ -177,8 +178,8 @@ export default async function TimelinePage({ searchParams }) {
         ]}
       />
 
-      <section className="public-two-col-rail grid items-start gap-6 xl:grid-cols-[1.15fr_0.85fr]">
-        <div className="space-y-5 xl:self-start">
+      <section className="public-two-col-rail grid items-start gap-4 xl:grid-cols-[1.15fr_0.85fr]">
+        <div className="space-y-4 xl:self-start">
           <SectionIntro
             eyebrow="Chronology"
             title="Browse the public record"
@@ -198,38 +199,38 @@ export default async function TimelinePage({ searchParams }) {
               ))}
             </div>
           ) : (
-            <div className="rounded-[1.6rem] border border-dashed border-white/12 bg-white/4 p-6 text-sm leading-7 text-[var(--ink-soft)]">
+            <div className="dashboard-empty-state text-sm leading-7 text-[var(--ink-soft)]">
               No timeline records matched the current filters.
             </div>
           )}
         </div>
-        <div className="space-y-5">
+        <div className="space-y-4">
           <MethodologyCallout description="Timeline order helps users understand sequence, but chronology alone does not explain impact. Open the linked detail pages for evidence, scoring context, and methodology." />
-          <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+          <Panel padding="md">
             <h2 className="text-lg font-semibold text-white">How to read the timeline</h2>
             <div className="mt-4 grid gap-3 text-sm leading-7 text-[var(--ink-soft)]">
-              <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+              <Panel padding="md" className="bg-[rgba(18,31,49,0.52)]">
                 Use it to identify when major shifts in Black policy history happened.
-              </div>
-              <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+              </Panel>
+              <Panel padding="md" className="bg-[rgba(18,31,49,0.52)]">
                 Open policy cards when you need the evidence and impact explanation.
-              </div>
-              <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+              </Panel>
+              <Panel padding="md" className="bg-[rgba(18,31,49,0.52)]">
                 Open promise cards when you need the original commitment and status logic.
-              </div>
+              </Panel>
             </div>
-          </div>
+          </Panel>
         </div>
       </section>
 
-      <section className="space-y-5">
+      <section className="space-y-4">
         <SectionIntro
           eyebrow="Continue exploring"
           title="Use chronology as a starting point, then move into records and research guides"
           description="The timeline works best as a discovery layer. These next steps help you turn sequence into policy detail, promise context, and broader research paths."
         />
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <Link href="/reports/civil-rights-timeline" className="panel-link rounded-[1.4rem] p-5">
+          <Link href="/reports/civil-rights-timeline" className="panel-link p-4">
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
               Historical report
             </p>
@@ -238,7 +239,7 @@ export default async function TimelinePage({ searchParams }) {
               Use the curated report when you want a chronology-first interpretation layer rather than a mixed event stream.
             </p>
           </Link>
-          <Link href="/policies" className="panel-link rounded-[1.4rem] p-5">
+          <Link href="/policies" className="panel-link p-4">
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
               Policy explorer
             </p>
@@ -247,7 +248,7 @@ export default async function TimelinePage({ searchParams }) {
               Open policy pages when you need the evidence, score, and record-level explanation behind a timeline event.
             </p>
           </Link>
-          <Link href="/promises" className="panel-link rounded-[1.4rem] p-5">
+          <Link href="/promises" className="panel-link p-4">
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
               Promise tracker
             </p>
@@ -256,7 +257,7 @@ export default async function TimelinePage({ searchParams }) {
               Use the promise tracker when the timeline raises a question about commitments, delivery, and what followed over time.
             </p>
           </Link>
-          <Link href="/research" className="panel-link rounded-[1.4rem] p-5">
+          <Link href="/research" className="panel-link p-4">
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
               Research hub
             </p>

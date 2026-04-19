@@ -79,7 +79,7 @@ export default async function AdministrationDetailPage({ params }) {
           description="Administration pages summarize governing activity, promise throughput, and directional outcome mix in one place, then point back into the underlying promise and policy record."
           actions={
             profile?.president?.president_slug ? (
-              <Link href={`/presidents/${profile.president.president_slug}`} className="public-button-secondary">
+              <Link href={`/presidents/${profile.president.president_slug}`} className="dashboard-button-secondary">
                 Open the full president profile
               </Link>
             ) : null
@@ -125,7 +125,7 @@ export default async function AdministrationDetailPage({ params }) {
             description="Direction mix helps users see whether the administration feed skews positive, negative, mixed, or blocked."
           />
           {!administration?.impact_breakdown ? (
-            <div className="rounded-[1.4rem] border border-dashed border-white/12 bg-white/4 p-5 text-sm leading-7 text-[var(--ink-soft)]">
+            <div className="dashboard-empty-state text-sm leading-7 text-[var(--ink-soft)]">
               No administration-level direction breakdown is currently available.
             </div>
           ) : null}
@@ -138,7 +138,7 @@ export default async function AdministrationDetailPage({ params }) {
             dataKey="score"
           />
           {!topTopics.length ? (
-            <div className="rounded-[1.4rem] border border-dashed border-white/12 bg-white/4 p-5 text-sm leading-7 text-[var(--ink-soft)]">
+            <div className="dashboard-empty-state text-sm leading-7 text-[var(--ink-soft)]">
               No topic concentration data is currently available for this administration.
             </div>
           ) : null}
@@ -157,7 +157,7 @@ export default async function AdministrationDetailPage({ params }) {
             buildHref={(item) => `/promises/${item.slug}`}
           />
           {(detail.linkedPolicyFeed || []).length ? (
-            <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+            <div className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4">
               <h3 className="text-lg font-semibold text-white">Linked policy feed</h3>
               <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
                 These policy records help connect the administration summary to legislation, executive action, and other documented policy changes.
@@ -178,24 +178,24 @@ export default async function AdministrationDetailPage({ params }) {
               </div>
             </div>
           ) : (
-            <div className="rounded-[1.4rem] border border-dashed border-white/12 bg-white/4 p-5 text-sm leading-7 text-[var(--ink-soft)]">
+            <div className="dashboard-empty-state text-sm leading-7 text-[var(--ink-soft)]">
               No linked policy feed is currently available for this administration.
             </div>
           )}
         </div>
         <div className="space-y-5">
           <MethodologyCallout description="Administration views are descriptive operating summaries. Presidential score pages remain the place to read the Black Impact Score itself." />
-          <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+          <div className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4">
             <h2 className="text-lg font-semibold text-white">Keep researching this administration</h2>
             <div className="mt-4 grid gap-3">
-              <Link href="/promises" className="panel-link rounded-[1.2rem] p-4">
+              <Link href="/promises" className="panel-link p-4">
                 <h3 className="text-base font-semibold text-white">Open the full promise tracker</h3>
                 <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
                   Move from this administration summary into the broader promise library when you want cross-president comparison.
                 </p>
               </Link>
               {profile?.president?.president_slug ? (
-                <Link href={`/presidents/${profile.president.president_slug}`} className="panel-link rounded-[1.2rem] p-4">
+                <Link href={`/presidents/${profile.president.president_slug}`} className="panel-link p-4">
                   <h3 className="text-base font-semibold text-white">Open the president profile</h3>
                   <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
                     Use the president page for Black Impact Score context, score drivers, and deeper historical interpretation.
@@ -211,7 +211,7 @@ export default async function AdministrationDetailPage({ params }) {
           />
           <div className="grid gap-4">
             {(administration?.recent_activity || []).slice(0, 6).map((item) => (
-              <Link key={item.slug} href={`/promises/${item.slug}`} className="panel-link rounded-[1.4rem] p-5">
+              <Link key={item.slug} href={`/promises/${item.slug}`} className="panel-link p-4">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
                   {item.latest_action_date || item.promise_date || "Record"}
                 </p>

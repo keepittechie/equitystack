@@ -11,6 +11,7 @@ import {
   SectionIntro,
   SourceTrustPanel,
 } from "@/app/components/public/core";
+import { Panel } from "@/app/components/dashboard/primitives";
 import { SourceLibraryTable } from "@/app/components/public/entities";
 import {
   buildBreadcrumbJsonLd,
@@ -40,7 +41,7 @@ export default async function SourcesPage({ searchParams }) {
   ).length;
 
   return (
-    <main className="space-y-10">
+    <main className="space-y-8">
       <StructuredData
         data={[
           buildBreadcrumbJsonLd(
@@ -97,13 +98,13 @@ export default async function SourcesPage({ searchParams }) {
           description="The source library gives users a direct view into the public evidence base behind policies, promises, and outcomes. Use it to inspect source types, publishers, linked-record counts, and coverage depth."
           actions={
             <>
-              <Link href="/methodology" className="public-button-primary">
+              <Link href="/methodology" className="dashboard-button-primary">
                 Read evidence rules
               </Link>
-              <Link href="/research" className="public-button-secondary">
+              <Link href="/research" className="dashboard-button-secondary">
                 Open research hub
               </Link>
-              <Link href="/search" className="public-button-secondary">
+              <Link href="/search" className="dashboard-button-secondary">
                 Universal search
               </Link>
             </>
@@ -111,7 +112,7 @@ export default async function SourcesPage({ searchParams }) {
         />
       </section>
 
-      <section className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6">
+      <Panel padding="md">
         <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--accent)]">
           How sources are used
         </p>
@@ -127,21 +128,21 @@ export default async function SourcesPage({ searchParams }) {
           Multiple sources can support a single policy, promise, or outcome record. The public library
           exists so readers can inspect that evidence layer directly.
         </p>
-      </section>
+      </Panel>
 
       <section className="grid gap-4 md:grid-cols-2">
-        <div className="rounded-[1.5rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+        <Panel padding="md">
           <h2 className="text-lg font-semibold text-white">Why researchers use this page</h2>
           <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
             Readers can use this page to verify claims, understand what kinds of sources support Black policy impact analysis, and see how widely a source is used across the site.
           </p>
-        </div>
-        <div className="rounded-[1.5rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+        </Panel>
+        <Panel padding="md">
           <h2 className="text-lg font-semibold text-white">Why it is citation-friendly</h2>
           <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
             Link this page when a reader needs to inspect the evidence layer itself, not just the interpretation built from it. It is the clearest public page for checking publisher mix, source types, and visible record linkage.
           </p>
-        </div>
+        </Panel>
       </section>
 
       <CitationNote
@@ -160,10 +161,10 @@ export default async function SourcesPage({ searchParams }) {
               name="q"
               defaultValue={query}
               placeholder="Source title, publisher, or URL"
-              className="rounded-xl border border-white/8 bg-white/5 px-3 py-2.5 text-sm text-white"
+              className="dashboard-field"
             />
           </label>
-          <button type="submit" className="public-button-secondary">
+          <button type="submit" className="dashboard-button-secondary">
             Search sources
           </button>
         </form>
@@ -195,8 +196,8 @@ export default async function SourcesPage({ searchParams }) {
         ]}
       />
 
-      <section className="public-two-col-rail grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
-        <div className="space-y-5">
+      <section className="public-two-col-rail grid gap-4 xl:grid-cols-[1.15fr_0.85fr]">
+        <div className="space-y-4">
           <SectionIntro
             eyebrow="Source records"
             title="Public source index"
@@ -204,7 +205,7 @@ export default async function SourcesPage({ searchParams }) {
           />
           <SourceLibraryTable items={sources} />
         </div>
-        <div className="space-y-5">
+        <div className="space-y-4">
           <SourceTrustPanel
             sourceCount={sources.length}
             sourceQuality={highAuthorityCount ? `${highAuthorityCount} high-authority visible` : "Mixed"}
@@ -212,47 +213,47 @@ export default async function SourcesPage({ searchParams }) {
             summary="EquityStack prefers official, archival, academic, and similarly authoritative records. The public source library exists so readers can inspect that evidence layer directly."
           />
           <MethodologyCallout description="Source type alone is not the whole story, but surfacing it nearby helps users tell the difference between official records, contextual reporting, and sparse evidence." />
-          <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+          <Panel padding="md">
             <h2 className="text-lg font-semibold text-white">Best companion pages</h2>
             <div className="mt-4 grid gap-3">
-              <Link href="/methodology" className="panel-link rounded-[1.1rem] p-4">
+              <Link href="/methodology" className="panel-link p-4">
                 <h3 className="text-base font-semibold text-white">Methodology</h3>
                 <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
                   Use methodology when a reader needs to know how evidence quality affects scoring and interpretation.
                 </p>
               </Link>
-              <Link href="/research" className="panel-link rounded-[1.1rem] p-4">
+              <Link href="/research" className="panel-link p-4">
                 <h3 className="text-base font-semibold text-white">Research Hub</h3>
                 <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
                   Use the research hub when the source trail opens into a broader question about presidents, legislation, reports, or explainers.
                 </p>
               </Link>
-              <Link href="/reports" className="panel-link rounded-[1.1rem] p-4">
+              <Link href="/reports" className="panel-link p-4">
                 <h3 className="text-base font-semibold text-white">Reports</h3>
                 <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
                   Pair the source library with reports when you want both the summary view and the evidence layer behind it.
                 </p>
               </Link>
-              <Link href="/explainers" className="panel-link rounded-[1.1rem] p-4">
+              <Link href="/explainers" className="panel-link p-4">
                 <h3 className="text-base font-semibold text-white">Explainers</h3>
                 <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
                   Use explainers when the reader needs historical context before interpreting the sources attached to a topic.
                 </p>
               </Link>
-              <Link href="/start" className="panel-link rounded-[1.1rem] p-4">
+              <Link href="/start" className="panel-link p-4">
                 <h3 className="text-base font-semibold text-white">How to Use EquityStack</h3>
                 <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
                   Share the guided path when a first-time reader needs orientation before moving from evidence into reports, explainers, or tracked records.
                 </p>
               </Link>
-              <Link href="/glossary" className="panel-link rounded-[1.1rem] p-4">
+              <Link href="/glossary" className="panel-link p-4">
                 <h3 className="text-base font-semibold text-white">Glossary</h3>
                 <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
                   Use the glossary when a reader needs quick definitions for record, report, thematic page, outcome, or source-quality terms.
                 </p>
               </Link>
             </div>
-          </div>
+          </Panel>
         </div>
       </section>
     </main>

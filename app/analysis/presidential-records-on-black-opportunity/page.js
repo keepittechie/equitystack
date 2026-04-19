@@ -280,10 +280,10 @@ export default function PresidentialRecordsOnBlackOpportunityPage() {
           description="This is the evidence-and-records guide for readers who want documentary review rather than broad framing. It focuses on policies, promises, legislation, outcomes, and the linked evidence trail behind claims about Black opportunity."
           actions={
             <>
-              <Link href="/presidents" className="public-button-primary">
+              <Link href="/presidents" className="dashboard-button-primary">
                 Review presidential records
               </Link>
-              <Link href="/policies" className="public-button-secondary">
+              <Link href="/policies" className="dashboard-button-secondary">
                 Review policy records affecting opportunity
               </Link>
             </>
@@ -316,7 +316,7 @@ export default function PresidentialRecordsOnBlackOpportunityPage() {
           {WHAT_COUNTS_AS_A_RECORD.map((item) => (
             <article
               key={item.title}
-              className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6"
+              className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4"
             >
               <h2 className="text-xl font-semibold text-white">{item.title}</h2>
               <p className="mt-4 text-sm leading-7 text-[var(--ink-soft)]">{item.body}</p>
@@ -335,7 +335,7 @@ export default function PresidentialRecordsOnBlackOpportunityPage() {
           {WHY_RECORDS_MATTER.map((item) => (
             <article
               key={item.title}
-              className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6"
+              className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4"
             >
               <h2 className="text-xl font-semibold text-white">{item.title}</h2>
               <p className="mt-4 text-sm leading-7 text-[var(--ink-soft)]">{item.body}</p>
@@ -354,7 +354,7 @@ export default function PresidentialRecordsOnBlackOpportunityPage() {
           {HOW_TO_USE.map((item) => (
             <article
               key={item.title}
-              className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6"
+              className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4"
             >
               <h2 className="text-xl font-semibold text-white">{item.title}</h2>
               <p className="mt-4 text-sm leading-7 text-[var(--ink-soft)]">{item.body}</p>

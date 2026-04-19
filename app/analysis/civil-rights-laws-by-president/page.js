@@ -271,10 +271,10 @@ export default function CivilRightsLawsByPresidentPage() {
           description="This is the legislation-first guide for readers asking about civil-rights laws by president. It focuses on federal law, enforcement, implementation, and how administrations shaped the legal record affecting Black Americans."
           actions={
             <>
-              <Link href="/bills" className="public-button-primary">
+              <Link href="/bills" className="dashboard-button-primary">
                 Browse civil-rights legislation
               </Link>
-              <Link href="/policies" className="public-button-secondary">
+              <Link href="/policies" className="dashboard-button-secondary">
                 Explore policy outcomes
               </Link>
             </>
@@ -301,7 +301,7 @@ export default function CivilRightsLawsByPresidentPage() {
         {FLAGSHIP_SUPPORT.map((item) => (
           <article
             key={item.title}
-            className="rounded-[1.4rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5"
+            className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4"
           >
             <h2 className="text-lg font-semibold text-white">{item.title}</h2>
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item.description}</p>
@@ -339,7 +339,7 @@ export default function CivilRightsLawsByPresidentPage() {
           {WHY_IT_MATTERS.map((item) => (
             <article
               key={item.title}
-              className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6"
+              className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4"
             >
               <h2 className="text-xl font-semibold text-white">{item.title}</h2>
               <p className="mt-4 text-sm leading-7 text-[var(--ink-soft)]">{item.body}</p>
@@ -358,7 +358,7 @@ export default function CivilRightsLawsByPresidentPage() {
           {HOW_TO_USE.map((item) => (
             <article
               key={item.title}
-              className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6"
+              className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4"
             >
               <h2 className="text-xl font-semibold text-white">{item.title}</h2>
               <p className="mt-4 text-sm leading-7 text-[var(--ink-soft)]">{item.body}</p>

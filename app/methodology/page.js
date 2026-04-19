@@ -305,10 +305,10 @@ export default function MethodologyPage() {
           description="EquityStack is a public research platform, not a black box. This page explains what the site measures, how its page types relate to one another, how scores and statuses should be interpreted, and where evidence or coverage limits still matter."
           actions={
             <>
-              <Link href="/sources" className="public-button-primary">
+              <Link href="/sources" className="dashboard-button-primary">
                 Browse sources
               </Link>
-              <Link href="/start" className="public-button-secondary">
+              <Link href="/start" className="dashboard-button-secondary">
                 Read the guided research path
               </Link>
             </>
@@ -316,14 +316,14 @@ export default function MethodologyPage() {
         />
       </section>
 
-      <section className="grid gap-4 md:grid-cols-2">
-        <div className="rounded-[1.5rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+      <section className="grid gap-6 border-t border-[var(--line)] pt-6 md:grid-cols-2">
+        <div>
           <h2 className="text-lg font-semibold text-white">What this page is for</h2>
           <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
             Use this page when you need to understand how EquityStack organizes presidents, promises, policies, bills, reports, explainers, narratives, and thematic research pages into one public reading system.
           </p>
         </div>
-        <div className="rounded-[1.5rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+        <div>
           <h2 className="text-lg font-semibold text-white">Why researchers cite it</h2>
           <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
             This is the clearest public reference for how EquityStack defines score construction, promise grading, evidence thresholds, page roles, and known interpretive limits before a metric or summary is cited externally.
@@ -344,7 +344,7 @@ export default function MethodologyPage() {
         />
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           {CITATION_ROUTING.map((item) => (
-            <Link key={item.href} href={item.href} className="panel-link rounded-[1.4rem] p-5">
+            <Link key={item.href} href={item.href} className="panel-link p-4">
               <h2 className="text-lg font-semibold text-white">{item.title}</h2>
               <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item.description}</p>
             </Link>
@@ -382,12 +382,9 @@ export default function MethodologyPage() {
           title="The site is built from several distinct public page types"
           description="Readers should not treat every page as the same kind of evidence. Some pages are closer to the record layer, while others are context, synthesis, or guided entry points."
         />
-        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-x-8 gap-y-6 md:grid-cols-2 xl:grid-cols-4">
           {SITE_SURFACES.map((item) => (
-            <article
-              key={item.title}
-              className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5"
-            >
+            <article key={item.title}>
               <h2 className="text-lg font-semibold text-white">{item.title}</h2>
               <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item.description}</p>
             </article>
@@ -401,12 +398,9 @@ export default function MethodologyPage() {
           title="Different page types serve different interpretive jobs"
           description="EquityStack works best when readers move deliberately between records, context, synthesis, and research-entry pages rather than treating one page type as sufficient by itself."
         />
-        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-x-8 gap-y-6 md:grid-cols-2 xl:grid-cols-4">
           {READING_LAYERS.map((item) => (
-            <article
-              key={item.title}
-              className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5"
-            >
+            <article key={item.title}>
               <h2 className="text-lg font-semibold text-white">{item.title}</h2>
               <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item.description}</p>
             </article>
@@ -415,7 +409,7 @@ export default function MethodologyPage() {
       </section>
 
       <section className="public-two-col-rail grid gap-6 xl:grid-cols-[1fr_1fr]">
-        <div className="rounded-[1.8rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6">
+        <div className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4">
           <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--accent)]">
             Record framing
           </p>
@@ -424,7 +418,7 @@ export default function MethodologyPage() {
             {FRAMING_RULES.map((item) => (
               <div
                 key={item.title}
-                className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4"
+                className="rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4"
               >
                 <p className="text-sm font-semibold text-white">{item.title}</p>
                 <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
@@ -435,19 +429,19 @@ export default function MethodologyPage() {
           </div>
         </div>
 
-        <div className="rounded-[1.8rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6">
+        <div className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4">
           <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--accent)]">
             Why methodology matters
           </p>
           <h2 className="mt-4 text-2xl font-semibold text-white">Context, categories, and limits change how a page should be read</h2>
           <div className="mt-5 grid gap-3 text-sm leading-7 text-[var(--ink-soft)]">
-            <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+            <div className="rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4">
               Categories shape interpretation. A promise page, a policy page, and a report page may discuss the same administration, but they answer different questions.
             </div>
-            <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+            <div className="rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4">
               Context matters because public records rarely interpret themselves. Historical explainers and narratives help readers understand significance without replacing documentary evidence.
             </div>
-            <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+            <div className="rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4">
               Limits matter because not every historical period, institution, or policy area is equally complete in the current dataset. Transparency is part of the method, not a footnote.
             </div>
           </div>
@@ -455,45 +449,45 @@ export default function MethodologyPage() {
       </section>
 
       <section className="public-two-col-rail grid gap-6 xl:grid-cols-[1fr_1fr]">
-        <div className="rounded-[1.8rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6">
+        <div className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4">
           <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--accent)]">
             Presidential Black Impact Score
           </p>
           <h2 className="mt-4 text-2xl font-semibold text-white">How presidential scoring works</h2>
           <div className="mt-5 grid gap-3 text-sm leading-7 text-[var(--ink-soft)]">
-            <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+            <div className="rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4">
               Presidential Black Impact Score is derived from tracked policy impacts in the EquityStack dataset. It aggregates measured policy outcomes rather than campaign messaging or general reputation.
             </div>
-            <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+            <div className="rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4">
               The score reflects the available structured record, not every action in a presidency. Source coverage, attribution limits, mixed-impact outcomes, and historical dataset gaps all affect interpretation.
             </div>
-            <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+            <div className="rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4">
               Direct and systemic score families stay separate so judicial downstream effects do not silently blend into direct presidential policy credit.
             </div>
           </div>
           <div className="mt-5 flex flex-wrap gap-3">
-            <Link href="/presidents" className="public-button-primary">
+            <Link href="/presidents" className="dashboard-button-primary">
               Browse presidential records
             </Link>
-            <Link href="/compare/presidents" className="public-button-secondary">
+            <Link href="/compare/presidents" className="dashboard-button-secondary">
               Compare presidents
             </Link>
           </div>
         </div>
 
-        <div className="rounded-[1.8rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6">
+        <div className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4">
           <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--accent)]">
             Source hierarchy
           </p>
           <h2 className="mt-4 text-2xl font-semibold text-white">How the evidence layer works</h2>
           <ul className="mt-5 grid gap-3 text-sm leading-7 text-[var(--ink-soft)]">
             {SOURCE_RULES.map((item) => (
-              <li key={item} className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+              <li key={item} className="rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4">
                 {item}
               </li>
             ))}
           </ul>
-          <div className="mt-5 rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4 text-sm leading-7 text-[var(--ink-soft)]">
+          <div className="mt-5 rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4 text-sm leading-7 text-[var(--ink-soft)]">
             Certification status is a concise trust signal. It reflects current source coverage, how complete the visible verification work is, and how much confidence the available evidence supports in the public dataset.
           </div>
         </div>
@@ -509,7 +503,7 @@ export default function MethodologyPage() {
           {SCORE_DIMENSIONS.map((item) => (
             <article
               key={item.title}
-              className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5"
+              className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4"
             >
               <h2 className="text-lg font-semibold text-white">{item.title}</h2>
               <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item.description}</p>
@@ -519,32 +513,32 @@ export default function MethodologyPage() {
       </section>
 
       <section className="public-two-col-rail grid gap-6 xl:grid-cols-[1fr_1fr]">
-        <div className="rounded-[1.8rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6">
+        <div className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4">
           <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--accent)]">
             Promise grading
           </p>
           <h2 className="mt-4 text-2xl font-semibold text-white">Why promise status is shown separately</h2>
           <div className="mt-5 grid gap-3 text-sm leading-7 text-[var(--ink-soft)]">
-            <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+            <div className="rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4">
               Promise tracking is based on documented commitments and observed policy outcomes in the current EquityStack dataset. Promise status tracks whether a public commitment was delivered, blocked, partially fulfilled, still in progress, or failed.
             </div>
-            <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+            <div className="rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4">
               Promise status does not automatically mean positive impact. A delivered promise can still have mixed or negative downstream effects, and EquityStack keeps that distinction visible.
             </div>
-            <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+            <div className="rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4">
               Promise-status assignments are constrained by available source coverage and implementation evidence. Promise pages therefore sit beside policy and score pages, not on top of them.
             </div>
           </div>
         </div>
 
-        <div className="rounded-[1.8rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6">
+        <div className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4">
           <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--accent)]">
             Confidence and review status
           </p>
           <h2 className="mt-4 text-2xl font-semibold text-white">How uncertainty stays visible</h2>
           <ul className="mt-5 grid gap-3 text-sm leading-7 text-[var(--ink-soft)]">
             {CONFIDENCE_NOTES.map((item) => (
-              <li key={item} className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+              <li key={item} className="rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4">
                 {item}
               </li>
             ))}
@@ -558,12 +552,9 @@ export default function MethodologyPage() {
           title="The method is strongest when its boundaries remain visible"
           description="EquityStack is designed to make uncertainty legible instead of hiding it behind a single score, narrative, or summary page."
         />
-        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-x-8 gap-y-5 md:grid-cols-2 xl:grid-cols-4">
           {LIMITATIONS.map((item) => (
-            <article
-              key={item}
-              className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5"
-            >
+            <article key={item} className="border-l border-[var(--line)] pl-4">
               <p className="text-sm leading-7 text-[var(--ink-soft)]">{item}</p>
             </article>
           ))}
@@ -578,7 +569,7 @@ export default function MethodologyPage() {
         />
         <div className="grid gap-4 md:grid-cols-2">
           {RESPONSIBLE_PATHS.map((item) => (
-            <Link key={item.href} href={item.href} className="panel-link rounded-[1.4rem] p-5">
+            <Link key={item.href} href={item.href} className="panel-link p-4">
               <h2 className="text-lg font-semibold text-white">{item.title}</h2>
               <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item.description}</p>
             </Link>
@@ -594,7 +585,7 @@ export default function MethodologyPage() {
         />
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-6">
           {TRUST_PAGES.map((item) => (
-            <Link key={item.href} href={item.href} className="panel-link rounded-[1.4rem] p-5">
+            <Link key={item.href} href={item.href} className="panel-link p-4">
               <h2 className="text-lg font-semibold text-white">{item.title}</h2>
               <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item.description}</p>
             </Link>

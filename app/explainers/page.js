@@ -9,6 +9,7 @@ import {
   MethodologyCallout,
   SectionIntro,
 } from "@/app/components/public/core";
+import { Panel } from "@/app/components/dashboard/primitives";
 import { ExplainerIndexGrid } from "@/app/components/public/entities";
 import {
   buildBreadcrumbJsonLd,
@@ -17,16 +18,6 @@ import {
 } from "@/lib/structured-data";
 
 export const dynamic = "force-dynamic";
-
-function ExplainerPanel({ children, className = "" }) {
-  return (
-    <section
-      className={`rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 md:p-6 ${className}`}
-    >
-      {children}
-    </section>
-  );
-}
 
 export async function generateMetadata({ searchParams }) {
   const resolvedSearchParams = (await searchParams) || {};
@@ -61,7 +52,7 @@ export default async function ExplainersPage({ searchParams }) {
   });
 
   return (
-    <main className="space-y-10">
+    <main className="space-y-8">
       <StructuredData
         data={[
           buildBreadcrumbJsonLd(
@@ -109,10 +100,10 @@ export default async function ExplainersPage({ searchParams }) {
           description="Explainers are the bridge between broad public claims and the specific presidents, policies, promises, and sources inside EquityStack. They are meant to clarify the record, not replace it."
           actions={
             <>
-              <Link href="/reports" className="public-button-primary">
+              <Link href="/reports" className="dashboard-button-primary">
                 Open historical reports
               </Link>
-              <Link href="/methodology" className="public-button-secondary">
+              <Link href="/methodology" className="dashboard-button-secondary">
                 Read methodology
               </Link>
             </>
@@ -131,7 +122,7 @@ export default async function ExplainersPage({ searchParams }) {
               name="q"
               defaultValue={resolvedSearchParams.q || ""}
               placeholder="Topic, title, or claim"
-              className="rounded-xl border border-white/8 bg-white/5 px-3 py-2.5 text-sm text-white"
+              className="dashboard-field"
             />
           </label>
           <label className="grid gap-2">
@@ -141,7 +132,7 @@ export default async function ExplainersPage({ searchParams }) {
             <select
               name="category"
               defaultValue={resolvedSearchParams.category || ""}
-              className="rounded-xl border border-white/8 bg-white/5 px-3 py-2.5 text-sm text-white"
+              className="dashboard-field"
             >
               <option value="">All categories</option>
               {(data.categories || []).map((item) => (
@@ -151,7 +142,7 @@ export default async function ExplainersPage({ searchParams }) {
               ))}
             </select>
           </label>
-          <button type="submit" className="public-button-secondary">
+          <button type="submit" className="dashboard-button-secondary">
             Apply filters
           </button>
         </form>
@@ -183,8 +174,8 @@ export default async function ExplainersPage({ searchParams }) {
         ]}
       />
 
-      <section className="space-y-5">
-        <ExplainerPanel className="space-y-5">
+      <section className="space-y-4">
+        <Panel padding="md" className="space-y-4">
           <SectionIntro
             eyebrow="Library"
             title="Browse the explainer archive"
@@ -192,21 +183,21 @@ export default async function ExplainersPage({ searchParams }) {
           />
           <ExplainerIndexGrid items={explainers} />
           <MethodologyCallout description="Explainers help interpret the public record, but the evidence hierarchy still matters. Use them as context pages that route you into primary records and linked sources." />
-          <div className="rounded-[1.3rem] border border-white/8 bg-white/5 p-5">
+          <Panel padding="md" className="bg-[rgba(18,31,49,0.52)]">
             <h2 className="text-lg font-semibold text-white">How to use explainers</h2>
             <div className="mt-4 grid gap-3 text-sm leading-7 text-[var(--ink-soft)]">
-              <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+              <Panel padding="md" className="bg-[rgba(18,31,49,0.52)]">
                 Start here when the policy or legal context is unfamiliar.
-              </div>
-              <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+              </Panel>
+              <Panel padding="md" className="bg-[rgba(18,31,49,0.52)]">
                 Use the related records section on each explainer to verify the narrative against underlying evidence.
-              </div>
-              <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+              </Panel>
+              <Panel padding="md" className="bg-[rgba(18,31,49,0.52)]">
                 When the claim is especially important, move from explainer to report, then into the linked policy or promise records.
-              </div>
+              </Panel>
             </div>
-          </div>
-        </ExplainerPanel>
+          </Panel>
+        </Panel>
       </section>
     </main>
   );

@@ -240,7 +240,7 @@ export default async function CivilRightsTimelinePage() {
         </div>
       </section>
 
-      <section className="card-surface rounded-[1.6rem] p-5">
+      <section className="card-surface p-4">
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div className="max-w-3xl">
             <h2 className="text-lg font-semibold mb-2">How to Read This Timeline</h2>
@@ -309,7 +309,7 @@ export default async function CivilRightsTimelinePage() {
         ))}
       </div>
 
-      <section className="card-surface rounded-[1.6rem] p-6">
+      <section className="card-surface p-4">
         <div className="max-w-3xl">
           <p className="eyebrow mb-3">Continue exploring</p>
           <h2 className="text-2xl font-semibold">Move from chronology into records, methods, and broader research paths</h2>

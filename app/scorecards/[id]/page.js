@@ -139,7 +139,7 @@ export default async function LegislatorScorecardDetailPage({ params }) {
 
       <section className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-6">
-          <section className="card-surface rounded-[1.6rem] p-6 space-y-4">
+          <section className="card-surface p-4 space-y-4">
             <div>
               <h2 className="text-2xl font-semibold">Current Snapshot</h2>
               <p className="text-sm text-[var(--ink-soft)] mt-1">
@@ -214,7 +214,7 @@ export default async function LegislatorScorecardDetailPage({ params }) {
             ) : null}
           </section>
 
-          <section className="card-surface rounded-[1.6rem] p-6 space-y-4">
+          <section className="card-surface p-4 space-y-4">
             <div>
               <h2 className="text-2xl font-semibold">Tracked Bill Roles</h2>
               <p className="text-sm text-[var(--ink-soft)] mt-1">
@@ -256,7 +256,7 @@ export default async function LegislatorScorecardDetailPage({ params }) {
             </div>
           </section>
 
-          <section className="card-surface rounded-[1.6rem] p-6 space-y-4">
+          <section className="card-surface p-4 space-y-4">
             <div>
               <h2 className="text-2xl font-semibold">Future Bill Positions</h2>
               <p className="text-sm text-[var(--ink-soft)] mt-1">
@@ -289,7 +289,7 @@ export default async function LegislatorScorecardDetailPage({ params }) {
             </div>
           </section>
 
-          <section className="card-surface rounded-[1.6rem] p-6 space-y-4">
+          <section className="card-surface p-4 space-y-4">
             <div>
               <h2 className="text-2xl font-semibold">Issue Area Focus</h2>
               <p className="text-sm text-[var(--ink-soft)] mt-1">
@@ -322,7 +322,7 @@ export default async function LegislatorScorecardDetailPage({ params }) {
             )}
           </section>
 
-          <section className="card-surface rounded-[1.6rem] p-6 space-y-4">
+          <section className="card-surface p-4 space-y-4">
             <div>
               <h2 className="text-2xl font-semibold">Related Explainers</h2>
               <p className="text-sm text-[var(--ink-soft)] mt-1">
@@ -359,7 +359,7 @@ export default async function LegislatorScorecardDetailPage({ params }) {
             )}
           </section>
 
-          <section className="card-surface rounded-[1.6rem] p-6 space-y-4">
+          <section className="card-surface p-4 space-y-4">
             <div>
               <h2 className="text-2xl font-semibold">Related Policies</h2>
               <p className="text-sm text-[var(--ink-soft)] mt-1">
@@ -408,7 +408,7 @@ export default async function LegislatorScorecardDetailPage({ params }) {
         </div>
 
         <aside className="space-y-6">
-          <section className="card-surface rounded-[1.6rem] p-5">
+          <section className="card-surface p-4">
             <h2 className="text-lg font-semibold mb-3">Profile Snapshot</h2>
             <div className="space-y-2 text-sm text-[var(--ink-soft)]">
               <p><strong>Name:</strong> {legislator.full_name}</p>
@@ -422,7 +422,7 @@ export default async function LegislatorScorecardDetailPage({ params }) {
             </div>
           </section>
 
-          <section className="card-surface rounded-[1.6rem] p-5">
+          <section className="card-surface p-4">
             <h2 className="text-lg font-semibold mb-3">Coverage</h2>
             <div className="grid gap-4">
               <div className="metric-card p-4">

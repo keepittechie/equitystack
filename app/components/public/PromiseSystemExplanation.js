@@ -1,6 +1,6 @@
 export default function PromiseSystemExplanation() {
   return (
-    <aside className="h-full rounded-[1.5rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 md:p-6">
+    <aside className="h-full rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4 md:p-6">
       <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--accent)]">
         Promise system
       </p>

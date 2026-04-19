@@ -84,7 +84,7 @@ export default async function ComparePresidentsPage({ searchParams }) {
             selected={data.selected_identifiers || []}
             name="compare"
           />
-          <button type="submit" className="public-button-primary">
+          <button type="submit" className="dashboard-button-primary">
             Compare selected presidents
           </button>
         </form>
@@ -144,18 +144,18 @@ export default async function ComparePresidentsPage({ searchParams }) {
                 title="What the comparison shows"
                 description="The comparison layer keeps the analytic summary compact and pushes you toward the deeper profile pages for full evidence and trend context."
               />
-              <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 text-sm leading-7 text-[var(--ink-soft)]">
+              <div className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4 text-sm leading-7 text-[var(--ink-soft)]">
                 {data.directional_contrast_summary ||
                   "Directional contrast summary is not available for the current selection."}
               </div>
-              <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+              <div className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4">
                 <h2 className="text-lg font-semibold text-white">How to read score differences</h2>
                 <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
                   Larger gaps suggest different measured policy records in the EquityStack dataset, not a full historical judgment. Confidence, direction mix, and topic concentration help explain whether a gap is broad-based or driven by a smaller set of records.
                 </p>
               </div>
               {data.strongest_topic_difference ? (
-                <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+                <div className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--accent)]">
                     Strongest topic difference
                   </p>
@@ -179,7 +179,7 @@ export default async function ComparePresidentsPage({ searchParams }) {
                 return (
                   <article
                     key={item.president_slug || item.president_id}
-                    className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 md:p-6"
+                    className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4 md:p-6"
                   >
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex items-start gap-4">
@@ -218,7 +218,7 @@ export default async function ComparePresidentsPage({ searchParams }) {
                       Delivered {item.delivered_count ?? 0} • Blocked {item.blocked_count ?? 0}
                     </span>
                   </div>
-                  <div className="mt-4 rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4 text-sm leading-7 text-[var(--ink-soft)]">
+                  <div className="mt-4 rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4 text-sm leading-7 text-[var(--ink-soft)]">
                     Positive {item.directional_breakdown?.Positive || 0} • Negative {item.directional_breakdown?.Negative || 0} • Mixed {item.directional_breakdown?.Mixed || 0} • Blocked {item.directional_breakdown?.Blocked || 0}
                   </div>
                   {item.top_contributing_topics?.length ? (
@@ -246,7 +246,7 @@ export default async function ComparePresidentsPage({ searchParams }) {
           </section>
         </>
       ) : (
-        <section className="rounded-[1.6rem] border border-dashed border-white/12 bg-white/4 p-6 text-sm leading-7 text-[var(--ink-soft)]">
+        <section className="dashboard-empty-state text-sm leading-7 text-[var(--ink-soft)]">
           Select at least two presidents to generate a comparison. The page will compare up to four valid records at once.
         </section>
       )}

@@ -280,10 +280,10 @@ export default function HowPresidentsShapedBlackOpportunityPage() {
           description="This is the systems-and-governance guide for readers asking how presidents shaped Black opportunity. It focuses on the mechanisms of access, advancement, federal priorities, and policy design rather than broad synthesis or evidence review alone."
           actions={
             <>
-              <Link href="/presidents" className="public-button-primary">
+              <Link href="/presidents" className="dashboard-button-primary">
                 Explore presidential records on opportunity
               </Link>
-              <Link href="/policies" className="public-button-secondary">
+              <Link href="/policies" className="dashboard-button-secondary">
                 Review policies affecting access and advancement
               </Link>
             </>
@@ -316,7 +316,7 @@ export default function HowPresidentsShapedBlackOpportunityPage() {
           {WHAT_OPPORTUNITY_MEANS.map((item) => (
             <article
               key={item.title}
-              className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6"
+              className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4"
             >
               <h2 className="text-xl font-semibold text-white">{item.title}</h2>
               <p className="mt-4 text-sm leading-7 text-[var(--ink-soft)]">{item.body}</p>
@@ -335,7 +335,7 @@ export default function HowPresidentsShapedBlackOpportunityPage() {
           {WHY_PRESIDENTS_MATTER.map((item) => (
             <article
               key={item.title}
-              className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6"
+              className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4"
             >
               <h2 className="text-xl font-semibold text-white">{item.title}</h2>
               <p className="mt-4 text-sm leading-7 text-[var(--ink-soft)]">{item.body}</p>
@@ -354,7 +354,7 @@ export default function HowPresidentsShapedBlackOpportunityPage() {
           {HOW_TO_USE.map((item) => (
             <article
               key={item.title}
-              className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6"
+              className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4"
             >
               <h2 className="text-xl font-semibold text-white">{item.title}</h2>
               <p className="mt-4 text-sm leading-7 text-[var(--ink-soft)]">{item.body}</p>

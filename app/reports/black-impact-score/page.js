@@ -1186,7 +1186,7 @@ function SystemLevelInsight({ presidents, metadata }) {
     .sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]))[0] || null;
 
   return (
-    <section className="card-surface rounded-[1.6rem] p-5">
+    <section className="card-surface p-4">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="max-w-3xl">
           <h2 className="text-lg font-semibold mb-2">System-Level Insight</h2>
@@ -1328,7 +1328,7 @@ function TopSummarySection({ presidents }) {
   const summary = getTopAndBottomPresidents(presidents);
 
   return (
-    <section className="card-surface rounded-[1.6rem] p-5">
+    <section className="card-surface p-4">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="max-w-3xl">
           <h2 className="text-lg font-semibold mb-2">Highest and Lowest Current Scores</h2>
@@ -1409,7 +1409,7 @@ function MethodologySection({ methodology, metadata, usingLegacyModel, isLegacyF
   const usingOutcomeModel = isOutcomeScoringModel({ metadata, usingLegacyModel });
 
   return (
-    <section className="card-surface rounded-[1.6rem] p-5">
+    <section className="card-surface p-4">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="max-w-3xl">
           <h2 className="text-lg font-semibold mb-2">Scoring Details</h2>
@@ -1490,7 +1490,7 @@ function ScoringTransparencySection({ usingLegacyModel, isLegacyFallbackActive }
   const content = EXPLANATION_CONTENT.blackImpactScore;
 
   return (
-    <section className="card-surface rounded-[1.6rem] p-5">
+    <section className="card-surface p-4">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="max-w-3xl">
           <h2 className="text-lg font-semibold mb-2">How this was scored</h2>
@@ -1557,7 +1557,7 @@ function HowThisWasBuiltSection({
   const content = EXPLANATION_CONTENT.blackImpactScore;
 
   return (
-    <section className="card-surface rounded-[1.6rem] p-5">
+    <section className="card-surface p-4">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="max-w-3xl">
           <h2 className="text-lg font-semibold mb-2">Build</h2>
@@ -1609,7 +1609,7 @@ function ScoringReadyFilterSection({
   isLegacyFallbackActive,
 }) {
   return (
-    <section className="card-surface rounded-[1.6rem] p-5 print:hidden">
+    <section className="card-surface p-4 print:hidden">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="max-w-3xl">
           <h2 className="text-lg font-semibold mb-2">Scoring-ready view</h2>
@@ -1647,7 +1647,7 @@ function ScoringReadyFilterSection({
 
 function ShareHeader({ shareUrl }) {
   return (
-    <section className="card-surface rounded-[1.6rem] p-6 print:hidden">
+    <section className="card-surface p-4 print:hidden">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="max-w-3xl">
           <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Share Report</p>
@@ -1677,7 +1677,7 @@ function ShareHeader({ shareUrl }) {
 
 function PermalinkSection({ permalinkUrl }) {
   return (
-    <section className="card-surface rounded-[1.6rem] p-5 print:hidden">
+    <section className="card-surface p-4 print:hidden">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="max-w-3xl">
           <h2 className="text-lg font-semibold mb-2">Permalink</h2>
@@ -1863,7 +1863,7 @@ function SourceAwareShareHeader({
       : "Outcome-based";
 
   return (
-    <section className="card-surface rounded-[1.6rem] p-6 print:hidden">
+    <section className="card-surface p-4 print:hidden">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="max-w-3xl">
           <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Share Report</p>
@@ -1898,7 +1898,7 @@ function SourceAwareShareHeader({
 
 function DebateModeHeader() {
   return (
-    <section className="card-surface rounded-[1.6rem] p-6">
+    <section className="card-surface p-4">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="max-w-3xl">
           <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Debate Mode</p>
@@ -1925,7 +1925,7 @@ function AdvancedReportToolsSection({
   children,
 }) {
   return (
-    <section className="card-surface rounded-[1.6rem] p-5 print:hidden">
+    <section className="card-surface p-4 print:hidden">
       <details>
         <summary className="cursor-pointer list-none text-lg font-semibold">
           Advanced Tools and Sharing
@@ -2008,7 +2008,7 @@ function VerificationSection() {
   const content = EXPLANATION_CONTENT.blackImpactScore;
 
   return (
-    <section className="card-surface rounded-[1.6rem] p-5">
+    <section className="card-surface p-4">
       <h2 className="text-lg font-semibold">Verify</h2>
       <ul className="mt-3 space-y-2 text-sm text-[var(--ink-soft)] leading-7">
         {content.verify.map((item) => (
@@ -2023,7 +2023,7 @@ function ShareVerificationSection() {
   const content = EXPLANATION_CONTENT.blackImpactScore;
 
   return (
-    <section className="card-surface rounded-[1.6rem] p-5">
+    <section className="card-surface p-4">
       <h2 className="text-lg font-semibold">Verify</h2>
       <ul className="mt-3 space-y-2 text-sm text-[var(--ink-soft)] leading-7">
         {content.verify.map((item) => (
@@ -2090,7 +2090,7 @@ function collectShareEvidenceItems({
 
 function SourceAwareEvidenceTrail({ items, isPublicView }) {
   return (
-    <section className="card-surface rounded-[1.6rem] p-5">
+    <section className="card-surface p-4">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="max-w-3xl">
           <h2 className="text-lg font-semibold mb-2">Top Evidence Trail</h2>
@@ -2149,7 +2149,7 @@ function TopicFilterSection({
   }
 
   return (
-    <section className="card-surface rounded-[1.6rem] p-5 print:hidden">
+    <section className="card-surface p-4 print:hidden">
       <details>
         <summary className="cursor-pointer list-none">
           <div className="flex items-start justify-between gap-4 flex-wrap">
@@ -2198,7 +2198,7 @@ function TopicFilterSection({
 
 function ViewToggleSection({ standardHref, timelineHref, isTimelineView }) {
   return (
-    <section className="card-surface rounded-[1.6rem] p-5">
+    <section className="card-surface p-4">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="max-w-3xl">
           <h2 className="text-lg font-semibold mb-2">Choose a View</h2>
@@ -2247,7 +2247,7 @@ function ViewToggleSection({ standardHref, timelineHref, isTimelineView }) {
 
 function TimelineShortcutSection({ timelineHref }) {
   return (
-    <section className="card-surface rounded-[1.6rem] p-5 print:hidden">
+    <section className="card-surface p-4 print:hidden">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="max-w-3xl">
           <h2 className="text-lg font-semibold mb-2">Need the timeline?</h2>
@@ -2335,7 +2335,7 @@ function TimelineConnector({ relationshipType, crossesPresident }) {
 
 function TimelineModeSection({ entries, isPublicView, effectiveScoringModel, selectedTopic }) {
   return (
-    <section className="card-surface rounded-[1.6rem] p-5">
+    <section className="card-surface p-4">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="max-w-3xl">
           <h2 className="text-lg font-semibold mb-2">Timeline Mode</h2>
@@ -2484,7 +2484,7 @@ function TopicComparisonSection({
 }) {
   if (!selectedTopic) {
     return (
-      <section className="card-surface rounded-[1.6rem] p-6">
+      <section className="card-surface p-4">
         <h2 className="text-lg font-semibold">Topic Comparison</h2>
         <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
           Select a topic to compare presidents within a single policy domain.
@@ -2495,7 +2495,7 @@ function TopicComparisonSection({
 
   if (requestedPresidentSlug) {
     return (
-      <section className="card-surface rounded-[1.6rem] p-6">
+      <section className="card-surface p-4">
         <h2 className="text-lg font-semibold">Topic Comparison</h2>
         <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
           Topic comparison is reduced in single-president view. Clear the president filter to compare presidents within {selectedTopic.label}.
@@ -2506,7 +2506,7 @@ function TopicComparisonSection({
 
   if (!presidents.length) {
     return (
-      <section className="card-surface rounded-[1.6rem] p-6">
+      <section className="card-surface p-4">
         <h2 className="text-lg font-semibold">Topic Comparison</h2>
         <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
           No scored records matched {selectedTopic.label} in the current comparison view.
@@ -2538,7 +2538,7 @@ function TopicComparisonSection({
       : "Outcome-based";
 
   return (
-    <section className="card-surface rounded-[1.6rem] p-5">
+    <section className="card-surface p-4">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="max-w-3xl">
           <h2 className="text-lg font-semibold mb-2">Topic Comparison</h2>
@@ -2652,7 +2652,7 @@ function PresidentCompareSelectorSection({
   }
 
   return (
-    <section className="card-surface rounded-[1.6rem] p-5 print:hidden">
+    <section className="card-surface p-4 print:hidden">
       <div className="grid gap-5 lg:grid-cols-2">
         <div>
           <h2 className="text-lg font-semibold mb-2">Select President A</h2>
@@ -2769,7 +2769,7 @@ function PresidentComparisonSection({
 }) {
   if (!selectedTopic) {
     return (
-      <section className="card-surface rounded-[1.6rem] p-6">
+      <section className="card-surface p-4">
         <h2 className="text-lg font-semibold">President Comparison</h2>
         <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
           Select a topic before comparing two presidents.
@@ -2780,7 +2780,7 @@ function PresidentComparisonSection({
 
   if (!selectedPresidentASlug || !selectedPresidentBSlug) {
     return (
-      <section className="card-surface rounded-[1.6rem] p-6">
+      <section className="card-surface p-4">
         <h2 className="text-lg font-semibold">President Comparison</h2>
         <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
           Select two presidents to compare within {selectedTopic.label}.
@@ -2791,7 +2791,7 @@ function PresidentComparisonSection({
 
   if (selectedPresidentASlug === selectedPresidentBSlug) {
     return (
-      <section className="card-surface rounded-[1.6rem] p-6">
+      <section className="card-surface p-4">
         <h2 className="text-lg font-semibold">President Comparison</h2>
         <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
           President comparison requires two different presidents.
@@ -2802,7 +2802,7 @@ function PresidentComparisonSection({
 
   if (!selectedPresidentA || !selectedPresidentB) {
     return (
-      <section className="card-surface rounded-[1.6rem] p-6">
+      <section className="card-surface p-4">
         <h2 className="text-lg font-semibold">President Comparison</h2>
         <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
           One or both selected presidents do not have scored records in {selectedTopic.label} for the current model and filters.
@@ -2826,7 +2826,7 @@ function PresidentComparisonSection({
   );
 
   return (
-    <section className="card-surface rounded-[1.6rem] p-5">
+    <section className="card-surface p-4">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="max-w-3xl">
           <h2 className="text-lg font-semibold mb-2">President Comparison</h2>
@@ -3614,7 +3614,7 @@ export default async function BlackImpactScorePage({ searchParams }) {
       ) : null}
 
       {presidents.length === 0 && !isTimelineView && !isTopicCompareView && !isPresidentCompareView ? (
-        <section className="card-surface rounded-[1.6rem] p-8 text-center">
+        <section className="card-surface p-6 text-center">
           <h2 className="text-xl font-semibold">
             {selectedTopic
               ? `No scored records matched ${selectedTopic.label}.`
@@ -3660,7 +3660,7 @@ export default async function BlackImpactScorePage({ searchParams }) {
       ) : (
         <div className="space-y-6">
           {presidents.map((president) => (
-            <section key={president.president_slug} className="card-surface rounded-[1.6rem] p-6">
+            <section key={president.president_slug} className="card-surface p-4">
               <div className="flex items-start justify-between gap-4 flex-wrap">
                 <div>
                   <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">President Summary</p>
@@ -3868,7 +3868,7 @@ export default async function BlackImpactScorePage({ searchParams }) {
       {isPublicShareView ? <ShareVerificationSection /> : null}
 
       {!isPublicView ? (
-        <section className="card-surface rounded-[1.6rem] p-5">
+        <section className="card-surface p-4">
           <div className="flex items-start justify-between gap-4 flex-wrap">
             <div className="max-w-3xl">
               <h2 className="text-lg font-semibold mb-2">Built From Promise Tracker</h2>
@@ -3887,7 +3887,7 @@ export default async function BlackImpactScorePage({ searchParams }) {
         </section>
       ) : null}
 
-      <section id="methodology" className="card-surface rounded-[1.6rem] p-5">
+      <section id="methodology" className="card-surface p-4">
         <details>
           <summary className="cursor-pointer text-lg font-semibold">View Methodology</summary>
           <div className="mt-4 space-y-4">

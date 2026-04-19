@@ -10,6 +10,7 @@ import {
   PageContextBlock,
   SectionIntro,
 } from "@/app/components/public/core";
+import { Panel } from "@/app/components/dashboard/primitives";
 import {
   PromiseResultsTable,
   RecentPolicyChangesTable,
@@ -23,16 +24,6 @@ import {
 } from "@/lib/structured-data";
 
 export const dynamic = "force-dynamic";
-
-function PromisePanel({ children, className = "" }) {
-  return (
-    <section
-      className={`rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 md:p-6 ${className}`}
-    >
-      {children}
-    </section>
-  );
-}
 
 export async function generateMetadata({ searchParams }) {
   const resolvedSearchParams = (await searchParams) || {};
@@ -63,7 +54,7 @@ export default async function PromisesPage({ searchParams }) {
   };
 
   return (
-    <main className="space-y-10">
+    <main className="space-y-8">
       <StructuredData
         data={[
           buildBreadcrumbJsonLd(
@@ -112,10 +103,10 @@ export default async function PromisesPage({ searchParams }) {
           description="Promise pages separate political intent from the documented outcomes that followed. That makes it easier to study promises to Black Americans, implementation, partial progress, failure, or blockage without losing the evidence trail."
           actions={
             <>
-              <Link href="/dashboard" className="public-button-primary">
+              <Link href="/dashboard" className="dashboard-button-primary">
                 Open the promise data dashboard
               </Link>
-              <Link href="/methodology" className="public-button-secondary">
+              <Link href="/methodology" className="dashboard-button-secondary">
                 Read how promise grading works
               </Link>
             </>
@@ -128,21 +119,21 @@ export default async function PromisesPage({ searchParams }) {
         detail="Use it to research campaign promises related to Black communities, compare presidents by follow-through, and move from a statement into the linked policy history and evidence."
       />
 
-      <section className="space-y-5">
-        <PromisePanel className="space-y-5">
+      <section className="space-y-4">
+        <Panel padding="md" className="space-y-4">
           <PromiseSystemExplanation />
           <PromiseStatusLegend />
-        </PromisePanel>
+        </Panel>
       </section>
 
       <section className="grid gap-4 md:grid-cols-2">
-        <Link href="/presidents" className="panel-link rounded-[1.5rem] p-5">
+        <Link href="/presidents" className="panel-link p-4">
           <h2 className="text-lg font-semibold text-white">Compare presidents by linked promise records</h2>
           <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
             Move from the promise tracker into presidential profiles when you want score context, policy drivers, and Black history by administration.
           </p>
         </Link>
-        <Link href="/current-administration" className="panel-link rounded-[1.5rem] p-5">
+        <Link href="/current-administration" className="panel-link p-4">
           <h2 className="text-lg font-semibold text-white">Follow the current administration</h2>
           <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
             The current-administration overview highlights recent promise movement, actions, and outcomes inside the live public record.
@@ -159,12 +150,12 @@ export default async function PromisesPage({ searchParams }) {
               name="q"
               defaultValue={resolvedSearchParams.q || ""}
               placeholder="Promise title or keyword"
-              className="rounded-xl border border-white/8 bg-white/5 px-3 py-2.5 text-sm text-white"
+              className="dashboard-field"
             />
           </label>
           <label className="grid gap-2">
             <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">Status</span>
-            <select name="status" defaultValue={resolvedSearchParams.status || ""} className="rounded-xl border border-white/8 bg-white/5 px-3 py-2.5 text-sm text-white">
+            <select name="status" defaultValue={resolvedSearchParams.status || ""} className="dashboard-field">
               <option value="">All statuses</option>
               {(data.filters?.statuses || []).map((item) => (
                 <option key={item} value={item}>{item}</option>
@@ -173,7 +164,7 @@ export default async function PromisesPage({ searchParams }) {
           </label>
           <label className="grid gap-2">
             <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">President</span>
-            <select name="president" defaultValue={resolvedSearchParams.president || ""} className="rounded-xl border border-white/8 bg-white/5 px-3 py-2.5 text-sm text-white">
+            <select name="president" defaultValue={resolvedSearchParams.president || ""} className="dashboard-field">
               <option value="">All presidents</option>
               {(data.filters?.presidents || []).map((item) => (
                 <option key={item} value={item}>{item}</option>
@@ -182,14 +173,14 @@ export default async function PromisesPage({ searchParams }) {
           </label>
           <label className="grid gap-2">
             <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">Topic</span>
-            <select name="topic" defaultValue={resolvedSearchParams.topic || ""} className="rounded-xl border border-white/8 bg-white/5 px-3 py-2.5 text-sm text-white">
+            <select name="topic" defaultValue={resolvedSearchParams.topic || ""} className="dashboard-field">
               <option value="">All topics</option>
               {(data.filters?.topics || []).map((item) => (
                 <option key={item} value={item}>{item}</option>
               ))}
             </select>
           </label>
-          <button type="submit" className="public-button-secondary">
+          <button type="submit" className="dashboard-button-secondary">
             Apply filters
           </button>
         </form>
@@ -231,20 +222,20 @@ export default async function PromisesPage({ searchParams }) {
         ]}
       />
 
-      <section className="space-y-5">
-        <PromisePanel className="space-y-5">
+      <section className="space-y-4">
+        <Panel padding="md" className="space-y-4">
           <SectionIntro
             eyebrow="Results table"
             title="Searchable public promise records"
             description="Open any row for the promise statement, current rationale, linked policies, evidence, and the status history timeline."
           />
           <PromiseResultsTable items={data.items || []} buildHref={(item) => `/promises/${item.slug}`} />
-          <div className="rounded-[1.3rem] border border-white/8 bg-white/5 p-5">
+          <Panel padding="md" className="bg-[rgba(18,31,49,0.52)]">
             <h2 className="text-lg font-semibold text-white">Promise Tracker interpretation</h2>
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
               Promise Status shows what happened to a documented commitment. Linked policy action and Policy Outcomes show whether that commitment produced visible implementation in the current EquityStack dataset.
             </p>
-          </div>
+          </Panel>
           <MethodologyCallout description="Promise Status tells users what happened to the commitment. It does not automatically imply a positive or negative real-world outcome without linked Policy Outcomes and evidence." />
           <SectionIntro
             eyebrow="Latest status changes"
@@ -260,7 +251,7 @@ export default async function PromisesPage({ searchParams }) {
             }))}
             buildHref={(item) => `/promises/${item.slug}`}
           />
-        </PromisePanel>
+        </Panel>
       </section>
     </main>
   );

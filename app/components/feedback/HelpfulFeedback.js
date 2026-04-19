@@ -34,7 +34,7 @@ export default function HelpfulFeedback({
   }
 
   return (
-    <section className="card-surface rounded-[1.6rem] p-5">
+    <section className="card-surface p-4">
       <h2 className="text-lg font-semibold">{title}</h2>
       <p className="text-sm text-[var(--ink-soft)] mt-2">
         Tell us whether this page helped, and optionally leave a short note.

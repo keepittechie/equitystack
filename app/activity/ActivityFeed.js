@@ -333,7 +333,7 @@ export default function ActivityFeed({ bills }) {
       </section>
 
       {recentlyUpdatedIdeas.length > 0 ? (
-        <section className="card-surface rounded-[1.6rem] p-6">
+        <section className="card-surface p-4">
           <div className="flex items-center justify-between gap-4 mb-5">
             <div className="section-intro">
               <h2 className="text-2xl font-semibold">Recently Updated Ideas</h2>
@@ -366,7 +366,7 @@ export default function ActivityFeed({ bills }) {
         </section>
       ) : null}
 
-      <section className="card-surface rounded-[1.6rem] p-5 md:p-6 space-y-5">
+      <section className="card-surface p-4 md:p-6 space-y-5">
         <div className="section-intro">
           <h2 className="text-2xl font-semibold">Browse Activity</h2>
           <p className="text-sm text-[var(--ink-soft)] mt-2">
@@ -443,7 +443,7 @@ export default function ActivityFeed({ bills }) {
 
       <section className="space-y-5">
         {filteredItems.length === 0 ? (
-          <div className="card-surface rounded-[1.6rem] p-8 text-center">
+          <div className="card-surface p-6 text-center">
             <h2 className="text-2xl font-semibold">No activity matches this filter set</h2>
             <p className="text-sm text-[var(--ink-soft)] mt-3">
               Try clearing the query or broadening the chamber and scope filters.

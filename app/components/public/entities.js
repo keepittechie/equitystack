@@ -6,7 +6,17 @@ import {
   isNonStandardSystemicImpact,
   systemicMultiplierFor,
 } from "@/lib/systemicImpact";
+import { Panel, StatusPill } from "@/app/components/dashboard/primitives";
 import { ScoreBadge } from "./core";
+
+const FILTER_FIELD_CLASS =
+  "w-full rounded-md border border-[var(--line)] bg-[rgba(18,31,49,0.5)] px-3 py-2 text-sm text-white outline-none transition-[background-color,border-color,box-shadow] placeholder:text-[var(--ink-muted)] hover:border-[var(--line-strong)] focus:border-[rgba(132,247,198,0.38)] focus:bg-[rgba(18,31,49,0.76)] focus-visible:ring-2 focus-visible:ring-[rgba(132,247,198,0.28)]";
+
+const PRIMARY_ACTION_CLASS =
+  "inline-flex min-h-9 items-center justify-center rounded-md border border-[rgba(132,247,198,0.72)] bg-[var(--accent)] px-3 text-[12px] font-semibold text-[#051019] transition-[background-color,border-color,box-shadow] hover:border-[var(--accent)] hover:bg-[rgba(132,247,198,0.9)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(132,247,198,0.28)]";
+
+const SECONDARY_ACTION_CLASS =
+  "inline-flex min-h-9 items-center justify-center rounded-md border border-[var(--line-strong)] bg-[rgba(18,31,49,0.58)] px-3 text-[12px] font-semibold text-white transition-[background-color,border-color,box-shadow] hover:border-[var(--line-strong)] hover:bg-[rgba(18,31,49,0.86)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(132,247,198,0.28)]";
 
 function formatRenderableDate(value) {
   if (!value) {
@@ -68,11 +78,7 @@ function RecordTypeBadge({ label }) {
     return null;
   }
 
-  return (
-    <span className="inline-flex rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--accent)]">
-      {label}
-    </span>
-  );
+  return <StatusPill tone="default">{label}</StatusPill>;
 }
 
 export function PresidentPortrait({
@@ -105,7 +111,7 @@ export function PresidentPortrait({
 
 export function PolicySearchBar({ defaultValue = "", action = "/policies" }) {
   return (
-    <form action={action} method="GET" className="flex items-center gap-3 rounded-[1.4rem] border border-white/8 bg-[rgba(8,14,24,0.92)] px-4 py-3">
+    <form action={action} method="GET" className="flex items-center gap-2 rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-3">
       <label htmlFor="policy-search" className="sr-only">
         Search policy records
       </label>
@@ -117,7 +123,7 @@ export function PolicySearchBar({ defaultValue = "", action = "/policies" }) {
         placeholder="Search policy titles, categories, and summaries"
         className="min-w-0 flex-1 border-0 bg-transparent text-sm text-white placeholder:text-[var(--ink-muted)] focus:outline-none"
       />
-      <button type="submit" className="rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-medium text-[#051019]">
+      <button type="submit" className={PRIMARY_ACTION_CLASS}>
         Search
       </button>
     </form>
@@ -130,12 +136,10 @@ export function PolicyFilterSidebar({
   action = "/policies",
   layout = "stacked",
 }) {
-  const fieldClass =
-    "w-full rounded-xl border border-white/8 bg-white/5 px-3 py-2.5 text-sm text-white outline-none";
   const isSplitLayout = layout === "split";
   const formClass = isSplitLayout
-    ? "grid gap-4 rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 xl:grid-cols-2"
-    : "grid gap-4 rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5";
+    ? "grid gap-4 rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4 xl:grid-cols-2"
+    : "grid gap-4 rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4";
 
   return (
     <form action={action} method="GET" className={formClass}>
@@ -143,14 +147,14 @@ export function PolicyFilterSidebar({
         <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
           Search
         </label>
-        <input name="q" defaultValue={filters.q || ""} className={fieldClass} placeholder="Title or keyword" />
+        <input name="q" defaultValue={filters.q || ""} className={FILTER_FIELD_CLASS} placeholder="Title or keyword" />
       </div>
 
       <div>
         <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
           Category
         </label>
-        <select name="category" defaultValue={filters.category || ""} className={fieldClass}>
+        <select name="category" defaultValue={filters.category || ""} className={FILTER_FIELD_CLASS}>
           <option value="">All categories</option>
           {(options.categories || []).map((item) => (
             <option key={item} value={item}>{item}</option>
@@ -162,7 +166,7 @@ export function PolicyFilterSidebar({
         <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
           President
         </label>
-        <select name="president" defaultValue={filters.president || ""} className={fieldClass}>
+        <select name="president" defaultValue={filters.president || ""} className={FILTER_FIELD_CLASS}>
           <option value="">All presidents</option>
           {(options.presidents || []).map((item) => (
             <option key={item} value={item}>{item}</option>
@@ -174,7 +178,7 @@ export function PolicyFilterSidebar({
         <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
           Era
         </label>
-        <select name="era" defaultValue={filters.era || ""} className={fieldClass}>
+        <select name="era" defaultValue={filters.era || ""} className={FILTER_FIELD_CLASS}>
           <option value="">All eras</option>
           {(options.eras || []).map((item) => (
             <option key={item} value={item}>{item}</option>
@@ -186,7 +190,7 @@ export function PolicyFilterSidebar({
         <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
           Direction
         </label>
-        <select name="impact_direction" defaultValue={filters.impact_direction || ""} className={fieldClass}>
+        <select name="impact_direction" defaultValue={filters.impact_direction || ""} className={FILTER_FIELD_CLASS}>
           <option value="">All directions</option>
           {["Positive", "Negative", "Mixed", "Blocked"].map((item) => (
             <option key={item} value={item}>{item}</option>
@@ -198,7 +202,7 @@ export function PolicyFilterSidebar({
         <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
           Sort
         </label>
-        <select name="sort" defaultValue={filters.sort || "impact_score_desc"} className={fieldClass}>
+        <select name="sort" defaultValue={filters.sort || "impact_score_desc"} className={FILTER_FIELD_CLASS}>
           <option value="impact_score_desc">Highest impact</option>
           <option value="year_desc">Newest first</option>
           <option value="year_asc">Oldest first</option>
@@ -208,7 +212,7 @@ export function PolicyFilterSidebar({
 
       <button
         type="submit"
-        className={`rounded-full bg-[var(--accent)] px-4 py-2.5 text-sm font-medium text-[#051019] ${
+        className={`${PRIMARY_ACTION_CLASS} ${
           isSplitLayout ? "xl:col-span-2" : ""
         }`}
       >
@@ -221,14 +225,14 @@ export function PolicyFilterSidebar({
 export function PolicyResultsTable({ items = [], buildHref }) {
   if (!items.length) {
     return (
-      <div className="rounded-[1.6rem] border border-dashed border-white/12 bg-white/4 p-6 text-sm leading-7 text-[var(--ink-soft)]">
+      <div className="rounded-lg border border-dashed border-[var(--line)] bg-[rgba(18,31,49,0.32)] p-4 text-sm leading-7 text-[var(--ink-soft)]">
         No policies match your current filters. Try adjusting search or filters to explore more records.
       </div>
     );
   }
 
   return (
-    <div className="overflow-hidden rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)]">
+    <div className="overflow-hidden rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)]">
       <div className="overflow-x-auto">
         <table className="min-w-full text-left text-sm">
           <thead className="border-b border-white/8 text-[11px] uppercase tracking-[0.2em] text-[var(--ink-muted)]">
@@ -245,7 +249,7 @@ export function PolicyResultsTable({ items = [], buildHref }) {
             {items.map((item) => (
               <tr key={item.id} className="border-b border-white/6 last:border-b-0">
                 <td className="px-5 py-4">
-                  <Link href={buildHref(item)} className="font-medium text-white hover:text-[var(--accent)]">
+                  <Link href={buildHref(item)} className="font-medium text-white hover:text-white">
                     {item.title}
                   </Link>
                   {item.summary ? (
@@ -269,7 +273,7 @@ export function PolicyResultsTable({ items = [], buildHref }) {
 export function PolicyCardList({ items = [], buildHref }) {
   if (!items.length) {
     return (
-      <div className="rounded-[1.6rem] border border-dashed border-white/12 bg-white/4 p-6 text-sm leading-7 text-[var(--ink-soft)]">
+      <div className="rounded-lg border border-dashed border-[var(--line)] bg-[rgba(18,31,49,0.32)] p-4 text-sm leading-7 text-[var(--ink-soft)]">
         No policies match your current filters. Try adjusting search or filters to explore more records.
       </div>
     );
@@ -278,29 +282,30 @@ export function PolicyCardList({ items = [], buildHref }) {
   return (
     <div className="grid gap-4 md:grid-cols-2">
       {items.map((item) => (
-        <Link
+        <Panel
           key={item.id}
+          as={Link}
           href={buildHref(item)}
-          className="flex h-full flex-col rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 md:p-6 hover:border-[rgba(132,247,198,0.24)]"
+          padding="md"
+          interactive
+          className="flex h-full flex-col"
         >
           <div className="flex items-center justify-between gap-4">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+            <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
               {item.year_enacted || "Undated"} • {item.policy_type || "Policy"}
             </p>
             <ScoreBadge value={item.impact_score ?? "—"} label="Impact Score" />
           </div>
-          <h3 className="mt-4 text-xl font-semibold text-white">{item.title}</h3>
+          <h3 className="mt-3 text-lg font-semibold text-white">{item.title}</h3>
           {item.summary ? (
-            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item.summary}</p>
+            <p className="mt-3 text-sm leading-6 text-[var(--ink-soft)]">{item.summary}</p>
           ) : null}
-          <div className="mt-auto pt-4 flex flex-wrap gap-2 text-xs text-[var(--ink-muted)]">
-            <span>{item.impact_direction || "Unknown direction"}</span>
-            <span>•</span>
-            <span>{item.president || item.primary_party || "Historical record"}</span>
-            <span>•</span>
-            <span>{item.total_sources ?? item.source_count ?? 0} sources</span>
+          <div className="mt-auto flex flex-wrap gap-2 pt-4">
+            <StatusPill tone="default">{item.impact_direction || "Unknown direction"}</StatusPill>
+            <StatusPill tone="default">{item.president || item.primary_party || "Historical record"}</StatusPill>
+            <StatusPill tone="info">{item.total_sources ?? item.source_count ?? 0} sources</StatusPill>
           </div>
-        </Link>
+        </Panel>
       ))}
     </div>
   );
@@ -340,24 +345,28 @@ export function EvidenceSourceList({ items = [] }) {
   return (
     <div className="grid gap-3">
       {items.map((item, index) => (
-        <a
+        <Panel
           key={`${item.url || item.source_url || item.title || item.source_title}-${index}`}
+          as="a"
           href={item.url || item.source_url || "#"}
           target="_blank"
           rel="noreferrer"
-          className="rounded-[1.2rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-4 hover:border-[rgba(132,247,198,0.24)]"
+          padding="md"
+          interactive
         >
-          <div className="flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
-            <span>{item.source_type || item.publisher || "Source"}</span>
-            {formatRenderableDate(item.published_date) ? <span>{formatRenderableDate(item.published_date)}</span> : null}
+          <div className="flex flex-wrap items-center gap-2">
+            <StatusPill tone="default">{item.source_type || item.publisher || "Source"}</StatusPill>
+            {formatRenderableDate(item.published_date) ? (
+              <StatusPill tone="info">{formatRenderableDate(item.published_date)}</StatusPill>
+            ) : null}
           </div>
           <h3 className="mt-3 text-base font-medium text-white">
             {item.source_title || item.title || item.url || item.source_url}
           </h3>
           {item.notes ? (
-            <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">{item.notes}</p>
+            <p className="mt-2 text-sm leading-6 text-[var(--ink-soft)]">{item.notes}</p>
           ) : null}
-        </a>
+        </Panel>
       ))}
     </div>
   );
@@ -367,12 +376,12 @@ export function PolicyTimeline({ items = [] }) {
   return (
     <div className="grid gap-4">
       {items.map((item, index) => (
-        <div key={`${item.year || item.date || index}`} className="rounded-[1.2rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--accent)]">
+        <Panel key={`${item.year || item.date || index}`} padding="md">
+          <StatusPill tone="info">
             {item.year || formatRenderableDate(item.date) || item.label || `Step ${index + 1}`}
-          </p>
-          <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item.summary || item.event || item.description}</p>
-        </div>
+          </StatusPill>
+          <p className="mt-3 text-sm leading-6 text-[var(--ink-soft)]">{item.summary || item.event || item.description}</p>
+        </Panel>
       ))}
     </div>
   );
@@ -381,7 +390,7 @@ export function PolicyTimeline({ items = [] }) {
 export function PresidentCardGrid({ items = [], buildHref, compareHref = null }) {
   if (!items.length) {
     return (
-      <div className="rounded-[1.6rem] border border-dashed border-white/12 bg-white/4 p-6 text-sm leading-7 text-[var(--ink-soft)]">
+      <div className="rounded-lg border border-dashed border-[var(--line)] bg-[rgba(18,31,49,0.32)] p-4 text-sm leading-7 text-[var(--ink-soft)]">
         No president records match your current filters. Try broadening the search or removing a filter.
       </div>
     );
@@ -396,7 +405,7 @@ export function PresidentCardGrid({ items = [], buildHref, compareHref = null })
         });
 
         return (
-          <article key={item.slug || item.id} className="flex h-full flex-col rounded-[1.7rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 md:p-6">
+          <Panel key={item.slug || item.id} as="article" padding="md" className="flex h-full flex-col">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div className="flex min-w-0 flex-1 items-start gap-4">
                 <PresidentPortrait
@@ -408,7 +417,7 @@ export function PresidentCardGrid({ items = [], buildHref, compareHref = null })
                   <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
                     {item.party || item.president_party || "Historical record"}
                   </p>
-                  <h3 className="mt-2 line-clamp-2 text-xl font-semibold text-white">
+                  <h3 className="mt-2 line-clamp-2 text-lg font-semibold text-white">
                     {item.name || item.president}
                   </h3>
                   {item.termLabel ? (
@@ -423,40 +432,34 @@ export function PresidentCardGrid({ items = [], buildHref, compareHref = null })
                 label="Black Impact Score"
               />
             </div>
-            <p className="mt-4 line-clamp-4 text-sm leading-7 text-[var(--ink-soft)]">{item.summary || item.narrative_summary || "View metrics, timelines, and policy drivers for this presidential record."}</p>
-            <div className="mt-4 flex flex-wrap gap-2 text-xs text-[var(--ink-muted)]">
+            <p className="mt-3 line-clamp-4 text-sm leading-6 text-[var(--ink-soft)]">{item.summary || item.narrative_summary || "View metrics, timelines, and policy drivers for this presidential record."}</p>
+            <div className="mt-4 flex flex-wrap gap-2">
               {item.score_confidence ? (
-                <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5">
-                  Confidence: {item.score_confidence}
-                </span>
+                <StatusPill tone="default">Confidence: {item.score_confidence}</StatusPill>
               ) : null}
               {item.outcome_count != null ? (
-                <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5">
-                  {item.outcome_count} outcomes
-                </span>
+                <StatusPill tone="info">{item.outcome_count} outcomes</StatusPill>
               ) : null}
               {item.direction_breakdown ? (
-                <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5">
-                  {summarizeDirectionLeader(item.direction_breakdown)}
-                </span>
+                <StatusPill tone="default">{summarizeDirectionLeader(item.direction_breakdown)}</StatusPill>
               ) : null}
               {Number(item.linked_bill_count || 0) > 0 ? (
-                <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5">
+                <StatusPill tone="verified">
                   {item.linked_bill_count} linked bill{Number(item.linked_bill_count || 0) === 1 ? "" : "s"}
-                </span>
+                </StatusPill>
               ) : null}
             </div>
             <div className="mt-auto flex flex-wrap gap-3 pt-5">
-              <Link href={buildHref(item)} className="rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-medium text-[#051019]">
+              <Link href={buildHref(item)} className={PRIMARY_ACTION_CLASS}>
                 Read presidential record
               </Link>
               {compareHref ? (
-                <Link href={compareHref} className="rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-white">
+                <Link href={compareHref} className={SECONDARY_ACTION_CLASS}>
                   Compare
                 </Link>
               ) : null}
             </div>
-          </article>
+          </Panel>
         );
       })}
     </div>
@@ -468,14 +471,14 @@ export function PresidentRankingBoard({ items = [], buildHref, limit = 10, title
 
   if (!visibleItems.length) {
     return (
-      <div className="rounded-[1.6rem] border border-dashed border-white/12 bg-white/4 p-6 text-sm leading-7 text-[var(--ink-soft)]">
+      <div className="rounded-lg border border-dashed border-[var(--line)] bg-[rgba(18,31,49,0.32)] p-4 text-sm leading-7 text-[var(--ink-soft)]">
         No presidential records are available for ranking in the current view. Try adjusting the filters to explore more records.
       </div>
     );
   }
 
   return (
-    <section className="overflow-hidden rounded-[1.8rem] border border-white/8 bg-[rgba(8,14,24,0.92)]">
+    <section className="overflow-hidden rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)]">
       {title ? (
         <div className="border-b border-white/8 px-5 py-4">
           <h3 className="text-lg font-semibold text-white">{title}</h3>
@@ -529,7 +532,7 @@ export function PresidentRankingBoard({ items = [], buildHref, limit = 10, title
                 />
               </div>
               <div className="grid gap-2 text-sm text-[var(--ink-soft)]">
-                <div className="rounded-[1rem] border border-white/8 bg-white/5 px-4 py-3">
+                <div className="rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] px-4 py-3">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
                     Confidence
                   </p>
@@ -537,7 +540,7 @@ export function PresidentRankingBoard({ items = [], buildHref, limit = 10, title
                     {item.score_confidence || "Unknown"}
                   </p>
                 </div>
-                <div className="rounded-[1rem] border border-white/8 bg-white/5 px-4 py-3">
+                <div className="rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] px-4 py-3">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
                     Impact Direction mix
                   </p>
@@ -597,7 +600,7 @@ export function PresidentMetricsRow({ items = [] }) {
   return (
     <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
       {items.map((item) => (
-        <div key={item.label} className="rounded-[1.4rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+        <div key={item.label} className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4">
           <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">{item.label}</p>
           <p className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-white">{item.value}</p>
           {item.detail ? <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">{item.detail}</p> : null}
@@ -610,14 +613,14 @@ export function PresidentMetricsRow({ items = [] }) {
 export function PresidentPolicyTable({ items = [], buildHref }) {
   if (!items.length) {
     return (
-      <div className="rounded-[1.6rem] border border-dashed border-white/12 bg-white/4 p-6 text-sm leading-7 text-[var(--ink-soft)]">
+      <div className="rounded-lg border border-dashed border-[var(--line)] bg-[rgba(18,31,49,0.32)] p-4 text-sm leading-7 text-[var(--ink-soft)]">
         No linked policy or promise records are available in this view yet. Browse the policy and promise indexes to continue the research path.
       </div>
     );
   }
 
   return (
-    <div className="overflow-hidden rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)]">
+    <div className="overflow-hidden rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)]">
       <div className="overflow-x-auto">
         <table className="min-w-full text-left text-sm">
           <thead className="border-b border-white/8 text-[11px] uppercase tracking-[0.2em] text-[var(--ink-muted)]">
@@ -643,7 +646,7 @@ export function PresidentPolicyTable({ items = [], buildHref }) {
                         </span>
                       ) : null}
                     </div>
-                    <Link href={buildHref(item)} className="font-medium text-white hover:text-[var(--accent)]">
+                    <Link href={buildHref(item)} className="font-medium text-white hover:text-white">
                       {item.title}
                     </Link>
                     {systemicMeta?.summary ? (
@@ -674,14 +677,14 @@ export function PresidentPolicyTable({ items = [], buildHref }) {
 export function PromiseResultsTable({ items = [], buildHref }) {
   if (!items.length) {
     return (
-      <div className="rounded-[1.6rem] border border-dashed border-white/12 bg-white/4 p-6 text-sm leading-7 text-[var(--ink-soft)]">
+      <div className="rounded-lg border border-dashed border-[var(--line)] bg-[rgba(18,31,49,0.32)] p-4 text-sm leading-7 text-[var(--ink-soft)]">
         No promises match your current filters. Try adjusting search or filters to explore more records.
       </div>
     );
   }
 
   return (
-    <div className="overflow-hidden rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)]">
+    <div className="overflow-hidden rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)]">
       <div className="overflow-x-auto">
         <table className="min-w-full text-left text-sm">
           <thead className="border-b border-white/8 text-[11px] uppercase tracking-[0.2em] text-[var(--ink-muted)]">
@@ -698,7 +701,7 @@ export function PromiseResultsTable({ items = [], buildHref }) {
             {items.map((item) => (
               <tr key={item.slug} className="border-b border-white/6 last:border-b-0">
                 <td className="px-5 py-4">
-                  <Link href={buildHref(item)} className="font-medium text-white hover:text-[var(--accent)]">
+                  <Link href={buildHref(item)} className="font-medium text-white hover:text-white">
                     {item.title}
                   </Link>
                   {item.summary ? <p className="mt-1 line-clamp-2 text-xs leading-6 text-[var(--ink-soft)]">{item.summary}</p> : null}
@@ -717,7 +720,7 @@ export function PromiseResultsTable({ items = [], buildHref }) {
                 <td className="px-5 py-4 text-[var(--ink-soft)]">{item.outcome_count ?? item.action_count ?? 0}</td>
                 <td className="px-5 py-4 text-[var(--ink-soft)]">{item.source_count ?? 0}</td>
                 <td className="px-5 py-4">
-                  <Link href={buildHref(item)} className="text-[var(--accent)] hover:text-white">
+                  <Link href={buildHref(item)} className="text-[var(--ink-soft)] hover:text-white">
                     Read promise record
                   </Link>
                 </td>
@@ -732,23 +735,21 @@ export function PromiseResultsTable({ items = [], buildHref }) {
 
 export function PromiseHero({ title, statement, status, president, termLabel, badges = [] }) {
   return (
-    <section className="rounded-[2rem] border border-white/8 bg-[linear-gradient(145deg,rgba(10,18,29,0.98),rgba(7,11,18,0.96))] p-8 md:p-10">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[var(--accent)]">Promise record</p>
-      <h1 className="mt-4 text-[clamp(2rem,4vw,4.2rem)] font-semibold leading-[0.98] tracking-[-0.05em] text-white">
+    <Panel prominence="primary" padding="md">
+      <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">Promise record</p>
+      <h1 className="mt-3 text-[clamp(2rem,4vw,4.2rem)] font-semibold leading-[0.98] tracking-[-0.05em] text-white">
         {title}
       </h1>
-      {statement ? <p className="mt-5 max-w-3xl text-base leading-8 text-[var(--ink-soft)] md:text-lg">{statement}</p> : null}
-      <div className="mt-5 flex flex-wrap gap-2 text-sm text-[var(--ink-soft)]">
-        {status ? <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5">{status}</span> : null}
-        {president ? <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5">{president}</span> : null}
-        {termLabel ? <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5">{termLabel}</span> : null}
+      {statement ? <p className="mt-4 max-w-3xl text-base leading-7 text-[var(--ink-soft)] md:text-lg">{statement}</p> : null}
+      <div className="mt-4 flex flex-wrap gap-2">
+        {status ? <StatusPill tone="info">{status}</StatusPill> : null}
+        {president ? <StatusPill tone="default">{president}</StatusPill> : null}
+        {termLabel ? <StatusPill tone="default">{termLabel}</StatusPill> : null}
         {badges.map((badge) => (
-          <span key={badge} className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5">
-            {badge}
-          </span>
+          <StatusPill key={badge} tone="default">{badge}</StatusPill>
         ))}
       </div>
-    </section>
+    </Panel>
   );
 }
 
@@ -756,13 +757,13 @@ export function PromiseTimeline({ items = [] }) {
   return (
     <div className="grid gap-4">
       {items.map((item) => (
-        <div key={`${item.id || item.action_date || item.label}`} className="rounded-[1.2rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--accent)]">
+        <Panel key={`${item.id || item.action_date || item.label}`} padding="md">
+          <StatusPill tone="info">
             {formatRenderableDate(item.action_date) || formatRenderableDate(item.date) || item.label || "Update"}
-          </p>
+          </StatusPill>
           <h3 className="mt-3 text-base font-medium text-white">{item.title || item.event}</h3>
-          {item.description ? <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">{item.description}</p> : null}
-        </div>
+          {item.description ? <p className="mt-2 text-sm leading-6 text-[var(--ink-soft)]">{item.description}</p> : null}
+        </Panel>
       ))}
     </div>
   );
@@ -771,7 +772,7 @@ export function PromiseTimeline({ items = [] }) {
 export function ReportCardGrid({ items = [] }) {
   if (!items.length) {
     return (
-      <div className="rounded-[1.6rem] border border-dashed border-white/12 bg-white/4 p-6 text-sm leading-7 text-[var(--ink-soft)]">
+      <div className="rounded-lg border border-dashed border-[var(--line)] bg-[rgba(18,31,49,0.32)] p-4 text-sm leading-7 text-[var(--ink-soft)]">
         No reports match the current browse state. Try broadening the search or clearing a category filter.
       </div>
     );
@@ -780,19 +781,22 @@ export function ReportCardGrid({ items = [] }) {
   return (
     <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
       {items.map((item) => (
-        <Link
+        <Panel
           key={item.slug}
+          as={Link}
           href={item.href || `/reports/${item.slug}`}
-          className="flex h-full flex-col rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 md:p-6 hover:border-[rgba(132,247,198,0.24)]"
+          padding="md"
+          interactive
+          className="flex h-full flex-col"
         >
-          <div className="flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
-            <span>{item.category || "Report"}</span>
-            {item.theme ? <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1">{item.theme}</span> : null}
+          <div className="flex flex-wrap items-center gap-2">
+            <StatusPill tone="default">{item.category || "Report"}</StatusPill>
+            {item.theme ? <StatusPill tone="info">{item.theme}</StatusPill> : null}
           </div>
-          <h3 className="mt-4 text-xl font-semibold text-white">{item.title}</h3>
-          <p className="mt-3 line-clamp-4 text-sm leading-7 text-[var(--ink-soft)]">{item.summary}</p>
-          <span className="mt-auto pt-5 text-sm font-medium text-[var(--accent)]">Read report analysis</span>
-        </Link>
+          <h3 className="mt-3 text-lg font-semibold text-white">{item.title}</h3>
+          <p className="mt-3 line-clamp-4 text-sm leading-6 text-[var(--ink-soft)]">{item.summary}</p>
+          <span className="mt-auto pt-4 text-[12px] font-semibold text-[var(--ink-soft)]">Read report analysis</span>
+        </Panel>
       ))}
     </div>
   );
@@ -801,7 +805,7 @@ export function ReportCardGrid({ items = [] }) {
 export function ExplainerIndexGrid({ items = [] }) {
   if (!items.length) {
     return (
-      <div className="rounded-[1.6rem] border border-dashed border-white/12 bg-white/4 p-6 text-sm leading-7 text-[var(--ink-soft)]">
+      <div className="rounded-lg border border-dashed border-[var(--line)] bg-[rgba(18,31,49,0.32)] p-4 text-sm leading-7 text-[var(--ink-soft)]">
         No explainers match the current browse state. Try broadening the search to explore more background material.
       </div>
     );
@@ -810,20 +814,21 @@ export function ExplainerIndexGrid({ items = [] }) {
   return (
     <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
       {items.map((item) => (
-        <Link
+        <Panel
           key={item.slug}
+          as={Link}
           href={`/explainers/${item.slug}`}
-          className="flex h-full flex-col rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 md:p-6 hover:border-[rgba(132,247,198,0.24)]"
+          padding="md"
+          interactive
+          className="flex h-full flex-col"
         >
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
-            {item.category || "Explainer"}
-          </p>
-          <h3 className="mt-4 text-xl font-semibold text-white">{item.title}</h3>
-          <p className="mt-3 line-clamp-4 text-sm leading-7 text-[var(--ink-soft)]">{item.summary}</p>
-          <span className="mt-auto pt-5 text-sm font-medium text-[var(--accent)]">
+          <StatusPill tone="default">{item.category || "Explainer"}</StatusPill>
+          <h3 className="mt-3 text-lg font-semibold text-white">{item.title}</h3>
+          <p className="mt-3 line-clamp-4 text-sm leading-6 text-[var(--ink-soft)]">{item.summary}</p>
+          <span className="mt-auto pt-4 text-[12px] font-semibold text-[var(--ink-soft)]">
             Read historical context and linked records
           </span>
-        </Link>
+        </Panel>
       ))}
     </div>
   );
@@ -831,39 +836,37 @@ export function ExplainerIndexGrid({ items = [] }) {
 
 export function TimelineEventCard({ title, summary, year, href = null, badges = [] }) {
   const content = (
-    <div className="rounded-[1.4rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--accent)]">{year || "Timeline"}</p>
+    <Panel padding="md">
+      <StatusPill tone="info">{year || "Timeline"}</StatusPill>
       <h3 className="mt-3 text-lg font-semibold text-white">{title}</h3>
-      {summary ? <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{summary}</p> : null}
+      {summary ? <p className="mt-3 text-sm leading-6 text-[var(--ink-soft)]">{summary}</p> : null}
       {badges.length ? (
-        <div className="mt-4 flex flex-wrap gap-2 text-xs text-[var(--ink-muted)]">
+        <div className="mt-4 flex flex-wrap gap-2">
           {badges.map((badge) => (
-            <span key={badge} className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5">
-              {badge}
-            </span>
+            <StatusPill key={badge} tone="default">{badge}</StatusPill>
           ))}
         </div>
       ) : null}
-    </div>
+    </Panel>
   );
 
-  return href ? <Link href={href}>{content}</Link> : content;
+  return href ? <Link href={href} className="block">{content}</Link> : content;
 }
 
 export function SourceLibraryTable({ items = [] }) {
   if (!items.length) {
     return (
-      <div className="rounded-[1.6rem] border border-dashed border-white/12 bg-white/4 p-6 text-sm leading-7 text-[var(--ink-soft)]">
+      <div className="rounded-lg border border-dashed border-[var(--line)] bg-[rgba(18,31,49,0.32)] p-4 text-sm leading-7 text-[var(--ink-soft)]">
         No sources match the current query. Try broadening the search to inspect more of the public evidence library.
       </div>
     );
   }
 
   return (
-    <div className="overflow-hidden rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)]">
+    <div className="overflow-hidden rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)]">
       <div className="overflow-x-auto">
         <table className="min-w-full text-left text-sm">
-          <thead className="border-b border-white/8 text-[11px] uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+          <thead className="border-b border-[var(--line)] text-[11px] uppercase tracking-[0.18em] text-[var(--ink-muted)]">
             <tr>
               <th className="px-5 py-4">Source</th>
               <th className="px-5 py-4">Publisher</th>
@@ -882,7 +885,7 @@ export function SourceLibraryTable({ items = [] }) {
                       href={item.source_url}
                       target="_blank"
                       rel="noreferrer"
-                      className="font-medium text-white hover:text-[var(--accent)]"
+                      className="font-medium text-white hover:text-white"
                     >
                       {item.source_title || item.source_url}
                     </a>
@@ -927,7 +930,7 @@ export function SearchResultGroup({ title, items = [] }) {
   }
 
   return (
-    <section className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+    <section className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4">
       <h2 className="text-lg font-semibold text-white">{title}</h2>
       <div className="mt-4 grid gap-3">
         {items.map((item, index) => (
@@ -956,7 +959,7 @@ export function SearchResultGroup({ title, items = [] }) {
 
 export function CompareSelector({ options = [], selected = [], name = "compare" }) {
   return (
-    <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+    <div className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4">
       <label htmlFor={`${name}-selector`} className="mb-3 block text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
         Select comparison targets
       </label>
@@ -989,7 +992,7 @@ export function ComparisonMetricsTable({
 }) {
   if (!rows.length) {
     return (
-      <div className="rounded-[1.6rem] border border-dashed border-white/12 bg-white/4 p-6 text-sm leading-7 text-[var(--ink-soft)]">
+      <div className="dashboard-empty-state text-sm leading-7 text-[var(--ink-soft)]">
         No comparable records are available for the current selection. Try choosing a different set of records.
       </div>
     );
@@ -1033,7 +1036,7 @@ export function ComparisonMetricsTable({
 export function RecentPolicyChangesTable({ items = [], buildHref }) {
   if (!items.length) {
     return (
-      <div className="rounded-[1.6rem] border border-dashed border-white/12 bg-white/4 p-6 text-sm leading-7 text-[var(--ink-soft)]">
+      <div className="dashboard-empty-state text-sm leading-7 text-[var(--ink-soft)]">
         No policy updates are available in this view yet.
       </div>
     );
@@ -1080,7 +1083,7 @@ export function RecentPolicyChangesTable({ items = [], buildHref }) {
                   <td className="px-5 py-4 text-[var(--ink-soft)]">{item.impact_direction || item.status || "—"}</td>
                   <td className="px-5 py-4">
                     {href ? (
-                      <Link href={href} className="font-medium text-[var(--accent)] hover:text-white">
+                      <Link href={href} className="font-medium text-[var(--ink-soft)] hover:text-white">
                         {linkedRecordTitle}
                       </Link>
                     ) : (

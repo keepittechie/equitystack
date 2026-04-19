@@ -180,7 +180,7 @@ export default async function AllPromisesPage({ searchParams }) {
         </Link>
       </section>
 
-      <section className="card-surface rounded-[1.6rem] p-5 mb-8">
+      <section className="card-surface p-4 mb-8">
         <div className="mb-4">
           <h2 className="text-xl font-semibold">Search and Filter</h2>
           <p className="text-sm text-[var(--ink-soft)] mt-1">
@@ -313,7 +313,7 @@ export default async function AllPromisesPage({ searchParams }) {
       </section>
 
       {promises.length === 0 ? (
-        <section className="card-surface rounded-[1.6rem] p-8 text-center">
+        <section className="card-surface p-6 text-center">
           <h3 className="text-xl font-semibold">No promises matched these filters.</h3>
           <p className="text-[var(--ink-soft)] mt-3">
             Try removing a filter or broadening the search terms.
@@ -322,7 +322,7 @@ export default async function AllPromisesPage({ searchParams }) {
       ) : (
         <section className="grid gap-4 md:grid-cols-2">
           {promises.map((promise) => (
-            <article key={promise.id} className="panel-link rounded-[1.45rem] p-5">
+            <article key={promise.id} className="panel-link p-4">
               <div className="flex items-start justify-between gap-4 flex-wrap">
                 <div>
                   <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">

@@ -252,10 +252,10 @@ export default async function ReportDetailPage({ params }) {
           description={report.summary}
           actions={
             <>
-              <Link href="/reports" className="public-button-secondary">
+              <Link href="/reports" className="dashboard-button-secondary">
                 Back to reports
               </Link>
-              <Link href="/methodology" className="public-button-primary">
+              <Link href="/methodology" className="dashboard-button-primary">
                 Read methodology
               </Link>
             </>
@@ -289,19 +289,19 @@ export default async function ReportDetailPage({ params }) {
             "This page is best used as a reference when someone needs a concise analytical summary that still links back into the underlying records. Cite the report title, EquityStack, the report URL, and your access date, then link to the related policies, sources, or methodology page when precision matters."
           }
         />
-        <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6">
+        <div className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4">
           <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--accent)]">
             What this page covers
           </p>
           <h2 className="mt-3 text-2xl font-semibold text-white">A reference page, not just a visualization layer</h2>
           <div className="mt-4 grid gap-3 text-sm leading-7 text-[var(--ink-soft)]">
-            <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+            <div className="rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4">
               Use this page when the audience needs a readable summary before opening the underlying policy records.
             </div>
-            <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+            <div className="rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4">
               The strongest use of a report page is as a bridge between broad interpretation, linked charts, related records, and visible methodology.
             </div>
-            <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+            <div className="rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4">
               When the topic is contested or technical, pair this report with the source library or methodology page rather than treating the summary as self-sufficient.
             </div>
           </div>
@@ -326,7 +326,7 @@ export default async function ReportDetailPage({ params }) {
               "Read the findings first, then move into the linked records, charts, and trust pages rather than treating the report summary as self-sufficient.",
           },
         ]).map((item) => (
-          <div key={item.title} className="rounded-[1.4rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+          <div key={item.title} className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4">
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--accent)]">
               Flagship note
             </p>
@@ -370,13 +370,13 @@ export default async function ReportDetailPage({ params }) {
               ))}
             </div>
           ) : (
-            <div className="rounded-[1.6rem] border border-dashed border-white/12 bg-white/4 p-6 text-sm leading-7 text-[var(--ink-soft)]">
+            <div className="dashboard-empty-state text-sm leading-7 text-[var(--ink-soft)]">
               Narrative findings are not available for this report yet. Use the linked charts and records below for the structured view.
             </div>
           )}
         </div>
         <div className="grid gap-4 md:grid-cols-2 2xl:grid-cols-1">
-          <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+          <div className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4">
             <h2 className="text-lg font-semibold text-white">Why researchers use this page</h2>
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
               This report is generated from structured policy data in EquityStack. It is not an opinion piece. The analysis aggregates policy-level records, score context, and linked evidence into a readable public summary that can be shared before readers drill down into the records themselves.
@@ -385,11 +385,11 @@ export default async function ReportDetailPage({ params }) {
           <CitationNote description="When referencing this report externally, cite the report title, EquityStack, the page URL, and your access date. The report summarizes the current structured dataset and should be read with the linked policy records, sources, and methodology." />
           <ScoreExplanation title="How to interpret score language in this report" />
           <MethodologyCallout description="This report is a structured reading layer, not a standalone claim. Use the related links, policies, and methodology access below to validate what the report is summarizing." />
-          <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 md:col-span-2 xl:col-span-1">
+          <div className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4 md:col-span-2 xl:col-span-1">
             <h2 className="text-lg font-semibold text-white">Related paths</h2>
             <div className="mt-4 grid gap-3">
               {relatedPathCards.map((item) => (
-                <Link key={item.href} href={item.href} className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4 hover:border-[rgba(132,247,198,0.24)]">
+                <Link key={item.href} href={item.href} className="rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4 hover:border-[rgba(132,247,198,0.24)]">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
                     {item.eyebrow}
                   </p>
@@ -412,7 +412,7 @@ export default async function ReportDetailPage({ params }) {
           </div>
         </>
       ) : (
-        <section className="rounded-[1.6rem] border border-dashed border-white/12 bg-white/4 p-6 text-sm leading-7 text-[var(--ink-soft)]">
+        <section className="dashboard-empty-state text-sm leading-7 text-[var(--ink-soft)]">
           This report does not currently expose structured chart data.
         </section>
       )}
@@ -462,28 +462,28 @@ export default async function ReportDetailPage({ params }) {
           description="Reports should open outward into the rest of the site. Use these next steps to move into adjacent analysis, underlying records, or the trust pages that explain and verify the public record."
         />
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <Link href="/explainers" className="panel-link rounded-[1.4rem] p-5">
+          <Link href="/explainers" className="panel-link p-4">
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">Historical context</p>
             <h3 className="mt-3 text-lg font-semibold text-white">Read related explainers</h3>
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
               Explain how the historical, legal, or policy background supports the patterns summarized in this report.
             </p>
           </Link>
-          <Link href="/presidents" className="panel-link rounded-[1.4rem] p-5">
+          <Link href="/presidents" className="panel-link p-4">
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">Entity profiles</p>
             <h3 className="mt-3 text-lg font-semibold text-white">Compare presidential records</h3>
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
               Move from this summary into president-level profiles when the question is really about administrations and long-term historical comparison.
             </p>
           </Link>
-          <Link href="/policies" className="panel-link rounded-[1.4rem] p-5">
+          <Link href="/policies" className="panel-link p-4">
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">Underlying records</p>
             <h3 className="mt-3 text-lg font-semibold text-white">Browse the policy evidence</h3>
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
               Use the policy explorer when you want the laws, executive actions, and court decisions underneath the report&apos;s main findings.
             </p>
           </Link>
-          <Link href="/research" className="panel-link rounded-[1.4rem] p-5">
+          <Link href="/research" className="panel-link p-4">
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">Research hub</p>
             <h3 className="mt-3 text-lg font-semibold text-white">Return to the broader research hub</h3>
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
@@ -500,7 +500,7 @@ export default async function ReportDetailPage({ params }) {
         />
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           {CONTINUE_EXPLORING_CARDS.map((item) => (
-            <Link key={item.href} href={item.href} className="panel-link rounded-[1.4rem] p-5">
+            <Link key={item.href} href={item.href} className="panel-link p-4">
               <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
                 {item.eyebrow}
               </p>

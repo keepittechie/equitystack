@@ -202,7 +202,7 @@ export default async function CurrentAdministrationPage() {
                 entityType="presidency"
                 entityKey={overview.president.slug}
                 targetPath={`/promises/president/${overview.president.slug}?show_all=1`}
-                className="public-button-secondary"
+                className="dashboard-button-secondary"
               >
                 Open the current-term promise tracker
               </TrackedLink>
@@ -217,7 +217,7 @@ export default async function CurrentAdministrationPage() {
         </div>
       </section>
 
-      <section className="card-surface rounded-[1.6rem] p-6">
+      <section className="card-surface p-4">
         <div className="max-w-3xl mb-5">
           <h2 className="text-2xl font-semibold">How to read the current administration overview</h2>
           <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
@@ -255,7 +255,7 @@ export default async function CurrentAdministrationPage() {
         </div>
       </section>
 
-      <section className="card-surface rounded-[1.6rem] p-6">
+      <section className="card-surface p-4">
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <div>
             <h2 className="text-2xl font-semibold">Recent administration activity</h2>
@@ -283,7 +283,7 @@ export default async function CurrentAdministrationPage() {
               No current-administration activity has been published yet.
             </p>
           ) : overview.recent_activity.map((item) => (
-            <article key={item.slug} className="panel-link rounded-[1.35rem] p-5">
+            <article key={item.slug} className="panel-link p-4">
               <div className="flex items-start justify-between gap-4 flex-wrap">
                 <div>
                   <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">
@@ -327,7 +327,7 @@ export default async function CurrentAdministrationPage() {
                   entityType="promise"
                   entityKey={item.slug}
                   targetPath={`/promises/${item.slug}`}
-                  className="public-button-primary px-4 py-2"
+                  className="dashboard-button-primary px-4 py-2"
                 >
                   Open Promise Tracker record
                 </TrackedLink>
@@ -339,7 +339,7 @@ export default async function CurrentAdministrationPage() {
                   entityType="promise"
                   entityKey={item.slug}
                   targetPath={buildPromiseCardHref(item)}
-                  className="public-button-secondary px-4 py-2"
+                  className="dashboard-button-secondary px-4 py-2"
                 >
                   Share Card
                 </TrackedLink>
@@ -350,7 +350,7 @@ export default async function CurrentAdministrationPage() {
       </section>
 
       <section className="grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
-        <div className="card-surface rounded-[1.6rem] p-6">
+        <div className="card-surface p-4">
           <div className="flex items-center justify-between gap-4 flex-wrap">
             <div>
               <h2 className="text-2xl font-semibold">Top Impact Areas</h2>
@@ -384,7 +384,7 @@ export default async function CurrentAdministrationPage() {
           </div>
         </div>
 
-        <section className="card-surface rounded-[1.6rem] p-6">
+        <section className="card-surface p-4">
           <h2 className="text-2xl font-semibold">Build, Interpret, Verify</h2>
           <div className="mt-4 space-y-3 text-sm leading-7 text-[var(--ink-soft)]">
             <p>{explanation.build}</p>
@@ -408,7 +408,7 @@ export default async function CurrentAdministrationPage() {
         </section>
       </section>
 
-      <section className="card-surface rounded-[1.6rem] p-6">
+      <section className="card-surface p-4">
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <div>
             <h2 className="text-2xl font-semibold">Featured Current-Administration Records</h2>
@@ -422,7 +422,7 @@ export default async function CurrentAdministrationPage() {
           {overview.featured_records.length === 0 ? (
             <p className="text-sm text-[var(--ink-soft)]">No featured records are available yet.</p>
           ) : overview.featured_records.map((record) => (
-            <article key={record.slug} className="panel-link rounded-[1.35rem] p-5">
+            <article key={record.slug} className="panel-link p-4">
               <div className="flex items-start justify-between gap-4 flex-wrap">
                 <div>
                   <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">
@@ -483,7 +483,7 @@ export default async function CurrentAdministrationPage() {
         </div>
       </section>
 
-      <section className="card-surface rounded-[1.6rem] p-6">
+      <section className="card-surface p-4">
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <div>
             <h2 className="text-2xl font-semibold">Next Steps</h2>
@@ -502,7 +502,7 @@ export default async function CurrentAdministrationPage() {
             entityType="presidency"
             entityKey={overview.president.slug}
             targetPath={`/promises/president/${overview.president.slug}?show_all=1`}
-            className="panel-link block rounded-[1.35rem] p-5"
+            className="panel-link p-4"
           >
             <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Browse</p>
             <h3 className="mt-3 text-lg font-semibold">Open current-term Promise Tracker</h3>
@@ -518,7 +518,7 @@ export default async function CurrentAdministrationPage() {
             entityType="report"
             entityKey="black-impact-score"
             targetPath="/reports/black-impact-score"
-            className="panel-link block rounded-[1.35rem] p-5"
+            className="panel-link p-4"
           >
             <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Score</p>
             <h3 className="mt-3 text-lg font-semibold">Open Black Impact Score</h3>
@@ -534,7 +534,7 @@ export default async function CurrentAdministrationPage() {
             entityType="promise"
             entityKey={overview.featured_records[0]?.slug || overview.president.slug}
             targetPath={featuredShareHref}
-            className="panel-link block rounded-[1.35rem] p-5"
+            className="panel-link p-4"
           >
             <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Share</p>
             <h3 className="mt-3 text-lg font-semibold">Share a current-administration card</h3>

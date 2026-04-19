@@ -11,6 +11,7 @@ import {
   PageContextBlock,
   SectionIntro,
 } from "@/app/components/public/core";
+import { Panel } from "@/app/components/dashboard/primitives";
 import {
   RecentPolicyChangesTable,
   ReportCardGrid,
@@ -30,16 +31,6 @@ import {
 } from "@/lib/structured-data";
 
 export const dynamic = "force-dynamic";
-
-function ReportPanel({ children, className = "" }) {
-  return (
-    <section
-      className={`rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 md:p-6 ${className}`}
-    >
-      {children}
-    </section>
-  );
-}
 
 export async function generateMetadata({ searchParams }) {
   const resolvedSearchParams = (await searchParams) || {};
@@ -81,7 +72,7 @@ export default async function ReportsPage({ searchParams }) {
   }));
 
   return (
-    <main className="space-y-10">
+    <main className="space-y-8">
       <StructuredData
         data={[
           buildBreadcrumbJsonLd(
@@ -143,10 +134,10 @@ export default async function ReportsPage({ searchParams }) {
           description="Reports are the public intelligence layer on top of the browseable database. Use them to move from headline interpretation into policy records, promise evidence, timelines, and methodology without losing the audit trail."
           actions={
             <>
-              <Link href="/dashboard" className="public-button-primary">
+              <Link href="/dashboard" className="dashboard-button-primary">
                 Open dashboard
               </Link>
-              <Link href="/methodology" className="public-button-secondary">
+              <Link href="/methodology" className="dashboard-button-secondary">
                 Read methodology
               </Link>
             </>
@@ -156,40 +147,40 @@ export default async function ReportsPage({ searchParams }) {
 
       <TrustBar />
 
-      <section className="space-y-5">
-        <ReportPanel className="space-y-5">
+      <section className="space-y-4">
+        <Panel padding="md" className="space-y-4">
           <PageContextBlock
             description="This page organizes EquityStack’s analytical outputs, from flagship score views to historical and category-based report paths."
             detail="Reports summarize structured policy data. They are designed to help users move from synthesis into the underlying records, sources, and methodology."
           />
           <ScoreExplanation title="How to read report score language" />
-        </ReportPanel>
+        </Panel>
       </section>
 
-      <section className="space-y-5">
-        <ReportPanel className="space-y-5">
+      <section className="space-y-4">
+        <Panel padding="md" className="space-y-4">
           <CitationNote
             title="Why this hub is worth citing"
             description="The reports hub is the strongest page to share when someone needs a curated entry point into EquityStack&apos;s analysis layer. It organizes flagship reports, score interpretation, and related record pathways in one place instead of forcing readers to start with a raw table."
           />
-          <div className="rounded-[1.3rem] border border-white/8 bg-white/5 p-5">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--accent)]">
+          <Panel padding="md" className="bg-[rgba(18,31,49,0.52)]">
+          <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
             Best external use cases
           </p>
           <h2 className="mt-3 text-2xl font-semibold text-white">Where this page helps most</h2>
           <div className="mt-4 grid gap-3 text-sm leading-7 text-[var(--ink-soft)]">
-            <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+            <Panel padding="md" className="bg-[rgba(18,31,49,0.52)]">
               Share this page when a reader needs a summary-level entry into EquityStack before opening presidents, policies, or promises.
-            </div>
-            <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+            </Panel>
+            <Panel padding="md" className="bg-[rgba(18,31,49,0.52)]">
               Link here when a story or class discussion needs a report library rather than one isolated chart or one isolated record.
-            </div>
-            <div className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+            </Panel>
+            <Panel padding="md" className="bg-[rgba(18,31,49,0.52)]">
               Use the flagship reports below when you need the most shareable pages for historical comparison, score context, or timeline framing.
-            </div>
+            </Panel>
           </div>
-          </div>
-        </ReportPanel>
+          </Panel>
+        </Panel>
       </section>
 
       <DashboardFilterBar helpText="Browse reports by category or keyword. Flagship reports stay visible, but the hub is designed to move you into the right analysis path fast.">
@@ -203,7 +194,7 @@ export default async function ReportsPage({ searchParams }) {
               name="q"
               defaultValue={resolvedSearchParams.q || ""}
               placeholder="Report title or theme"
-              className="rounded-xl border border-white/8 bg-white/5 px-3 py-2.5 text-sm text-white"
+              className="dashboard-field"
             />
           </label>
           <label className="grid gap-2">
@@ -213,7 +204,7 @@ export default async function ReportsPage({ searchParams }) {
             <select
               name="category"
               defaultValue={resolvedSearchParams.category || ""}
-              className="rounded-xl border border-white/8 bg-white/5 px-3 py-2.5 text-sm text-white"
+              className="dashboard-field"
             >
               <option value="">All categories</option>
               {(data.reportCategories || []).map((item) => (
@@ -223,7 +214,7 @@ export default async function ReportsPage({ searchParams }) {
               ))}
             </select>
           </label>
-          <button type="submit" className="public-button-secondary">
+          <button type="submit" className="dashboard-button-secondary">
             Apply filters
           </button>
         </form>
@@ -274,7 +265,7 @@ export default async function ReportsPage({ searchParams }) {
         </section>
       ) : null}
 
-      <section className="space-y-5">
+      <section className="space-y-4">
         <SectionIntro
           eyebrow="Featured"
           title="Start with the flagship views"
@@ -290,21 +281,21 @@ export default async function ReportsPage({ searchParams }) {
           description="Use these report destinations when you need a serious summary page that can be cited, taught from, or linked before readers drill into underlying records."
         />
         <div className="grid gap-4 md:grid-cols-3">
-          <Link href="/reports/black-impact-score" className="panel-link rounded-[1.4rem] p-5">
+          <Link href="/reports/black-impact-score" className="panel-link p-4">
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">Flagship report</p>
             <h3 className="mt-3 text-lg font-semibold text-white">Black Impact Score</h3>
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
               Best first report for journalists, researchers, and general readers who need a comparative synthesis page before opening presidents or policies.
             </p>
           </Link>
-          <Link href="/reports/civil-rights-timeline" className="panel-link rounded-[1.4rem] p-5">
+          <Link href="/reports/civil-rights-timeline" className="panel-link p-4">
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">Historical report</p>
             <h3 className="mt-3 text-lg font-semibold text-white">Civil Rights Timeline</h3>
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
               Best report when chronology matters and the reader needs the long civil-rights arc rather than one administration snapshot.
             </p>
           </Link>
-          <Link href="/reports" className="panel-link rounded-[1.4rem] p-5">
+          <Link href="/reports" className="panel-link p-4">
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">Report hub</p>
             <h3 className="mt-3 text-lg font-semibold text-white">Full reports library</h3>
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
@@ -314,28 +305,28 @@ export default async function ReportsPage({ searchParams }) {
         </div>
       </section>
 
-      <section className="space-y-5">
+      <section className="space-y-4">
         <SectionIntro
           eyebrow="Reference paths"
           title="Pair reports with methodology, sources, and guided context"
           description="The strongest outreach-ready pages usually combine a report with the methodology page, the source library, or a guided explainer path."
         />
         <div className="grid gap-4 md:grid-cols-3">
-          <Link href="/methodology" className="panel-link rounded-[1.4rem] p-5">
+          <Link href="/methodology" className="panel-link p-4">
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">Methodology</p>
             <h3 className="mt-3 text-lg font-semibold text-white">Explain how the report was built</h3>
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
               Pair a report with the methodology page when a reader needs to understand score construction, evidence thresholds, and analytical limits.
             </p>
           </Link>
-          <Link href="/sources" className="panel-link rounded-[1.4rem] p-5">
+          <Link href="/sources" className="panel-link p-4">
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">Sources</p>
             <h3 className="mt-3 text-lg font-semibold text-white">Verify the evidence base directly</h3>
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
               Link the source library when the next question is about documentation, publisher quality, or the breadth of the visible evidence layer.
             </p>
           </Link>
-          <Link href="/start" className="panel-link rounded-[1.4rem] p-5">
+          <Link href="/start" className="panel-link p-4">
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">Research guide</p>
             <h3 className="mt-3 text-lg font-semibold text-white">Give first-time readers a guided path</h3>
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
@@ -358,12 +349,12 @@ export default async function ReportsPage({ searchParams }) {
         />
       </section>
 
-      <div className="rounded-[1.3rem] border border-white/8 bg-white/5 px-5 py-4 text-sm leading-7 text-[var(--ink-soft)]">
+      <Panel padding="md" className="bg-[rgba(18,31,49,0.52)] text-sm leading-7 text-[var(--ink-soft)]">
         Charts reflect underlying policy data in the EquityStack database.
-      </div>
+      </Panel>
 
-      <section className="space-y-5">
-        <ReportPanel className="space-y-5">
+      <section className="space-y-4">
+        <Panel padding="md" className="space-y-4">
           <SectionIntro
             eyebrow="All reports"
             title={`${reports.length} reports currently visible`}
@@ -373,17 +364,17 @@ export default async function ReportsPage({ searchParams }) {
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           <MethodologyCallout description="Reports summarize. They do not replace the underlying record. Each report should send users back into policies, promises, timeline entries, and source context when they need to verify a claim." />
           <CitationNote description="When referencing an EquityStack report externally, cite the report title, EquityStack, the page URL, and your access date. Reports summarize the current structured dataset and should be read alongside underlying records and methodology." />
-          <div className="rounded-[1.3rem] border border-white/8 bg-white/5 p-5">
+          <Panel padding="md" className="bg-[rgba(18,31,49,0.52)]">
             <h2 className="text-lg font-semibold text-white">About these reports</h2>
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
               Reports are generated from structured policy data in EquityStack. They are not opinion pieces. Each report aggregates policy-level analysis, evidence, and score context into a readable public summary.
             </p>
+          </Panel>
           </div>
-          </div>
-        </ReportPanel>
+        </Panel>
       </section>
 
-      <section className="space-y-5">
+      <section className="space-y-4">
         <SectionIntro
           eyebrow="Recent updates"
           title="Latest report-linked policy movement"

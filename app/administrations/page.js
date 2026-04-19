@@ -8,6 +8,7 @@ import {
   MethodologyCallout,
   SectionIntro,
 } from "@/app/components/public/core";
+import { Panel } from "@/app/components/dashboard/primitives";
 
 export const dynamic = "force-dynamic";
 
@@ -28,7 +29,7 @@ export default async function AdministrationsPage({ searchParams }) {
   const administrations = await fetchAdministrationsOverviewData(resolvedSearchParams);
 
   return (
-    <main className="space-y-10">
+    <main className="space-y-8">
       <Breadcrumbs items={[{ href: "/", label: "Home" }, { label: "Administrations" }]} />
 
       <section className="hero-panel p-8 md:p-10 xl:p-14">
@@ -41,18 +42,18 @@ export default async function AdministrationsPage({ searchParams }) {
       </section>
 
       <section className="grid gap-4 md:grid-cols-2">
-        <div className="rounded-[1.5rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+        <Panel padding="md">
           <h2 className="text-lg font-semibold text-white">What this section covers</h2>
           <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
             This index groups public records by administration so users can study governing activity, promise status, and visible policy movement across terms.
           </p>
-        </div>
-        <div className="rounded-[1.5rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+        </Panel>
+        <Panel padding="md">
           <h2 className="text-lg font-semibold text-white">Best next step</h2>
           <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
             Open an administration profile when you want the promise feed and recent activity, then move into the president profile for Black Impact Score interpretation.
           </p>
-        </div>
+        </Panel>
       </section>
 
       <DashboardFilterBar helpText="Browse administrations as public entities with both governing throughput and presidential score context.">
@@ -64,10 +65,10 @@ export default async function AdministrationsPage({ searchParams }) {
               name="q"
               defaultValue={resolvedSearchParams.q || ""}
               placeholder="Administration or president"
-              className="rounded-xl border border-white/8 bg-white/5 px-3 py-2.5 text-sm text-white"
+              className="dashboard-field"
             />
           </label>
-          <button type="submit" className="public-button-secondary">
+          <button type="submit" className="dashboard-button-secondary">
             Apply filters
           </button>
         </form>
@@ -104,10 +105,10 @@ export default async function AdministrationsPage({ searchParams }) {
         ]}
       />
 
-      <section className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {administrations.length ? (
           administrations.map((item) => (
-            <Link key={item.slug} href={`/administrations/${item.slug}`} className="panel-link rounded-[1.7rem] p-6">
+            <Link key={item.slug} href={`/administrations/${item.slug}`} className="panel-link p-4">
               <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
                 {item.president_party || "Administration"} • {item.termLabel}
               </p>
@@ -121,7 +122,7 @@ export default async function AdministrationsPage({ searchParams }) {
             </Link>
           ))
         ) : (
-          <div className="rounded-[1.6rem] border border-dashed border-white/12 bg-white/4 p-6 text-sm leading-7 text-[var(--ink-soft)]">
+          <div className="dashboard-empty-state text-sm leading-7 text-[var(--ink-soft)]">
             No administrations matched the current search.
           </div>
         )}

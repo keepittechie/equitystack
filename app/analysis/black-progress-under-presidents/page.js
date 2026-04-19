@@ -279,10 +279,10 @@ export default function BlackProgressUnderPresidentsPage() {
           description="This is the outcomes-and-change guide for readers asking how Black progress shifted under different presidents. It focuses on measurable change, mixed results, stalled reform, and reversal rather than broad synthesis or legislation alone."
           actions={
             <>
-              <Link href="/presidents" className="public-button-primary">
+              <Link href="/presidents" className="dashboard-button-primary">
                 Explore presidential impact
               </Link>
-              <Link href="/policies" className="public-button-secondary">
+              <Link href="/policies" className="dashboard-button-secondary">
                 Compare policy outcomes
               </Link>
             </>
@@ -315,7 +315,7 @@ export default function BlackProgressUnderPresidentsPage() {
           {WHAT_PROGRESS_MEANS.map((item) => (
             <article
               key={item.title}
-              className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6"
+              className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4"
             >
               <h2 className="text-xl font-semibold text-white">{item.title}</h2>
               <p className="mt-4 text-sm leading-7 text-[var(--ink-soft)]">{item.body}</p>
@@ -334,7 +334,7 @@ export default function BlackProgressUnderPresidentsPage() {
           {WHY_ADMINISTRATIONS_MATTER.map((item) => (
             <article
               key={item.title}
-              className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6"
+              className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4"
             >
               <h2 className="text-xl font-semibold text-white">{item.title}</h2>
               <p className="mt-4 text-sm leading-7 text-[var(--ink-soft)]">{item.body}</p>
@@ -353,7 +353,7 @@ export default function BlackProgressUnderPresidentsPage() {
           {HOW_TO_USE.map((item) => (
             <article
               key={item.title}
-              className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-6"
+              className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4"
             >
               <h2 className="text-xl font-semibold text-white">{item.title}</h2>
               <p className="mt-4 text-sm leading-7 text-[var(--ink-soft)]">{item.body}</p>

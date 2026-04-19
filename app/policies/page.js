@@ -12,6 +12,7 @@ import {
   PageContextBlock,
   SectionIntro,
 } from "@/app/components/public/core";
+import { Panel } from "@/app/components/dashboard/primitives";
 import {
   PolicyCardList,
   PolicyFilterSidebar,
@@ -30,11 +31,9 @@ export const dynamic = "force-dynamic";
 
 function PolicyPanel({ children, className = "" }) {
   return (
-    <section
-      className={`rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 md:p-6 ${className}`}
-    >
+    <Panel padding="md" className={className}>
       {children}
-    </section>
+    </Panel>
   );
 }
 
@@ -122,10 +121,13 @@ export default async function PoliciesPage({ searchParams }) {
           description="The policy explorer is built for civic research: search first, filter by president, era, direction, or category, and move from broad historical questions into record-level evidence."
           actions={
             <>
-              <Link href="/dashboard" className="public-button-primary">
+              <Link href="/dashboard" className="dashboard-button-primary">
                 Open the policy dashboard
               </Link>
-              <Link href="/methodology" className="public-button-secondary">
+              <Link
+                href="/methodology"
+                className="inline-flex min-h-9 items-center justify-center rounded-md border border-[var(--line-strong)] bg-[rgba(18,31,49,0.58)] px-3 text-[12px] font-semibold text-white transition-[background-color,border-color,box-shadow] hover:border-[var(--line-strong)] hover:bg-[rgba(18,31,49,0.86)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(132,247,198,0.28)]"
+              >
                 Read methodology
               </Link>
             </>
@@ -160,7 +162,7 @@ export default async function PoliciesPage({ searchParams }) {
           />
         </div>
         <PolicyPanel className="space-y-5">
-          <div className="flex flex-wrap items-center justify-between gap-4 rounded-[1.5rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+          <Panel padding="md" className="flex flex-wrap items-center justify-between gap-4">
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">Results</p>
               <h2 className="mt-3 text-2xl font-semibold text-white">
@@ -176,18 +178,26 @@ export default async function PoliciesPage({ searchParams }) {
             <div className="flex flex-wrap gap-2">
               <Link
                 href={`/policies?${new URLSearchParams({ ...resolvedSearchParams, view: "table" }).toString()}`}
-                className={view === "table" ? "public-button-primary" : "public-button-secondary"}
+                className={
+                  view === "table"
+                    ? "inline-flex min-h-9 items-center justify-center rounded-md border border-[rgba(132,247,198,0.72)] bg-[var(--accent)] px-3 text-[12px] font-semibold text-[#051019] transition-[background-color,border-color,box-shadow] hover:border-[var(--accent)] hover:bg-[rgba(132,247,198,0.9)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(132,247,198,0.28)]"
+                    : "inline-flex min-h-9 items-center justify-center rounded-md border border-[var(--line-strong)] bg-[rgba(18,31,49,0.58)] px-3 text-[12px] font-semibold text-white transition-[background-color,border-color,box-shadow] hover:border-[var(--line-strong)] hover:bg-[rgba(18,31,49,0.86)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(132,247,198,0.28)]"
+                }
               >
                 Table
               </Link>
               <Link
                 href={`/policies?${new URLSearchParams({ ...resolvedSearchParams, view: "cards" }).toString()}`}
-                className={view === "cards" ? "public-button-primary" : "public-button-secondary"}
+                className={
+                  view === "cards"
+                    ? "inline-flex min-h-9 items-center justify-center rounded-md border border-[rgba(132,247,198,0.72)] bg-[var(--accent)] px-3 text-[12px] font-semibold text-[#051019] transition-[background-color,border-color,box-shadow] hover:border-[var(--accent)] hover:bg-[rgba(132,247,198,0.9)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(132,247,198,0.28)]"
+                    : "inline-flex min-h-9 items-center justify-center rounded-md border border-[var(--line-strong)] bg-[rgba(18,31,49,0.58)] px-3 text-[12px] font-semibold text-white transition-[background-color,border-color,box-shadow] hover:border-[var(--line-strong)] hover:bg-[rgba(18,31,49,0.86)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(132,247,198,0.28)]"
+                }
               >
                 Cards
               </Link>
             </div>
-          </div>
+          </Panel>
 
           {view === "cards" ? (
             <PolicyCardList items={data.items || []} buildHref={(item) => `/policies/${item.slug || buildPolicySlug(item)}`} />
