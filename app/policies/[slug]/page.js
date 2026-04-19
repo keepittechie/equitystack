@@ -388,6 +388,7 @@ export default async function PolicyDetailPage({ params }) {
         Number(policy.relationships?.length || 0),
     },
   ];
+  const showLocalNavigation = localNavigationItems.length >= 3;
   const badges = [
     policy.year_enacted ? `Year ${policy.year_enacted}` : null,
     policy.president ? `President: ${policy.president}` : null,
@@ -470,16 +471,18 @@ export default async function PolicyDetailPage({ params }) {
 
       <TrustBar />
 
-      <div className="space-y-2">
-        <p className="px-1 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
-          On this page
-        </p>
-        <EquityStackTabbar
-          items={localNavigationItems}
-          ariaLabel="Policy page sections"
-          defaultHref="#overview"
-        />
-      </div>
+      {showLocalNavigation ? (
+        <div className="space-y-1.5">
+          <p className="px-1 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
+            On this page
+          </p>
+          <EquityStackTabbar
+            items={localNavigationItems}
+            ariaLabel="Policy page sections"
+            defaultHref="#overview"
+          />
+        </div>
+      ) : null}
 
       <Panel id="overview" prominence="primary" className={`${localSectionOffsetClass} overflow-hidden`}>
         <SectionHeader

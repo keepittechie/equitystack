@@ -92,9 +92,9 @@ export default function EquityStackTabbar({
   return (
     <nav
       aria-label={ariaLabel}
-      className={`-mx-1 overflow-x-auto px-1 thin-scrollbar ${className}`}
+      className={`-mx-1 overflow-x-auto px-1 pb-0.5 thin-scrollbar overscroll-x-contain ${className}`}
     >
-      <div className="inline-flex min-w-full gap-1 rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-1">
+      <div className="inline-flex min-w-full items-center gap-1 rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-1">
         {normalizedItems.map((item) => {
           const active = isTabActive({
             href: item.href,
@@ -105,13 +105,13 @@ export default function EquityStackTabbar({
 
           const tabContent = (
             <>
-              <span className="whitespace-nowrap">{item.label}</span>
+              <span className="whitespace-nowrap leading-none">{item.label}</span>
               {item.count != null ? (
                 <span
-                  className={`rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${
+                  className={`shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-medium tabular-nums leading-none ${
                     active
                       ? "bg-[rgba(132,247,198,0.12)] text-[var(--accent)]"
-                      : "bg-[rgba(18,31,49,0.64)] text-[var(--ink-muted)]"
+                      : "bg-[rgba(18,31,49,0.52)] text-[var(--ink-muted)]"
                   }`}
                 >
                   {item.count}
@@ -120,10 +120,10 @@ export default function EquityStackTabbar({
             </>
           );
 
-          const className = `inline-flex min-h-8 shrink-0 items-center gap-2 rounded-md border px-3 text-[12px] font-medium transition-[background-color,border-color,box-shadow,color] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(132,247,198,0.28)] focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(11,20,33)] ${
+          const className = `inline-flex min-h-9 shrink-0 items-center gap-2 rounded-md border px-3 text-[12px] font-medium transition-[background-color,border-color,box-shadow,color] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(132,247,198,0.24)] focus-visible:ring-offset-1 focus-visible:ring-offset-[rgb(11,20,33)] ${
             active
-              ? "border-[rgba(132,247,198,0.22)] bg-[rgba(18,31,49,0.72)] text-white"
-              : "border-transparent text-[var(--ink-muted)] hover:border-[var(--line)] hover:bg-[rgba(18,31,49,0.48)] hover:text-white"
+              ? "border-[rgba(132,247,198,0.24)] bg-[rgba(18,31,49,0.78)] text-white"
+              : "border-transparent text-[var(--ink-muted)] hover:border-[rgba(255,255,255,0.08)] hover:bg-[rgba(18,31,49,0.56)] hover:text-[var(--ink-soft)]"
           }`;
 
           if (String(item.href || "").startsWith("#")) {

@@ -24,6 +24,7 @@ import {
   PromiseHero,
   PromiseTimeline,
 } from "@/app/components/public/entities";
+import EquityStackTabbar from "@/app/components/dashboard/EquityStackTabbar";
 import {
   buildBreadcrumbJsonLd,
   buildPromiseJsonLd,
@@ -40,9 +41,10 @@ function formatTermLabel(start, end) {
   return null;
 }
 
-function PromisePanel({ children, className = "" }) {
+function PromisePanel({ children, className = "", ...props }) {
   return (
     <section
+      {...props}
       className={`rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4 ${className}`}
     >
       {children}
@@ -221,6 +223,18 @@ export default async function PromiseDetailPage({ params }) {
     ? `/policies?president=${encodeURIComponent(promise.president)}`
     : "/policies";
   const contextParagraphs = buildPromiseContextParagraphs(promise);
+  const localSectionOffsetClass = "scroll-mt-28 md:scroll-mt-32";
+  const localNavigationItems = [
+    { href: "#status", label: "Status" },
+    ...(evidence.length
+      ? [{ href: "#evidence", label: "Evidence", count: evidence.length }]
+      : []),
+    ...(timelineItems.length
+      ? [{ href: "#timeline", label: "Timeline", count: timelineItems.length }]
+      : []),
+    { href: "#related", label: "Related" },
+  ];
+  const showLocalNavigation = localNavigationItems.length >= 3;
 
   return (
     <main className="space-y-10">
@@ -305,7 +319,20 @@ export default async function PromiseDetailPage({ params }) {
         </div>
       </PromisePanel>
 
-      <PromisePanel className="space-y-5">
+      {showLocalNavigation ? (
+        <div className="space-y-1.5">
+          <p className="px-1 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
+            On this page
+          </p>
+          <EquityStackTabbar
+            items={localNavigationItems}
+            ariaLabel="Promise page sections"
+            defaultHref="#status"
+          />
+        </div>
+      ) : null}
+
+      <PromisePanel id="status" className={`${localSectionOffsetClass} space-y-5`}>
         <SectionIntro
           eyebrow="What this means"
           title="Status and rationale"
@@ -392,7 +419,9 @@ export default async function PromiseDetailPage({ params }) {
           ) : null}
         </div>
         {timelineItems.length ? (
-          <PromiseTimeline items={timelineItems} />
+          <div id="timeline" className={localSectionOffsetClass}>
+            <PromiseTimeline items={timelineItems} />
+          </div>
         ) : (
           <div className="dashboard-empty-state text-sm leading-7 text-[var(--ink-soft)]">
             No status history or dated action timeline is attached to this promise yet.
@@ -408,7 +437,7 @@ export default async function PromiseDetailPage({ params }) {
         <MethodologyCallout description="Promise grading and Black Impact Score are related but distinct. A promise can be delivered with mixed or limited downstream impact, and the site keeps those layers separate." />
       </PromisePanel>
 
-      <section className="space-y-5">
+      <section id="evidence" className={`${localSectionOffsetClass} space-y-5`}>
         <SectionIntro
           eyebrow="Evidence"
           title="Source trail"
@@ -423,7 +452,7 @@ export default async function PromiseDetailPage({ params }) {
         )}
       </section>
 
-      <section className="space-y-5">
+      <section id="related" className={`${localSectionOffsetClass} space-y-5`}>
         <SectionIntro
           eyebrow="Continue exploring"
           title="Policies and context connected to this promise"

@@ -12,6 +12,7 @@ import {
   EvidenceSourceList,
   PolicyTimeline,
 } from "@/app/components/public/entities";
+import EquityStackTabbar from "@/app/components/dashboard/EquityStackTabbar";
 import { ImpactBadge, statusPillClasses } from "@/app/components/policy-badges";
 import { buildPageMetadata } from "@/lib/metadata";
 import {
@@ -60,9 +61,10 @@ function SummaryPanel({ label, children }) {
   );
 }
 
-function BillPanel({ children, className = "" }) {
+function BillPanel({ children, className = "", ...props }) {
   return (
     <section
+      {...props}
       className={`rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4 ${className}`}
     >
       {children}
@@ -219,6 +221,19 @@ export default async function BillDetailPage({ params }) {
     notFound();
   }
 
+  const localSectionOffsetClass = "scroll-mt-28 md:scroll-mt-32";
+  const localNavigationItems = [
+    { href: "#status", label: "Status" },
+    ...(bill.timeline?.length
+      ? [{ href: "#timeline", label: "Timeline", count: bill.timeline.length }]
+      : []),
+    { href: "#related", label: "Related" },
+    ...(bill.sources?.length
+      ? [{ href: "#evidence", label: "Evidence", count: bill.sources.length }]
+      : []),
+  ];
+  const showLocalNavigation = localNavigationItems.length >= 3;
+
   return (
     <main className="space-y-10">
       <StructuredData
@@ -351,7 +366,20 @@ export default async function BillDetailPage({ params }) {
         />
       </BillPanel>
 
-      <BillPanel className="space-y-5">
+      {showLocalNavigation ? (
+        <div className="space-y-1.5">
+          <p className="px-1 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
+            On this page
+          </p>
+          <EquityStackTabbar
+            items={localNavigationItems}
+            ariaLabel="Bill page sections"
+            defaultHref="#status"
+          />
+        </div>
+      ) : null}
+
+      <BillPanel id="status" className={`${localSectionOffsetClass} space-y-5`}>
         <SectionIntro
           eyebrow="Legislative details"
           title="Current bill record"
@@ -365,7 +393,7 @@ export default async function BillDetailPage({ params }) {
           <DetailLine label="Introduced" value={formatBillDate(bill.introducedDate) || "Not surfaced"} />
           <DetailLine label="Latest action" value={bill.latestAction || "No public action text yet"} />
         </div>
-        <div className="space-y-5">
+        <div id="timeline" className={`${localSectionOffsetClass} space-y-5`}>
           <SectionIntro
             eyebrow="Timeline"
             title="Status progression"
@@ -388,7 +416,7 @@ export default async function BillDetailPage({ params }) {
         </div>
       </section>
 
-      <section className="space-y-5">
+      <section id="related" className={`${localSectionOffsetClass} space-y-5`}>
         <SectionIntro
           eyebrow="Related context"
           title="What this bill connects to today"
@@ -488,7 +516,7 @@ export default async function BillDetailPage({ params }) {
         )}
       </section>
 
-      <section className="space-y-5">
+      <section id="evidence" className={`${localSectionOffsetClass} space-y-5`}>
         <SectionIntro
           eyebrow="Sources"
           title={`${bill.sourceCount} source${bill.sourceCount === 1 ? "" : "s"} linked to this bill`}

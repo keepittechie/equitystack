@@ -309,6 +309,7 @@ export default async function PresidentProfilePage({ params }) {
       : []),
     { href: "#related", label: "Related" },
   ];
+  const showLocalNavigation = localNavigationItems.length >= 3;
 
   return (
     <main className="space-y-4">
@@ -407,17 +408,6 @@ export default async function PresidentProfilePage({ params }) {
 
       <TrustBar />
 
-      <div className="space-y-2">
-        <p className="px-1 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
-          On this page
-        </p>
-        <EquityStackTabbar
-          items={localNavigationItems}
-          ariaLabel="President page sections"
-          defaultHref="#overview"
-        />
-      </div>
-
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
         <MetricCard
           label="Outcome confidence"
@@ -451,6 +441,19 @@ export default async function PresidentProfilePage({ params }) {
           tone="default"
         />
       </section>
+
+      {showLocalNavigation ? (
+        <div className="space-y-1.5">
+          <p className="px-1 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
+            On this page
+          </p>
+          <EquityStackTabbar
+            items={localNavigationItems}
+            ariaLabel="President page sections"
+            defaultHref="#overview"
+          />
+        </div>
+      ) : null}
 
       <Panel id="overview" prominence="primary" className={`${localSectionOffsetClass} overflow-hidden`}>
         <SectionHeader
