@@ -695,11 +695,11 @@ export function PromiseResultsTable({ items = [], buildHref }) {
           <thead className="border-b border-white/8 text-[11px] uppercase tracking-[0.2em] text-[var(--ink-muted)]">
             <tr>
               <th className="px-5 py-4">Promise</th>
-              <th className="px-5 py-4">Status</th>
-              <th className="px-5 py-4">Confidence</th>
-              <th className="px-5 py-4">Policy Outcomes</th>
+              <th className="px-5 py-4">Current status</th>
+              <th className="px-5 py-4">Evidence confidence</th>
+              <th className="px-5 py-4">Linked outcomes</th>
               <th className="px-5 py-4">Sources</th>
-              <th className="px-5 py-4">Detail</th>
+              <th className="px-5 py-4">Record</th>
             </tr>
           </thead>
           <tbody>
@@ -717,16 +717,16 @@ export function PromiseResultsTable({ items = [], buildHref }) {
                   </p>
                 </td>
                 <td className="px-5 py-4 text-[var(--ink-soft)]">
-                  <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5">
+                  <StatusPill tone={getPromiseStatusTone(item.status)}>
                     {item.status || "Unknown"}
-                  </span>
+                  </StatusPill>
                 </td>
                 <td className="px-5 py-4 text-[var(--ink-soft)]">{item.confidence_label || "—"}</td>
                 <td className="px-5 py-4 text-[var(--ink-soft)]">{item.outcome_count ?? item.action_count ?? 0}</td>
                 <td className="px-5 py-4 text-[var(--ink-soft)]">{item.source_count ?? 0}</td>
                 <td className="px-5 py-4">
                   <Link href={buildHref(item)} className="text-[var(--ink-soft)] hover:text-white">
-                    Read promise record
+                    Open record
                   </Link>
                 </td>
               </tr>
@@ -1049,14 +1049,30 @@ export function ComparisonMetricsTable({
           </thead>
           <tbody>
             {metrics.map((metric) => (
-              <tr key={metric.key} className="border-b border-white/6 last:border-b-0">
-                <td className="px-4 py-4 align-top font-medium text-white md:px-5">{metric.label}</td>
+              <tr
+                key={metric.key}
+                className={`border-b border-white/6 last:border-b-0 ${
+                  metric.primary ? "bg-[rgba(18,31,49,0.42)]" : ""
+                }`}
+              >
+                <td className="px-4 py-4 align-top md:px-5">
+                  <p className={`font-medium ${metric.primary ? "text-[var(--accent)]" : "text-white"}`}>
+                    {metric.label}
+                  </p>
+                  {metric.description ? (
+                    <p className="mt-1 text-xs leading-5 text-[var(--ink-muted)]">
+                      {metric.description}
+                    </p>
+                  ) : null}
+                </td>
                 {rows.map((row) => (
                   <td
                     key={`${row.label}-${metric.key}`}
                     className="px-4 py-4 align-top text-[var(--ink-soft)] md:px-5"
                   >
-                    <span className="font-medium text-white">{row[metric.key] ?? "—"}</span>
+                    <span className={metric.primary ? "text-base font-semibold text-white" : "font-medium text-white"}>
+                      {row[metric.key] ?? "—"}
+                    </span>
                   </td>
                 ))}
               </tr>

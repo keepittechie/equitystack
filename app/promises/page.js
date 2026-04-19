@@ -98,8 +98,8 @@ export default async function PromisesPage({ searchParams }) {
         <SectionIntro
           as="h1"
           eyebrow="Promise tracker"
-          title="Track campaign promises, delivery, and linked outcomes in one place."
-          description="Promise pages separate political intent from the documented outcomes that followed. That makes it easier to study promises to Black Americans, implementation, partial progress, failure, or blockage without losing the evidence trail."
+          title="See which promises were kept, partial, blocked, or broken."
+          description="The Promise Tracker follows public commitments tied to Black Americans and shows what happened next: current status, linked outcomes, evidence confidence, and the source trail behind each record."
           actions={
             <>
               <Link href="/dashboard" className="dashboard-button-primary">
@@ -113,7 +113,7 @@ export default async function PromisesPage({ searchParams }) {
         />
       </section>
 
-      <DashboardFilterBar helpText="Promise status remains separate from the Black Impact Score. Use filters to narrow by president, topic, or status before opening a record.">
+      <DashboardFilterBar helpText="Use Status to see what happened to the commitment, then compare linked outcomes and evidence confidence before opening a record. Promise status remains separate from the Black Impact Score.">
         <form action="/promises" method="GET" className="flex flex-1 flex-wrap items-end gap-4">
           <label className="grid gap-2">
             <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">Search</span>
@@ -163,33 +163,33 @@ export default async function PromisesPage({ searchParams }) {
           {
             label: "Promises shown",
             value: data.pagination?.total || data.items?.length || 0,
-            description: "The public tracker remains queryable by president, topic, and current status.",
+            description: "Filter by president, topic, or status, then compare promise records side by side.",
             tone: "accent",
           },
           {
-            label: "Delivered",
+            label: "Kept",
             value: statusCounts.Delivered || 0,
-            description: "Promises with documented implemented policy action in the filtered result set.",
+            description: "Tracker label: Delivered. Documented policy action shows the commitment was carried out.",
           },
           {
             label: "In Progress",
             value: statusCounts["In Progress"] || 0,
-            description: "Promises with ongoing action or incomplete implementation.",
+            description: "Action is underway, but the commitment is not complete yet.",
           },
           {
             label: "Partial",
             value: statusCounts.Partial || 0,
-            description: "Promises with meaningful but incomplete documented implementation.",
+            description: "Meaningful implementation is documented, but only part of the promise is complete.",
           },
           {
             label: "Blocked",
             value: statusCounts.Blocked || 0,
-            description: "Promises that did not reach implementation because of visible barriers.",
+            description: "Visible barriers stopped the promise from reaching implementation.",
           },
           {
-            label: "Failed",
+            label: "Broken",
             value: statusCounts.Failed || 0,
-            description: "Promises currently marked failed in the filtered result set.",
+            description: "Tracker label: Failed. The commitment was not fulfilled in the current documented record.",
           },
         ]}
       />
@@ -198,20 +198,14 @@ export default async function PromisesPage({ searchParams }) {
         <Panel padding="md" className="space-y-4">
           <SectionIntro
             eyebrow="Results table"
-            title="Searchable public promise records"
-            description="Open any row for the promise statement, current rationale, linked policies, evidence, and the status history timeline."
+            title="Compare promise records by status, evidence, and linked outcomes"
+            description="Read the current status first. Then compare linked outcomes and evidence confidence to see how much documented record supports that label."
           />
-          <PromiseResultsTable items={data.items || []} buildHref={(item) => `/promises/${item.slug}`} />
-          <Panel padding="md" className="space-y-4 bg-[rgba(18,31,49,0.52)]">
+          <div className="grid gap-4 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
             <PromiseSystemExplanation />
             <PromiseStatusLegend />
-          </Panel>
-          <Panel padding="md" className="bg-[rgba(18,31,49,0.52)]">
-            <h2 className="text-lg font-semibold text-white">Promise Tracker interpretation</h2>
-            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-              Promise Status shows what happened to a documented commitment. Linked policy action and Policy Outcomes show whether that commitment produced visible implementation in the current EquityStack dataset.
-            </p>
-          </Panel>
+          </div>
+          <PromiseResultsTable items={data.items || []} buildHref={(item) => `/promises/${item.slug}`} />
           <MethodologyCallout description="Promise Status tells users what happened to the commitment. It does not automatically imply a positive or negative real-world outcome without linked Policy Outcomes and evidence." />
           <SectionIntro
             eyebrow="Latest status changes"

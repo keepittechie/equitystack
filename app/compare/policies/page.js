@@ -39,19 +39,34 @@ export default async function ComparePoliciesPage({ searchParams }) {
   const resolvedSearchParams = (await searchParams) || {};
   const selected = normalizeSelected(resolvedSearchParams.compare);
   const data = await fetchComparePoliciesData(selected);
+  const items = data.items || [];
   const rows = (data.items || []).map((item) => ({
     label: item.title,
-    year: item.year_enacted || "—",
-    president: item.president || "—",
-    direction: item.impact_direction || "—",
     score: formatScore(item.impact_score),
-    sources: item.source_count ?? 0,
+    direction: item.impact_direction || "—",
     confidence: item.confidence_label || "Unknown",
+    sources: item.source_count ?? 0,
+    president: item.president || "—",
+    year: item.year_enacted || "—",
   }));
   const mostSourced =
-    data.items?.slice().sort(
+    items.slice().sort(
       (left, right) => Number(right.source_count || 0) - Number(left.source_count || 0)
     )[0] || null;
+  const highestScore =
+    items.slice().sort(
+      (left, right) => Number(right.impact_score || 0) - Number(left.impact_score || 0)
+    )[0] || null;
+  const lowestScore =
+    items.slice().sort(
+      (left, right) => Number(left.impact_score || 0) - Number(right.impact_score || 0)
+    )[0] || null;
+  const positiveCount = items.filter(
+    (item) => String(item.impact_direction || "").toLowerCase() === "positive"
+  ).length;
+  const negativeCount = items.filter(
+    (item) => String(item.impact_direction || "").toLowerCase() === "negative"
+  ).length;
 
   return (
     <main className="space-y-4">
@@ -67,8 +82,8 @@ export default async function ComparePoliciesPage({ searchParams }) {
         <SectionIntro
           as="h1"
           eyebrow="Policy comparison"
-          title="Put policy records next to each other and keep the evidence visible."
-          description="Policy comparison is most useful when the records are meaningfully comparable. The page keeps source count, confidence, and direction close to the score so users can see when the evidence base is thin."
+          title="Compare policy records by impact score first, then evidence strength."
+          description="Higher impact score means a more positive documented policy effect in the current EquityStack record. Read impact score first, then check direction, confidence, and source count before deciding which record is stronger."
         />
       </section>
 
@@ -86,8 +101,9 @@ export default async function ComparePoliciesPage({ searchParams }) {
           </button>
         </form>
         <p className="max-w-4xl text-sm leading-7 text-[var(--ink-soft)]">
-          Choose records that actually belong in the same conversation. Score, direction, confidence,
-          and source count are most useful when the policies share topic, era, or historical context.
+          Choose records that belong in the same conversation. Columns are policies and rows are
+          comparison metrics. Start with impact score, then use direction and evidence strength to
+          decide whether the gap is meaningful.
         </p>
       </section>
 
@@ -95,52 +111,72 @@ export default async function ComparePoliciesPage({ searchParams }) {
         <>
           <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             <KpiCard
-              label="Policies compared"
-              value={data.items.length}
-              description="Valid policy records in the current comparison set."
+              label="Highest impact score"
+              value={highestScore ? formatScore(highestScore.impact_score) : "—"}
+              description={
+                highestScore
+                  ? `${highestScore.title} currently leads on documented impact score.`
+                  : "No policy lead is available."
+              }
               tone="accent"
             />
             <KpiCard
-              label="Highest score"
-              value={
-                formatScore(
-                  Math.max(...data.items.map((item) => Number(item.impact_score || 0)))
-                )
+              label="Lowest impact score"
+              value={lowestScore ? formatScore(lowestScore.impact_score) : "—"}
+              description={
+                lowestScore
+                  ? `${lowestScore.title} currently sits at the bottom of the selected set.`
+                  : "No lower score is available."
               }
-              description="Highest impact score in the selected comparison set."
             />
             <KpiCard
-              label="Most sourced"
+              label="Strongest source base"
               value={mostSourced?.source_count ?? 0}
               description={
                 mostSourced ? `${mostSourced.title} has the largest visible source count.` : "—"
               }
             />
             <KpiCard
-              label="Categories visible"
-              value={
-                new Set(
-                  data.items.flatMap((item) =>
-                    String(item.categories || "")
-                      .split(",")
-                      .map((entry) => entry.trim())
-                      .filter(Boolean)
-                  )
-                ).size
-              }
-              description="Distinct category labels visible across the selected records."
+              label="Direction split"
+              value={`${positiveCount} positive / ${negativeCount} negative`}
+              description="Quick read on whether the selected set leans positive or negative before you open each policy."
             />
           </section>
 
           <ComparisonMetricsTable
             rows={rows}
             metrics={[
-              { key: "year", label: "Year" },
-              { key: "president", label: "President" },
-              { key: "direction", label: "Impact Direction" },
-              { key: "score", label: "Impact Score" },
-              { key: "sources", label: "Source count" },
-              { key: "confidence", label: "Confidence" },
+              {
+                key: "score",
+                label: "Impact score",
+                description: "Higher = more positive documented impact in the current record.",
+                primary: true,
+              },
+              {
+                key: "direction",
+                label: "Impact direction",
+                description: "Shows whether the record leans positive, negative, mixed, or blocked.",
+              },
+              {
+                key: "confidence",
+                label: "Evidence confidence",
+                description: "Use this with source count to judge how hard to lean on the score.",
+              },
+              {
+                key: "sources",
+                label: "Source count",
+                description: "Visible source coverage attached to the policy record.",
+              },
+              {
+                key: "president",
+                label: "President",
+                description: "Historical owner of the policy record.",
+              },
+              {
+                key: "year",
+                label: "Year enacted",
+                description: "Placement in historical time.",
+              },
             ]}
           />
 
@@ -148,8 +184,8 @@ export default async function ComparePoliciesPage({ searchParams }) {
             <div className="space-y-5">
               <SectionIntro
                 eyebrow="Selected records"
-                title="Comparison cards"
-                description="Use the cards below when you want the summaries next to the table before opening the full detail pages."
+                title="Record snapshots"
+                description="Use the cards to confirm why one record is higher, lower, or more thinly evidenced before opening the full policy pages."
               />
               <PolicyCardList
                 items={data.items}
@@ -158,16 +194,16 @@ export default async function ComparePoliciesPage({ searchParams }) {
             </div>
             <div className="space-y-5">
               <div className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4">
-                <h2 className="text-lg font-semibold text-white">Quick read</h2>
+                <h2 className="text-lg font-semibold text-white">What to look at first</h2>
                 <div className="mt-4 grid gap-3 text-sm leading-7 text-[var(--ink-soft)]">
                   <div className="rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4">
-                    Policies with higher impact scores are not automatically more trustworthy if source coverage is thin.
+                    Start with impact score. The higher score is the stronger documented policy record in this comparison.
                   </div>
                   <div className="rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4">
-                    Direction matters: mixed and blocked records should not be flattened into positive/negative shorthand.
+                    Then check direction. Mixed and blocked records need more caution than a clean positive or negative record.
                   </div>
                   <div className="rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4">
-                    Category overlap helps determine whether a comparison is substantive or just convenient.
+                    Finally check confidence and sources to see whether the visible gap rests on a stronger evidence base.
                   </div>
                 </div>
               </div>
