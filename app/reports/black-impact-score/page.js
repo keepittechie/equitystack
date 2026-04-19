@@ -28,6 +28,12 @@ import {
 } from "@/lib/structured-data";
 import CopyShareLinkButton from "./CopyShareLinkButton";
 import SnapshotLibraryPanel from "./SnapshotLibraryPanel";
+import {
+  MetricCard,
+  Panel,
+  SectionHeader,
+  StatusPill,
+} from "@/app/components/dashboard/primitives";
 
 const REPORT_PATH = "/reports/black-impact-score";
 const DEFAULT_TITLE = "Black Impact Score | Outcome-Based Presidential Report";
@@ -498,6 +504,32 @@ function formatPercent(value) {
   const numeric = Number(value);
   if (!Number.isFinite(numeric)) return null;
   return `${Math.round(numeric * 100)}%`;
+}
+
+function getDirectionMeaning(value) {
+  const numeric = Number(value || 0);
+
+  if (numeric > 0) {
+    return {
+      label: "Net documented positive impact",
+      tone: "success",
+      description: "Positive outcomes currently outweigh negative ones in the visible scored record.",
+    };
+  }
+
+  if (numeric < 0) {
+    return {
+      label: "Net documented negative impact",
+      tone: "danger",
+      description: "Negative outcomes currently outweigh positive ones in the visible scored record.",
+    };
+  }
+
+  return {
+    label: "Mixed or neutral current profile",
+    tone: "contested",
+    description: "The visible scored record is currently balanced, mixed, blocked, or too thin to push clearly positive or negative.",
+  };
 }
 
 function getTrustPercentage(metadata, key) {
@@ -1324,26 +1356,66 @@ function PresidentCredibilityPanel({
   );
 }
 
-function TopSummarySection({ presidents }) {
+function TopSummarySection({ presidents, selectedTopic, usingLegacyModel }) {
   const summary = getTopAndBottomPresidents(presidents);
+  const comparisonScope = selectedTopic
+    ? `within ${selectedTopic.label}`
+    : "across the current visible presidential dataset";
+  const scoringDriverDescription = usingLegacyModel
+    ? "Direction, editorial relevance, and current promise status drive the legacy fallback score."
+    : "Outcome direction sets the sign, while evidence strength and systemic weighting change how much each scored outcome moves the total.";
 
   return (
-    <section className="card-surface p-4">
-      <div className="flex items-start justify-between gap-4 flex-wrap">
-        <div className="max-w-3xl">
-          <h2 className="text-lg font-semibold mb-2">Highest and Lowest Current Scores</h2>
-          <p className="text-sm text-[var(--ink-soft)] leading-7">
-            This section shows the current highest and lowest president-level Black Impact Scores.
-            More positive values indicate stronger documented positive impact on Black communities,
-            while more negative values indicate stronger documented negative impact based on currently scored outcomes.
-          </p>
-        </div>
-        <MetaPill>{presidents.length} presidents included</MetaPill>
+    <Panel padding="none" className="overflow-hidden">
+      <SectionHeader
+        eyebrow="How To Read The Score"
+        title="This is a comparative net-impact score, not an absolute grade"
+        description={`The Black Impact Score rolls currently scored records into one comparable president-level value. More positive values mean stronger documented positive impact on Black communities. More negative values mean stronger documented negative impact. Read comparisons ${comparisonScope}, not as a complete historical verdict.`}
+        action={<StatusPill tone="info">{presidents.length} presidents included</StatusPill>}
+      />
+
+      <div className="grid gap-4 p-4 md:grid-cols-2 xl:grid-cols-4">
+        <MetricCard
+          label="What It Measures"
+          value="Net impact"
+          description="A composite of documented outcomes affecting Black communities in the current EquityStack record."
+          tone="info"
+          density="compact"
+        />
+        <MetricCard
+          label="Direction"
+          value="Positive is better"
+          description="Negative values mean stronger documented harm. Near-zero values usually mean the current record is mixed, blocked, or thin."
+          tone="success"
+          density="compact"
+        />
+        <MetricCard
+          label="How To Compare"
+          value="Relative scale"
+          description={`Use it to compare presidents ${comparisonScope}. The score reflects only currently visible scored records.`}
+          tone="default"
+          density="compact"
+        />
+        <MetricCard
+          label="What Moves It"
+          value="Direction + evidence"
+          description={scoringDriverDescription}
+          tone="verified"
+          density="compact"
+        />
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2 mt-5">
+      <div className="grid gap-4 px-4 pb-4 lg:grid-cols-2">
         <section className="card-muted rounded-[1.25rem] p-4">
-          <h3 className="text-lg font-semibold">Highest Current Score</h3>
+          <div className="flex items-start justify-between gap-3 flex-wrap">
+            <div>
+              <h3 className="text-lg font-semibold">Most Positive Current Scores</h3>
+              <p className="mt-2 text-sm leading-6 text-[var(--ink-soft)]">
+                Presidents at the positive end of the current score range.
+              </p>
+            </div>
+            <StatusPill tone="success">Higher positive = stronger documented benefit</StatusPill>
+          </div>
           <div className="mt-3 space-y-3">
             {summary.top.map((president) => (
               <div
@@ -1357,10 +1429,18 @@ function TopSummarySection({ presidents }) {
                       presidentName={president.president}
                       size={42}
                     />
-                    <p className="text-base font-semibold">{president.president}</p>
+                    <div>
+                      <p className="text-base font-semibold">{president.president}</p>
+                      <p className="mt-1 text-xs text-[var(--ink-muted)]">
+                        {getDirectionMeaning(president.normalized_score).description}
+                      </p>
+                    </div>
                   </div>
                   <div className="flex flex-wrap justify-end gap-2">
-                    <MetaPill>{formatNormalizedScore(president.normalized_score)}</MetaPill>
+                    <StatusPill tone={getDirectionMeaning(president.normalized_score).tone}>
+                      {getDirectionMeaning(president.normalized_score).label}
+                    </StatusPill>
+                    <MetaPill>Score {formatNormalizedScore(president.normalized_score)}</MetaPill>
                     {president.display_score != null ? (
                       <MetaPill>Display {formatNormalizedScore(president.display_score)}</MetaPill>
                     ) : null}
@@ -1372,7 +1452,15 @@ function TopSummarySection({ presidents }) {
         </section>
 
         <section className="card-muted rounded-[1.25rem] p-4">
-          <h3 className="text-lg font-semibold">Lowest Current Score</h3>
+          <div className="flex items-start justify-between gap-3 flex-wrap">
+            <div>
+              <h3 className="text-lg font-semibold">Most Negative Current Scores</h3>
+              <p className="mt-2 text-sm leading-6 text-[var(--ink-soft)]">
+                Presidents at the negative end of the current score range.
+              </p>
+            </div>
+            <StatusPill tone="danger">Lower negative = stronger documented harm</StatusPill>
+          </div>
           <div className="mt-3 space-y-3">
             {summary.bottom.map((president) => (
               <div
@@ -1386,10 +1474,18 @@ function TopSummarySection({ presidents }) {
                       presidentName={president.president}
                       size={42}
                     />
-                    <p className="text-base font-semibold">{president.president}</p>
+                    <div>
+                      <p className="text-base font-semibold">{president.president}</p>
+                      <p className="mt-1 text-xs text-[var(--ink-muted)]">
+                        {getDirectionMeaning(president.normalized_score).description}
+                      </p>
+                    </div>
                   </div>
                   <div className="flex flex-wrap justify-end gap-2">
-                    <MetaPill>{formatNormalizedScore(president.normalized_score)}</MetaPill>
+                    <StatusPill tone={getDirectionMeaning(president.normalized_score).tone}>
+                      {getDirectionMeaning(president.normalized_score).label}
+                    </StatusPill>
+                    <MetaPill>Score {formatNormalizedScore(president.normalized_score)}</MetaPill>
                     {president.display_score != null ? (
                       <MetaPill>Display {formatNormalizedScore(president.display_score)}</MetaPill>
                     ) : null}
@@ -1400,7 +1496,7 @@ function TopSummarySection({ presidents }) {
           </div>
         </section>
       </div>
-    </section>
+    </Panel>
   );
 }
 
@@ -3260,12 +3356,6 @@ export default async function BlackImpactScorePage({ searchParams }) {
       : usingLegacyModel || effectiveScoringModel === "legacy"
         ? "Scores are currently using the legacy promise-based model."
       : `Scores are based on documented real-world outcomes using ${effectiveScoringModel}.`;
-  const evidenceBadgeDescription =
-    isLegacyFallbackActive
-      ? "Legacy fallback is active while outcome-based evidence weighting is unavailable."
-      : usingLegacyModel || effectiveScoringModel === "legacy"
-        ? "Legacy scoring uses Promise Tracker relevance and impact curation."
-      : "Evidence strength changes numeric weighting. Linked source-backed outcomes are required for scoring and help inform confidence.";
   const shareViewFlags = new Set([...viewFlags].filter((flag) => flag !== "public" && flag !== "public-share"));
   shareViewFlags.add("public-share");
   const shareUrl = buildReportHref({
@@ -3540,10 +3630,10 @@ export default async function BlackImpactScorePage({ searchParams }) {
         <p className="eyebrow mb-4">Promise Tracker Report</p>
         <h1 className="page-title">Black Impact Score</h1>
         <p className="text-base md:text-lg text-[var(--ink-soft)] mt-4 max-w-3xl leading-8">
-          This score reflects documented outcomes, not campaign promises alone. It shows how presidential records affected Black communities using reviewed actions, outcomes, and source-backed evidence.
+          EquityStack’s Black Impact Score is a composite comparison of documented presidential outcomes affecting Black communities. It is built from reviewed actions, outcome summaries, impact direction, and linked evidence rather than campaign promises alone.
         </p>
         <p className="text-sm text-[var(--ink-soft)] mt-3 max-w-3xl leading-7">
-          Start with the score below, then open the timeline or linked Promise Tracker records when you want more context.
+          More positive values mean the visible record contains stronger documented positive impact. More negative values mean stronger documented negative impact. Read the number as a relative score built from currently scored records, not as a complete historical verdict.
         </p>
         <div className="mt-5 flex flex-wrap gap-2">
           <MetaPill>{presidents.length} presidents scored</MetaPill>
@@ -3551,13 +3641,11 @@ export default async function BlackImpactScorePage({ searchParams }) {
           {metadata?.total_outcomes ? <MetaPill>{metadata.total_outcomes} outcomes scored</MetaPill> : null}
           <MetaPill>{effectiveScoringModel}</MetaPill>
           {selectedTopic ? <MetaPill>Filtered Topic: {selectedTopic.label}</MetaPill> : null}
+          <StatusPill tone="success">Positive = documented benefit</StatusPill>
+          <StatusPill tone="danger">Negative = documented harm</StatusPill>
           <TrustBadge
             label={methodologyBadgeLabel}
             description={methodologyBadgeDescription}
-          />
-          <TrustBadge
-            label="Evidence-Based Scoring"
-            description={evidenceBadgeDescription}
           />
         </div>
       </section>
@@ -3575,7 +3663,13 @@ export default async function BlackImpactScorePage({ searchParams }) {
         </section>
       ) : null}
 
-      {presidents.length && !isTopicCompareView && !isPresidentCompareView ? <TopSummarySection presidents={presidents} /> : null}
+      {presidents.length && !isTopicCompareView && !isPresidentCompareView ? (
+        <TopSummarySection
+          presidents={presidents}
+          selectedTopic={selectedTopic}
+          usingLegacyModel={usingLegacyModel}
+        />
+      ) : null}
 
       {!isPublicView && !isTimelineView && !isTopicCompareView && !isPresidentCompareView ? (
         <TimelineShortcutSection timelineHref={timelineReportHref} />
