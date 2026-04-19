@@ -688,6 +688,21 @@ export default async function ExplainerDetailPage({ params }) {
         </ExplainerPanel>
       </section>
 
+      {editorial.sourcesResearchContext ? (
+        <section className="space-y-5">
+          <SectionIntro
+            eyebrow="Evidence"
+            title="Sources and research context"
+            description="A short note on how to read the source base behind this explainer."
+          />
+          <ExplainerPanel>
+            <p className="text-sm leading-8 text-[var(--ink-soft)]">
+              {editorial.sourcesResearchContext}
+            </p>
+          </ExplainerPanel>
+        </section>
+      ) : null}
+
       <section className="space-y-5">
         <SectionIntro
           eyebrow="Continue exploring"

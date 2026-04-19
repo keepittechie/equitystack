@@ -80,7 +80,14 @@ SET @white_house_dei_explainer_id := (
 
 DELETE FROM explainer_sources
 WHERE explainer_id = @white_house_dei_explainer_id
-  AND source_url = '/sources/economic-consequences-of-dei-2026.pdf';
+  AND source_url IN (
+    '/sources/economic-consequences-of-dei-2026.pdf',
+    'https://www.econometricsociety.org/publications/econometrica/2019/09/01/allocation-talent-and-us-economic-growth',
+    'https://www.nber.org/papers/w3894',
+    'https://www.nber.org/papers/w22014',
+    'https://econjwatch.org/articles/mckinsey-s-diversity-matters-delivers-wins-results-revisited',
+    'https://www.sciencedirect.com/org/science/article/pii/S1460106022000347'
+  );
 
 INSERT INTO explainer_sources (
   explainer_id,
@@ -100,6 +107,51 @@ INSERT INTO explainer_sources (
   NULL,
   'Source PDF for the study analyzed in this explainer.',
   1
+), (
+  @white_house_dei_explainer_id,
+  'The Allocation of Talent and U.S. Economic Growth',
+  'https://www.econometricsociety.org/publications/econometrica/2019/09/01/allocation-talent-and-us-economic-growth',
+  'Academic',
+  'Econometrica',
+  '2019-09-01',
+  'Economic research connecting improved talent allocation to aggregate output growth.',
+  2
+), (
+  @white_house_dei_explainer_id,
+  'Continuous Versus Episodic Change: The Impact of Civil Rights Policy on the Economic Status of Blacks',
+  'https://www.nber.org/papers/w3894',
+  'Academic',
+  'National Bureau of Economic Research',
+  '1991-11-01',
+  'Research on civil-rights policy and Black economic advancement after the mid-1960s.',
+  3
+), (
+  @white_house_dei_explainer_id,
+  'Field Experiments on Discrimination',
+  'https://www.nber.org/papers/w22014',
+  'Academic',
+  'National Bureau of Economic Research',
+  '2016-02-01',
+  'Review of field-experimental evidence on discrimination, its costs, and anti-discrimination interventions.',
+  4
+), (
+  @white_house_dei_explainer_id,
+  'McKinsey''s Diversity Matters/Delivers/Wins Results Revisited',
+  'https://econjwatch.org/articles/mckinsey-s-diversity-matters-delivers-wins-results-revisited',
+  'Academic',
+  'Econ Journal Watch',
+  '2024-03-01',
+  'Academic critique highlighting replication and reverse-causality concerns in business-case diversity studies.',
+  5
+), (
+  @white_house_dei_explainer_id,
+  'Board diversity and firm innovation: a meta-analysis',
+  'https://www.sciencedirect.com/org/science/article/pii/S1460106022000347',
+  'Academic',
+  'European Journal of Innovation Management',
+  '2022-04-08',
+  'Meta-analysis showing a mixed research landscape and a positive association between board diversity and firm innovation.',
+  6
 );
 
 COMMIT;
