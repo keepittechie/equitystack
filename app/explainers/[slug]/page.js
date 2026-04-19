@@ -58,6 +58,19 @@ function buildStructuredSectionTitle(title) {
   return map[title] || title;
 }
 
+function ExplainerContentCard({ card, grid = false }) {
+  return (
+    <article
+      className={`${grid ? "h-full " : ""}rounded-[1.3rem] border border-white/8 bg-white/5 p-5`}
+    >
+      <h2 className="text-2xl font-semibold text-white">{card.title}</h2>
+      <p className="mt-4 whitespace-pre-line text-sm leading-8 text-[var(--ink-soft)]">
+        {card.body}
+      </p>
+    </article>
+  );
+}
+
 function buildConnectedPresidents(relatedPromises = []) {
   const presidents = new Map();
 
@@ -326,6 +339,24 @@ export default async function ExplainerDetailPage({ params }) {
       : (explainersIndex.items || [])
           .filter((item) => item.slug !== slug)
           .slice(0, 3);
+  const explainerContentCards = [
+    ...(explainer.intro_text
+      ? [
+          {
+            key: "intro-text",
+            title: "Historical framing",
+            body: explainer.intro_text,
+          },
+        ]
+      : []),
+    ...(explainer.structured_sections || []).map((section) => ({
+      key: section.title,
+      title: buildStructuredSectionTitle(section.title),
+      body: section.body,
+    })),
+  ];
+  const featuredCards = explainerContentCards.slice(0, 2);
+  const gridCards = explainerContentCards.slice(2);
 
   return (
     <main className="space-y-10">
@@ -493,30 +524,17 @@ export default async function ExplainerDetailPage({ params }) {
 
       <section className="space-y-5">
         <ExplainerPanel className="space-y-5">
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-            {explainer.intro_text ? (
-              <article className="h-full rounded-[1.3rem] border border-white/8 bg-white/5 p-5">
-                <h2 className="text-2xl font-semibold text-white">Historical framing</h2>
-                <p className="mt-4 whitespace-pre-line text-sm leading-8 text-[var(--ink-soft)]">
-                  {explainer.intro_text}
-                </p>
-              </article>
-            ) : null}
+          {featuredCards.map((card) => (
+            <ExplainerContentCard key={card.key} card={card} />
+          ))}
 
-            {(explainer.structured_sections || []).map((section) => (
-              <article
-                key={section.title}
-                className="h-full rounded-[1.3rem] border border-white/8 bg-white/5 p-5"
-              >
-                <h2 className="text-2xl font-semibold text-white">
-                  {buildStructuredSectionTitle(section.title)}
-                </h2>
-                <p className="mt-4 whitespace-pre-line text-sm leading-8 text-[var(--ink-soft)]">
-                  {section.body}
-                </p>
-              </article>
-            ))}
-          </div>
+          {gridCards.length ? (
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+              {gridCards.map((card) => (
+                <ExplainerContentCard key={card.key} card={card} grid />
+              ))}
+            </div>
+          ) : null}
 
           <div className="rounded-[1.3rem] border border-white/8 bg-white/5 p-5">
             <h2 className="text-xl font-semibold text-white">Connected records on this page</h2>
