@@ -299,9 +299,14 @@ export function PolicyCardList({ items = [], buildHref }) {
             <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
               {item.year_enacted || "Undated"} • {item.policy_type || "Policy"}
             </p>
+            <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--ink-muted)]">
+              Open policy
+            </span>
+          </div>
+          <div className="mt-3 flex items-start justify-between gap-4">
+            <h3 className="text-lg font-semibold text-white">{item.title}</h3>
             <ScoreBadge value={item.impact_score ?? "—"} label="Impact Score" />
           </div>
-          <h3 className="mt-3 text-lg font-semibold text-white">{item.title}</h3>
           {item.summary ? (
             <p className="mt-3 text-sm leading-6 text-[var(--ink-soft)]">{item.summary}</p>
           ) : null}
@@ -410,7 +415,12 @@ export function PresidentCardGrid({ items = [], buildHref, compareHref = null })
         });
 
         return (
-          <Panel key={item.slug || item.id} as="article" padding="md" className="flex h-full flex-col">
+          <Panel
+            key={item.slug || item.id}
+            as="article"
+            padding="md"
+            className="flex h-full flex-col transition-[background-color,border-color,box-shadow] hover:border-[var(--line-strong)] hover:bg-[rgba(18,31,49,0.64)]"
+          >
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div className="flex min-w-0 flex-1 items-start gap-4">
                 <PresidentPortrait
@@ -456,7 +466,7 @@ export function PresidentCardGrid({ items = [], buildHref, compareHref = null })
             </div>
             <div className="mt-auto flex flex-wrap gap-3 pt-5">
               <Link href={buildHref(item)} className={PRIMARY_ACTION_CLASS}>
-                Read presidential record
+                Open profile
               </Link>
               {compareHref ? (
                 <Link href={compareHref} className={SECONDARY_ACTION_CLASS}>
@@ -824,13 +834,18 @@ export function ReportCardGrid({ items = [] }) {
           interactive
           className="flex h-full flex-col"
         >
-          <div className="flex flex-wrap items-center gap-2">
-            <StatusPill tone="default">{item.category || "Report"}</StatusPill>
-            {item.theme ? <StatusPill tone="info">{item.theme}</StatusPill> : null}
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <StatusPill tone="default">{item.category || "Report"}</StatusPill>
+              {item.theme ? <StatusPill tone="info">{item.theme}</StatusPill> : null}
+            </div>
+            <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--ink-muted)]">
+              Open report
+            </span>
           </div>
           <h3 className="mt-3 text-lg font-semibold text-white">{item.title}</h3>
           <p className="mt-3 line-clamp-4 text-sm leading-6 text-[var(--ink-soft)]">{item.summary}</p>
-          <span className="mt-auto pt-4 text-[12px] font-semibold text-[var(--ink-soft)]">Read report analysis</span>
+          <span className="mt-auto pt-4 text-[12px] font-semibold text-[var(--ink-soft)]">Open report analysis</span>
         </Panel>
       ))}
     </div>
@@ -857,11 +872,16 @@ export function ExplainerIndexGrid({ items = [] }) {
           interactive
           className="flex h-full flex-col"
         >
-          <StatusPill tone="default">{item.category || "Explainer"}</StatusPill>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <StatusPill tone="default">{item.category || "Explainer"}</StatusPill>
+            <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--ink-muted)]">
+              Open explainer
+            </span>
+          </div>
           <h3 className="mt-3 text-lg font-semibold text-white">{item.title}</h3>
           <p className="mt-3 line-clamp-4 text-sm leading-6 text-[var(--ink-soft)]">{item.summary}</p>
           <span className="mt-auto pt-4 text-[12px] font-semibold text-[var(--ink-soft)]">
-            Read historical context and linked records
+            Open historical context and linked records
           </span>
         </Panel>
       ))}

@@ -164,7 +164,7 @@ export function Panel({
       ? "border-[var(--line-strong)] bg-[rgba(11,20,33,0.96)]"
       : "border-[var(--line)] bg-[rgba(11,20,33,0.92)]";
   const interactiveClass = interactive
-    ? "transition-[background-color,border-color,box-shadow] hover:border-[var(--line-strong)] hover:bg-[rgba(18,31,49,0.64)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(132,247,198,0.28)] focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(11,20,33)]"
+    ? "cursor-pointer transition-[background-color,border-color,box-shadow,transform] hover:border-[var(--line-strong)] hover:bg-[rgba(18,31,49,0.64)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(132,247,198,0.28)] focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(11,20,33)]"
     : "";
 
   return (
