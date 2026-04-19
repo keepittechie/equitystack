@@ -114,7 +114,9 @@ export default async function ComparePresidentsPage({ searchParams }) {
             name="compare"
           />
           <button type="submit" className="dashboard-button-primary">
-            Compare selected presidents
+            {selected.length >= 2
+              ? `Compare ${selected.length} selected president${selected.length === 1 ? "" : "s"}`
+              : "Compare selected presidents"}
           </button>
         </form>
         <p className="max-w-4xl text-sm leading-7 text-[var(--ink-soft)]">
@@ -303,7 +305,7 @@ export default async function ComparePresidentsPage({ searchParams }) {
                     href={`/presidents/${item.president_slug}`}
                     className="mt-5 inline-flex text-sm font-medium text-[var(--accent)]"
                   >
-                    Open profile
+                    Open profile for score drivers
                   </Link>
                   </article>
                 );

@@ -993,18 +993,36 @@ export function SearchResultGroup({ title, items = [] }) {
 }
 
 export function CompareSelector({ options = [], selected = [], name = "compare" }) {
+  const selectedCount = Array.isArray(selected) ? selected.length : 0;
+  const canCompare = selectedCount >= 2;
+
   return (
     <div className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4">
-      <label htmlFor={`${name}-selector`} className="mb-3 block text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
-        Select comparison targets
-      </label>
+      <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <label htmlFor={`${name}-selector`} className="block text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+            Select comparison targets
+          </label>
+          <p id={`${name}-selector-help`} className="mt-2 text-sm leading-6 text-[var(--ink-soft)]">
+            Select 2-4 records. Click one record, then hold Command or Control while clicking more.
+          </p>
+        </div>
+        <div className="rounded-md border border-[var(--line)] bg-[rgba(18,31,49,0.52)] px-3 py-2 text-right">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
+            Selected
+          </p>
+          <p className="mt-1 text-sm font-medium text-white">
+            {selectedCount} of 4
+          </p>
+        </div>
+      </div>
       <select
         id={`${name}-selector`}
         name={name}
         multiple
         defaultValue={selected}
-        aria-describedby={`${name}-selector-help`}
-        className="min-h-[220px] w-full rounded-[1.1rem] border border-white/8 bg-white/5 px-3 py-3 text-sm text-white"
+        aria-describedby={`${name}-selector-help ${name}-selector-status`}
+        className="min-h-[220px] w-full rounded-[1.1rem] border border-white/8 bg-white/5 px-3 py-3 text-sm text-white accent-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(132,247,198,0.22)] focus-visible:ring-offset-2 focus-visible:ring-offset-[rgba(11,20,33,0.96)]"
       >
         {options.map((option) => (
           <option key={option.value} value={option.value}>
@@ -1012,8 +1030,10 @@ export function CompareSelector({ options = [], selected = [], name = "compare" 
           </option>
         ))}
       </select>
-      <p id={`${name}-selector-help`} className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-        Hold command or control to select more than one record.
+      <p id={`${name}-selector-status`} className="mt-3 text-sm leading-6 text-[var(--ink-soft)]">
+        {canCompare
+          ? "Ready to compare. Submit to load the side-by-side table and ranking summary."
+          : "Choose at least two records to generate a comparison."}
       </p>
     </div>
   );

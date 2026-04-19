@@ -231,9 +231,14 @@ export default async function ReportsPage({ searchParams }) {
         <SectionIntro
           eyebrow="Featured"
           title="Start with the flagship views"
-          description="These are the clearest entry points for public users who want the score, the recent state of the dataset, and the longer historical arc."
+          description="Start with one of these when you need the key takeaway first. Then open presidents, policies, or methodology from the linked report."
         />
         <ReportCardGrid items={data.featuredReports || []} />
+        <Panel padding="md" className="bg-[rgba(18,31,49,0.52)]">
+          <p className="text-sm leading-6 text-[var(--ink-soft)]">
+            Best first click: start with <span className="font-semibold text-white">Black Impact Score</span> for ranked comparison, or use <span className="font-semibold text-white">Civil Rights Timeline</span> when sequence matters more than ranking.
+          </p>
+        </Panel>
       </section>
 
       <section className="space-y-5">
@@ -317,11 +322,11 @@ export default async function ReportsPage({ searchParams }) {
 
       <section className="space-y-4">
         <Panel padding="md" className="space-y-4">
-          <SectionIntro
-            eyebrow="All reports"
-            title={`${reports.length} reports currently visible`}
-            description="Use report cards as the jump layer into deeper analysis of presidents, legislation, civil-rights policy, and historical policy impact."
-          />
+        <SectionIntro
+          eyebrow="All reports"
+          title={`${reports.length} reports currently visible`}
+          description="Use report cards as the jump layer into deeper analysis. Open one report, then move into the linked records or methodology when you need verification."
+        />
           <ReportCardGrid items={reports} />
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           <MethodologyCallout description="Reports summarize. They do not replace the underlying record. Each report should send users back into policies, promises, timeline entries, and source context when they need to verify a claim." />

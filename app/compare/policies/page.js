@@ -97,7 +97,9 @@ export default async function ComparePoliciesPage({ searchParams }) {
             name="compare"
           />
           <button type="submit" className="dashboard-button-primary">
-            Compare selected policies
+            {selected.length >= 2
+              ? `Compare ${selected.length} selected polic${selected.length === 1 ? "y" : "ies"}`
+              : "Compare selected policies"}
           </button>
         </form>
         <p className="max-w-4xl text-sm leading-7 text-[var(--ink-soft)]">
@@ -185,7 +187,7 @@ export default async function ComparePoliciesPage({ searchParams }) {
               <SectionIntro
                 eyebrow="Selected records"
                 title="Record snapshots"
-                description="Use the cards to confirm why one record is higher, lower, or more thinly evidenced before opening the full policy pages."
+                description="Open the highest or lowest score first when you need to see the underlying record behind the gap."
               />
               <PolicyCardList
                 items={data.items}
@@ -204,6 +206,9 @@ export default async function ComparePoliciesPage({ searchParams }) {
                   </div>
                   <div className="rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4">
                     Finally check confidence and sources to see whether the visible gap rests on a stronger evidence base.
+                  </div>
+                  <div className="rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4">
+                    Then open the policy card for the record you want to verify. That is the fastest path from comparison into the underlying evidence.
                   </div>
                 </div>
               </div>

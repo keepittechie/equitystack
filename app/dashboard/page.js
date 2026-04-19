@@ -306,9 +306,9 @@ export default async function DashboardPage({ searchParams }) {
               Black policy impact, promises, and evidence in one operating view.
             </h1>
             <p className="mt-4 max-w-[18.5rem] text-sm leading-6 text-[var(--ink-soft)] sm:max-w-[calc(100vw-5rem)] md:max-w-3xl md:text-base md:leading-7">
-              Scan score coverage, impact direction, presidential ranking,
-              promise movement, and the underlying records that explain the
-              public dataset.
+              Start with score coverage and direction mix. Then use the
+              presidential ranking, policy tables, and promise panels to open
+              the records driving the current public dataset.
             </p>
             <div className="mt-5 flex flex-wrap gap-2">
               <DashboardActionLink href="/reports/black-impact-score" variant="primary">
@@ -326,7 +326,7 @@ export default async function DashboardPage({ searchParams }) {
             <MetricCard
               label="Primary read"
               value="Score coverage and direction mix"
-              description="Start here before drilling into records."
+              description="This is the fastest first read before you open presidents or policies."
               density="compact"
               showDot
             />
@@ -526,7 +526,7 @@ export default async function DashboardPage({ searchParams }) {
           <SectionHeader
             eyebrow="Flagship score feature"
             title="Black Impact Score by president"
-            description="This ranking summarizes how presidents compare on measured policy impact in the current EquityStack dataset. Open the full presidents index for broader Black history by president, or compare presidents directly when you need a tighter read."
+            description="This ranking is the fastest answer to who currently sits higher or lower on measured policy impact. Open a president profile for the why, or compare presidents when the gap looks close."
             action={
               <div className="flex flex-wrap gap-2">
                 <DashboardActionLink href="/presidents" variant="primary">
@@ -546,13 +546,13 @@ export default async function DashboardPage({ searchParams }) {
             />
             <div className="mt-4 rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4">
               <h3 className="text-sm font-semibold text-white">
-                Interpret the score with confidence and drivers nearby
+                Best next step after the ranking
               </h3>
               <p className="mt-2 text-[12px] leading-5 text-[var(--ink-soft)]">
-                Scores reflect measured policy impact in the EquityStack
-                dataset, not a complete judgment of a presidency. Confidence,
-                direction mix, and profile-level drivers matter when reading
-                differences between presidents.
+                Open the top or bottom profile first if you need the clearest
+                explanation. Use direct comparison when two presidents look
+                close and you need confidence, outcomes, and promise context
+                side by side.
               </p>
             </div>
           </div>

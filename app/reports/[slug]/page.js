@@ -284,7 +284,7 @@ export default async function ReportDetailPage({ params }) {
           <SectionIntro
             eyebrow="Findings"
             title="What this report shows"
-            description="The report layer is designed for interpretation first, then drill-down into the evidence-bearing records below."
+            description="Read the findings first, then open the linked policy records or recent updates below when you need to verify what is driving the takeaway."
           />
           {report.findings?.length ? (
             <div className="grid gap-3">
@@ -304,9 +304,9 @@ export default async function ReportDetailPage({ params }) {
         </div>
         <div className="grid gap-4 md:grid-cols-2 2xl:grid-cols-1">
           <div className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4">
-            <h2 className="text-lg font-semibold text-white">Why researchers use this page</h2>
+            <h2 className="text-lg font-semibold text-white">Best next step from this page</h2>
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-              This report is generated from structured policy data in EquityStack. It is not an opinion piece. The analysis aggregates policy-level records, score context, and linked evidence into a readable public summary that can be shared before readers drill down into the records themselves.
+              Use this report for the high-level takeaway first. Then open the linked policy records if you need the evidence trail, or jump to methodology if the main question is how the summary was constructed.
             </p>
           </div>
           <ScoreExplanation title="How to interpret score language in this report" />
@@ -414,7 +414,7 @@ export default async function ReportDetailPage({ params }) {
         <SectionIntro
           eyebrow="Continue exploring"
           title="Continue through reports, explainers, public records, and trust pages"
-          description="Reports should open outward into the rest of the site. Use these next steps to move into adjacent analysis, underlying records, or the trust pages that explain and verify the public record."
+          description="Choose the next path based on your question: explainers for context, president or policy pages for records, and trust pages for verification."
         />
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           <Link href="/explainers" className="panel-link p-4">
