@@ -59,7 +59,9 @@ export function Panel({
   className = "",
   padding = "none",
   prominence = "default",
+  interactive = false,
   as: Component = "section",
+  ...props
 }) {
   const paddingClass = {
     none: "",
@@ -71,10 +73,14 @@ export function Panel({
     prominence === "primary"
       ? "border-[var(--line-strong)] bg-[rgba(11,20,33,0.96)]"
       : "border-[var(--line)] bg-[rgba(11,20,33,0.92)]";
+  const interactiveClass = interactive
+    ? "transition-[background-color,border-color,box-shadow] hover:border-[var(--line-strong)] hover:bg-[rgba(18,31,49,0.64)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(132,247,198,0.28)] focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(11,20,33)]"
+    : "";
 
   return (
     <Component
-      className={`min-w-0 rounded-lg border ${prominenceClass} ${paddingClass} ${className}`}
+      {...props}
+      className={`min-w-0 rounded-lg border ${prominenceClass} ${paddingClass} ${interactiveClass} ${className}`}
     >
       {children}
     </Component>
@@ -86,11 +92,14 @@ export function SectionHeader({
   description,
   action = null,
   eyebrow = null,
+  bordered = true,
   className = "",
 }) {
   return (
     <div
-      className={`flex flex-col gap-3 border-b border-[var(--line)] px-4 py-3 lg:flex-row lg:items-center lg:justify-between ${className}`}
+      className={`flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between ${
+        bordered ? "border-b border-[var(--line)] px-4 py-3" : ""
+      } ${className}`}
     >
       <div className="min-w-0 max-w-full md:max-w-3xl">
         {eyebrow ? (
@@ -112,7 +121,12 @@ export function SectionHeader({
   );
 }
 
-export function StatusPill({ children, tone = "default", selected = false }) {
+export function StatusPill({
+  children,
+  tone = "default",
+  selected = false,
+  className = "",
+}) {
   return (
     <span
       className={`inline-flex min-h-6 items-center gap-1.5 rounded-full border px-2.5 text-[10px] font-semibold uppercase tracking-[0.14em] ${getStatusSurfaceClass(
@@ -121,7 +135,7 @@ export function StatusPill({ children, tone = "default", selected = false }) {
         selected
           ? "shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)]"
           : ""
-      }`}
+      } ${className}`}
     >
       <span className={`h-1.5 w-1.5 rounded-full ${getStatusDotClass(tone)}`} />
       {children}
@@ -150,6 +164,7 @@ export function MetricCard({
   label,
   value,
   description = null,
+  children = null,
   tone = "default",
   density = "default",
   prominence = "default",
@@ -195,6 +210,7 @@ export function MetricCard({
           {description}
         </p>
       ) : null}
+      {children ? <div className="mt-3">{children}</div> : null}
     </div>
   );
 }

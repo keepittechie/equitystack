@@ -20,7 +20,6 @@ import {
   MethodologyCallout,
   PresidentScoreMethodologyNote,
   ScoreBadge,
-  SectionIntro,
   SourceTrustPanel,
 } from "@/app/components/public/core";
 import TrustBar from "@/app/components/public/TrustBar";
@@ -29,10 +28,15 @@ import ScoreExplanation from "@/app/components/public/ScoreExplanation";
 import InsightCard from "@/app/components/public/InsightCard";
 import {
   PresidentHero,
-  PresidentMetricsRow,
   PresidentPolicyTable,
   PromiseTimeline,
 } from "@/app/components/public/entities";
+import {
+  MetricCard,
+  Panel,
+  SectionHeader,
+  StatusPill,
+} from "@/app/components/dashboard/primitives";
 import {
   buildBreadcrumbJsonLd,
   buildProfilePageJsonLd,
@@ -92,11 +96,76 @@ function formatBillRelationshipType(type) {
     .join(" ");
 }
 
+function getConfidenceTone(value) {
+  const label = String(value || "").toLowerCase();
+  if (label.includes("high") || label.includes("strong")) {
+    return "verified";
+  }
+  if (label.includes("medium") || label.includes("moderate")) {
+    return "warning";
+  }
+  if (label.includes("low") || label.includes("weak")) {
+    return "danger";
+  }
+  return "default";
+}
+
+function getDirectionTone(value) {
+  const label = String(value || "").toLowerCase();
+  if (label.includes("positive") || label.includes("delivered")) {
+    return "success";
+  }
+  if (label.includes("negative") || label.includes("failed")) {
+    return "danger";
+  }
+  if (label.includes("mixed") || label.includes("blocked") || label.includes("partial")) {
+    return "contested";
+  }
+  return "default";
+}
+
+function getPromiseStatusTone(status) {
+  const label = String(status || "").toLowerCase();
+  if (label.includes("delivered")) {
+    return "success";
+  }
+  if (label.includes("progress")) {
+    return "info";
+  }
+  if (label.includes("partial")) {
+    return "warning";
+  }
+  if (label.includes("blocked")) {
+    return "contested";
+  }
+  if (label.includes("failed")) {
+    return "danger";
+  }
+  return "default";
+}
+
+function getBillStatusTone(status) {
+  const label = String(status || "").toLowerCase();
+  if (label.includes("enacted") || label.includes("became law") || label.includes("passed")) {
+    return "success";
+  }
+  if (label.includes("introduced") || label.includes("referred") || label.includes("pending")) {
+    return "info";
+  }
+  if (label.includes("failed") || label.includes("vetoed")) {
+    return "danger";
+  }
+  return "default";
+}
+
 function LinkedBillCard({ item }) {
   return (
-    <Link
+    <Panel
+      as={Link}
       href={item.detailHref}
-      className="flex min-w-0 flex-col rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4 hover:border-[rgba(132,247,198,0.24)]"
+      padding="md"
+      interactive
+      className="flex min-w-0 flex-col"
     >
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="min-w-0 flex-1">
@@ -109,38 +178,28 @@ function LinkedBillCard({ item }) {
         </div>
         <ScoreBadge value={String(item.blackImpactScore)} label="Bill BIS" />
       </div>
-      <div className="mt-3 flex flex-wrap gap-2 text-xs text-[var(--ink-muted)]">
+      <div className="mt-3 flex flex-wrap gap-2">
         {item.primaryDomain ? (
-          <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5">
+          <StatusPill tone="default">
             {item.primaryDomain}
-          </span>
+          </StatusPill>
         ) : null}
         {item.status ? (
-          <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5">
+          <StatusPill tone={getBillStatusTone(item.status)}>
             {item.status}
-          </span>
+          </StatusPill>
         ) : null}
-        <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5">
+        <StatusPill tone="info">
           {formatBillRelationshipType(item.relationshipType)}
-        </span>
-        <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5">
+        </StatusPill>
+        <StatusPill tone={getConfidenceTone(item.impactConfidence)}>
           {item.impactConfidence} confidence
-        </span>
+        </StatusPill>
       </div>
       <p className="mt-3 line-clamp-4 text-sm leading-7 text-[var(--ink-soft)]">
         {item.whyItMatters || "Open the bill detail page for the full tracked record and linked context."}
       </p>
-    </Link>
-  );
-}
-
-function ProfilePanel({ children, className = "" }) {
-  return (
-    <section
-      className={`rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5 md:p-6 ${className}`}
-    >
-      {children}
-    </section>
+    </Panel>
   );
 }
 
@@ -150,14 +209,6 @@ function humanizeToken(value) {
     .filter(Boolean)
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(" ");
-}
-
-function BreakdownPill({ label, value }) {
-  return (
-    <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-[var(--ink-soft)]">
-      {label} {value}
-    </span>
-  );
 }
 
 function buildPresidentOverview(profile, editorial = null) {
@@ -410,129 +461,127 @@ export default async function PresidentProfilePage({ params }) {
 
       <TrustBar />
 
-      <PresidentMetricsRow
-        items={[
-          {
-            label: "Outcome-based confidence",
-            value: president.direct_score_confidence || president.score_confidence || "Unknown",
-            detail: `The final score remains anchored by ${president.direct_outcome_count ?? president.outcome_count ?? 0} scored outcomes.`,
-          },
-          {
-            label: "Promises tracked",
-            value: promiseTracker.visible_promise_count ?? promiseTracker.total_tracked_promises ?? 0,
-            detail: `${promiseTracker.visible_outcome_count ?? 0} linked outcomes currently visible.`,
-          },
-          {
-            label: "Delivered promises",
-            value: promiseTracker.visible_delivered_count ?? promiseTracker.delivered_count ?? 0,
-            detail: "Promise tracker performance stays separate from the impact score.",
-          },
-          {
-            label: "Source references",
-            value: promiseTracker.visible_source_count ?? 0,
-            detail: "These totals reflect visible promise-tracker source references, not guaranteed unique source rows.",
-          },
-          {
-            label: "Linked bills",
-            value: billInputs.linked_bill_count ?? 0,
-            detail: `${billInputs.linked_promises_with_bill_support ?? 0} promise-backed bill joins currently support this profile.`,
-          },
-        ]}
-      />
+      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+        <MetricCard
+          label="Outcome confidence"
+          value={president.direct_score_confidence || president.score_confidence || "Unknown"}
+          description={`Anchored by ${president.direct_outcome_count ?? president.outcome_count ?? 0} scored outcomes.`}
+          tone={getConfidenceTone(president.direct_score_confidence || president.score_confidence)}
+          showDot
+        />
+        <MetricCard
+          label="Promises tracked"
+          value={promiseTracker.visible_promise_count ?? promiseTracker.total_tracked_promises ?? 0}
+          description={`${promiseTracker.visible_outcome_count ?? 0} linked outcomes currently visible.`}
+          tone="info"
+        />
+        <MetricCard
+          label="Delivered"
+          value={promiseTracker.visible_delivered_count ?? promiseTracker.delivered_count ?? 0}
+          description="Promise performance stays separate from impact scoring."
+          tone="success"
+        />
+        <MetricCard
+          label="Source references"
+          value={promiseTracker.visible_source_count ?? 0}
+          description="Visible promise-tracker references, not unique source rows."
+          tone="verified"
+        />
+        <MetricCard
+          label="Linked bills"
+          value={billInputs.linked_bill_count ?? 0}
+          description={`${billInputs.linked_promises_with_bill_support ?? 0} promise-backed bill joins.`}
+          tone="default"
+        />
+      </section>
 
-      <ProfilePanel className="space-y-5">
-        <SectionIntro
+      <Panel padding="lg" prominence="primary" className="space-y-5">
+        <SectionHeader
           eyebrow="Score breakdown"
           title="Why this president has this score"
           description={scoreComposition.summary_line}
-          actions={
+          action={
             <Link href="/research/how-black-impact-score-works" className="public-button-secondary">
               Read the full scoring methodology
             </Link>
           }
+          bordered={false}
         />
         <div className="grid gap-4 xl:grid-cols-3">
-          <div className="rounded-[1.4rem] border border-white/8 bg-white/5 p-5">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--accent)]">
-              Direct impact
-            </p>
-            <p className="mt-3 text-2xl font-semibold text-white">
-              {scoreComposition.direct.outcome_count} outcomes
-            </p>
-            <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
-              Direct impact reflects what actually happened in the scored outcome record before broader interpretation.
-            </p>
-            <div className="mt-4 flex flex-wrap gap-2">
-              {Object.entries(scoreComposition.direct.direction_counts).map(([label, value]) => (
-                <BreakdownPill key={label} label={label} value={value} />
+          <MetricCard
+            label="Direct impact"
+            value={`${scoreComposition.direct.outcome_count} outcomes`}
+            description="What actually happened in the scored outcome record before broader interpretation."
+            tone="verified"
+            prominence="primary"
+          >
+            <div className="flex flex-wrap gap-2">
+              {Object.entries(scoreComposition.direct.direction_counts || {}).map(([label, value]) => (
+                <StatusPill key={label} tone={getDirectionTone(label)}>
+                  {humanizeToken(label)} {value}
+                </StatusPill>
               ))}
             </div>
-          </div>
+          </MetricCard>
 
-          <div className="rounded-[1.4rem] border border-white/8 bg-white/5 p-5">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--accent)]">
-              Intent
-            </p>
-            <p className="mt-3 text-2xl font-semibold text-white">
-              {scoreComposition.intent.classified_outcome_count} classified
-            </p>
-            <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
-              Intent modifies interpretation, not historical reality. These counts show how the linked policies behind scored outcomes are classified.
-            </p>
-            <div className="mt-4 flex flex-wrap gap-2">
-              {Object.entries(scoreComposition.intent.counts).map(([label, value]) => (
-                <BreakdownPill key={label} label={humanizeToken(label)} value={value} />
+          <MetricCard
+            label="Intent"
+            value={`${scoreComposition.intent.classified_outcome_count} classified`}
+            description="How linked policies behind scored outcomes are classified without replacing the outcome record."
+            tone="info"
+          >
+            <div className="flex flex-wrap gap-2">
+              {Object.entries(scoreComposition.intent.counts || {}).map(([label, value]) => (
+                <StatusPill key={label}>
+                  {humanizeToken(label)} {value}
+                </StatusPill>
               ))}
             </div>
-          </div>
+          </MetricCard>
 
-          <div className="rounded-[1.4rem] border border-white/8 bg-white/5 p-5">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--accent)]">
-              Systemic effect
-            </p>
-            <p className="mt-3 text-2xl font-semibold text-white">
-              {scoreComposition.systemic.weighted_outcome_count} weighted
-            </p>
-            <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
-              Systemic weighting captures long-run institutional effect. Most rows remain standard unless a stronger structural case has been curated.
-            </p>
-            <div className="mt-4 flex flex-wrap gap-2">
-              {Object.entries(scoreComposition.systemic.counts).map(([label, value]) => (
-                <BreakdownPill key={label} label={humanizeToken(label)} value={value} />
+          <MetricCard
+            label="Systemic effect"
+            value={`${scoreComposition.systemic.weighted_outcome_count} weighted`}
+            description="Long-run institutional effect, with most rows remaining standard unless curated otherwise."
+            tone="default"
+          >
+            <div className="flex flex-wrap gap-2">
+              {Object.entries(scoreComposition.systemic.counts || {}).map(([label, value]) => (
+                <StatusPill key={label}>
+                  {humanizeToken(label)} {value}
+                </StatusPill>
               ))}
             </div>
-          </div>
+          </MetricCard>
         </div>
-        <div className="rounded-[1.2rem] border border-[rgba(132,247,198,0.16)] bg-[rgba(7,32,52,0.45)] px-4 py-4">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--accent)]">
-            What this means
-          </p>
-          <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
+        <Panel padding="md" className="space-y-2">
+          <StatusPill tone="info">What this means</StatusPill>
+          <p className="text-sm leading-7 text-[var(--ink-soft)]">
             {scoreComposition.interpretation}
           </p>
-        </div>
-      </ProfilePanel>
+        </Panel>
+      </Panel>
 
       <section className="grid gap-4 md:grid-cols-3">
         {buildPresidentGuideCards(profile, flagshipEditorial).map((item) => (
-          <div
+          <Panel
             key={item.title}
-            className="rounded-[1.4rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5"
+            padding="lg"
+            className="space-y-3"
           >
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--accent)]">
-              {item.eyebrow}
-            </p>
-            <h2 className="mt-3 text-lg font-semibold text-white">{item.title}</h2>
-            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item.description}</p>
-          </div>
+            <StatusPill tone="info">{item.eyebrow}</StatusPill>
+            <h2 className="text-lg font-semibold text-white">{item.title}</h2>
+            <p className="text-sm leading-7 text-[var(--ink-soft)]">{item.description}</p>
+          </Panel>
         ))}
       </section>
 
-      <ProfilePanel>
-        <SectionIntro
+      <Panel padding="lg">
+        <SectionHeader
           eyebrow="Context and background"
           title="What this presidential page shows in practice"
           description="This added context is meant to keep shorter profile narratives anchored in the visible promise, policy, and bill record already attached to the page."
+          bordered={false}
         />
         <div className="mt-5 grid gap-4">
           {contextParagraphs.map((paragraph, index) => (
@@ -541,50 +590,69 @@ export default async function PresidentProfilePage({ params }) {
             </p>
           ))}
         </div>
-      </ProfilePanel>
+      </Panel>
 
-      <ProfilePanel className="space-y-5">
-        <SectionIntro
+      <Panel padding="lg" className="space-y-5">
+        <SectionHeader
           eyebrow="Bill-informed signals"
           title="Legislation linked to this presidential record"
           description="These bill-linked inputs help connect the presidency to legislation, promises, and the wider historical record affecting Black Americans."
+          bordered={false}
         />
         {Number(billInputs.linked_bill_count || 0) > 0 ? (
           <>
             <div className="grid gap-4 md:grid-cols-2">
-              <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+              <Panel padding="lg" className="space-y-4">
                 <h3 className="text-lg font-semibold text-white">Bill input summary</h3>
-                <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+                <p className="text-sm leading-7 text-[var(--ink-soft)]">
                   {president.bill_input_summary} The final Black Impact Score blends this bill-informed layer in as a capped modifier rather than letting bill links override the outcome-based record.
                 </p>
-                <div className="mt-4 grid gap-3 text-sm text-[var(--ink-soft)]">
-                  <p>Unweighted avg bill BIS: {formatScore(billInputs.linked_bill_score_avg)}</p>
-                  <p>Weighted avg bill BIS: {formatScore(billInputs.linked_bill_score_weighted)}</p>
-                  <p>Linked bills influence: {formatScore(billInputs.bill_blend_weight_pct)}%</p>
-                  <p>Positive / Mixed / Negative: {billInputs.linked_positive_bill_count || 0} / {billInputs.linked_mixed_bill_count || 0} / {billInputs.linked_negative_bill_count || 0}</p>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <MetricCard
+                    label="Unweighted bill BIS"
+                    value={formatScore(billInputs.linked_bill_score_avg)}
+                    density="compact"
+                  />
+                  <MetricCard
+                    label="Weighted bill BIS"
+                    value={formatScore(billInputs.linked_bill_score_weighted)}
+                    density="compact"
+                  />
+                  <MetricCard
+                    label="Bill influence"
+                    value={`${formatScore(billInputs.bill_blend_weight_pct)}%`}
+                    density="compact"
+                    tone="info"
+                  />
+                  <MetricCard
+                    label="Direction mix"
+                    value={`${billInputs.linked_positive_bill_count || 0} / ${billInputs.linked_mixed_bill_count || 0} / ${billInputs.linked_negative_bill_count || 0}`}
+                    description="Positive / mixed / negative linked bills"
+                    density="compact"
+                  />
                 </div>
-              </div>
-              <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+              </Panel>
+              <Panel padding="lg" className="space-y-4">
                 <h3 className="text-lg font-semibold text-white">Evidence and domains</h3>
-                <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+                <p className="text-sm leading-7 text-[var(--ink-soft)]">
                   Join confidence stays bounded by the existing promise lineage and the bill’s own evidence depth.
                 </p>
-                <p className="mt-4 text-sm leading-7 text-[var(--ink-soft)]">
+                <p className="text-sm leading-7 text-[var(--ink-soft)]">
                   Bill confidence mix: {formatBillConfidenceSummary(billInputs.linked_bill_confidence_summary)}
                 </p>
-                <p className="mt-4 text-sm leading-7 text-[var(--ink-soft)]">
-                  Blend status: {billInputs.bill_influence_label || "No bill-linked inputs"}
-                </p>
-                <div className="mt-4 flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2">
+                  <StatusPill tone="info">
+                    Blend status: {billInputs.bill_influence_label || "No bill-linked inputs"}
+                  </StatusPill>
                   {(billInputs.linked_bill_domains || []).map((item) => (
-                    <span key={item.domain} className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-[var(--ink-soft)]">
-                      {item.domain} • {item.count}
-                    </span>
+                    <StatusPill key={item.domain} tone="default">
+                      {item.domain} {item.count}
+                    </StatusPill>
                   ))}
                 </div>
-              </div>
+              </Panel>
             </div>
-            <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+            <Panel padding="lg">
               <h3 className="text-lg font-semibold text-white">Top linked bills</h3>
               <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
                 These are the strongest currently linked bills by bill-level BIS contribution within this president’s existing promise-linked legislative context.
@@ -595,19 +663,19 @@ export default async function PresidentProfilePage({ params }) {
                     <LinkedBillCard key={item.slug || item.id} item={item} />
                   ))
                 ) : (
-                  <div className="rounded-[1.1rem] border border-dashed border-white/12 bg-white/4 px-4 py-4 text-sm leading-7 text-[var(--ink-soft)] md:col-span-2">
+                  <Panel padding="md" className="border-dashed text-sm leading-7 text-[var(--ink-soft)] md:col-span-2">
                     No linked bills are available to rank for this profile yet.
-                  </div>
+                  </Panel>
                 )}
               </div>
-            </div>
+            </Panel>
           </>
         ) : (
-          <div className="rounded-[1.4rem] border border-dashed border-white/12 bg-white/4 p-5 text-sm leading-7 text-[var(--ink-soft)]">
+          <Panel padding="lg" className="border-dashed text-sm leading-7 text-[var(--ink-soft)]">
             No tracked bills currently reach this president through supported promise lineage, so no bill-informed inputs are shown yet.
-          </div>
+          </Panel>
         )}
-      </ProfilePanel>
+      </Panel>
 
       <section className="grid items-start gap-6 2xl:grid-cols-[1.1fr_0.9fr]">
         <div className="space-y-5 2xl:self-start">
@@ -617,9 +685,9 @@ export default async function PresidentProfilePage({ params }) {
             description={trend?.interpretation || "Read the yearly score path, cumulative movement, and strongest shifts over time."}
           />
           {!trend?.score_by_year?.length ? (
-            <div className="rounded-[1.4rem] border border-dashed border-white/12 bg-white/4 p-5 text-sm leading-7 text-[var(--ink-soft)]">
+            <Panel padding="lg" className="border-dashed text-sm leading-7 text-[var(--ink-soft)]">
               No dated outcome series are available for this profile yet.
-            </div>
+            </Panel>
           ) : null}
         </div>
         <div className="space-y-5">
@@ -629,18 +697,19 @@ export default async function PresidentProfilePage({ params }) {
             description="Topic contributions explain where the score is actually coming from."
           />
           {!topicData.length ? (
-            <div className="rounded-[1.4rem] border border-dashed border-white/12 bg-white/4 p-5 text-sm leading-7 text-[var(--ink-soft)]">
+            <Panel padding="lg" className="border-dashed text-sm leading-7 text-[var(--ink-soft)]">
               Topic-level contribution data is not available for this presidential record yet.
-            </div>
+            </Panel>
           ) : null}
         </div>
       </section>
 
-      <ProfilePanel className="space-y-5">
-        <SectionIntro
+      <Panel padding="lg" className="space-y-5">
+        <SectionHeader
           eyebrow="Top records"
           title="Policies and promises shaping this record"
           description="Open the most consequential underlying policies and promises instead of treating the presidential score as self-explanatory."
+          bordered={false}
         />
         {topPolicies.length ? (
           <PresidentPolicyTable
@@ -650,9 +719,9 @@ export default async function PresidentProfilePage({ params }) {
             }
           />
         ) : (
-          <div className="rounded-[1.4rem] border border-dashed border-white/12 bg-white/4 p-5 text-sm leading-7 text-[var(--ink-soft)]">
+          <Panel padding="lg" className="border-dashed text-sm leading-7 text-[var(--ink-soft)]">
             No top contributing policy records are attached to this profile yet.
-          </div>
+          </Panel>
         )}
         <div className="grid gap-4 md:grid-cols-2">
           <SourceTrustPanel
@@ -681,26 +750,32 @@ export default async function PresidentProfilePage({ params }) {
             linkLabel="Read score architecture"
           />
         </div>
-      </ProfilePanel>
+      </Panel>
 
-      <ProfilePanel className="space-y-5">
-        <SectionIntro
+      <Panel padding="lg" className="space-y-5">
+        <SectionHeader
           eyebrow="What shaped this score"
           title="Driver visibility"
           description="The presidential score should be readable as a structured result, not a mystery number. These drivers show where the strongest movement came from in the available dataset."
+          bordered={false}
         />
         <div className="grid gap-4 md:grid-cols-2">
-          <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+          <Panel padding="lg">
             <h3 className="text-lg font-semibold text-white">Strongest positive drivers</h3>
             {(scoreDrivers?.strongest_positive || []).length ? (
               <div className="mt-4 grid gap-3">
                 {scoreDrivers.strongest_positive.map((item, index) => (
-                  <div key={`${item.slug || item.title}-${index}`} className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+                  <Panel key={`${item.slug || item.title}-${index}`} padding="md">
                     <p className="text-sm font-medium text-white">{item.title}</p>
-                    <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
-                      {item.topic || item.category || "Policy record"} • {item.status || item.impact_direction || "Scored record"}
-                    </p>
-                  </div>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <StatusPill tone="default">
+                        {item.topic || item.category || "Policy record"}
+                      </StatusPill>
+                      <StatusPill tone={getDirectionTone(item.status || item.impact_direction)}>
+                        {item.status || item.impact_direction || "Scored record"}
+                      </StatusPill>
+                    </div>
+                  </Panel>
                 ))}
               </div>
             ) : (
@@ -708,18 +783,23 @@ export default async function PresidentProfilePage({ params }) {
                 {scoreDrivers?.score_scope_note || "This score is based on available policy records in the current EquityStack dataset."}
               </p>
             )}
-          </div>
-          <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+          </Panel>
+          <Panel padding="lg">
             <h3 className="text-lg font-semibold text-white">Strongest negative drivers</h3>
             {(scoreDrivers?.strongest_negative || []).length ? (
               <div className="mt-4 grid gap-3">
                 {scoreDrivers.strongest_negative.map((item, index) => (
-                  <div key={`${item.slug || item.title}-${index}`} className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+                  <Panel key={`${item.slug || item.title}-${index}`} padding="md">
                     <p className="text-sm font-medium text-white">{item.title}</p>
-                    <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
-                      {item.topic || item.category || "Policy record"} • {item.status || item.impact_direction || "Scored record"}
-                    </p>
-                  </div>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <StatusPill tone="default">
+                        {item.topic || item.category || "Policy record"}
+                      </StatusPill>
+                      <StatusPill tone={getDirectionTone(item.status || item.impact_direction)}>
+                        {item.status || item.impact_direction || "Scored record"}
+                      </StatusPill>
+                    </div>
+                  </Panel>
                 ))}
               </div>
             ) : (
@@ -727,22 +807,22 @@ export default async function PresidentProfilePage({ params }) {
                 {scoreDrivers?.score_scope_note || "This score is based on available policy records in the current EquityStack dataset."}
               </p>
             )}
-          </div>
+          </Panel>
         </div>
         <div className="grid gap-4 md:grid-cols-2">
-          <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+          <Panel padding="lg">
             <h3 className="text-lg font-semibold text-white">Topic contributions</h3>
             {(scoreDrivers?.topic_drivers || []).length ? (
               <div className="mt-4 grid gap-3">
                 {scoreDrivers.topic_drivers.map((item) => (
-                  <div key={item.topic} className="rounded-[1.1rem] border border-white/8 bg-white/5 px-4 py-4">
+                  <Panel key={item.topic} padding="md">
                     <div className="flex items-center justify-between gap-3">
                       <p className="text-sm font-medium text-white">{item.topic}</p>
-                      <span className="text-sm font-medium text-[var(--accent)]">
+                      <span className="text-sm font-medium text-[var(--info)]">
                         {Number(item.raw_score_total || 0).toFixed(2)}
                       </span>
                     </div>
-                  </div>
+                  </Panel>
                 ))}
               </div>
             ) : (
@@ -750,158 +830,168 @@ export default async function PresidentProfilePage({ params }) {
                 This score is based on available policy records in the current EquityStack dataset.
               </p>
             )}
-          </div>
-          <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
+          </Panel>
+          <Panel padding="lg" className="space-y-4">
             <h3 className="text-lg font-semibold text-white">Impact Direction mix</h3>
-            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-              Positive {scoreDrivers?.direction_breakdown?.Positive || 0} • Negative {scoreDrivers?.direction_breakdown?.Negative || 0} • Mixed {scoreDrivers?.direction_breakdown?.Mixed || 0} • Blocked {scoreDrivers?.direction_breakdown?.Blocked || 0}
-            </p>
-            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+            <div className="flex flex-wrap gap-2">
+              {Object.entries({
+                Positive: scoreDrivers?.direction_breakdown?.Positive || 0,
+                Negative: scoreDrivers?.direction_breakdown?.Negative || 0,
+                Mixed: scoreDrivers?.direction_breakdown?.Mixed || 0,
+                Blocked: scoreDrivers?.direction_breakdown?.Blocked || 0,
+              }).map(([label, value]) => (
+                <StatusPill key={label} tone={getDirectionTone(label)}>
+                  {humanizeToken(label)} {value}
+                </StatusPill>
+              ))}
+            </div>
+            <p className="text-sm leading-7 text-[var(--ink-soft)]">
               Mixed and blocked outcomes stay visible because presidential scores should not hide conflicting or incomplete implementation.
             </p>
-          </div>
+          </Panel>
         </div>
-      </ProfilePanel>
+      </Panel>
 
-      <ProfilePanel className="space-y-5">
-          <SectionIntro
-            eyebrow="Promise tracker snapshot"
-            title="Promise tracker context for this president"
-            description="Promise status stays visible here because campaign and governing commitments help explain the broader historical record and policy impact on Black Americans."
+      <Panel padding="lg" className="space-y-5">
+        <SectionHeader
+          eyebrow="Promise tracker snapshot"
+          title="Promise tracker context for this president"
+          description="Promise status stays visible here because campaign and governing commitments help explain the broader historical record and policy impact on Black Americans."
+          bordered={false}
+        />
+        <PromiseSystemExplanation />
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-6">
+          <MetricCard
+            label="Promises tracked"
+            value={promiseTracker.visible_promise_count ?? 0}
+            description="Visible promise records in the current tracker set."
+            tone="info"
+            density="compact"
           />
-          <PromiseSystemExplanation />
-          <PresidentMetricsRow
-            items={[
-              {
-                label: "Promises tracked",
-                value: promiseTracker.visible_promise_count ?? 0,
-                detail: "Visible promise records in the current tracker set for this presidential profile.",
-              },
-              {
-                label: "Delivered",
-                value: promiseStatusSnapshot.Delivered ?? 0,
-                detail: "Promises with documented implemented policy action.",
-              },
-              {
-                label: "In Progress",
-                value: promiseStatusSnapshot["In Progress"] ?? 0,
-                detail: "Promises with ongoing or incomplete implementation.",
-              },
-              {
-                label: "Partial",
-                value: promiseStatusSnapshot.Partial ?? 0,
-                detail: "Promises with meaningful but incomplete documented implementation.",
-              },
-              {
-                label: "Blocked",
-                value: promiseStatusSnapshot.Blocked ?? 0,
-                detail: "Promises that did not reach implementation because of visible barriers.",
-              },
-              {
-                label: "Failed",
-                value: promiseStatusSnapshot.Failed ?? 0,
-                detail: "Promises not fulfilled in the current documented record.",
-              },
-            ]}
-          />
-          <div className="rounded-[1.6rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
-            <h3 className="text-lg font-semibold text-white">How to interpret promise outcomes</h3>
-            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-              Promise outcomes provide context for how stated goals translated into documented policy action. They help explain implementation, but they are not the same thing as presidential Impact Score.
-            </p>
-          </div>
-      </ProfilePanel>
+          {[
+            ["Delivered", "Promises with documented implemented policy action."],
+            ["In Progress", "Promises with ongoing or incomplete implementation."],
+            ["Partial", "Meaningful but incomplete documented implementation."],
+            ["Blocked", "Did not reach implementation because of visible barriers."],
+            ["Failed", "Not fulfilled in the current documented record."],
+          ].map(([label, description]) => (
+            <MetricCard
+              key={label}
+              label={label}
+              value={promiseStatusSnapshot[label] ?? 0}
+              description={description}
+              tone={getPromiseStatusTone(label)}
+              density="compact"
+            />
+          ))}
+        </div>
+        <Panel padding="lg" className="space-y-3">
+          <h3 className="text-lg font-semibold text-white">How to interpret promise outcomes</h3>
+          <p className="text-sm leading-7 text-[var(--ink-soft)]">
+            Promise outcomes provide context for how stated goals translated into documented policy action. They help explain implementation, but they are not the same thing as presidential Impact Score.
+          </p>
+        </Panel>
+      </Panel>
 
-      <ProfilePanel className="space-y-5">
-        <SectionIntro
+      <Panel padding="lg" className="space-y-5">
+        <SectionHeader
           eyebrow="Continue exploring"
           title="Where to go next from this presidential record"
           description="Profiles should lead naturally into compare, methodology, and underlying record detail."
+          bordered={false}
         />
         <div className="grid gap-4 md:grid-cols-2">
           {(flagshipEditorial?.priorityLinks || []).map((item) => (
-            <Link key={item.href} href={item.href} className="panel-link rounded-[1.5rem] p-5">
+            <Panel
+              key={item.href}
+              as={Link}
+              href={item.href}
+              padding="lg"
+              interactive
+            >
               <h3 className="text-lg font-semibold text-white">{item.title}</h3>
               <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
                 {item.description}
               </p>
-            </Link>
+            </Panel>
           ))}
-          <Link href="/research" className="panel-link rounded-[1.5rem] p-5">
+          <Panel as={Link} href="/research" padding="lg" interactive>
             <h3 className="text-lg font-semibold text-white">Return to the research hub</h3>
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
               Use the curated research hub when this profile opens into a larger question about civil-rights law, thematic analysis, explainers, or public methods.
             </p>
-          </Link>
-          <Link href="/analysis/presidential-impact-on-black-americans" className="panel-link rounded-[1.5rem] p-5">
+          </Panel>
+          <Panel as={Link} href="/analysis/presidential-impact-on-black-americans" padding="lg" interactive>
             <h3 className="text-lg font-semibold text-white">Explore presidential impact on Black Americans</h3>
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
               Move into the broader synthesis page when you want to compare this presidency against the wider historical impact question rather than this profile alone.
             </p>
-          </Link>
-          <Link href={`/compare/presidents?compare=${slug}`} className="panel-link rounded-[1.5rem] p-5">
+          </Panel>
+          <Panel as={Link} href={`/compare/presidents?compare=${slug}`} padding="lg" interactive>
             <h3 className="text-lg font-semibold text-white">Compare this president</h3>
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
               Add other presidents to compare direct score, systemic score, topic differences, and directional contrast.
             </p>
-          </Link>
-          <Link href="/methodology" className="panel-link rounded-[1.5rem] p-5">
+          </Panel>
+          <Panel as={Link} href="/methodology" padding="lg" interactive>
             <h3 className="text-lg font-semibold text-white">Review the methodology</h3>
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
               Read how low-coverage damping, confidence, evidence, and score-family separation work before drawing conclusions.
             </p>
-          </Link>
-          <Link href="/reports/black-impact-score" className="panel-link rounded-[1.5rem] p-5">
+          </Panel>
+          <Panel as={Link} href="/reports/black-impact-score" padding="lg" interactive>
             <h3 className="text-lg font-semibold text-white">Open the flagship report</h3>
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
               Use the report view when you want broader ranking context or public-facing interpretation across presidents.
             </p>
-          </Link>
+          </Panel>
         </div>
-      </ProfilePanel>
+      </Panel>
 
-      <ProfilePanel className="space-y-5">
-          <SectionIntro
-            eyebrow="Timeline"
-            title="Promise and policy chronology"
-            description="The profile timeline helps users place campaign promises and policy movement into a clearer historical sequence."
-          />
-          {timelineItems.length ? (
-            <PromiseTimeline items={timelineItems} />
-          ) : (
-            <div className="rounded-[1.4rem] border border-dashed border-white/12 bg-white/4 p-5 text-sm leading-7 text-[var(--ink-soft)]">
-              No dated promise records are attached to this profile yet.
-            </div>
-          )}
-      </ProfilePanel>
+      <Panel padding="lg" className="space-y-5">
+        <SectionHeader
+          eyebrow="Timeline"
+          title="Promise and policy chronology"
+          description="The profile timeline helps users place campaign promises and policy movement into a clearer historical sequence."
+          bordered={false}
+        />
+        {timelineItems.length ? (
+          <PromiseTimeline items={timelineItems} />
+        ) : (
+          <Panel padding="lg" className="border-dashed text-sm leading-7 text-[var(--ink-soft)]">
+            No dated promise records are attached to this profile yet.
+          </Panel>
+        )}
+      </Panel>
 
-      <ProfilePanel className="space-y-5">
-        <SectionIntro
+      <Panel padding="lg" className="space-y-5">
+        <SectionHeader
           eyebrow="Related routes"
           title="Keep researching this president through linked records"
           description="Every presidential profile should make it easy to move from summary into promises, legislation, comparison tools, and methodology."
+          bordered={false}
         />
         <div className="grid gap-4 md:grid-cols-2">
-          <Link href={`/promises/president/${slug}`} className="panel-link rounded-[1.5rem] p-5">
+          <Panel as={Link} href={`/promises/president/${slug}`} padding="lg" interactive>
             <h3 className="text-lg font-semibold text-white">Open this president&apos;s promise tracker</h3>
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
               Review delivered, partial, failed, and blocked promises for this presidency term in one place.
             </p>
-          </Link>
-          <Link href={presidentPoliciesHref} className="panel-link rounded-[1.5rem] p-5">
+          </Panel>
+          <Panel as={Link} href={presidentPoliciesHref} padding="lg" interactive>
             <h3 className="text-lg font-semibold text-white">Browse policies under {presidentName}</h3>
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
               Open the policy index filtered to this president to study legislation, executive actions, and court-era context tied to this record.
             </p>
-          </Link>
-          <Link href="/explainers" className="panel-link rounded-[1.5rem] p-5">
+          </Panel>
+          <Panel as={Link} href="/explainers" padding="lg" interactive>
             <h3 className="text-lg font-semibold text-white">Read related Black history explainers</h3>
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
               Use explainers when you need more historical or legal context before returning to the president, promise, or policy detail pages.
             </p>
-          </Link>
+          </Panel>
         </div>
-      </ProfilePanel>
+      </Panel>
     </main>
   );
 }
