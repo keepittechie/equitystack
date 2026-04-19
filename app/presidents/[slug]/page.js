@@ -40,6 +40,7 @@ import {
   SectionHeader,
   StatusPill,
 } from "@/app/components/dashboard/primitives";
+import EquityStackTabbar from "@/app/components/dashboard/EquityStackTabbar";
 import {
   buildBreadcrumbJsonLd,
   buildProfilePageJsonLd,
@@ -291,6 +292,23 @@ export default async function PresidentProfilePage({ params }) {
       title: item.title,
       description: item.summary || `${item.status} promise in ${item.topic || "uncategorized"} policy.`,
     }));
+  const localSectionOffsetClass = "scroll-mt-28 md:scroll-mt-32";
+  const visiblePromiseCount =
+    promiseTracker.visible_promise_count ?? promiseTracker.total_tracked_promises ?? 0;
+  const linkedBillCount = Number(billInputs.linked_bill_count || 0);
+  const localNavigationItems = [
+    { href: "#overview", label: "Overview" },
+    ...(timelineItems.length
+      ? [{ href: "#timeline", label: "Timeline", count: timelineItems.length }]
+      : []),
+    ...(visiblePromiseCount > 0
+      ? [{ href: "#promises", label: "Promises", count: visiblePromiseCount }]
+      : []),
+    ...(linkedBillCount > 0
+      ? [{ href: "#bills", label: "Bills", count: linkedBillCount }]
+      : []),
+    { href: "#related", label: "Related" },
+  ];
 
   return (
     <main className="space-y-4">
@@ -389,6 +407,17 @@ export default async function PresidentProfilePage({ params }) {
 
       <TrustBar />
 
+      <div className="space-y-2">
+        <p className="px-1 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
+          On this page
+        </p>
+        <EquityStackTabbar
+          items={localNavigationItems}
+          ariaLabel="President page sections"
+          defaultHref="#overview"
+        />
+      </div>
+
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
         <MetricCard
           label="Outcome confidence"
@@ -423,7 +452,7 @@ export default async function PresidentProfilePage({ params }) {
         />
       </section>
 
-      <Panel prominence="primary" className="overflow-hidden">
+      <Panel id="overview" prominence="primary" className={`${localSectionOffsetClass} overflow-hidden`}>
         <SectionHeader
           eyebrow="Score breakdown"
           title="Why this president has this score"
@@ -523,7 +552,7 @@ export default async function PresidentProfilePage({ params }) {
         </div>
       </Panel>
 
-      <Panel className="overflow-hidden">
+      <Panel id="bills" className={`${localSectionOffsetClass} overflow-hidden`}>
         <SectionHeader
           eyebrow="Bill-informed signals"
           title="Legislation linked to this presidential record"
@@ -831,7 +860,7 @@ export default async function PresidentProfilePage({ params }) {
         </div>
       </Panel>
 
-      <Panel className="overflow-hidden">
+      <Panel id="promises" className={`${localSectionOffsetClass} overflow-hidden`}>
         <SectionHeader
           eyebrow="Promise tracker snapshot"
           title="Promise tracker context for this president"
@@ -927,7 +956,7 @@ export default async function PresidentProfilePage({ params }) {
         </div>
       </Panel>
 
-      <Panel className="overflow-hidden">
+      <Panel id="timeline" className={`${localSectionOffsetClass} overflow-hidden`}>
         <SectionHeader
           eyebrow="Timeline"
           title="Promise and policy chronology"
@@ -944,7 +973,7 @@ export default async function PresidentProfilePage({ params }) {
         </div>
       </Panel>
 
-      <Panel className="overflow-hidden">
+      <Panel id="related" className={`${localSectionOffsetClass} overflow-hidden`}>
         <SectionHeader
           eyebrow="Related routes"
           title="Keep researching this president through linked records"

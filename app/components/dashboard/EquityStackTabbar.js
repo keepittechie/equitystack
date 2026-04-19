@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 function parseHref(href) {
   const [pathPart, hashPart] = String(href || "").split("#");
@@ -46,6 +46,7 @@ export default function EquityStackTabbar({
 }) {
   const pathname = usePathname();
   const [currentHash, setCurrentHash] = useState("");
+  const tabRefs = useRef(new Map());
 
   useEffect(() => {
     const syncHash = () => setCurrentHash(readCurrentHash());
@@ -59,14 +60,39 @@ export default function EquityStackTabbar({
       items.map((item) => ({
         ...item,
         key: item.key || item.href,
+        count:
+          Number.isFinite(Number(item.count)) && Number(item.count) > 0
+            ? Number(item.count)
+            : null,
       })),
     [items]
   );
 
+  useEffect(() => {
+    const activeItem = normalizedItems.find((item) =>
+      isTabActive({
+        href: item.href,
+        pathname,
+        currentHash,
+        defaultHref,
+      })
+    );
+
+    if (!activeItem) {
+      return;
+    }
+
+    const activeNode = tabRefs.current.get(activeItem.key);
+    activeNode?.scrollIntoView({
+      block: "nearest",
+      inline: "nearest",
+    });
+  }, [currentHash, defaultHref, normalizedItems, pathname]);
+
   return (
     <nav
       aria-label={ariaLabel}
-      className={`overflow-x-auto thin-scrollbar ${className}`}
+      className={`-mx-1 overflow-x-auto px-1 thin-scrollbar ${className}`}
     >
       <div className="inline-flex min-w-full gap-1 rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-1">
         {normalizedItems.map((item) => {
@@ -79,7 +105,7 @@ export default function EquityStackTabbar({
 
           const tabContent = (
             <>
-              <span className="truncate">{item.label}</span>
+              <span className="whitespace-nowrap">{item.label}</span>
               {item.count != null ? (
                 <span
                   className={`rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${
@@ -107,6 +133,13 @@ export default function EquityStackTabbar({
                 href={item.href}
                 className={className}
                 aria-current={active ? "location" : undefined}
+                ref={(node) => {
+                  if (node) {
+                    tabRefs.current.set(item.key, node);
+                  } else {
+                    tabRefs.current.delete(item.key);
+                  }
+                }}
               >
                 {tabContent}
               </a>
@@ -119,6 +152,13 @@ export default function EquityStackTabbar({
               href={item.href}
               className={className}
               aria-current={active ? "page" : undefined}
+              ref={(node) => {
+                if (node) {
+                  tabRefs.current.set(item.key, node);
+                } else {
+                  tabRefs.current.delete(item.key);
+                }
+              }}
             >
               {tabContent}
             </Link>

@@ -368,6 +368,7 @@ export default async function PolicyDetailPage({ params }) {
   const thinOutcome = isThinText(policy.outcome_summary, 140);
   const contextParagraphs = buildPolicyContextParagraphs(policy, flagshipEditorial);
   const systemicImpact = buildSystemicImpactCard(policy);
+  const localSectionOffsetClass = "scroll-mt-28 md:scroll-mt-32";
   const localNavigationItems = [
     { href: "#overview", label: "Overview" },
     ...(timeline.length
@@ -469,13 +470,18 @@ export default async function PolicyDetailPage({ params }) {
 
       <TrustBar />
 
-      <EquityStackTabbar
-        items={localNavigationItems}
-        ariaLabel="Policy page sections"
-        defaultHref="#overview"
-      />
+      <div className="space-y-2">
+        <p className="px-1 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
+          On this page
+        </p>
+        <EquityStackTabbar
+          items={localNavigationItems}
+          ariaLabel="Policy page sections"
+          defaultHref="#overview"
+        />
+      </div>
 
-      <Panel id="overview" prominence="primary" className="scroll-mt-24 overflow-hidden">
+      <Panel id="overview" prominence="primary" className={`${localSectionOffsetClass} overflow-hidden`}>
         <SectionHeader
           eyebrow="Policy takeaway"
           title="The record, classification, and evidence in one view"
@@ -568,7 +574,7 @@ export default async function PolicyDetailPage({ params }) {
         </div>
       </Panel>
 
-      <Panel id="summary" className="scroll-mt-24 overflow-hidden">
+      <Panel id="summary" className={`${localSectionOffsetClass} overflow-hidden`}>
         <SectionHeader
           eyebrow="Plain-language summary"
           title="What happened and why it matters"
@@ -628,7 +634,7 @@ export default async function PolicyDetailPage({ params }) {
           </Panel>
 
           {timeline.length ? (
-            <div id="timeline" className="scroll-mt-24">
+            <div id="timeline" className={localSectionOffsetClass}>
               <PolicyTimeline items={timeline} />
             </div>
           ) : null}
@@ -669,7 +675,7 @@ export default async function PolicyDetailPage({ params }) {
         </div>
       </Panel>
 
-      <Panel id="evidence" className="scroll-mt-24 overflow-hidden">
+      <Panel id="evidence" className={`${localSectionOffsetClass} overflow-hidden`}>
         <SectionHeader
           eyebrow="Evidence"
           title="Source trail"
@@ -686,7 +692,7 @@ export default async function PolicyDetailPage({ params }) {
         </div>
       </Panel>
 
-      <Panel id="related" className="scroll-mt-24 overflow-hidden">
+      <Panel id="related" className={`${localSectionOffsetClass} overflow-hidden`}>
         <SectionHeader
           eyebrow="Continue exploring"
           title="Promises, explainers, reports, and research paths"
