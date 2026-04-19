@@ -21,7 +21,6 @@ import StructuredData from "@/app/components/public/StructuredData";
 import { Breadcrumbs } from "@/app/components/public/chrome";
 import {
   MethodologyCallout,
-  PageContextBlock,
   SourceTrustPanel,
   CitationNote,
 } from "@/app/components/public/core";
@@ -29,7 +28,6 @@ import TrustBar from "@/app/components/public/TrustBar";
 import ScoreExplanation from "@/app/components/public/ScoreExplanation";
 import {
   EvidenceSourceList,
-  PolicyHero,
   PolicyTimeline,
   PromiseResultsTable,
 } from "@/app/components/public/entities";
@@ -404,59 +402,114 @@ export default async function PolicyDetailPage({ params }) {
         ]}
       />
 
-      <PolicyHero
-        title={policy.title}
-        summary={policy.summary || policy.outcome_summary}
-        score={formatScore(score)}
-        scoreLabel="Impact Score"
-        badges={badges}
-      />
+      <Panel prominence="primary" className="overflow-hidden">
+        <div className="grid gap-0 xl:grid-cols-[minmax(0,1fr)_18rem]">
+          <div className="min-w-0 border-b border-[var(--line)] p-4 xl:border-b-0 xl:border-r">
+            <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+              Policy record
+            </p>
+            <h1 className="mt-3 max-w-4xl text-[clamp(1.9rem,5.5vw,3.7rem)] font-semibold leading-[1] tracking-[-0.04em] text-white">
+              {policy.title}
+            </h1>
+            {policy.summary || policy.outcome_summary ? (
+              <p className="mt-4 max-w-3xl text-sm leading-6 text-[var(--ink-soft)] md:text-base md:leading-7">
+                {policy.summary || policy.outcome_summary}
+              </p>
+            ) : null}
+            {badges.length ? (
+              <div className="mt-5 flex flex-wrap gap-2">
+                {badges.map((badge) => (
+                  <StatusPill key={badge} tone="default">
+                    {badge}
+                  </StatusPill>
+                ))}
+              </div>
+            ) : null}
+          </div>
+          <aside className="grid content-start gap-3 p-4">
+            <MetricCard
+              label="Impact Score"
+              value={formatScore(score)}
+              description="Record-level policy score."
+              prominence="primary"
+              tone="info"
+              showDot
+            />
+            <MetricCard
+              label="Impact direction"
+              value={policy.impact_direction || "Unknown"}
+              description={policy.policy_type || "Policy record"}
+              density="compact"
+              tone={getImpactDirectionTone(policy.impact_direction)}
+              showDot
+            />
+          </aside>
+        </div>
+      </Panel>
 
       <TrustBar />
 
-      <Panel padding="md" prominence="primary" className="space-y-4">
+      <Panel prominence="primary" className="overflow-hidden">
         <SectionHeader
           eyebrow="Policy takeaway"
           title="The record, classification, and evidence in one view"
           description={buildWhatItMeans(policy)}
-          bordered={false}
         />
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <MetricCard
-            label="Impact direction"
-            value={policy.impact_direction || "Unknown"}
-            description={policy.policy_type || "Policy record"}
-            tone={getImpactDirectionTone(policy.impact_direction)}
-            showDot
-          />
-          <MetricCard
-            label="Impact score"
-            value={formatScore(score)}
-            description="Record-level policy score, separate from presidential aggregate scoring."
-            tone="info"
-          />
-          <MetricCard
-            label="Evidence"
-            value={policy.evidence_summary?.evidence_strength || "Limited"}
-            description={`${countLabel(policy.evidence_summary?.total_sources || 0, "source")} in the visible trail.`}
-            tone={getEvidenceTone(policy.evidence_summary?.evidence_strength)}
-          />
-          <MetricCard
-            label="Completeness"
-            value={policy.completeness_summary?.status || "Unknown"}
-            description={policy.year_enacted ? `Anchored in ${policy.year_enacted}.` : "No enacted year attached."}
-            tone={getCompletenessTone(policy.completeness_summary?.status)}
-          />
-        </div>
-        <div className="grid gap-4 md:grid-cols-2">
-          <PageContextBlock
-            description="Policy detail pages are the core evidence layer of EquityStack. Each one is meant to answer what happened, how the record is classified, and why it matters for Black Americans."
-            detail="Use this page when you want to verify a law, executive action, or court decision directly before moving into broader presidential, legislative, or historical comparisons."
-          />
-          <PageContextBlock
-            title="Why this page matters"
-            description="Search visitors often arrive with a broad question about civil-rights law, presidential impact, or historical harm. This page is where that question should become concrete through summary, score, sources, and related records."
-          />
+        <div className="space-y-4 p-4">
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <MetricCard
+              label="Impact direction"
+              value={policy.impact_direction || "Unknown"}
+              description={policy.policy_type || "Policy record"}
+              tone={getImpactDirectionTone(policy.impact_direction)}
+              showDot
+            />
+            <MetricCard
+              label="Impact score"
+              value={formatScore(score)}
+              description="Record-level policy score, separate from presidential aggregate scoring."
+              tone="info"
+            />
+            <MetricCard
+              label="Evidence"
+              value={policy.evidence_summary?.evidence_strength || "Limited"}
+              description={`${countLabel(policy.evidence_summary?.total_sources || 0, "source")} in the visible trail.`}
+              tone={getEvidenceTone(policy.evidence_summary?.evidence_strength)}
+            />
+            <MetricCard
+              label="Completeness"
+              value={policy.completeness_summary?.status || "Unknown"}
+              description={policy.year_enacted ? `Anchored in ${policy.year_enacted}.` : "No enacted year attached."}
+              tone={getCompletenessTone(policy.completeness_summary?.status)}
+            />
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            <Panel padding="md">
+              <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
+                Evidence layer
+              </p>
+              <h3 className="mt-2 text-base font-semibold text-white">
+                What this page is for
+              </h3>
+              <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
+                Policy detail pages are the core evidence layer of EquityStack. Each one is meant to answer what happened, how the record is classified, and why it matters for Black Americans.
+              </p>
+              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+                Use this page when you want to verify a law, executive action, or court decision directly before moving into broader presidential, legislative, or historical comparisons.
+              </p>
+            </Panel>
+            <Panel padding="md">
+              <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
+                Public read
+              </p>
+              <h3 className="mt-2 text-base font-semibold text-white">
+                Why this page matters
+              </h3>
+              <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
+                Search visitors often arrive with a broad question about civil-rights law, presidential impact, or historical harm. This page is where that question should become concrete through summary, score, sources, and related records.
+              </p>
+            </Panel>
+          </div>
         </div>
       </Panel>
 
@@ -474,14 +527,13 @@ export default async function PolicyDetailPage({ params }) {
         ))}
       </section>
 
-      <Panel padding="md">
+      <Panel className="overflow-hidden">
         <SectionHeader
           eyebrow="Context and background"
           title="What this policy page adds beyond the headline summary"
           description="This section helps keep shorter policy narratives useful by framing them with the supporting evidence, relationships, and record structure already present on the page."
-          bordered={false}
         />
-        <div className="mt-5 grid gap-4">
+        <div className="grid gap-4 p-4">
           {contextParagraphs.map((paragraph, index) => (
             <p key={`${policy.id}-context-${index}`} className="text-sm leading-8 text-[var(--ink-soft)]">
               {paragraph}
@@ -490,14 +542,13 @@ export default async function PolicyDetailPage({ params }) {
         </div>
       </Panel>
 
-      <Panel padding="md" className="space-y-4">
+      <Panel className="overflow-hidden">
         <SectionHeader
           eyebrow="Plain-language summary"
           title="What happened and why it matters"
           description="This page is the proof layer of the public site. It should let a reader move from score into explanation, evidence, and related records without guessing."
-          bordered={false}
         />
-        <div className="space-y-4">
+        <div className="space-y-4 p-4">
           <Panel padding="md">
             <StatusPill tone="info">What happened</StatusPill>
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
@@ -588,86 +639,87 @@ export default async function PolicyDetailPage({ params }) {
         </div>
       </Panel>
 
-      <Panel padding="md" className="space-y-4">
+      <Panel className="overflow-hidden">
         <SectionHeader
           eyebrow="Evidence"
           title="Source trail"
           description="Evidence should be visible immediately, not hidden behind a second click. Open the source list first if you want to verify the record before reading related content."
-          bordered={false}
         />
-        {policy.sources?.length ? (
-          <EvidenceSourceList items={policy.sources} />
-        ) : (
-          <Panel padding="md" className="border-dashed text-sm leading-7 text-[var(--ink-soft)]">
-            No evidence sources are attached to this policy record yet. Use related records or methodology for broader context.
-          </Panel>
-        )}
+        <div className="p-4">
+          {policy.sources?.length ? (
+            <EvidenceSourceList items={policy.sources} />
+          ) : (
+            <Panel padding="md" className="border-dashed text-sm leading-7 text-[var(--ink-soft)]">
+              No evidence sources are attached to this policy record yet. Use related records or methodology for broader context.
+            </Panel>
+          )}
+        </div>
       </Panel>
 
-      <Panel padding="md" className="space-y-4">
+      <Panel className="overflow-hidden">
         <SectionHeader
           eyebrow="Continue exploring"
           title="Promises, explainers, reports, and research paths"
           description="Related records make it easier to move from a single policy into campaign promises, Black history explainers, and broader presidential or administrative context."
-          bordered={false}
         />
-        {(policy.related_promises || []).length ? (
-          <PromiseResultsTable items={policy.related_promises} buildHref={(item) => `/promises/${item.slug}`} />
-        ) : (
-          <Panel padding="md" className="border-dashed text-sm leading-7 text-[var(--ink-soft)]">
-            No related promise records are linked to this policy yet.
-          </Panel>
-        )}
-        <div className="grid gap-4 md:grid-cols-2">
-          {(policy.related_explainers || []).map((item) => (
-            <Panel
-              key={item.slug}
-              as={Link}
-              href={`/explainers/${item.slug}`}
-              padding="md"
-              interactive
-            >
-              <StatusPill tone="info">
-                {item.category || "Explainer"}
-              </StatusPill>
-              <h3 className="mt-3 text-lg font-semibold text-white">{item.title}</h3>
-              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item.summary}</p>
+        <div className="space-y-4 p-4">
+          {(policy.related_promises || []).length ? (
+            <PromiseResultsTable items={policy.related_promises} buildHref={(item) => `/promises/${item.slug}`} />
+          ) : (
+            <Panel padding="md" className="border-dashed text-sm leading-7 text-[var(--ink-soft)]">
+              No related promise records are linked to this policy yet.
             </Panel>
-          ))}
-          <Panel as={Link} href="/reports/black-impact-score" padding="md" interactive>
-            <StatusPill tone="info">Related report</StatusPill>
-            <h3 className="mt-3 text-lg font-semibold text-white">Black Impact Score</h3>
-            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-              Move from this policy proof page into the flagship report when you want presidential or historical comparison context.
-            </p>
-          </Panel>
-          {researchPaths.map((item) => (
-            <Panel
-              key={item.href}
-              as={Link}
-              href={item.href}
-              padding="md"
-              interactive
-            >
-              <StatusPill tone="default">
-                {item.label}
-              </StatusPill>
-              <h3 className="mt-3 text-lg font-semibold text-white">{item.title}</h3>
-              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item.description}</p>
+          )}
+          <div className="grid gap-4 md:grid-cols-2">
+            {(policy.related_explainers || []).map((item) => (
+              <Panel
+                key={item.slug}
+                as={Link}
+                href={`/explainers/${item.slug}`}
+                padding="md"
+                interactive
+              >
+                <StatusPill tone="info">
+                  {item.category || "Explainer"}
+                </StatusPill>
+                <h3 className="mt-3 text-lg font-semibold text-white">{item.title}</h3>
+                <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item.summary}</p>
+              </Panel>
+            ))}
+            <Panel as={Link} href="/reports/black-impact-score" padding="md" interactive>
+              <StatusPill tone="info">Related report</StatusPill>
+              <h3 className="mt-3 text-lg font-semibold text-white">Black Impact Score</h3>
+              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+                Move from this policy proof page into the flagship report when you want presidential or historical comparison context.
+              </p>
             </Panel>
-          ))}
+            {researchPaths.map((item) => (
+              <Panel
+                key={item.href}
+                as={Link}
+                href={item.href}
+                padding="md"
+                interactive
+              >
+                <StatusPill tone="default">
+                  {item.label}
+                </StatusPill>
+                <h3 className="mt-3 text-lg font-semibold text-white">{item.title}</h3>
+                <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item.description}</p>
+              </Panel>
+            ))}
+          </div>
         </div>
       </Panel>
 
       {(policy.relationships || []).length ? (
-        <Panel padding="md" className="space-y-4">
+        <Panel className="overflow-hidden">
           <SectionHeader
             eyebrow="Policy lineage"
             title="Related policies in the same historical thread"
             description="Use related records to move across expansions, restrictions, responses, and later reversals instead of reading this policy in isolation."
-            bordered={false}
           />
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4 p-4 md:grid-cols-2">
             {policy.relationships.map((item) => (
               <Panel
                 as={Link}

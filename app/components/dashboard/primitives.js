@@ -182,14 +182,9 @@ export function SectionHeader({
   description,
   action = null,
   eyebrow = null,
-  bordered = true,
 }) {
   return (
-    <div
-      className={`flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between ${
-        bordered ? "border-b border-[var(--line)] px-4 py-3" : ""
-      }`}
-    >
+    <div className="flex flex-col gap-3 border-b border-[var(--line)] px-4 py-3 lg:flex-row lg:items-center lg:justify-between">
       <div className="min-w-0 max-w-full md:max-w-3xl">
         {eyebrow ? (
           <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">

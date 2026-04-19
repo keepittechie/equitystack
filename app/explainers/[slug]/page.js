@@ -10,18 +10,12 @@ import StructuredData from "@/app/components/public/StructuredData";
 import { Breadcrumbs } from "@/app/components/public/chrome";
 import {
   MethodologyCallout,
-  SectionIntro,
 } from "@/app/components/public/core";
 import {
   EvidenceSourceList,
-  ExplainerIndexGrid,
   PolicyTimeline,
   PromiseResultsTable,
 } from "@/app/components/public/entities";
-import {
-  ThematicHubCard,
-  ThematicQuestionList,
-} from "@/app/components/public/thematic";
 import { getExplainerEditorial } from "@/lib/explainer-editorial";
 import {
   buildExplainerCardHref,
@@ -52,17 +46,6 @@ function buildStructuredSectionTitle(title) {
   };
 
   return map[title] || title;
-}
-
-function ExplainerContentCard({ card, grid = false }) {
-  return (
-    <Panel as="article" padding="md" className={grid ? "h-full" : ""}>
-      <h2 className="text-2xl font-semibold text-white">{card.title}</h2>
-      <p className="mt-4 whitespace-pre-line text-sm leading-8 text-[var(--ink-soft)]">
-        {card.body}
-      </p>
-    </Panel>
-  );
 }
 
 function buildConnectedPresidents(relatedPromises = []) {
@@ -163,36 +146,6 @@ function buildExplainerResearchPaths({
     seen.add(item.href);
     return true;
   });
-}
-
-function FutureBillCard({ item }) {
-  return (
-    <Panel
-      as={Link}
-      href={buildFutureBillDetailHref(item)}
-      padding="md"
-      interactive
-    >
-      <div className="flex flex-wrap gap-2">
-        <StatusPill tone="info">{item.target_area || "Future bill"}</StatusPill>
-        <StatusPill tone="default">{item.priority_level || "Priority pending"}</StatusPill>
-      </div>
-      <h3 className="mt-2 text-base font-medium text-white">{item.title}</h3>
-      <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
-        {item.problem_statement ||
-          "Open the proposal page for the problem statement, linked bills, and related policy context."}
-      </p>
-      <div className="mt-3 flex flex-wrap gap-2">
-        <StatusPill tone={getBillStatusTone(item.status)}>
-          {item.status || "Status pending"}
-        </StatusPill>
-        <StatusPill tone="info">
-          {(item.tracked_bills || []).length} linked tracked bill
-          {(item.tracked_bills || []).length === 1 ? "" : "s"}
-        </StatusPill>
-      </div>
-    </Panel>
-  );
 }
 
 function buildExplainerUtilityNotes(explainer, editorial) {
@@ -384,30 +337,43 @@ export default async function ExplainerDetailPage({ params }) {
         ]}
       />
 
-      <section className="hero-panel p-8 md:p-10 xl:p-14">
-        <SectionIntro
-          as="h1"
-          eyebrow={explainer.category || "Explainer"}
-          title={explainer.title}
-          description={
-            explainer.summary ||
-            "This explainer connects a common public claim to the relevant historical record and linked policy evidence."
-          }
-          actions={
-            <>
-              <Link href="/explainers" className="public-button-secondary">
-                Back to explainers
-              </Link>
-              <Link
-                href={buildExplainerCardHref(explainer)}
-                className="public-button-primary"
-              >
-                Share card
-              </Link>
-            </>
-          }
-        />
-      </section>
+      <Panel prominence="primary" className="overflow-hidden">
+        <div className="grid gap-0 xl:grid-cols-[minmax(0,1fr)_18rem]">
+          <div className="min-w-0 border-b border-[var(--line)] p-4 xl:border-b-0 xl:border-r">
+            <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+              {explainer.category || "Explainer"}
+            </p>
+            <h1 className="mt-3 max-w-4xl text-[clamp(1.9rem,5.5vw,3.7rem)] font-semibold leading-[1] tracking-[-0.04em] text-white">
+              {explainer.title}
+            </h1>
+            <p className="mt-4 max-w-3xl text-sm leading-6 text-[var(--ink-soft)] md:text-base md:leading-7">
+              {explainer.summary ||
+                "This explainer connects a common public claim to the relevant historical record and linked policy evidence."}
+            </p>
+          </div>
+          <aside className="grid content-start gap-3 p-4">
+            <MetricCard
+              label="Primary read"
+              value={editorial.lens || "Historical context"}
+              description="Start here before opening the linked records."
+              density="compact"
+              showDot
+            />
+            <Link
+              href="/explainers"
+              className="inline-flex min-h-9 items-center justify-center rounded-md border border-[var(--line-strong)] bg-[rgba(18,31,49,0.58)] px-3 text-[12px] font-semibold text-white transition-[background-color,border-color,box-shadow] hover:border-[var(--line-strong)] hover:bg-[rgba(18,31,49,0.86)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(132,247,198,0.28)]"
+            >
+              Back to explainers
+            </Link>
+            <Link
+              href={buildExplainerCardHref(explainer)}
+              className="inline-flex min-h-9 items-center justify-center rounded-md border border-[rgba(132,247,198,0.72)] bg-[var(--accent)] px-3 text-[12px] font-semibold text-[#051019] transition-[background-color,border-color,box-shadow] hover:border-[var(--accent)] hover:bg-[rgba(132,247,198,0.9)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(132,247,198,0.28)]"
+            >
+              Share card
+            </Link>
+          </aside>
+        </div>
+      </Panel>
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <MetricCard
@@ -435,7 +401,7 @@ export default async function ExplainerDetailPage({ params }) {
         />
       </section>
 
-      <Panel padding="md" prominence="primary" className="space-y-4">
+      <Panel prominence="primary" className="overflow-hidden">
         <SectionHeader
           eyebrow={editorial.lens || "Read this for"}
           title="What this explainer helps clarify"
@@ -443,16 +409,17 @@ export default async function ExplainerDetailPage({ params }) {
             editorial.pagePurpose ||
             "The best use of an explainer is to clarify the claim, connect it to Black history or policy history, and make the next evidentiary click obvious."
           }
-          bordered={false}
         />
-        <div className="grid gap-3 text-sm leading-7 text-[var(--ink-soft)]">
-          {utilityNotes.map((item) => (
-            <Panel key={item} padding="md" className="text-sm leading-7 text-[var(--ink-soft)]">
-              {item}
-            </Panel>
-          ))}
+        <div className="space-y-4 p-4">
+          <div className="grid gap-3 text-sm leading-7 text-[var(--ink-soft)]">
+            {utilityNotes.map((item) => (
+              <Panel key={item} padding="md" className="text-sm leading-7 text-[var(--ink-soft)]">
+                {item}
+              </Panel>
+            ))}
+          </div>
+          <MethodologyCallout description={buildPageMethodNote()} />
         </div>
-        <MethodologyCallout description={buildPageMethodNote()} />
       </Panel>
 
       {flagshipCards.length ? (
@@ -467,49 +434,64 @@ export default async function ExplainerDetailPage({ params }) {
       ) : null}
 
       {editorial.questions?.length ? (
-        <Panel padding="md" className="space-y-4">
+        <Panel className="overflow-hidden">
           <SectionHeader
             eyebrow="Questions"
             title="Questions this explainer helps answer"
             description="These prompts clarify the historical or policy question this page is designed to support."
-            bordered={false}
           />
-          <ThematicQuestionList items={editorial.questions} />
+          <div className="grid gap-3 p-4">
+            {editorial.questions.map((item) => (
+              <Panel key={item} padding="md" className="text-sm leading-7 text-[var(--ink-soft)]">
+                {item}
+              </Panel>
+            ))}
+          </div>
         </Panel>
       ) : null}
 
       {researchPaths.length ? (
-        <Panel padding="md" className="space-y-4">
+        <Panel className="overflow-hidden">
           <SectionHeader
             eyebrow="Research paths"
             title="Where to go next from this explainer"
             description="These routes help turn one explainer page into a fuller research path across presidents, promises, policies, legislation, reports, and thematic guides."
-            bordered={false}
           />
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid gap-4 p-4 md:grid-cols-2 xl:grid-cols-3">
             {researchPaths.map((item) => (
-              <ThematicHubCard
+              <Panel
                 key={item.href}
-                eyebrow={item.eyebrow}
-                title={item.title}
-                description={item.description}
-                note={item.note}
                 href={item.href}
-              />
+                as={Link}
+                padding="md"
+                interactive
+              >
+                <StatusPill tone="info">{item.eyebrow}</StatusPill>
+                <h3 className="mt-3 text-lg font-semibold text-white">
+                  {item.title}
+                </h3>
+                <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+                  {item.description}
+                </p>
+                {item.note ? (
+                  <p className="mt-3 text-[12px] leading-5 text-[var(--ink-muted)]">
+                    {item.note}
+                  </p>
+                ) : null}
+              </Panel>
             ))}
           </div>
         </Panel>
       ) : null}
 
       {takeaways.length ? (
-        <Panel padding="md" className="space-y-4">
+        <Panel className="overflow-hidden">
           <SectionHeader
             eyebrow="Key takeaways"
             title="What to retain from this page"
             description="These takeaways summarize the core argument before you move into the underlying record."
-            bordered={false}
           />
-          <div className="grid gap-3 text-sm leading-7 text-[var(--ink-soft)]">
+          <div className="grid gap-3 p-4 text-sm leading-7 text-[var(--ink-soft)]">
             {takeaways.map((item) => (
               <Panel key={item} padding="md" className="text-sm leading-7 text-[var(--ink-soft)]">
                 {item}
@@ -519,225 +501,322 @@ export default async function ExplainerDetailPage({ params }) {
         </Panel>
       ) : null}
 
-      <Panel padding="md" className="space-y-4">
-        {featuredCards.map((card) => (
-          <ExplainerContentCard key={card.key} card={card} />
-        ))}
+      <Panel className="overflow-hidden">
+        <SectionHeader
+          eyebrow="Page structure"
+          title="Connected records and supporting context"
+          description="Use these grouped records to move from the explainer narrative into linked policy, promise, and reform evidence."
+        />
+        <div className="space-y-4 p-4">
+          {featuredCards.map((card) => (
+            <Panel as="article" key={card.key} padding="md">
+              <h2 className="text-2xl font-semibold text-white">{card.title}</h2>
+              <p className="mt-4 whitespace-pre-line text-sm leading-8 text-[var(--ink-soft)]">
+                {card.body}
+              </p>
+            </Panel>
+          ))}
 
-        {gridCards.length ? (
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {gridCards.map((card) => (
-              <ExplainerContentCard key={card.key} card={card} grid />
-            ))}
-          </div>
-        ) : null}
+          {gridCards.length ? (
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {gridCards.map((card) => (
+                <Panel as="article" key={card.key} padding="md" className="h-full">
+                  <h2 className="text-2xl font-semibold text-white">{card.title}</h2>
+                  <p className="mt-4 whitespace-pre-line text-sm leading-8 text-[var(--ink-soft)]">
+                    {card.body}
+                  </p>
+                </Panel>
+              ))}
+            </div>
+          ) : null}
 
-        <Panel padding="md" className="space-y-4">
-          <h2 className="text-xl font-semibold text-white">Connected records on this page</h2>
-          <div className="grid gap-3 md:grid-cols-3">
-            <MetricCard
-              label="Policies"
-              value={relatedPolicies.length}
-              description="Linked policy records"
-              density="compact"
-              tone="info"
-            />
-            <MetricCard
-              label="Promises"
-              value={relatedPromises.length}
-              description="Related promise records"
-              density="compact"
-            />
-            <MetricCard
-              label="Reform paths"
-              value={relatedFutureBills.length}
-              description="Reform or tracked-bill records"
-              density="compact"
-            />
-          </div>
-        </Panel>
+          <Panel padding="md" className="space-y-4">
+            <h2 className="text-xl font-semibold text-white">Connected records on this page</h2>
+            <div className="grid gap-3 md:grid-cols-3">
+              <MetricCard
+                label="Policies"
+                value={relatedPolicies.length}
+                description="Linked policy records"
+                density="compact"
+                tone="info"
+              />
+              <MetricCard
+                label="Promises"
+                value={relatedPromises.length}
+                description="Related promise records"
+                density="compact"
+              />
+              <MetricCard
+                label="Reform paths"
+                value={relatedFutureBills.length}
+                description="Reform or tracked-bill records"
+                density="compact"
+              />
+            </div>
+          </Panel>
 
-        <Panel padding="md" className="space-y-4">
-          <h2 className="text-xl font-semibold text-white">How to use this page well</h2>
-          <div className="grid gap-3">
-            {genericResourceLinks.slice(0, 3).map((item) => (
-              <Panel
-                key={item.href}
-                as={Link}
-                href={item.href}
-                padding="md"
-                interactive
-              >
-                <StatusPill tone="default">{item.eyebrow}</StatusPill>
-                <h3 className="mt-2 text-base font-semibold text-white">{item.title}</h3>
-                <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">{item.description}</p>
-              </Panel>
-            ))}
-          </div>
-        </Panel>
+          <Panel padding="md" className="space-y-4">
+            <h2 className="text-xl font-semibold text-white">How to use this page well</h2>
+            <div className="grid gap-3">
+              {genericResourceLinks.slice(0, 3).map((item) => (
+                <Panel
+                  key={item.href}
+                  as={Link}
+                  href={item.href}
+                  padding="md"
+                  interactive
+                >
+                  <StatusPill tone="default">{item.eyebrow}</StatusPill>
+                  <h3 className="mt-2 text-base font-semibold text-white">{item.title}</h3>
+                  <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">{item.description}</p>
+                </Panel>
+              ))}
+            </div>
+          </Panel>
+        </div>
       </Panel>
 
-      <Panel padding="md" className="space-y-4">
+      <Panel className="overflow-hidden">
         <SectionHeader
           eyebrow="Timeline"
           title="Historical sequence"
           description="When timeline data is available, it helps turn the explainer from an argument into a chronological record."
-          bordered={false}
         />
-        {timelineItems.length ? (
-          <PolicyTimeline items={timelineItems} />
-        ) : (
-          <Panel padding="md" className="border-dashed text-sm leading-7 text-[var(--ink-soft)]">
-            No structured timeline entries are attached to this explainer yet.
-          </Panel>
-        )}
+        <div className="p-4">
+          {timelineItems.length ? (
+            <PolicyTimeline items={timelineItems} />
+          ) : (
+            <Panel padding="md" className="border-dashed text-sm leading-7 text-[var(--ink-soft)]">
+              No structured timeline entries are attached to this explainer yet.
+            </Panel>
+          )}
+        </div>
       </Panel>
 
-      <Panel padding="md" className="space-y-4">
+      <Panel className="overflow-hidden">
         <SectionHeader
           eyebrow="Evidence"
           title="Sources and verification"
           description="The explainer layer should never hide the source layer. Use these citations to check the narrative against the record."
-          bordered={false}
         />
-        {explainer.sources?.length ? (
-          <EvidenceSourceList items={explainer.sources} />
-        ) : (
-          <Panel padding="md" className="border-dashed text-sm leading-7 text-[var(--ink-soft)]">
-            No structured explainer sources are attached yet.
-          </Panel>
-        )}
+        <div className="p-4">
+          {explainer.sources?.length ? (
+            <EvidenceSourceList items={explainer.sources} />
+          ) : (
+            <Panel padding="md" className="border-dashed text-sm leading-7 text-[var(--ink-soft)]">
+              No structured explainer sources are attached yet.
+            </Panel>
+          )}
+        </div>
+      </Panel>
+
+      <Panel className="overflow-hidden">
         <SectionHeader
           eyebrow="Related promises"
           title="Promise records tied to this topic"
           description="Promise records help connect the explainer to public commitments and status changes where available."
-          bordered={false}
         />
-        {relatedPromises.length ? (
-          <PromiseResultsTable
-            items={relatedPromises}
-            buildHref={(item) => `/promises/${item.slug}`}
-          />
-        ) : (
-          <Panel padding="md" className="border-dashed text-sm leading-7 text-[var(--ink-soft)]">
-            No related promise records were attached to this explainer.
-          </Panel>
-        )}
+        <div className="p-4">
+          {relatedPromises.length ? (
+            <PromiseResultsTable
+              items={relatedPromises}
+              buildHref={(item) => `/promises/${item.slug}`}
+            />
+          ) : (
+            <Panel padding="md" className="border-dashed text-sm leading-7 text-[var(--ink-soft)]">
+              No related promise records were attached to this explainer.
+            </Panel>
+          )}
+        </div>
       </Panel>
 
       {(relatedFutureBills.length || connectedPresidents.length) ? (
-        <Panel padding="md" className="space-y-4">
-          <SectionHeader
-            eyebrow="Bills and proposals"
-            title="Legislation and reform context linked from this explainer"
-            description="These proposal pages extend the topic into current or future legislative paths when the site already has that relationship modeled."
-            bordered={false}
-          />
-          {relatedFutureBills.length ? (
+        <>
+          <Panel className="overflow-hidden">
+            <SectionHeader
+              eyebrow="Bills and proposals"
+              title="Legislation and reform context linked from this explainer"
+              description="These proposal pages extend the topic into current or future legislative paths when the site already has that relationship modeled."
+            />
+            <div className="p-4">
+              {relatedFutureBills.length ? (
+                <div className="grid gap-3">
+                  {relatedFutureBills.map((item) => (
+                    <Panel
+                      key={item.id}
+                      as={Link}
+                      href={buildFutureBillDetailHref(item)}
+                      padding="md"
+                      interactive
+                    >
+                      <div className="flex flex-wrap gap-2">
+                        <StatusPill tone="info">{item.target_area || "Future bill"}</StatusPill>
+                        <StatusPill tone="default">{item.priority_level || "Priority pending"}</StatusPill>
+                      </div>
+                      <h3 className="mt-2 text-base font-medium text-white">{item.title}</h3>
+                      <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
+                        {item.problem_statement ||
+                          "Open the proposal page for the problem statement, linked bills, and related policy context."}
+                      </p>
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        <StatusPill tone={getBillStatusTone(item.status)}>
+                          {item.status || "Status pending"}
+                        </StatusPill>
+                        <StatusPill tone="info">
+                          {(item.tracked_bills || []).length} linked tracked bill
+                          {(item.tracked_bills || []).length === 1 ? "" : "s"}
+                        </StatusPill>
+                      </div>
+                    </Panel>
+                  ))}
+                </div>
+              ) : (
+                <Panel padding="md" className="border-dashed text-sm leading-7 text-[var(--ink-soft)]">
+                  No reform-proposal or future-bill records are attached to this explainer yet.
+                </Panel>
+              )}
+            </div>
+          </Panel>
+
+          <Panel className="overflow-hidden">
+            <SectionHeader
+              eyebrow="Related presidents"
+              title="Presidents connected through the linked record"
+              description="When promise records tie this topic to a presidency, those profiles are the fastest way to add administration-level context."
+            />
+            <div className="p-4">
+              {connectedPresidents.length ? (
+                <div className="grid gap-3">
+                  {connectedPresidents.map((item) => (
+                    <Panel
+                      key={item.slug}
+                      as={Link}
+                      href={`/presidents/${item.slug}`}
+                      padding="md"
+                      interactive
+                    >
+                      <StatusPill tone="info">President profile</StatusPill>
+                      <h3 className="mt-2 text-base font-medium text-white">{item.name}</h3>
+                      <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
+                        {item.promiseCount} linked promise record{item.promiseCount === 1 ? "" : "s"}
+                        {item.promiseTitles[0] ? `, including ${item.promiseTitles[0]}` : ""}.
+                      </p>
+                    </Panel>
+                  ))}
+                </div>
+              ) : (
+                <Panel padding="md" className="border-dashed text-sm leading-7 text-[var(--ink-soft)]">
+                  No presidency-specific promise links are attached to this explainer yet.
+                </Panel>
+              )}
+            </div>
+          </Panel>
+        </>
+      ) : null}
+
+      <Panel className="overflow-hidden">
+        <SectionHeader
+          eyebrow="Related policies"
+          title="Policy records linked from this topic"
+          description="These records are usually the fastest route from narrative framing into the underlying policy evidence."
+        />
+        <div className="p-4">
+          {relatedPolicies.length ? (
             <div className="grid gap-3">
-              {relatedFutureBills.map((item) => (
-                <FutureBillCard key={item.id} item={item} />
+              {relatedPolicies.map((item) => (
+                <Panel
+                  key={item.id}
+                  as={Link}
+                  href={`/policies/${buildPolicySlug(item)}`}
+                  padding="md"
+                  interactive
+                >
+                  <div className="flex flex-wrap gap-2">
+                    <StatusPill tone="default">{item.year_enacted || "Undated"}</StatusPill>
+                    <StatusPill tone="info">{item.policy_type || "Policy"}</StatusPill>
+                  </div>
+                  <h3 className="mt-2 text-base font-medium text-white">{item.title}</h3>
+                  {item.primary_party ? (
+                    <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
+                      {item.primary_party}
+                    </p>
+                  ) : null}
+                </Panel>
               ))}
             </div>
           ) : (
             <Panel padding="md" className="border-dashed text-sm leading-7 text-[var(--ink-soft)]">
-              No reform-proposal or future-bill records are attached to this explainer yet.
+              No linked policy records are attached to this explainer yet.
             </Panel>
           )}
-          <SectionHeader
-            eyebrow="Related presidents"
-            title="Presidents connected through the linked record"
-            description="When promise records tie this topic to a presidency, those profiles are the fastest way to add administration-level context."
-            bordered={false}
-          />
-          {connectedPresidents.length ? (
-            <div className="grid gap-3">
-              {connectedPresidents.map((item) => (
+        </div>
+      </Panel>
+
+      <Panel className="overflow-hidden">
+        <SectionHeader
+          eyebrow="Keep reading"
+          title="Related explainers"
+          description="Use related explainers when you need adjacent context instead of reopening the same topic from scratch."
+        />
+        <div className="p-4">
+          {relatedExplainers.length ? (
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {relatedExplainers.map((item) => (
                 <Panel
                   key={item.slug}
                   as={Link}
-                  href={`/presidents/${item.slug}`}
+                  href={`/explainers/${item.slug}`}
                   padding="md"
                   interactive
+                  className="flex h-full flex-col"
                 >
-                  <StatusPill tone="info">President profile</StatusPill>
-                  <h3 className="mt-2 text-base font-medium text-white">{item.name}</h3>
-                  <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
-                    {item.promiseCount} linked promise record{item.promiseCount === 1 ? "" : "s"}
-                    {item.promiseTitles[0] ? `, including ${item.promiseTitles[0]}` : ""}.
+                  <StatusPill tone="default">{item.category || "Explainer"}</StatusPill>
+                  <h3 className="mt-3 text-lg font-semibold text-white">{item.title}</h3>
+                  <p className="mt-3 line-clamp-4 text-sm leading-7 text-[var(--ink-soft)]">
+                    {item.summary}
+                  </p>
+                  <p className="mt-auto pt-4 text-[12px] font-semibold text-[var(--ink-soft)]">
+                    Read historical context and linked records
                   </p>
                 </Panel>
               ))}
             </div>
           ) : (
             <Panel padding="md" className="border-dashed text-sm leading-7 text-[var(--ink-soft)]">
-              No presidency-specific promise links are attached to this explainer yet.
+              No related explainers are attached to this topic yet.
             </Panel>
           )}
-        </Panel>
-      ) : null}
-
-      <Panel padding="md" className="space-y-4">
-        <SectionHeader
-          eyebrow="Related policies"
-          title="Policy records linked from this topic"
-          description="These records are usually the fastest route from narrative framing into the underlying policy evidence."
-          bordered={false}
-        />
-        {relatedPolicies.length ? (
-          <div className="grid gap-3">
-            {relatedPolicies.map((item) => (
-              <Panel
-                key={item.id}
-                as={Link}
-                href={`/policies/${buildPolicySlug(item)}`}
-                padding="md"
-                interactive
-              >
-                <div className="flex flex-wrap gap-2">
-                  <StatusPill tone="default">{item.year_enacted || "Undated"}</StatusPill>
-                  <StatusPill tone="info">{item.policy_type || "Policy"}</StatusPill>
-                </div>
-                <h3 className="mt-2 text-base font-medium text-white">{item.title}</h3>
-                {item.primary_party ? (
-                  <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
-                    {item.primary_party}
-                  </p>
-                ) : null}
-              </Panel>
-            ))}
-          </div>
-        ) : (
-          <Panel padding="md" className="border-dashed text-sm leading-7 text-[var(--ink-soft)]">
-            No linked policy records are attached to this explainer yet.
-          </Panel>
-        )}
-        <SectionHeader
-          eyebrow="Keep reading"
-          title="Related explainers"
-          description="Use related explainers when you need adjacent context instead of reopening the same topic from scratch."
-          bordered={false}
-        />
-        <ExplainerIndexGrid items={relatedExplainers} />
+        </div>
       </Panel>
 
-      <Panel padding="md" className="space-y-4">
+      <Panel className="overflow-hidden">
         <SectionHeader
           eyebrow="Continue exploring"
           title="Move from this explainer into records, reports, and trust pages"
           description="Use these next steps when you want to turn one topic page into a broader research path across records, synthesis, and verification."
-          bordered={false}
         />
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-4 p-4 md:grid-cols-2 xl:grid-cols-4">
           {genericResourceLinks.slice(0, 4).map((item) => (
-            <ThematicHubCard
+            <Panel
               key={item.href}
-              eyebrow={item.eyebrow}
-              title={item.title}
-              description={item.description}
-              note={item.note}
               href={item.href}
-            />
+              as={Link}
+              padding="md"
+              interactive
+            >
+              <StatusPill tone="default">{item.eyebrow}</StatusPill>
+              <h3 className="mt-3 text-lg font-semibold text-white">
+                {item.title}
+              </h3>
+              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+                {item.description}
+              </p>
+              {item.note ? (
+                <p className="mt-3 text-[12px] leading-5 text-[var(--ink-muted)]">
+                  {item.note}
+                </p>
+              ) : null}
+            </Panel>
           ))}
         </div>
       </Panel>
