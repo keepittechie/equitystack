@@ -493,28 +493,30 @@ export default async function ExplainerDetailPage({ params }) {
 
       <section className="space-y-5">
         <ExplainerPanel className="space-y-5">
-          {explainer.intro_text ? (
-            <article className="rounded-[1.3rem] border border-white/8 bg-white/5 p-5">
-              <h2 className="text-2xl font-semibold text-white">Historical framing</h2>
-              <p className="mt-4 whitespace-pre-line text-sm leading-8 text-[var(--ink-soft)]">
-                {explainer.intro_text}
-              </p>
-            </article>
-          ) : null}
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+            {explainer.intro_text ? (
+              <article className="h-full rounded-[1.3rem] border border-white/8 bg-white/5 p-5">
+                <h2 className="text-2xl font-semibold text-white">Historical framing</h2>
+                <p className="mt-4 whitespace-pre-line text-sm leading-8 text-[var(--ink-soft)]">
+                  {explainer.intro_text}
+                </p>
+              </article>
+            ) : null}
 
-          {(explainer.structured_sections || []).map((section) => (
-            <article
-              key={section.title}
-              className="rounded-[1.3rem] border border-white/8 bg-white/5 p-5"
-            >
-              <h2 className="text-2xl font-semibold text-white">
-                {buildStructuredSectionTitle(section.title)}
-              </h2>
-              <p className="mt-4 whitespace-pre-line text-sm leading-8 text-[var(--ink-soft)]">
-                {section.body}
-              </p>
-            </article>
-          ))}
+            {(explainer.structured_sections || []).map((section) => (
+              <article
+                key={section.title}
+                className="h-full rounded-[1.3rem] border border-white/8 bg-white/5 p-5"
+              >
+                <h2 className="text-2xl font-semibold text-white">
+                  {buildStructuredSectionTitle(section.title)}
+                </h2>
+                <p className="mt-4 whitespace-pre-line text-sm leading-8 text-[var(--ink-soft)]">
+                  {section.body}
+                </p>
+              </article>
+            ))}
+          </div>
 
           <div className="rounded-[1.3rem] border border-white/8 bg-white/5 p-5">
             <h2 className="text-xl font-semibold text-white">Connected records on this page</h2>
@@ -687,21 +689,6 @@ export default async function ExplainerDetailPage({ params }) {
           <ExplainerIndexGrid items={relatedExplainers} />
         </ExplainerPanel>
       </section>
-
-      {editorial.sourcesResearchContext ? (
-        <section className="space-y-5">
-          <SectionIntro
-            eyebrow="Evidence"
-            title="Sources and research context"
-            description="A short note on how to read the source base behind this explainer."
-          />
-          <ExplainerPanel>
-            <p className="text-sm leading-8 text-[var(--ink-soft)]">
-              {editorial.sourcesResearchContext}
-            </p>
-          </ExplainerPanel>
-        </section>
-      ) : null}
 
       <section className="space-y-5">
         <SectionIntro
