@@ -6,6 +6,8 @@ import {
 import PresidentAvatar from "@/app/components/PresidentAvatar";
 import StructuredData from "@/app/components/public/StructuredData";
 import { Breadcrumbs } from "@/app/components/public/chrome";
+import TrustBar from "@/app/components/public/TrustBar";
+import { Panel, SectionHeader } from "@/app/components/dashboard/primitives";
 import { buildPageMetadata } from "@/lib/metadata";
 import { fetchCivilRightsTimeline } from "@/lib/services/promiseService";
 import {
@@ -172,7 +174,7 @@ export default async function CivilRightsTimelinePage() {
   const totalEntries = timeline.items?.length || 0;
 
   return (
-    <main className="report-shell w-full pt-4 pb-6 space-y-6">
+    <main className="report-shell w-full pt-4 pb-6 space-y-4">
       <StructuredData
         data={[
           buildBreadcrumbJsonLd(
@@ -212,21 +214,21 @@ export default async function CivilRightsTimelinePage() {
       <div className="flex flex-wrap gap-3">
         <Link
           href="/reports"
-          className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:border-white/20 hover:bg-white/8 hover:text-white"
+          className="dashboard-button-secondary"
         >
           Back to Reports
         </Link>
         <Link
           href="/promises"
-          className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:border-white/20 hover:bg-white/8 hover:text-white"
+          className="dashboard-button-secondary"
         >
           Explore Promise Tracker data
         </Link>
       </div>
 
-      <section className="hero-panel p-6 md:p-8">
+      <section className="hero-panel p-4">
         <p className="eyebrow mb-4">Promise Tracker Report</p>
-        <h1 className="text-4xl md:text-5xl font-bold">Civil Rights Timeline</h1>
+        <h1 className="page-title">Civil Rights Timeline</h1>
         <p className="text-base md:text-lg text-[var(--ink-soft)] mt-4 max-w-3xl leading-8">
           This curated timeline traces how federal civil-rights policy moved through protection,
           retreat, rebuilding, and modern continuity for Black communities across U.S. history.
@@ -240,46 +242,49 @@ export default async function CivilRightsTimelinePage() {
         </div>
       </section>
 
-      <section className="card-surface p-4">
-        <div className="flex items-start justify-between gap-4 flex-wrap">
-          <div className="max-w-3xl">
-            <h2 className="text-lg font-semibold mb-2">How to Read This Timeline</h2>
-            <p className="text-sm text-[var(--ink-soft)] leading-7">
-              Each entry shows what federal commitment was made, what the government did next, and how the
-              documented outcome is classified in the Promise Tracker. Use it to follow continuity across
-              Reconstruction, the Civil Rights Era, and modern accountability records.
+      <TrustBar />
+
+      <Panel prominence="primary" className="overflow-hidden">
+        <SectionHeader
+          eyebrow="How to read this report"
+          title="Chronology, classification, and civil-rights context in one view"
+          description="Each entry shows what federal commitment was made, what the government did next, and how the documented outcome is classified in the Promise Tracker."
+        />
+        <div className="grid gap-4 p-4 xl:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.85fr)]">
+          <div className="space-y-4">
+            <div className="flex flex-wrap gap-2">
+              {eras.map((era) => (
+                <EraChip key={era.id} era={era} />
+              ))}
+            </div>
+            <p className="text-sm leading-7 text-[var(--ink-soft)]">
+              Use this page to follow continuity across Reconstruction, the Civil Rights Era, and modern accountability records without losing the chronological thread.
             </p>
           </div>
-          <div className="flex flex-wrap gap-2">
-            {eras.map((era) => (
-              <EraChip key={era.id} era={era} />
-            ))}
+          <div className="grid gap-4">
+            <div className="rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4">
+              <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
+                Status legend
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {TIMELINE_LEGEND_STATUSES.map((status) => (
+                  <PromiseStatusBadge key={status} status={status} />
+                ))}
+              </div>
+            </div>
+            <div className="rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4">
+              <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
+                Impact legend
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {TIMELINE_LEGEND_IMPACTS.map((impact) => (
+                  <PromiseImpactDirectionBadge key={impact} impact={impact} />
+                ))}
+              </div>
+            </div>
           </div>
         </div>
-      </section>
-
-      <section className="grid gap-4 lg:grid-cols-[1.2fr,1fr]">
-        <div className="card-muted rounded-[1.4rem] p-4">
-          <h2 className="text-sm font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">
-            Status Legend
-          </h2>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {TIMELINE_LEGEND_STATUSES.map((status) => (
-              <PromiseStatusBadge key={status} status={status} />
-            ))}
-          </div>
-        </div>
-        <div className="card-muted rounded-[1.4rem] p-4">
-          <h2 className="text-sm font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">
-            Impact Legend
-          </h2>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {TIMELINE_LEGEND_IMPACTS.map((impact) => (
-              <PromiseImpactDirectionBadge key={impact} impact={impact} />
-            ))}
-          </div>
-        </div>
-      </section>
+      </Panel>
 
       <div className="space-y-6">
         {eras.map((era) => (

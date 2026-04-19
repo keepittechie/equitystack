@@ -12,7 +12,6 @@ import {
   CitationNote,
   KpiCard,
   MethodologyCallout,
-  PageContextBlock,
   SectionIntro,
 } from "@/app/components/public/core";
 import TrustBar from "@/app/components/public/TrustBar";
@@ -32,6 +31,7 @@ import {
   buildBreadcrumbJsonLd,
   buildReportJsonLd,
 } from "@/lib/structured-data";
+import { Panel, SectionHeader } from "@/app/components/dashboard/primitives";
 
 export const dynamic = "force-dynamic";
 
@@ -204,7 +204,7 @@ export default async function ReportDetailPage({ params }) {
   const reportEditorial = getFlagshipReportEditorial(slug);
 
   return (
-    <main className="space-y-10">
+    <main className="space-y-4">
       <StructuredData
         data={[
           buildBreadcrumbJsonLd(
@@ -244,69 +244,56 @@ export default async function ReportDetailPage({ params }) {
         ]}
       />
 
-      <section className="hero-panel p-8 md:p-10 xl:p-14">
-        <SectionIntro
-          as="h1"
-          eyebrow={report.category || "Report"}
-          title={report.title}
-          description={report.summary}
-          actions={
-            <>
-              <Link href="/reports" className="dashboard-button-secondary">
-                Back to reports
-              </Link>
-              <Link href="/methodology" className="dashboard-button-primary">
-                Read methodology
-              </Link>
-            </>
-          }
-        />
-      </section>
+      <Panel prominence="primary" className="overflow-hidden">
+        <div className="p-4">
+          <SectionIntro
+            as="h1"
+            eyebrow={report.category || "Report"}
+            title={report.title}
+            description={report.summary}
+            actions={
+              <>
+                <Link href="/reports" className="dashboard-button-secondary">
+                  Back to reports
+                </Link>
+                <Link href="/methodology" className="dashboard-button-primary">
+                  Read methodology
+                </Link>
+              </>
+            }
+          />
+        </div>
+      </Panel>
 
       <TrustBar />
 
-      <section className="grid items-start gap-6 2xl:grid-cols-[1.05fr_0.95fr]">
-        <PageContextBlock
-          description="Report pages are EquityStack's interpretation layer. They synthesize patterns across the dataset, but they still need to route readers back to policies, presidents, promises, and sources."
-          detail="Use this page when you want a higher-level answer first, then drill down into the underlying public record without losing the audit trail."
+      <Panel prominence="primary" className="overflow-hidden">
+        <SectionHeader
+          eyebrow="How to use this report"
+          title="Interpretation, citation, and verification stay together"
+          description="Report pages synthesize patterns across the dataset, but they still need to route readers back into policies, presidents, promises, sources, and methodology."
         />
-        <div className="rounded-[1.6rem] border border-[rgba(132,247,198,0.18)] bg-[linear-gradient(145deg,rgba(14,36,33,0.72),rgba(8,14,24,0.96))] p-6">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--accent)]">
-            Why this report matters
-          </p>
-          <h2 className="mt-4 text-2xl font-semibold text-white">Synthesis without losing the record</h2>
-          <p className="mt-4 text-sm leading-7 text-[var(--ink-soft)]">
-            Search visitors often need more than a single policy page but less than a raw database view. This report is designed to bridge that gap, turning many records into a readable analytical frame while keeping the underlying evidence close by.
-          </p>
-        </div>
-      </section>
-
-      <section className="grid gap-6 2xl:grid-cols-[1.05fr_0.95fr]">
-        <CitationNote
-          title="Why readers cite this report"
-          description={
-            reportEditorial?.citationDescription ||
-            "This page is best used as a reference when someone needs a concise analytical summary that still links back into the underlying records. Cite the report title, EquityStack, the report URL, and your access date, then link to the related policies, sources, or methodology page when precision matters."
-          }
-        />
-        <div className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--accent)]">
-            What this page covers
-          </p>
-          <h2 className="mt-3 text-2xl font-semibold text-white">A reference page, not just a visualization layer</h2>
-          <div className="mt-4 grid gap-3 text-sm leading-7 text-[var(--ink-soft)]">
-            <div className="rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4">
-              Use this page when the audience needs a readable summary before opening the underlying policy records.
+        <div className="grid gap-4 p-4 xl:grid-cols-[minmax(0,1.05fr)_minmax(20rem,0.95fr)]">
+          <div className="grid gap-4">
+            <div className="rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4 text-sm leading-7 text-[var(--ink-soft)]">
+              Use this page when you want a higher-level answer first, then drill down into the underlying public record without losing the audit trail.
             </div>
-            <div className="rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4">
-              The strongest use of a report page is as a bridge between broad interpretation, linked charts, related records, and visible methodology.
-            </div>
-            <div className="rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4">
-              When the topic is contested or technical, pair this report with the source library or methodology page rather than treating the summary as self-sufficient.
+            <div className="rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4 text-sm leading-7 text-[var(--ink-soft)]">
+              Search visitors often need more than a single policy page but less than a raw database view. This report is designed to bridge that gap, turning many records into a readable analytical frame while keeping the underlying evidence close by.
             </div>
           </div>
+          <div className="grid gap-4">
+            <CitationNote
+              title="Why readers cite this report"
+              description={
+                reportEditorial?.citationDescription ||
+                "This page is best used as a reference when someone needs a concise analytical summary that still links back into the underlying records. Cite the report title, EquityStack, the report URL, and your access date, then link to the related policies, sources, or methodology page when precision matters."
+              }
+            />
+            <MethodologyCallout description="This report is a structured reading layer, not a standalone claim. Use the related links, policies, and methodology access below to validate what the report is summarizing." />
+          </div>
         </div>
-      </section>
+      </Panel>
 
       <section className="grid gap-4 md:grid-cols-3">
         {(reportEditorial?.cards || [
@@ -382,9 +369,7 @@ export default async function ReportDetailPage({ params }) {
               This report is generated from structured policy data in EquityStack. It is not an opinion piece. The analysis aggregates policy-level records, score context, and linked evidence into a readable public summary that can be shared before readers drill down into the records themselves.
             </p>
           </div>
-          <CitationNote description="When referencing this report externally, cite the report title, EquityStack, the page URL, and your access date. The report summarizes the current structured dataset and should be read with the linked policy records, sources, and methodology." />
           <ScoreExplanation title="How to interpret score language in this report" />
-          <MethodologyCallout description="This report is a structured reading layer, not a standalone claim. Use the related links, policies, and methodology access below to validate what the report is summarizing." />
           <div className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4 md:col-span-2 xl:col-span-1">
             <h2 className="text-lg font-semibold text-white">Related paths</h2>
             <div className="mt-4 grid gap-3">

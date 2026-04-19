@@ -116,14 +116,14 @@ export default async function LegislatorScorecardDetailPage({ params }) {
   );
 
   return (
-    <main className="max-w-7xl mx-auto p-6 space-y-10">
+    <main className="max-w-7xl mx-auto p-6 space-y-4">
       <Link href="/scorecards" className="text-sm underline">
         Back to scorecards
       </Link>
 
-      <section className="hero-panel p-8 md:p-10">
+      <section className="hero-panel p-4">
         <p className="eyebrow mb-4">Legislator Record</p>
-        <h1 className="text-4xl md:text-5xl font-bold tracking-tight">{legislator.full_name}</h1>
+        <h1 className="page-title">{legislator.full_name}</h1>
         <p className="text-[var(--ink-soft)] text-lg max-w-3xl leading-8 mt-4">
           {[legislator.chamber, legislator.party, legislator.state].filter(Boolean).join(" • ")}
         </p>

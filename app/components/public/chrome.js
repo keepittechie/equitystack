@@ -157,6 +157,15 @@ function ChevronDownIcon({ open = false }) {
   );
 }
 
+function desktopNavItemClass(active = false) {
+  return [
+    "inline-flex min-h-8 items-center rounded-md border px-2 py-1.5 text-[12.5px] font-medium transition-[background-color,border-color,color,box-shadow] duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(132,247,198,0.22)] focus-visible:ring-offset-2 focus-visible:ring-offset-[rgba(11,20,33,0.96)]",
+    active
+      ? "border-[var(--line)] bg-[rgba(132,247,198,0.07)] text-[rgba(255,255,255,0.96)] shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]"
+      : "border-transparent bg-transparent text-[var(--ink-muted)] hover:border-white/8 hover:bg-white/[0.045] hover:text-[var(--ink-soft)]",
+  ].join(" ");
+}
+
 export function GlobalSearch({
   compact = false,
   expanded = false,
@@ -197,16 +206,135 @@ export function PrimaryNav({ mobile = false }) {
   return (
     <nav
       aria-label={mobile ? "Mobile primary navigation" : "Primary navigation"}
-      className={mobile ? "grid gap-2" : "hidden shrink-0 items-center justify-center gap-1 xl:flex xl:flex-nowrap 2xl:gap-1.5"}
+      className={
+        mobile
+          ? "grid gap-2"
+          : "hidden shrink-0 items-center justify-center xl:flex xl:flex-nowrap"
+      }
     >
+      {!mobile ? (
+        <div className="inline-flex items-center gap-0 rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.9)] p-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.02)]">
+          {PRIMARY_NAV_ITEMS.map((item) => {
+            const active = isActive(pathname, item.href);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                aria-current={active ? "page" : undefined}
+                className={desktopNavItemClass(active)}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
+
+          <div
+            className="relative overflow-visible"
+            onMouseEnter={() => setResearchOpenForPath(pathname || "/")}
+            onMouseLeave={() => setResearchOpenForPath(null)}
+          >
+            <button
+              type="button"
+              aria-haspopup="menu"
+              aria-expanded={researchOpen}
+              onClick={() =>
+                setResearchOpenForPath((value) => (value === pathname ? null : pathname || "/"))
+              }
+              className={desktopNavItemClass(researchActive)}
+            >
+              Research
+              <ChevronDownIcon open={researchOpen} />
+            </button>
+            {researchOpen ? (
+              <div className="absolute left-1/2 top-full z-[60] mt-3 w-[24rem] max-w-[calc(100vw-2rem)] -translate-x-1/2 rounded-[1.6rem] border border-white/10 bg-[rgba(5,11,19,0.98)] p-4 shadow-[0_24px_80px_rgba(0,0,0,0.34)] backdrop-blur-xl pointer-events-auto">
+                <div className="max-h-[min(70vh,36rem)] overflow-y-auto overscroll-contain pr-1 pb-2">
+                  <div className="space-y-4">
+                    <div className="grid gap-2">
+                      <p className="px-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+                        Research hub
+                      </p>
+                      <Link
+                        href={RESEARCH_HUB_ITEM.href}
+                        aria-current={isActive(pathname, RESEARCH_HUB_ITEM.href) ? "page" : undefined}
+                        className={`rounded-[1.2rem] border px-4 py-4 ${
+                          isActive(pathname, RESEARCH_HUB_ITEM.href)
+                            ? "border-[rgba(132,247,198,0.28)] bg-[rgba(132,247,198,0.12)]"
+                            : "border-white/8 bg-white/5 hover:border-[rgba(132,247,198,0.2)]"
+                        }`}
+                      >
+                        <p className="text-sm font-medium text-white">{RESEARCH_HUB_ITEM.label}</p>
+                        <p className="mt-1 text-sm leading-6 text-[var(--ink-soft)]">{RESEARCH_HUB_ITEM.description}</p>
+                      </Link>
+                    </div>
+                    <div className="grid gap-2">
+                      <p className="px-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+                        Impact analysis
+                      </p>
+                      {IMPACT_ANALYSIS_ITEMS.map((item) => {
+                        const active = isActive(pathname, item.href);
+                        return (
+                          <Link
+                            key={item.href}
+                            href={item.href}
+                            aria-current={active ? "page" : undefined}
+                            className={`rounded-[1.2rem] border px-4 py-4 ${
+                              active
+                                ? "border-[rgba(132,247,198,0.28)] bg-[rgba(132,247,198,0.12)]"
+                                : "border-white/8 bg-white/5 hover:border-[rgba(132,247,198,0.2)]"
+                            }`}
+                          >
+                            <p className="text-sm font-medium text-white">{item.label}</p>
+                            <p className="mt-1 text-sm leading-6 text-[var(--ink-soft)]">{item.description}</p>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                    <div className="grid gap-2">
+                      <p className="px-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+                        Reference pages
+                      </p>
+                      {RESEARCH_EXTRA_ITEMS.map((item) => {
+                        const active = isActive(pathname, item.href);
+                        return (
+                          <Link
+                            key={item.href}
+                            href={item.href}
+                            aria-current={active ? "page" : undefined}
+                            className={`rounded-[1.2rem] border px-4 py-4 ${
+                              active
+                                ? "border-[rgba(132,247,198,0.28)] bg-[rgba(132,247,198,0.12)]"
+                                : "border-white/8 bg-white/5 hover:border-[rgba(132,247,198,0.2)]"
+                            }`}
+                          >
+                            <p className="text-sm font-medium text-white">{item.label}</p>
+                            <p className="mt-1 text-sm leading-6 text-[var(--ink-soft)]">{item.description}</p>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                    <div
+                      aria-hidden="true"
+                      className="pointer-events-none sticky bottom-0 h-6 bg-gradient-to-b from-transparent to-[rgba(5,11,19,0.98)]"
+                    />
+                  </div>
+                </div>
+              </div>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
+
       {PRIMARY_NAV_ITEMS.map((item) => {
+        if (!mobile) {
+          return null;
+        }
         const active = isActive(pathname, item.href);
         return (
           <Link
             key={item.href}
             href={item.href}
             aria-current={active ? "page" : undefined}
-            className={`rounded-full px-3 py-2 text-sm font-medium xl:px-3.5 2xl:px-4 ${
+            className={`rounded-full px-3 py-2 text-sm font-medium ${
               active
                 ? "bg-[var(--accent)] text-[#04131d]"
                 : "text-[var(--ink-soft)] hover:bg-white/6 hover:text-white"
@@ -303,105 +431,7 @@ export function PrimaryNav({ mobile = false }) {
             </div>
           </div>
         </div>
-      ) : (
-        <div
-          className="relative overflow-visible"
-          onMouseEnter={() => setResearchOpenForPath(pathname || "/")}
-          onMouseLeave={() => setResearchOpenForPath(null)}
-        >
-          <button
-            type="button"
-            aria-haspopup="menu"
-            aria-expanded={researchOpen}
-            onClick={() =>
-              setResearchOpenForPath((value) => (value === pathname ? null : pathname || "/"))
-            }
-            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-sm font-medium xl:px-3.5 2xl:px-4 ${
-              researchActive || researchOpen
-                ? "bg-[var(--accent)] text-[#04131d]"
-                : "text-[var(--ink-soft)] hover:bg-white/6 hover:text-white"
-            }`}
-          >
-            Research
-            <ChevronDownIcon open={researchOpen} />
-          </button>
-          {researchOpen ? (
-            <div className="absolute left-1/2 top-full z-[60] mt-3 w-[24rem] max-w-[calc(100vw-2rem)] -translate-x-1/2 rounded-[1.6rem] border border-white/10 bg-[rgba(5,11,19,0.98)] p-4 shadow-[0_24px_80px_rgba(0,0,0,0.34)] backdrop-blur-xl pointer-events-auto">
-              <div className="max-h-[min(70vh,36rem)] overflow-y-auto overscroll-contain pr-1 pb-2">
-                <div className="space-y-4">
-                  <div className="grid gap-2">
-                    <p className="px-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
-                      Research hub
-                    </p>
-                    <Link
-                      href={RESEARCH_HUB_ITEM.href}
-                      aria-current={isActive(pathname, RESEARCH_HUB_ITEM.href) ? "page" : undefined}
-                      className={`rounded-[1.2rem] border px-4 py-4 ${
-                        isActive(pathname, RESEARCH_HUB_ITEM.href)
-                          ? "border-[rgba(132,247,198,0.28)] bg-[rgba(132,247,198,0.12)]"
-                          : "border-white/8 bg-white/5 hover:border-[rgba(132,247,198,0.2)]"
-                      }`}
-                    >
-                      <p className="text-sm font-medium text-white">{RESEARCH_HUB_ITEM.label}</p>
-                      <p className="mt-1 text-sm leading-6 text-[var(--ink-soft)]">{RESEARCH_HUB_ITEM.description}</p>
-                    </Link>
-                  </div>
-                  <div className="grid gap-2">
-                    <p className="px-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
-                      Impact analysis
-                    </p>
-                    {IMPACT_ANALYSIS_ITEMS.map((item) => {
-                      const active = isActive(pathname, item.href);
-                      return (
-                        <Link
-                          key={item.href}
-                          href={item.href}
-                          aria-current={active ? "page" : undefined}
-                          className={`rounded-[1.2rem] border px-4 py-4 ${
-                            active
-                              ? "border-[rgba(132,247,198,0.28)] bg-[rgba(132,247,198,0.12)]"
-                              : "border-white/8 bg-white/5 hover:border-[rgba(132,247,198,0.2)]"
-                          }`}
-                        >
-                          <p className="text-sm font-medium text-white">{item.label}</p>
-                          <p className="mt-1 text-sm leading-6 text-[var(--ink-soft)]">{item.description}</p>
-                        </Link>
-                      );
-                    })}
-                  </div>
-                  <div className="grid gap-2">
-                    <p className="px-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
-                      Reference pages
-                    </p>
-                    {RESEARCH_EXTRA_ITEMS.map((item) => {
-                      const active = isActive(pathname, item.href);
-                      return (
-                        <Link
-                          key={item.href}
-                          href={item.href}
-                          aria-current={active ? "page" : undefined}
-                          className={`rounded-[1.2rem] border px-4 py-4 ${
-                            active
-                              ? "border-[rgba(132,247,198,0.28)] bg-[rgba(132,247,198,0.12)]"
-                              : "border-white/8 bg-white/5 hover:border-[rgba(132,247,198,0.2)]"
-                          }`}
-                        >
-                          <p className="text-sm font-medium text-white">{item.label}</p>
-                          <p className="mt-1 text-sm leading-6 text-[var(--ink-soft)]">{item.description}</p>
-                        </Link>
-                      );
-                    })}
-                  </div>
-                  <div
-                    aria-hidden="true"
-                    className="pointer-events-none sticky bottom-0 h-6 bg-gradient-to-b from-transparent to-[rgba(5,11,19,0.98)]"
-                  />
-                </div>
-              </div>
-            </div>
-          ) : null}
-        </div>
-      )}
+      ) : null}
     </nav>
   );
 }
@@ -424,9 +454,9 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-white/8 bg-[rgba(4,10,18,0.88)] backdrop-blur-xl">
-      <div className="mx-auto max-w-[1500px] px-5 py-4 xl:px-8">
-        <div className="flex min-w-0 items-center gap-3 xl:grid xl:grid-cols-[minmax(0,320px)_minmax(0,1fr)_minmax(0,340px)] xl:grid-rows-[auto_auto] xl:items-center xl:gap-x-5 xl:gap-y-2 2xl:grid-cols-[minmax(0,340px)_minmax(0,1fr)_minmax(0,360px)] 2xl:gap-x-6">
-          <div className="min-w-0 flex-1 xl:row-span-2 xl:min-w-0">
+      <div className="mx-auto max-w-[1500px] px-5 py-3 xl:px-8">
+        <div className="relative flex min-w-0 items-center gap-3 xl:min-h-[3.5rem]">
+          <div className="min-w-0 flex-1 xl:max-w-[280px] 2xl:max-w-[320px]">
             <Link href="/" className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-center gap-x-3 gap-y-1.5">
               <div className="relative row-span-2 h-10 w-10 shrink-0 overflow-hidden rounded-2xl border border-white/10 bg-[rgba(17,29,46,0.9)] shadow-[0_12px_30px_rgba(0,0,0,0.25)] xl:h-11 xl:w-11">
                 <Image src="/logo.png" alt="EquityStack" fill className="object-contain p-1.5" priority />
@@ -434,18 +464,18 @@ export function SiteHeader() {
               <p className="min-w-0 self-center text-[13px] font-semibold uppercase tracking-[0.28em] text-[var(--accent)] md:text-[14px] xl:text-[15px]">
                 EquityStack
               </p>
-              <p className="hidden min-w-0 max-w-[17rem] text-[11px] leading-[1.35] text-[var(--ink-muted)] sm:block xl:max-w-[16.5rem] 2xl:max-w-[17.5rem]">
+              <p className="hidden min-w-0 max-w-[17rem] text-[11px] leading-[1.35] text-[var(--ink-muted)] sm:block xl:max-w-[14.5rem] 2xl:max-w-[16rem]">
                 Civic intelligence for Black policy impact
               </p>
             </Link>
           </div>
 
-          <div className="hidden min-w-0 xl:col-start-2 xl:row-start-1 xl:flex xl:justify-center xl:px-2 2xl:px-4">
+          <div className="hidden xl:absolute xl:left-1/2 xl:top-1/2 xl:z-10 xl:flex xl:-translate-x-1/2 xl:-translate-y-1/2">
             <PrimaryNav />
           </div>
 
-          <div className="ml-auto flex min-w-0 items-center justify-end gap-2 md:gap-3 xl:col-start-3 xl:row-start-1 xl:ml-0 xl:w-full xl:max-w-[340px] xl:flex-nowrap xl:justify-end 2xl:max-w-[360px]">
-            <div className="hidden min-w-0 flex-none xl:flex xl:w-[320px] 2xl:w-[340px]">
+          <div className="ml-auto flex min-w-0 items-center justify-end gap-2 md:gap-3 xl:w-auto xl:flex-nowrap xl:gap-2.5">
+            <div className="hidden min-w-0 flex-none xl:flex xl:w-[280px] 2xl:w-[320px]">
               <GlobalSearch
                 compact
                 idSuffix="desktop"
@@ -480,12 +510,10 @@ export function SiteHeader() {
             >
               {menuOpen ? <CloseIcon /> : <MenuIcon />}
             </button>
-          </div>
 
-          <div className="hidden xl:col-start-3 xl:row-start-2 xl:flex xl:justify-end xl:pt-0.5">
             <Link
               href="/dashboard"
-              className="inline-flex shrink-0 rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-white hover:border-white/20 hover:bg-white/6"
+              className="hidden xl:inline-flex xl:shrink-0 xl:rounded-full xl:border xl:border-white/10 xl:px-3.5 xl:py-2 xl:text-sm xl:font-medium xl:text-white xl:hover:border-white/20 xl:hover:bg-white/6"
             >
               Open Data Center
             </Link>
@@ -534,7 +562,7 @@ export function Breadcrumbs({ items = [] }) {
   }
 
   return (
-    <nav aria-label="Breadcrumb" className="mb-6 flex flex-wrap items-center gap-2 text-sm text-[var(--ink-muted)]">
+    <nav aria-label="Breadcrumb" className="mb-4 flex flex-wrap items-center gap-2 text-sm text-[var(--ink-muted)]">
       {items.map((item, index) => {
         const isLast = index === items.length - 1;
         return (

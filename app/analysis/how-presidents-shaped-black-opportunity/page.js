@@ -241,7 +241,7 @@ const RELATED_THEMATIC_PAGES = getRelatedThematicPages(
 
 export default function HowPresidentsShapedBlackOpportunityPage() {
   return (
-    <main className="space-y-10">
+    <main className="space-y-4">
       <StructuredData
         data={buildThematicLandingJsonLd({
           title: "How Presidents Shaped Black Opportunity",
@@ -272,7 +272,7 @@ export default function HowPresidentsShapedBlackOpportunityPage() {
         ]}
       />
 
-      <section className="hero-panel p-8 md:p-10 xl:p-14">
+      <section className="hero-panel p-4">
         <SectionIntro
           as="h1"
           eyebrow="Editorial guide"

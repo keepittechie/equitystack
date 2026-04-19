@@ -31,10 +31,10 @@ export default async function SearchPage({ searchParams }) {
   );
 
   return (
-    <main className="space-y-8">
+    <main className="space-y-4">
       <Breadcrumbs items={[{ href: "/", label: "Home" }, { label: "Search" }]} />
 
-      <section className="hero-panel p-8 md:p-10 xl:p-14">
+      <section className="hero-panel p-4">
         <SectionIntro
           as="h1"
           eyebrow="Universal search"

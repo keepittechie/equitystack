@@ -35,7 +35,7 @@ export default async function TimelinePage({ searchParams }) {
   const lastYear = items.length ? items[0]?.year : null;
 
   return (
-    <main className="space-y-8">
+    <main className="space-y-4">
       <StructuredData
         data={[
           buildBreadcrumbJsonLd(
@@ -63,7 +63,7 @@ export default async function TimelinePage({ searchParams }) {
       />
       <Breadcrumbs items={[{ href: "/", label: "Home" }, { label: "Timeline" }]} />
 
-      <section className="hero-panel p-8 md:p-10 xl:p-14">
+      <section className="hero-panel p-4">
         <SectionIntro
           as="h1"
           eyebrow="Timeline"

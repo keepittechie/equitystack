@@ -30,7 +30,7 @@ export function SectionIntro({
         <HeadingTag
           className={`text-white ${
             isHero
-              ? "mt-3 text-[clamp(2.25rem,5vw,4.5rem)] font-semibold leading-[0.96] tracking-[-0.05em]"
+              ? "mt-3 text-[clamp(1.9rem,5.5vw,3.7rem)] font-semibold leading-[1] tracking-[-0.04em]"
               : "mt-2 text-[clamp(1.45rem,3vw,2.15rem)] font-semibold leading-[1.02] tracking-[-0.04em]"
           }`}
         >
@@ -40,7 +40,7 @@ export function SectionIntro({
           <p
             className={`max-w-3xl text-[var(--ink-soft)] ${
               isHero
-                ? "mt-4 text-base leading-7 md:text-lg"
+                ? "mt-4 text-sm leading-6 md:text-base md:leading-7"
                 : "mt-2 text-sm leading-6 md:text-base md:leading-7"
             }`}
           >

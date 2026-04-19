@@ -32,10 +32,10 @@ function CompareHubCard({ title, description, href, label }) {
 
 export default function ComparePage() {
   return (
-    <main className="space-y-10">
+    <main className="space-y-4">
       <Breadcrumbs items={[{ href: "/", label: "Home" }, { label: "Compare" }]} />
 
-      <section className="hero-panel p-8 md:p-10 xl:p-14">
+      <section className="hero-panel p-4">
         <SectionIntro
           as="h1"
           eyebrow="Compare"

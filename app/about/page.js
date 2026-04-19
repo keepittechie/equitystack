@@ -41,7 +41,7 @@ const ABOUT_SECTIONS = [
 
 export default function AboutPage() {
   return (
-    <main className="space-y-10">
+    <main className="space-y-4">
       <StructuredData
         data={[
           buildBreadcrumbJsonLd(
@@ -70,7 +70,7 @@ export default function AboutPage() {
       />
       <Breadcrumbs items={[{ href: "/", label: "Home" }, { label: "About" }]} />
 
-      <section className="hero-panel p-8 md:p-10 xl:p-14">
+      <section className="hero-panel p-4">
         <SectionIntro
           as="h1"
           eyebrow="About EquityStack"

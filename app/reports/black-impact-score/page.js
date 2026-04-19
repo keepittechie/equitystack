@@ -3503,19 +3503,19 @@ export default async function BlackImpactScorePage({ searchParams }) {
         />
       ) : null}
       <main
-        className={`report-shell w-full ${isPublicView ? "pt-6 pb-8 space-y-8" : "pt-4 pb-6 space-y-6"}`}
+        className={`report-shell w-full ${isPublicView ? "pt-4 pb-8 space-y-4" : "pt-4 pb-6 space-y-4"}`}
       >
       {!isPublicView ? (
         <div className="flex flex-wrap gap-3 print:hidden">
           <Link
             href="/promises"
-            className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:border-white/20 hover:bg-white/8 hover:text-white"
+            className="dashboard-button-secondary"
           >
             Open Promise Tracker
           </Link>
           <Link
             href="/reports"
-            className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:border-white/20 hover:bg-white/8 hover:text-white"
+            className="dashboard-button-secondary"
           >
             Back to Reports
           </Link>
@@ -3536,9 +3536,9 @@ export default async function BlackImpactScorePage({ searchParams }) {
 
       {isDebateMode ? <DebateModeHeader /> : null}
 
-      <section className="hero-panel p-6 md:p-8">
+      <section className="hero-panel p-4">
         <p className="eyebrow mb-4">Promise Tracker Report</p>
-        <h1 className="text-4xl md:text-5xl font-bold">Black Impact Score</h1>
+        <h1 className="page-title">Black Impact Score</h1>
         <p className="text-base md:text-lg text-[var(--ink-soft)] mt-4 max-w-3xl leading-8">
           This score reflects documented outcomes, not campaign promises alone. It shows how presidential records affected Black communities using reviewed actions, outcomes, and source-backed evidence.
         </p>

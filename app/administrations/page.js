@@ -29,10 +29,10 @@ export default async function AdministrationsPage({ searchParams }) {
   const administrations = await fetchAdministrationsOverviewData(resolvedSearchParams);
 
   return (
-    <main className="space-y-8">
+    <main className="space-y-4">
       <Breadcrumbs items={[{ href: "/", label: "Home" }, { label: "Administrations" }]} />
 
-      <section className="hero-panel p-8 md:p-10 xl:p-14">
+      <section className="hero-panel p-4">
         <SectionIntro
           as="h1"
           eyebrow="Administration index"

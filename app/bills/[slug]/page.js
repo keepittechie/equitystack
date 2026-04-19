@@ -13,6 +13,15 @@ import {
   PolicyTimeline,
 } from "@/app/components/public/entities";
 import EquityStackTabbar from "@/app/components/dashboard/EquityStackTabbar";
+import {
+  MetricCard,
+  Panel,
+  SectionHeader,
+  StatusPill,
+  getBillStatusTone,
+  getConfidenceTone,
+  getImpactDirectionTone,
+} from "@/app/components/dashboard/primitives";
 import { ImpactBadge, statusPillClasses } from "@/app/components/policy-badges";
 import { buildPageMetadata } from "@/lib/metadata";
 import {
@@ -44,21 +53,6 @@ async function getBillDetail(slug) {
 
 function buildBillDescription(bill) {
   return bill.officialSummary || bill.whyItMatters;
-}
-
-function MetaPill({ children }) {
-  return <span className="public-pill">{children}</span>;
-}
-
-function SummaryPanel({ label, children }) {
-  return (
-    <div className="rounded-[1.35rem] border border-white/8 bg-[rgba(8,14,24,0.92)] p-5">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--ink-muted)]">
-        {label}
-      </p>
-      <div className="mt-3">{children}</div>
-    </div>
-  );
 }
 
 function BillPanel({ children, className = "", ...props }) {
@@ -235,7 +229,7 @@ export default async function BillDetailPage({ params }) {
   const showLocalNavigation = localNavigationItems.length >= 3;
 
   return (
-    <main className="space-y-10">
+    <main className="space-y-4">
       <StructuredData
         data={[
           buildBreadcrumbJsonLd(
@@ -276,95 +270,115 @@ export default async function BillDetailPage({ params }) {
         ]}
       />
 
-      <section className="hero-panel p-8 md:p-10 xl:p-14">
-        <div className="flex items-start justify-between gap-6 flex-wrap">
-          <div className="max-w-4xl">
-            <p className="eyebrow mb-4">{bill.billNumber}</p>
-            <h1 className="page-title">{bill.title}</h1>
-            <p className="mt-5 max-w-3xl text-base leading-8 text-[var(--ink-soft)] md:text-lg">
+      <Panel prominence="primary" className="overflow-hidden">
+        <div className="grid gap-0 xl:grid-cols-[minmax(0,1fr)_18rem]">
+          <div className="min-w-0 border-b border-[var(--line)] p-4 xl:border-b-0 xl:border-r">
+            <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
+              {bill.billNumber}
+            </p>
+            <h1 className="page-title mt-3">{bill.title}</h1>
+            <p className="mt-4 max-w-3xl text-sm leading-6 text-[var(--ink-soft)] md:text-base md:leading-7">
               {buildBillDescription(bill)}
             </p>
             <div className="mt-5 flex flex-wrap gap-2">
-              <span className={statusPillClasses(bill.statusTone)}>{bill.status}</span>
-              <ImpactBadge impact={bill.impactDirection} />
-              <span className={statusPillClasses(bill.confidenceTone)}>
-                Impact confidence: {bill.impactConfidence}
-              </span>
-              <span className={statusPillClasses(bill.reviewTone)}>{bill.reviewProxy}</span>
+              <StatusPill tone={getBillStatusTone(bill.status)}>{bill.status}</StatusPill>
+              <StatusPill tone={getImpactDirectionTone(bill.impactDirection)}>
+                {bill.impactDirection}
+              </StatusPill>
+              <StatusPill tone={getConfidenceTone(bill.impactConfidence)}>
+                Confidence {bill.impactConfidence}
+              </StatusPill>
+              <StatusPill tone="default">{bill.reviewProxy}</StatusPill>
               {bill.topicTags.map((topic) => (
-                <MetaPill key={`${bill.id}-${topic}`}>{topic}</MetaPill>
+                <StatusPill key={`${bill.id}-${topic}`} tone="default">
+                  {topic}
+                </StatusPill>
               ))}
             </div>
           </div>
-
-          <div className="flex flex-wrap gap-3">
-            <Link href="/bills" className="dashboard-button-secondary">
-              Back to bills
-            </Link>
-            <Link href={bill.primaryContextHref} className="dashboard-button-secondary">
-              Open bill context
-            </Link>
-            <a
-              href={bill.congressUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="dashboard-button-secondary"
-            >
-              View on Congress.gov
-            </a>
-          </div>
+          <aside className="grid content-start gap-3 p-4">
+            <MetricCard
+              label="Estimated BIS"
+              value={String(bill.blackImpactScore)}
+              description="Bill-level Black Impact Score estimate."
+              tone={getImpactDirectionTone(bill.impactDirection)}
+              prominence="primary"
+              showDot
+            />
+            <MetricCard
+              label="Impact confidence"
+              value={bill.impactConfidence}
+              description={`Last action ${formatBillDate(bill.latestActionDate) || "Unavailable"}.`}
+              tone={getConfidenceTone(bill.impactConfidence)}
+              showDot
+            />
+            <div className="flex flex-wrap gap-2">
+              <Link href="/bills" className="dashboard-button-secondary">
+                Back to bills
+              </Link>
+              <Link href={bill.primaryContextHref} className="dashboard-button-secondary">
+                Open bill context
+              </Link>
+              <a
+                href={bill.congressUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="dashboard-button-secondary"
+              >
+                View on Congress.gov
+              </a>
+            </div>
+          </aside>
         </div>
+      </Panel>
+
+      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <MetricCard
+          label="Review status"
+          value={bill.reviewProxy}
+          description="Current public review proxy for this bill record."
+          tone="info"
+        />
+        <MetricCard
+          label="Source count"
+          value={String(bill.sourceCount || 0)}
+          description="Bill sources and action-history links in the public record."
+          tone="verified"
+        />
+        <MetricCard
+          label="Linked reform concepts"
+          value={String(bill.linkedFutureBills.length || 0)}
+          description="Connected proposal and reform paths already modeled in EquityStack."
+          tone="default"
+        />
+        <MetricCard
+          label="Tracked sponsors"
+          value={String(bill.sponsorCount || 0)}
+          description="Sponsors currently surfaced on the tracked bill record."
+          tone="default"
+        />
       </section>
 
-      <BillPanel className="space-y-5">
-        <SummaryPanel label="Impact panel">
-          <div className="flex items-start justify-between gap-5 flex-wrap">
-            <div>
-              <p className="text-sm leading-7 text-[var(--ink-soft)]">
-                EquityStack estimates a bill-level Black Impact Score from domain relevance, population reach, enforcement strength, legislative progress, risk signals, and source-backed confidence.
-              </p>
-              <div className="mt-4 flex flex-wrap gap-2">
-                <ImpactBadge impact={bill.impactDirection} />
-                <MetaPill>Confidence {bill.impactConfidence}</MetaPill>
-                <MetaPill>Last action {formatBillDate(bill.latestActionDate) || "Unavailable"}</MetaPill>
-              </div>
-            </div>
-            <ScoreBadge
-              value={String(bill.blackImpactScore)}
-              label="Estimated Black Impact Score"
-              tone={
-                bill.impactDirection === "Positive"
-                  ? "positive"
-                  : bill.impactDirection === "Negative"
-                    ? "negative"
-                    : "default"
-              }
-              size="lg"
-            />
+      <Panel prominence="primary" className="overflow-hidden">
+        <SectionHeader
+          eyebrow="How to read this bill"
+          title="Impact estimate, public fields, and linked context in one view"
+          description="The bill layer is meant to stay readable without pretending it is more complete than the public tracked-bill dataset allows."
+        />
+        <div className="grid gap-4 p-4 xl:grid-cols-[minmax(0,1.2fr)_minmax(20rem,0.8fr)]">
+          <div className="space-y-4">
+            <p className="text-sm leading-7 text-[var(--ink-soft)]">{bill.whyItMatters}</p>
+            <p className="text-sm leading-7 text-[var(--ink-soft)]">
+              EquityStack estimates a bill-level Black Impact Score from domain relevance, population reach, enforcement strength, legislative progress, risk signals, and source-backed confidence.
+            </p>
           </div>
-        </SummaryPanel>
-
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <DetailLine label="Review status" value={bill.reviewProxy} />
-          <DetailLine label="Source count" value={String(bill.sourceCount || 0)} />
-          <DetailLine label="Linked reform concepts" value={String(bill.linkedFutureBills.length || 0)} />
-          <DetailLine label="Tracked sponsors" value={String(bill.sponsorCount || 0)} />
+          <PageContextBlock
+            title="What this page can and cannot tell you"
+            description="This is a public bill detail page built from tracked bill records, actions, sponsors, and linked future-bill context already in EquityStack."
+            detail="The bill BIS model is deterministic and explainable, but still limited by the public tracked-bill dataset. Missing source depth or thin legislative context can keep a bill closer to mixed or low-confidence readings."
+          />
         </div>
-      </BillPanel>
-
-      <BillPanel className="space-y-5">
-        <SectionIntro
-          eyebrow="Why this matters"
-          title="Why EquityStack is surfacing this bill"
-          description="The goal here is to make the legislative layer readable: why the bill matters, what it is connected to, and how far the public record goes right now."
-        />
-        <p className="text-sm leading-8 text-[var(--ink-soft)]">{bill.whyItMatters}</p>
-        <PageContextBlock
-          title="What this page can and cannot tell you"
-          description="This is a public bill detail page built from tracked bill records, actions, sponsors, and linked future-bill context already in EquityStack."
-          detail="The bill BIS model is deterministic and explainable, but still limited by the public tracked-bill dataset. Missing source depth or thin legislative context can keep a bill closer to mixed or low-confidence readings."
-        />
-      </BillPanel>
+      </Panel>
 
       {showLocalNavigation ? (
         <div className="space-y-1.5">

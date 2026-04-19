@@ -21,14 +21,14 @@ export default function PromiseStatusLegend({
   statuses = ["Delivered", "In Progress", "Partial", "Blocked", "Failed"],
 }) {
   return (
-    <aside className="h-full rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4 md:p-6">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--accent)]">
+    <aside className="h-full rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4">
+      <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
         Status legend
       </p>
-      <h3 className="mt-3 text-base font-semibold text-white md:text-lg">
+      <h3 className="mt-2 text-base font-semibold text-white">
         How Promise Status is assigned
       </h3>
-      <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+      <p className="mt-2 text-sm leading-6 text-[var(--ink-soft)]">
         Promise Status reflects documented implementation and evidence in the
         current EquityStack dataset. It does not measure rhetoric on its own.
       </p>
@@ -36,10 +36,10 @@ export default function PromiseStatusLegend({
         {statuses.map((status) => (
           <div
             key={status}
-            className="rounded-[1.05rem] border border-white/8 bg-white/5 px-4 py-3.5"
+            className="rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-3"
           >
             <p className="text-sm font-semibold text-white">{status}</p>
-            <p className="mt-1 text-sm leading-7 text-[var(--ink-soft)]">
+            <p className="mt-1 text-sm leading-6 text-[var(--ink-soft)]">
               {describeStatus(status)}
             </p>
           </div>

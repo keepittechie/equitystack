@@ -219,7 +219,7 @@ const GLOSSARY_USE_CASES = [
 
 export default function GlossaryPage() {
   return (
-    <main className="space-y-10">
+    <main className="space-y-4">
       <StructuredData
         data={[
           buildBreadcrumbJsonLd(
@@ -257,7 +257,7 @@ export default function GlossaryPage() {
       />
       <Breadcrumbs items={[{ href: "/", label: "Home" }, { label: "Glossary" }]} />
 
-      <section className="hero-panel p-8 md:p-10 xl:p-14">
+      <section className="hero-panel p-4">
         <SectionIntro
           as="h1"
           eyebrow="Glossary"

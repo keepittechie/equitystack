@@ -97,8 +97,8 @@ export default async function ScorecardsPage({ searchParams }) {
   );
 
   return (
-    <main className="max-w-7xl mx-auto p-6 space-y-10">
-      <section className="hero-panel p-8 md:p-10">
+    <main className="max-w-7xl mx-auto p-6 space-y-4">
+      <section className="hero-panel p-4">
         <p className="eyebrow mb-4">Accountability Layer</p>
         <h1 className="page-title">
           Legislator Scorecards

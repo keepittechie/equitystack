@@ -148,11 +148,11 @@ export default async function AllPromisesPage({ searchParams }) {
   const showAll = resolvedSearchParams.show_all !== "0";
 
   return (
-    <main className="max-w-7xl mx-auto p-6">
-      <section className="hero-panel p-8 md:p-10 mb-6">
+    <main className="max-w-7xl mx-auto p-6 space-y-4">
+      <section className="hero-panel p-4">
         <div className="section-intro">
           <p className="eyebrow mb-4">Promise Tracker</p>
-          <h1 className="text-4xl md:text-5xl font-bold">All Promise Records</h1>
+          <h1 className="page-title">All Promise Records</h1>
           <p className="text-base md:text-lg text-[var(--ink-soft)] mt-4 leading-8 max-w-3xl">
             Browse tracked promise records across presidents. The default public view shows the full public dataset,
             with an option to switch into the prioritized relevance subset when a tighter editorial view is useful.
@@ -165,22 +165,22 @@ export default async function AllPromisesPage({ searchParams }) {
         </div>
       </section>
 
-      <section className="mb-6 flex flex-wrap gap-3">
+      <section className="flex flex-wrap gap-3">
         <Link
           href="/promises"
-          className="rounded-full border border-white/10 bg-white/5 px-5 py-2 text-sm font-medium text-white hover:border-white/20 hover:bg-white/8"
+          className="dashboard-button-secondary"
         >
           View Presidents
         </Link>
         <Link
           href={buildShowAllHref(resolvedSearchParams, !showAll)}
-          className="rounded-full border border-white/10 bg-white/5 px-5 py-2 text-sm font-medium text-white hover:border-white/20 hover:bg-white/8"
+          className="dashboard-button-secondary"
         >
           {showAll ? "Show Prioritized View" : "Show All Promises"}
         </Link>
       </section>
 
-      <section className="card-surface p-4 mb-8">
+      <section className="card-surface p-4">
         <div className="mb-4">
           <h2 className="text-xl font-semibold">Search and Filter</h2>
           <p className="text-sm text-[var(--ink-soft)] mt-1">
@@ -290,7 +290,7 @@ export default async function AllPromisesPage({ searchParams }) {
       </section>
 
       {activeFilters.length > 0 && (
-        <section className="mb-6 flex flex-wrap gap-2">
+        <section className="flex flex-wrap gap-2">
           {activeFilters.map((filter) => (
             <Link
               key={filter.key}

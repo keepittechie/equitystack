@@ -175,7 +175,7 @@ export default async function NarrativesPage() {
         ]}
       />
       <Breadcrumbs items={[{ href: "/", label: "Home" }, { label: "Narratives" }]} />
-      <section className="hero-panel p-8 md:p-10">
+      <section className="hero-panel p-4">
         <p className="eyebrow mb-4">
           Narrative Mode
         </p>

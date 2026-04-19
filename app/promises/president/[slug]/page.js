@@ -133,7 +133,7 @@ export default async function PromisePresidentPage({ params, searchParams }) {
   const explanation = EXPLANATION_CONTENT.promisePresident;
 
   return (
-    <main className="max-w-7xl mx-auto p-6">
+    <main className="max-w-7xl mx-auto p-6 space-y-4">
       <StructuredData
         data={[
           buildBreadcrumbJsonLd(
@@ -168,38 +168,38 @@ export default async function PromisePresidentPage({ params, searchParams }) {
           { label: president.president },
         ]}
       />
-      <div className="mb-4 flex flex-wrap gap-3">
+      <div className="flex flex-wrap gap-3">
         <Link
           href="/promises"
-          className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:border-white/20 hover:bg-white/8 hover:text-white"
+          className="dashboard-button-secondary"
         >
           Back to Presidency Terms
         </Link>
         <Link
           href={showAll ? "/promises/all" : "/promises/all?show_all=0"}
-          className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:border-white/20 hover:bg-white/8 hover:text-white"
+          className="dashboard-button-secondary"
         >
           Browse All Promise Records
         </Link>
         <Link
           href={showAll ? `/promises/president/${slug}?show_all=0` : `/promises/president/${slug}`}
-          className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:border-white/20 hover:bg-white/8 hover:text-white"
+          className="dashboard-button-secondary"
         >
           {showAll ? "Show Prioritized View" : "Show All Promises"}
         </Link>
         <Link
           href="/reports/black-impact-score"
-          className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:border-white/20 hover:bg-white/8 hover:text-white"
+          className="dashboard-button-secondary"
         >
           View Black Impact Score
         </Link>
       </div>
 
-      <section className="hero-panel p-8 md:p-10 mb-6">
+      <section className="hero-panel p-4">
         <div className="flex items-start justify-between gap-6 flex-wrap">
           <div className="max-w-4xl">
             <p className="eyebrow mb-4">Promise Tracker</p>
-            <h1 className="text-3xl md:text-4xl font-bold">{president.president}</h1>
+            <h1 className="page-title">{president.president}</h1>
             <p className="text-base md:text-lg text-[var(--ink-soft)] mt-4 leading-8">
               Promise Tracker groups this presidency term&apos;s records by status so users can study campaign promises, governing commitments, and linked outcomes affecting Black Americans in one place. The default public view shows the full tracked promise set for this term, while the prioritized view narrows to higher-relevance records when needed.
             </p>
@@ -228,7 +228,7 @@ export default async function PromisePresidentPage({ params, searchParams }) {
         </div>
       </section>
 
-      <section className="grid gap-4 md:grid-cols-5 mb-8">
+      <section className="grid gap-4 md:grid-cols-5">
         <MiniStat label="Delivered" value={showAll ? president.delivered_count : president.visible_delivered_count} />
         <MiniStat label="In Progress" value={showAll ? president.in_progress_count : president.visible_in_progress_count} />
         <MiniStat label="Partial" value={showAll ? president.partial_count : president.visible_partial_count} />
@@ -236,7 +236,7 @@ export default async function PromisePresidentPage({ params, searchParams }) {
         <MiniStat label="Blocked" value={showAll ? president.blocked_count : president.visible_blocked_count} />
       </section>
 
-      <section className="card-surface p-4 mb-8">
+      <section className="card-surface p-4">
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div className="max-w-3xl">
             <h2 className="text-lg font-semibold mb-2">Build, Interpret, Verify</h2>
@@ -259,16 +259,13 @@ export default async function PromisePresidentPage({ params, searchParams }) {
           ))}
         </ul>
         <div className="mt-4">
-          <Link
-            href="/reports/black-impact-score"
-            className="rounded-full border border-white/10 bg-white/5 px-5 py-2 text-sm font-medium text-white hover:border-white/20 hover:bg-white/8"
-          >
+          <Link href="/reports/black-impact-score" className="dashboard-button-secondary">
             Explore Black Impact Score
           </Link>
         </div>
       </section>
 
-      <section className="grid gap-4 md:grid-cols-3 mb-8">
+      <section className="grid gap-4 md:grid-cols-3">
         <Link
           href={`/presidents/${slug}`}
           className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4 hover:border-white/16"

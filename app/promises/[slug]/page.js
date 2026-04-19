@@ -26,6 +26,14 @@ import {
 } from "@/app/components/public/entities";
 import EquityStackTabbar from "@/app/components/dashboard/EquityStackTabbar";
 import {
+  MetricCard,
+  Panel,
+  SectionHeader,
+  StatusPill,
+  getConfidenceTone,
+  getPromiseStatusTone,
+} from "@/app/components/dashboard/primitives";
+import {
   buildBreadcrumbJsonLd,
   buildPromiseJsonLd,
 } from "@/lib/structured-data";
@@ -237,7 +245,7 @@ export default async function PromiseDetailPage({ params }) {
   const showLocalNavigation = localNavigationItems.length >= 3;
 
   return (
-    <main className="space-y-10">
+    <main className="space-y-4">
       <StructuredData
         data={[
           buildBreadcrumbJsonLd(
@@ -273,51 +281,63 @@ export default async function PromiseDetailPage({ params }) {
         ].filter(Boolean)}
       />
 
-      <PromisePanel className="space-y-5">
-        <PromiseSystemExplanation />
-        <PromiseStatusLegend statuses={["Delivered", "In Progress", "Partial", "Blocked", "Failed"]} />
-      </PromisePanel>
-
-      <PromisePanel className="space-y-5">
-        <PageContextBlock
-          description="This page is the landing point for a single promise record: the original commitment, the current status, the linked policy actions, and the evidence used to justify the classification."
-          detail="Use it when you want to move from a broad question about campaign promises to Black Americans into the specific public record behind one promise."
+      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <MetricCard
+          label="Current status"
+          value={promise.status || "Unknown"}
+          description="Promise-tracker classification in the current public record."
+          tone={getPromiseStatusTone(promise.status)}
+          showDot
         />
-        <PageContextBlock
-          title="Why this promise matters"
-          description={buildWhyPromiseMatters(promise)}
+        <MetricCard
+          label="Confidence"
+          value={promise.confidence_label || "Not yet available"}
+          description="Evidence confidence for the current status assignment."
+          tone={getConfidenceTone(promise.confidence_label)}
+          showDot
         />
-      </PromisePanel>
-
-      <section className="grid gap-4 md:grid-cols-3">
-        {guideCards.map((item) => (
-          <div
-            key={item.title}
-            className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4"
-          >
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--accent)]">
-              {item.eyebrow}
-            </p>
-            <h2 className="mt-3 text-lg font-semibold text-white">{item.title}</h2>
-            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item.description}</p>
-          </div>
-        ))}
+        <MetricCard
+          label="Linked policy actions"
+          value={linkedPolicyCount}
+          description={`${actionCount} documented action record${actionCount === 1 ? "" : "s"} attached.`}
+          tone="info"
+        />
+        <MetricCard
+          label="Policy outcomes"
+          value={policyOutcomeCount}
+          description={`${evidence.length} visible evidence source${evidence.length === 1 ? "" : "s"} in the current trail.`}
+          tone="verified"
+        />
       </section>
 
-      <PromisePanel>
-        <SectionIntro
-          eyebrow="Context and background"
-          title="How to interpret this promise when the narrative is brief"
-          description="This framing keeps shorter promise summaries from feeling thin by tying them back to the actions, outcomes, linked policies, and surrounding research paths already visible on the page."
+      <Panel prominence="primary" className="overflow-hidden">
+        <SectionHeader
+          eyebrow="How to use this record"
+          title="Promise language, status, and evidence in one frame"
+          description="Read the statement, status rationale, linked policies, outcomes, and source trail together before treating the status as settled."
         />
-        <div className="mt-5 grid gap-4">
-          {contextParagraphs.map((paragraph, index) => (
-            <p key={`${slug}-context-${index}`} className="text-sm leading-8 text-[var(--ink-soft)]">
-              {paragraph}
-            </p>
-          ))}
+        <div className="grid gap-4 p-4 xl:grid-cols-[minmax(0,1.1fr)_minmax(18rem,0.9fr)]">
+          <div className="space-y-4">
+            <PromiseSystemExplanation />
+            <Panel padding="md" className="space-y-3">
+              <StatusPill tone="info">Why this promise matters</StatusPill>
+              <p className="text-sm leading-6 text-[var(--ink-soft)]">
+                {buildWhyPromiseMatters(promise)}
+              </p>
+              <p className="text-sm leading-6 text-[var(--ink-soft)]">
+                {buildPromiseOverview(promise)}
+              </p>
+            </Panel>
+          </div>
+          <div className="space-y-4">
+            <PromiseStatusLegend statuses={["Delivered", "In Progress", "Partial", "Blocked", "Failed"]} />
+            <PageContextBlock
+              description="This page is the landing point for a single promise record: the original commitment, the current status, the linked policy actions, and the evidence used to justify the classification."
+              detail="Use it when you want to move from a broad question about campaign promises to Black Americans into the specific public record behind one promise."
+            />
+          </div>
         </div>
-      </PromisePanel>
+      </Panel>
 
       {showLocalNavigation ? (
         <div className="space-y-1.5">
@@ -436,6 +456,31 @@ export default async function PromiseDetailPage({ params }) {
         />
         <MethodologyCallout description="Promise grading and Black Impact Score are related but distinct. A promise can be delivered with mixed or limited downstream impact, and the site keeps those layers separate." />
       </PromisePanel>
+
+      <section className="grid gap-4 md:grid-cols-3">
+        {guideCards.map((item) => (
+          <Panel key={item.title} padding="md" className="space-y-3">
+            <StatusPill tone="info">{item.eyebrow}</StatusPill>
+            <h2 className="text-lg font-semibold text-white">{item.title}</h2>
+            <p className="text-sm leading-7 text-[var(--ink-soft)]">{item.description}</p>
+          </Panel>
+        ))}
+      </section>
+
+      <Panel className="overflow-hidden">
+        <SectionHeader
+          eyebrow="Context and background"
+          title="How to interpret this promise when the narrative is brief"
+          description="This framing ties shorter promise summaries back to the actions, outcomes, linked policies, and surrounding research paths already visible on the page."
+        />
+        <div className="grid gap-4 p-4">
+          {contextParagraphs.map((paragraph, index) => (
+            <p key={`${slug}-context-${index}`} className="text-sm leading-7 text-[var(--ink-soft)]">
+              {paragraph}
+            </p>
+          ))}
+        </div>
+      </Panel>
 
       <section id="evidence" className={`${localSectionOffsetClass} space-y-5`}>
         <SectionIntro

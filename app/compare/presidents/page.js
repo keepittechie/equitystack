@@ -57,7 +57,7 @@ export default async function ComparePresidentsPage({ searchParams }) {
   }));
 
   return (
-    <main className="space-y-10">
+    <main className="space-y-4">
       <Breadcrumbs
         items={[
           { href: "/", label: "Home" },
@@ -66,7 +66,7 @@ export default async function ComparePresidentsPage({ searchParams }) {
         ]}
       />
 
-      <section className="hero-panel p-8 md:p-10 xl:p-14">
+      <section className="hero-panel p-4">
         <SectionIntro
           as="h1"
           eyebrow="President comparison"

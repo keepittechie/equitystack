@@ -164,12 +164,12 @@ export default async function CurrentAdministrationPage() {
     : `/promises/president/${overview.president.slug}?show_all=1`;
 
   return (
-    <main className="max-w-7xl mx-auto p-6 space-y-8">
-      <section className="hero-panel p-8 md:p-10">
+    <main className="max-w-7xl mx-auto p-6 space-y-4">
+      <section className="hero-panel p-4">
         <div className="flex items-start justify-between gap-6 flex-wrap">
           <div className="max-w-4xl">
             <p className="eyebrow mb-4">Current Administration</p>
-            <h1 className="page-title text-[clamp(2.2rem,4vw,3.5rem)]">
+            <h1 className="page-title">
               {overview.administration_name} ({termLabel})
             </h1>
             <p className="mt-5 max-w-3xl text-base leading-8 text-[var(--ink-soft)] md:text-lg">

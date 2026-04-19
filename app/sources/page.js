@@ -41,7 +41,7 @@ export default async function SourcesPage({ searchParams }) {
   ).length;
 
   return (
-    <main className="space-y-8">
+    <main className="space-y-4">
       <StructuredData
         data={[
           buildBreadcrumbJsonLd(
@@ -90,7 +90,7 @@ export default async function SourcesPage({ searchParams }) {
       />
       <Breadcrumbs items={[{ href: "/", label: "Home" }, { label: "Sources" }]} />
 
-      <section className="hero-panel p-8 md:p-10 xl:p-14">
+      <section className="hero-panel p-4">
         <SectionIntro
           as="h1"
           eyebrow="Source library"

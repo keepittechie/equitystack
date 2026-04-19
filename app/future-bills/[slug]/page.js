@@ -190,7 +190,7 @@ export default async function FutureBillDetailPage({ params }) {
         </TrackedLink>
       </div>
 
-      <section className="hero-panel p-8 md:p-10">
+      <section className="hero-panel p-4">
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div className="max-w-4xl">
             <p className="eyebrow mb-4">{bill.target_area || "Future Bill"}</p>

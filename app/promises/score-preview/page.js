@@ -680,11 +680,11 @@ export default async function PromiseScorePreviewPage() {
       : null;
 
   return (
-    <main className="max-w-7xl mx-auto p-6">
-      <section className="hero-panel p-8 md:p-10 mb-6">
+    <main className="max-w-7xl mx-auto p-6 space-y-4">
+      <section className="hero-panel p-4">
         <div className="section-intro">
           <p className="eyebrow mb-4">Promise Tracker</p>
-          <h1 className="text-4xl md:text-5xl font-bold">Black Impact Score Comparison Preview</h1>
+          <h1 className="page-title">Black Impact Score Comparison Preview</h1>
           <p className="text-base md:text-lg text-[var(--ink-soft)] mt-4 leading-8 max-w-3xl">
             This internal page compares the legacy promise-based score model with the newer
             outcome-based model before any public transition. It is intended for methodological
@@ -699,30 +699,21 @@ export default async function PromiseScorePreviewPage() {
         </div>
       </section>
 
-      <section className="mb-6 flex flex-wrap gap-3">
-        <Link
-          href="/promises"
-          className="rounded-full border border-white/10 bg-white/5 px-5 py-2 text-sm font-medium text-white hover:border-white/20 hover:bg-white/8"
-        >
+      <section className="flex flex-wrap gap-3">
+        <Link href="/promises" className="dashboard-button-secondary">
           View Presidents
         </Link>
-        <Link
-          href="/promises/all"
-          className="rounded-full border border-white/10 bg-white/5 px-5 py-2 text-sm font-medium text-white hover:border-white/20 hover:bg-white/8"
-        >
+        <Link href="/promises/all" className="dashboard-button-secondary">
           Browse All Promise Records
         </Link>
-        <Link
-          href="/reports/black-impact-score"
-          className="rounded-full border border-white/10 bg-white/5 px-5 py-2 text-sm font-medium text-white hover:border-white/20 hover:bg-white/8"
-        >
+        <Link href="/reports/black-impact-score" className="dashboard-button-secondary">
           View Current Public Report
         </Link>
       </section>
 
       {outcome.error ? (
         <section
-          className="card-surface p-4 mb-8 border border-[rgba(185,28,28,0.18)] bg-[linear-gradient(180deg,rgba(254,242,242,0.9),rgba(255,255,255,0.98))]"
+          className="card-surface p-4 border border-[rgba(185,28,28,0.18)] bg-[linear-gradient(180deg,rgba(254,242,242,0.9),rgba(255,255,255,0.98))]"
           aria-live="polite"
         >
           <h2 className="text-xl font-semibold">Outcome-Based Model Unavailable</h2>
@@ -733,7 +724,7 @@ export default async function PromiseScorePreviewPage() {
         </section>
       ) : null}
 
-      <section className="grid gap-4 md:grid-cols-2 mb-8">
+      <section className="grid gap-4 md:grid-cols-2">
         <MetricCard
           label="Legacy Promise Model"
           value={legacyItems.length}

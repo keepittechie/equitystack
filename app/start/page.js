@@ -104,7 +104,7 @@ const audienceStartPoints = [
 
 export default function StartPage() {
   return (
-    <main className="max-w-5xl mx-auto p-6 space-y-10">
+    <main className="max-w-5xl mx-auto p-6 space-y-4">
       <StructuredData
         data={[
           buildBreadcrumbJsonLd(
@@ -141,7 +141,7 @@ export default function StartPage() {
         ]}
       />
       <Breadcrumbs items={[{ href: "/", label: "Home" }, { label: "Start Here" }]} />
-      <section className="hero-panel p-8 md:p-10">
+      <section className="hero-panel p-4">
         <p className="eyebrow mb-4">
           Research guide
         </p>

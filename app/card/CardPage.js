@@ -61,11 +61,11 @@ export default function CardPage({ card, backHref, backLabel }) {
   const absoluteUrl = toAbsoluteUrl(card.sharePath);
 
   return (
-    <main className="max-w-4xl mx-auto p-6 space-y-5">
+    <main className="max-w-4xl mx-auto p-6 space-y-4">
       <div className="flex flex-wrap items-center gap-3">
         <Link
           href={backHref}
-          className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:border-white/20 hover:bg-white/8 hover:text-white"
+          className="dashboard-button-secondary"
         >
           {backLabel}
         </Link>
@@ -77,7 +77,7 @@ export default function CardPage({ card, backHref, backLabel }) {
       <article className="card-surface rounded-[1.8rem] p-7 md:p-9 space-y-7">
         <header className="space-y-3">
           <p className="eyebrow">{card.category}</p>
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight">{card.title}</h1>
+          <h1 className="page-title">{card.title}</h1>
           <p className="text-lg text-[var(--ink-soft)] leading-8">
             {card.summary}
           </p>

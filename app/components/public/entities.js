@@ -6,7 +6,12 @@ import {
   isNonStandardSystemicImpact,
   systemicMultiplierFor,
 } from "@/lib/systemicImpact";
-import { Panel, StatusPill } from "@/app/components/dashboard/primitives";
+import {
+  MetricCard,
+  Panel,
+  StatusPill,
+  getPromiseStatusTone,
+} from "@/app/components/dashboard/primitives";
 import { ScoreBadge } from "./core";
 
 const FILTER_FIELD_CLASS =
@@ -735,19 +740,49 @@ export function PromiseResultsTable({ items = [], buildHref }) {
 
 export function PromiseHero({ title, statement, status, president, termLabel, badges = [] }) {
   return (
-    <Panel prominence="primary" padding="md">
-      <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">Promise record</p>
-      <h1 className="mt-3 text-[clamp(2rem,4vw,4.2rem)] font-semibold leading-[0.98] tracking-[-0.05em] text-white">
-        {title}
-      </h1>
-      {statement ? <p className="mt-4 max-w-3xl text-base leading-7 text-[var(--ink-soft)] md:text-lg">{statement}</p> : null}
-      <div className="mt-4 flex flex-wrap gap-2">
-        {status ? <StatusPill tone="info">{status}</StatusPill> : null}
-        {president ? <StatusPill tone="default">{president}</StatusPill> : null}
-        {termLabel ? <StatusPill tone="default">{termLabel}</StatusPill> : null}
-        {badges.map((badge) => (
-          <StatusPill key={badge} tone="default">{badge}</StatusPill>
-        ))}
+    <Panel prominence="primary" className="overflow-hidden">
+      <div className="grid gap-0 xl:grid-cols-[minmax(0,1fr)_18rem]">
+        <div className="min-w-0 border-b border-[var(--line)] p-4 xl:border-b-0 xl:border-r">
+          <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
+            Promise record
+          </p>
+          <h1 className="page-title mt-3">{title}</h1>
+          {statement ? (
+            <p className="mt-4 max-w-3xl text-sm leading-6 text-[var(--ink-soft)] md:text-base md:leading-7">
+              {statement}
+            </p>
+          ) : null}
+          <div className="mt-5 flex flex-wrap gap-2">
+            {president ? <StatusPill tone="default">{president}</StatusPill> : null}
+            {termLabel ? <StatusPill tone="default">{termLabel}</StatusPill> : null}
+            {badges.map((badge) => (
+              <StatusPill key={badge} tone="default">
+                {badge}
+              </StatusPill>
+            ))}
+          </div>
+        </div>
+        <aside className="grid content-start gap-3 p-4">
+          {status ? (
+            <MetricCard
+              label="Current status"
+              value={status}
+              description="Promise-tracker classification in the current public record."
+              tone={getPromiseStatusTone(status)}
+              prominence="primary"
+              showDot
+            />
+          ) : null}
+          <Panel padding="md">
+            <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
+              Record context
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {president ? <StatusPill tone="default">{president}</StatusPill> : null}
+              {termLabel ? <StatusPill tone="default">{termLabel}</StatusPill> : null}
+            </div>
+          </Panel>
+        </aside>
       </div>
     </Panel>
   );
