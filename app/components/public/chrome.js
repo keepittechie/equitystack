@@ -474,8 +474,8 @@ export function SiteHeader() {
             <PrimaryNav />
           </div>
 
-          <div className="ml-auto flex min-w-0 items-center justify-end gap-2 md:gap-3 xl:w-auto xl:flex-nowrap xl:gap-2.5">
-            <div className="hidden min-w-0 flex-none xl:flex xl:w-[280px] 2xl:w-[320px]">
+          <div className="ml-auto flex min-w-0 items-center justify-end gap-2 md:gap-3 xl:w-auto xl:flex-nowrap xl:gap-2">
+            <div className="hidden min-w-0 flex-none xl:flex xl:w-[264px] 2xl:w-[320px]">
               <GlobalSearch
                 compact
                 idSuffix="desktop"
@@ -513,7 +513,7 @@ export function SiteHeader() {
 
             <Link
               href="/dashboard"
-              className="hidden xl:inline-flex xl:shrink-0 xl:rounded-full xl:border xl:border-white/10 xl:px-3.5 xl:py-2 xl:text-sm xl:font-medium xl:text-white xl:hover:border-white/20 xl:hover:bg-white/6"
+              className="hidden xl:inline-flex xl:shrink-0 xl:rounded-full xl:border xl:border-white/10 xl:px-3 xl:py-2 xl:text-sm xl:font-medium xl:text-white xl:hover:border-white/20 xl:hover:bg-white/6"
             >
               Open Data Center
             </Link>
