@@ -456,7 +456,27 @@ export function SiteHeader() {
     <header className="sticky top-0 z-50 border-b border-white/8 bg-[rgba(4,10,18,0.88)] backdrop-blur-xl">
       <div className="mx-auto max-w-[1500px] px-5 py-3 xl:px-8">
         <div className="relative flex min-w-0 items-center gap-3 xl:min-h-[3.5rem]">
-          <div className="min-w-0 flex-1 xl:max-w-[280px] 2xl:max-w-[320px]">
+          <div className="hidden min-w-0 items-center xl:flex">
+            <div className="min-w-0 xl:max-w-[280px] 2xl:max-w-[320px]">
+              <Link href="/" className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-center gap-x-3 gap-y-1.5">
+                <div className="relative row-span-2 h-10 w-10 shrink-0 overflow-hidden rounded-2xl border border-white/10 bg-[rgba(17,29,46,0.9)] shadow-[0_12px_30px_rgba(0,0,0,0.25)] xl:h-11 xl:w-11">
+                  <Image src="/logo.png" alt="EquityStack" fill className="object-contain p-1.5" priority />
+                </div>
+                <p className="min-w-0 self-center text-[13px] font-semibold uppercase tracking-[0.28em] text-[var(--accent)] md:text-[14px] xl:text-[15px]">
+                  EquityStack
+                </p>
+                <p className="hidden min-w-0 max-w-[17rem] text-[11px] leading-[1.35] text-[var(--ink-muted)] sm:block xl:max-w-[14.5rem] 2xl:max-w-[16rem]">
+                  Civic intelligence for Black policy impact
+                </p>
+              </Link>
+            </div>
+
+            <div className="ml-6 2xl:ml-8">
+              <PrimaryNav />
+            </div>
+          </div>
+
+          <div className="min-w-0 flex-1 xl:hidden">
             <Link href="/" className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-center gap-x-3 gap-y-1.5">
               <div className="relative row-span-2 h-10 w-10 shrink-0 overflow-hidden rounded-2xl border border-white/10 bg-[rgba(17,29,46,0.9)] shadow-[0_12px_30px_rgba(0,0,0,0.25)] xl:h-11 xl:w-11">
                 <Image src="/logo.png" alt="EquityStack" fill className="object-contain p-1.5" priority />
@@ -468,10 +488,6 @@ export function SiteHeader() {
                 Civic intelligence for Black policy impact
               </p>
             </Link>
-          </div>
-
-          <div className="hidden xl:absolute xl:left-1/2 xl:top-1/2 xl:z-10 xl:flex xl:-translate-x-1/2 xl:-translate-y-1/2">
-            <PrimaryNav />
           </div>
 
           <div className="ml-auto flex min-w-0 items-center justify-end gap-2 md:gap-3 xl:w-auto xl:flex-nowrap xl:gap-2">
