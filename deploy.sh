@@ -31,6 +31,7 @@ rsync -avzh --delete \
   --exclude=.next \
   --exclude=.git \
   --exclude=.env \
+  --exclude=research \
   --exclude=python/reports \
   --exclude=python/venv \
   ./ josh@10.10.0.13:/home/josh/black-policy-site/

@@ -63,3 +63,6 @@ database/equitystack.sql
 
 # PM2 logs
 *.log
+
+# research
+research/
