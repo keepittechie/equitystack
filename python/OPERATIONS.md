@@ -108,7 +108,7 @@ Legislative outcomes are intentionally excluded from president scoring until the
 The commands in this section assume you are running from the repository root:
 
 ```bash
-cd /home/josh/black-policy-site
+cd /opt/equitystack-frontend
 ```
 
 ### Fast Path
@@ -471,7 +471,12 @@ Important:
 
 ## Remote Executor
 
-- Production app host: `10.10.0.13`
+- Production frontend host: `10.10.0.13`
+- Production frontend root: `/opt/equitystack-frontend`
+- Production frontend PM2 app: `equitystack-frontend`
+- Separate PM2 app on the same host: `watchdog-frontend`
+- Production MariaDB host: `10.10.0.15`
+- Production database: `black_policy_tracker`
 - Production LLM/executor host, when configured: `10.10.0.60`
 - Reserved executor model: `$MCP_MODEL`
 
@@ -509,6 +514,9 @@ These checks are safe and read-only. They do not enqueue normal workflow jobs.
 
 `./deploy.sh` ships the local working tree to production. It now refuses to run when untracked
 deployable files are present in shipped paths such as `app/`, `lib/`, `docs/`, or `python/`.
+
+For live runtime checks, treat PM2 on `10.10.0.13` as the source of truth: inspect
+`equitystack-frontend` serving `/opt/equitystack-frontend`, not legacy paths or old PM2 names.
 
 Keep these rules in mind:
 

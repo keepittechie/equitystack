@@ -51,15 +51,24 @@ python3 -m venv --clear venv
 - Verifier, draft, and fallback review steps use the same configured provider/model family unless explicitly overridden.
 - Scheduled LLM review stages now default to a 240 second timeout.
 - `MCP_MODEL` configures the executor/MCP model for preprocessing, summaries, and approved command execution.
-- DB-backed scripts read `.env.local`, but legislative helpers now also honor runtime env overrides such as `DB_HOST=10.10.0.13`.
+- DB-backed scripts read `.env.local`, but legislative helpers now also honor runtime env overrides such as `DB_HOST=10.10.0.15`.
 - `python/venv` is the preferred local-dev interpreter after bootstrap.
 - If local `python/venv` is unavailable, you can point the wrapper at another interpreter with `EQUITYSTACK_PYTHON_BIN=/path/to/python`.
+
+## Production Runtime Topology
+
+- frontend host: `10.10.0.13`
+- deployed repo root on the frontend host: `/opt/equitystack-frontend`
+- live PM2 app: `equitystack-frontend`
+- separate PM2 app on the same host: `watchdog-frontend`
+- MariaDB host: `10.10.0.15`
+- production database: `black_policy_tracker`
 
 Example production-style local verification:
 
 ```bash
 EQUITYSTACK_PYTHON_BIN=/path/to/python \
-DB_HOST=10.10.0.13 \
+DB_HOST=10.10.0.15 \
 ./bin/equitystack current-admin status
 ```
 

@@ -1,6 +1,10 @@
 #!/bin/bash
 set -e
 
+REMOTE_HOST="josh@10.10.0.13"
+REMOTE_APP_DIR="/opt/equitystack-frontend"
+PM2_APP_NAME="equitystack-frontend"
+
 UNTRACKED_DEPLOY_FILES=$(git ls-files --others --exclude-standard -- app lib docs python public bin package.json package-lock.json deploy.sh 2>/dev/null | grep -v '^python/reports/' || true)
 
 if [ -n "$UNTRACKED_DEPLOY_FILES" ]; then
@@ -22,7 +26,7 @@ rsync -avzh \
   --exclude=.git \
   --exclude=.env \
   --exclude=python/venv \
-  josh@10.10.0.13:/home/josh/black-policy-site/ "$BACKUP_DIR/"
+  "$REMOTE_HOST:$REMOTE_APP_DIR/" "$BACKUP_DIR/"
 
 echo "Deploying local code to server"
 
@@ -34,19 +38,19 @@ rsync -avzh --delete \
   --exclude=research \
   --exclude=python/reports \
   --exclude=python/venv \
-  ./ josh@10.10.0.13:/home/josh/black-policy-site/
+  ./ "$REMOTE_HOST:$REMOTE_APP_DIR/"
 
 echo "Building and restarting app"
 
-ssh josh@10.10.0.13 "bash -lc '
+ssh "$REMOTE_HOST" "bash -lc '
   export NVM_DIR=\"\$HOME/.nvm\"
   [ -s \"\$NVM_DIR/nvm.sh\" ] && . \"\$NVM_DIR/nvm.sh\"
-  cd /home/josh/black-policy-site
+  cd \"$REMOTE_APP_DIR\"
   npm run build
-  if pm2 describe nextjs-app >/dev/null 2>&1; then
-    pm2 restart nextjs-app
+  if pm2 describe $PM2_APP_NAME >/dev/null 2>&1; then
+    pm2 restart $PM2_APP_NAME
   else
-    pm2 start npm --name nextjs-app -- start
+    pm2 start npm --name $PM2_APP_NAME -- start
   fi
-  pm2 status
+  pm2 status $PM2_APP_NAME
 '"

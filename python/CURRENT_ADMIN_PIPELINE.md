@@ -193,14 +193,14 @@ The review artifact stores requested model, effective model, backend, fallback s
 - DB-backed commands require a working Python environment with `pymysql`.
 - Preferred local-dev path: rebuild `python/venv` with `./bin/bootstrap-python-env`.
 - `EQUITYSTACK_PYTHON_BIN=/path/to/python` remains the fallback override.
-- Current-admin DB helpers already honor runtime env overrides such as `DB_HOST=10.10.0.13`.
+- Current-admin DB helpers already honor runtime env overrides such as `DB_HOST=10.10.0.15`.
 - Local `.env.local` may still point to `localhost`; production-style verification should override `DB_HOST`.
 
 Example production-style local run:
 
 ```bash
 EQUITYSTACK_PYTHON_BIN=/path/to/python \
-DB_HOST=10.10.0.13 \
+DB_HOST=10.10.0.15 \
 ./bin/equitystack current-admin import --input reports/current_admin/<batch-name>.manual-review-queue.json
 ```
 

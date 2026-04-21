@@ -67,6 +67,18 @@ The preferred maintenance entry point is the CLI operator layer:
 
 `weekly-run` orchestrates the read-only production certification, integrity, impact, source-gap, intent-gap, and final score checks. `review` shows only the compact manual queue. The admin UI remains a control plane on top of the same canonical workflows; it does not replace these checks.
 
+## Production Topology
+
+- frontend host: `10.10.0.13`
+- deployed frontend root: `/opt/equitystack-frontend`
+- live PM2 app: `equitystack-frontend`
+- separate PM2 app on the same host: `watchdog-frontend`
+- MariaDB host: `10.10.0.15`
+- production database: `black_policy_tracker`
+
+`/admin/tools` environment verification runs from the live frontend host, so DB health means the app
+on `10.10.0.13` can reach MariaDB on `10.10.0.15`.
+
 ## Main Concepts
 
 ### Jobs
@@ -293,6 +305,9 @@ Every mutation must be explicit, confirmed, and auditable. Unsafe duplicate clus
 
 `./deploy.sh` deploys from the local working tree, so it now fails fast when untracked deployable
 files are present under `app/`, `lib/`, `docs/`, `python/`, or other shipped paths.
+
+For live runtime checks, treat PM2 on `10.10.0.13` as the source of truth: the active EquityStack
+frontend is `equitystack-frontend` serving `/opt/equitystack-frontend`.
 
 The goal is simple:
 

@@ -4,12 +4,19 @@ If you forgot everything, start here.
 
 ## One-Command Weekly Check
 
-From the repo root:
+From the repo root. On the production frontend host (`10.10.0.13`), that root is:
 
 ```bash
-cd /home/josh/black-policy-site
+cd /opt/equitystack-frontend
 ./python/bin/equitystack weekly-run
 ```
+
+Live production topology for these checks:
+
+- frontend host: `10.10.0.13`
+- live frontend app: `equitystack-frontend`
+- MariaDB host: `10.10.0.15`
+- database: `black_policy_tracker`
 
 This runs the safe weekly loop:
 

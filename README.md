@@ -108,7 +108,20 @@ npm run lint
 
 The app expects local environment variables in `.env.local`, including database connection settings and the admin basic-auth credentials used by [`proxy.js`](proxy.js).
 
-Deployment is handled by [`deploy.sh`](deploy.sh).
+## Production Topology
+
+- frontend host: `10.10.0.13`
+- deployed frontend root: `/opt/equitystack-frontend`
+- live PM2 app: `equitystack-frontend`
+- separate PM2 app on the same host: `watchdog-frontend`
+- MariaDB host: `10.10.0.15`
+- production database: `black_policy_tracker`
+
+When you inspect or restart the live frontend, target `equitystack-frontend` explicitly and leave
+`watchdog-frontend` alone.
+
+The repo still includes [`deploy.sh`](deploy.sh) as a deployment helper, but the live runtime source
+of truth is the PM2 process on `10.10.0.13` serving `/opt/equitystack-frontend`.
 
 ## Sharing and Reuse
 

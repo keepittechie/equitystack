@@ -19,5 +19,5 @@ Recommended usage:
   ./bin/equitystack --help
 
 If you need production-style DB access from local dev:
-  DB_HOST=10.10.0.13 ./bin/equitystack current-admin status
+  DB_HOST=10.10.0.15 ./bin/equitystack current-admin status
 EOF

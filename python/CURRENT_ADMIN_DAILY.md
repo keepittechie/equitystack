@@ -142,7 +142,7 @@ These still work and remain the canonical lower-level path:
 - `pre-commit` is read-only.
 - `import` is dry-run by default.
 - Review artifacts clearly stamp requested model, effective model, backend, and fallback status.
-- DB-backed commands honor runtime overrides such as `DB_HOST=10.10.0.13`.
+- DB-backed commands honor runtime overrides such as `DB_HOST=10.10.0.15`.
 - Preferred local path: rebuild `python/venv` with `./bin/bootstrap-python-env`.
 - Fallback override: `EQUITYSTACK_PYTHON_BIN=/path/to/python`.
 - `current-admin run`, `current-admin review`, and `current-admin apply` are thin wrappers over the same canonical artifacts and safety checkpoints.

@@ -138,7 +138,7 @@ This command:
 ## Environment Notes
 
 - LLM execution uses the configured provider endpoint from `config/llm.json` or `EQUITYSTACK_LLM_ENDPOINT`.
-- DB-backed legislative helpers now honor runtime env overrides such as `DB_HOST=10.10.0.13`.
+- DB-backed legislative helpers now honor runtime env overrides such as `DB_HOST=10.10.0.15`.
 - `import_tracked_bills.py` also honors `CONGRESS_API_KEY` from the runtime environment.
 - Preferred local path: rebuild `python/venv` with `./bin/bootstrap-python-env`.
 - Fallback override: `EQUITYSTACK_PYTHON_BIN=/path/to/python`.
@@ -148,7 +148,7 @@ Example production-style dry run:
 
 ```bash
 EQUITYSTACK_PYTHON_BIN=/path/to/python \
-DB_HOST=10.10.0.13 \
+DB_HOST=10.10.0.15 \
 python3 scripts/import_approved_tracked_bills.py --input reports/approved_tracked_bills_seed.json
 ```
 
