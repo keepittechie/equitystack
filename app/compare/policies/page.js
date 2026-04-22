@@ -76,7 +76,6 @@ function buildPairComparisonSummary(items = []) {
   } else if (left.has_black_impact_score && right.has_black_impact_score) {
     const higher =
       Number(left.impact_score || 0) >= Number(right.impact_score || 0) ? left : right;
-    const lower = higher.id === left.id ? right : left;
     const gap = Math.abs(Number(left.impact_score || 0) - Number(right.impact_score || 0));
 
     if (gap >= 2) {

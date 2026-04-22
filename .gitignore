@@ -57,9 +57,7 @@ python/reports/current_admin/review_decisions/
 python/reports/integrity/
 
 # Database dumps
-database/equitystack.sql
-*.dump.sql
-*.sql.gz
+database/
 
 # PM2 logs
 *.log

@@ -9,14 +9,15 @@ export default function TrustBar() {
             Trust and method
           </p>
           <p className="mt-2 text-sm leading-6 text-[var(--ink-soft)]">
-            EquityStack analyzes documented government actions, source-backed evidence,
-            and structured impact scoring. The platform is non-partisan, data-driven,
-            and transparent about methodology.
+            EquityStack keeps policies, promises, demographic-impact evidence, and
+            public sources in one record. It distinguishes direct evidence,
+            supporting context, and incomplete analysis instead of forcing a
+            conclusion where the record is still thin.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Link href="/methodology" className="dashboard-button-secondary">
-            Methodology
+          <Link href="/how-it-works" className="dashboard-button-secondary">
+            How it works
           </Link>
           <Link href="/sources" className="dashboard-button-secondary">
             Sources

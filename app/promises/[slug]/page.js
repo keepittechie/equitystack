@@ -729,7 +729,7 @@ export default async function PromiseDetailPage({ params }) {
                 Structured evidence
               </p>
               <p className="text-sm leading-7 text-[var(--ink-soft)]">
-                No promise-level demographic-impact rows have been added yet. The outcome-based summary above is derived from linked promise outcomes, and the page is ready to surface structured demographic-impact rows when they are seeded.
+                No promise-level demographic-impact rows have been added yet. The outcome-based summary above is derived from linked promise outcomes, and the page is ready to surface structured demographic-impact rows when they are added.
               </p>
             </Panel>
           ) : null}
@@ -819,7 +819,7 @@ export default async function PromiseDetailPage({ params }) {
             </div>
             <div className="rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4">
               <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
-                Policy Outcomes
+                Policy outcomes
               </p>
               <p className="mt-2 text-lg font-medium text-white">{policyOutcomeCount}</p>
             </div>
@@ -829,7 +829,7 @@ export default async function PromiseDetailPage({ params }) {
             {promise.summary || "No status narrative is currently available."}
           </p>
           <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-            This Promise currently has {actionCount} documented action record{actionCount === 1 ? "" : "s"} and {policyOutcomeCount} linked Policy Outcome{policyOutcomeCount === 1 ? "" : "s"} in the current EquityStack dataset.
+            This promise currently has {actionCount} documented action record{actionCount === 1 ? "" : "s"} and {policyOutcomeCount} linked policy outcome{policyOutcomeCount === 1 ? "" : "s"} in the current EquityStack dataset.
           </p>
           {thinSummary ? (
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
