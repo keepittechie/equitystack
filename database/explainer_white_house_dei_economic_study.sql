@@ -47,13 +47,17 @@ It does not prove that DEI policies, as actually adopted by specific employers, 
 
 It does not isolate alternative explanations such as labor-market shifts, industry trends, worker sorting, state-level economic changes, remote-work disruption, pandemic-era shocks, technology changes, or other post-2016 changes that may affect productivity.
 
-The report can be read as an argument built from a statistical proxy. It should not be read as direct proof that minority representation itself caused lower productivity.',
+The report can be read as an argument built from a statistical proxy. It should not be read as direct proof that minority representation itself caused lower productivity.
+
+The Black-impact stakes are not abstract. The study effectively treats unexplained growth in minority managerial representation as evidence of DEI distortion, which can encourage readers to view gains in Black representation as presumptively suspect rather than as a possible sign of reduced exclusion or broader access to opportunity. That is one reason the source base matters: the policy consequence of a weak proxy is not just a technical mistake, but a potential justification for rolling back institutions that address unequal access.',
   'This matters because economic studies can influence policy even when their identification strategy is contested. A headline estimate, such as a $94 billion annual cost, can travel farther than the assumptions that produced it.
 
-When a model is highly sensitive to a constructed variable, readers should ask how the variable was built, what it actually measures, what it leaves out, and whether the causal claim is stronger than the evidence supports. Weak or assumption-heavy models can still shape real-world decisions.',
+When a model is highly sensitive to a constructed variable, readers should ask how the variable was built, what it actually measures, what it leaves out, and whether the causal claim is stronger than the evidence supports. Weak or assumption-heavy models can still shape real-world decisions.
+
+That policy relevance became clearer in 2025 as the administration paired anti-DEI orders and fact sheets with broader arguments that DEI undermines merit, civil rights, and efficiency. Even where a study is not the sole basis for policy, contested economic claims can help legitimize agency action, contractor-rule changes, or public narratives that narrow support for anti-discrimination and equal-opportunity structures.',
   'EquityStack takeaway: separate claims from evidence. The report makes a strong economic claim, but its conclusion depends on treating unexplained minority manager share as evidence of DEI and then treating the resulting productivity relationship as causal.
 
-Policy decisions built on flawed assumptions can have real consequences. The right question is not only what the headline number says, but how the data were constructed, what the model assumes, and what the evidence actually demonstrates.',
+Policy decisions built on flawed assumptions can have real consequences. The right question is not only what the headline number says, but how the data were constructed, what the model assumes, what Black-impact assumptions are embedded in the model, and what the evidence actually demonstrates.',
   1
 )
 ON DUPLICATE KEY UPDATE
@@ -86,7 +90,9 @@ WHERE explainer_id = @white_house_dei_explainer_id
     'https://www.nber.org/papers/w3894',
     'https://www.nber.org/papers/w22014',
     'https://econjwatch.org/articles/mckinsey-s-diversity-matters-delivers-wins-results-revisited',
-    'https://www.sciencedirect.com/org/science/article/pii/S1460106022000347'
+    'https://www.sciencedirect.com/org/science/article/pii/S1460106022000347',
+    'https://www.whitehouse.gov/fact-sheets/2025/01/fact-sheet-president-donald-j-trump-protects-civil-rights-and-merit-based-opportunity-by-ending-illegal-dei/',
+    'https://www.whitehouse.gov/cea/information-resources/'
   );
 
 INSERT INTO explainer_sources (
@@ -152,6 +158,24 @@ INSERT INTO explainer_sources (
   '2022-04-08',
   'Meta-analysis showing a mixed research landscape and a positive association between board diversity and firm innovation.',
   6
+), (
+  @white_house_dei_explainer_id,
+  'Fact Sheet: President Donald J. Trump Protects Civil Rights and Merit-Based Opportunity by Ending Illegal DEI',
+  'https://www.whitehouse.gov/fact-sheets/2025/01/fact-sheet-president-donald-j-trump-protects-civil-rights-and-merit-based-opportunity-by-ending-illegal-dei/',
+  'Government',
+  'The White House',
+  '2025-01-22',
+  'White House fact sheet showing how anti-DEI policy was framed in merit, contracting, and civil-rights terms during implementation.',
+  7
+), (
+  @white_house_dei_explainer_id,
+  'Information & Resources – CEA',
+  'https://www.whitehouse.gov/cea/information-resources/',
+  'Government',
+  'Council of Economic Advisers',
+  NULL,
+  'White House CEA page listing the Economic Report of the President chapter containing The Economic Consequences of DEI.',
+  8
 );
 
 COMMIT;
