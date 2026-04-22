@@ -1,0 +1,35 @@
+[
+  {
+    "title": "President's Budget, Fiscal Year 2027",
+    "policy_type": "Agency Action",
+    "summary": "The Trump administration's FY2027 President's Budget proposes eliminating or sharply reducing multiple domestic programs, including MBDA, LIHEAP, CDBG, and Job Corps.",
+    "year_enacted": 2026,
+    "date_enacted": null,
+    "era": "Contemporary Era",
+    "president": "Donald J. Trump",
+    "primary_party": "Republican Party",
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "The proposal would eliminate or sharply reduce several federal programs that plausibly matter to Black-owned businesses, Black households, Black communities, and Black young adults, but downstream effects should be treated as proposed risk until Congress acts or implementation occurs.",
+    "status": "Proposed",
+    "impact_direction": "Negative",
+    "impact_notes": "Canonical FY2027 budget proposal anchor for structured demographic-impact tracking. Initial impact rows focus on explicit program eliminations named in the White House FY2027 budget PDF rather than downstream outcome estimates.",
+    "categories": [
+      "Business and Economics",
+      "Housing",
+      "Labor",
+      "Social Welfare"
+    ],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 4,
+      "evidence_score": 4,
+      "durability_score": 0,
+      "equity_score": 0,
+      "harm_offset_score": 0,
+      "notes": "A high-salience proposed budget anchor with clear documentary support for the named program eliminations, but with provisional downstream impact because the budget was proposed rather than enacted."
+    },
+    "sources": [],
+    "metrics": []
+  }
+]

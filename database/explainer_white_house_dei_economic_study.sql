@@ -17,9 +17,9 @@ INSERT INTO explainers (
   published
 ) VALUES (
   'white-house-dei-economic-study',
-  'The White House “Economic Consequences of DEI” Study',
+  'The White House "Economic Consequences of DEI" Study',
   'Economics',
-  'A breakdown of the study’s claims, methodology, and why its conclusions are widely disputed.',
+  'A breakdown of the study''s claims, methodology, and why its conclusions are widely disputed.',
   'The report''s headline estimate depends on a proxy for DEI, not direct measurement of employer DEI policies.
 The analysis links higher unexplained minority manager share to lower productivity after 2016, but that correlation does not by itself establish causation.
 The model does not directly measure manager qualifications, individual performance, or whether specific hires resulted from DEI programs.
@@ -169,7 +169,7 @@ INSERT INTO explainer_sources (
   7
 ), (
   @white_house_dei_explainer_id,
-  'Information & Resources – CEA',
+  'Information & Resources - CEA',
   'https://www.whitehouse.gov/cea/information-resources/',
   'Government',
   'Council of Economic Advisers',

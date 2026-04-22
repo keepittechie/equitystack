@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
+import { fetchEntityDemographicImpacts } from "@/lib/services/entityDemographicImpactService";
 import { fetchRelatedPromisesForPolicy } from "@/lib/services/promiseService";
 
 export async function GET(request, { params }) {
@@ -279,7 +280,10 @@ export async function GET(request, { params }) {
       [policyId]
     );
 
-    const relatedPromiseRows = await fetchRelatedPromisesForPolicy(policyId);
+    const [relatedPromiseRows, demographicImpacts] = await Promise.all([
+      fetchRelatedPromisesForPolicy(policyId),
+      fetchEntityDemographicImpacts("policy", policyId, { includeSources: true }),
+    ]);
 
     const totalSources = sourceRows.length;
     const governmentSources = sourceRows.filter(
@@ -375,6 +379,7 @@ export async function GET(request, { params }) {
       scores: scoreRows[0] || null,
       sources: sourceRows,
       metrics: metricRows,
+      demographic_impacts: demographicImpacts,
       relationships: relationshipRows,
       related_explainers: explainerRows,
       related_promises: relatedPromiseRows,
