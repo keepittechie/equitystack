@@ -1,7 +1,18 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buildPageMetadata } from "@/lib/metadata";
-import { buildPolicySlug, fetchPromisePageData } from "@/lib/public-site-data";
+import {
+  buildPolicySlug,
+  deriveMetricLabel,
+  deriveProgramLabel,
+  fetchPromisePageData,
+  formatConfidenceLabel,
+  formatImpactValue,
+} from "@/lib/public-site-data";
+import {
+  buildEvidenceCoverage,
+  buildEvidenceStrengtheningNote,
+} from "@/lib/evidenceCoverage";
 import {
   countLabel,
   filterParagraphs,
@@ -31,6 +42,7 @@ import {
   SectionHeader,
   StatusPill,
   getConfidenceTone,
+  getImpactDirectionTone,
   getPromiseStatusTone,
 } from "@/app/components/dashboard/primitives";
 import {
@@ -47,6 +59,209 @@ function formatTermLabel(start, end) {
     return `${startYear}-${endYear}`;
   }
   return null;
+}
+
+function formatSignedScore(value) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) {
+    return "—";
+  }
+
+  return `${numeric > 0 ? "+" : ""}${numeric.toFixed(2)}`;
+}
+
+function formatSourceDateLabel(value) {
+  if (!value) {
+    return null;
+  }
+
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) {
+    return null;
+  }
+
+  return parsed.toISOString().slice(0, 10);
+}
+
+function isSupportingDemographicImpact(impact) {
+  return /^Supporting evidence\s*-/i.test(String(impact?.metric_name || "").trim());
+}
+
+function buildPromiseDemographicImpactSections(impacts = []) {
+  const directOutcomeImpacts = impacts.filter((impact) => !isSupportingDemographicImpact(impact));
+  const supportingImpacts = impacts.filter((impact) => isSupportingDemographicImpact(impact));
+  const sections = [];
+
+  if (directOutcomeImpacts.length) {
+    sections.push({
+      key: "direct",
+      title: "Direct outcomes",
+      description: supportingImpacts.length
+        ? "These rows capture the clearest direct Black-impact outcomes currently attached to this promise record."
+        : null,
+      items: directOutcomeImpacts,
+    });
+  }
+
+  if (supportingImpacts.length) {
+    sections.push({
+      key: "supporting",
+      title: "Supporting evidence",
+      description: directOutcomeImpacts.length
+        ? "These rows add usage, participation, or implementation context that helps explain the promise's Black-impact read."
+        : null,
+      items: supportingImpacts,
+    });
+  }
+
+  return sections;
+}
+
+function countUniquePromiseEvidenceSources(promise) {
+  const seen = new Set();
+
+  const addSource = (source) => {
+    const key = source?.id || source?.source_id || source?.source_url || source?.url || source?.source_title;
+    if (key) {
+      seen.add(String(key));
+    }
+  };
+
+  for (const action of promise.actions || []) {
+    for (const source of action.action_sources || action.sources || []) {
+      addSource(source);
+    }
+  }
+
+  for (const outcome of promise.outcomes || []) {
+    for (const source of outcome.outcome_sources || outcome.sources || []) {
+      addSource(source);
+    }
+  }
+
+  for (const impact of promise.demographic_impacts || []) {
+    for (const source of impact.sources || []) {
+      addSource(source);
+    }
+  }
+
+  return seen.size;
+}
+
+function buildPromiseDemographicContextBridge(promise, evidenceCount) {
+  const explainer = (promise.related_explainers || [])[0] || null;
+  const relatedPolicyCount = Number((promise.related_policies || []).length || 0);
+
+  if (!explainer && !relatedPolicyCount && !evidenceCount) {
+    return null;
+  }
+
+  return {
+    explainer,
+    relatedPolicyCount,
+    evidenceCount,
+  };
+}
+
+function PromiseDemographicImpactCard({ impact }) {
+  const supporting = isSupportingDemographicImpact(impact);
+  const metricLabel = deriveMetricLabel(impact.metric_name);
+
+  return (
+    <Panel padding="md" className="space-y-5">
+      <div className="space-y-2">
+        <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
+          Focus
+        </p>
+        <h3 className="text-lg font-semibold text-white">
+          {deriveProgramLabel(impact.metric_name)}
+        </h3>
+        {metricLabel ? (
+          <p className="text-sm leading-6 text-[var(--ink-soft)]">
+            {metricLabel}
+          </p>
+        ) : null}
+      </div>
+      <dl className="grid gap-4 sm:grid-cols-2">
+        <div>
+          <dt className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
+            {supporting ? "Supporting metric" : "Measured outcome"}
+          </dt>
+          <dd className="mt-2 text-sm leading-7 text-white">
+            {formatImpactValue(impact)}
+          </dd>
+        </div>
+        <div>
+          <dt className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
+            Affected group
+          </dt>
+          <dd className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
+            {impact.demographic_group || "Not specified"}
+          </dd>
+        </div>
+        <div>
+          <dt className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
+            Confidence
+          </dt>
+          <dd className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
+            {formatConfidenceLabel(impact.confidence_score)}
+          </dd>
+        </div>
+        {impact.methodology_note ? (
+          <div className="sm:col-span-2">
+            <dt className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
+              Notes
+            </dt>
+            <dd className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
+              {impact.methodology_note}
+            </dd>
+          </div>
+        ) : null}
+        <div className="sm:col-span-2">
+          <dt className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
+            Sources
+          </dt>
+          {(impact.sources || []).length ? (
+            <dd className="mt-3 space-y-3">
+              {(impact.sources || []).map((source, index) => (
+                <div
+                  key={`${source.id || source.source_url || source.source_title}-${index}`}
+                  className="space-y-1"
+                >
+                  <a
+                    href={source.source_url || "#"}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-sm font-medium leading-6 text-white underline decoration-white/20 underline-offset-4 transition-colors hover:text-[var(--accent)] hover:decoration-[var(--accent)]"
+                  >
+                    {source.source_title || source.source_url || "Source"}
+                  </a>
+                  <p className="text-sm leading-6 text-[var(--ink-soft)]">
+                    {[
+                      source.source_role === "primary" ? "Primary source" : null,
+                      source.publisher || null,
+                      formatSourceDateLabel(source.published_date),
+                    ]
+                      .filter(Boolean)
+                      .join(" • ")}
+                  </p>
+                  {source.citation_note ? (
+                    <p className="text-sm leading-6 text-[var(--ink-soft)]">
+                      {source.citation_note}
+                    </p>
+                  ) : null}
+                </div>
+              ))}
+            </dd>
+          ) : (
+            <dd className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
+              No linked sources are attached to this impact row yet.
+            </dd>
+          )}
+        </div>
+      </dl>
+    </Panel>
+  );
 }
 
 function PromisePanel({ children, className = "", ...props }) {
@@ -211,6 +426,13 @@ export default async function PromiseDetailPage({ params }) {
     description: item.description,
   }));
   const evidence = flattenPromiseSources(promise);
+  const demographicImpacts = Array.isArray(promise.demographic_impacts)
+    ? promise.demographic_impacts
+    : [];
+  const blackImpactSummary =
+    promise.black_impact_summary && Number(promise.black_impact_summary.outcome_count || 0) > 0
+      ? promise.black_impact_summary
+      : null;
   const whyStatus =
     promise.review_summary ||
     promise.summary ||
@@ -232,7 +454,48 @@ export default async function PromiseDetailPage({ params }) {
     : "/policies";
   const contextParagraphs = buildPromiseContextParagraphs(promise);
   const localSectionOffsetClass = "scroll-mt-28 md:scroll-mt-32";
+  const directDemographicImpactCount = demographicImpacts.filter(
+    (impact) => !isSupportingDemographicImpact(impact)
+  ).length;
+  const supportingDemographicImpactCount = demographicImpacts.length - directDemographicImpactCount;
+  const demographicImpactSections = buildPromiseDemographicImpactSections(demographicImpacts);
+  const blackImpactEvidenceSourceCount = countUniquePromiseEvidenceSources(promise);
+  const blackImpactCoverage =
+    blackImpactSummary || demographicImpacts.length
+      ? buildEvidenceCoverage({
+          sourceCount: blackImpactEvidenceSourceCount,
+          demographicImpactCount: demographicImpacts.length,
+          directImpactCount: directDemographicImpactCount,
+          supportingImpactCount: supportingDemographicImpactCount,
+          hasScore: Boolean(blackImpactSummary),
+        })
+      : null;
+  const blackImpactStrengtheningNote = blackImpactCoverage
+    ? buildEvidenceStrengtheningNote({
+        sourceCount: blackImpactEvidenceSourceCount,
+        demographicImpactCount: demographicImpacts.length,
+        directImpactCount: directDemographicImpactCount,
+        supportingImpactCount: supportingDemographicImpactCount,
+        hasScore: Boolean(blackImpactSummary),
+      })
+    : null;
+  const showBlackImpactSection = Boolean(
+    blackImpactSummary || demographicImpacts.length || blackImpactCoverage
+  );
+  const demographicContextBridge = buildPromiseDemographicContextBridge(
+    promise,
+    blackImpactEvidenceSourceCount
+  );
   const localNavigationItems = [
+    ...(showBlackImpactSection
+      ? [
+          {
+            href: "#black-impact",
+            label: "Black impact",
+            count: demographicImpacts.length || undefined,
+          },
+        ]
+      : []),
     { href: "#status", label: "Status" },
     ...(evidence.length
       ? [{ href: "#evidence", label: "Evidence", count: evidence.length }]
@@ -351,6 +614,170 @@ export default async function PromiseDetailPage({ params }) {
           />
         </div>
       ) : null}
+
+      {showBlackImpactSection ? (
+        <PromisePanel id="black-impact" className={`${localSectionOffsetClass} space-y-5`}>
+          <SectionIntro
+            eyebrow="Black impact"
+            title="Promise-level Black-impact analysis"
+            description="When EquityStack has structured demographic-impact analysis for a promise, it appears here as a bounded evidence layer alongside the tracker status, actions, and outcomes."
+          />
+          {blackImpactSummary ? (
+            <Panel padding="md" prominence="primary" className="space-y-4">
+              <StatusPill tone={getImpactDirectionTone(blackImpactSummary.direction)}>
+                Black impact
+              </StatusPill>
+              <div className="grid gap-4 lg:grid-cols-[minmax(0,13rem)_1fr] lg:items-start">
+                <div className="space-y-2">
+                  <p className="text-3xl font-semibold tracking-[-0.04em] text-white">
+                    {blackImpactSummary.direction_label}
+                  </p>
+                  <p className="text-sm leading-6 text-[var(--ink-soft)]">
+                    Outcome-based read across{" "}
+                    {countLabel(blackImpactSummary.outcome_count, "scored outcome")}
+                  </p>
+                  <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
+                    Net outcome score {formatSignedScore(blackImpactSummary.total_score)}
+                  </p>
+                </div>
+                <div className="space-y-3">
+                  {blackImpactSummary.explanation_summary ? (
+                    <p className="text-sm leading-7 text-[var(--ink-soft)]">
+                      {blackImpactSummary.explanation_summary}
+                    </p>
+                  ) : null}
+                  <p className="text-sm leading-7 text-[var(--ink-soft)]">
+                    This summary is derived from linked promise outcomes and stays separate from the Promise Tracker status label.
+                  </p>
+                  {blackImpactSummary.confidence_label ? (
+                    <p className="text-sm leading-7 text-[var(--ink-soft)]">
+                      Current confidence read:{" "}
+                      {String(blackImpactSummary.confidence_label).toLowerCase()}.
+                    </p>
+                  ) : null}
+                  {blackImpactSummary.systemic_explanation_summary ? (
+                    <p className="text-sm leading-7 text-[var(--ink-soft)]">
+                      {blackImpactSummary.systemic_explanation_summary}
+                    </p>
+                  ) : null}
+                </div>
+              </div>
+            </Panel>
+          ) : null}
+          {blackImpactCoverage ? (
+            <Panel padding="md" className="space-y-3">
+              <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
+                Analysis coverage
+              </p>
+              <div className="flex flex-wrap items-center gap-2">
+                <StatusPill tone={blackImpactCoverage.tone}>
+                  {blackImpactCoverage.label}
+                </StatusPill>
+              </div>
+              <p className="text-sm leading-7 text-[var(--ink-soft)]">
+                {blackImpactCoverage.description}
+              </p>
+              {blackImpactStrengtheningNote ? (
+                <div className="space-y-2 border-t border-[var(--line)] pt-3">
+                  <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
+                    {blackImpactStrengtheningNote.title}
+                  </p>
+                  <p className="text-sm leading-7 text-[var(--ink-soft)]">
+                    {blackImpactStrengtheningNote.description}
+                  </p>
+                </div>
+              ) : null}
+            </Panel>
+          ) : null}
+          {demographicImpacts.length ? (
+            demographicImpactSections.length > 1 ? (
+              <div className="space-y-8">
+                {demographicImpactSections.map((section) => (
+                  <div key={section.key} className="space-y-4">
+                    <div className="space-y-1">
+                      <h3 className="text-lg font-semibold text-white">{section.title}</h3>
+                      {section.description ? (
+                        <p className="text-sm leading-7 text-[var(--ink-soft)]">
+                          {section.description}
+                        </p>
+                      ) : null}
+                    </div>
+                    <div className="grid gap-4 lg:grid-cols-2">
+                      {section.items.map((impact) => (
+                        <PromiseDemographicImpactCard
+                          key={impact.id || `${impact.metric_name}-${impact.demographic_group}`}
+                          impact={impact}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="grid gap-4 lg:grid-cols-2">
+                {demographicImpacts.map((impact) => (
+                  <PromiseDemographicImpactCard
+                    key={impact.id || `${impact.metric_name}-${impact.demographic_group}`}
+                    impact={impact}
+                  />
+                ))}
+              </div>
+            )
+          ) : blackImpactSummary ? (
+            <Panel padding="md" className="space-y-3">
+              <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
+                Structured evidence
+              </p>
+              <p className="text-sm leading-7 text-[var(--ink-soft)]">
+                No promise-level demographic-impact rows have been added yet. The outcome-based summary above is derived from linked promise outcomes, and the page is ready to surface structured demographic-impact rows when they are seeded.
+              </p>
+            </Panel>
+          ) : null}
+          {demographicContextBridge ? (
+            <Panel padding="md" className="space-y-3">
+              <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
+                Related context
+              </p>
+              <div className="space-y-2 text-sm leading-7 text-[var(--ink-soft)]">
+                {demographicContextBridge.explainer ? (
+                  <p>
+                    For broader context, read{" "}
+                    <Link
+                      href={`/explainers/${demographicContextBridge.explainer.slug}`}
+                      className="font-semibold text-white underline decoration-white/20 underline-offset-4 transition-colors hover:text-[var(--accent)] hover:decoration-[var(--accent)]"
+                    >
+                      {demographicContextBridge.explainer.title}
+                    </Link>
+                    .
+                  </p>
+                ) : null}
+                {demographicContextBridge.relatedPolicyCount ? (
+                  <p>
+                    {countLabel(
+                      demographicContextBridge.relatedPolicyCount,
+                      "linked policy",
+                      "linked policies"
+                    )}{" "}
+                    below carry the concrete implementation record behind this promise where that linkage exists.
+                  </p>
+                ) : null}
+                {demographicContextBridge.evidenceCount ? (
+                  <p>
+                    The source trail below keeps {countLabel(demographicContextBridge.evidenceCount, "linked source")} visible alongside this analysis.
+                  </p>
+                ) : null}
+              </div>
+            </Panel>
+          ) : null}
+        </PromisePanel>
+      ) : (
+        <Panel padding="md" className="space-y-3">
+          <StatusPill tone="info">Black impact analysis</StatusPill>
+          <p className="text-sm leading-7 text-[var(--ink-soft)]">
+            Promise-level demographic-impact analysis has not been added to this record yet. Use the linked policies, outcome evidence, and source trail below while this layer is still being built.
+          </p>
+        </Panel>
+      )}
 
       <PromisePanel id="status" className={`${localSectionOffsetClass} space-y-5`}>
         <SectionIntro
