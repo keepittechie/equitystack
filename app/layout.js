@@ -8,19 +8,19 @@ import { buildSiteJsonLd } from "@/lib/structured-data";
 export const metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://equitystack.org"),
   title: {
-    default: "EquityStack | Policies, promises, and Black impact evidence",
+    default: "EquityStack | Black history, presidents, promises, and policy impact",
     template: "%s | EquityStack",
   },
   description:
-    "EquityStack is a public-interest research platform for tracking policies, promises, outcomes, and Black impact evidence with public sources and visible analysis limits.",
+    "EquityStack is a public-interest research platform covering Black history, U.S. presidents, campaign promises, civil rights policy, legislation, and policy impact on Black Americans.",
   applicationName: "EquityStack",
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "EquityStack | Policies, promises, and Black impact evidence",
+    title: "EquityStack | Black history, presidents, promises, and policy impact",
     description:
-      "Track policies, promises, outcomes, and Black impact evidence with public sources, structured records, and visible analysis coverage.",
+      "Research Black history by president, campaign promises, legislation, civil rights policy, and measured policy impact on Black Americans.",
     siteName: "EquityStack",
     type: "website",
     url: "/",
@@ -35,9 +35,9 @@ export const metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "EquityStack | Policies, promises, and Black impact evidence",
+    title: "EquityStack | Black history, presidents, promises, and policy impact",
     description:
-      "Explore policy records, promises, outcomes, and Black impact evidence with linked public sources.",
+      "Explore Black history, presidents, campaign promises, legislation, and policy impact on Black Americans.",
     images: ["/images/hero/civil-rights-march.jpg"],
   },
 };
