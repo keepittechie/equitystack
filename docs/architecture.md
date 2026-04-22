@@ -1,50 +1,79 @@
 # Navigation and Information Architecture
 
-EquityStack is organized as one product with a clear public hierarchy rather than a flat collection of tools.
+EquityStack is organized as one public research product with a small primary navigation and a broader supporting route system underneath it.
 
-## Core
+## Primary Public Path
 
-These routes form the main public path:
+The main user-facing navigation is intentionally limited to:
 
-- `Start Here`
-- `Promise Tracker`
-- `Impact Score`
-- `Timeline`
-
-This path gives a new visitor a sensible progression from framing, to evidence, to summary, to historical continuity.
-
-## Analysis
-
-These routes and views extend the core product when the user wants narrower or more comparative analysis:
-
-- `Compare`
-- topic views inside Black Impact Score
-- president views inside Black Impact Score
-- timeline and causal timeline inside Black Impact Score
-
-These are valuable, but they should not compete visually with the core path.
-
-## Supporting
-
-These routes remain important, but they are supporting surfaces rather than the primary front door:
-
-- `Explainers`
 - `Policies`
-- `Scorecards`
-- `Future Bills`
-- broader analytics dashboard views
-
-They can stay accessible through the footer, contextual links, and curated landing pages without taking over the main navigation.
-
-## Why the Top Navigation Is Simplified
-
-The top navigation is intentionally limited to:
-
-- `Home`
-- `Start Here`
-- `Promise Tracker`
-- `Impact Score`
-- `Timeline`
+- `Promises`
 - `Compare`
+- `How it works`
 
-This is a product-clarity choice. The goal is to make the main journey obvious without removing deeper pages from the site.
+This is the clearest route for a first-time visitor:
+
+1. understand what the product is on the homepage
+2. enter the record layer through policies or promises
+3. compare records when a side-by-side read is needed
+4. verify the methodology and evidence rules through `How it works`
+
+## Supporting Routes
+
+These routes remain important, but they are supporting rather than primary:
+
+- `/research`
+- `/reports`
+- `/start`
+- `/explainers`
+- `/sources`
+- `/about`
+- `/glossary`
+
+They deepen trust, context, and discovery without competing with the core navigation.
+
+## Public Record Layers
+
+### Policy records
+
+Policy pages are now one of the main public destinations. A strong policy page can include:
+
+- Black Impact Score summary
+- impact direction
+- grouped demographic-impact evidence
+- evidence-coverage treatment
+- related context and compare links
+
+### Promise records
+
+Promise pages are accountability pages first. They can include:
+
+- promise status and rationale
+- linked actions and outcomes
+- outcome-derived Black-impact summary
+- promise-level demographic-impact evidence when present
+
+### Comparison
+
+The public comparison entry point is:
+
+- `/compare/policies`
+
+It is designed to stay editorial and readable. It compares score, direction, evidence coverage, and top demographic-impact highlights rather than exposing a large analytics surface.
+
+## Why The Top Navigation Is Minimal
+
+The goal is clarity, not breadth.
+
+The homepage, footer, and contextual links can surface the wider system. The primary nav should only expose the highest-frequency public paths that a new visitor can understand immediately.
+
+## Trust Routing
+
+Method and trust pages are intentionally visible, but not dominant:
+
+- `/how-it-works` is the primary reader-facing explainer
+- `/methodology` remains the deeper companion page
+- `/research/how-black-impact-score-works` is the score-specific explainer
+- `/sources` provides the broader source trail
+
+This keeps public framing close to the product without turning the site into a documentation-first interface.

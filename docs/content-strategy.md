@@ -46,6 +46,7 @@ Good policy pages:
 
 - explain what happened
 - explain why the record matters
+- separate direct demographic-impact evidence from supporting evidence
 - show evidence and completeness nearby
 - connect to related promises, explainers, and thematic guides
 
@@ -54,8 +55,18 @@ Good policy pages:
 Good promise pages:
 
 - separate statement, status, and evidence
+- separate promise status from Black-impact interpretation
 - explain what to compare
 - link into policies, president profile, reports, and methodology
+
+### Homepage and orientation pages
+
+Good homepage and orientation pages:
+
+- explain what EquityStack is in plain language
+- surface policies, promises, compare, and methodology as clear next steps
+- show why the public analysis is trustworthy without turning into a dashboard
+- route first-time visitors into flagship records or methodology cleanly
 
 ### Report pages
 
@@ -103,6 +114,7 @@ Current editorial baseline:
 |---|---:|---:|---:|---:|---|
 | Thematic pages | 4 | 5 | 5 | 5 | Strongest search-entry layer |
 | Reports | 4 | 5 | 4 | 5 | Strong synthesis and trust flow |
+| Homepage / orientation | 4 | 5 | 5 | 5 | Stronger entry layer after homepage and methodology pass |
 | Explainers | 4 | 5 | 4 | 5 | Good context layer after expansion |
 | President detail | 3 | 4 | 4 | 4 | Better framing, but narrative depth still varies |
 | Policy detail | 3 | 4 | 4 | 4 | Strong structure, uneven source-backed summaries |

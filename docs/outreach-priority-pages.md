@@ -15,6 +15,7 @@ This is not a claim that EquityStack already has broad outside authority. It is 
 ### Ready now
 
 - `/research`
+- `/how-it-works`
 - `/methodology`
 - `/reports/black-impact-score`
 - `/reports/civil-rights-timeline`
@@ -52,7 +53,8 @@ These pages are the strongest current mix of clarity, trust, synthesis, and link
 | Page | Route | Type | Best-fit audiences | Why it is promotion-worthy | Best sharing context |
 |---|---|---|---|---|---|
 | Research Hub | `/research` | Research hub | Journalists, researchers, educators, students, nonprofit/public-interest readers | Best single start page for the public site. Curated, broad, and routes cleanly into thematic pages, reports, explainers, methodology, and sources. | “Start here” link for anyone new to EquityStack |
-| Methodology | `/methodology` | Trust / methods page | Researchers, editors, skeptical readers, journalists | Strongest page for explaining how the site works, what page types mean, and how scores, confidence, and limits should be interpreted. | When someone asks “How does EquityStack work?” or needs interpretive guardrails |
+| How it works | `/how-it-works` | Trust / methods page | Researchers, editors, skeptical readers, journalists, first-time visitors | Strongest short public explainer for how the site works, what page types mean, how evidence is structured, and how to read coverage labels. | When someone asks “How does EquityStack work?” or needs a clean public explainer |
+| Methodology | `/methodology` | Deeper methods page | Researchers, editors, skeptical readers | Stronger companion page when the audience wants more detail than the reader-facing explainer. | When someone needs the deeper companion methods page after `/how-it-works` |
 | Black Impact Score | `/reports/black-impact-score` | Flagship report | Journalists, bloggers, researchers, policy writers | Best public-facing synthesis page for administration comparison, score context, and evidence-aware interpretation. | Comparative story, essay, briefing, or summary reference |
 | Civil Rights Timeline | `/reports/civil-rights-timeline` | Flagship historical report | Educators, history writers, students, researchers | Strong chronology-first page that is easier to teach from and cite than a raw record set. | Historical overview, classroom use, chronology-based framing |
 | Presidential Impact on Black Americans | `/analysis/presidential-impact-on-black-americans` | Top-level thematic guide | Journalists, bloggers, general readers, nonprofit/public-interest audiences | Best broad thematic entry page for the “how presidents affected Black Americans” question. | Broad topical share, landing page for general-interest audiences |
@@ -129,6 +131,7 @@ Why:
 Best first pages:
 
 - `/methodology`
+- `/how-it-works`
 - `/research`
 - `/reports/black-impact-score`
 - `/analysis/presidential-records-on-black-opportunity`
@@ -183,18 +186,19 @@ Why:
 
 ## First-Wave Promotion Recommendation
 
-If promotion started now, the first wave should focus on these 10 pages:
+If promotion started now, the first wave should focus on these pages:
 
 1. `/research`
-2. `/methodology`
-3. `/reports/black-impact-score`
-4. `/reports/civil-rights-timeline`
-5. `/analysis/presidential-impact-on-black-americans`
-6. `/analysis/civil-rights-laws-by-president`
-7. `/analysis/presidents-and-black-americans`
-8. `/explainers/equal-protection-under-the-law`
-9. `/explainers/redlining-black-homeownership`
-10. `/explainers/gi-bill-access-and-impact`
+2. `/how-it-works`
+3. `/methodology`
+4. `/reports/black-impact-score`
+5. `/reports/civil-rights-timeline`
+6. `/analysis/presidential-impact-on-black-americans`
+7. `/analysis/civil-rights-laws-by-president`
+8. `/analysis/presidents-and-black-americans`
+9. `/explainers/equal-protection-under-the-law`
+10. `/explainers/redlining-black-homeownership`
+11. `/explainers/gi-bill-access-and-impact`
 
 Why this first wave:
 

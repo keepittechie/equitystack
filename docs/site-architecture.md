@@ -1,6 +1,6 @@
 # EquityStack Site Architecture
 
-This document describes the public-side architecture after the SEO, trust, and discovery pass.
+This document describes the current public-side architecture after the navigation, homepage, methodology, and evidence-model rollout.
 
 ## Public Page Types
 
@@ -48,6 +48,7 @@ These pages are editorial entry hubs. They should not replace the underlying rec
 
 - `/research`
 - `/start`
+- `/how-it-works`
 - `/methodology`
 - `/glossary`
 - `/sources`
@@ -71,29 +72,23 @@ These are supporting exploration routes, not the main trust or search hubs.
 ### Entry hierarchy
 
 1. Homepage
-2. Research Hub / Key Questions / core hubs
-3. Thematic analysis pages and flagship reports
+2. Core record hubs: `/policies`, `/promises`, `/compare/policies`, `/how-it-works`
+3. Supporting hubs: `/research`, `/reports`, `/start`, `/explainers`
 4. Record pages and explainers
-5. Methodology / Sources / Glossary for verification
+5. Trust / verification pages: `/how-it-works`, `/methodology`, `/sources`, `/glossary`
 
 ### Navigation model
 
 - Primary nav keeps the core high-frequency hubs:
-  - Dashboard
   - Policies
-  - Bills
-  - Presidents
   - Promises
-  - Reports
-- `Research` groups:
-  - Research Hub
-  - Impact Analysis pages
-  - Civil-Rights Timeline
+  - Compare
+  - How it works
 - Footer carries the fuller discovery and trust system:
-  - Research / Explore
+  - Core paths
   - Guides / Understanding
-  - Impact Analysis
-  - Reference Paths
+  - Research / Analysis
+  - Reference / About
   - Sources & Code
 
 ## SEO / Discovery Structure
@@ -103,9 +98,10 @@ These are supporting exploration routes, not the main trust or search hubs.
 Owns:
 
 - broad site understanding
-- `Key Questions`
 - strongest entry points for first-time visitors
-- reference-page surfacing
+- flagship examples
+- policy / promise / compare branching
+- method and trust framing
 
 ### Thematic pages
 
@@ -152,10 +148,11 @@ Common types in use:
 
 EquityStack should feel like one connected research system:
 
-- thematic pages frame the question
-- reports summarize patterns
+- homepage explains the product and routes readers cleanly
+- policy and promise pages carry the core evidence-bearing record layer
+- compare pages help readers test records against each other
+- reports summarize broader patterns
 - explainers provide context
-- record pages provide evidence-bearing detail
 - trust pages explain how to read and verify the site
 
 No single page type should try to do all five jobs at once.
