@@ -1162,14 +1162,28 @@ export function SourceLibraryTable({ items = [] }) {
   );
 }
 
-export function SearchResultGroup({ title, items = [] }) {
+export function SearchResultGroup({
+  title,
+  description = null,
+  items = [],
+}) {
   if (!items.length) {
     return null;
   }
 
   return (
     <section className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4">
-      <h2 className="text-lg font-semibold text-white">{title}</h2>
+      <div className="space-y-2">
+        <div className="flex flex-wrap items-center gap-3">
+          <h2 className="text-lg font-semibold text-white">{title}</h2>
+          <span className="text-[11px] uppercase tracking-[0.18em] text-[var(--ink-muted)]">
+            {items.length} result{items.length === 1 ? "" : "s"}
+          </span>
+        </div>
+        {description ? (
+          <p className="text-sm leading-7 text-[var(--ink-soft)]">{description}</p>
+        ) : null}
+      </div>
       <div className="mt-4 grid gap-3">
         {items.map((item, index) => (
           <Link

@@ -215,7 +215,7 @@ export default async function PromisesPage({ searchParams }) {
           <div className="grid gap-4 xl:grid-cols-2">
             <DiscoveryGuidancePanel
               eyebrow="Best-covered paths"
-              title="Start with the best-documented promise records in this slice"
+              title="Start with the best-covered promise records in this slice"
               description="These promise records have the clearest visible mix of sources, actions, and downstream outcomes in the current filtered view."
               items={data.bestCoveredPaths || []}
             />

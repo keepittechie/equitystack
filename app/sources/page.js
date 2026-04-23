@@ -11,6 +11,8 @@ import {
   SectionIntro,
   SourceTrustPanel,
 } from "@/app/components/public/core";
+import PageRoleCallout from "@/app/components/public/PageRoleCallout";
+import DiscoveryGuidancePanel from "@/app/components/public/DiscoveryGuidancePanel";
 import { Panel } from "@/app/components/dashboard/primitives";
 import { SourceLibraryTable } from "@/app/components/public/entities";
 import {
@@ -27,6 +29,33 @@ export const metadata = buildPageMetadata({
     "Browse the public source library behind EquityStack’s policy, promise, and outcome records.",
   path: "/sources",
 });
+
+const SOURCE_SYSTEM_GUIDANCE = [
+  {
+    href: "/reports",
+    label: "Reports",
+    tone: "info",
+    title: "Reports are the synthesis layer built from underlying records",
+    description:
+      "Use reports when the question is comparative or thematic. Then come back to sources when the summary needs verification.",
+  },
+  {
+    href: "/explainers",
+    label: "Explainers",
+    tone: "default",
+    title: "Explainers are the context layer for reading records and sources",
+    description:
+      "Use explainers when a source needs legal, historical, or institutional context before the evidence can be read well.",
+  },
+  {
+    href: "/policies",
+    label: "Records",
+    tone: "verified",
+    title: "Policy and promise pages are the record layer where sources are applied",
+    description:
+      "Open the record layer to see how specific sources support policies, outcomes, promise actions, and Black-impact rows.",
+  },
+];
 
 export default async function SourcesPage({ searchParams }) {
   const resolvedSearchParams = (await searchParams) || {};
@@ -95,7 +124,7 @@ export default async function SourcesPage({ searchParams }) {
           as="h1"
           eyebrow="Source library"
           title="Browse the evidence behind EquityStack’s public record."
-          description="The source library gives users a direct view into the public evidence base behind policies, promises, outcomes, and Black-impact rows. Use it to inspect source types, publishers, linked-record counts, and the strongest visible records each source is helping support."
+          description="Use the source library to inspect the visible evidence base behind policies, promises, outcomes, and Black-impact rows, including source type, publisher, trust label, and linked support."
           actions={
             <>
               <Link href="/methodology" className="dashboard-button-primary">
@@ -112,42 +141,53 @@ export default async function SourcesPage({ searchParams }) {
         />
       </section>
 
+      <PageRoleCallout
+        title="Use sources as the evidence layer"
+        description="Sources are the evidence layer. Use them to verify records and analysis. Reports are the synthesis layer built from those records, and explainers are the context layer for interpreting them."
+        links={[
+          { href: "/reports", label: "Reports" },
+          { href: "/explainers", label: "Explainers" },
+          { href: "/methodology", label: "Methodology" },
+        ]}
+      />
+
       <Panel padding="md">
         <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--accent)]">
           How sources are used
         </p>
         <h2 className="mt-3 text-2xl font-semibold text-white">
-          Sources verify claims, support impact classification, and provide historical grounding.
+          Sources verify claims, support impact classification, and anchor the public record.
         </h2>
         <p className="mt-4 text-sm leading-7 text-[var(--ink-soft)]">
-          In this library, trust refers to credibility and reliability signals such as official origin,
-          archival quality, source type, and evidentiary usefulness. It does not mean agreement with
-          a policy position.
-        </p>
-        <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-          Multiple sources can support a single policy, promise, or outcome record. The public library
-          exists so readers can inspect that evidence layer directly.
+          Trust here refers to credibility and reliability signals such as official origin, archival quality, source type, and evidentiary usefulness. It does not mean agreement with a policy position.
         </p>
       </Panel>
 
       <section className="grid gap-4 md:grid-cols-2">
         <Panel padding="md">
-          <h2 className="text-lg font-semibold text-white">Why researchers use this page</h2>
+          <h2 className="text-lg font-semibold text-white">Why use this page</h2>
           <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-            Readers can use this page to verify claims, understand what kinds of sources support Black policy impact analysis, and see how widely a source is used across the site.
+            Use it to verify claims, inspect what kinds of evidence support Black policy impact analysis, and see how widely a source is used across the public site.
           </p>
         </Panel>
         <Panel padding="md">
-          <h2 className="text-lg font-semibold text-white">Why it is citation-friendly</h2>
+          <h2 className="text-lg font-semibold text-white">When to cite it</h2>
           <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-            Link this page when a reader needs to inspect the evidence layer itself, not just the interpretation built from it. It is the clearest public page for checking publisher mix, source types, and visible record linkage.
+            Cite the source library when a reader needs the evidence layer itself, not just the interpretation built from it.
           </p>
         </Panel>
       </section>
 
       <CitationNote
         title="How to reference the source library"
-        description="Use this page when citing EquityStack&apos;s visible evidence base. It is especially useful when a report, policy page, or explainer needs to be paired with the underlying source environment rather than treated as a stand-alone claim."
+        description="Use this page when citing EquityStack&apos;s visible evidence base, especially when a report, policy page, or explainer needs to be paired with the underlying source environment."
+      />
+
+      <DiscoveryGuidancePanel
+        eyebrow="How this fits together"
+        title="Use evidence, synthesis, context, and records together"
+        description="The platform works best when these layers stay distinct but visibly connected."
+        items={SOURCE_SYSTEM_GUIDANCE}
       />
 
       <DashboardFilterBar helpText="Search by source title, publisher, type, or URL. The goal is to make transparency legible without exposing raw internal junction-table noise.">

@@ -8,6 +8,8 @@ import {
 } from "@/lib/public-site-data";
 import StructuredData from "@/app/components/public/StructuredData";
 import { Breadcrumbs } from "@/app/components/public/chrome";
+import PageRoleCallout from "@/app/components/public/PageRoleCallout";
+import DiscoveryGuidancePanel from "@/app/components/public/DiscoveryGuidancePanel";
 import {
   MethodologyCallout,
 } from "@/app/components/public/core";
@@ -208,6 +210,33 @@ function buildRelatedExplainerResearchPaths() {
   ];
 }
 
+const EXPLAINER_SYSTEM_GUIDANCE = [
+  {
+    href: "/reports",
+    label: "Synthesis",
+    tone: "info",
+    title: "Reports show the broader pattern around this topic",
+    description:
+      "Use reports when the question becomes comparative, historical across many records, or more analytical than one topic page can hold.",
+  },
+  {
+    href: "/sources",
+    label: "Evidence",
+    tone: "verified",
+    title: "Sources let you verify the record beneath the narrative",
+    description:
+      "Use the source library when you want to inspect the evidence base supporting the policy, promise, and outcome claims around this topic.",
+  },
+  {
+    href: "/policies",
+    label: "Records",
+    tone: "default",
+    title: "Policy pages turn topic context into concrete records",
+    description:
+      "Use policy and promise pages when you want the specific laws, actions, outcomes, and related Black-impact rows underneath the explainer.",
+  },
+];
+
 function buildFlagshipExplainerCards(editorial) {
   return Array.isArray(editorial.referenceCards) ? editorial.referenceCards : [];
 }
@@ -375,6 +404,16 @@ export default async function ExplainerDetailPage({ params }) {
         </div>
       </Panel>
 
+      <PageRoleCallout
+        title="Use explainers as the context layer"
+        description="Explainers are the context layer. They help readers understand a legal, historical, or policy question before moving into the record layer or the evidence layer. Reports remain the synthesis layer."
+        links={[
+          { href: "/reports", label: "Reports" },
+          { href: "/sources", label: "Sources" },
+          { href: "/policies", label: "Policy records" },
+        ]}
+      />
+
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <MetricCard
           label="Linked policies"
@@ -418,6 +457,12 @@ export default async function ExplainerDetailPage({ params }) {
               </Panel>
             ))}
           </div>
+          <DiscoveryGuidancePanel
+            eyebrow="How this explainer supports the platform"
+            title="Read this explainer with records, reports, and sources nearby"
+            description="Explainers give topic context first. The next step is usually a linked record, a report, or the evidence layer."
+            items={EXPLAINER_SYSTEM_GUIDANCE}
+          />
           <MethodologyCallout description={buildPageMethodNote()} />
         </div>
       </Panel>

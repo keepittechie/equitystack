@@ -196,6 +196,8 @@ export function CitationNote({
   title = "Citation note",
   description =
     "When referencing this page externally, cite the page title, EquityStack, the page URL, and your access date. Treat the page as a structured summary of the current dataset, not a complete historical judgment.",
+  referenceLine = null,
+  items = [],
 }) {
   return (
     <Panel padding="md" className="h-full">
@@ -204,6 +206,29 @@ export function CitationNote({
       </p>
       <h3 className="mt-2 text-base font-semibold text-white">{title}</h3>
       <p className="mt-2 text-sm leading-6 text-[var(--ink-soft)]">{description}</p>
+      {referenceLine ? (
+        <div className="mt-4 rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] px-4 py-3">
+          <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
+            Reference line
+          </p>
+          <p className="mt-2 text-sm leading-6 text-white">{referenceLine}</p>
+        </div>
+      ) : null}
+      {items.length ? (
+        <div className="mt-4 grid gap-3 md:grid-cols-2">
+          {items.map((item) => (
+            <Panel key={item.label} padding="md">
+              <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
+                {item.label}
+              </p>
+              <p className="mt-2 text-sm font-semibold text-white">{item.value}</p>
+              {item.detail ? (
+                <p className="mt-2 text-sm leading-6 text-[var(--ink-soft)]">{item.detail}</p>
+              ) : null}
+            </Panel>
+          ))}
+        </div>
+      ) : null}
     </Panel>
   );
 }

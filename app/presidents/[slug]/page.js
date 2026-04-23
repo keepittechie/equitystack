@@ -31,6 +31,7 @@ import TrustBar from "@/app/components/public/TrustBar";
 import PromiseSystemExplanation from "@/app/components/public/PromiseSystemExplanation";
 import ScoreExplanation from "@/app/components/public/ScoreExplanation";
 import WhyThisScorePanel from "@/app/components/public/WhyThisScorePanel";
+import DiscoveryGuidancePanel from "@/app/components/public/DiscoveryGuidancePanel";
 import InsightCard from "@/app/components/public/InsightCard";
 import {
   PresidentPolicyTable,
@@ -163,6 +164,205 @@ function buildWhyThisPresidentScore(profile) {
     ].filter(Boolean),
     note: scoreComposition?.interpretation || null,
   };
+}
+
+function buildPresidentReferenceSynthesis(profile, researchCoverage) {
+  const { president, promiseTracker, scoreComposition, scoreDrivers } = profile;
+  const dominantDirection = Object.entries(scoreComposition?.direct?.direction_counts || {})
+    .sort((left, right) => Number(right[1] || 0) - Number(left[1] || 0))[0]?.[0];
+  const promiseCount =
+    promiseTracker.visible_promise_count ?? promiseTracker.total_tracked_promises ?? 0;
+  const outcomeCount = president.direct_outcome_count ?? president.outcome_count ?? 0;
+  const topicLabels = takeLabels(scoreDrivers?.topic_drivers, (item) => item.topic, 3);
+
+  return {
+    summary:
+      sentenceJoin([
+        buildPresidentOverview(profile),
+        scoreComposition?.summary_line || null,
+      ]) ||
+      "This profile organizes the visible scored outcomes, tracked promises, and current score context for one presidency.",
+    items: [
+      {
+        label: "What defines this record",
+        value: sentenceJoin([
+          countLabel(outcomeCount, "scored outcome"),
+          countLabel(promiseCount, "tracked promise"),
+        ]),
+        detail:
+          "The profile starts from visible outcome-backed record, then widens into promise and bill-linked context where the current public data supports it.",
+      },
+      dominantDirection
+        ? {
+            label: "Current trend",
+            value: `${humanizeToken(dominantDirection)}-leaning record`,
+            detail:
+              "This is the dominant direction in the current direct outcome mix, not a complete judgment of the presidency.",
+          }
+        : null,
+      topicLabels.length
+        ? {
+            label: "Defining topics",
+            value: oxfordJoin(topicLabels),
+            detail:
+              "These issue areas currently do the most visible work in the public score narrative.",
+          }
+        : null,
+      researchCoverage
+        ? {
+            label: "Evidence read",
+            value: researchCoverage.label,
+            detail: researchCoverage.description,
+          }
+        : null,
+    ].filter(Boolean),
+    note:
+      scoreComposition?.interpretation ||
+      "Use the score as a starting point, then move into the underlying promises, policies, and bill context before treating this profile as settled.",
+  };
+}
+
+function buildPresidentReferenceUtility({ profile, researchCoverage }) {
+  const { president, promiseTracker } = profile;
+  const presidentName = president.president || president.president_name || "President";
+  const termLabel = formatTermLabel(promiseTracker.term_start, promiseTracker.term_end);
+  const scoreValue =
+    president.normalized_score_total ?? president.score ?? president.direct_normalized_score;
+  const confidenceLabel = president.direct_score_confidence || president.score_confidence || null;
+  const outcomeCount = president.direct_outcome_count ?? president.outcome_count ?? 0;
+  const promiseCount =
+    promiseTracker.visible_promise_count ?? promiseTracker.total_tracked_promises ?? 0;
+  const referenceLine = [
+    presidentName,
+    termLabel !== "Historical record" ? termLabel : null,
+    Number.isFinite(Number(scoreValue)) ? `Black Impact Score ${formatScore(scoreValue)}` : null,
+    confidenceLabel ? `${confidenceLabel} confidence` : null,
+    researchCoverage?.label || null,
+  ]
+    .filter(Boolean)
+    .join(" • ");
+
+  return {
+    description:
+      "When referencing this presidential profile, name the president, EquityStack, the page URL, and your access date. For a stronger reference, also note the visible score context, the current confidence/evidence read, and that the profile is anchored in scored outcomes plus linked promise and legislative context.",
+    referenceLine,
+    items: [
+      {
+        label: "Name the profile",
+        value: sentenceJoin([presidentName, termLabel !== "Historical record" ? termLabel : null]),
+        detail:
+          "This keeps the reference anchored to the specific presidential profile rather than to a general administration or era page.",
+      },
+      {
+        label: "Anchor the score",
+        value:
+          sentenceJoin([
+            Number.isFinite(Number(scoreValue)) ? `Black Impact Score ${formatScore(scoreValue)}` : null,
+            confidenceLabel ? `${confidenceLabel} confidence` : null,
+          ]) || "Score context still limited",
+        detail:
+          "Treat the score as a structured summary of the current visible dataset, not as a complete judgment of every action in a presidency.",
+      },
+      {
+        label: "Describe the record base",
+        value: sentenceJoin([
+          countLabel(outcomeCount, "scored outcome"),
+          countLabel(promiseCount, "tracked promise"),
+        ]),
+        detail:
+          "These counts help explain what the current public profile is actually built from.",
+      },
+      {
+        label: "Pair with methodology",
+        value: researchCoverage?.label || "Coverage still developing",
+        detail:
+          "Pair the profile with the score methodology or underlying record tables when precision matters, especially if coverage is still developing.",
+      },
+    ],
+  };
+}
+
+function buildPresidentNextReviewItems({
+  slug,
+  presidentName,
+  topPolicies = [],
+  flagshipEditorial = null,
+}) {
+  const items = [];
+  const seen = new Set();
+
+  const priorityLink = flagshipEditorial?.priorityLinks?.[0];
+  if (priorityLink && !seen.has(priorityLink.href) && items.length < 4) {
+    seen.add(priorityLink.href);
+    items.push({
+      label: "Priority path",
+      tone: "info",
+      title: priorityLink.title,
+      description: priorityLink.description,
+      href: priorityLink.href,
+    });
+  }
+
+  const reportHref = "/reports/black-impact-score";
+  if (!seen.has(reportHref) && items.length < 4) {
+    seen.add(reportHref);
+    items.push({
+      label: "Flagship report",
+      tone: "info",
+      title: "Open the flagship report",
+      description:
+        "Use the report view when you want broader ranking and historical comparison context beyond this single presidential profile.",
+      href: reportHref,
+    });
+  }
+
+  const compareHref = `/compare/presidents?compare=${slug}`;
+  if (!seen.has(compareHref) && items.length < 4) {
+    seen.add(compareHref);
+    items.push({
+      label: "Compare presidents",
+      tone: "info",
+      title: `Compare ${presidentName} against other presidents`,
+      description:
+        "Use the compare view when you want to test whether this score pattern is distinctive or relatively narrow against other presidencies.",
+      href: compareHref,
+    });
+  }
+
+  const promiseHref = `/promises/president/${slug}`;
+  if (!seen.has(promiseHref) && items.length < 4) {
+    seen.add(promiseHref);
+    items.push({
+      label: "Promise tracker",
+      tone: "default",
+      title: `Open ${presidentName}'s promise tracker`,
+      description:
+        "Use the promise tracker when you want the fuller delivered, partial, blocked, and failed commitment record behind this profile.",
+      href: promiseHref,
+    });
+  }
+
+  const topRecord = (topPolicies || [])[0];
+  if (topRecord && items.length < 4) {
+    const href = topRecord.slug ? `/promises/${topRecord.slug}` : `/policies/${buildPolicySlug(topRecord)}`;
+    if (!seen.has(href)) {
+      seen.add(href);
+      items.push({
+        label: topRecord.slug ? "Connected promise" : "Underlying policy",
+        tone: topRecord.slug ? "default" : "info",
+        title: topRecord.title,
+        meta: [topRecord.topic || topRecord.category || null, topRecord.status || topRecord.impact_direction || null]
+          .filter(Boolean)
+          .join(" • "),
+        description:
+          topRecord.summary ||
+          "Open one of the strongest currently surfaced underlying records shaping the visible presidential profile.",
+        href,
+      });
+    }
+  }
+
+  return items.slice(0, 4);
 }
 
 function buildPresidentOverview(profile, editorial = null) {
@@ -371,6 +571,20 @@ export default async function PresidentProfilePage({ params }) {
       Number(president.normalized_score_total ?? president.score ?? president.direct_normalized_score)
     ),
   });
+  const presidentReferenceSynthesis = buildPresidentReferenceSynthesis(
+    profile,
+    researchCoverage
+  );
+  const presidentReferenceUtility = buildPresidentReferenceUtility({
+    profile,
+    researchCoverage,
+  });
+  const bestNextReviewItems = buildPresidentNextReviewItems({
+    slug,
+    presidentName,
+    topPolicies,
+    flagshipEditorial,
+  });
   const localNavigationItems = [
     { href: "#overview", label: "Overview" },
     ...(timelineItems.length
@@ -552,6 +766,15 @@ export default async function PresidentProfilePage({ params }) {
           }
         />
         <div className="space-y-4 p-4">
+          <WhyThisScorePanel
+            eyebrow="Profile synthesis"
+            title="Read this presidency in one pass"
+            summary={presidentReferenceSynthesis.summary}
+            items={presidentReferenceSynthesis.items}
+            note={presidentReferenceSynthesis.note}
+            actionHref={`/compare/presidents?compare=${slug}`}
+            actionLabel="Compare this president"
+          />
           <WhyThisScorePanel
             summary={whyThisScore.summary}
             items={whyThisScore.items}
@@ -835,10 +1058,13 @@ export default async function PresidentProfilePage({ params }) {
             />
             <PresidentScoreMethodologyNote />
             <CitationNote
+              title="How to reference this record"
               description={
                 flagshipEditorial?.citationDescription ||
-                "When referencing this presidential profile, cite the president name, page title, EquityStack, the page URL, and your access date. Treat the profile as a structured summary of the current dataset and its current evidence coverage."
+                presidentReferenceUtility.description
               }
+              referenceLine={presidentReferenceUtility.referenceLine}
+              items={presidentReferenceUtility.items}
             />
             <ScoreExplanation title="How to interpret this presidential profile" />
             {profile.profileInsight ? (
@@ -1002,9 +1228,17 @@ export default async function PresidentProfilePage({ params }) {
         <SectionHeader
           eyebrow="Continue exploring"
           title="Where to go next from this presidential record"
-          description="Profiles should lead naturally into compare, methodology, and underlying record detail."
+          description="Start with the curated next-step panel first. The cards below keep the wider set of compare, methodology, report, and research paths visible."
         />
         <div className="grid gap-4 p-4 md:grid-cols-2">
+          <div className="md:col-span-2">
+            <DiscoveryGuidancePanel
+              eyebrow="Best context to read next"
+              title="Start with this curated next step before browsing the full linked set"
+              description="Use this short path when you want the clearest next click first. The broader compare, report, methodology, and research routes remain visible below."
+              items={bestNextReviewItems}
+            />
+          </div>
           {(flagshipEditorial?.priorityLinks || []).map((item) => (
             <Panel
               key={item.href}

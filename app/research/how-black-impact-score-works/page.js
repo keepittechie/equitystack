@@ -9,6 +9,7 @@ import {
   SectionIntro,
 } from "@/app/components/public/core";
 import PageRoleCallout from "@/app/components/public/PageRoleCallout";
+import DiscoveryGuidancePanel from "@/app/components/public/DiscoveryGuidancePanel";
 import { buildBreadcrumbJsonLd, buildWebPageJsonLd } from "@/lib/structured-data";
 
 export const metadata = buildPageMetadata({
@@ -242,6 +243,72 @@ const NEXT_STEPS = [
   },
 ];
 
+const SCORE_SIGNAL_GUIDANCE = [
+  {
+    label: "Why this score",
+    tone: "info",
+    title: "A human-readable explanation of the live score",
+    description:
+      "On policy and president pages, Why this score is a plain-language reading of the strongest visible drivers, direction, and evidence limits. It is not a separate formula or a second score.",
+  },
+  {
+    label: "Research coverage",
+    tone: "info",
+    title: "A completeness cue around the live record",
+    description:
+      "Research coverage tells readers how much source, outcome, and linked-record depth is currently visible around a record or result set. It should be read as completeness, not certainty.",
+  },
+  {
+    label: "Best-covered",
+    tone: "verified",
+    title: "The strongest-supported items in the visible slice",
+    description:
+      "Best-covered labels appear on explorers to help readers start with the clearest-supported material in a filtered slice. They do not claim that those records are universally most important.",
+  },
+  {
+    label: "Consequence signals",
+    tone: "warning",
+    title: "Scoped high-signal discovery cues",
+    description:
+      "Consequence signals use visible score, outcome, and context depth to suggest which records in the current slice may be most consequential to inspect next. They are not global rankings.",
+  },
+];
+
+const SCORE_LIVE_EXAMPLES = [
+  {
+    href: "/reports/black-impact-score",
+    label: "Flagship report",
+    tone: "verified",
+    title: "Black Impact Score report",
+    description:
+      "Open the live report to see score interpretation, comparison framing, and methodology pathing in one public reference surface.",
+  },
+  {
+    href: "/presidents/lyndon-b-johnson",
+    label: "President profile",
+    tone: "info",
+    title: "Lyndon B. Johnson",
+    description:
+      "Use a president page to see how the score model becomes a readable profile with Why this score, research coverage, and linked policy drivers nearby.",
+  },
+  {
+    href: "/policies/5-civil-rights-act-of-1964",
+    label: "Policy record",
+    tone: "default",
+    title: "Civil Rights Act of 1964",
+    description:
+      "Use a flagship policy page to see score interpretation, evidence strength, lineage, and source trails aligned around one record.",
+  },
+  {
+    href: "/sources",
+    label: "Evidence layer",
+    tone: "default",
+    title: "Source library",
+    description:
+      "Open the source library when you want to verify how visible evidence and support trails sit underneath the score-facing pages.",
+  },
+];
+
 function badgeClasses(tone = "default") {
   if (tone === "positive") {
     return "border-[rgba(132,247,198,0.22)] bg-[rgba(11,58,50,0.62)] text-[var(--success)]";
@@ -366,7 +433,7 @@ export default function HowBlackImpactScoreWorksPage() {
 
       <PageRoleCallout
         title="Use this page for score-specific transparency"
-        description="This page is narrower than the full methodology. It explains the Black Impact Score itself: what is included, how direction and confidence are handled, and where score coverage is still incomplete. Use the broader Methodology page when the question is about page types, promises, reports, or site-wide evidence rules."
+        description="This page is narrower than the full methodology. It explains the Black Impact Score itself: what is included, how direction and confidence are handled, and where score coverage is still incomplete. It is also the best public explanation for score-adjacent labels now visible on live pages, such as Why this score and Research coverage. Use the broader Methodology page when the question is about page types, promises, reports, or site-wide evidence rules."
         links={[
           { href: "/methodology", label: "Site methodology" },
           { href: "/research", label: "Research hub" },
@@ -383,6 +450,21 @@ export default function HowBlackImpactScoreWorksPage() {
         <CitationNote
           title="Why this page exists"
           description="EquityStack should be explainable without hand-waving. This page is here so a skeptical reader can see the moving parts of the score, understand what is missing, and evaluate the system on its actual rules rather than on summary language alone."
+        />
+      </section>
+
+      <section className="grid gap-4 xl:grid-cols-2">
+        <DiscoveryGuidancePanel
+          eyebrow="Interpretation cues"
+          title="How score-adjacent labels should be read"
+          description="These public cues are designed to make the score easier to interpret without pretending that label language is enough on its own."
+          items={SCORE_SIGNAL_GUIDANCE}
+        />
+        <DiscoveryGuidancePanel
+          eyebrow="See this in practice"
+          title="Open live examples of the score layer at work"
+          description="Use these routes to move from formula and scoring rules into real public pages where the model is applied."
+          items={SCORE_LIVE_EXAMPLES}
         />
       </section>
 

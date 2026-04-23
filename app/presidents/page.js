@@ -18,6 +18,7 @@ import {
   PresidentRankingBoard,
 } from "@/app/components/public/entities";
 import TrustBar from "@/app/components/public/TrustBar";
+import DiscoveryGuidancePanel from "@/app/components/public/DiscoveryGuidancePanel";
 import {
   buildBreadcrumbJsonLd,
   buildCollectionPageJsonLd,
@@ -62,7 +63,8 @@ function formatScore(value) {
 
 export default async function PresidentsPage({ searchParams }) {
   const resolvedSearchParams = (await searchParams) || {};
-  const { presidents } = await fetchPresidentsOverviewData(resolvedSearchParams);
+  const data = await fetchPresidentsOverviewData(resolvedSearchParams);
+  const { presidents } = data;
   const partyFilter = resolvedSearchParams.party || "";
   const confidenceFilter = resolvedSearchParams.confidence || "";
   const query = resolvedSearchParams.q || "";
@@ -263,6 +265,20 @@ export default async function PresidentsPage({ searchParams }) {
             title="Black Impact Score ranking"
             description="This ranking shows how presidents compare on the current final Black Impact Score. It remains a structured policy-impact measure, not a complete judgment of a presidency."
           />
+          <div className="grid gap-4 xl:grid-cols-2">
+            <DiscoveryGuidancePanel
+              eyebrow="Best-covered paths"
+              title="Start with the best-covered presidential records in this slice"
+              description="These profiles currently show the clearest visible mix of score confidence, outcome depth, and connected presidential context in the active filtered view."
+              items={data.bestCoveredPaths || []}
+            />
+            <DiscoveryGuidancePanel
+              eyebrow="Consequence signals"
+              title="Where the current presidential set looks most consequential"
+              description="These cues stay scoped to the visible presidential set, using score, outcome depth, and connected record context rather than a platform-wide moral ranking."
+              items={data.consequenceHighlights || []}
+            />
+          </div>
           <PresidentRankingBoard
             items={topRanked}
             buildHref={(item) => `/presidents/${item.slug}`}

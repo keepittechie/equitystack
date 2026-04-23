@@ -4,6 +4,7 @@ import StructuredData from "@/app/components/public/StructuredData";
 import { Breadcrumbs } from "@/app/components/public/chrome";
 import { CitationNote, SectionIntro } from "@/app/components/public/core";
 import PageRoleCallout from "@/app/components/public/PageRoleCallout";
+import DiscoveryGuidancePanel from "@/app/components/public/DiscoveryGuidancePanel";
 import {
   buildBreadcrumbJsonLd,
   buildCollectionPageJsonLd,
@@ -274,6 +275,30 @@ const CONTINUE_EXPLORING = [
   },
 ];
 
+const HUB_GUIDANCE = [
+  {
+    label: "Curated path",
+    tone: "info",
+    title: "This hub is a research index, not a ranking",
+    description:
+      "Featured pages and priority paths are editorial entry points designed to get readers into the strongest live material quickly. They are not claims that one page type settles the whole question.",
+  },
+  {
+    label: "Use methodology for rules",
+    tone: "default",
+    title: "Switch pages when interpretation rules matter",
+    description:
+      "Move to Methodology when the question turns to Research coverage, Best-covered, trust labels, or how records and reports should be cited or compared.",
+  },
+  {
+    label: "Use the score page for formula",
+    tone: "default",
+    title: "Score construction lives on the score page",
+    description:
+      "When the question is specifically how the Black Impact Score works, move to the score-methodology page instead of treating the hub as a scoring explainer.",
+  },
+];
+
 export default function ResearchHubPage() {
   return (
     <main className="space-y-4">
@@ -346,12 +371,19 @@ export default function ResearchHubPage() {
 
       <PageRoleCallout
         title="Use the research hub as the site’s curated research index"
-        description="This page is for choosing the strongest evidence-oriented path into EquityStack once you know the question you are asking. Use Start Here for a guided explainer sequence, Methodology for site-wide evaluation rules, and the score page when the question is specifically how the Black Impact Score works."
+        description="This page is for choosing the strongest evidence-oriented path into EquityStack once you know the question you are asking. Use Start Here for a guided explainer sequence, Methodology for site-wide evaluation rules and trust labels, and the score page when the question is specifically how the Black Impact Score works."
         links={[
           { href: "/start", label: "Guided start" },
           { href: "/methodology", label: "Site methodology" },
           { href: "/research/how-black-impact-score-works", label: "Score method" },
         ]}
+      />
+
+      <DiscoveryGuidancePanel
+        eyebrow="How to read this hub"
+        title="Use the hub to choose the right live path, not to settle the question by itself"
+        description="The research hub is strongest when it routes readers into records, reports, explainers, methodology, and sources in the right order."
+        items={HUB_GUIDANCE}
       />
 
       <section className="public-two-col-rail grid items-start gap-6 md:grid-cols-2 xl:grid-cols-[1.05fr_0.95fr]">

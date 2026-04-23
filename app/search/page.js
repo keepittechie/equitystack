@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { buildPageMetadata } from "@/lib/metadata";
 import { fetchUniversalSearchData } from "@/lib/public-site-data";
 import { Breadcrumbs } from "@/app/components/public/chrome";
@@ -21,6 +22,13 @@ export const metadata = buildPageMetadata({
     follow: true,
   },
 });
+
+const EXAMPLE_QUERIES = [
+  { href: "/search?q=Lyndon+B.+Johnson", label: "Lyndon B. Johnson" },
+  { href: "/search?q=Civil+Rights+Act+of+1964", label: "Civil Rights Act of 1964" },
+  { href: "/search?q=redlining", label: "redlining" },
+  { href: "/search?q=voting+rights", label: "voting rights" },
+];
 
 export default async function SearchPage({ searchParams }) {
   const resolvedSearchParams = (await searchParams) || {};
@@ -62,8 +70,22 @@ export default async function SearchPage({ searchParams }) {
             <p className="mt-4 text-sm leading-7 text-[var(--ink-soft)]">
               Try a president, policy area, promise topic, law title, or source publisher. Search is grouped by record type so you can choose the right next path instead of reading one long undifferentiated result list.
             </p>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+              Search works best for titles, names, broad topics, law names, court cases, and major source publishers.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {EXAMPLE_QUERIES.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="inline-flex min-h-8 items-center rounded-md border border-[var(--line)] bg-[rgba(18,31,49,0.58)] px-3 text-xs font-semibold text-white transition-[background-color,border-color] hover:border-[var(--line-strong)] hover:bg-[rgba(18,31,49,0.86)]"
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </div>
           </Panel>
-          <MethodologyCallout description="Search is a discovery tool, not a scoring layer. The next step after search should usually be a detail page, report, or source view with evidence and methodology nearby." />
+          <MethodologyCallout description="Search is a discovery tool, not a scoring layer. After finding a match, the next step should usually be a detail page, report, or source view with evidence and methodology nearby." />
         </section>
       ) : (
         <>
@@ -99,6 +121,7 @@ export default async function SearchPage({ searchParams }) {
                 <SearchResultGroup
                   key={section.key}
                   title={section.label}
+                  description={section.description || null}
                   items={section.items}
                 />
               ))}

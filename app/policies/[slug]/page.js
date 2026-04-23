@@ -38,6 +38,7 @@ import TrustBar from "@/app/components/public/TrustBar";
 import ResearchCoveragePanel from "@/app/components/public/ResearchCoveragePanel";
 import PolicyLineagePanel from "@/app/components/public/PolicyLineagePanel";
 import ScoreExplanation from "@/app/components/public/ScoreExplanation";
+import DiscoveryGuidancePanel from "@/app/components/public/DiscoveryGuidancePanel";
 import WhyThisScorePanel from "@/app/components/public/WhyThisScorePanel";
 import {
   EvidenceSourceList,
@@ -62,7 +63,9 @@ import ShareCardPanel from "@/app/components/share/ShareCardPanel";
 import { buildPolicyCardHref } from "@/lib/shareable-card-links";
 import {
   buildPolicyRelationshipClusterSummary,
+  buildPolicyNextRecordSuggestions,
   formatPolicyRelationshipTypeLabel,
+  getPolicyRelationshipTone,
   summarizePolicyRelationshipContinuity,
 } from "@/lib/policyRelationships";
 
@@ -803,6 +806,184 @@ function buildPolicyReferenceSynthesis({
   };
 }
 
+function buildPolicyReferenceUtility({
+  policy,
+  score,
+  blackImpactScoreSummary,
+  coverage,
+}) {
+  const sourceCount = Number(policy.sources?.length || policy.evidence_summary?.total_sources || 0);
+  const referenceLine = [
+    policy.title,
+    policy.year_enacted ? `(${policy.year_enacted})` : null,
+    policy.policy_type ? `${policy.policy_type} record` : null,
+    policy.president ? `${policy.president} context` : null,
+    policy.impact_direction ? `${policy.impact_direction} impact` : null,
+    blackImpactScoreSummary?.display_score
+      ? `Black Impact Score ${blackImpactScoreSummary.display_score}`
+      : Number.isFinite(Number(score))
+        ? `Impact score ${formatScore(score)}`
+        : null,
+    coverage?.label || null,
+  ]
+    .filter(Boolean)
+    .join(" • ");
+
+  return {
+    description:
+      "When citing this record, name the policy, EquityStack, the page URL, and your access date. For a stronger public reference, also note the administration or year context, the current impact direction, and whether the visible evidence base is still developing or already well-supported.",
+    referenceLine,
+    items: [
+      {
+        label: "Name the record",
+        value: sentenceJoin([
+          policy.title,
+          policy.year_enacted ? `Year ${policy.year_enacted}` : null,
+          policy.policy_type ? `${policy.policy_type} record` : null,
+        ]),
+        detail:
+          "This keeps the reference anchored to the specific law, order, case, or program record rather than to a broader administration or topic page.",
+      },
+      {
+        label: "Anchor the context",
+        value:
+          sentenceJoin([
+            policy.president ? `${policy.president} context` : null,
+            policy.era || null,
+            takeLabels(policy.categories, (item) => item.name, 2).join(" • ") || null,
+          ]) || "Historical policy record",
+        detail:
+          "Use administration, era, or category context when you need to place the record inside a broader Black policy history thread.",
+      },
+      {
+        label: "Characterize the impact",
+        value:
+          sentenceJoin([
+            policy.impact_direction ? `${policy.impact_direction} impact` : null,
+            blackImpactScoreSummary?.display_score
+              ? `Black Impact Score ${blackImpactScoreSummary.display_score}`
+              : Number.isFinite(Number(score))
+                ? `Impact score ${formatScore(score)}`
+                : null,
+          ]) || "Impact interpretation still limited",
+        detail:
+          "Treat the score and direction as record-level interpretation, not as a complete judgment of the entire historical period.",
+      },
+      {
+        label: "Pair with evidence",
+        value:
+          sentenceJoin([
+            countLabel(sourceCount, "source"),
+            coverage?.label || null,
+          ]) || "Visible evidence base still thin",
+        detail:
+          "Pair the page citation with the source trail or methodology when precision matters, especially if the current coverage is still developing.",
+      },
+    ],
+  };
+}
+
+function buildPolicyNextReviewGuidance({
+  policy,
+  relationships = [],
+  currentYear = null,
+  editorial = null,
+}) {
+  const items = [];
+  const seen = new Set();
+  const explainer = Array.isArray(policy.related_explainers)
+    ? policy.related_explainers.find((item) => item?.slug && item?.title)
+    : null;
+  if (explainer) {
+    const href = `/explainers/${explainer.slug}`;
+    if (!seen.has(href)) {
+      seen.add(href);
+      items.push({
+        label: explainer.category || "Context explainer",
+        tone: "info",
+        title: explainer.title,
+        description:
+          explainer.summary ||
+          "Use the explainer when you need broader historical or doctrinal context around this record.",
+        href,
+      });
+    }
+  }
+
+  const reportHref = "/reports/black-impact-score";
+  if (items.length < 4 && !seen.has(reportHref)) {
+    seen.add(reportHref);
+    items.push({
+      label: "Flagship report",
+      tone: "info",
+      title: "Black Impact Score",
+      description:
+        "Move from this policy record into the flagship report when you want higher-level presidential or historical comparison context.",
+      href: reportHref,
+    });
+  }
+
+  const broaderContext = buildResearchPaths(policy, editorial)[0];
+  if (broaderContext && items.length < 4 && !seen.has(broaderContext.href)) {
+    seen.add(broaderContext.href);
+    items.push({
+      label: broaderContext.label || "Broader context",
+      tone: "default",
+      title: broaderContext.title,
+      description: broaderContext.description,
+      href: broaderContext.href,
+    });
+  }
+
+  const lineageSuggestion = buildPolicyNextRecordSuggestions(relationships, currentYear)[0];
+  if (lineageSuggestion && items.length < 4) {
+    const href = `/policies/${buildPolicySlug({
+      id: lineageSuggestion.related_policy_id,
+      title: lineageSuggestion.related_policy_title,
+    })}`;
+    if (!seen.has(href)) {
+      seen.add(href);
+      items.push({
+        label: "Policy thread",
+        tone: getPolicyRelationshipTone(lineageSuggestion.relationship_type),
+        title: lineageSuggestion.related_policy_title,
+        meta: [
+          formatPolicyRelationshipTypeLabel(lineageSuggestion.relationship_type),
+          lineageSuggestion.related_policy_year,
+        ]
+          .filter(Boolean)
+          .join(" • "),
+        description:
+          lineageSuggestion.notes ||
+          "Open the closest linked policy record when you want adjacent context inside the same historical thread.",
+        href,
+      });
+    }
+  }
+
+  const promise = Array.isArray(policy.related_promises)
+    ? policy.related_promises.find((item) => item?.slug && item?.title)
+    : null;
+  if (promise && items.length < 4) {
+    const href = `/promises/${promise.slug}`;
+    if (!seen.has(href)) {
+      seen.add(href);
+      items.push({
+        label: "Connected promise",
+        tone: "default",
+        title: promise.title,
+        meta: promise.status || null,
+        description:
+          promise.summary ||
+          "Use the connected promise record when you want to see the commitment, follow-through, and downstream policy context together.",
+        href,
+      });
+    }
+  }
+
+  return items.slice(0, 4);
+}
+
 function buildPolicyGuideCards(policy, editorial = null) {
   const thinNarrative =
     isThinText(policy.summary, 140) || isThinText(policy.outcome_summary, 140);
@@ -1048,9 +1229,21 @@ export default async function PolicyDetailPage({ params }) {
     relationships: policy.relationships || [],
     editorial: flagshipEditorial,
   });
+  const policyReferenceUtility = buildPolicyReferenceUtility({
+    policy,
+    score,
+    blackImpactScoreSummary,
+    coverage: researchCoverage || evidenceCoverage,
+  });
   const demographicContextBridge = buildDemographicContextBridge(policy);
   const demographicImpactSections = buildDemographicImpactSections(demographicImpacts);
   const policyComparisonEntries = await buildPolicyComparisonEntries(policy);
+  const bestNextReviewItems = buildPolicyNextReviewGuidance({
+    policy,
+    relationships: policy.relationships || [],
+    currentYear: policy.year_enacted,
+    editorial: flagshipEditorial,
+  });
   const localSectionOffsetClass = "scroll-mt-28 md:scroll-mt-32";
   const localNavigationItems = [
     { href: "#overview", label: "Overview" },
@@ -1545,10 +1738,13 @@ export default async function PolicyDetailPage({ params }) {
             </Panel>
           ) : null}
           <CitationNote
+            title="How to reference this record"
             description={
               flagshipEditorial?.citationDescription ||
-              "When referencing this policy page externally, cite the policy title, EquityStack, the page URL, and your access date. Treat the page as a structured public record summary and pair it with linked sources or methodology when precision matters."
+              policyReferenceUtility.description
             }
+            referenceLine={policyReferenceUtility.referenceLine}
+            items={policyReferenceUtility.items}
           />
           <MethodologyCallout description="Impact Score is a structured record-level metric. The presidential Black Impact Score is a separate aggregate model built from outcomes, confidence, and time normalization." />
         </div>
@@ -1575,9 +1771,15 @@ export default async function PolicyDetailPage({ params }) {
         <SectionHeader
           eyebrow="Continue exploring"
           title="Promises, explainers, reports, and research paths"
-          description="Related records make it easier to move from a single policy into campaign promises, Black history explainers, and broader presidential or administrative context."
+          description="Start with the curated next-step panel first. The linked records and context cards below keep the broader related set visible without forcing one path."
         />
         <div className="space-y-4 p-4">
+          <DiscoveryGuidancePanel
+            eyebrow="Best context to read next"
+            title="Start with this curated next step before browsing the full linked set"
+            description="Use this short path when you want the clearest next click first. The full promise, explainer, report, and research links remain visible below."
+            items={bestNextReviewItems}
+          />
           {(policy.related_promises || []).length ? (
             <PromiseResultsTable items={policy.related_promises} buildHref={(item) => `/promises/${item.slug}`} />
           ) : (

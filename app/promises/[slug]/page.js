@@ -10,6 +10,8 @@ import {
   formatImpactValue,
 } from "@/lib/public-site-data";
 import {
+  buildResearchCoverage,
+  buildResearchStrengtheningNote,
   buildEvidenceCoverage,
   buildEvidenceStrengtheningNote,
 } from "@/lib/evidenceCoverage";
@@ -22,14 +24,18 @@ import {
 import StructuredData from "@/app/components/public/StructuredData";
 import { Breadcrumbs } from "@/app/components/public/chrome";
 import {
+  CitationNote,
   MethodologyCallout,
   PageContextBlock,
   SectionIntro,
   SourceTrustPanel,
 } from "@/app/components/public/core";
+import ResearchCoveragePanel from "@/app/components/public/ResearchCoveragePanel";
 import PromiseStatusLegend from "@/app/components/public/PromiseStatusLegend";
 import PromiseSystemExplanation from "@/app/components/public/PromiseSystemExplanation";
 import PromiseProvenanceChain from "@/app/components/public/PromiseProvenanceChain";
+import WhyThisScorePanel from "@/app/components/public/WhyThisScorePanel";
+import DiscoveryGuidancePanel from "@/app/components/public/DiscoveryGuidancePanel";
 import {
   EvidenceSourceList,
   PolicyCardList,
@@ -383,9 +389,233 @@ function buildPromiseContextParagraphs(promise) {
     ]),
     sentenceJoin([
       `Promise status is only one layer of interpretation.`,
-      `The stronger reading comes from comparing the promise text, the status rationale, the linked policy record, and the source trail together.`,
+      `The stronger reading comes from comparing the promise text, status rationale, linked policy record, and source trail together.`,
     ]),
   ]);
+}
+
+function buildPromiseRecordSynthesis({
+  promise,
+  actionCount,
+  outcomeCount,
+  linkedPolicyCount,
+  blackImpactSummary,
+  researchCoverage,
+}) {
+  const downstreamValue = blackImpactSummary
+    ? `${blackImpactSummary.direction_label} downstream read`
+    : outcomeCount > 0
+      ? "Documented downstream record"
+      : actionCount > 0 || linkedPolicyCount > 0
+        ? "Partial visible follow-through"
+        : "Downstream record still limited";
+  const downstreamDetail = blackImpactSummary
+    ? sentenceJoin([
+        blackImpactSummary.explanation_summary || null,
+        "This downstream interpretation is derived from linked outcomes and remains separate from the Promise Tracker status label.",
+      ])
+    : outcomeCount > 0
+      ? "The page has linked outcomes or related policies, so the downstream record is more than a status label alone."
+      : actionCount > 0 || linkedPolicyCount > 0
+        ? "There is some visible implementation or policy linkage, but the fuller downstream outcome record is still limited."
+        : "Right now the page is strongest as a commitment-and-status record, not as a fully developed downstream impact record.";
+
+  return {
+    summary: sentenceJoin([
+      promise.summary || buildPromiseOverview(promise),
+      buildWhyPromiseMatters(promise),
+    ]),
+    items: [
+      {
+        label: "What was promised",
+        value: promise.status ? `${promise.status} promise record` : "Tracked promise record",
+        detail: promise.promise_text || promise.summary || buildPromiseOverview(promise),
+      },
+      {
+        label: "What happened after",
+        value: sentenceJoin([
+          countLabel(actionCount, "documented action"),
+          countLabel(outcomeCount, "linked outcome"),
+          countLabel(linkedPolicyCount, "related policy"),
+        ]),
+        detail:
+          "Use the provenance chain below to connect promise language to actions, outcomes, related policies, and any current Black-impact layer.",
+      },
+      {
+        label: "Downstream read",
+        value: downstreamValue,
+        detail: downstreamDetail,
+      },
+      researchCoverage
+        ? {
+            label: "Evidence read",
+            value: researchCoverage.label,
+            detail: researchCoverage.description,
+          }
+        : null,
+    ].filter(Boolean),
+    note:
+      "Promise status and downstream Black-impact interpretation are kept separate on purpose. Read them together, not as the same thing.",
+  };
+}
+
+function buildPromiseReferenceUtility({
+  promise,
+  actionCount,
+  outcomeCount,
+  linkedPolicyCount,
+  researchCoverage,
+}) {
+  const termLabel = formatTermLabel(promise.term_start, promise.term_end);
+  const referenceLine = [
+    promise.title,
+    promise.president || null,
+    termLabel || null,
+    promise.status ? `Status: ${promise.status}` : null,
+    researchCoverage?.label || null,
+  ]
+    .filter(Boolean)
+    .join(" • ");
+
+  return {
+    description:
+      "When referencing this promise record, name the promise, president or administration context, EquityStack, the page URL, and your access date. For a stronger reference, also note the current status, the visible downstream action or outcome trail, and whether the supporting research base is still developing.",
+    referenceLine,
+    items: [
+      {
+        label: "Name the promise",
+        value: sentenceJoin([
+          promise.title,
+          promise.promise_type ? `${promise.promise_type} record` : null,
+        ]),
+        detail:
+          "This keeps the reference anchored to the specific promise record rather than to a broader campaign or presidency summary.",
+      },
+      {
+        label: "Anchor the context",
+        value:
+          sentenceJoin([
+            promise.president || null,
+            termLabel || null,
+            promise.topic || null,
+          ]) || "Promise tracker context",
+        detail:
+          "Use presidency, term, or topic context when you need to place the promise inside a wider administrative or campaign record.",
+      },
+      {
+        label: "Describe the current read",
+        value:
+          sentenceJoin([
+            promise.status ? `Status: ${promise.status}` : null,
+            promise.confidence_label ? `${promise.confidence_label} confidence` : null,
+          ]) || "Status still limited",
+        detail:
+          "The status label is a tracker classification. It should be read alongside the evidence and downstream record, not as a full impact judgment.",
+      },
+      {
+        label: "Pair with downstream record",
+        value: sentenceJoin([
+          countLabel(actionCount, "documented action"),
+          countLabel(outcomeCount, "linked outcome"),
+          countLabel(linkedPolicyCount, "related policy"),
+        ]),
+        detail:
+          "Use the provenance chain, linked policies, and source trail when precision matters, especially if the record is still developing.",
+      },
+    ],
+  };
+}
+
+function buildPromiseContextItems({
+  promise,
+  presidentPromiseHref,
+  presidentProfileHref,
+  presidentPoliciesHref,
+}) {
+  const items = [];
+  const seen = new Set();
+  const explainer = (promise.related_explainers || []).find((item) => item?.slug && item?.title);
+
+  if (explainer) {
+    const href = `/explainers/${explainer.slug}`;
+    seen.add(href);
+    items.push({
+      label: explainer.category || "Context explainer",
+      tone: "info",
+      title: explainer.title,
+      description:
+        explainer.summary ||
+        "Use the explainer when you need broader historical or legal context around this promise record.",
+      href,
+    });
+  }
+
+  const reportHref = "/reports/black-impact-score";
+  if (!seen.has(reportHref)) {
+    seen.add(reportHref);
+    items.push({
+      label: "Flagship report",
+      tone: "info",
+      title: "Black Impact Score",
+      description:
+        "Read the flagship report when you want to place this promise inside the wider presidential score and historical policy context.",
+      href: reportHref,
+    });
+  }
+
+  if (presidentProfileHref && !seen.has(presidentProfileHref) && items.length < 4) {
+    seen.add(presidentProfileHref);
+    items.push({
+      label: "President profile",
+      tone: "default",
+      title: `Read ${promise.president}'s presidential record`,
+      description:
+        "Move from this single promise into the wider presidential profile, including score context, policy drivers, and broader historical framing.",
+      href: presidentProfileHref,
+    });
+  }
+
+  const firstPolicy = (promise.related_policies || [])[0];
+  if (firstPolicy && items.length < 4) {
+    const href = `/policies/${buildPolicySlug(firstPolicy)}`;
+    if (!seen.has(href)) {
+      seen.add(href);
+      items.push({
+        label: "Related policy",
+        tone: "default",
+        title: firstPolicy.title,
+        description:
+          firstPolicy.summary ||
+          "Open the clearest linked policy record when you need the concrete implementation or legal record behind this promise.",
+        href,
+      });
+    }
+  }
+
+  if (presidentPromiseHref && !seen.has(presidentPromiseHref) && items.length < 4) {
+    seen.add(presidentPromiseHref);
+    items.push({
+      label: "Promise tracker",
+      tone: "default",
+      title: `Read ${promise.president}'s full promise tracker`,
+      description:
+        "See how this promise fits into the wider delivered, partial, failed, and blocked record for the same president.",
+      href: presidentPromiseHref,
+    });
+  }
+
+  if (presidentPoliciesHref && !seen.has(presidentPoliciesHref) && items.length < 4) {
+    items.push({
+      label: "Policy context",
+      tone: "default",
+      title: "Browse related policy records",
+      description:
+        "Open the policy explorer to see the legislation, executive actions, and court decisions that help explain this promise record.",
+      href: presidentPoliciesHref,
+    });
+  }
+
+  return items.slice(0, 4);
 }
 
 export async function generateMetadata({ params }) {
@@ -489,6 +719,52 @@ export default async function PromiseDetailPage({ params }) {
     promise,
     blackImpactEvidenceSourceCount
   );
+  const researchCoverage = buildResearchCoverage({
+    sourceCount:
+      (promise.source_summary?.action_sources || 0) +
+      (promise.source_summary?.outcome_sources || 0),
+    outcomeCount: policyOutcomeCount,
+    relatedRecordCount:
+      linkedPolicyCount +
+      Number((promise.related_explainers || []).length || 0) +
+      Number(Boolean(presidentProfileHref)) +
+      Number(Boolean(presidentPromiseHref)),
+    hasScore: Boolean(blackImpactSummary),
+    confidenceLabel: promise.confidence_label || null,
+  });
+  const researchStrengtheningNote = buildResearchStrengtheningNote({
+    sourceCount:
+      (promise.source_summary?.action_sources || 0) +
+      (promise.source_summary?.outcome_sources || 0),
+    outcomeCount: policyOutcomeCount,
+    relatedRecordCount:
+      linkedPolicyCount +
+      Number((promise.related_explainers || []).length || 0) +
+      Number(Boolean(presidentProfileHref)) +
+      Number(Boolean(presidentPromiseHref)),
+    hasScore: Boolean(blackImpactSummary),
+  });
+  const promiseRecordSynthesis = buildPromiseRecordSynthesis({
+    promise,
+    actionCount,
+    outcomeCount: policyOutcomeCount,
+    linkedPolicyCount,
+    blackImpactSummary,
+    researchCoverage,
+  });
+  const promiseReferenceUtility = buildPromiseReferenceUtility({
+    promise,
+    actionCount,
+    outcomeCount: policyOutcomeCount,
+    linkedPolicyCount,
+    researchCoverage,
+  });
+  const promiseContextItems = buildPromiseContextItems({
+    promise,
+    presidentPromiseHref,
+    presidentProfileHref,
+    presidentPoliciesHref,
+  });
   const localNavigationItems = [
     ...(showBlackImpactSection
       ? [
@@ -597,26 +873,41 @@ export default async function PromiseDetailPage({ params }) {
           title="Promise language, status, and evidence in one frame"
           description="Read the statement, status rationale, linked policies, outcomes, and source trail together before treating the status as settled."
         />
-        <div className="grid gap-4 p-4 xl:grid-cols-[minmax(0,1.1fr)_minmax(18rem,0.9fr)]">
-          <div className="space-y-4">
-            <PromiseSystemExplanation />
-            <Panel padding="md" className="space-y-3">
-              <StatusPill tone="info">Why this promise matters</StatusPill>
-              <p className="text-sm leading-6 text-[var(--ink-soft)]">
-                {buildWhyPromiseMatters(promise)}
-              </p>
-              <p className="text-sm leading-6 text-[var(--ink-soft)]">
-                {buildPromiseOverview(promise)}
-              </p>
-            </Panel>
+        <div className="space-y-4 p-4">
+          <div className="grid gap-4 xl:grid-cols-[minmax(0,1.1fr)_minmax(18rem,0.9fr)]">
+            <div className="space-y-4">
+              <PromiseSystemExplanation />
+              <Panel padding="md" className="space-y-3">
+                <StatusPill tone="info">Why this promise matters</StatusPill>
+                <p className="text-sm leading-6 text-[var(--ink-soft)]">
+                  {buildWhyPromiseMatters(promise)}
+                </p>
+                <p className="text-sm leading-6 text-[var(--ink-soft)]">
+                  {buildPromiseOverview(promise)}
+                </p>
+              </Panel>
+            </div>
+            <div className="space-y-4">
+              <PromiseStatusLegend statuses={["Delivered", "In Progress", "Partial", "Blocked", "Failed"]} />
+              <PageContextBlock
+                description="This page is the landing point for a single promise record: the original commitment, the current status, the linked policy actions, and the evidence used to justify the classification."
+                detail="Use it when you want to move from a broad question about campaign promises to Black Americans into the specific public record behind one promise."
+              />
+            </div>
           </div>
-          <div className="space-y-4">
-            <PromiseStatusLegend statuses={["Delivered", "In Progress", "Partial", "Blocked", "Failed"]} />
-            <PageContextBlock
-              description="This page is the landing point for a single promise record: the original commitment, the current status, the linked policy actions, and the evidence used to justify the classification."
-              detail="Use it when you want to move from a broad question about campaign promises to Black Americans into the specific public record behind one promise."
-            />
-          </div>
+          <WhyThisScorePanel
+            eyebrow="Record synthesis"
+            title="Read this promise in one pass"
+            summary={promiseRecordSynthesis.summary}
+            items={promiseRecordSynthesis.items}
+            note={promiseRecordSynthesis.note}
+            actionHref="#provenance"
+            actionLabel="Jump to provenance"
+          />
+          <ResearchCoveragePanel
+            coverage={researchCoverage}
+            strengtheningNote={researchStrengtheningNote}
+          />
         </div>
       </Panel>
 
@@ -910,7 +1201,13 @@ export default async function PromiseDetailPage({ params }) {
           sourceQuality={promise.latest_outcome?.source_quality || "Promise evidence trail"}
           confidenceLabel={promise.confidence_label || undefined}
           completenessLabel={`${(promise.actions || []).length} actions / ${(promise.outcomes || []).length} outcomes`}
-          summary="Promise pages separate the statement from the underlying action and outcome evidence so users can inspect both."
+          summary="Promise pages separate the statement from the action and outcome trail so users can inspect both."
+        />
+        <CitationNote
+          title="How to reference this record"
+          description={promiseReferenceUtility.description}
+          referenceLine={promiseReferenceUtility.referenceLine}
+          items={promiseReferenceUtility.items}
         />
         <MethodologyCallout description="Promise grading and Black Impact Score are related but distinct. A promise can be delivered with mixed or limited downstream impact, and the site keeps those layers separate." />
       </PromisePanel>
@@ -929,7 +1226,7 @@ export default async function PromiseDetailPage({ params }) {
         <SectionHeader
           eyebrow="Context and background"
           title="How to interpret this promise when the narrative is brief"
-          description="This framing ties shorter promise summaries back to the actions, outcomes, linked policies, and surrounding research paths already visible on the page."
+          description="Use this short framing when the written narrative is thin and you need one more layer of context before relying on the status label alone."
         />
         <div className="grid gap-4 p-4">
           {contextParagraphs.map((paragraph, index) => (
@@ -959,7 +1256,13 @@ export default async function PromiseDetailPage({ params }) {
         <SectionIntro
           eyebrow="Continue exploring"
           title="Policies and context connected to this promise"
-          description="Policy links help users move from campaign or governing statements into administrative records, legislation, and broader historical context."
+          description="Start with the curated next-step panel first. The linked policy and presidency paths below keep the broader related set visible."
+        />
+        <DiscoveryGuidancePanel
+          eyebrow="Best context to read next"
+          title="Start with this curated next step before browsing the full linked set"
+          description="Use this short path when you want the clearest next click first. The wider policy, presidency, and context links remain visible below."
+          items={promiseContextItems}
         />
         {(promise.related_policies || []).length ? (
           <PolicyCardList

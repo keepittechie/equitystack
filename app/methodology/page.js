@@ -4,6 +4,7 @@ import StructuredData from "@/app/components/public/StructuredData";
 import { Breadcrumbs } from "@/app/components/public/chrome";
 import { CitationNote, KpiCard, SectionIntro } from "@/app/components/public/core";
 import PageRoleCallout from "@/app/components/public/PageRoleCallout";
+import DiscoveryGuidancePanel from "@/app/components/public/DiscoveryGuidancePanel";
 import {
   buildBreadcrumbJsonLd,
   buildWebPageJsonLd,
@@ -264,6 +265,72 @@ const CITATION_ROUTING = [
   },
 ];
 
+const PUBLIC_SIGNAL_GUIDANCE = [
+  {
+    label: "Why this score",
+    tone: "info",
+    title: "A readable score summary, not a second scoring model",
+    description:
+      "Use this panel to see the main contributors, direction, and limits around a live record. It summarizes the model in plain language, but it does not replace the underlying score page, source trail, or linked records.",
+  },
+  {
+    label: "Research coverage",
+    tone: "info",
+    title: "How complete the visible public record currently is",
+    description:
+      "Research coverage reflects the visible mix of sources, outcomes, scored context, and linked records around a page or slice. It is a completeness cue, not a claim of certainty.",
+  },
+  {
+    label: "Best-covered",
+    tone: "verified",
+    title: "The strongest-supported material in the current slice",
+    description:
+      "Best-covered is scoped to the visible explorer or filtered result set. It means those records currently show clearer support or context than the rest of that slice, not that they are morally best.",
+  },
+  {
+    label: "Consequence signals",
+    tone: "warning",
+    title: "High-signal records worth opening next",
+    description:
+      "Consequence signals are discovery cues built from visible score, outcome depth, and context. They are not platform-wide rankings or final judgments.",
+  },
+];
+
+const LIVE_METHOD_EXAMPLES = [
+  {
+    href: "/policies/5-civil-rights-act-of-1964",
+    label: "Flagship policy",
+    tone: "verified",
+    title: "Civil Rights Act of 1964",
+    description:
+      "Open a flagship policy record to see score explanation, research coverage, lineage context, sources, and reference guidance working together.",
+  },
+  {
+    href: "/presidents/lyndon-b-johnson",
+    label: "President profile",
+    tone: "info",
+    title: "Lyndon B. Johnson",
+    description:
+      "Use a president page to inspect score framing, coverage cues, policy drivers, and curated context paths in one administration-level record.",
+  },
+  {
+    href: "/promises/president/lyndon-b-johnson",
+    label: "Promise context",
+    tone: "default",
+    title: "Lyndon B. Johnson promise tracker",
+    description:
+      "Use a promise-tracker view to see how accountability status stays distinct from downstream impact and related policy context.",
+  },
+  {
+    href: "/timeline?mode=turning_points",
+    label: "Historical path",
+    tone: "default",
+    title: "Timeline turning points",
+    description:
+      "Use the turning-points timeline to see how Best-covered and consequence-style guidance becomes a chronology-first discovery path.",
+  },
+];
+
 export default function MethodologyPage() {
   return (
     <main className="space-y-4">
@@ -319,7 +386,7 @@ export default function MethodologyPage() {
 
       <PageRoleCallout
         title="Use methodology for site-wide evaluation rules"
-        description="This page explains how EquityStack organizes page types, handles evidence and limits, and distinguishes records from reports, explainers, and guided entry pages. If you only need the Black Impact Score formula and scoring logic, the score-specific methodology page is the tighter route."
+        description="This page explains how EquityStack organizes page types, handles evidence and limits, and distinguishes records from reports, explainers, and guided entry pages. It is also the best place to interpret newer public signals such as Why this score, Research coverage, Best-covered, and Consequence signals. If you only need the Black Impact Score formula and scoring logic, the score-specific methodology page is the tighter route."
         links={[
           { href: "/research/how-black-impact-score-works", label: "Score method" },
           { href: "/research", label: "Research hub" },
@@ -346,6 +413,21 @@ export default function MethodologyPage() {
         title="How to reference the methodology page"
         description="Use this page when citing how EquityStack organizes policy records, builds scores, grades promises, displays uncertainty, and distinguishes between record pages, explainers, reports, and thematic guides. Treat it as the main public reference for how the site should be read and interpreted."
       />
+
+      <section className="grid gap-4 xl:grid-cols-2">
+        <DiscoveryGuidancePanel
+          eyebrow="Interpretation cues"
+          title="How to read the platform's public guidance labels"
+          description="These labels are designed to make the site easier to use without pretending that summary language is enough on its own."
+          items={PUBLIC_SIGNAL_GUIDANCE}
+        />
+        <DiscoveryGuidancePanel
+          eyebrow="See this in practice"
+          title="Open live examples of the trust layer at work"
+          description="These routes show how methodology language appears in real public pages rather than only in abstract explanation."
+          items={LIVE_METHOD_EXAMPLES}
+        />
+      </section>
 
       <section className="space-y-5">
         <SectionIntro

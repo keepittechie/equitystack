@@ -8,6 +8,8 @@ import {
 import { getFlagshipReportEditorial } from "@/lib/flagship-editorial";
 import StructuredData from "@/app/components/public/StructuredData";
 import { Breadcrumbs } from "@/app/components/public/chrome";
+import PageRoleCallout from "@/app/components/public/PageRoleCallout";
+import DiscoveryGuidancePanel from "@/app/components/public/DiscoveryGuidancePanel";
 import {
   KpiCard,
   SectionIntro,
@@ -124,6 +126,33 @@ const CONTINUE_EXPLORING_CARDS = [
     title: "Follow the guided research path",
     description:
       "Use the start page when a reader needs orientation before moving between explainers, reports, records, and methodology.",
+  },
+];
+
+const REPORT_SYSTEM_GUIDANCE = [
+  {
+    href: "/policies",
+    label: "Underlying records",
+    tone: "verified",
+    title: "This report builds on policy and promise records",
+    description:
+      "Use the record layer when you need the concrete law, executive action, court decision, or promise trail underneath the synthesis.",
+  },
+  {
+    href: "/explainers",
+    label: "Context",
+    tone: "default",
+    title: "Explainers help interpret why the report matters",
+    description:
+      "Use explainers when the findings need constitutional, historical, or institutional framing before they can be read well.",
+  },
+  {
+    href: "/sources",
+    label: "Evidence",
+    tone: "info",
+    title: "Sources help verify what the report is summarizing",
+    description:
+      "Use the source library when the next step is checking the evidence base, publisher mix, or linked support beneath the report.",
   },
 ];
 
@@ -265,6 +294,16 @@ export default async function ReportDetailPage({ params }) {
 
       <TrustBar />
 
+      <PageRoleCallout
+        title="Use reports as the synthesis layer"
+        description="Reports are the synthesis layer. They summarize patterns across many underlying records. Use sources as the evidence layer for verification and explainers as the context layer for interpretation."
+        links={[
+          { href: "/policies", label: "Underlying records" },
+          { href: "/explainers", label: "Explainers" },
+          { href: "/sources", label: "Sources" },
+        ]}
+      />
+
       {report.metrics?.length ? (
         <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {report.metrics.map((item) => (
@@ -302,16 +341,22 @@ export default async function ReportDetailPage({ params }) {
             </div>
           )}
         </div>
-        <div className="grid gap-4 md:grid-cols-2 2xl:grid-cols-1">
-          <div className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4">
-            <h2 className="text-lg font-semibold text-white">Best next step from this page</h2>
-            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-              Use this report for the high-level takeaway first. Then open the linked policy records if you need the evidence trail, or jump to methodology if the main question is how the summary was constructed.
-            </p>
-          </div>
-          <ScoreExplanation title="How to interpret score language in this report" />
-          <div className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4 md:col-span-2 xl:col-span-1">
-            <h2 className="text-lg font-semibold text-white">Related paths</h2>
+          <div className="grid gap-4 md:grid-cols-2 2xl:grid-cols-1">
+            <div className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4">
+              <h2 className="text-lg font-semibold text-white">Best next step from this page</h2>
+              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+                Use this report for the high-level takeaway first. Then open the linked policy records if you need the record trail, the source library if you need the evidence trail, or methodology if the main question is how the summary was constructed.
+              </p>
+            </div>
+            <DiscoveryGuidancePanel
+              eyebrow="How this report supports the platform"
+              title="Read this report with context and evidence nearby"
+              description="Reports summarize patterns. They work best when paired with context pages and the underlying evidence layer."
+              items={REPORT_SYSTEM_GUIDANCE}
+            />
+            <ScoreExplanation title="How to interpret score language in this report" />
+            <div className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4 md:col-span-2 xl:col-span-1">
+              <h2 className="text-lg font-semibold text-white">Related paths</h2>
             <div className="mt-4 grid gap-3">
               {relatedPathCards.map((item) => (
                 <Link key={item.href} href={item.href} className="rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4 hover:border-[rgba(132,247,198,0.24)]">
