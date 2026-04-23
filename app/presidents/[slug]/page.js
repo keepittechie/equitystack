@@ -731,13 +731,6 @@ export default async function PresidentProfilePage({ params }) {
         />
       </section>
 
-      <ShareCardPanel
-        pagePath={`/presidents/${slug}`}
-        cardPath={buildPresidentCardHref({ slug })}
-        title="Share this presidential profile or its card"
-        description="Use the page link when you want the full profile, or open the share card for a cleaner summary view."
-      />
-
       {showLocalNavigation ? (
         <div className="space-y-1.5">
           <p className="px-1 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
@@ -841,6 +834,13 @@ export default async function PresidentProfilePage({ params }) {
           </Panel>
         </div>
       </Panel>
+
+      <ShareCardPanel
+        pagePath={`/presidents/${slug}`}
+        cardPath={buildPresidentCardHref({ slug })}
+        title="Share this presidential profile or its card"
+        description="Use the page link when you want the full profile, or open the share card for a cleaner summary view."
+      />
 
       <section className="grid gap-4 md:grid-cols-3">
         {buildPresidentGuideCards(profile, flagshipEditorial).map((item) => (

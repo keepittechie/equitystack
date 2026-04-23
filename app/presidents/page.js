@@ -265,6 +265,11 @@ export default async function PresidentsPage({ searchParams }) {
             title="Black Impact Score ranking"
             description="This ranking shows how presidents compare on the current final Black Impact Score. It remains a structured policy-impact measure, not a complete judgment of a presidency."
           />
+          <PresidentRankingBoard
+            items={topRanked}
+            buildHref={(item) => `/presidents/${item.slug}`}
+            title="Ranked presidential records"
+          />
           <div className="grid gap-4 xl:grid-cols-2">
             <DiscoveryGuidancePanel
               eyebrow="Best-covered paths"
@@ -279,11 +284,6 @@ export default async function PresidentsPage({ searchParams }) {
               items={data.consequenceHighlights || []}
             />
           </div>
-          <PresidentRankingBoard
-            items={topRanked}
-            buildHref={(item) => `/presidents/${item.slug}`}
-            title="Ranked presidential records"
-          />
           <Panel padding="md" className="bg-[rgba(18,31,49,0.52)]">
             <PresidentScoreMethodologyNote />
           </Panel>

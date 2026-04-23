@@ -189,6 +189,12 @@ export default async function PoliciesPage({ searchParams }) {
             </div>
           </Panel>
 
+          {view === "cards" ? (
+            <PolicyCardList items={data.items || []} buildHref={(item) => `/policies/${item.slug || buildPolicySlug(item)}`} />
+          ) : (
+            <PolicyResultsTable items={data.items || []} buildHref={(item) => `/policies/${item.slug || buildPolicySlug(item)}`} />
+          )}
+
           <ResearchCoveragePanel
             coverage={data.researchSummary?.coverage || null}
             strengtheningNote={data.researchSummary?.strengtheningNote || null}
@@ -216,12 +222,6 @@ export default async function PoliciesPage({ searchParams }) {
             description="This summary is limited to the visible result set. It helps show which categories in the current slice have the deepest coverage, strongest visible impact signals, or the largest active footprint."
             items={data.categorySynthesis || []}
           />
-
-          {view === "cards" ? (
-            <PolicyCardList items={data.items || []} buildHref={(item) => `/policies/${item.slug || buildPolicySlug(item)}`} />
-          ) : (
-            <PolicyResultsTable items={data.items || []} buildHref={(item) => `/policies/${item.slug || buildPolicySlug(item)}`} />
-          )}
 
           <MethodologyCallout description="Impact direction, score, and source presence appear together so users can filter quickly without hiding uncertainty or incomplete classification." />
         </PolicyPanel>

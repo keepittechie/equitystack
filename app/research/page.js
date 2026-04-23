@@ -369,6 +369,29 @@ export default function ResearchHubPage() {
         />
       </section>
 
+      <section className="space-y-5">
+        <SectionIntro
+          eyebrow="Promotion-ready pages"
+          title="Best pages to share first"
+          description="These are the strongest public pages to promote externally when you need a serious, link-worthy starting point rather than a raw database destination."
+        />
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {OUTREACH_PRIORITY_PAGES.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="panel-link p-4"
+            >
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--accent)]">
+                {item.audience}
+              </p>
+              <h2 className="mt-4 text-xl font-semibold text-white">{item.title}</h2>
+              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item.description}</p>
+            </Link>
+          ))}
+        </div>
+      </section>
+
       <PageRoleCallout
         title="Use the research hub as the site’s curated research index"
         description="This page is for choosing the strongest evidence-oriented path into EquityStack once you know the question you are asking. Use Start Here for a guided explainer sequence, Methodology for site-wide evaluation rules and trust labels, and the score page when the question is specifically how the Black Impact Score works."
@@ -407,29 +430,6 @@ export default function ResearchHubPage() {
               Use explainers, sources, and methodology when context, verification, and interpretation matter more than speed.
             </div>
           </div>
-        </div>
-      </section>
-
-      <section className="space-y-5">
-        <SectionIntro
-          eyebrow="Promotion-ready pages"
-          title="Best pages to share first"
-          description="These are the strongest public pages to promote externally when you need a serious, link-worthy starting point rather than a raw database destination."
-        />
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {OUTREACH_PRIORITY_PAGES.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="panel-link p-4"
-            >
-              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--accent)]">
-                {item.audience}
-              </p>
-              <h2 className="mt-4 text-xl font-semibold text-white">{item.title}</h2>
-              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item.description}</p>
-            </Link>
-          ))}
         </div>
       </section>
 

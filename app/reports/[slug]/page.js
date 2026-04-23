@@ -294,16 +294,6 @@ export default async function ReportDetailPage({ params }) {
 
       <TrustBar />
 
-      <PageRoleCallout
-        title="Use reports as the synthesis layer"
-        description="Reports are the synthesis layer. They summarize patterns across many underlying records. Use sources as the evidence layer for verification and explainers as the context layer for interpretation."
-        links={[
-          { href: "/policies", label: "Underlying records" },
-          { href: "/explainers", label: "Explainers" },
-          { href: "/sources", label: "Sources" },
-        ]}
-      />
-
       {report.metrics?.length ? (
         <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {report.metrics.map((item) => (
@@ -318,7 +308,7 @@ export default async function ReportDetailPage({ params }) {
         </section>
       ) : null}
 
-      <section className="public-two-col-rail grid items-start gap-6 2xl:grid-cols-[1.15fr_0.85fr]">
+      <section className="space-y-6">
         <div className="space-y-5">
           <SectionIntro
             eyebrow="Findings"
@@ -341,22 +331,22 @@ export default async function ReportDetailPage({ params }) {
             </div>
           )}
         </div>
-          <div className="grid gap-4 md:grid-cols-2 2xl:grid-cols-1">
-            <div className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4">
-              <h2 className="text-lg font-semibold text-white">Best next step from this page</h2>
-              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-                Use this report for the high-level takeaway first. Then open the linked policy records if you need the record trail, the source library if you need the evidence trail, or methodology if the main question is how the summary was constructed.
-              </p>
-            </div>
-            <DiscoveryGuidancePanel
-              eyebrow="How this report supports the platform"
-              title="Read this report with context and evidence nearby"
-              description="Reports summarize patterns. They work best when paired with context pages and the underlying evidence layer."
-              items={REPORT_SYSTEM_GUIDANCE}
-            />
-            <ScoreExplanation title="How to interpret score language in this report" />
-            <div className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4 md:col-span-2 xl:col-span-1">
-              <h2 className="text-lg font-semibold text-white">Related paths</h2>
+        <div className="space-y-4">
+          <div className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4">
+            <h2 className="text-lg font-semibold text-white">Best next step from this page</h2>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+              Use this report for the high-level takeaway first. Then open the linked policy records if you need the record trail, the source library if you need the evidence trail, or methodology if the main question is how the summary was constructed.
+            </p>
+          </div>
+          <DiscoveryGuidancePanel
+            eyebrow="How this report supports the platform"
+            title="Read this report with context and evidence nearby"
+            description="Reports summarize patterns. They work best when paired with context pages and the underlying evidence layer."
+            items={REPORT_SYSTEM_GUIDANCE}
+          />
+          <ScoreExplanation title="How to interpret score language in this report" />
+          <div className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4">
+            <h2 className="text-lg font-semibold text-white">Related paths</h2>
             <div className="mt-4 grid gap-3">
               {relatedPathCards.map((item) => (
                 <Link key={item.href} href={item.href} className="rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4 hover:border-[rgba(132,247,198,0.24)]">
@@ -371,6 +361,16 @@ export default async function ReportDetailPage({ params }) {
           </div>
         </div>
       </section>
+
+      <PageRoleCallout
+        title="Use reports as the synthesis layer"
+        description="Reports are the synthesis layer. They summarize patterns across many underlying records. Use sources as the evidence layer for verification and explainers as the context layer for interpretation."
+        links={[
+          { href: "/policies", label: "Underlying records" },
+          { href: "/explainers", label: "Explainers" },
+          { href: "/sources", label: "Sources" },
+        ]}
+      />
 
       {report.chartBlocks?.length ? (
         <>
@@ -461,6 +461,13 @@ export default async function ReportDetailPage({ params }) {
           title="Continue through reports, explainers, public records, and trust pages"
           description="Choose the next path based on your question: explainers for context, president or policy pages for records, and trust pages for verification."
         />
+        <ReportCardGrid
+          items={
+            report.relatedReports?.length
+              ? report.relatedReports
+              : hub.reports.filter((item) => item.slug !== slug).slice(0, 3)
+          }
+        />
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           <Link href="/explainers" className="panel-link p-4">
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">Historical context</p>
@@ -491,13 +498,6 @@ export default async function ReportDetailPage({ params }) {
             </p>
           </Link>
         </div>
-        <ReportCardGrid
-          items={
-            report.relatedReports?.length
-              ? report.relatedReports
-              : hub.reports.filter((item) => item.slug !== slug).slice(0, 3)
-          }
-        />
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           {CONTINUE_EXPLORING_CARDS.map((item) => (
             <Link key={item.href} href={item.href} className="panel-link p-4">

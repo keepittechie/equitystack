@@ -64,14 +64,11 @@ export default async function SearchPage({ searchParams }) {
       </section>
 
       {!query ? (
-        <section className="public-two-col-rail grid gap-4 xl:grid-cols-[1.15fr_0.85fr]">
+        <section className="space-y-4">
           <Panel padding="md">
             <h2 className="text-2xl font-semibold text-white">Start with a public query</h2>
             <p className="mt-4 text-sm leading-7 text-[var(--ink-soft)]">
               Try a president, policy area, promise topic, law title, or source publisher. Search is grouped by record type so you can choose the right next path instead of reading one long undifferentiated result list.
-            </p>
-            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-              Search works best for titles, names, broad topics, law names, court cases, and major source publishers.
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
               {EXAMPLE_QUERIES.map((item) => (

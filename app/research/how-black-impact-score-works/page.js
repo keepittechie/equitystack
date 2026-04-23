@@ -431,6 +431,21 @@ export default function HowBlackImpactScoreWorksPage() {
         />
       </section>
 
+      <section className="space-y-5">
+        <SectionIntro
+          eyebrow="1. What it measures"
+          title="The score measures documented policy outcomes affecting Black Americans"
+          description="The Black Impact Score is outcome-first. It asks what happened in the public record, what effect that outcome had on Black Americans, how strong the evidence is, what the underlying policy appears to have intended, and whether the policy had broader structural consequences beyond the immediate outcome."
+        />
+        <SurfaceCard>
+          <p className="text-sm leading-7 text-[var(--ink-soft)]">
+            The core unit is not a speech, a slogan, or a campaign promise by itself. The core unit is a documented
+            policy outcome. Promise Tracker records matter because they help connect modern administrations to actions
+            and outcomes, but the score is anchored in what actually happened and what can be supported with linked evidence.
+          </p>
+        </SurfaceCard>
+      </section>
+
       <PageRoleCallout
         title="Use this page for score-specific transparency"
         description="This page is narrower than the full methodology. It explains the Black Impact Score itself: what is included, how direction and confidence are handled, and where score coverage is still incomplete. It is also the best public explanation for score-adjacent labels now visible on live pages, such as Why this score and Research coverage. Use the broader Methodology page when the question is about page types, promises, reports, or site-wide evidence rules."
@@ -466,21 +481,6 @@ export default function HowBlackImpactScoreWorksPage() {
           description="Use these routes to move from formula and scoring rules into real public pages where the model is applied."
           items={SCORE_LIVE_EXAMPLES}
         />
-      </section>
-
-      <section className="space-y-5">
-        <SectionIntro
-          eyebrow="1. What it measures"
-          title="The score measures documented policy outcomes affecting Black Americans"
-          description="The Black Impact Score is outcome-first. It asks what happened in the public record, what effect that outcome had on Black Americans, how strong the evidence is, what the underlying policy appears to have intended, and whether the policy had broader structural consequences beyond the immediate outcome."
-        />
-        <SurfaceCard>
-          <p className="text-sm leading-7 text-[var(--ink-soft)]">
-            The core unit is not a speech, a slogan, or a campaign promise by itself. The core unit is a documented
-            policy outcome. Promise Tracker records matter because they help connect modern administrations to actions
-            and outcomes, but the score is anchored in what actually happened and what can be supported with linked evidence.
-          </p>
-        </SurfaceCard>
       </section>
 
       <section className="space-y-5">

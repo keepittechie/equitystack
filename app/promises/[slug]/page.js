@@ -860,13 +860,6 @@ export default async function PromiseDetailPage({ params }) {
         />
       </section>
 
-      <ShareCardPanel
-        pagePath={`/promises/${slug}`}
-        cardPath={buildPromiseCardHref(promise)}
-        title="Share this promise record or its card"
-        description="Use the page link for the full accountability record, or open the share card for a cleaner stand-alone summary."
-      />
-
       <Panel prominence="primary" className="overflow-hidden">
         <SectionHeader
           eyebrow="How to use this record"
@@ -874,6 +867,19 @@ export default async function PromiseDetailPage({ params }) {
           description="Read the statement, status rationale, linked policies, outcomes, and source trail together before treating the status as settled."
         />
         <div className="space-y-4 p-4">
+          <WhyThisScorePanel
+            eyebrow="Record synthesis"
+            title="Read this promise in one pass"
+            summary={promiseRecordSynthesis.summary}
+            items={promiseRecordSynthesis.items}
+            note={promiseRecordSynthesis.note}
+            actionHref="#provenance"
+            actionLabel="Jump to provenance"
+          />
+          <ResearchCoveragePanel
+            coverage={researchCoverage}
+            strengtheningNote={researchStrengtheningNote}
+          />
           <div className="grid gap-4 xl:grid-cols-[minmax(0,1.1fr)_minmax(18rem,0.9fr)]">
             <div className="space-y-4">
               <PromiseSystemExplanation />
@@ -895,21 +901,15 @@ export default async function PromiseDetailPage({ params }) {
               />
             </div>
           </div>
-          <WhyThisScorePanel
-            eyebrow="Record synthesis"
-            title="Read this promise in one pass"
-            summary={promiseRecordSynthesis.summary}
-            items={promiseRecordSynthesis.items}
-            note={promiseRecordSynthesis.note}
-            actionHref="#provenance"
-            actionLabel="Jump to provenance"
-          />
-          <ResearchCoveragePanel
-            coverage={researchCoverage}
-            strengtheningNote={researchStrengtheningNote}
-          />
         </div>
       </Panel>
+
+      <ShareCardPanel
+        pagePath={`/promises/${slug}`}
+        cardPath={buildPromiseCardHref(promise)}
+        title="Share this promise record or its card"
+        description="Use the page link for the full accountability record, or open the share card for a cleaner stand-alone summary."
+      />
 
       {showLocalNavigation ? (
         <div className="space-y-1.5">

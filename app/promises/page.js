@@ -203,6 +203,7 @@ export default async function PromisesPage({ searchParams }) {
             title="Compare promise records by status, evidence, and linked outcomes"
             description="Read the current status first. Then compare linked outcomes and evidence confidence to see how much documented record supports that label."
           />
+          <PromiseResultsTable items={data.items || []} buildHref={(item) => `/promises/${item.slug}`} />
           <div className="grid gap-4 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
             <PromiseSystemExplanation />
             <PromiseStatusLegend />
@@ -232,7 +233,6 @@ export default async function PromisesPage({ searchParams }) {
             description="This summary is limited to the visible promise result set. It highlights which topics in the current slice are best-covered, show the deepest downstream trail, or have the largest active footprint."
             items={data.topicSynthesis || []}
           />
-          <PromiseResultsTable items={data.items || []} buildHref={(item) => `/promises/${item.slug}`} />
           <MethodologyCallout description="Promise Status tells users what happened to the commitment. It does not automatically imply a positive or negative real-world outcome without linked Policy Outcomes and evidence." />
           <SectionIntro
             eyebrow="Latest status changes"

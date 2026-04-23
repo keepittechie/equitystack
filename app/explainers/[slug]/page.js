@@ -404,16 +404,6 @@ export default async function ExplainerDetailPage({ params }) {
         </div>
       </Panel>
 
-      <PageRoleCallout
-        title="Use explainers as the context layer"
-        description="Explainers are the context layer. They help readers understand a legal, historical, or policy question before moving into the record layer or the evidence layer. Reports remain the synthesis layer."
-        links={[
-          { href: "/reports", label: "Reports" },
-          { href: "/sources", label: "Sources" },
-          { href: "/policies", label: "Policy records" },
-        ]}
-      />
-
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <MetricCard
           label="Linked policies"
@@ -440,6 +430,16 @@ export default async function ExplainerDetailPage({ params }) {
         />
       </section>
 
+      <PageRoleCallout
+        title="Use explainers as the context layer"
+        description="Explainers are the context layer. They help readers understand a legal, historical, or policy question before moving into the record layer or the evidence layer. Reports remain the synthesis layer."
+        links={[
+          { href: "/reports", label: "Reports" },
+          { href: "/sources", label: "Sources" },
+          { href: "/policies", label: "Policy records" },
+        ]}
+      />
+
       <Panel prominence="primary" className="overflow-hidden">
         <SectionHeader
           eyebrow={editorial.lens || "Read this for"}
@@ -464,6 +464,81 @@ export default async function ExplainerDetailPage({ params }) {
             items={EXPLAINER_SYSTEM_GUIDANCE}
           />
           <MethodologyCallout description={buildPageMethodNote()} />
+        </div>
+      </Panel>
+
+      <Panel className="overflow-hidden">
+        <SectionHeader
+          eyebrow="Page structure"
+          title="Connected records and supporting context"
+          description="Use these grouped records to move from the explainer narrative into linked policy, promise, and reform evidence."
+        />
+        <div className="space-y-4 p-4">
+          {featuredCards.map((card) => (
+            <Panel as="article" key={card.key} padding="md">
+              <h2 className="text-2xl font-semibold text-white">{card.title}</h2>
+              <p className="mt-4 whitespace-pre-line text-sm leading-8 text-[var(--ink-soft)]">
+                {card.body}
+              </p>
+            </Panel>
+          ))}
+
+          {gridCards.length ? (
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {gridCards.map((card) => (
+                <Panel as="article" key={card.key} padding="md" className="h-full">
+                  <h2 className="text-2xl font-semibold text-white">{card.title}</h2>
+                  <p className="mt-4 whitespace-pre-line text-sm leading-8 text-[var(--ink-soft)]">
+                    {card.body}
+                  </p>
+                </Panel>
+              ))}
+            </div>
+          ) : null}
+
+          <Panel padding="md" className="space-y-4">
+            <h2 className="text-xl font-semibold text-white">Connected records on this page</h2>
+            <div className="grid gap-3 md:grid-cols-3">
+              <MetricCard
+                label="Policies"
+                value={relatedPolicies.length}
+                description="Linked policy records"
+                density="compact"
+                tone="info"
+              />
+              <MetricCard
+                label="Promises"
+                value={relatedPromises.length}
+                description="Related promise records"
+                density="compact"
+              />
+              <MetricCard
+                label="Reform paths"
+                value={relatedFutureBills.length}
+                description="Reform or tracked-bill records"
+                density="compact"
+              />
+            </div>
+          </Panel>
+
+          <Panel padding="md" className="space-y-4">
+            <h2 className="text-xl font-semibold text-white">How to use this page well</h2>
+            <div className="grid gap-3">
+              {genericResourceLinks.slice(0, 3).map((item) => (
+                <Panel
+                  key={item.href}
+                  as={Link}
+                  href={item.href}
+                  padding="md"
+                  interactive
+                >
+                  <StatusPill tone="default">{item.eyebrow}</StatusPill>
+                  <h3 className="mt-2 text-base font-semibold text-white">{item.title}</h3>
+                  <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">{item.description}</p>
+                </Panel>
+              ))}
+            </div>
+          </Panel>
         </div>
       </Panel>
 
@@ -545,81 +620,6 @@ export default async function ExplainerDetailPage({ params }) {
           </div>
         </Panel>
       ) : null}
-
-      <Panel className="overflow-hidden">
-        <SectionHeader
-          eyebrow="Page structure"
-          title="Connected records and supporting context"
-          description="Use these grouped records to move from the explainer narrative into linked policy, promise, and reform evidence."
-        />
-        <div className="space-y-4 p-4">
-          {featuredCards.map((card) => (
-            <Panel as="article" key={card.key} padding="md">
-              <h2 className="text-2xl font-semibold text-white">{card.title}</h2>
-              <p className="mt-4 whitespace-pre-line text-sm leading-8 text-[var(--ink-soft)]">
-                {card.body}
-              </p>
-            </Panel>
-          ))}
-
-          {gridCards.length ? (
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-              {gridCards.map((card) => (
-                <Panel as="article" key={card.key} padding="md" className="h-full">
-                  <h2 className="text-2xl font-semibold text-white">{card.title}</h2>
-                  <p className="mt-4 whitespace-pre-line text-sm leading-8 text-[var(--ink-soft)]">
-                    {card.body}
-                  </p>
-                </Panel>
-              ))}
-            </div>
-          ) : null}
-
-          <Panel padding="md" className="space-y-4">
-            <h2 className="text-xl font-semibold text-white">Connected records on this page</h2>
-            <div className="grid gap-3 md:grid-cols-3">
-              <MetricCard
-                label="Policies"
-                value={relatedPolicies.length}
-                description="Linked policy records"
-                density="compact"
-                tone="info"
-              />
-              <MetricCard
-                label="Promises"
-                value={relatedPromises.length}
-                description="Related promise records"
-                density="compact"
-              />
-              <MetricCard
-                label="Reform paths"
-                value={relatedFutureBills.length}
-                description="Reform or tracked-bill records"
-                density="compact"
-              />
-            </div>
-          </Panel>
-
-          <Panel padding="md" className="space-y-4">
-            <h2 className="text-xl font-semibold text-white">How to use this page well</h2>
-            <div className="grid gap-3">
-              {genericResourceLinks.slice(0, 3).map((item) => (
-                <Panel
-                  key={item.href}
-                  as={Link}
-                  href={item.href}
-                  padding="md"
-                  interactive
-                >
-                  <StatusPill tone="default">{item.eyebrow}</StatusPill>
-                  <h3 className="mt-2 text-base font-semibold text-white">{item.title}</h3>
-                  <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">{item.description}</p>
-                </Panel>
-              ))}
-            </div>
-          </Panel>
-        </div>
-      </Panel>
 
       <Panel className="overflow-hidden">
         <SectionHeader

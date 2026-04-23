@@ -384,6 +384,30 @@ export default function MethodologyPage() {
         />
       </section>
 
+      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <KpiCard
+          label="Record surfaces"
+          value="8"
+          description="Presidents, promises, policies, bills, reports, explainers, narratives, and thematic guides each serve a different interpretive role."
+          tone="accent"
+        />
+        <KpiCard
+          label="Score families"
+          value="2"
+          description="Direct and systemic score families stay separate so judicial downstream effects do not get mixed into direct policy credit."
+        />
+        <KpiCard
+          label="Trust layers"
+          value="4"
+          description="Confidence, completeness, source quality, and certification status remain visible throughout the public site."
+        />
+        <KpiCard
+          label="Evidence access"
+          value="Nearby"
+          description="The strongest public pages keep sources, methodology, and linked records close to the headline interpretation."
+        />
+      </section>
+
       <PageRoleCallout
         title="Use methodology for site-wide evaluation rules"
         description="This page explains how EquityStack organizes page types, handles evidence and limits, and distinguishes records from reports, explainers, and guided entry pages. It is also the best place to interpret newer public signals such as Why this score, Research coverage, Best-covered, and Consequence signals. If you only need the Black Impact Score formula and scoring logic, the score-specific methodology page is the tighter route."
@@ -443,30 +467,6 @@ export default function MethodologyPage() {
             </Link>
           ))}
         </div>
-      </section>
-
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <KpiCard
-          label="Record surfaces"
-          value="8"
-          description="Presidents, promises, policies, bills, reports, explainers, narratives, and thematic guides each serve a different interpretive role."
-          tone="accent"
-        />
-        <KpiCard
-          label="Score families"
-          value="2"
-          description="Direct and systemic score families stay separate so judicial downstream effects do not get mixed into direct policy credit."
-        />
-        <KpiCard
-          label="Trust layers"
-          value="4"
-          description="Confidence, completeness, source quality, and certification status remain visible throughout the public site."
-        />
-        <KpiCard
-          label="Evidence access"
-          value="Nearby"
-          description="The strongest public pages keep sources, methodology, and linked records close to the headline interpretation."
-        />
       </section>
 
       <section className="space-y-5">
