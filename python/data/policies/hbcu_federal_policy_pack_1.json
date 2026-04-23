@@ -1,0 +1,198 @@
+[
+  {
+    "title": "Morrill Act of 1862",
+    "policy_type": "Law",
+    "summary": "Created the first federal land-grant college framework, expanding public higher education through federal land support while leaving Black students largely excluded from many of the institutions that states built or funded under the system.",
+    "year_enacted": 1862,
+    "date_enacted": "1862-07-02",
+    "era": "Civil War and Reconstruction",
+    "president": "Abraham Lincoln",
+    "primary_party": "Republican Party",
+    "house_party": "Republican Party",
+    "senate_party": "Republican Party",
+    "bipartisan": false,
+    "direct_black_impact": false,
+    "outcome_summary": "Helped establish a durable public higher-education system, but Black Americans were often shut out of the early opportunities it created, setting up the need for later federal intervention through the Second Morrill Act.",
+    "status": "Active",
+    "impact_direction": "Mixed",
+    "impact_notes": "Historically transformative for public higher education overall, but the early land-grant system did not provide equal access for Black students and functioned within an exclusionary educational order.",
+    "categories": ["Education", "HBCUs", "Business and Economics"],
+    "scores": {
+      "directness_score": 2,
+      "material_impact_score": 5,
+      "evidence_score": 5,
+      "durability_score": 5,
+      "equity_score": 1,
+      "harm_offset_score": 1,
+      "notes": "A foundational higher-education law whose benefits were broad but not equitably shared by Black Americans at the time."
+    },
+    "sources": [
+      {
+        "source_title": "Morrill Act (1862)",
+        "source_url": "https://www.archives.gov/milestone-documents/morrill-act",
+        "source_type": "Government",
+        "publisher": "National Archives",
+        "published_date": "1862-07-02",
+        "notes": "National Archives milestone document page explaining the Act's creation of the land-grant college system and noting that people of color were often excluded from those educational opportunities."
+      },
+      {
+        "source_title": "First and Second Morrill Act",
+        "source_url": "https://www.nifa.usda.gov/first-second-morrill-act",
+        "source_type": "Government",
+        "publisher": "USDA National Institute of Food and Agriculture",
+        "published_date": null,
+        "notes": "USDA overview identifying the First Morrill Act as the legal foundation for the land-grant system later expanded to 1890 institutions."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Second Morrill Act of 1890",
+    "policy_type": "Law",
+    "summary": "Required former Confederate states to show that race was not an admissions barrier at their land-grant colleges or to create separate land-grant institutions for Black students, which helped establish the federal legal foundation for the 1890 HBCU system.",
+    "year_enacted": 1890,
+    "date_enacted": "1890-08-30",
+    "era": "Jim Crow and Disenfranchisement",
+    "president": "Benjamin Harrison",
+    "primary_party": "Republican Party",
+    "house_party": "Republican Party",
+    "senate_party": "Republican Party",
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "Expanded federal support for Black higher education by creating the 1890 land-grant pathway, but did so inside a segregated dual-system model rather than by requiring equal integrated access.",
+    "status": "Active",
+    "impact_direction": "Mixed",
+    "impact_notes": "Directly important to Black higher education and to the origin of many HBCUs, but it accommodated segregation instead of dismantling it.",
+    "categories": ["Education", "HBCUs", "Business and Economics"],
+    "scores": {
+      "directness_score": 5,
+      "material_impact_score": 5,
+      "evidence_score": 5,
+      "durability_score": 5,
+      "equity_score": 3,
+      "harm_offset_score": 1,
+      "notes": "A major federal HBCU-building law whose gains were real but shaped by the separate-and-unequal structure of the era."
+    },
+    "sources": [
+      {
+        "source_title": "First and Second Morrill Act",
+        "source_url": "https://www.nifa.usda.gov/first-second-morrill-act",
+        "source_type": "Government",
+        "publisher": "USDA National Institute of Food and Agriculture",
+        "published_date": null,
+        "notes": "USDA page identifying the Second Morrill Act as the 1890 law governing Black land-grant institutions."
+      },
+      {
+        "source_title": "1890 Land-grant Institutions",
+        "source_url": "https://www.nifa.usda.gov/grant-eligibility/1890-land-grant-institutions",
+        "source_type": "Government",
+        "publisher": "USDA National Institute of Food and Agriculture",
+        "published_date": null,
+        "notes": "USDA page describing the 1890 land-grant institutions that emerged from the Second Morrill Act framework."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Executive Order 12320",
+    "policy_type": "Executive Order",
+    "summary": "Established a federal planning and coordination framework to increase historically Black colleges and universities' participation in federally sponsored programs and to reduce barriers that limited their access to federal support.",
+    "year_enacted": 1981,
+    "date_enacted": "1981-09-15",
+    "era": "Post Civil Rights Era",
+    "president": "Ronald Reagan",
+    "primary_party": "Republican Party",
+    "house_party": null,
+    "senate_party": null,
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "Created an administrative framework for annual federal planning around HBCUs and formalized a federal responsibility to reduce barriers that had limited HBCUs' participation in government programs.",
+    "status": "Expired",
+    "impact_direction": "Positive",
+    "impact_notes": "Important because it treated HBCU participation in federal programs as an administrative priority rather than a peripheral issue, even though later orders revised the framework.",
+    "categories": ["Education", "HBCUs", "Civil Rights"],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 3,
+      "evidence_score": 5,
+      "durability_score": 3,
+      "equity_score": 4,
+      "harm_offset_score": 1,
+      "notes": "A meaningful executive action that strengthened the federal administrative infrastructure around HBCU participation."
+    },
+    "sources": [
+      {
+        "source_title": "Executive Order 12320--Historically Black colleges and universities",
+        "source_url": "https://www.archives.gov/federal-register/codification/executive-order/12320.html",
+        "source_type": "Government",
+        "publisher": "National Archives",
+        "published_date": "1981-09-15",
+        "notes": "Official codified text of the order establishing the annual federal HBCU participation plan and barrier-reduction framework."
+      },
+      {
+        "source_title": "Ronald Reagan Executive Orders - 1981",
+        "source_url": "https://www.archives.gov/federal-register/executive-orders/1981-reagan.html",
+        "source_type": "Government",
+        "publisher": "National Archives",
+        "published_date": null,
+        "notes": "National Archives disposition table confirming Executive Order 12320 in the 1981 Reagan executive-order record."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Historically Black College and University Capital Financing Program",
+    "policy_type": "Program",
+    "summary": "Created a federal loan-guarantee pathway to help HBCUs obtain lower-cost capital financing for campus maintenance, renovation, and construction projects that many institutions struggled to finance through private markets alone.",
+    "year_enacted": 1992,
+    "date_enacted": "1992-07-23",
+    "era": "Post Civil Rights Era",
+    "president": "George H. W. Bush",
+    "primary_party": "Republican Party",
+    "house_party": "Democratic Party",
+    "senate_party": "Democratic Party",
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "Built a durable federal financing channel for HBCU facilities and infrastructure, helping institutions address deferred maintenance and capital access barriers rooted in smaller endowments and historical underinvestment.",
+    "status": "Active",
+    "impact_direction": "Positive",
+    "impact_notes": "A direct institutional-support program aimed at a longstanding structural disadvantage facing HBCUs in credit and capital markets.",
+    "categories": ["Education", "HBCUs", "Business and Economics"],
+    "scores": {
+      "directness_score": 5,
+      "material_impact_score": 4,
+      "evidence_score": 5,
+      "durability_score": 4,
+      "equity_score": 5,
+      "harm_offset_score": 1,
+      "notes": "A strong example of targeted federal institutional support for Black higher education."
+    },
+    "sources": [
+      {
+        "source_title": "Historically Black College and University Capital Financing Program",
+        "source_url": "https://www.ed.gov/about/ed-offices/ope/historically-black-college-and-university-capital-financing-program",
+        "source_type": "Government",
+        "publisher": "U.S. Department of Education",
+        "published_date": null,
+        "notes": "Department of Education program overview describing the goal of providing low-cost capital for HBCU infrastructure."
+      },
+      {
+        "source_title": "Loans - HBCU Capital Financing Program",
+        "source_url": "https://www.ed.gov/grants-and-programs/grants-higher-education/grants-hbcus/hbcu-capital-financing/loans",
+        "source_type": "Government",
+        "publisher": "U.S. Department of Education",
+        "published_date": null,
+        "notes": "Department of Education page documenting the program's loan history, participating institutions, and continuing loan activity."
+      },
+      {
+        "source_title": "Higher Education Act of 1965, as Amended Title III, Part D",
+        "source_url": "https://www.ed.gov/about/ed-offices/office-of-postsecondary-education/higher-education-act-of-1965-amended-title-iii",
+        "source_type": "Government",
+        "publisher": "U.S. Department of Education",
+        "published_date": null,
+        "notes": "Department of Education statute page containing the HBCU capital financing provisions and advisory board language."
+      }
+    ],
+    "metrics": []
+  }
+]

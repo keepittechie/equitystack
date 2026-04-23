@@ -1,0 +1,190 @@
+[
+  {
+    "title": "HEW Medicare Title VI Hospital Desegregation Enforcement",
+    "policy_type": "Agency Action",
+    "summary": "The Department of Health, Education, and Welfare used Title VI compliance review and Medicare participation leverage to pressure hospitals to end formal racial segregation before the Medicare program began operations.",
+    "year_enacted": 1966,
+    "date_enacted": "1966-07-01",
+    "era": "Civil Rights Era",
+    "president": "Lyndon B. Johnson",
+    "primary_party": "Democratic Party",
+    "house_party": null,
+    "senate_party": null,
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "Helped force rapid desegregation of many hospitals that wanted access to Medicare funds, making federal healthcare financing a practical civil-rights enforcement tool.",
+    "status": "Expired",
+    "impact_direction": "Positive",
+    "impact_notes": "A major administrative civil-rights intervention because it converted formal nondiscrimination law into immediate institutional pressure on segregated hospitals.",
+    "categories": ["Civil Rights", "Healthcare"],
+    "scores": {
+      "directness_score": 5,
+      "material_impact_score": 5,
+      "evidence_score": 5,
+      "durability_score": 4,
+      "equity_score": 5,
+      "harm_offset_score": 1,
+      "notes": "One of the clearest examples of federal administrative enforcement materially changing access for Black Americans."
+    },
+    "sources": [
+      {
+        "source_title": "Medical Facilities Compliance Report (Civil Rights Act Title VI)",
+        "source_url": "https://digitalgallery.nlm.nih.gov/gallery/8/item/1563/show/1584",
+        "source_type": "Government",
+        "publisher": "National Library of Medicine",
+        "published_date": "1966-03-04",
+        "notes": "National Library of Medicine document page describing Title VI hospital compliance review before Medicare participation."
+      },
+      {
+        "source_title": "CMS Presidents Speeches and Historic Program Reflections",
+        "source_url": "https://www.cms.hhs.gov/History/downloads/CMSPresidentsSpeeches.pdf",
+        "source_type": "Government",
+        "publisher": "Centers for Medicare & Medicaid Services",
+        "published_date": null,
+        "notes": "CMS historical collection noting that Title VI as applied to Medicare helped desegregate hospitals."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Philadelphia Plan",
+    "policy_type": "Agency Action",
+    "summary": "The Department of Labor used federal contracting authority to require construction contractors in the Philadelphia area to adopt goals and timetables for hiring Black workers in trades that had long excluded them.",
+    "year_enacted": 1969,
+    "date_enacted": "1969-06-27",
+    "era": "Post Civil Rights Era",
+    "president": "Richard Nixon",
+    "primary_party": "Republican Party",
+    "house_party": null,
+    "senate_party": null,
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "Marked a major federal shift from abstract nondiscrimination toward measurable contract-compliance enforcement in industries where Black workers had been systematically locked out.",
+    "status": "Expired",
+    "impact_direction": "Positive",
+    "impact_notes": "Historically important because it tied federal contract power to practical labor-market desegregation in a sector where exclusion had remained entrenched.",
+    "categories": ["Civil Rights", "Labor", "Business and Economics"],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 4,
+      "evidence_score": 4,
+      "durability_score": 3,
+      "equity_score": 5,
+      "harm_offset_score": 1,
+      "notes": "A high-value administrative enforcement model that helped make affirmative compliance more concrete."
+    },
+    "sources": [
+      {
+        "source_title": "Nixon on the Home Front",
+        "source_url": "https://www.archives.gov/publications/prologue/2012/winter/nixon-homefront",
+        "source_type": "Government",
+        "publisher": "National Archives",
+        "published_date": null,
+        "notes": "National Archives history article describing the Philadelphia Plan as a Nixon-era federal response to discrimination in construction hiring."
+      },
+      {
+        "source_title": "History and Rationale of Federal Affirmative Action",
+        "source_url": "https://clintonwhitehouse5.archives.gov/WH/EOP/OP/html/aa/aa02.html",
+        "source_type": "Government",
+        "publisher": "The White House Archives",
+        "published_date": null,
+        "notes": "Archived White House history explaining the 1969 revival of goals and timetables through the Philadelphia Plan."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Executive Order 12250",
+    "policy_type": "Executive Order",
+    "summary": "Delegated to the Attorney General a federal leadership and coordination role over Title VI, Title IX, Section 504, and related nondiscrimination rules governing federally assisted programs.",
+    "year_enacted": 1980,
+    "date_enacted": "1980-11-02",
+    "era": "Post Civil Rights Era",
+    "president": "Jimmy Carter",
+    "primary_party": "Democratic Party",
+    "house_party": null,
+    "senate_party": null,
+    "bipartisan": false,
+    "direct_black_impact": false,
+    "outcome_summary": "Strengthened the federal coordination structure for civil-rights enforcement in federally funded programs by giving the Attorney General a continuing oversight role.",
+    "status": "Active",
+    "impact_direction": "Positive",
+    "impact_notes": "More structural than visible, but highly important because durable enforcement often depends on interagency coordination rather than statute text alone.",
+    "categories": ["Civil Rights", "Constitutional Rights"],
+    "scores": {
+      "directness_score": 3,
+      "material_impact_score": 3,
+      "evidence_score": 5,
+      "durability_score": 5,
+      "equity_score": 4,
+      "harm_offset_score": 1,
+      "notes": "A coordination-focused executive order with long-term significance for how civil-rights rules are implemented."
+    },
+    "sources": [
+      {
+        "source_title": "Executive Order 12250--Leadership and Coordination of Nondiscrimination Laws",
+        "source_url": "https://www.archives.gov/federal-register/codification/executive-order/12250.html",
+        "source_type": "Government",
+        "publisher": "National Archives",
+        "published_date": "1980-11-02",
+        "notes": "Official codified text of the order delegating and coordinating federal nondiscrimination enforcement functions."
+      },
+      {
+        "source_title": "Title VI of the Civil Rights Act of 1964",
+        "source_url": "https://www.justice.gov/crt/fcs/TitleVI",
+        "source_type": "Government",
+        "publisher": "U.S. Department of Justice",
+        "published_date": null,
+        "notes": "Department of Justice overview noting the Attorney General's coordinating role under Executive Order 12250."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "HHS Section 1557 Final Rule",
+    "policy_type": "Agency Action",
+    "summary": "HHS issued the first comprehensive final rule implementing Section 1557 of the Affordable Care Act, clarifying nondiscrimination obligations in federally funded health programs and activities.",
+    "year_enacted": 2016,
+    "date_enacted": "2016-05-18",
+    "era": "Contemporary Era",
+    "president": "Barack Obama",
+    "primary_party": "Democratic Party",
+    "house_party": null,
+    "senate_party": null,
+    "bipartisan": false,
+    "direct_black_impact": false,
+    "outcome_summary": "Expanded the practical civil-rights framework for healthcare by clarifying that race, color, national origin, sex, age, and disability protections applied across a wide range of health programs receiving federal support.",
+    "status": "Expired",
+    "impact_direction": "Positive",
+    "impact_notes": "Important not because it created Section 1557, but because it turned a statutory nondiscrimination clause into a more usable enforcement and compliance regime.",
+    "categories": ["Civil Rights", "Healthcare"],
+    "scores": {
+      "directness_score": 3,
+      "material_impact_score": 4,
+      "evidence_score": 5,
+      "durability_score": 2,
+      "equity_score": 4,
+      "harm_offset_score": 1,
+      "notes": "A significant administrative implementation step with real practical reach but limited durability."
+    },
+    "sources": [
+      {
+        "source_title": "Section 1557: Coverage of Health Insurance in Marketplaces and Other Health Plans",
+        "source_url": "https://www.hhs.gov/civil-rights/for-individuals/section-1557/fs-health-insurance/index.html",
+        "source_type": "Government",
+        "publisher": "U.S. Department of Health and Human Services",
+        "published_date": "2016-08-25",
+        "notes": "HHS fact sheet explaining the scope and effect of the 2016 Section 1557 final rule."
+      },
+      {
+        "source_title": "ACA Continues to Break Down Barriers to Health Care for all Americans",
+        "source_url": "https://www.hhs.gov/civil-rights/for-individuals/special-topics/limited-english-proficiency/aca-breaks-barriers-lep/index.html",
+        "source_type": "Government",
+        "publisher": "U.S. Department of Health and Human Services",
+        "published_date": "2016-11-04",
+        "notes": "HHS page summarizing how the 2016 final rule extended and clarified nondiscrimination protections in health care."
+      }
+    ],
+    "metrics": []
+  }
+]

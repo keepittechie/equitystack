@@ -122,6 +122,14 @@
         "publisher": "Justia",
         "published_date": "1978-06-28",
         "notes": "Primary decision text mirror"
+      },
+      {
+        "source_title": "Regents of the University of California v. Bakke, 438 U.S. 265 (1978)",
+        "source_url": "https://www.govinfo.gov/content/pkg/USREPORTS-438/pdf/USREPORTS-438-265.pdf",
+        "source_type": "Government",
+        "publisher": "U.S. Government Publishing Office",
+        "published_date": "1978-06-28",
+        "notes": "Official United States Reports PDF"
       }
     ],
     "metrics": []
@@ -164,6 +172,73 @@
         "publisher": "Justia",
         "published_date": "2003-06-23",
         "notes": "Primary decision text mirror"
+      },
+      {
+        "source_title": "Grutter v. Bollinger, 539 U.S. 306 (2003)",
+        "source_url": "https://www.govinfo.gov/content/pkg/USREPORTS-539/pdf/USREPORTS-539-306.pdf",
+        "source_type": "Government",
+        "publisher": "U.S. Government Publishing Office",
+        "published_date": "2003-06-23",
+        "notes": "Official United States Reports PDF"
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Gratz v. Bollinger",
+    "policy_type": "Court Case",
+    "summary": "The Supreme Court struck down the University of Michigan's undergraduate admissions system because its automatic point allocation for underrepresented minority applicants was not narrowly tailored.",
+    "year_enacted": 2003,
+    "date_enacted": "2003-06-23",
+    "era": "Post Civil Rights Era",
+    "president": "George W. Bush",
+    "primary_party": null,
+    "house_party": null,
+    "senate_party": null,
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "The ruling narrowed the forms of race-conscious admissions universities could use, limiting one direct tool institutions had used to support Black representation in higher education.",
+    "status": "Partially Active",
+    "impact_direction": "Negative",
+    "impact_notes": "Important limiting decision issued the same day as Grutter; it constrained mechanical affirmative-action systems while leaving individualized review intact.",
+    "categories": [
+      "Education",
+      "Civil Rights",
+      "Constitutional Rights"
+    ],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 3,
+      "evidence_score": 5,
+      "durability_score": 2,
+      "equity_score": 2,
+      "harm_offset_score": 0,
+      "notes": "Meaningful restriction on affirmative-action admissions design, though narrower than a full ban."
+    },
+    "sources": [
+      {
+        "source_title": "Gratz v. Bollinger, 539 U.S. 244 (2003)",
+        "source_url": "https://supreme.justia.com/cases/federal/us/539/244/",
+        "source_type": "Archive",
+        "publisher": "Justia",
+        "published_date": "2003-06-23",
+        "notes": "Primary decision text mirror"
+      },
+      {
+        "source_title": "Gratz v. Bollinger, 539 U.S. 244 (2003)",
+        "source_url": "https://www.govinfo.gov/content/pkg/USREPORTS-539/pdf/USREPORTS-539-244.pdf",
+        "source_type": "Government",
+        "publisher": "U.S. Government Publishing Office",
+        "published_date": "2003-06-23",
+        "notes": "Official United States Reports PDF"
+      },
+      {
+        "source_title": "Students for Fair Admissions v. Harvard/UNC Resources",
+        "source_url": "https://www.law.columbia.edu/news/archive/students-fair-admissions-v-harvardunc-resources",
+        "source_type": "Academic",
+        "publisher": "Columbia Law School",
+        "published_date": "2023-06-29",
+        "notes": "Academic explainer placing Gratz within the longer affirmative action doctrine line later revisited in Fisher and Students for Fair Admissions."
       }
     ],
     "metrics": []
@@ -207,6 +282,124 @@
         "publisher": "Justia",
         "published_date": "2007-06-28",
         "notes": "Primary decision text mirror"
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Fisher v. University of Texas at Austin (2013)",
+    "policy_type": "Court Case",
+    "summary": "The Supreme Court vacated the lower-court ruling that had upheld the University of Texas admissions plan and required courts to apply genuine strict scrutiny to race-conscious admissions policies.",
+    "year_enacted": 2013,
+    "date_enacted": "2013-06-24",
+    "era": "Contemporary Era",
+    "president": "Barack Obama",
+    "primary_party": null,
+    "house_party": null,
+    "senate_party": null,
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "The ruling tightened judicial review of affirmative-action admissions programs, creating additional legal risk for policies used to support Black representation in higher education without outlawing such programs outright.",
+    "status": "Partially Active",
+    "impact_direction": "Mixed",
+    "impact_notes": "Important doctrinal tightening decision: it did not ban race-conscious admissions, but it raised the scrutiny standard that universities had to survive.",
+    "categories": [
+      "Education",
+      "Civil Rights",
+      "Constitutional Rights"
+    ],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 3,
+      "evidence_score": 5,
+      "durability_score": 3,
+      "equity_score": 2,
+      "harm_offset_score": 0,
+      "notes": "Mixed-impact ruling that tightened doctrine without eliminating affirmative action."
+    },
+    "sources": [
+      {
+        "source_title": "Fisher v. University of Texas at Austin, 570 U.S. 297 (2013)",
+        "source_url": "https://supreme.justia.com/cases/federal/us/570/297/",
+        "source_type": "Archive",
+        "publisher": "Justia",
+        "published_date": "2013-06-24",
+        "notes": "Primary decision text mirror"
+      },
+      {
+        "source_title": "Fisher v. University of Texas at Austin, 570 U.S. 297 (2013)",
+        "source_url": "https://www.govinfo.gov/content/pkg/USREPORTS-570/pdf/USREPORTS-570-297.pdf",
+        "source_type": "Government",
+        "publisher": "U.S. Government Publishing Office",
+        "published_date": "2013-06-24",
+        "notes": "Official United States Reports PDF"
+      },
+      {
+        "source_title": "Students for Fair Admissions v. Harvard/UNC Resources",
+        "source_url": "https://www.law.columbia.edu/news/archive/students-fair-admissions-v-harvardunc-resources",
+        "source_type": "Academic",
+        "publisher": "Columbia Law School",
+        "published_date": "2023-06-29",
+        "notes": "Academic explainer connecting Fisher I to the longer Bakke-Grutter-SFFA line in affirmative action doctrine."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Fisher v. University of Texas at Austin (2016)",
+    "policy_type": "Court Case",
+    "summary": "The Supreme Court upheld the University of Texas admissions plan after applying strict scrutiny, concluding that the university had shown a sufficient basis for its limited use of race in admissions.",
+    "year_enacted": 2016,
+    "date_enacted": "2016-06-23",
+    "era": "Contemporary Era",
+    "president": "Barack Obama",
+    "primary_party": null,
+    "house_party": null,
+    "senate_party": null,
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "The ruling preserved a narrowing but still meaningful legal path for race-conscious admissions policies that institutions viewed as relevant to Black educational access before the later Harvard and UNC decision.",
+    "status": "Partially Active",
+    "impact_direction": "Positive",
+    "impact_notes": "Important late-stage reaffirmation of affirmative-action doctrine, though the holding was later overtaken by Students for Fair Admissions.",
+    "categories": [
+      "Education",
+      "Civil Rights",
+      "Constitutional Rights"
+    ],
+    "scores": {
+      "directness_score": 4,
+      "material_impact_score": 3,
+      "evidence_score": 5,
+      "durability_score": 2,
+      "equity_score": 4,
+      "harm_offset_score": 0,
+      "notes": "Positive but time-limited preservation of race-conscious admissions authority."
+    },
+    "sources": [
+      {
+        "source_title": "Fisher v. University of Texas at Austin, 579 U.S. 365 (2016)",
+        "source_url": "https://supreme.justia.com/cases/federal/us/579/365/",
+        "source_type": "Archive",
+        "publisher": "Justia",
+        "published_date": "2016-06-23",
+        "notes": "Primary decision text mirror"
+      },
+      {
+        "source_title": "Fisher v. University of Texas at Austin, 579 U.S. 365 (2016)",
+        "source_url": "https://www.govinfo.gov/content/pkg/USREPORTS-579/pdf/USREPORTS-579-365.pdf",
+        "source_type": "Government",
+        "publisher": "U.S. Government Publishing Office",
+        "published_date": "2016-06-23",
+        "notes": "Official United States Reports PDF"
+      },
+      {
+        "source_title": "Students for Fair Admissions v. Harvard/UNC Resources",
+        "source_url": "https://www.law.columbia.edu/news/archive/students-fair-admissions-v-harvardunc-resources",
+        "source_type": "Academic",
+        "publisher": "Columbia Law School",
+        "published_date": "2023-06-29",
+        "notes": "Academic explainer connecting Fisher II to the doctrine line later displaced by Students for Fair Admissions."
       }
     ],
     "metrics": []

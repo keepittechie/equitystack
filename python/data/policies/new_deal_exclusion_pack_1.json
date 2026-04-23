@@ -1,0 +1,151 @@
+[
+  {
+    "title": "Agricultural Adjustment Act of 1933",
+    "policy_type": "Law",
+    "summary": "Created the first major New Deal farm-support framework by paying landowners to reduce production and stabilize agricultural prices during the Depression.",
+    "year_enacted": 1933,
+    "date_enacted": "1933-05-12",
+    "era": "Jim Crow and Disenfranchisement",
+    "president": "Franklin D. Roosevelt",
+    "primary_party": "Democratic Party",
+    "house_party": "Democratic Party",
+    "senate_party": "Democratic Party",
+    "bipartisan": false,
+    "direct_black_impact": false,
+    "outcome_summary": "Provided large-scale federal support to agriculture, but local landlord-centered administration and acreage reduction policies often bypassed or displaced Black tenant farmers and sharecroppers.",
+    "status": "Expired",
+    "impact_direction": "Mixed",
+    "impact_notes": "A major New Deal intervention whose benefits were real for agricultural producers in general, but whose design and administration often worsened insecurity for Black rural laborers and tenants.",
+    "categories": ["Business and Economics", "Labor", "Social Welfare"],
+    "scores": {
+      "directness_score": 2,
+      "material_impact_score": 4,
+      "evidence_score": 4,
+      "durability_score": 3,
+      "equity_score": 1,
+      "harm_offset_score": 1,
+      "notes": "A foundational farm-support law whose unequal local administration makes it an important exclusion-era case."
+    },
+    "sources": [
+      {
+        "source_title": "Agricultural Adjustment Act of 1933",
+        "source_url": "https://www.nal.usda.gov/collections/exhibits/houseag200th/list",
+        "source_type": "Government",
+        "publisher": "National Agricultural Library",
+        "published_date": null,
+        "notes": "USDA historical page identifying the Agricultural Adjustment Act as the first major New Deal farm bill."
+      },
+      {
+        "source_title": "USDA Equity Commission Final Report",
+        "source_url": "https://www.usda.gov/sites/default/files/documents/usda-equity-commission-final-report.pdf",
+        "source_type": "Government",
+        "publisher": "U.S. Department of Agriculture",
+        "published_date": "2024-02-27",
+        "notes": "USDA Equity Commission report noting that Agricultural Adjustment Act policies led to the displacement of many Black tenant farmers and sharecroppers."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Civilian Conservation Corps",
+    "policy_type": "Program",
+    "summary": "Created a large federal work-relief and conservation program for unemployed young men during the Great Depression, placing enrollees in camps to perform environmental and infrastructure work.",
+    "year_enacted": 1933,
+    "date_enacted": "1933-03-31",
+    "era": "Jim Crow and Disenfranchisement",
+    "president": "Franklin D. Roosevelt",
+    "primary_party": "Democratic Party",
+    "house_party": null,
+    "senate_party": null,
+    "bipartisan": false,
+    "direct_black_impact": false,
+    "outcome_summary": "Provided jobs and training to many participants, including Black enrollees, but operated within a segregated structure that sharply limited equal treatment and opportunity.",
+    "status": "Expired",
+    "impact_direction": "Mixed",
+    "impact_notes": "A major relief program that cannot be read as simply exclusionary or simply beneficial because Black participation existed but was mediated by segregation and unequal camp conditions.",
+    "categories": ["Labor", "Social Welfare", "Business and Economics"],
+    "scores": {
+      "directness_score": 2,
+      "material_impact_score": 4,
+      "evidence_score": 4,
+      "durability_score": 2,
+      "equity_score": 2,
+      "harm_offset_score": 1,
+      "notes": "A large New Deal jobs program with real access for Black participants but under clearly segregated conditions."
+    },
+    "sources": [
+      {
+        "source_title": "The Civilian Conservation Corps",
+        "source_url": "https://www.nps.gov/articles/the-civilian-conservation-corps.htm",
+        "source_type": "Government",
+        "publisher": "National Park Service",
+        "published_date": null,
+        "notes": "National Park Service overview of the CCC's basic structure and scale."
+      },
+      {
+        "source_title": "Company 818 and Segregation in the Civilian Conservation Corps",
+        "source_url": "https://www.nps.gov/articles/000/company-818-and-segregation-in-the-civilian-conservation-corps.htm",
+        "source_type": "Government",
+        "publisher": "National Park Service",
+        "published_date": null,
+        "notes": "National Park Service article documenting how Black CCC participants worked within segregated camps and discriminatory conditions."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Works Progress Administration",
+    "policy_type": "Program",
+    "summary": "Established the largest New Deal work-relief program, employing millions of unemployed people in public works, cultural projects, and local infrastructure efforts.",
+    "year_enacted": 1935,
+    "date_enacted": "1935-05-06",
+    "era": "Jim Crow and Disenfranchisement",
+    "president": "Franklin D. Roosevelt",
+    "primary_party": "Democratic Party",
+    "house_party": null,
+    "senate_party": null,
+    "bipartisan": false,
+    "direct_black_impact": false,
+    "outcome_summary": "Offered jobs and public investment on a huge scale, including work performed by Black Americans, but local administration and segregation limited equal access and shaped who benefited most from the program.",
+    "status": "Expired",
+    "impact_direction": "Mixed",
+    "impact_notes": "An important example of uneven New Deal inclusion: the WPA opened meaningful employment channels for many Black workers while still operating inside discriminatory local systems.",
+    "categories": ["Labor", "Social Welfare", "Business and Economics"],
+    "scores": {
+      "directness_score": 2,
+      "material_impact_score": 5,
+      "evidence_score": 4,
+      "durability_score": 2,
+      "equity_score": 2,
+      "harm_offset_score": 1,
+      "notes": "A massive work-relief program with major real benefits but uneven and discriminatory implementation."
+    },
+    "sources": [
+      {
+        "source_title": "Works Progress Administration",
+        "source_url": "https://georgewbush-whitehouse.archives.gov/history/thisday/0506.html",
+        "source_type": "Government",
+        "publisher": "The White House Archives",
+        "published_date": "1935-05-06",
+        "notes": "Archived White House history page noting Roosevelt's announcement of the Works Progress Administration on May 6, 1935."
+      },
+      {
+        "source_title": "Work Relief Archeology",
+        "source_url": "https://www.nps.gov/articles/work-relief-archeology.htm",
+        "source_type": "Government",
+        "publisher": "National Park Service",
+        "published_date": null,
+        "notes": "National Park Service article describing the WPA as one of the largest and most successful New Deal work-relief programs."
+      },
+      {
+        "source_title": "Claiming Citizenship: African Americans and Works Progress Administration",
+        "source_url": "https://www.nps.gov/brvb/learn/news/claimingcitizenship.htm",
+        "source_type": "Government",
+        "publisher": "National Park Service",
+        "published_date": "2010-09-27",
+        "notes": "National Park Service exhibition page focused on African American life, labor, and citizenship claims under WPA-era conditions."
+      }
+    ],
+    "metrics": []
+  }
+]

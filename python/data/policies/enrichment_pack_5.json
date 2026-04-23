@@ -136,6 +136,14 @@
         "notes": "Opinion page for the 1978 decision that struck down rigid racial quotas while allowing race to be considered as one factor in admissions."
       },
       {
+        "source_title": "Regents of the University of California v. Bakke, 438 U.S. 265 (1978)",
+        "source_url": "https://www.govinfo.gov/content/pkg/USREPORTS-438/pdf/USREPORTS-438-265.pdf",
+        "source_type": "Government",
+        "publisher": "U.S. Government Publishing Office",
+        "published_date": "1978-06-28",
+        "notes": "Official United States Reports PDF."
+      },
+      {
         "source_title": "Affirmative Action Fast Facts",
         "source_url": "https://www.cnn.com/2013/11/12/us/affirmative-action-fast-facts/index.html",
         "source_type": "News",
@@ -165,6 +173,14 @@
         "publisher": "Supreme Court / Justia",
         "published_date": null,
         "notes": "Opinion page for the 2003 decision upholding limited use of race in higher education admissions to further diversity."
+      },
+      {
+        "source_title": "Grutter v. Bollinger, 539 U.S. 306 (2003)",
+        "source_url": "https://www.govinfo.gov/content/pkg/USREPORTS-539/pdf/USREPORTS-539-306.pdf",
+        "source_type": "Government",
+        "publisher": "U.S. Government Publishing Office",
+        "published_date": "2003-06-23",
+        "notes": "Official United States Reports PDF."
       },
       {
         "source_title": "The Compelling Need for Diversity in Higher Education",
@@ -198,6 +214,14 @@
         "notes": "Opinion page for the 2023 ruling sharply limiting race-conscious admissions in higher education."
       },
       {
+        "source_title": "Students for Fair Admissions, Inc. v. President and Fellows of Harvard College / UNC",
+        "source_url": "https://www.supremecourt.gov/opinions/22pdf/20-1199_hgdj.pdf",
+        "source_type": "Government",
+        "publisher": "Supreme Court of the United States",
+        "published_date": "2023-06-29",
+        "notes": "Official Supreme Court slip opinion PDF."
+      },
+      {
         "source_title": "Students for Fair Admissions v. Harvard/UNC Resources",
         "source_url": "https://www.law.columbia.edu/news/archive/students-fair-admissions-v-harvardunc-resources",
         "source_type": "Academic",
@@ -212,6 +236,14 @@
         "publisher": "Brookings Institution",
         "published_date": "2023-06-29",
         "notes": "Policy analysis summarizing the practical effect of the decision on higher education admissions."
+      },
+      {
+        "source_title": "Students for Fair Admissions, Inc. v. President and Fellows of Harvard College",
+        "source_url": "https://www.govinfo.gov/content/pkg/USCOURTS-ca1-19-02005/pdf/USCOURTS-ca1-19-02005-0.pdf",
+        "source_type": "Government",
+        "publisher": "U.S. Courts / GovInfo",
+        "published_date": "2020-11-12",
+        "notes": "First Circuit opinion showing how the Harvard challenge was analyzed through the Bakke, Grutter, Gratz, and Fisher doctrine line before the Supreme Court reversal."
       }
     ],
     "metrics": []

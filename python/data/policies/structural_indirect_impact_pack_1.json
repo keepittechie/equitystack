@@ -1,0 +1,151 @@
+[
+  {
+    "title": "Labor Management Relations Act of 1947",
+    "policy_type": "Law",
+    "summary": "Amended the National Labor Relations Act by restricting union tactics, permitting right-to-work laws, and reshaping the balance of power between labor and management in ways that weakened organized labor's reach.",
+    "year_enacted": 1947,
+    "date_enacted": "1947-06-23",
+    "era": "Civil Rights Era",
+    "president": "Harry S. Truman",
+    "primary_party": "Republican Party",
+    "house_party": "Republican Party",
+    "senate_party": "Republican Party",
+    "bipartisan": true,
+    "direct_black_impact": false,
+    "outcome_summary": "Restructured labor law in ways that indirectly affected Black workers by weakening some of the institutional channels through which union power could support wage growth, job access, and workplace bargaining strength.",
+    "status": "Active",
+    "impact_direction": "Negative",
+    "impact_notes": "Not a race-specific law, but an important structural example because Black workers' gains often depended on broader labor power that Taft-Hartley constrained.",
+    "categories": ["Labor", "Business and Economics", "Civil Rights"],
+    "scores": {
+      "directness_score": 2,
+      "material_impact_score": 4,
+      "evidence_score": 4,
+      "durability_score": 5,
+      "equity_score": 1,
+      "harm_offset_score": 0,
+      "notes": "A durable structural labor-law change with significant downstream implications for unequal economic power."
+    },
+    "sources": [
+      {
+        "source_title": "1947 Taft-Hartley Passage and NLRB Structural Changes",
+        "source_url": "https://www.nlrb.gov/about-nlrb/who-we-are/our-history/1947-taft-hartley-passage-and-nlrb-structural-changes",
+        "source_type": "Government",
+        "publisher": "National Labor Relations Board",
+        "published_date": null,
+        "notes": "NLRB history page describing the law's passage and structural reshaping of federal labor enforcement."
+      },
+      {
+        "source_title": "1947 Taft-Hartley Substantive Provisions",
+        "source_url": "https://www.nlrb.gov/about-nlrb/who-we-are/our-history/1947-taft-hartley-substantive-provisions",
+        "source_type": "Government",
+        "publisher": "National Labor Relations Board",
+        "published_date": null,
+        "notes": "NLRB explanation of the major substantive restrictions and changes introduced by the Act."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Elementary and Secondary Education Act of 1965",
+    "policy_type": "Law",
+    "summary": "Created a large federal aid structure for K-12 education, especially through Title I funding for schools serving concentrations of low-income students.",
+    "year_enacted": 1965,
+    "date_enacted": "1965-04-11",
+    "era": "Civil Rights Era",
+    "president": "Lyndon B. Johnson",
+    "primary_party": "Democratic Party",
+    "house_party": "Democratic Party",
+    "senate_party": "Democratic Party",
+    "bipartisan": true,
+    "direct_black_impact": false,
+    "outcome_summary": "Expanded the federal role in school funding through poverty-targeted aid, which indirectly mattered greatly for Black students because segregated and underfunded school systems left many Black communities heavily represented in the populations the law was designed to reach.",
+    "status": "Active",
+    "impact_direction": "Positive",
+    "impact_notes": "A structural-equity example rather than a race-specific law: its importance for Black Americans came through the funding architecture it created for schools serving low-income communities.",
+    "categories": ["Education", "Business and Economics", "Civil Rights"],
+    "scores": {
+      "directness_score": 2,
+      "material_impact_score": 5,
+      "evidence_score": 4,
+      "durability_score": 5,
+      "equity_score": 4,
+      "harm_offset_score": 1,
+      "notes": "A durable education-finance intervention whose Black impact was mediated through poverty, segregation, and unequal school funding."
+    },
+    "sources": [
+      {
+        "source_title": "H.R.2362 - Elementary and Secondary Education Act of 1965",
+        "source_url": "https://www.congress.gov/bill/89th-congress/house-bill/2362",
+        "source_type": "Government",
+        "publisher": "Congress.gov",
+        "published_date": "1965-04-11",
+        "notes": "Official legislative record for the law that created the basic federal K-12 aid architecture."
+      },
+      {
+        "source_title": "The Elementary and Secondary Education Act",
+        "source_url": "https://www.congress.gov/crs_external_products/R/PDF/R45977/R45977.1.pdf",
+        "source_type": "Government",
+        "publisher": "Congressional Research Service",
+        "published_date": "2019-11-20",
+        "notes": "CRS overview explaining the structure and continuing importance of the Elementary and Secondary Education Act."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Personal Responsibility and Work Opportunity Reconciliation Act of 1996",
+    "policy_type": "Law",
+    "summary": "Replaced Aid to Families with Dependent Children with Temporary Assistance for Needy Families, ending a federal cash-assistance entitlement and shifting welfare policy toward time limits, work requirements, and state discretion.",
+    "year_enacted": 1996,
+    "date_enacted": "1996-08-22",
+    "era": "Contemporary Era",
+    "president": "Bill Clinton",
+    "primary_party": "Republican Party",
+    "house_party": "Republican Party",
+    "senate_party": "Republican Party",
+    "bipartisan": true,
+    "direct_black_impact": false,
+    "outcome_summary": "Restructured the cash safety net in ways that were formally race-neutral but carried major implications for Black women and Black families because of unequal exposure to poverty, sanction systems, and state administrative discretion.",
+    "status": "Active",
+    "impact_direction": "Negative",
+    "impact_notes": "A strong structural-impact example because it changed the architecture of public assistance without naming race, yet had unequal downstream effects in a system already marked by racialized administration.",
+    "categories": ["Social Welfare", "Business and Economics", "Civil Rights"],
+    "scores": {
+      "directness_score": 2,
+      "material_impact_score": 4,
+      "evidence_score": 4,
+      "durability_score": 5,
+      "equity_score": 1,
+      "harm_offset_score": 0,
+      "notes": "A durable welfare-state restructuring with substantial indirect consequences for Black households."
+    },
+    "sources": [
+      {
+        "source_title": "H.R.3734 - Personal Responsibility and Work Opportunity Reconciliation Act of 1996",
+        "source_url": "https://www.congress.gov/bill/104th-congress/house-bill/3734",
+        "source_type": "Government",
+        "publisher": "Congress.gov",
+        "published_date": "1996-08-22",
+        "notes": "Official legislative record for the welfare reform law that replaced AFDC with TANF."
+      },
+      {
+        "source_title": "1996 Welfare Amendments Vote Tallies",
+        "source_url": "https://www.ssa.gov/history/tally1996.html",
+        "source_type": "Government",
+        "publisher": "Social Security Administration",
+        "published_date": null,
+        "notes": "SSA history page explaining the law's core structural change from AFDC to TANF and its legislative path."
+      },
+      {
+        "source_title": "Laws and Welfare Reform Overview",
+        "source_url": "https://www.hhs.gov/civil-rights/for-individuals/special-topics/needy-families/laws-welfare-reform-overview/index.html",
+        "source_type": "Government",
+        "publisher": "U.S. Department of Health and Human Services",
+        "published_date": null,
+        "notes": "HHS civil-rights overview showing how welfare administration still intersects with nondiscrimination law in the post-1996 system."
+      }
+    ],
+    "metrics": []
+  }
+]
