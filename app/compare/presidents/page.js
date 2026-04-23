@@ -2,6 +2,7 @@ import Link from "next/link";
 import { buildPageMetadata } from "@/lib/metadata";
 import { resolvePresidentImageSrc } from "@/lib/president-image-paths";
 import { fetchComparePresidentsData } from "@/lib/public-site-data";
+import { getAgendaOverlapComparisonForPresidents } from "@/lib/agendas";
 import { buildEvidenceSignal, buildResearchCoverage } from "@/lib/evidenceCoverage";
 import { Breadcrumbs } from "@/app/components/public/chrome";
 import EvidenceBadge from "@/app/components/public/EvidenceBadge";
@@ -17,6 +18,7 @@ import {
   PresidentPortrait,
 } from "@/app/components/public/entities";
 import {
+  MetricCard,
   Panel,
   StatusPill,
   getImpactDirectionTone,
@@ -172,6 +174,102 @@ function buildCompareWhyThisScore({
   };
 }
 
+function AgendaOverlapComparePanel({ comparison }) {
+  if (!comparison) {
+    return null;
+  }
+
+  return (
+    <Panel padding="md" className="space-y-4">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="space-y-2">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--accent)]">
+            Agenda Tracker overlap
+          </p>
+          <div>
+            <h2 className="text-lg font-semibold text-white">Project 2025 overlap</h2>
+            <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
+              {comparison.summary} This reads only from verified links between the tracked agenda
+              and existing EquityStack records. It does not change any Black Impact Score.
+            </p>
+          </div>
+        </div>
+        <Link href="/agendas/project-2025" className="text-sm font-medium text-[var(--accent)]">
+          Open tracker
+        </Link>
+      </div>
+
+      <div className="grid gap-3 md:grid-cols-2">
+        {comparison.entities.map((item) => (
+          <Panel key={item.president_slug || item.president_name} padding="md" className="space-y-3">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <h3 className="text-base font-semibold text-white">{item.president_name}</h3>
+                {item.term_label ? (
+                  <p className="mt-1 text-[11px] uppercase tracking-[0.16em] text-[var(--ink-muted)]">
+                    {item.term_label}
+                  </p>
+                ) : null}
+              </div>
+              <StatusPill tone={item.has_overlap ? "info" : "default"}>
+                {item.has_overlap
+                  ? `${item.linked_agenda_item_count} linked agenda item${
+                      item.linked_agenda_item_count === 1 ? "" : "s"
+                    }`
+                  : "No verified overlap yet"}
+              </StatusPill>
+            </div>
+
+            <div className="grid gap-2 sm:grid-cols-3">
+              <MetricCard
+                density="compact"
+                label="Agenda items"
+                value={item.linked_agenda_item_count}
+                tone={item.has_overlap ? "info" : "default"}
+              />
+              <MetricCard
+                density="compact"
+                label="Linked records"
+                value={item.linked_record_count}
+                tone={item.has_overlap ? "verified" : "default"}
+              />
+              <MetricCard
+                density="compact"
+                label="Top domain"
+                value={item.top_domain?.domain || "—"}
+              />
+            </div>
+
+            {item.top_domains.length ? (
+              <div className="flex flex-wrap gap-2 text-xs text-[var(--ink-muted)]">
+                {item.top_domains.map((domain) => (
+                  <span
+                    key={`${item.president_slug || item.president_name}-${domain.domain}`}
+                    className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5"
+                  >
+                    {domain.domain} ({domain.count})
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <p className="text-xs leading-6 text-[var(--ink-muted)]">
+                No verified Project 2025-linked records are attached to this comparison record yet.
+              </p>
+            )}
+
+            {item.linked_records_preview.length ? (
+              <p className="text-xs leading-6 text-[var(--ink-soft)]">
+                Linked records:{" "}
+                {item.linked_records_preview.map((record) => record.title).join(" • ")}
+              </p>
+            ) : null}
+          </Panel>
+        ))}
+      </div>
+    </Panel>
+  );
+}
+
 export default async function ComparePresidentsPage({ searchParams }) {
   const resolvedSearchParams = (await searchParams) || {};
   const selected = normalizeSelected(resolvedSearchParams.compare);
@@ -225,6 +323,10 @@ export default async function ComparePresidentsPage({ searchParams }) {
     directGap,
     strongestTopicDifference: data.strongest_topic_difference,
   });
+  const agendaOverlapComparison = getAgendaOverlapComparisonForPresidents(
+    comparedPresidents,
+    "project-2025"
+  );
 
   return (
     <main className="space-y-4">
@@ -362,6 +464,7 @@ export default async function ComparePresidentsPage({ searchParams }) {
                 actionHref="/research/how-black-impact-score-works"
                 actionLabel="Read the scoring method"
               />
+              <AgendaOverlapComparePanel comparison={agendaOverlapComparison} />
               <div className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4 text-sm leading-7 text-[var(--ink-soft)]">
                 {data.directional_contrast_summary ||
                   "Directional contrast summary is not available for the current selection."}

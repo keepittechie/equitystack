@@ -40,6 +40,7 @@ import PolicyLineagePanel from "@/app/components/public/PolicyLineagePanel";
 import ScoreExplanation from "@/app/components/public/ScoreExplanation";
 import DiscoveryGuidancePanel from "@/app/components/public/DiscoveryGuidancePanel";
 import WhyThisScorePanel from "@/app/components/public/WhyThisScorePanel";
+import LinkedAgendaItemsPanel from "@/app/components/public/LinkedAgendaItemsPanel";
 import {
   EvidenceSourceList,
   PolicyTimeline,
@@ -68,6 +69,7 @@ import {
   getPolicyRelationshipTone,
   summarizePolicyRelationshipContinuity,
 } from "@/lib/policyRelationships";
+import { getLinkedAgendaItemsForEntity } from "@/lib/agendas";
 
 export const dynamic = "force-dynamic";
 const POLICY_IMPACT_SCORE_MAX = 35;
@@ -1244,6 +1246,7 @@ export default async function PolicyDetailPage({ params }) {
     currentYear: policy.year_enacted,
     editorial: flagshipEditorial,
   });
+  const linkedAgendaItems = getLinkedAgendaItemsForEntity("policy", policy.id);
   const localSectionOffsetClass = "scroll-mt-28 md:scroll-mt-32";
   const localNavigationItems = [
     { href: "#overview", label: "Overview" },
@@ -1780,6 +1783,7 @@ export default async function PolicyDetailPage({ params }) {
             description="Use this short path when you want the clearest next click first. The full promise, explainer, report, and research links remain visible below."
             items={bestNextReviewItems}
           />
+          <LinkedAgendaItemsPanel items={linkedAgendaItems} />
           {(policy.related_promises || []).length ? (
             <PromiseResultsTable items={policy.related_promises} buildHref={(item) => `/promises/${item.slug}`} />
           ) : (

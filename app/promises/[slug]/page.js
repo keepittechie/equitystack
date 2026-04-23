@@ -36,6 +36,7 @@ import PromiseSystemExplanation from "@/app/components/public/PromiseSystemExpla
 import PromiseProvenanceChain from "@/app/components/public/PromiseProvenanceChain";
 import WhyThisScorePanel from "@/app/components/public/WhyThisScorePanel";
 import DiscoveryGuidancePanel from "@/app/components/public/DiscoveryGuidancePanel";
+import LinkedAgendaItemsPanel from "@/app/components/public/LinkedAgendaItemsPanel";
 import {
   EvidenceSourceList,
   PolicyCardList,
@@ -58,6 +59,7 @@ import {
 } from "@/lib/structured-data";
 import ShareCardPanel from "@/app/components/share/ShareCardPanel";
 import { buildPromiseCardHref } from "@/lib/shareable-card-links";
+import { getLinkedAgendaItemsForEntity } from "@/lib/agendas";
 
 export const dynamic = "force-dynamic";
 
@@ -765,6 +767,7 @@ export default async function PromiseDetailPage({ params }) {
     presidentProfileHref,
     presidentPoliciesHref,
   });
+  const linkedAgendaItems = getLinkedAgendaItemsForEntity("promise", promise.slug);
   const localNavigationItems = [
     ...(showBlackImpactSection
       ? [
@@ -1264,6 +1267,7 @@ export default async function PromiseDetailPage({ params }) {
           description="Use this short path when you want the clearest next click first. The wider policy, presidency, and context links remain visible below."
           items={promiseContextItems}
         />
+        <LinkedAgendaItemsPanel items={linkedAgendaItems} />
         {(promise.related_policies || []).length ? (
           <PolicyCardList
             items={promise.related_policies || []}

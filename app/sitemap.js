@@ -56,6 +56,7 @@ export default async function sitemap() {
     "/analysis/presidential-records-on-black-opportunity",
     "/analysis/presidents-and-black-americans",
     "/activity",
+    "/agendas/project-2025",
     "/bills",
     "/current-administration",
     "/dashboard",

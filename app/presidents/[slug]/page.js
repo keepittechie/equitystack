@@ -17,6 +17,7 @@ import {
 import { getFlagshipPresidentEditorial } from "@/lib/flagship-editorial";
 import { resolvePresidentImageSrc } from "@/lib/president-image-paths";
 import { buildPolicySlug, fetchPresidentProfileData } from "@/lib/public-site-data";
+import { getAgendaOverlapForPromiseRecords } from "@/lib/agendas";
 import StructuredData from "@/app/components/public/StructuredData";
 import { Breadcrumbs } from "@/app/components/public/chrome";
 import { CategoryImpactChart, ImpactTrendChart } from "@/app/components/public/charts";
@@ -432,6 +433,101 @@ function buildPresidentGuideCards(profile, editorial = null) {
   ];
 }
 
+function AgendaOverlapPanel({ overlap = null }) {
+  if (!overlap) {
+    return null;
+  }
+
+  const topLinkedRecords = overlap.linked_records.slice(0, 3);
+
+  return (
+    <Panel className="overflow-hidden">
+      <SectionHeader
+        eyebrow="Tracked agenda"
+        title="Project 2025 overlap"
+        description="This is a grounded overlap summary based on already linked public records. It is not a score, and it does not imply that every similar action originated with the agenda."
+        action={
+          <Link
+            href={`/${["agendas", overlap.agenda_slug].join("/")}`}
+            className="inline-flex min-h-9 items-center justify-center rounded-md border border-[var(--line-strong)] bg-[rgba(18,31,49,0.58)] px-3 text-[12px] font-semibold text-white transition-[background-color,border-color,box-shadow] hover:border-[var(--line-strong)] hover:bg-[rgba(18,31,49,0.86)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(132,247,198,0.28)]"
+          >
+            Open the agenda tracker
+          </Link>
+        }
+      />
+      <div className="space-y-4 p-4">
+        <div className="grid gap-4 md:grid-cols-3">
+          <MetricCard
+            label="Linked agenda items"
+            value={overlap.linked_agenda_item_count}
+            description="Tracked agenda items touched by this president’s visible linked records."
+            tone="verified"
+            density="compact"
+            showDot
+          />
+          <MetricCard
+            label="Linked records"
+            value={overlap.linked_record_count}
+            description="Currently grounded promise-tracker records connected to those agenda items."
+            tone="info"
+            density="compact"
+            showDot
+          />
+          <MetricCard
+            label="Top overlap domain"
+            value={overlap.top_domain?.domain || "No dominant area"}
+            description={
+              overlap.top_domain
+                ? `${overlap.top_domain.count} linked agenda item${overlap.top_domain.count === 1 ? "" : "s"} in the strongest visible overlap area.`
+                : "Domain concentration is not visible yet."
+            }
+            tone="default"
+            density="compact"
+          />
+        </div>
+        <Panel padding="md" className="space-y-3">
+          <p className="text-sm leading-7 text-[var(--ink-soft)]">
+            This president currently has {overlap.linked_record_count} linked record{overlap.linked_record_count === 1 ? "" : "s"} touching{" "}
+            {overlap.linked_agenda_item_count} tracked Project 2025 agenda item{overlap.linked_agenda_item_count === 1 ? "" : "s"}. The overlap reflects existing record links only.
+          </p>
+          {overlap.top_domains.length ? (
+            <div className="flex flex-wrap gap-2">
+              {overlap.top_domains.map((item) => (
+                <StatusPill key={item.domain} tone="default">
+                  {item.domain} {item.count}
+                </StatusPill>
+              ))}
+              {overlap.implemented_agenda_item_count > 0 ? (
+                <StatusPill tone="verified">
+                  Implemented linked items {overlap.implemented_agenda_item_count}
+                </StatusPill>
+              ) : null}
+            </div>
+          ) : null}
+          {topLinkedRecords.length ? (
+            <div className="grid gap-2 text-sm leading-6 text-[var(--ink-soft)]">
+              {topLinkedRecords.map((item) => (
+                <p key={item.slug}>
+                  <Link href={item.href} className="font-medium text-white hover:text-white">
+                    {item.title}
+                  </Link>
+                  <span className="text-[var(--ink-muted)]">
+                    {" "}
+                    • {item.linked_agenda_item_count} linked agenda item{item.linked_agenda_item_count === 1 ? "" : "s"}
+                  </span>
+                  {item.status ? (
+                    <span className="text-[var(--ink-muted)]"> • {item.status}</span>
+                  ) : null}
+                </p>
+              ))}
+            </div>
+          ) : null}
+        </Panel>
+      </div>
+    </Panel>
+  );
+}
+
 function buildPresidentContextParagraphs(profile, editorial = null) {
   const { president, promiseTracker, scoreDrivers } = profile;
   const presidentName = president.president || president.president_name || "this presidency";
@@ -585,6 +681,7 @@ export default async function PresidentProfilePage({ params }) {
     topPolicies,
     flagshipEditorial,
   });
+  const agendaOverlap = getAgendaOverlapForPromiseRecords(promises, "project-2025");
   const localNavigationItems = [
     { href: "#overview", label: "Overview" },
     ...(timelineItems.length
@@ -1223,6 +1320,8 @@ export default async function PresidentProfilePage({ params }) {
           </Panel>
         </div>
       </Panel>
+
+      {agendaOverlap ? <AgendaOverlapPanel overlap={agendaOverlap} /> : null}
 
       <Panel className="overflow-hidden">
         <SectionHeader

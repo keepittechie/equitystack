@@ -12,6 +12,7 @@ import {
   EvidenceSourceList,
   PolicyTimeline,
 } from "@/app/components/public/entities";
+import LinkedAgendaItemsPanel from "@/app/components/public/LinkedAgendaItemsPanel";
 import EquityStackTabbar from "@/app/components/dashboard/EquityStackTabbar";
 import {
   MetricCard,
@@ -36,6 +37,7 @@ import {
   buildBreadcrumbJsonLd,
   buildLegislationJsonLd,
 } from "@/lib/structured-data";
+import { getLinkedAgendaItemsForEntity } from "@/lib/agendas";
 
 async function getBillPageData(slug) {
   const futureBills = await getFutureBills();
@@ -227,6 +229,7 @@ export default async function BillDetailPage({ params }) {
       : []),
   ];
   const showLocalNavigation = localNavigationItems.length >= 3;
+  const linkedAgendaItems = getLinkedAgendaItemsForEntity("bill", bill.id);
 
   return (
     <main className="space-y-4">
@@ -436,6 +439,7 @@ export default async function BillDetailPage({ params }) {
           title="What this bill connects to today"
           description="This section only surfaces joins supported by existing explainer, policy, promise, and president lineage already modeled in EquityStack."
         />
+        <LinkedAgendaItemsPanel items={linkedAgendaItems} />
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           <div className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4">
             <h3 className="text-lg font-semibold text-white">Related promises</h3>
