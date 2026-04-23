@@ -2,17 +2,25 @@ import Link from "next/link";
 import { buildPageMetadata } from "@/lib/metadata";
 import { resolvePresidentImageSrc } from "@/lib/president-image-paths";
 import { fetchComparePresidentsData } from "@/lib/public-site-data";
+import { buildEvidenceSignal, buildResearchCoverage } from "@/lib/evidenceCoverage";
 import { Breadcrumbs } from "@/app/components/public/chrome";
+import EvidenceBadge from "@/app/components/public/EvidenceBadge";
 import {
   KpiCard,
   ScoreBadge,
   SectionIntro,
 } from "@/app/components/public/core";
+import WhyThisScorePanel from "@/app/components/public/WhyThisScorePanel";
 import {
   CompareSelector,
   ComparisonMetricsTable,
   PresidentPortrait,
 } from "@/app/components/public/entities";
+import {
+  Panel,
+  StatusPill,
+  getImpactDirectionTone,
+} from "@/app/components/dashboard/primitives";
 import TrustBar from "@/app/components/public/TrustBar";
 
 export const dynamic = "force-dynamic";
@@ -36,6 +44,132 @@ function normalizeSelected(value) {
 function formatScore(value) {
   const numeric = Number(value);
   return Number.isFinite(numeric) ? numeric.toFixed(2) : "—";
+}
+
+function rankConfidence(value) {
+  const normalized = String(value || "").toLowerCase();
+  if (normalized.includes("high") || normalized.includes("strong")) {
+    return 3;
+  }
+  if (normalized.includes("medium") || normalized.includes("moderate")) {
+    return 2;
+  }
+  if (normalized.includes("low") || normalized.includes("weak")) {
+    return 1;
+  }
+  return 0;
+}
+
+function findDominantDirection(breakdown = {}) {
+  return Object.entries({
+    Positive: Number(breakdown.Positive || 0),
+    Negative: Number(breakdown.Negative || 0),
+    Mixed: Number(breakdown.Mixed || 0),
+    Blocked: Number(breakdown.Blocked || 0),
+  }).sort((left, right) => right[1] - left[1])[0]?.[0] || null;
+}
+
+function humanizeDirection(label) {
+  return String(label || "")
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function buildCompareWhyThisScore({
+  comparedPresidents = [],
+  directLeader = null,
+  directRunnerUp = null,
+  directGap = null,
+  strongestTopicDifference = null,
+}) {
+  if (!comparedPresidents.length) {
+    return null;
+  }
+
+  const leaderName = directLeader?.president_name || "The current leader";
+  const runnerUpName = directRunnerUp?.president_name || null;
+  const leaderDirection = findDominantDirection(directLeader?.direct_direction_counts);
+  const runnerUpDirection = findDominantDirection(directRunnerUp?.direct_direction_counts);
+  const coverageByStrength = comparedPresidents
+    .map((item) => {
+      const coverage = buildResearchCoverage({
+        sourceCount: item.visible_source_count ?? 0,
+        outcomeCount: item.direct_outcome_count ?? item.outcome_count ?? 0,
+        relatedRecordCount: item.visible_promise_count ?? item.promise_count ?? 0,
+        hasScore: Number.isFinite(Number(item.direct_normalized_score)),
+        confidenceLabel: item.direct_score_confidence || null,
+      });
+
+      return {
+        president: item,
+        coverage,
+        confidenceRank: rankConfidence(item.direct_score_confidence),
+      };
+    })
+    .sort((left, right) => {
+      const toneRank = (tone) =>
+        tone === "verified" ? 3 : tone === "info" ? 2 : tone === "warning" ? 1 : 0;
+      return (
+        toneRank(right.coverage?.tone) - toneRank(left.coverage?.tone) ||
+        right.confidenceRank - left.confidenceRank ||
+        Number(right.president.direct_outcome_count || 0) -
+          Number(left.president.direct_outcome_count || 0)
+      );
+    });
+  const evidenceLeader = coverageByStrength[0]?.president || null;
+  const evidenceRunnerUp = coverageByStrength[1]?.president || null;
+
+  return {
+    summary:
+      directLeader && runnerUpName
+        ? `${leaderName} currently leads on direct Black Impact Score. Read the gap through direct score first, then use confidence, visible outcomes, and the strongest topic split to see whether the lead is broad or relatively narrow.`
+        : `${leaderName} is the only fully comparable president in the current selection.`,
+    items: [
+      directLeader && runnerUpName
+        ? {
+            label: "Current lead",
+            value: `${leaderName} by ${formatScore(directGap)}`,
+            detail: `This is the direct-score gap between ${leaderName} and ${runnerUpName}.`,
+          }
+        : null,
+      leaderDirection || runnerUpDirection
+        ? {
+            label: "Direction read",
+            value: `${leaderName}: ${humanizeDirection(leaderDirection || "Unknown")} • ${
+              runnerUpName || "Comparison"
+            }: ${humanizeDirection(runnerUpDirection || "Unknown")}`,
+            detail:
+              "Dominant direction helps explain whether a president's visible record leans more positive, negative, mixed, or blocked.",
+          }
+        : null,
+      evidenceLeader
+        ? {
+            label: "Evidence edge",
+            value: `${evidenceLeader.president_name}${
+              evidenceRunnerUp ? ` over ${evidenceRunnerUp.president_name}` : ""
+            }`,
+            detail: `${
+              evidenceLeader.direct_score_confidence || "Unknown"
+            } confidence • ${evidenceLeader.direct_outcome_count ?? 0} direct outcomes • ${
+              evidenceLeader.visible_source_count ?? 0
+            } visible sources.`,
+          }
+        : null,
+      strongestTopicDifference?.topic
+        ? {
+            label: "Strongest topic split",
+            value: strongestTopicDifference.topic,
+            detail: `${
+              strongestTopicDifference.stronger_president || "Neither president"
+            } has the stronger raw contribution in this topic across the first two selected records.`,
+          }
+        : null,
+    ].filter(Boolean),
+    note:
+      directLeader?.score_scope_note ||
+      directLeader?.score_interpretation ||
+      "When the score gap is close, lean harder on confidence, source density, and outcome counts before treating the separation as decisive.",
+  };
 }
 
 export default async function ComparePresidentsPage({ searchParams }) {
@@ -84,6 +218,13 @@ export default async function ComparePresidentsPage({ searchParams }) {
             Number(directRunnerUp.direct_normalized_score || 0)
         )
       : null;
+  const whyThisComparison = buildCompareWhyThisScore({
+    comparedPresidents,
+    directLeader,
+    directRunnerUp,
+    directGap,
+    strongestTopicDifference: data.strongest_topic_difference,
+  });
 
   return (
     <main className="space-y-4">
@@ -212,6 +353,15 @@ export default async function ComparePresidentsPage({ searchParams }) {
                 title="What to look at first"
                 description="If one president has the higher direct score and similar or stronger confidence and outcomes, that is the clearest lead in this comparison."
               />
+              <WhyThisScorePanel
+                eyebrow="Why these scores differ"
+                title="What is separating this comparison"
+                summary={whyThisComparison?.summary}
+                items={whyThisComparison?.items}
+                note={whyThisComparison?.note}
+                actionHref="/research/how-black-impact-score-works"
+                actionLabel="Read the scoring method"
+              />
               <div className="rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] p-4 text-sm leading-7 text-[var(--ink-soft)]">
                 {data.directional_contrast_summary ||
                   "Directional contrast summary is not available for the current selection."}
@@ -243,6 +393,14 @@ export default async function ComparePresidentsPage({ searchParams }) {
                   presidentSlug: item.president_slug,
                   presidentName: item.president_name,
                 });
+                const evidenceSignal = buildEvidenceSignal({
+                  confidenceLabel: item.direct_score_confidence || null,
+                  sourceCount: item.visible_source_count ?? 0,
+                  hasScore: Number.isFinite(Number(item.direct_normalized_score)),
+                });
+                const dominantDirection = findDominantDirection(
+                  item.direct_direction_counts || item.directional_breakdown
+                );
 
                 return (
                   <article
@@ -272,6 +430,7 @@ export default async function ComparePresidentsPage({ searchParams }) {
                     </div>
                     <ScoreBadge value={formatScore(item.direct_normalized_score)} label="Direct" />
                   </div>
+                  <EvidenceBadge signal={evidenceSignal} className="mt-4" />
                   <div className="mt-4 flex flex-wrap gap-2 text-xs text-[var(--ink-muted)]">
                     <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5">
                       {item.direct_score_confidence || "Unknown"} confidence
@@ -289,6 +448,25 @@ export default async function ComparePresidentsPage({ searchParams }) {
                   <div className="mt-4 rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4 text-sm leading-7 text-[var(--ink-soft)]">
                     Documented direction mix: Positive {item.directional_breakdown?.Positive || 0} • Negative {item.directional_breakdown?.Negative || 0} • Mixed {item.directional_breakdown?.Mixed || 0} • Blocked {item.directional_breakdown?.Blocked || 0}
                   </div>
+                  <Panel padding="md" className="mt-4 space-y-2">
+                    <div className="flex flex-wrap items-center gap-2">
+                      {dominantDirection ? (
+                        <StatusPill tone={getImpactDirectionTone(dominantDirection)}>
+                          {humanizeDirection(dominantDirection)} leaning
+                        </StatusPill>
+                      ) : null}
+                      {item.top_driver_topics?.[0] ? (
+                        <StatusPill tone="info">
+                          Top driver: {item.top_driver_topics[0]}
+                        </StatusPill>
+                      ) : null}
+                    </div>
+                    <p className="text-sm leading-7 text-[var(--ink-soft)]">
+                      {item.score_summary_line ||
+                        item.score_interpretation ||
+                        "Open the president profile for fuller score-driver context."}
+                    </p>
+                  </Panel>
                   {item.top_contributing_topics?.length ? (
                     <div className="mt-4 flex flex-wrap gap-2 text-xs text-[var(--ink-muted)]">
                       {item.top_contributing_topics.slice(0, 3).map((topic) => (

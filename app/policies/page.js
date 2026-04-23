@@ -19,6 +19,8 @@ import {
   PolicySearchBar,
 } from "@/app/components/public/entities";
 import TrustBar from "@/app/components/public/TrustBar";
+import ResearchCoveragePanel from "@/app/components/public/ResearchCoveragePanel";
+import DiscoveryGuidancePanel from "@/app/components/public/DiscoveryGuidancePanel";
 import {
   buildBreadcrumbJsonLd,
   buildCollectionPageJsonLd,
@@ -186,6 +188,34 @@ export default async function PoliciesPage({ searchParams }) {
               </Link>
             </div>
           </Panel>
+
+          <ResearchCoveragePanel
+            coverage={data.researchSummary?.coverage || null}
+            strengtheningNote={data.researchSummary?.strengtheningNote || null}
+            eyebrow="Coverage in this view"
+          />
+
+          <div className="grid gap-4 xl:grid-cols-2">
+            <DiscoveryGuidancePanel
+              eyebrow="Best-covered paths"
+              title="Start with the strongest-supported records in this slice"
+              description="These records currently have the clearest visible mix of sourcing, score context, and linked explanatory context in the active result set."
+              items={data.bestCoveredPaths || []}
+            />
+            <DiscoveryGuidancePanel
+              eyebrow="Consequence signals"
+              title="Where the current result set looks most consequential"
+              description="These are scoped to the visible result set, using current impact score, source presence, and linked-context depth as consequence proxies rather than a platform-wide ranking."
+              items={data.consequenceHighlights || []}
+            />
+          </div>
+
+          <DiscoveryGuidancePanel
+            eyebrow="Category synthesis"
+            title="Where the current category picture is strongest"
+            description="This summary is limited to the visible result set. It helps show which categories in the current slice have the deepest coverage, strongest visible impact signals, or the largest active footprint."
+            items={data.categorySynthesis || []}
+          />
 
           {view === "cards" ? (
             <PolicyCardList items={data.items || []} buildHref={(item) => `/policies/${item.slug || buildPolicySlug(item)}`} />

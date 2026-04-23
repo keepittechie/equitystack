@@ -3,6 +3,7 @@ import Link from "next/link";
 import StructuredData from "@/app/components/public/StructuredData";
 import { Breadcrumbs } from "@/app/components/public/chrome";
 import { CitationNote, KpiCard, SectionIntro } from "@/app/components/public/core";
+import PageRoleCallout from "@/app/components/public/PageRoleCallout";
 import {
   buildBreadcrumbJsonLd,
   buildWebPageJsonLd,
@@ -315,6 +316,16 @@ export default function MethodologyPage() {
           }
         />
       </section>
+
+      <PageRoleCallout
+        title="Use methodology for site-wide evaluation rules"
+        description="This page explains how EquityStack organizes page types, handles evidence and limits, and distinguishes records from reports, explainers, and guided entry pages. If you only need the Black Impact Score formula and scoring logic, the score-specific methodology page is the tighter route."
+        links={[
+          { href: "/research/how-black-impact-score-works", label: "Score method" },
+          { href: "/research", label: "Research hub" },
+          { href: "/sources", label: "Source library" },
+        ]}
+      />
 
       <section className="grid gap-6 border-t border-[var(--line)] pt-6 md:grid-cols-2">
         <div>

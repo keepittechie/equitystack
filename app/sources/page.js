@@ -33,7 +33,7 @@ export default async function SourcesPage({ searchParams }) {
   const query = String(resolvedSearchParams.q || "");
   const sources = await fetchSourcesLibraryData(query);
   const linkedTotal = sources.reduce(
-    (total, item) => total + Number(item.linked_record_count || 0),
+    (total, item) => total + Number(item.support_link_count || item.linked_record_count || 0),
     0
   );
   const highAuthorityCount = sources.filter(
@@ -95,7 +95,7 @@ export default async function SourcesPage({ searchParams }) {
           as="h1"
           eyebrow="Source library"
           title="Browse the evidence behind EquityStack’s public record."
-          description="The source library gives users a direct view into the public evidence base behind policies, promises, and outcomes. Use it to inspect source types, publishers, linked-record counts, and coverage depth."
+          description="The source library gives users a direct view into the public evidence base behind policies, promises, outcomes, and Black-impact rows. Use it to inspect source types, publishers, linked-record counts, and the strongest visible records each source is helping support."
           actions={
             <>
               <Link href="/methodology" className="dashboard-button-primary">
@@ -181,7 +181,7 @@ export default async function SourcesPage({ searchParams }) {
           {
             label: "Linked records",
             value: linkedTotal,
-            description: "Total visible policy, promise, action, and outcome links across the current result set.",
+            description: "Total visible policy, promise, action, outcome, and Black-impact support links across the current result set.",
           },
           {
             label: "High authority",
@@ -201,7 +201,7 @@ export default async function SourcesPage({ searchParams }) {
           <SectionIntro
             eyebrow="Source records"
             title="Public source index"
-            description="Use the table to scan authority level, type, publisher, and linked-record counts before opening the original source."
+            description="Use the table to scan authority level, type, publisher, linked-record counts, and the strongest visible records each source is helping support before opening the original source."
           />
           <SourceLibraryTable items={sources} />
         </div>

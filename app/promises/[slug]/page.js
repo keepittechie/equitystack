@@ -29,6 +29,7 @@ import {
 } from "@/app/components/public/core";
 import PromiseStatusLegend from "@/app/components/public/PromiseStatusLegend";
 import PromiseSystemExplanation from "@/app/components/public/PromiseSystemExplanation";
+import PromiseProvenanceChain from "@/app/components/public/PromiseProvenanceChain";
 import {
   EvidenceSourceList,
   PolicyCardList,
@@ -49,6 +50,8 @@ import {
   buildBreadcrumbJsonLd,
   buildPromiseJsonLd,
 } from "@/lib/structured-data";
+import ShareCardPanel from "@/app/components/share/ShareCardPanel";
+import { buildPromiseCardHref } from "@/lib/shareable-card-links";
 
 export const dynamic = "force-dynamic";
 
@@ -496,6 +499,14 @@ export default async function PromiseDetailPage({ params }) {
           },
         ]
       : []),
+    ...(actionCount || policyOutcomeCount || linkedPolicyCount || showBlackImpactSection
+      ? [
+          {
+            href: "#provenance",
+            label: "What happened",
+          },
+        ]
+      : []),
     { href: "#status", label: "Status" },
     ...(evidence.length
       ? [{ href: "#evidence", label: "Evidence", count: evidence.length }]
@@ -572,6 +583,13 @@ export default async function PromiseDetailPage({ params }) {
           tone="verified"
         />
       </section>
+
+      <ShareCardPanel
+        pagePath={`/promises/${slug}`}
+        cardPath={buildPromiseCardHref(promise)}
+        title="Share this promise record or its card"
+        description="Use the page link for the full accountability record, or open the share card for a cleaner stand-alone summary."
+      />
 
       <Panel prominence="primary" className="overflow-hidden">
         <SectionHeader
@@ -778,6 +796,19 @@ export default async function PromiseDetailPage({ params }) {
           </p>
         </Panel>
       )}
+
+      <PromisePanel id="provenance" className={`${localSectionOffsetClass} space-y-5`}>
+        <SectionIntro
+          eyebrow="What happened after this promise?"
+          title="From promise language to visible consequences"
+          description="This chain keeps the promise text, implementation record, related policies, and current Black-impact layer in one compact view."
+        />
+        <PromiseProvenanceChain
+          promise={promise}
+          blackImpactSummary={blackImpactSummary}
+          demographicImpacts={demographicImpacts}
+        />
+      </PromisePanel>
 
       <PromisePanel id="status" className={`${localSectionOffsetClass} space-y-5`}>
         <SectionIntro

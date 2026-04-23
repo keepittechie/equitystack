@@ -13,6 +13,8 @@ import {
   getPromiseStatusTone,
 } from "@/app/components/dashboard/primitives";
 import { ScoreBadge } from "./core";
+import EvidenceBadge from "./EvidenceBadge";
+import { buildEvidenceSignal } from "@/lib/evidenceCoverage";
 
 const FILTER_FIELD_CLASS =
   "w-full rounded-md border border-[var(--line)] bg-[rgba(18,31,49,0.5)] px-3 py-2 text-sm text-white outline-none transition-[background-color,border-color,box-shadow] placeholder:text-[var(--ink-muted)] hover:border-[var(--line-strong)] focus:border-[rgba(132,247,198,0.38)] focus:bg-[rgba(18,31,49,0.76)] focus-visible:ring-2 focus-visible:ring-[rgba(132,247,198,0.28)]";
@@ -84,6 +86,32 @@ function RecordTypeBadge({ label }) {
   }
 
   return <StatusPill tone="default">{label}</StatusPill>;
+}
+
+function buildPolicyEvidenceSignal(item = {}) {
+  return buildEvidenceSignal({
+    sourceCount: item.total_sources ?? item.source_count ?? 0,
+    hasPolicyScore:
+      item.impact_score != null ||
+      item.directness_score != null ||
+      item.material_impact_score != null ||
+      item.evidence_score != null,
+    evidenceStrength: item.evidence_summary?.evidence_strength || null,
+  });
+}
+
+function buildPromiseEvidenceSignal(item = {}) {
+  return buildEvidenceSignal({
+    confidenceLabel: item.confidence_label || null,
+    sourceCount: item.source_count ?? 0,
+  });
+}
+
+function buildPresidentEvidenceSignal(item = {}) {
+  return buildEvidenceSignal({
+    confidenceLabel: item.score_confidence || item.direct_score_confidence || null,
+    sourceCount: item.visible_source_count ?? item.source_count ?? 0,
+  });
 }
 
 export function PresidentPortrait({
@@ -260,6 +288,10 @@ export function PolicyResultsTable({ items = [], buildHref }) {
                   {item.summary ? (
                     <p className="mt-1 line-clamp-2 max-w-xl text-xs leading-6 text-[var(--ink-soft)]">{item.summary}</p>
                   ) : null}
+                  <EvidenceBadge
+                    signal={buildPolicyEvidenceSignal(item)}
+                    className="mt-2"
+                  />
                 </td>
                 <td className="px-5 py-4 text-[var(--ink-soft)]">{item.year_enacted || "—"}</td>
                 <td className="px-5 py-4 text-[var(--ink-soft)]">{item.president || item.primary_party || "—"}</td>
@@ -286,7 +318,10 @@ export function PolicyCardList({ items = [], buildHref }) {
 
   return (
     <div className="grid gap-4 md:grid-cols-2">
-      {items.map((item) => (
+      {items.map((item) => {
+        const evidenceSignal = buildPolicyEvidenceSignal(item);
+
+        return (
         <Panel
           key={item.id}
           as={Link}
@@ -310,13 +345,15 @@ export function PolicyCardList({ items = [], buildHref }) {
           {item.summary ? (
             <p className="mt-3 text-sm leading-6 text-[var(--ink-soft)]">{item.summary}</p>
           ) : null}
+          <EvidenceBadge signal={evidenceSignal} className="mt-4" />
           <div className="mt-auto flex flex-wrap gap-2 pt-4">
             <StatusPill tone="default">{item.impact_direction || "Unknown direction"}</StatusPill>
             <StatusPill tone="default">{item.president || item.primary_party || "Historical record"}</StatusPill>
             <StatusPill tone="info">{item.total_sources ?? item.source_count ?? 0} sources</StatusPill>
           </div>
         </Panel>
-      ))}
+        );
+      })}
     </div>
   );
 }
@@ -413,6 +450,7 @@ export function PresidentCardGrid({ items = [], buildHref, compareHref = null })
           presidentSlug: item.slug || item.president_slug,
           presidentName: item.name || item.president_name || item.president,
         });
+        const evidenceSignal = buildPresidentEvidenceSignal(item);
 
         return (
           <Panel
@@ -449,9 +487,7 @@ export function PresidentCardGrid({ items = [], buildHref, compareHref = null })
             </div>
             <p className="mt-3 line-clamp-4 text-sm leading-6 text-[var(--ink-soft)]">{item.summary || item.narrative_summary || "View metrics, timelines, and policy drivers for this presidential record."}</p>
             <div className="mt-4 flex flex-wrap gap-2">
-              {item.score_confidence ? (
-                <StatusPill tone="default">Confidence: {item.score_confidence}</StatusPill>
-              ) : null}
+              <EvidenceBadge signal={evidenceSignal} />
               {item.outcome_count != null ? (
                 <StatusPill tone="info">{item.outcome_count} outcomes</StatusPill>
               ) : null}
@@ -713,7 +749,10 @@ export function PromiseResultsTable({ items = [], buildHref }) {
             </tr>
           </thead>
           <tbody>
-            {items.map((item) => (
+            {items.map((item) => {
+              const evidenceSignal = buildPromiseEvidenceSignal(item);
+
+              return (
               <tr key={item.slug} className="border-b border-white/6 last:border-b-0">
                 <td className="px-5 py-4">
                   <Link href={buildHref(item)} className="font-medium text-white hover:text-white">
@@ -731,7 +770,9 @@ export function PromiseResultsTable({ items = [], buildHref }) {
                     {item.status || "Unknown"}
                   </StatusPill>
                 </td>
-                <td className="px-5 py-4 text-[var(--ink-soft)]">{item.confidence_label || "—"}</td>
+                <td className="px-5 py-4 text-[var(--ink-soft)]">
+                  <EvidenceBadge signal={evidenceSignal} />
+                </td>
                 <td className="px-5 py-4 text-[var(--ink-soft)]">{item.outcome_count ?? item.action_count ?? 0}</td>
                 <td className="px-5 py-4 text-[var(--ink-soft)]">{item.source_count ?? 0}</td>
                 <td className="px-5 py-4">
@@ -740,7 +781,8 @@ export function PromiseResultsTable({ items = [], buildHref }) {
                   </Link>
                 </td>
               </tr>
-            ))}
+              );
+            })}
           </tbody>
         </table>
       </div>
@@ -889,12 +931,29 @@ export function ExplainerIndexGrid({ items = [] }) {
   );
 }
 
-export function TimelineEventCard({ title, summary, year, href = null, badges = [] }) {
+export function TimelineEventCard({
+  title,
+  summary,
+  year,
+  href = null,
+  badges = [],
+  highlight = null,
+}) {
   const content = (
     <Panel padding="md">
-      <StatusPill tone="info">{year || "Timeline"}</StatusPill>
+      <div className="flex flex-wrap gap-2">
+        <StatusPill tone="info">{year || "Timeline"}</StatusPill>
+        {highlight?.label ? (
+          <StatusPill tone={highlight.tone || "default"}>{highlight.label}</StatusPill>
+        ) : null}
+      </div>
       <h3 className="mt-3 text-lg font-semibold text-white">{title}</h3>
       {summary ? <p className="mt-3 text-sm leading-6 text-[var(--ink-soft)]">{summary}</p> : null}
+      {highlight?.detail ? (
+        <p className="mt-3 text-xs leading-6 text-[var(--ink-muted)]">
+          {highlight.detail}
+        </p>
+      ) : null}
       {badges.length ? (
         <div className="mt-4 flex flex-wrap gap-2">
           {badges.map((badge) => (
@@ -906,6 +965,113 @@ export function TimelineEventCard({ title, summary, year, href = null, badges = 
   );
 
   return href ? <Link href={href} className="block">{content}</Link> : content;
+}
+
+function SourceSupportPreview({ items = [], breakdown = null, supportCount = null }) {
+  if (!items.length && !breakdown) {
+    return null;
+  }
+  const summaryItems = breakdown
+    ? [
+        breakdown.policies ? `${breakdown.policies} policy record${breakdown.policies === 1 ? "" : "s"}` : null,
+        breakdown.promises ? `${breakdown.promises} promise record${breakdown.promises === 1 ? "" : "s"}` : null,
+        breakdown.actions ? `${breakdown.actions} promise action${breakdown.actions === 1 ? "" : "s"}` : null,
+        breakdown.outcomes ? `${breakdown.outcomes} policy outcome${breakdown.outcomes === 1 ? "" : "s"}` : null,
+        breakdown.impacts ? `${breakdown.impacts} Black-impact row${breakdown.impacts === 1 ? "" : "s"}` : null,
+      ].filter(Boolean)
+    : [];
+  const summary = summaryItems.slice(0, 5).join(" • ");
+  const resolvedSupportCount =
+    supportCount != null
+      ? supportCount
+      : items.length;
+  const groupedItems = items.reduce((accumulator, item) => {
+    const key = String(item.kind || "").trim() || "Linked support";
+    accumulator[key] = accumulator[key] || [];
+    accumulator[key].push(item);
+    return accumulator;
+  }, {});
+  const contributionDescription = breakdown
+    ? [
+        breakdown.outcomes || breakdown.impacts
+          ? "This source contributes directly to outcome or Black-impact interpretation in the current public record."
+          : null,
+        !breakdown.outcomes && !breakdown.impacts && (breakdown.policies || breakdown.promises)
+          ? "This source currently anchors record-level context more than row-level analysis."
+          : null,
+        breakdown.actions
+          ? "It also helps verify implementation steps or downstream action history."
+          : null,
+      ]
+        .filter(Boolean)
+        .join(" ")
+    : null;
+
+  return (
+    <details className="mt-3 rounded-lg border border-white/8 bg-white/5 p-3">
+      <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.16em] text-[var(--ink-muted)] marker:hidden">
+        Supports {resolvedSupportCount} linked item{Number(resolvedSupportCount) === 1 ? "" : "s"}
+      </summary>
+      {summary ? (
+        <p className="mt-2 text-xs leading-6 text-[var(--ink-soft)]">{summary}</p>
+      ) : null}
+      {contributionDescription ? (
+        <p className="mt-2 text-xs leading-6 text-[var(--ink-muted)]">
+          {contributionDescription}
+        </p>
+      ) : null}
+      <div className="mt-3 grid gap-3">
+        {Object.entries(groupedItems).map(([groupLabel, groupItems]) => (
+          <div key={groupLabel} className="space-y-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <StatusPill tone="default">{groupLabel}</StatusPill>
+              <span className="text-[11px] uppercase tracking-[0.14em] text-[var(--ink-muted)]">
+                {groupItems.length} shown
+              </span>
+            </div>
+            <div className="grid gap-2">
+              {groupItems.map((item, index) => {
+                const content = (
+                  <>
+                    <div className="flex flex-wrap items-center gap-2">
+                      {item.detail ? (
+                        <span className="text-[11px] uppercase tracking-[0.14em] text-[var(--ink-muted)]">
+                          {item.detail}
+                        </span>
+                      ) : null}
+                    </div>
+                    <p className="mt-1 text-sm leading-6 text-white">{item.label}</p>
+                    {item.context ? (
+                      <p className="mt-1 text-xs leading-6 text-[var(--ink-soft)]">
+                        {item.context}
+                      </p>
+                    ) : null}
+                  </>
+                );
+
+                return item.href ? (
+                  <Link
+                    key={`${item.kind}-${item.href}-${index}`}
+                    href={item.href}
+                    className="rounded-lg border border-white/8 bg-[rgba(18,31,49,0.52)] px-3 py-2.5 transition-[border-color,background-color] hover:border-[rgba(132,247,198,0.24)] hover:bg-[rgba(18,31,49,0.8)]"
+                  >
+                    {content}
+                  </Link>
+                ) : (
+                  <div
+                    key={`${item.kind}-${item.label}-${index}`}
+                    className="rounded-lg border border-white/8 bg-[rgba(18,31,49,0.52)] px-3 py-2.5"
+                  >
+                    {content}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+      </div>
+    </details>
+  );
 }
 
 export function SourceLibraryTable({ items = [] }) {
@@ -954,6 +1120,11 @@ export function SourceLibraryTable({ items = [] }) {
                       {item.notes}
                     </p>
                   ) : null}
+                  <SourceSupportPreview
+                    items={item.support_preview || []}
+                    breakdown={item.support_breakdown || null}
+                    supportCount={item.support_link_count ?? item.linked_record_count ?? null}
+                  />
                 </td>
                 <td className="px-5 py-4 text-[var(--ink-soft)]">
                   {item.publisher || "—"}
@@ -962,7 +1133,19 @@ export function SourceLibraryTable({ items = [] }) {
                   {item.source_type || "—"}
                 </td>
                 <td className="px-5 py-4 text-[var(--ink-soft)]">
-                  {item.linked_record_count ?? 0}
+                  <div>
+                    <span>{item.support_link_count ?? item.linked_record_count ?? 0}</span>
+                    {item.support_link_count != null &&
+                    item.linked_record_count != null &&
+                    item.support_link_count !== item.linked_record_count ? (
+                      <p className="mt-1 text-xs leading-6 text-[var(--ink-muted)]">
+                        {item.linked_record_count} direct record link
+                        {Number(item.linked_record_count) === 1 ? "" : "s"} •{" "}
+                        {item.support_breakdown?.impacts ?? 0} Black-impact row
+                        {(item.support_breakdown?.impacts ?? 0) === 1 ? "" : "s"}
+                      </p>
+                    ) : null}
+                  </div>
                 </td>
                 <td className="px-5 py-4 text-[var(--ink-soft)]">
                   {item.trust_label || item.confidence_label || "—"}
@@ -994,10 +1177,15 @@ export function SearchResultGroup({ title, items = [] }) {
             href={item.href}
             className="rounded-[1.2rem] border border-white/8 bg-white/5 p-4 hover:border-[rgba(132,247,198,0.24)]"
           >
-            {item.meta ? (
-              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
-                {item.meta}
-              </p>
+            {(item.meta || item.trustSignal) ? (
+              <div className="flex flex-wrap items-center gap-2">
+                {item.meta ? (
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+                    {item.meta}
+                  </p>
+                ) : null}
+                <EvidenceBadge signal={item.trustSignal} />
+              </div>
             ) : null}
             <h3 className="mt-2 text-base font-medium text-white">{item.title}</h3>
             {item.summary ? (

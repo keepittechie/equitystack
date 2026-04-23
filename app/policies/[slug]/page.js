@@ -2,11 +2,14 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { fetchInternalJson } from "@/lib/api";
 import { buildPageMetadata } from "@/lib/metadata";
-import { buildPolicySlug, fetchPolicyDetailBySlug } from "@/lib/public-site-data";
+import { fetchPolicyDetailBySlug } from "@/lib/public-site-data";
 import { computePolicyImpactScore } from "@/lib/analytics/impactAggregator";
 import {
   buildEvidenceCoverage,
+  buildEvidenceSignal,
   buildEvidenceStrengtheningNote,
+  buildResearchCoverage,
+  buildResearchStrengtheningNote,
 } from "@/lib/evidenceCoverage";
 import {
   countLabel,
@@ -32,7 +35,10 @@ import {
   CitationNote,
 } from "@/app/components/public/core";
 import TrustBar from "@/app/components/public/TrustBar";
+import ResearchCoveragePanel from "@/app/components/public/ResearchCoveragePanel";
+import PolicyLineagePanel from "@/app/components/public/PolicyLineagePanel";
 import ScoreExplanation from "@/app/components/public/ScoreExplanation";
+import WhyThisScorePanel from "@/app/components/public/WhyThisScorePanel";
 import {
   EvidenceSourceList,
   PolicyTimeline,
@@ -51,6 +57,14 @@ import {
   buildBreadcrumbJsonLd,
   buildPolicyJsonLd,
 } from "@/lib/structured-data";
+import { explainPolicyScore } from "@/lib/black-impact-score/scoreExplanations";
+import ShareCardPanel from "@/app/components/share/ShareCardPanel";
+import { buildPolicyCardHref } from "@/lib/shareable-card-links";
+import {
+  buildPolicyRelationshipClusterSummary,
+  formatPolicyRelationshipTypeLabel,
+  summarizePolicyRelationshipContinuity,
+} from "@/lib/policyRelationships";
 
 export const dynamic = "force-dynamic";
 const POLICY_IMPACT_SCORE_MAX = 35;
@@ -65,6 +79,15 @@ function formatScore(value) {
 
 function formatSystemicMultiplier(value) {
   return `${Number(value || 1).toFixed(2)}x`;
+}
+
+function formatCompactScoreValue(value) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) {
+    return null;
+  }
+
+  return Number.isInteger(numeric) ? String(numeric) : numeric.toFixed(1);
 }
 
 function formatCurrencyValue(value, unit = null) {
@@ -448,16 +471,77 @@ function buildDemographicContextBridge(policy) {
   };
 }
 
-function formatRelationshipTypeLabel(value) {
-  const normalized = String(value || "").trim();
-  if (!normalized) {
-    return "Related policy";
-  }
-
-  return normalized
+function humanizePolicyFactorLabel(value) {
+  return String(value || "")
     .split("_")
+    .filter(Boolean)
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(" ");
+}
+
+function buildWhyThisPolicyScore(policy, rawScore, evidenceCoverage, evidenceStrengtheningNote) {
+  if (!Number.isFinite(Number(rawScore))) {
+    return null;
+  }
+
+  const explanation = explainPolicyScore({
+    ...policy,
+    ...(policy.scores || {}),
+    policy_impact_score: rawScore,
+    impact_score: rawScore,
+  });
+  const topContributors = Object.entries(explanation.modifiers || {})
+    .filter(([, value]) => Number.isFinite(Number(value?.contribution)))
+    .sort(
+      (left, right) =>
+        Math.abs(Number(right[1].contribution)) - Math.abs(Number(left[1].contribution))
+    )
+    .slice(0, 3)
+    .map(([label, value]) => {
+      const contribution = formatCompactScoreValue(value.contribution);
+      return `${humanizePolicyFactorLabel(label)} ${contribution}`;
+    });
+  const evidenceSignal = buildEvidenceSignal({
+    sourceCount: Number(policy.sources?.length || policy.evidence_summary?.total_sources || 0),
+    evidenceStrength: policy.evidence_summary?.evidence_strength || null,
+    hasPolicyScore: true,
+  });
+
+  return {
+    summary:
+      explanation.notes?.[0] ||
+      "This is a bounded record-level score built from the structured policy fields already attached to the page.",
+    items: [
+      topContributors.length
+        ? {
+            label: "Strongest contributors",
+            value: topContributors.join(" • "),
+            detail:
+              "Directness, material impact, evidence, durability, equity relevance, and harm offset do the main weighting work.",
+          }
+        : null,
+      {
+        label: "Effect trend",
+        value: policy.impact_direction ? `${policy.impact_direction} effect` : "Direction still limited",
+        detail:
+          "The score should be read as the documented direction and weight of this record's effect on Black Americans, not as a generic grade.",
+      },
+      evidenceSignal
+        ? {
+            label: "Evidence read",
+            value: evidenceSignal.label,
+            detail: evidenceCoverage?.description || null,
+          }
+        : null,
+      evidenceStrengtheningNote
+        ? {
+            label: "What is still thin",
+            value: "Some analysis remains provisional",
+            detail: evidenceStrengtheningNote.description,
+          }
+        : null,
+    ].filter(Boolean),
+  };
 }
 
 function buildComparisonLinkDescription(baseLabel, item = {}) {
@@ -520,11 +604,11 @@ async function buildPolicyComparisonEntries(policy) {
       id: item.related_policy_id,
       title: item.related_policy_title,
       eyebrow: "Explicit relationship",
-      description: buildComparisonLinkDescription(
-        formatRelationshipTypeLabel(item.relationship_type),
-        item
-      ),
-    });
+        description: buildComparisonLinkDescription(
+          formatPolicyRelationshipTypeLabel(item.relationship_type),
+          item
+        ),
+      });
   }
 
   if (entries.length < limit && policy.categories?.[0]?.name) {
@@ -657,6 +741,66 @@ function buildPolicyCoverageNote(policy) {
       evidenceStrength
     ).toLowerCase()} evidence strength in the public view.`,
   ]);
+}
+
+function buildPolicyReferenceSynthesis({
+  policy,
+  score,
+  blackImpactScoreSummary,
+  coverage,
+  strengtheningNote,
+  relationships = [],
+  editorial = null,
+}) {
+  const continuity = relationships.length
+    ? sentenceJoin([
+        summarizePolicyRelationshipContinuity(relationships),
+        buildPolicyRelationshipClusterSummary(relationships),
+      ])
+    : null;
+
+  return {
+    summary: sentenceJoin([
+      policy.summary || buildPolicyRecordOverview(policy, editorial),
+      buildWhyItMatters(policy),
+    ]),
+    items: [
+      {
+        label: "What happened",
+        value: policy.summary ? "Published summary available" : "Summary still relatively thin",
+        detail: policy.summary || buildPolicyRecordOverview(policy, editorial),
+      },
+      {
+        label: "Why it matters",
+        value: policy.impact_direction
+          ? `${policy.impact_direction} impact`
+          : "Impact direction still limited",
+        detail: buildWhyItMatters(policy),
+      },
+      {
+        label: "Impact signal",
+        value: `Score ${formatScore(score)}`,
+        detail:
+          blackImpactScoreSummary?.explanation ||
+          buildWhatItMeans(policy),
+      },
+      coverage
+        ? {
+            label: "Evidence read",
+            value: coverage.label,
+            detail: coverage.description,
+          }
+        : null,
+      continuity
+        ? {
+            label: "Historical thread",
+            value: "Part of a larger chain",
+            detail: continuity,
+          }
+        : null,
+    ].filter(Boolean),
+    note: strengtheningNote?.description || null,
+  };
 }
 
 function buildPolicyGuideCards(policy, editorial = null) {
@@ -870,6 +1014,40 @@ export default async function PolicyDetailPage({ params }) {
     supportingImpactCount,
     hasPolicyScore: Number.isFinite(Number(score)),
   });
+  const researchCoverage = buildResearchCoverage({
+    sourceCount: Number(policy.sources?.length || policy.evidence_summary?.total_sources || 0),
+    outcomeCount: Number((policy.scored_outcomes || []).length || policy.outcome_count || 0),
+    relatedRecordCount:
+      Number(policy.related_promises?.length || 0) +
+      Number(policy.related_explainers?.length || 0) +
+      Number(policy.related_policies?.length || 0),
+    hasScore: Number.isFinite(Number(score)),
+    confidenceLabel: policy.evidence_summary?.evidence_strength || null,
+  });
+  const researchStrengtheningNote = buildResearchStrengtheningNote({
+    sourceCount: Number(policy.sources?.length || policy.evidence_summary?.total_sources || 0),
+    outcomeCount: Number((policy.scored_outcomes || []).length || policy.outcome_count || 0),
+    relatedRecordCount:
+      Number(policy.related_promises?.length || 0) +
+      Number(policy.related_explainers?.length || 0) +
+      Number(policy.related_policies?.length || 0),
+    hasScore: Number.isFinite(Number(score)),
+  });
+  const whyThisScore = buildWhyThisPolicyScore(
+    policy,
+    score,
+    researchCoverage || evidenceCoverage,
+    researchStrengtheningNote || evidenceStrengtheningNote
+  );
+  const policyReferenceSynthesis = buildPolicyReferenceSynthesis({
+    policy,
+    score,
+    blackImpactScoreSummary,
+    coverage: researchCoverage || evidenceCoverage,
+    strengtheningNote: researchStrengtheningNote || evidenceStrengtheningNote,
+    relationships: policy.relationships || [],
+    editorial: flagshipEditorial,
+  });
   const demographicContextBridge = buildDemographicContextBridge(policy);
   const demographicImpactSections = buildDemographicImpactSections(demographicImpacts);
   const policyComparisonEntries = await buildPolicyComparisonEntries(policy);
@@ -1032,6 +1210,15 @@ export default async function PolicyDetailPage({ params }) {
               tone={getCompletenessTone(policy.completeness_summary?.status)}
             />
           </div>
+          <WhyThisScorePanel
+            eyebrow="Reference summary"
+            title="Read this record in one pass"
+            summary={policyReferenceSynthesis?.summary}
+            items={policyReferenceSynthesis?.items}
+            note={policyReferenceSynthesis?.note}
+            actionHref="#evidence"
+            actionLabel="Jump to evidence"
+          />
           {blackImpactScoreSummary ? (
             <Panel padding="md" prominence="primary" className="space-y-4">
               <StatusPill tone={getImpactDirectionTone(blackImpactScoreSummary.direction)}>
@@ -1065,29 +1252,18 @@ export default async function PolicyDetailPage({ params }) {
               </div>
             </Panel>
           ) : null}
-          {evidenceCoverage ? (
-            <Panel padding="md" className="space-y-3">
-              <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
-                Analysis coverage
-              </p>
-              <div className="flex flex-wrap items-center gap-2">
-                <StatusPill tone={evidenceCoverage.tone}>{evidenceCoverage.label}</StatusPill>
-              </div>
-              <p className="text-sm leading-7 text-[var(--ink-soft)]">
-                {evidenceCoverage.description}
-              </p>
-              {evidenceStrengtheningNote ? (
-                <div className="space-y-2 border-t border-[var(--line)] pt-3">
-                  <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
-                    {evidenceStrengtheningNote.title}
-                  </p>
-                  <p className="text-sm leading-7 text-[var(--ink-soft)]">
-                    {evidenceStrengtheningNote.description}
-                  </p>
-                </div>
-              ) : null}
-            </Panel>
-          ) : null}
+          <WhyThisScorePanel
+            eyebrow="Why this score?"
+            title="What is doing the most work in this score"
+            summary={whyThisScore?.summary}
+            items={whyThisScore?.items}
+            actionHref="/research/how-black-impact-score-works"
+            actionLabel="Read the scoring method"
+          />
+          <ResearchCoveragePanel
+            coverage={researchCoverage || evidenceCoverage}
+            strengtheningNote={researchStrengtheningNote || evidenceStrengtheningNote}
+          />
           <div className="grid gap-4 md:grid-cols-2">
             <Panel padding="md">
               <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
@@ -1114,6 +1290,11 @@ export default async function PolicyDetailPage({ params }) {
                 Search visitors often arrive with a broad question about civil-rights law, presidential impact, or historical harm. This page is where that question should become concrete through summary, score, sources, and related records.
               </p>
             </Panel>
+            <ShareCardPanel
+              pagePath={policyPath}
+              cardPath={buildPolicyCardHref(policy)}
+              title="Share this policy record or its card"
+            />
           </div>
         </div>
       </Panel>
@@ -1446,35 +1627,10 @@ export default async function PolicyDetailPage({ params }) {
         </div>
       </Panel>
 
-      {(policy.relationships || []).length ? (
-        <Panel className="overflow-hidden">
-          <SectionHeader
-            eyebrow="Policy lineage"
-            title="Related policies in the same historical thread"
-            description="Use related records to move across expansions, restrictions, responses, and later reversals instead of reading this policy in isolation."
-          />
-          <div className="grid gap-4 p-4 md:grid-cols-2">
-            {policy.relationships.map((item) => (
-              <Panel
-                as={Link}
-                key={`${item.related_policy_id}-${item.relationship_type}`}
-                href={`/policies/${buildPolicySlug({ id: item.related_policy_id, title: item.related_policy_title })}`}
-                padding="md"
-                interactive
-              >
-                <div className="flex flex-wrap gap-2">
-                  <StatusPill tone="info">{item.relationship_type || "Related"}</StatusPill>
-                  <StatusPill tone="default">{item.related_policy_year || "Undated"}</StatusPill>
-                </div>
-                <h3 className="mt-3 text-lg font-semibold text-white">{item.related_policy_title}</h3>
-                <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-                  {item.notes || "Open the related record for the full relationship context and source trail."}
-                </p>
-              </Panel>
-            ))}
-          </div>
-        </Panel>
-      ) : null}
+      <PolicyLineagePanel
+        relationships={policy.relationships || []}
+        currentYear={policy.year_enacted}
+      />
     </main>
   );
 }

@@ -159,6 +159,21 @@ export default async function HomePage() {
                 Track campaign promises
               </Link>
             </div>
+            <p className="mt-4 max-w-3xl text-sm leading-7 text-[#d8e2ee]">
+              Use the homepage for the broad public entry. If you want a guided orientation path, open{" "}
+              <Link href="/start" className="font-semibold text-white underline decoration-white/20 underline-offset-4 hover:text-[var(--accent)] hover:decoration-[var(--accent)]">
+                Start Here
+              </Link>
+              . If you want the evidence-first navigation layer, open{" "}
+              <Link href="/research" className="font-semibold text-white underline decoration-white/20 underline-offset-4 hover:text-[var(--accent)] hover:decoration-[var(--accent)]">
+                Research Hub
+              </Link>
+              . If you want evaluation rules, open{" "}
+              <Link href="/methodology" className="font-semibold text-white underline decoration-white/20 underline-offset-4 hover:text-[var(--accent)] hover:decoration-[var(--accent)]">
+                Methodology
+              </Link>
+              .
+            </p>
           </div>
         </div>
 

@@ -3,6 +3,7 @@ import { buildPageMetadata } from "@/lib/metadata";
 import StructuredData from "@/app/components/public/StructuredData";
 import { Breadcrumbs } from "@/app/components/public/chrome";
 import { CitationNote, SectionIntro } from "@/app/components/public/core";
+import PageRoleCallout from "@/app/components/public/PageRoleCallout";
 import {
   buildBreadcrumbJsonLd,
   buildCollectionPageJsonLd,
@@ -157,6 +158,16 @@ export default function StartPage() {
           page to explain how the site should be approached.
         </p>
       </section>
+
+      <PageRoleCallout
+        title="Use Start Here for the fastest guided onboarding path"
+        description="This page is the explainers-first route for first-time visitors, classrooms, and shared introductions. Open the Research Hub when you want broader navigation across reports and records, or Methodology when the question is how EquityStack organizes and evaluates the dataset."
+        links={[
+          { href: "/research", label: "Research hub" },
+          { href: "/methodology", label: "Site methodology" },
+          { href: "/sources", label: "Source library" },
+        ]}
+      />
 
       <section className="grid gap-6 border-t border-[var(--line)] pt-6 md:grid-cols-2">
         <div>

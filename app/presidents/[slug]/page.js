@@ -3,6 +3,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buildPageMetadata } from "@/lib/metadata";
 import {
+  buildResearchCoverage,
+  buildResearchStrengtheningNote,
+} from "@/lib/evidenceCoverage";
+import {
   countLabel,
   filterParagraphs,
   isThinText,
@@ -22,9 +26,11 @@ import {
   PresidentScoreMethodologyNote,
   SourceTrustPanel,
 } from "@/app/components/public/core";
+import ResearchCoveragePanel from "@/app/components/public/ResearchCoveragePanel";
 import TrustBar from "@/app/components/public/TrustBar";
 import PromiseSystemExplanation from "@/app/components/public/PromiseSystemExplanation";
 import ScoreExplanation from "@/app/components/public/ScoreExplanation";
+import WhyThisScorePanel from "@/app/components/public/WhyThisScorePanel";
 import InsightCard from "@/app/components/public/InsightCard";
 import {
   PresidentPolicyTable,
@@ -45,6 +51,8 @@ import {
   buildBreadcrumbJsonLd,
   buildProfilePageJsonLd,
 } from "@/lib/structured-data";
+import ShareCardPanel from "@/app/components/share/ShareCardPanel";
+import { buildPresidentCardHref } from "@/lib/shareable-card-links";
 
 export const dynamic = "force-dynamic";
 
@@ -106,6 +114,55 @@ function humanizeToken(value) {
     .filter(Boolean)
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(" ");
+}
+
+function buildWhyThisPresidentScore(profile) {
+  const { president, scoreComposition, scoreDrivers } = profile;
+  const topicLabels = takeLabels(scoreDrivers?.topic_drivers, (item) => item.topic, 3);
+  const directOutcomeCount = Number(scoreComposition?.direct?.outcome_count || 0);
+  const confidenceLabel =
+    president.direct_score_confidence || president.score_confidence || "Unknown";
+  const directionCounts = scoreComposition?.direct?.direction_counts || {};
+  const dominantDirection = Object.entries(directionCounts)
+    .sort((left, right) => Number(right[1] || 0) - Number(left[1] || 0))[0]?.[0];
+
+  return {
+    summary:
+      scoreComposition?.summary_line ||
+      "The presidential score starts from scored outcomes, then adds bounded intent, systemic, and bill-linked context.",
+    items: [
+      {
+        label: "Main anchor",
+        value: `${directOutcomeCount} scored outcomes`,
+        detail:
+          "The final presidential score starts with documented outcomes before broader interpretation layers are added.",
+      },
+      dominantDirection
+        ? {
+            label: "Dominant direction",
+            value: `${humanizeToken(dominantDirection)}-leaning record`,
+            detail:
+              "Direction counts show whether the visible scored record leans more positive, negative, mixed, or blocked.",
+          }
+        : null,
+      topicLabels.length
+        ? {
+            label: "Strongest topics",
+            value: oxfordJoin(topicLabels),
+            detail:
+              "These issue areas currently do the most visible work in the presidential score narrative.",
+          }
+        : null,
+      {
+        label: "Evidence read",
+        value: `${confidenceLabel} confidence`,
+        detail:
+          scoreDrivers?.score_scope_note ||
+          "Confidence reflects how much outcome-backed record is currently visible for this profile.",
+      },
+    ].filter(Boolean),
+    note: scoreComposition?.interpretation || null,
+  };
 }
 
 function buildPresidentOverview(profile, editorial = null) {
@@ -292,10 +349,28 @@ export default async function PresidentProfilePage({ params }) {
       title: item.title,
       description: item.summary || `${item.status} promise in ${item.topic || "uncategorized"} policy.`,
     }));
+  const whyThisScore = buildWhyThisPresidentScore(profile);
   const localSectionOffsetClass = "scroll-mt-28 md:scroll-mt-32";
   const visiblePromiseCount =
     promiseTracker.visible_promise_count ?? promiseTracker.total_tracked_promises ?? 0;
   const linkedBillCount = Number(billInputs.linked_bill_count || 0);
+  const researchCoverage = buildResearchCoverage({
+    sourceCount: promiseTracker.visible_source_count ?? 0,
+    outcomeCount: president.direct_outcome_count ?? president.outcome_count ?? 0,
+    relatedRecordCount: visiblePromiseCount + linkedBillCount,
+    hasScore: Number.isFinite(
+      Number(president.normalized_score_total ?? president.score ?? president.direct_normalized_score)
+    ),
+    confidenceLabel: president.direct_score_confidence || president.score_confidence || null,
+  });
+  const researchStrengtheningNote = buildResearchStrengtheningNote({
+    sourceCount: promiseTracker.visible_source_count ?? 0,
+    outcomeCount: president.direct_outcome_count ?? president.outcome_count ?? 0,
+    relatedRecordCount: visiblePromiseCount + linkedBillCount,
+    hasScore: Number.isFinite(
+      Number(president.normalized_score_total ?? president.score ?? president.direct_normalized_score)
+    ),
+  });
   const localNavigationItems = [
     { href: "#overview", label: "Overview" },
     ...(timelineItems.length
@@ -442,6 +517,13 @@ export default async function PresidentProfilePage({ params }) {
         />
       </section>
 
+      <ShareCardPanel
+        pagePath={`/presidents/${slug}`}
+        cardPath={buildPresidentCardHref({ slug })}
+        title="Share this presidential profile or its card"
+        description="Use the page link when you want the full profile, or open the share card for a cleaner summary view."
+      />
+
       {showLocalNavigation ? (
         <div className="space-y-1.5">
           <p className="px-1 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
@@ -470,6 +552,17 @@ export default async function PresidentProfilePage({ params }) {
           }
         />
         <div className="space-y-4 p-4">
+          <WhyThisScorePanel
+            summary={whyThisScore.summary}
+            items={whyThisScore.items}
+            note={whyThisScore.note}
+            actionHref="/research/how-black-impact-score-works"
+            actionLabel="Read the scoring method"
+          />
+          <ResearchCoveragePanel
+            coverage={researchCoverage}
+            strengtheningNote={researchStrengtheningNote}
+          />
           <div className="grid gap-4 xl:grid-cols-3">
             <MetricCard
               label="Direct impact"

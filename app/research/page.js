@@ -3,6 +3,7 @@ import { buildPageMetadata } from "@/lib/metadata";
 import StructuredData from "@/app/components/public/StructuredData";
 import { Breadcrumbs } from "@/app/components/public/chrome";
 import { CitationNote, SectionIntro } from "@/app/components/public/core";
+import PageRoleCallout from "@/app/components/public/PageRoleCallout";
 import {
   buildBreadcrumbJsonLd,
   buildCollectionPageJsonLd,
@@ -342,6 +343,16 @@ export default function ResearchHubPage() {
           }
         />
       </section>
+
+      <PageRoleCallout
+        title="Use the research hub as the site’s curated research index"
+        description="This page is for choosing the strongest evidence-oriented path into EquityStack once you know the question you are asking. Use Start Here for a guided explainer sequence, Methodology for site-wide evaluation rules, and the score page when the question is specifically how the Black Impact Score works."
+        links={[
+          { href: "/start", label: "Guided start" },
+          { href: "/methodology", label: "Site methodology" },
+          { href: "/research/how-black-impact-score-works", label: "Score method" },
+        ]}
+      />
 
       <section className="public-two-col-rail grid items-start gap-6 md:grid-cols-2 xl:grid-cols-[1.05fr_0.95fr]">
         <CitationNote

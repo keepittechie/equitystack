@@ -16,6 +16,8 @@ import {
 } from "@/app/components/public/entities";
 import PromiseStatusLegend from "@/app/components/public/PromiseStatusLegend";
 import PromiseSystemExplanation from "@/app/components/public/PromiseSystemExplanation";
+import ResearchCoveragePanel from "@/app/components/public/ResearchCoveragePanel";
+import DiscoveryGuidancePanel from "@/app/components/public/DiscoveryGuidancePanel";
 import {
   buildBreadcrumbJsonLd,
   buildCollectionPageJsonLd,
@@ -205,6 +207,31 @@ export default async function PromisesPage({ searchParams }) {
             <PromiseSystemExplanation />
             <PromiseStatusLegend />
           </div>
+          <ResearchCoveragePanel
+            coverage={data.researchSummary?.coverage || null}
+            strengtheningNote={data.researchSummary?.strengtheningNote || null}
+            eyebrow="Coverage in this view"
+          />
+          <div className="grid gap-4 xl:grid-cols-2">
+            <DiscoveryGuidancePanel
+              eyebrow="Best-covered paths"
+              title="Start with the best-documented promise records in this slice"
+              description="These promise records have the clearest visible mix of sources, actions, and downstream outcomes in the current filtered view."
+              items={data.bestCoveredPaths || []}
+            />
+            <DiscoveryGuidancePanel
+              eyebrow="Downstream trails"
+              title="Promises with the strongest visible follow-through trail"
+              description="This is not a moral ranking. It highlights where the current result set shows the deepest visible action-to-outcome chain for further review."
+              items={data.consequenceHighlights || []}
+            />
+          </div>
+          <DiscoveryGuidancePanel
+            eyebrow="Topic synthesis"
+            title="Where the current topic picture is strongest"
+            description="This summary is limited to the visible promise result set. It highlights which topics in the current slice are best-covered, show the deepest downstream trail, or have the largest active footprint."
+            items={data.topicSynthesis || []}
+          />
           <PromiseResultsTable items={data.items || []} buildHref={(item) => `/promises/${item.slug}`} />
           <MethodologyCallout description="Promise Status tells users what happened to the commitment. It does not automatically imply a positive or negative real-world outcome without linked Policy Outcomes and evidence." />
           <SectionIntro

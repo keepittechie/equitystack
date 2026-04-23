@@ -8,6 +8,7 @@ import {
   PageContextBlock,
   SectionIntro,
 } from "@/app/components/public/core";
+import PageRoleCallout from "@/app/components/public/PageRoleCallout";
 import { buildBreadcrumbJsonLd, buildWebPageJsonLd } from "@/lib/structured-data";
 
 export const metadata = buildPageMetadata({
@@ -362,6 +363,16 @@ export default function HowBlackImpactScoreWorksPage() {
           }
         />
       </section>
+
+      <PageRoleCallout
+        title="Use this page for score-specific transparency"
+        description="This page is narrower than the full methodology. It explains the Black Impact Score itself: what is included, how direction and confidence are handled, and where score coverage is still incomplete. Use the broader Methodology page when the question is about page types, promises, reports, or site-wide evidence rules."
+        links={[
+          { href: "/methodology", label: "Site methodology" },
+          { href: "/research", label: "Research hub" },
+          { href: "/reports/black-impact-score", label: "Live score report" },
+        ]}
+      />
 
       <section className="public-two-col-rail grid items-start gap-6 md:grid-cols-2 xl:grid-cols-[1.05fr_0.95fr]">
         <PageContextBlock
