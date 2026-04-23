@@ -369,6 +369,29 @@ export default async function AdminProject2025AgendaPage({ searchParams }) {
                 /admin/source-curation
               </Link>
             </div>
+            <div>
+              Exports:{" "}
+              <Link
+                href="/api/admin/agendas/project-2025?scope=full&download=1"
+                className="text-[var(--admin-link)] underline"
+              >
+                full JSON
+              </Link>
+              {" • "}
+              <Link
+                href="/api/admin/agendas/project-2025?scope=summary&download=1"
+                className="text-[var(--admin-link)] underline"
+              >
+                summary JSON
+              </Link>
+              {" • "}
+              <Link
+                href="/api/admin/agendas/project-2025?scope=gaps&download=1"
+                className="text-[var(--admin-link)] underline"
+              >
+                gaps JSON
+              </Link>
+            </div>
           </div>
         </div>
         <div className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface-muted)] p-3 text-[12px] text-[var(--admin-text-soft)] shadow-sm">
