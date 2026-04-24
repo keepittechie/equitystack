@@ -55,13 +55,13 @@ function MetaPill({ children }) {
 function SummaryStat({ label, value, tone = "default" }) {
   const toneClasses =
     tone === "accent"
-      ? "border-[rgba(37,99,235,0.16)] bg-[rgba(37,99,235,0.08)]"
-      : "border-[var(--line)] bg-white";
+      ? "metric-card border-[rgba(96,165,250,0.26)] bg-[linear-gradient(180deg,rgba(11,20,33,0.96),rgba(15,41,78,0.92))]"
+      : "metric-card";
 
   return (
-    <div className={`rounded-[1.2rem] border px-4 py-4 ${toneClasses}`}>
+    <div className={`rounded-[1.2rem] px-4 py-4 ${toneClasses}`}>
       <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">{label}</p>
-      <p className="mt-2 text-2xl font-semibold">{value}</p>
+      <p className="mt-2 text-2xl font-semibold text-white">{value}</p>
     </div>
   );
 }
@@ -363,7 +363,7 @@ export default async function CurrentAdministrationPage() {
             ) : overview.top_topics.map((topic) => (
               <article
                 key={topic.topic}
-                className="rounded-[1.25rem] border border-[var(--line)] bg-white px-5 py-4"
+                className="card-muted rounded-[1.25rem] px-5 py-4"
               >
                 <div className="flex items-start justify-between gap-4 flex-wrap">
                   <div>
