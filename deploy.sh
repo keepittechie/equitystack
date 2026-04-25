@@ -35,7 +35,7 @@ rsync -avzh --delete \
   --exclude=.next \
   --exclude=.git \
   --exclude=.env \
-  --exclude=research \
+  --exclude=/research/ \
   --exclude=python/reports \
   --exclude=python/venv \
   ./ "$REMOTE_HOST:$REMOTE_APP_DIR/"
