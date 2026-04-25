@@ -129,6 +129,22 @@ function truncateText(value, maxLength = 180) {
   return `${text.slice(0, maxLength).trim().replace(/[.,;:\s]+$/, "")}...`;
 }
 
+function softenBecauseClause(value) {
+  const text = String(value || "").trim();
+
+  if (!text) {
+    return "";
+  }
+
+  return text
+    .replace(/^This\b/, "this")
+    .replace(/^These\b/, "these")
+    .replace(/^The\b/, "the")
+    .replace(/^Federal\b/, "federal")
+    .replace(/^More\b/, "more")
+    .replace(/^Expanded\b/, "expanded");
+}
+
 function buildWhyThisPresidentScore(profile) {
   const { president, scoreComposition, scoreDrivers } = profile;
   const topicLabels = takeLabels(scoreDrivers?.topic_drivers, (item) => item.topic, 3);
@@ -410,13 +426,6 @@ function buildPresidentOverview(profile, editorial = null) {
   ]);
 }
 
-function formatQuickReadCountList(items = []) {
-  return items
-    .filter((item) => Number(item.value || 0) > 0)
-    .map((item) => `${Number(item.value)} ${item.label}`)
-    .join(", ");
-}
-
 function buildPresidentQuickRead({
   profile,
   legalContext = null,
@@ -428,116 +437,170 @@ function buildPresidentQuickRead({
     topPolicies = [],
     promises = [],
     scoreComposition,
-    scoreDrivers,
   } = profile;
-  const promiseCount =
-    promiseTracker.visible_promise_count ??
-    promiseTracker.total_tracked_promises ??
-    0;
+  const namedRecords = [...(topPolicies || []), ...(promises || [])].filter(
+    (item) => item?.title
+  );
+  const uniqueRecords = new Map();
+
+  for (const record of namedRecords) {
+    const key = record.slug || record.id || record.title;
+
+    if (!uniqueRecords.has(key)) {
+      uniqueRecords.set(key, record);
+    }
+  }
+
+  const concreteRecords = [...uniqueRecords.values()].slice(0, 4);
+  const scoredRecords = concreteRecords.filter(
+    (record) => record.scored_outcomes?.length || record.outcome_count > 0
+  );
+  const primaryRecords = (scoredRecords.length ? scoredRecords : concreteRecords).slice(
+    0,
+    3
+  );
   const outcomeCount = president.direct_outcome_count ?? president.outcome_count ?? 0;
-  const topicLabels = takeLabels(scoreDrivers?.topic_drivers, (item) => item.topic, 3);
-  const promiseTitles = takeLabels(promises, (item) => item.title, 2);
-  const topPolicyTitles = takeLabels(topPolicies, (item) => item.title, 2);
-  const directionSummary = formatQuickReadCountList([
-    {
-      label: "positive",
-      value: scoreComposition?.direct?.direction_counts?.Positive,
-    },
-    {
-      label: "mixed",
-      value: scoreComposition?.direct?.direction_counts?.Mixed,
-    },
-    {
-      label: "negative",
-      value: scoreComposition?.direct?.direction_counts?.Negative,
-    },
-    {
-      label: "blocked",
-      value: scoreComposition?.direct?.direction_counts?.Blocked,
-    },
-  ]);
-  const promiseStatusSummary = formatQuickReadCountList([
-    {
-      label: "delivered",
-      value:
-        promiseTracker.visible_delivered_count ??
-        promiseTracker.delivered_count,
-    },
-    {
-      label: "partial",
-      value: promiseTracker.visible_partial_count ?? promiseTracker.partial_count,
-    },
-    {
-      label: "blocked",
-      value: promiseTracker.visible_blocked_count ?? promiseTracker.blocked_count,
-    },
-    {
-      label: "failed",
-      value: promiseTracker.visible_failed_count ?? promiseTracker.failed_count,
-    },
-  ]);
   const linkedBillCount = Number(president.bill_impact_inputs?.linked_bill_count || 0);
+  const linkedBills =
+    president.bill_impact_inputs?.top_linked_bills || president.top_linked_bills || [];
   const blockedOrPartialCount =
     Number(promiseTracker.visible_blocked_count ?? promiseTracker.blocked_count ?? 0) +
     Number(promiseTracker.visible_partial_count ?? promiseTracker.partial_count ?? 0);
+  const leadingImpactDirection = Object.entries(
+    scoreComposition?.direct?.direction_counts || {}
+  )
+    .filter(([, value]) => Number(value || 0) > 0)
+    .sort((left, right) => Number(right[1] || 0) - Number(left[1] || 0))[0]?.[0];
 
-  const triedItems = [
-    topicLabels.length
-      ? `The visible record centers on ${oxfordJoin(topicLabels)}.`
-      : null,
-    promiseCount > 0
-      ? `The promise tracker includes ${countLabel(promiseCount, "commitment")}${
-          promiseTitles.length ? `, including ${oxfordJoin(promiseTitles)}` : ""
-        }.`
-      : null,
-    topPolicyTitles.length
-      ? `The main policy record surfaces ${oxfordJoin(topPolicyTitles)}.`
-      : null,
-  ].filter(Boolean).slice(0, 3);
+  const getTopOutcome = (record = {}) => {
+    const outcomes = record.scored_outcomes || [];
 
-  const happenedItems = [
-    outcomeCount > 0
-      ? `Documented scoring is anchored in ${countLabel(
-          outcomeCount,
-          "outcome"
-        )}${directionSummary ? `: ${directionSummary}` : ""}.`
-      : null,
-    promiseStatusSummary
-      ? `Promise outcomes currently include ${promiseStatusSummary} records.`
-      : null,
-    topPolicyTitles.length
-      ? `Top visible records include ${oxfordJoin(topPolicyTitles)}.`
-      : null,
-  ].filter(Boolean).slice(0, 3);
+    return outcomes.find((item) => item?.outcome) || outcomes[0] || null;
+  };
 
+  const getOutcomeField = (record = {}, field) => {
+    const outcome = getTopOutcome(record);
+
+    return outcome?.outcome?.[field] || outcome?.[field] || null;
+  };
+
+  const getRecordDirection = (record = {}) => {
+    const directionFromBreakdown = Object.entries(record.breakdown_by_direction || {})
+      .filter(([, value]) => Number(value || 0) > 0)
+      .sort((left, right) => Number(right[1] || 0) - Number(left[1] || 0))[0]?.[0];
+
+    return (
+      getOutcomeField(record, "impact_direction") ||
+      record.impact_direction ||
+      record.impact_direction_for_curation ||
+      directionFromBreakdown ||
+      leadingImpactDirection ||
+      null
+    );
+  };
+
+  const describeRecordContext = (record = {}) =>
+    [humanizeToken(record.status), humanizeToken(getRecordDirection(record))]
+      .filter(Boolean)
+      .join(", ");
+
+  const buildTriedItem = (record = {}) => {
+    const summary = truncateText(
+      record.summary ||
+        getOutcomeField(record, "systemic_impact_summary") ||
+        getOutcomeField(record, "measurable_impact") ||
+        getOutcomeField(record, "outcome_summary") ||
+        "",
+      190
+    );
+    const context = describeRecordContext(record);
+
+    return sentenceJoin([
+      context ? `${record.title} (${context}).` : `${record.title}.`,
+      summary || null,
+    ]);
+  };
+
+  const buildHappenedItem = (record = {}) => {
+    const outcomeSummary = truncateText(
+      getOutcomeField(record, "outcome_summary") ||
+        record.summary ||
+        getOutcomeField(record, "measurable_impact") ||
+        "",
+      210
+    );
+    const actionLabel = humanizeToken(
+      record.status || getOutcomeField(record, "status_override")
+    );
+
+    return sentenceJoin([
+      actionLabel ? `${actionLabel}: ${record.title}.` : `${record.title}.`,
+      outcomeSummary || null,
+    ]);
+  };
+
+  const triedItems = primaryRecords.map(buildTriedItem).filter(Boolean).slice(0, 3);
+  const happenedItems = primaryRecords.map(buildHappenedItem).filter(Boolean).slice(0, 3);
+  const impactNotes = primaryRecords
+    .map((record) => {
+      const direction = getRecordDirection(record);
+      const note =
+        getOutcomeField(record, "black_community_impact_note") ||
+        getOutcomeField(record, "measurable_impact") ||
+        getOutcomeField(record, "systemic_impact_summary") ||
+        record.summary;
+
+      if (!direction || !note) {
+        return null;
+      }
+
+      return `In the current dataset, ${record.title} is treated as a ${String(
+        direction
+      ).toLowerCase()} outcome because ${softenBecauseClause(truncateText(note, 230))}`;
+    })
+    .filter(Boolean);
   const meaning = filterParagraphs([
-    scoreComposition?.interpretation || scoreComposition?.summary_line || null,
+    ...impactNotes.slice(0, 2),
+    !impactNotes.length
+      ? scoreComposition?.interpretation || scoreComposition?.summary_line || null
+      : null,
   ]).slice(0, 2);
 
   const shapedItems = [
+    outcomeCount > 0 && outcomeCount < 3
+      ? `This profile is based on ${countLabel(
+          outcomeCount,
+          "scored outcome"
+        )}, so the Quick Read should be read as a narrow record summary rather than a complete presidency-wide account.`
+      : null,
     blockedOrPartialCount > 0
-      ? `${countLabel(
-          blockedOrPartialCount,
-          "visible promise"
-        )} were blocked or only partly implemented.`
+      ? `${countLabel(blockedOrPartialCount, "tracked promise")} ${
+          blockedOrPartialCount === 1 ? "was" : "were"
+        } blocked or only partly implemented.`
       : null,
-    linkedBillCount > 0
-      ? `${countLabel(
-          linkedBillCount,
-          "linked bill"
-        )} shape the legislative context without replacing outcome evidence.`
-      : null,
+    linkedBills.length
+      ? `Linked bill context includes ${oxfordJoin(
+          [
+            ...new Set(
+              takeLabels(linkedBills, (item) => item.title || item.bill_title || item.name, 4)
+            ),
+          ].slice(0, 2)
+        )}.`
+      : linkedBillCount > 0
+        ? `${countLabel(
+            linkedBillCount,
+            "linked bill"
+          )} shape the legislative context without replacing outcome evidence.`
+        : null,
     legalContext?.linked_case_count
-      ? `${countLabel(
-          legalContext.linked_case_count,
-          "verified linked case"
-        )} add legal context through visible policy records.`
+      ? `Related legal context includes ${oxfordJoin(
+          takeLabels(legalContext.top_cases, (item) => item.title, 2)
+        )}.`
       : null,
     agendaOverlap?.linked_agenda_item_count
-      ? `${countLabel(
-          agendaOverlap.linked_agenda_item_count,
-          "tracked agenda item"
-        )} overlap with already linked public records.`
+      ? `Agenda overlap is limited to already linked records such as ${oxfordJoin(
+          takeLabels(agendaOverlap.linked_records, (item) => item.title, 2)
+        )}.`
       : null,
   ].filter(Boolean).slice(0, 3);
 
@@ -572,7 +635,7 @@ function PresidentQuickReadPanel({ quickRead = null }) {
       <SectionHeader
         eyebrow="Plain-language summary"
         title="Quick Read"
-        description="A short readout from the visible promise, policy, outcome, and context data on this page."
+        description="A short readout from named policy, promise, outcome, and context records on this page."
       />
       <div className="grid gap-4 p-4 lg:grid-cols-2">
         <QuickReadSection title="What they tried to do">
