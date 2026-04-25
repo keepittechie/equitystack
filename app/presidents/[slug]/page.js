@@ -682,6 +682,434 @@ function PresidentQuickReadPanel({ quickRead = null }) {
   );
 }
 
+function getRecordKey(record = {}) {
+  return record.slug || record.id || record.title;
+}
+
+function getTopRecordOutcome(record = {}) {
+  const outcomes = record.scored_outcomes || [];
+
+  return outcomes.find((item) => item?.outcome) || outcomes[0] || null;
+}
+
+function getRecordOutcomeField(record = {}, field) {
+  const outcome = getTopRecordOutcome(record);
+
+  return outcome?.outcome?.[field] || outcome?.[field] || null;
+}
+
+function getRecordImpactDirection(record = {}) {
+  const directionFromBreakdown = Object.entries(record.breakdown_by_direction || {})
+    .filter(([, value]) => Number(value || 0) > 0)
+    .sort((left, right) => Number(right[1] || 0) - Number(left[1] || 0))[0]?.[0];
+
+  return (
+    getRecordOutcomeField(record, "impact_direction") ||
+    record.impact_direction ||
+    record.impact_direction_for_curation ||
+    directionFromBreakdown ||
+    null
+  );
+}
+
+function firstSentenceFragment(value, maxLength = 180) {
+  const text = truncateText(value, maxLength)
+    .replace(/\s+/g, " ")
+    .trim();
+
+  if (!text) {
+    return "";
+  }
+
+  return text
+    .split(/(?<=[.!?])\s+/)[0]
+    .replace(/[.!?]+$/, "")
+    .trim();
+}
+
+function wordCount(value) {
+  return String(value || "")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean).length;
+}
+
+function capWords(value, maxWords = 26) {
+  const words = String(value || "")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+
+  if (words.length <= maxWords) {
+    return words.join(" ");
+  }
+
+  return `${words.slice(0, maxWords).join(" ").replace(/[.,;:\s]+$/, "")}.`;
+}
+
+function removeBannedHighlightLanguage(value) {
+  return String(value || "")
+    .replace(/\b(?:visible record|dataset shows|score context|documented scoring|promise tracker|record centers on|top visible records)\b/gi, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function normalizeEffectFragment(value) {
+  return removeBannedHighlightLanguage(value)
+    .replace(/^(?:the\s+)?(?:administration|president|federal law|federal policy)\s+/i, "")
+    .replace(/^was\s+changed\s+to\s+/i, "")
+    .replace(/^created\s+a\s+much\s+larger\s+.+?,\s+but\s+/i, "")
+    .replace(/^established\s+/i, "establishing ")
+    .replace(/^placed\s+/i, "placing ")
+    .replace(/^changed\s+to\s+allow\s+/i, "allowing ")
+    .replace(/^initiated\s+/i, "initiating ")
+    .replace(/^formally\s+created\s+/i, "creating ")
+    .replace(/^began\s+/i, "beginning ")
+    .replace(/^delivered\s+/i, "providing ")
+    .replace(/^preserved\s+/i, "preserving ")
+    .replace(/\s+by\s+(?:signing|implementing|enacting|passing|issuing|creating|launching)\b.+$/i, "")
+    .replace(/\s+before\s+later\b.+$/i, "")
+    .replace(/\s+subject\s+to\b.+$/i, "")
+    .replace(/[.;:\s]+$/, "")
+    .trim();
+}
+
+function buildConciseRecordEffect({ record = {}, detail = "", group = "" }) {
+  const title = String(record.title || "").toLowerCase();
+  const summary = normalizeEffectFragment(detail);
+  const limitedOutcome = group === "negativeContested" || group === "mixedLimited";
+
+  if (/voting rights act reauthorization/i.test(title)) {
+    return "extending federal voting-rights protections";
+  }
+
+  if (/pre-existing-condition/i.test(title)) {
+    return "establishing broad insurance protections";
+  }
+
+  if (/embryonic stem cell/i.test(title)) {
+    return "allowing broader federal research support";
+  }
+
+  if (/credit card bill of rights/i.test(title)) {
+    return "limiting retroactive rate hikes and abusive billing practices";
+  }
+
+  if (/homeowner stabilization|foreclosure-prevention/i.test(title)) {
+    return "with limited results";
+  }
+
+  if (/long-term federal funding for HBCUs/i.test(title)) {
+    return "under the FUTURE Act funding framework";
+  }
+
+  if (/federal criminal justice reform/i.test(title)) {
+    return "under the First Step Act";
+  }
+
+  if (/southern border wall/i.test(title)) {
+    return "with partial barrier construction and no Mexico-funded wall";
+  }
+
+  if (/paris climate agreement/i.test(title)) {
+    return "ending U.S. participation in the accord";
+  }
+
+  if (/travel ban/i.test(title)) {
+    return "after legal challenges narrowed the policy";
+  }
+
+  if (/critical medicines/i.test(title)) {
+    return "supporting pharmaceutical manufacturing";
+  }
+
+  if (/skilled trade jobs/i.test(title)) {
+    return "through apprenticeship and skilled-trade policy";
+  }
+
+  if (/excellence and innovation at HBCUs/i.test(title)) {
+    return "through a White House initiative";
+  }
+
+  if (/federal DEI|equity-based government programs/i.test(title)) {
+    return "removing agency equity structures";
+  }
+
+  if (/school discipline/i.test(title)) {
+    return "replacing prior discipline guidance";
+  }
+
+  if (!summary) {
+    return "";
+  }
+
+  if (limitedOutcome && /\bunderperformed|not met|failed|partial|partly|limited\b/i.test(summary)) {
+    return summary.replace(/^but\s+/i, "with ");
+  }
+
+  return summary;
+}
+
+function normalizeActionTitle(title = "", status = "") {
+  const text = String(title || "").trim();
+  const normalizedStatus = String(status || "").toLowerCase();
+
+  if (!text) {
+    return "";
+  }
+
+  const borderWallFundingMatch = text.match(/^build\s+a\s+(.+)\s+and\s+make\s+(.+)\s+pay$/i);
+  if (borderWallFundingMatch) {
+    return `Proposed building a ${borderWallFundingMatch[1]} with ${borderWallFundingMatch[2]} paying`;
+  }
+
+  const rewrites = [
+    [/^sign(?:ed)?\s+/i, "Signed "],
+    [/^support(?:ed)?\s+reauthorization\s+of\s+/i, "Supported reauthorization of "],
+    [/^reauthorize(?:d)?\s+/i, "Reauthorized "],
+    [/^pass(?:ed)?\s+/i, "Passed "],
+    [/^enact(?:ed)?\s+/i, "Enacted "],
+    [/^expand(?:ed)?\s+/i, "Expanded "],
+    [/^end(?:ed)?\s+/i, "Ended "],
+    [/^restrict(?:ed)?\s+/i, "Restricted "],
+    [/^block(?:ed)?\s+/i, "Blocked "],
+    [/^ban(?:ned)?\s+/i, "Banned "],
+    [/^ease(?:d)?\s+/i, "Eased "],
+    [/^launch(?:ed)?\s+/i, "Launched "],
+    [/^build\s+a\s+/i, "Proposed a "],
+    [/^build\s+/i, "Proposed building "],
+    [/^ensure\s+/i, "Expanded support for "],
+    [/^impose\s+/i, "Imposed "],
+    [/^exit\s+the\s+/i, "Withdrew from the "],
+    [/^prepare\s+Americans\s+for\s+/i, "Expanded preparation for "],
+    [/^prepare\s+/i, "Expanded workforce preparation for "],
+    [/^promote\s+excellence\s+and\s+innovation\s+at\s+HBCUs$/i, "Expanded HBCU excellence and innovation initiatives"],
+    [/^promote\s+/i, "Expanded support for "],
+    [/^reinstate\s+/i, "Proposed reinstating "],
+    [/^attempt\s+to\s+add\s+/i, "Proposed adding "],
+    [/^attempt\s+to\s+rescind\s+/i, "Proposed rescinding "],
+    [/^attempt\s+to\s+/i, "Proposed "],
+  ];
+
+  for (const [pattern, replacement] of rewrites) {
+    if (pattern.test(text)) {
+      return text.replace(pattern, replacement);
+    }
+  }
+
+  if (/voting rights act reauthorization/i.test(text)) {
+    return `Signed ${text}`;
+  }
+
+  if (/zero[-\s]tolerance|family separation/i.test(text)) {
+    return `Implemented ${text}`;
+  }
+
+  if (/daca|deferred action/i.test(text) && /rescind|rescission/i.test(text)) {
+    return `Proposed ${text}`;
+  }
+
+  if (/(blocked|failed|not_implemented|not implemented)/i.test(normalizedStatus)) {
+    return `Proposed ${text}`;
+  }
+
+  if (/(partial|mixed|in progress)/i.test(normalizedStatus)) {
+    return `Partially implemented ${text}`;
+  }
+
+  if (/(delivered|implemented|signed|enacted)/i.test(normalizedStatus)) {
+    return `Implemented ${text}`;
+  }
+
+  return `Advanced ${text}`;
+}
+
+function buildRecordHighlightBullet(record = {}) {
+  const title = String(record.title || "").trim();
+
+  if (!title) {
+    return null;
+  }
+
+  const status = record.status || getRecordOutcomeField(record, "status_override") || "";
+  const action = normalizeActionTitle(title, status);
+  const rawDetail = firstSentenceFragment(
+    getRecordOutcomeField(record, "outcome_summary") ||
+      getRecordOutcomeField(record, "measurable_impact") ||
+      getRecordOutcomeField(record, "systemic_impact_summary") ||
+      record.summary ||
+      "",
+    180
+  );
+
+  if (!action) {
+    return null;
+  }
+
+  const group = getRecordHighlightGroup(record);
+  const detail = buildConciseRecordEffect({
+    record,
+    detail: rawDetail,
+    group,
+  });
+  const bullet = removeBannedHighlightLanguage(
+    detail ? `${action}, ${detail}.` : `${action}.`
+  )
+    .replace(/\s+/g, " ")
+    .replace(/\s+,/g, ",")
+    .replace(/\.\.+$/g, ".")
+    .trim();
+
+  return wordCount(bullet) > 28 ? capWords(bullet, 28) : bullet;
+}
+
+function getRecordHighlightGroup(record = {}) {
+  const direction = String(getRecordImpactDirection(record) || "").toLowerCase();
+  const status = String(
+    record.status || getRecordOutcomeField(record, "status_override") || ""
+  ).toLowerCase();
+
+  if (
+    direction.includes("negative") ||
+    direction.includes("blocked") ||
+    /(blocked|failed|not_implemented|not implemented|rescinded|restricted)/i.test(status)
+  ) {
+    return "negativeContested";
+  }
+
+  if (
+    direction.includes("mixed") ||
+    direction.includes("partial") ||
+    /(partial|mixed|in progress|ongoing|procedural)/i.test(status)
+  ) {
+    return "mixedLimited";
+  }
+
+  if (direction.includes("positive") || /(delivered|implemented|signed|enacted)/i.test(status)) {
+    return "majorActions";
+  }
+
+  return null;
+}
+
+function buildPresidentRecordHighlights(profile) {
+  const { topPolicies = [], promises = [], president = {} } = profile;
+  const linkedBills =
+    president.bill_impact_inputs?.top_linked_bills || president.top_linked_bills || [];
+  const uniqueRecords = new Map();
+
+  for (const record of [...(topPolicies || []), ...(promises || []), ...linkedBills]) {
+    if (!record?.title) {
+      continue;
+    }
+
+    const key = getRecordKey(record);
+
+    if (!uniqueRecords.has(key)) {
+      uniqueRecords.set(key, record);
+    }
+  }
+
+  const highlights = {
+    majorActions: [],
+    mixedLimited: [],
+    negativeContested: [],
+  };
+  const seenBullets = new Set();
+  const records = [...uniqueRecords.values()].sort((left, right) => {
+    const leftScore = Number(
+      left.outcome_count || left.scored_outcomes?.length || left.blackImpactScore || 0
+    );
+    const rightScore = Number(
+      right.outcome_count || right.scored_outcomes?.length || right.blackImpactScore || 0
+    );
+
+    return rightScore - leftScore;
+  });
+
+  for (const record of records) {
+    const group = getRecordHighlightGroup(record);
+
+    if (!group || highlights[group].length >= 3) {
+      continue;
+    }
+
+    const bullet = buildRecordHighlightBullet(record);
+
+    if (!bullet || seenBullets.has(bullet)) {
+      continue;
+    }
+
+    seenBullets.add(bullet);
+    highlights[group].push(bullet);
+  }
+
+  if (
+    !highlights.majorActions.length &&
+    !highlights.mixedLimited.length &&
+    !highlights.negativeContested.length
+  ) {
+    return null;
+  }
+
+  return highlights;
+}
+
+function RecordHighlightsSection({ title, items = [], tone = "default" }) {
+  if (!items.length) {
+    return null;
+  }
+
+  return (
+    <Panel padding="md" className="space-y-3">
+      <div className="flex flex-wrap items-center gap-2">
+        <StatusPill tone={tone}>{title}</StatusPill>
+      </div>
+      <ul className="space-y-2 text-sm leading-7 text-[var(--ink-soft)]">
+        {items.map((item) => (
+          <li key={item} className="flex gap-2">
+            <span className="mt-3 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--ink-muted)]" />
+            <span>{item}</span>
+          </li>
+        ))}
+      </ul>
+    </Panel>
+  );
+}
+
+function PresidentRecordHighlightsPanel({ highlights = null }) {
+  if (!highlights) {
+    return null;
+  }
+
+  return (
+    <Panel className="overflow-hidden">
+      <SectionHeader
+        eyebrow="Fact sheet"
+        title="Record Highlights"
+        description="Short, record-based bullets from named policy, promise, outcome, and bill records already attached to this profile."
+      />
+      <div className="space-y-4 p-4">
+        <RecordHighlightsSection
+          title="Major Actions"
+          items={highlights.majorActions}
+          tone="success"
+        />
+        <RecordHighlightsSection
+          title="Mixed or Limited Outcomes"
+          items={highlights.mixedLimited}
+          tone="warning"
+        />
+        <RecordHighlightsSection
+          title="Negative or Contested Actions"
+          items={highlights.negativeContested}
+          tone="contested"
+        />
+      </div>
+    </Panel>
+  );
+}
+
 function buildPresidentGuideCards(profile, editorial = null) {
   const { president, promiseTracker } = profile;
   const thinNarrative = isThinText(president.narrative_summary, 180);
@@ -1110,6 +1538,7 @@ export default async function PresidentProfilePage({ params }) {
     legalContext,
     agendaOverlap,
   });
+  const recordHighlights = buildPresidentRecordHighlights(profile);
   const localNavigationItems = [
     { href: "#overview", label: "Overview" },
     ...(timelineItems.length
@@ -1257,6 +1686,7 @@ export default async function PresidentProfilePage({ params }) {
       </section>
 
       <PresidentQuickReadPanel quickRead={quickRead} />
+      <PresidentRecordHighlightsPanel highlights={recordHighlights} />
 
       {showLocalNavigation ? (
         <div className="space-y-1.5">
