@@ -1191,7 +1191,7 @@ export default async function PresidentProfilePage({ params }) {
           </div>
           <aside className="grid content-start gap-3 p-4">
             {imageSrc ? (
-              <div className="relative h-56 overflow-hidden rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.5)] sm:h-64 md:h-72 xl:h-auto xl:aspect-[4/3]">
+              <div className="relative mx-auto h-56 w-full max-w-sm overflow-hidden rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.5)] sm:h-64 sm:max-w-md md:h-72 md:max-w-lg xl:mx-0 xl:h-auto xl:max-w-none xl:aspect-[4/3]">
                 <Image src={imageSrc} alt={presidentName} fill className="object-cover object-top" />
               </div>
             ) : null}
