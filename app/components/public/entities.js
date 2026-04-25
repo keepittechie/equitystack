@@ -875,11 +875,28 @@ export function PromiseTimeline({ items = [] }) {
   return (
     <div className="grid gap-4">
       {items.map((item) => (
-        <Panel key={`${item.id || item.action_date || item.label}`} padding="md">
-          <StatusPill tone="info">
-            {formatRenderableDate(item.action_date) || formatRenderableDate(item.date) || item.label || "Update"}
-          </StatusPill>
-          <h3 className="mt-3 text-base font-medium text-white">{item.title || item.event}</h3>
+        <Panel key={`${item.id || item.action_date || item.date || item.title || item.label}`} padding="md">
+          <div className="flex flex-wrap gap-2">
+            {formatRenderableDate(item.action_date) || formatRenderableDate(item.date) ? (
+              <StatusPill tone="info">
+                {formatRenderableDate(item.action_date) || formatRenderableDate(item.date)}
+              </StatusPill>
+            ) : null}
+            {item.status ? (
+              <StatusPill tone={getPromiseStatusTone(item.status)}>{item.status}</StatusPill>
+            ) : null}
+            {item.domain ? <StatusPill tone="default">{item.domain}</StatusPill> : null}
+            {!item.status && !item.domain && item.label ? (
+              <StatusPill tone="info">{item.label}</StatusPill>
+            ) : null}
+          </div>
+          {item.href ? (
+            <Link href={item.href} className="mt-3 block text-base font-medium text-white hover:text-white">
+              {item.title || item.event}
+            </Link>
+          ) : (
+            <h3 className="mt-3 text-base font-medium text-white">{item.title || item.event}</h3>
+          )}
           {item.description ? <p className="mt-2 text-sm leading-6 text-[var(--ink-soft)]">{item.description}</p> : null}
         </Panel>
       ))}

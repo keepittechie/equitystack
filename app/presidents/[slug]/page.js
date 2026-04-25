@@ -1110,6 +1110,84 @@ function PresidentRecordHighlightsPanel({ highlights = null }) {
   );
 }
 
+function isPlaceholderChronologyText(value) {
+  return /^(?:delivered|in progress|partial|failed|blocked)\s+promise\s+in\s+uncategorized\s+policy\.?$/i.test(
+    String(value || "").trim()
+  );
+}
+
+function buildChronologyDescription(record = {}) {
+  const summary =
+    record.summary ||
+    getRecordOutcomeField(record, "outcome_summary") ||
+    getRecordOutcomeField(record, "measurable_impact") ||
+    getRecordOutcomeField(record, "systemic_impact_summary") ||
+    "";
+  const text = truncateText(summary, 180);
+
+  if (!text || isPlaceholderChronologyText(text)) {
+    return "";
+  }
+
+  return text;
+}
+
+function buildChronologyTitle(record = {}) {
+  const title = String(record.title || record.policy_title || record.promise_title || "").trim();
+
+  if (title && !isPlaceholderChronologyText(title)) {
+    const status = String(record.status || "").trim();
+    if (status && ["Blocked", "Failed"].includes(status) && !title.toLowerCase().startsWith(status.toLowerCase())) {
+      return `${status} promise: ${title}`;
+    }
+    return title;
+  }
+
+  const summary = firstSentenceFragment(
+    record.summary ||
+      getRecordOutcomeField(record, "outcome_summary") ||
+      getRecordOutcomeField(record, "measurable_impact") ||
+      "",
+    120
+  );
+
+  if (summary && !isPlaceholderChronologyText(summary)) {
+    return summary;
+  }
+
+  return "";
+}
+
+function buildPresidentChronologyItems(records = []) {
+  return (records || [])
+    .map((record) => {
+      const title = buildChronologyTitle(record);
+      const description = buildChronologyDescription(record);
+
+      if (!title && !description) {
+        return null;
+      }
+
+      return {
+        id: record.id || record.slug || title,
+        action_date: record.latest_action_date || record.promise_date || null,
+        date: record.promise_date || null,
+        title,
+        description,
+        status: record.status || null,
+        domain: record.topic || record.category || null,
+        href: record.slug ? `/promises/${record.slug}` : null,
+      };
+    })
+    .filter(Boolean)
+    .sort((left, right) => {
+      const leftDate = String(left.action_date || left.date || "");
+      const rightDate = String(right.action_date || right.date || "");
+      return rightDate.localeCompare(leftDate);
+    })
+    .slice(0, 8);
+}
+
 function buildPresidentGuideCards(profile, editorial = null) {
   const { president, promiseTracker } = profile;
   const thinNarrative = isThinText(president.narrative_summary, 180);
@@ -1486,15 +1564,7 @@ export default async function PresidentProfilePage({ params }) {
       name: item.topic,
       score: Number(item.raw_score_total ?? item.raw_score ?? item.score ?? 0),
     }));
-  const timelineItems = promises
-    .slice()
-    .sort((left, right) => String(right.promise_date || "").localeCompare(String(left.promise_date || "")))
-    .slice(0, 8)
-    .map((item) => ({
-      action_date: item.promise_date,
-      title: item.title,
-      description: item.summary || `${item.status} promise in ${item.topic || "uncategorized"} policy.`,
-    }));
+  const timelineItems = buildPresidentChronologyItems(promises);
   const whyThisScore = buildWhyThisPresidentScore(profile);
   const localSectionOffsetClass = "scroll-mt-28 md:scroll-mt-32";
   const visiblePromiseCount =
