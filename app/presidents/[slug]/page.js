@@ -410,6 +410,215 @@ function buildPresidentOverview(profile, editorial = null) {
   ]);
 }
 
+function formatQuickReadCountList(items = []) {
+  return items
+    .filter((item) => Number(item.value || 0) > 0)
+    .map((item) => `${Number(item.value)} ${item.label}`)
+    .join(", ");
+}
+
+function buildPresidentQuickRead({
+  profile,
+  legalContext = null,
+  agendaOverlap = null,
+}) {
+  const {
+    president,
+    promiseTracker,
+    topPolicies = [],
+    promises = [],
+    scoreComposition,
+    scoreDrivers,
+  } = profile;
+  const promiseCount =
+    promiseTracker.visible_promise_count ??
+    promiseTracker.total_tracked_promises ??
+    0;
+  const outcomeCount = president.direct_outcome_count ?? president.outcome_count ?? 0;
+  const topicLabels = takeLabels(scoreDrivers?.topic_drivers, (item) => item.topic, 3);
+  const promiseTitles = takeLabels(promises, (item) => item.title, 2);
+  const topPolicyTitles = takeLabels(topPolicies, (item) => item.title, 2);
+  const directionSummary = formatQuickReadCountList([
+    {
+      label: "positive",
+      value: scoreComposition?.direct?.direction_counts?.Positive,
+    },
+    {
+      label: "mixed",
+      value: scoreComposition?.direct?.direction_counts?.Mixed,
+    },
+    {
+      label: "negative",
+      value: scoreComposition?.direct?.direction_counts?.Negative,
+    },
+    {
+      label: "blocked",
+      value: scoreComposition?.direct?.direction_counts?.Blocked,
+    },
+  ]);
+  const promiseStatusSummary = formatQuickReadCountList([
+    {
+      label: "delivered",
+      value:
+        promiseTracker.visible_delivered_count ??
+        promiseTracker.delivered_count,
+    },
+    {
+      label: "partial",
+      value: promiseTracker.visible_partial_count ?? promiseTracker.partial_count,
+    },
+    {
+      label: "blocked",
+      value: promiseTracker.visible_blocked_count ?? promiseTracker.blocked_count,
+    },
+    {
+      label: "failed",
+      value: promiseTracker.visible_failed_count ?? promiseTracker.failed_count,
+    },
+  ]);
+  const linkedBillCount = Number(president.bill_impact_inputs?.linked_bill_count || 0);
+  const blockedOrPartialCount =
+    Number(promiseTracker.visible_blocked_count ?? promiseTracker.blocked_count ?? 0) +
+    Number(promiseTracker.visible_partial_count ?? promiseTracker.partial_count ?? 0);
+
+  const triedItems = [
+    topicLabels.length
+      ? `The visible record centers on ${oxfordJoin(topicLabels)}.`
+      : null,
+    promiseCount > 0
+      ? `The promise tracker includes ${countLabel(promiseCount, "commitment")}${
+          promiseTitles.length ? `, including ${oxfordJoin(promiseTitles)}` : ""
+        }.`
+      : null,
+    topPolicyTitles.length
+      ? `The main policy record surfaces ${oxfordJoin(topPolicyTitles)}.`
+      : null,
+  ].filter(Boolean).slice(0, 3);
+
+  const happenedItems = [
+    outcomeCount > 0
+      ? `Documented scoring is anchored in ${countLabel(
+          outcomeCount,
+          "outcome"
+        )}${directionSummary ? `: ${directionSummary}` : ""}.`
+      : null,
+    promiseStatusSummary
+      ? `Promise outcomes currently include ${promiseStatusSummary} records.`
+      : null,
+    topPolicyTitles.length
+      ? `Top visible records include ${oxfordJoin(topPolicyTitles)}.`
+      : null,
+  ].filter(Boolean).slice(0, 3);
+
+  const meaning = filterParagraphs([
+    scoreComposition?.interpretation || scoreComposition?.summary_line || null,
+  ]).slice(0, 2);
+
+  const shapedItems = [
+    blockedOrPartialCount > 0
+      ? `${countLabel(
+          blockedOrPartialCount,
+          "visible promise"
+        )} were blocked or only partly implemented.`
+      : null,
+    linkedBillCount > 0
+      ? `${countLabel(
+          linkedBillCount,
+          "linked bill"
+        )} shape the legislative context without replacing outcome evidence.`
+      : null,
+    legalContext?.linked_case_count
+      ? `${countLabel(
+          legalContext.linked_case_count,
+          "verified linked case"
+        )} add legal context through visible policy records.`
+      : null,
+    agendaOverlap?.linked_agenda_item_count
+      ? `${countLabel(
+          agendaOverlap.linked_agenda_item_count,
+          "tracked agenda item"
+        )} overlap with already linked public records.`
+      : null,
+  ].filter(Boolean).slice(0, 3);
+
+  if (!triedItems.length || !happenedItems.length || !meaning.length) {
+    return null;
+  }
+
+  return {
+    triedItems,
+    happenedItems,
+    meaning,
+    shapedItems,
+  };
+}
+
+function QuickReadSection({ title, children }) {
+  return (
+    <Panel padding="md" className="space-y-3">
+      <h3 className="text-base font-semibold text-white">{title}</h3>
+      {children}
+    </Panel>
+  );
+}
+
+function PresidentQuickReadPanel({ quickRead = null }) {
+  if (!quickRead) {
+    return null;
+  }
+
+  return (
+    <Panel className="overflow-hidden">
+      <SectionHeader
+        eyebrow="Plain-language summary"
+        title="Quick Read"
+        description="A short readout from the visible promise, policy, outcome, and context data on this page."
+      />
+      <div className="grid gap-4 p-4 lg:grid-cols-2">
+        <QuickReadSection title="What they tried to do">
+          <ul className="space-y-2 text-sm leading-7 text-[var(--ink-soft)]">
+            {quickRead.triedItems.map((item) => (
+              <li key={item} className="flex gap-2">
+                <span className="mt-3 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--info)]" />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        </QuickReadSection>
+        <QuickReadSection title="What actually happened">
+          <ul className="space-y-2 text-sm leading-7 text-[var(--ink-soft)]">
+            {quickRead.happenedItems.map((item) => (
+              <li key={item} className="flex gap-2">
+                <span className="mt-3 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--success)]" />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        </QuickReadSection>
+        <QuickReadSection title="What it meant">
+          <div className="space-y-3 text-sm leading-7 text-[var(--ink-soft)]">
+            {quickRead.meaning.map((paragraph) => (
+              <p key={paragraph}>{paragraph}</p>
+            ))}
+          </div>
+        </QuickReadSection>
+        {quickRead.shapedItems.length ? (
+          <QuickReadSection title="What shaped the results">
+            <ul className="space-y-2 text-sm leading-7 text-[var(--ink-soft)]">
+              {quickRead.shapedItems.map((item) => (
+                <li key={item} className="flex gap-2">
+                  <span className="mt-3 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--warning)]" />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </QuickReadSection>
+        ) : null}
+      </div>
+    </Panel>
+  );
+}
+
 function buildPresidentGuideCards(profile, editorial = null) {
   const { president, promiseTracker } = profile;
   const thinNarrative = isThinText(president.narrative_summary, 180);
@@ -833,6 +1042,11 @@ export default async function PresidentProfilePage({ params }) {
   });
   const agendaOverlap = getAgendaOverlapForPromiseRecords(promises, "project-2025");
   const legalContext = buildPresidentLegalContext(topPolicies);
+  const quickRead = buildPresidentQuickRead({
+    profile,
+    legalContext,
+    agendaOverlap,
+  });
   const localNavigationItems = [
     { href: "#overview", label: "Overview" },
     ...(timelineItems.length
@@ -978,6 +1192,8 @@ export default async function PresidentProfilePage({ params }) {
           tone="default"
         />
       </section>
+
+      <PresidentQuickReadPanel quickRead={quickRead} />
 
       {showLocalNavigation ? (
         <div className="space-y-1.5">
