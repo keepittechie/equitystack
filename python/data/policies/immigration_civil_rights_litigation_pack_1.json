@@ -1,0 +1,124 @@
+[
+  {
+    "title": "Attempt to add citizenship question to U.S. Census",
+    "policy_type": "Agency Action",
+    "summary": "The Department of Commerce announced that it would add a citizenship question to the 2020 decennial census questionnaire, citing a request for citizenship voting-age population data for Voting Rights Act enforcement.",
+    "year_enacted": 2018,
+    "date_enacted": "2018-03-26",
+    "era": "Contemporary Era",
+    "president": "Donald J. Trump",
+    "primary_party": "Republican Party",
+    "house_party": null,
+    "senate_party": null,
+    "bipartisan": false,
+    "direct_black_impact": false,
+    "outcome_summary": "The Supreme Court held that the stated explanation for adding the question did not match the administrative record and remanded the matter, preventing the question from appearing on the 2020 census.",
+    "status": "Blocked",
+    "impact_direction": "Blocked",
+    "impact_notes": "The action is tracked as a blocked administrative policy attempt because implementation was stopped on procedural grounds. It is relevant to representation and funding analysis, but the record should not be treated as a final merits ruling on all census-question authority.",
+    "categories": ["Immigration", "Civil Rights", "Constitutional Rights"],
+    "sources": [
+      {
+        "source_title": "U.S. Department of Commerce Announces Reinstatement of Citizenship Question to the 2020 Decennial Census",
+        "source_url": "https://2017-2021.commerce.gov/news/press-releases/2018/03/us-department-commerce-announces-reinstatement-citizenship-question-2020.html",
+        "source_type": "Government",
+        "publisher": "U.S. Department of Commerce",
+        "published_date": "2018-03-26",
+        "notes": "Official Commerce announcement describing the decision to add a citizenship question and the stated Voting Rights Act data rationale."
+      },
+      {
+        "source_title": "Department of Commerce v. New York",
+        "source_url": "https://supreme.justia.com/cases/federal/us/588/18-966/",
+        "source_type": "Government",
+        "publisher": "Supreme Court / Justia",
+        "published_date": "2019-06-27",
+        "notes": "Supreme Court decision holding that the agency explanation was insufficient under administrative-law review and remanding the decision."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Attempt to rescind Deferred Action for Childhood Arrivals",
+    "policy_type": "Agency Action",
+    "summary": "The Department of Homeland Security issued a memorandum rescinding the 2012 Deferred Action for Childhood Arrivals policy and establishing a wind-down process for requests and renewals.",
+    "year_enacted": 2017,
+    "date_enacted": "2017-09-05",
+    "era": "Contemporary Era",
+    "president": "Donald J. Trump",
+    "primary_party": "Republican Party",
+    "house_party": null,
+    "senate_party": null,
+    "bipartisan": false,
+    "direct_black_impact": false,
+    "outcome_summary": "The Supreme Court held that the rescission was arbitrary and capricious under the Administrative Procedure Act because DHS did not adequately address important reliance interests and policy alternatives.",
+    "status": "Blocked",
+    "impact_direction": "Blocked",
+    "impact_notes": "The record is a procedural block of an attempted policy change, not a final holding that DHS lacked authority to change DACA through a properly reasoned process.",
+    "categories": ["Civil Rights", "Constitutional Rights"],
+    "sources": [
+      {
+        "source_title": "Memorandum on Rescission Of DACA",
+        "source_url": "https://www.dhs.gov/archive/news/2017/09/05/memorandum-rescission-daca",
+        "source_type": "Government",
+        "publisher": "U.S. Department of Homeland Security",
+        "published_date": "2017-09-05",
+        "notes": "Official DHS memorandum rescinding the June 15, 2012 DACA memorandum and describing the wind-down process."
+      },
+      {
+        "source_title": "Department of Homeland Security v. Regents of University of California",
+        "source_url": "https://supreme.justia.com/cases/federal/us/591/18-587/",
+        "source_type": "Government",
+        "publisher": "Supreme Court / Justia",
+        "published_date": "2020-06-18",
+        "notes": "Supreme Court decision reviewing the DACA rescission under the Administrative Procedure Act."
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "title": "Zero-tolerance immigration enforcement and family separation policy",
+    "policy_type": "Agency Action",
+    "summary": "The Department of Justice announced a zero-tolerance enforcement approach for criminal improper-entry referrals at the southwest border, and implementation contributed to the separation of parents and children when adults were referred for prosecution.",
+    "year_enacted": 2018,
+    "date_enacted": "2018-04-06",
+    "era": "Contemporary Era",
+    "president": "Donald J. Trump",
+    "primary_party": "Republican Party",
+    "house_party": null,
+    "senate_party": null,
+    "bipartisan": false,
+    "direct_black_impact": false,
+    "outcome_summary": "Federal litigation produced injunctions and later settlement activity addressing reunification and future separations, while the policy's implementation and remedial consequences remained subject to continuing legal and administrative follow-through.",
+    "status": "Partially Active",
+    "impact_direction": "Negative",
+    "impact_notes": "This record tracks a documented enforcement policy and its legal context. It should not be used to collapse all asylum or border litigation into one policy record, and it should not be treated as a final score determination.",
+    "categories": ["Immigration", "Civil Rights", "Criminal Justice", "Constitutional Rights"],
+    "sources": [
+      {
+        "source_title": "Attorney General Announces Zero-Tolerance Policy for Criminal Illegal Entry",
+        "source_url": "https://www.justice.gov/opa/pr/attorney-general-announces-zero-tolerance-policy-criminal-illegal-entry",
+        "source_type": "Government",
+        "publisher": "U.S. Department of Justice",
+        "published_date": "2018-04-06",
+        "notes": "Official DOJ announcement describing the zero-tolerance prosecution policy for improper entry referrals."
+      },
+      {
+        "source_title": "DOJ OIG Releases Report on the Department of Justice's Planning and Implementation of Its Zero Tolerance Policy",
+        "source_url": "https://oig.justice.gov/news/doj-oig-releases-report-department-justices-planning-and-implementation-its-zero-tolerance",
+        "source_type": "Government",
+        "publisher": "U.S. Department of Justice Office of the Inspector General",
+        "published_date": "2020-12-09",
+        "notes": "Inspector General release summarizing the report on zero-tolerance planning, implementation, and interagency coordination."
+      },
+      {
+        "source_title": "U.S. Government Reaches Settlement in Class Action Family Separation Case Seeking Injunctive Relief",
+        "source_url": "https://www.justice.gov/archives/opa/pr/us-government-reaches-settlement-class-action-family-separation-case-seeking-injunctive",
+        "source_type": "Government",
+        "publisher": "U.S. Department of Justice",
+        "published_date": "2023-10-16",
+        "notes": "DOJ announcement describing settlement activity in Ms. L. v. ICE, including future-separation limits and reunification-related relief."
+      }
+    ],
+    "metrics": []
+  }
+]
