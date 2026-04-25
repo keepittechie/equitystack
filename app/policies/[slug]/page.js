@@ -70,6 +70,7 @@ import {
   summarizePolicyRelationshipContinuity,
 } from "@/lib/policyRelationships";
 import { getLinkedAgendaItemsForEntity } from "@/lib/agendas";
+import { getCasesForPolicy } from "@/lib/cases";
 
 export const dynamic = "force-dynamic";
 const POLICY_IMPACT_SCORE_MAX = 35;
@@ -192,6 +193,76 @@ function formatConfidenceLabel(value) {
 
   const label = numeric >= 0.75 ? "High" : numeric >= 0.45 ? "Moderate" : "Low";
   return `${label} (${numeric.toFixed(2)})`;
+}
+
+function formatCaseLabel(value) {
+  return String(value || "")
+    .trim()
+    .replace(/_/g, " ")
+    .replace(/\s+/g, " ")
+    .replace(/\b\w/g, (match) => match.toUpperCase());
+}
+
+function truncateText(value, maxLength = 220) {
+  const text = String(value || "").trim();
+
+  if (text.length <= maxLength) {
+    return text;
+  }
+
+  return `${text.slice(0, maxLength).trim().replace(/[.,;:\s]+$/, "")}...`;
+}
+
+function RelatedCasesPanel({ items = [], limit = 5 }) {
+  const visibleItems = items.slice(0, limit);
+
+  if (!visibleItems.length) {
+    return null;
+  }
+
+  return (
+    <Panel padding="md" className="space-y-4">
+      <div className="space-y-2">
+        <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
+          Legal context
+        </p>
+        <h3 className="text-lg font-semibold text-white">Related Cases</h3>
+        <p className="text-sm leading-7 text-[var(--ink-soft)]">
+          Linked case records that provide legal context for this policy record.
+        </p>
+      </div>
+      <div className="grid gap-3">
+        {visibleItems.map((item) => (
+          <Panel
+            key={`${item.case_id}-${item.relationship}`}
+            padding="md"
+            className="space-y-3"
+          >
+            <div className="flex flex-wrap gap-2">
+              <StatusPill tone="info">Linked case</StatusPill>
+              {item.type ? (
+                <StatusPill tone="default">{formatCaseLabel(item.type)}</StatusPill>
+              ) : null}
+              {item.status ? (
+                <StatusPill tone="default">{formatCaseLabel(item.status)}</StatusPill>
+              ) : null}
+              <StatusPill tone="default">
+                {item.relationship_label || formatCaseLabel(item.relationship)}
+              </StatusPill>
+            </div>
+            <div>
+              <h4 className="text-base font-semibold text-white">{item.title}</h4>
+              {item.summary ? (
+                <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
+                  {truncateText(item.summary)}
+                </p>
+              ) : null}
+            </div>
+          </Panel>
+        ))}
+      </div>
+    </Panel>
+  );
 }
 
 function deriveProgramLabel(metricName) {
@@ -1247,6 +1318,7 @@ export default async function PolicyDetailPage({ params }) {
     editorial: flagshipEditorial,
   });
   const linkedAgendaItems = getLinkedAgendaItemsForEntity("policy", policy.id);
+  const linkedCases = getCasesForPolicy(policy.id);
   const localSectionOffsetClass = "scroll-mt-28 md:scroll-mt-32";
   const localNavigationItems = [
     { href: "#overview", label: "Overview" },
@@ -1273,7 +1345,8 @@ export default async function PolicyDetailPage({ params }) {
       count:
         Number(policy.related_promises?.length || 0) +
         Number(policy.related_explainers?.length || 0) +
-        Number(policy.relationships?.length || 0),
+        Number(policy.relationships?.length || 0) +
+        Number(linkedCases.length || 0),
     },
   ];
   const showLocalNavigation = localNavigationItems.length >= 3;
@@ -1784,6 +1857,7 @@ export default async function PolicyDetailPage({ params }) {
             items={bestNextReviewItems}
           />
           <LinkedAgendaItemsPanel items={linkedAgendaItems} />
+          <RelatedCasesPanel items={linkedCases} />
           {(policy.related_promises || []).length ? (
             <PromiseResultsTable items={policy.related_promises} buildHref={(item) => `/promises/${item.slug}`} />
           ) : (

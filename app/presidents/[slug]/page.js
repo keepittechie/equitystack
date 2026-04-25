@@ -55,6 +55,7 @@ import {
 } from "@/lib/structured-data";
 import ShareCardPanel from "@/app/components/share/ShareCardPanel";
 import { buildPresidentCardHref } from "@/lib/shareable-card-links";
+import { getCasesForPolicy } from "@/lib/cases";
 
 export const dynamic = "force-dynamic";
 
@@ -116,6 +117,16 @@ function humanizeToken(value) {
     .filter(Boolean)
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(" ");
+}
+
+function truncateText(value, maxLength = 180) {
+  const text = String(value || "").trim();
+
+  if (text.length <= maxLength) {
+    return text;
+  }
+
+  return `${text.slice(0, maxLength).trim().replace(/[.,;:\s]+$/, "")}...`;
 }
 
 function buildWhyThisPresidentScore(profile) {
@@ -528,6 +539,145 @@ function AgendaOverlapPanel({ overlap = null }) {
   );
 }
 
+function buildPresidentLegalContext(policyRecords = []) {
+  const caseMap = new Map();
+  const domainCounts = new Map();
+
+  for (const policy of policyRecords || []) {
+    if (policy?.slug || !policy?.id) {
+      continue;
+    }
+
+    for (const linkedCase of getCasesForPolicy(policy.id)) {
+      const key = `${linkedCase.case_id}:${linkedCase.relationship}`;
+
+      if (!caseMap.has(key)) {
+        caseMap.set(key, {
+          ...linkedCase,
+          linked_policy_count: 0,
+          linked_policy_titles: [],
+        });
+      }
+
+      const existing = caseMap.get(key);
+      existing.linked_policy_count += 1;
+
+      if (policy.title && existing.linked_policy_titles.length < 3) {
+        existing.linked_policy_titles.push(policy.title);
+      }
+    }
+  }
+
+  const linkedCases = [...caseMap.values()].sort((left, right) => {
+    if (right.linked_policy_count !== left.linked_policy_count) {
+      return right.linked_policy_count - left.linked_policy_count;
+    }
+
+    return String(left.title || "").localeCompare(String(right.title || ""));
+  });
+
+  for (const linkedCase of linkedCases) {
+    for (const domain of linkedCase.domains || []) {
+      const label = humanizeToken(domain);
+      domainCounts.set(label, Number(domainCounts.get(label) || 0) + 1);
+    }
+  }
+
+  if (!linkedCases.length) {
+    return null;
+  }
+
+  const topDomains = [...domainCounts.entries()]
+    .map(([domain, count]) => ({ domain, count }))
+    .sort((left, right) => right.count - left.count || left.domain.localeCompare(right.domain))
+    .slice(0, 3);
+
+  return {
+    linked_case_count: linkedCases.length,
+    top_domains: topDomains,
+    top_cases: linkedCases.slice(0, 3),
+  };
+}
+
+function PresidentLegalContextPanel({ context = null }) {
+  if (!context?.linked_case_count) {
+    return null;
+  }
+
+  return (
+    <Panel className="overflow-hidden">
+      <SectionHeader
+        eyebrow="Legal context"
+        title="Related Cases"
+        description="Verified linked cases provide related legal context for policy records already visible in this presidential profile."
+      />
+      <div className="space-y-4 p-4">
+        <div className="grid gap-4 md:grid-cols-2">
+          <MetricCard
+            label="Linked cases"
+            value={context.linked_case_count}
+            description="Verified case links attached through this profile's visible policy records."
+            tone="info"
+            density="compact"
+            showDot
+          />
+          <MetricCard
+            label="Top legal domains"
+            value={context.top_domains.length ? context.top_domains.map((item) => item.domain).join(", ") : "No dominant area"}
+            description="Domains are derived from linked case metadata only."
+            tone="default"
+            density="compact"
+          />
+        </div>
+        <Panel padding="md" className="space-y-3">
+          <div className="flex flex-wrap gap-2">
+            {context.top_domains.map((item) => (
+              <StatusPill key={item.domain} tone="default">
+                {item.domain} {item.count}
+              </StatusPill>
+            ))}
+          </div>
+          <div className="grid gap-3">
+            {context.top_cases.map((item) => (
+              <Panel
+                key={`${item.case_id}-${item.relationship}`}
+                padding="md"
+                className="space-y-3"
+              >
+                <div className="flex flex-wrap gap-2">
+                  <StatusPill tone="info">Linked case</StatusPill>
+                  {item.type ? (
+                    <StatusPill tone="default">{humanizeToken(item.type)}</StatusPill>
+                  ) : null}
+                  {item.status ? (
+                    <StatusPill tone="default">{humanizeToken(item.status)}</StatusPill>
+                  ) : null}
+                  <StatusPill tone="default">
+                    {item.relationship_label || humanizeToken(item.relationship)}
+                  </StatusPill>
+                </div>
+                <div>
+                  <h3 className="text-base font-semibold text-white">{item.title}</h3>
+                  {item.summary ? (
+                    <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
+                      {truncateText(item.summary)}
+                    </p>
+                  ) : null}
+                  {item.linked_policy_titles.length ? (
+                    <p className="mt-2 text-[12px] leading-6 text-[var(--ink-muted)]">
+                      Linked policy context: {item.linked_policy_titles.join("; ")}
+                    </p>
+                  ) : null}
+                </div>
+              </Panel>
+            ))}
+          </div>
+        </Panel>
+      </div>
+    </Panel>
+  );
+}
+
 function buildPresidentContextParagraphs(profile, editorial = null) {
   const { president, promiseTracker, scoreDrivers } = profile;
   const presidentName = president.president || president.president_name || "this presidency";
@@ -682,6 +832,7 @@ export default async function PresidentProfilePage({ params }) {
     flagshipEditorial,
   });
   const agendaOverlap = getAgendaOverlapForPromiseRecords(promises, "project-2025");
+  const legalContext = buildPresidentLegalContext(topPolicies);
   const localNavigationItems = [
     { href: "#overview", label: "Overview" },
     ...(timelineItems.length
@@ -1322,6 +1473,7 @@ export default async function PresidentProfilePage({ params }) {
       </Panel>
 
       {agendaOverlap ? <AgendaOverlapPanel overlap={agendaOverlap} /> : null}
+      {legalContext ? <PresidentLegalContextPanel context={legalContext} /> : null}
 
       <Panel className="overflow-hidden">
         <SectionHeader
