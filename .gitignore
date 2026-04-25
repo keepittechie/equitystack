@@ -63,7 +63,7 @@ database/
 *.log
 
 # research
-research/
+/research/
 
 # references
 references/
