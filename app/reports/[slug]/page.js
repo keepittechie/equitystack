@@ -394,13 +394,17 @@ export default async function ReportDetailPage({ params }) {
             title="Linked policy records"
             description="These policy records are the fastest way to move from summary interpretation into the underlying public evidence."
           />
-          <div className="grid items-start gap-6 2xl:grid-cols-3">
+          <div className="grid items-start gap-8 2xl:grid-cols-3">
             {["positive", "mixed", "negative"].map((bucket) => (
-              <div key={bucket} className="space-y-4">
+              <div key={bucket} className="space-y-5">
                 <h3 className="text-lg font-semibold text-white capitalize">{bucket} records</h3>
                 <PolicyCardList
                   items={report.topPolicies[bucket] || []}
                   buildHref={(item) => `/policies/${item.slug || item.id}`}
+                  listClassName="grid gap-6"
+                  cardPadding="none"
+                  cardClassName="p-5 md:p-6"
+                  spacing="relaxed"
                 />
               </div>
             ))}

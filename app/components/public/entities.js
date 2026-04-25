@@ -307,7 +307,14 @@ export function PolicyResultsTable({ items = [], buildHref }) {
   );
 }
 
-export function PolicyCardList({ items = [], buildHref }) {
+export function PolicyCardList({
+  items = [],
+  buildHref,
+  listClassName = "grid gap-4 md:grid-cols-2",
+  cardPadding = "md",
+  cardClassName = "",
+  spacing = "default",
+}) {
   if (!items.length) {
     return (
       <div className="rounded-lg border border-dashed border-[var(--line)] bg-[rgba(18,31,49,0.32)] p-4 text-sm leading-7 text-[var(--ink-soft)]">
@@ -317,41 +324,65 @@ export function PolicyCardList({ items = [], buildHref }) {
   }
 
   return (
-    <div className="grid gap-4 md:grid-cols-2">
+    <div className={listClassName}>
       {items.map((item) => {
         const evidenceSignal = buildPolicyEvidenceSignal(item);
+        const isRelaxed = spacing === "relaxed";
 
         return (
-        <Panel
-          key={item.id}
-          as={Link}
-          href={buildHref(item)}
-          padding="md"
-          interactive
-          className="flex h-full flex-col"
-        >
-          <div className="flex items-center justify-between gap-4">
-            <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
-              {item.year_enacted || "Undated"} • {item.policy_type || "Policy"}
-            </p>
-            <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--ink-muted)]">
-              Open policy
-            </span>
-          </div>
-          <div className="mt-3 flex items-start justify-between gap-4">
-            <h3 className="text-lg font-semibold text-white">{item.title}</h3>
-            <ScoreBadge value={item.impact_score ?? "—"} label="Impact Score" />
-          </div>
-          {item.summary ? (
-            <p className="mt-3 text-sm leading-6 text-[var(--ink-soft)]">{item.summary}</p>
-          ) : null}
-          <EvidenceBadge signal={evidenceSignal} className="mt-4" />
-          <div className="mt-auto flex flex-wrap gap-2 pt-4">
-            <StatusPill tone="default">{item.impact_direction || "Unknown direction"}</StatusPill>
-            <StatusPill tone="default">{item.president || item.primary_party || "Historical record"}</StatusPill>
-            <StatusPill tone="info">{item.total_sources ?? item.source_count ?? 0} sources</StatusPill>
-          </div>
-        </Panel>
+          <Panel
+            key={item.id}
+            as={Link}
+            href={buildHref(item)}
+            padding={cardPadding}
+            interactive
+            className={`flex h-full flex-col ${cardClassName}`}
+          >
+            <div className="flex items-center justify-between gap-4">
+              <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
+                {item.year_enacted || "Undated"} • {item.policy_type || "Policy"}
+              </p>
+              <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--ink-muted)]">
+                Open policy
+              </span>
+            </div>
+            <div
+              className={`${
+                isRelaxed ? "mt-4 gap-5" : "mt-3 gap-4"
+              } flex items-start justify-between`}
+            >
+              <h3 className="text-lg font-semibold text-white">{item.title}</h3>
+              <ScoreBadge value={item.impact_score ?? "—"} label="Impact Score" />
+            </div>
+            {item.summary ? (
+              <p
+                className={`${
+                  isRelaxed ? "mt-4" : "mt-3"
+                } text-sm leading-6 text-[var(--ink-soft)]`}
+              >
+                {item.summary}
+              </p>
+            ) : null}
+            <EvidenceBadge
+              signal={evidenceSignal}
+              className={isRelaxed ? "mt-5" : "mt-4"}
+            />
+            <div
+              className={`${
+                isRelaxed ? "gap-3 pt-5" : "gap-2 pt-4"
+              } mt-auto flex flex-wrap`}
+            >
+              <StatusPill tone="default">
+                {item.impact_direction || "Unknown direction"}
+              </StatusPill>
+              <StatusPill tone="default">
+                {item.president || item.primary_party || "Historical record"}
+              </StatusPill>
+              <StatusPill tone="info">
+                {item.total_sources ?? item.source_count ?? 0} sources
+              </StatusPill>
+            </div>
+          </Panel>
         );
       })}
     </div>
