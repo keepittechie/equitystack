@@ -924,11 +924,16 @@ export function PromiseTimeline({ items = [] }) {
   );
 }
 
-export function ReportCardGrid({ items = [] }) {
+export function ReportCardGrid({
+  items = [],
+  emptyTitle = "No reports match the current browse state.",
+  emptyDescription = "Try broadening the search or clearing a category filter.",
+}) {
   if (!items.length) {
     return (
       <div className="rounded-lg border border-dashed border-[var(--line)] bg-[rgba(18,31,49,0.32)] p-4 text-sm leading-7 text-[var(--ink-soft)]">
-        No reports match the current browse state. Try broadening the search or clearing a category filter.
+        <p className="font-medium text-white">{emptyTitle}</p>
+        <p className="mt-1 text-[var(--ink-soft)]">{emptyDescription}</p>
       </div>
     );
   }

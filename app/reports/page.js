@@ -227,6 +227,15 @@ export default async function ReportsPage({ searchParams }) {
     safeReportLinkedPolicyUpdates,
     "ReportLinkedPolicyMovement.items"
   );
+  const filteredFeaturedReportCount = data.featuredReports?.length || 0;
+  const totalFeaturedReportCount = data.reportKpis?.featured_count || 0;
+  const filtersActive = Boolean(
+    cleanText(resolvedSearchParams.q) || cleanText(resolvedSearchParams.category)
+  );
+  const featuredReportMetricValue =
+    filtersActive && totalFeaturedReportCount
+      ? `${filteredFeaturedReportCount} of ${totalFeaturedReportCount}`
+      : totalFeaturedReportCount;
   const strongestCategory = data.reportKpis?.strongest_category || "—";
   const directionData = [
     {
@@ -321,7 +330,7 @@ export default async function ReportsPage({ searchParams }) {
 
       <TrustBar />
 
-      <DashboardFilterBar helpText="Browse reports by category or keyword. Flagship reports stay visible, but the hub is designed to move you into the right analysis path fast.">
+      <DashboardFilterBar helpText="Use search and category filters to narrow the featured report cards. Live report-linked records continue below.">
         <form action="/reports" method="GET" className="flex flex-1 flex-wrap items-end gap-4">
           <label className="grid gap-2">
             <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
@@ -361,15 +370,17 @@ export default async function ReportsPage({ searchParams }) {
       <ImpactOverviewCards
         items={[
           {
-            label: "Reports available",
-            value: data.reportKpis?.report_count || 0,
-            description: "Structured public analyses currently available from the shared reporting layer.",
+            label: "Featured reports",
+            value: featuredReportMetricValue,
+            description: filtersActive
+              ? `${filteredFeaturedReportCount} visible after filters. Curated starting points for the main public reporting views.`
+              : "Curated starting points for the main public reporting views.",
             tone: "accent",
           },
           {
-            label: "Featured reports",
-            value: data.reportKpis?.featured_count || 0,
-            description: "Flagship entry points into scores, context, and historical continuity.",
+            label: "Report-linked records",
+            value: policyRankings.records?.length || 0,
+            description: "Live records feeding the reporting layer.",
           },
           {
             label: "Presidents scored",
@@ -409,7 +420,11 @@ export default async function ReportsPage({ searchParams }) {
           title="Start with the flagship views"
           description="Start with one of these when you need the key takeaway first. Then open presidents, policies, or methodology from the linked report."
         />
-        <ReportCardGrid items={data.featuredReports || []} />
+        <ReportCardGrid
+          items={data.featuredReports || []}
+          emptyTitle="No featured reports match those filters."
+          emptyDescription="Try a broader category or search term."
+        />
         <Panel padding="md" className="bg-[rgba(18,31,49,0.52)]">
           <p className="text-sm leading-6 text-[var(--ink-soft)]">
             Best first click: start with <span className="font-semibold text-white">Black Impact Score</span> for ranked comparison, or use <span className="font-semibold text-white">Civil Rights Timeline</span> when sequence matters more than ranking.
