@@ -80,7 +80,6 @@ function matchesSearch(item, query) {
 
 export default function ReportLinkedPolicyMovement({
   items = [],
-  buildHref,
   emptyTitle,
   emptyDescription,
 }) {
@@ -161,7 +160,6 @@ export default function ReportLinkedPolicyMovement({
 
       <RecentPolicyChangesTable
         items={filteredItems}
-        buildHref={buildHref}
         emptyTitle={items.length ? "No matching updates found." : emptyTitle}
         emptyDescription={
           items.length

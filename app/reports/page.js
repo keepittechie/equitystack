@@ -173,6 +173,7 @@ function buildReportLinkedPolicyUpdates(items = []) {
         title,
         summary,
         date,
+        href: item.linked_record_href || item.href || "/policies",
         impact_direction: direction || null,
         score_impact_label: buildScoreImpactLabel(item, direction),
         why_this_matters_text: buildWhyThisMattersText(
@@ -513,9 +514,6 @@ export default async function ReportsPage({ searchParams }) {
         />
         <ReportLinkedPolicyMovement
           items={reportLinkedPolicyUpdates}
-          buildHref={(item) =>
-            item.linked_record_href || item.href || "/policies"
-          }
           emptyTitle="No report-linked policy updates are available yet."
           emptyDescription="As report findings are connected to live policy records, they will appear here."
         />
