@@ -1374,11 +1374,19 @@ export function ComparisonMetricsTable({
   );
 }
 
-export function RecentPolicyChangesTable({ items = [], buildHref }) {
+export function RecentPolicyChangesTable({
+  items = [],
+  buildHref,
+  emptyTitle = "No policy updates are available in this view yet.",
+  emptyDescription = null,
+}) {
   if (!items.length) {
     return (
       <div className="dashboard-empty-state text-sm leading-7 text-[var(--ink-soft)]">
-        No policy updates are available in this view yet.
+        <p className="font-medium text-white">{emptyTitle}</p>
+        {emptyDescription ? (
+          <p className="mt-1 text-[var(--ink-soft)]">{emptyDescription}</p>
+        ) : null}
       </div>
     );
   }

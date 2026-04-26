@@ -15,6 +15,7 @@ import {
   RecentPolicyChangesTable,
   ReportCardGrid,
 } from "@/app/components/public/entities";
+import { fetchDashboardPolicyRankings } from "@/lib/services/dashboardPolicyService";
 import {
   CategoryImpactChart,
   DirectionBreakdownChart,
@@ -29,6 +30,77 @@ import {
 } from "@/lib/structured-data";
 
 export const dynamic = "force-dynamic";
+
+const PLACEHOLDER_LABELS = new Set([
+  "outcome update",
+  "policy outcome",
+  "promise record",
+  "tracked bill",
+  "record",
+  "policy",
+]);
+
+function cleanText(value) {
+  return typeof value === "string" ? value.trim() : "";
+}
+
+function isUsefulLabel(value) {
+  const text = cleanText(value);
+  const normalized = text.toLowerCase();
+
+  if (!text || text === "—" || PLACEHOLDER_LABELS.has(normalized)) {
+    return false;
+  }
+
+  return !/^policy outcome\s+\d+$/i.test(text);
+}
+
+function buildReportLinkedPolicyUpdates(items = []) {
+  const seen = new Set();
+
+  return items
+    .map((item) => {
+      const title = cleanText(item.title);
+      const linkedRecordTitle = cleanText(
+        item.linked_record_title || item.linked_record
+      );
+      const summary = cleanText(item.summary);
+      const date = item.date || item.latest_action_date || null;
+      const direction = cleanText(item.impact_direction || item.status);
+
+      if (!isUsefulLabel(title) || !isUsefulLabel(linkedRecordTitle)) {
+        return null;
+      }
+
+      if (!date && !summary && !direction) {
+        return null;
+      }
+
+      const dedupeKey = [
+        title.toLowerCase(),
+        linkedRecordTitle.toLowerCase(),
+        String(date || ""),
+        direction.toLowerCase(),
+      ].join("|");
+
+      if (seen.has(dedupeKey)) {
+        return null;
+      }
+      seen.add(dedupeKey);
+
+      return {
+        ...item,
+        title,
+        summary,
+        date,
+        impact_direction: direction || null,
+        linked_record_title: linkedRecordTitle,
+        record_type: item.record_type || "Policy",
+      };
+    })
+    .filter(Boolean)
+    .slice(0, 8);
+}
 
 export async function generateMetadata({ searchParams }) {
   const resolvedSearchParams = (await searchParams) || {};
@@ -49,8 +121,14 @@ export async function generateMetadata({ searchParams }) {
 
 export default async function ReportsPage({ searchParams }) {
   const resolvedSearchParams = (await searchParams) || {};
-  const data = await fetchReportsHubData(resolvedSearchParams);
+  const [data, policyRankings] = await Promise.all([
+    fetchReportsHubData(resolvedSearchParams),
+    fetchDashboardPolicyRankings({ latestLimit: 16 }),
+  ]);
   const reports = data.filteredReports || [];
+  const reportLinkedPolicyUpdates = buildReportLinkedPolicyUpdates(
+    policyRankings.latestPolicyUpdates || []
+  );
   const strongestCategory = data.reportKpis?.strongest_category || "—";
   const directionData = [
     {
@@ -348,21 +426,12 @@ export default async function ReportsPage({ searchParams }) {
           description="Recent policy updates are the fastest way to move from report context into live policy records."
         />
         <RecentPolicyChangesTable
-          items={(data.scores.records || [])
-            .flatMap((record) => record.scored_outcomes || [])
-            .slice(0, 8)
-            .map((item, index) => ({
-              id: item.policy_id || index,
-              title: item.policy_title || item.title || item.outcome_summary || "Outcome update",
-              summary: item.black_community_impact_note || item.measurable_impact || item.outcome_summary,
-              date: item.impact_start_date || item.action_date || "—",
-              impact_direction: item.impact_direction,
-              slug: item.policy_slug || item.policy_id,
-              record_type: "Policy",
-            }))}
+          items={reportLinkedPolicyUpdates}
           buildHref={(item) =>
-            item.slug ? `/policies/${item.slug}` : "/policies"
+            item.linked_record_href || item.href || "/policies"
           }
+          emptyTitle="No report-linked policy updates are available yet."
+          emptyDescription="As report findings are connected to live policy records, they will appear here."
         />
       </section>
     </main>
