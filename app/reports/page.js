@@ -1,6 +1,10 @@
 import Link from "next/link";
 import { buildListingMetadata } from "@/lib/metadata";
 import { fetchReportsHubData } from "@/lib/public-site-data";
+import {
+  assertSerializableClientProps,
+  normalizeToClientSafeObject,
+} from "@/app/lib/client-contract";
 import StructuredData from "@/app/components/public/StructuredData";
 import { Breadcrumbs } from "@/app/components/public/chrome";
 import {
@@ -215,6 +219,13 @@ export default async function ReportsPage({ searchParams }) {
   const reports = data.filteredReports || [];
   const reportLinkedPolicyUpdates = buildReportLinkedPolicyUpdates(
     policyRankings.latestPolicyUpdates || []
+  );
+  const safeReportLinkedPolicyUpdates = reportLinkedPolicyUpdates.map((row) =>
+    normalizeToClientSafeObject(row)
+  );
+  assertSerializableClientProps(
+    safeReportLinkedPolicyUpdates,
+    "ReportLinkedPolicyMovement.items"
   );
   const strongestCategory = data.reportKpis?.strongest_category || "—";
   const directionData = [
@@ -513,7 +524,7 @@ export default async function ReportsPage({ searchParams }) {
           description="Recent policy updates are the fastest way to move from report context into live policy records."
         />
         <ReportLinkedPolicyMovement
-          items={reportLinkedPolicyUpdates}
+          items={safeReportLinkedPolicyUpdates}
           emptyTitle="No report-linked policy updates are available yet."
           emptyDescription="As report findings are connected to live policy records, they will appear here."
         />
