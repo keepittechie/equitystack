@@ -10,6 +10,7 @@ import {
   MetricCard,
   Panel,
   StatusPill,
+  getImpactDirectionTone,
   getPromiseStatusTone,
 } from "@/app/components/dashboard/primitives";
 import { ScoreBadge } from "./core";
@@ -86,6 +87,25 @@ function RecordTypeBadge({ label }) {
   }
 
   return <StatusPill tone="default">{label}</StatusPill>;
+}
+
+function RecentUpdateWhyTooltip({ text }) {
+  if (!text) {
+    return null;
+  }
+
+  return (
+    <details className="group relative inline-block [&[open]_.why-popover]:block">
+      <summary className="inline-flex h-6 w-6 cursor-pointer list-none items-center justify-center rounded-full border border-[var(--line)] bg-[rgba(18,31,49,0.72)] text-[11px] font-semibold text-[var(--ink-soft)] transition hover:border-[var(--line-strong)] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(132,247,198,0.28)]">
+        <span aria-hidden="true">i</span>
+        <span className="sr-only">Why this matters</span>
+      </summary>
+      <div className="why-popover mt-2 hidden max-w-md rounded-lg border border-[var(--line)] bg-[rgba(8,14,24,0.98)] p-3 text-xs leading-6 text-[var(--ink-soft)] shadow-xl group-hover:block">
+        <p className="mb-1 font-semibold text-white">Why this matters</p>
+        <p>{text}</p>
+      </div>
+    </details>
+  );
 }
 
 function buildPolicyEvidenceSignal(item = {}) {
@@ -1379,6 +1399,10 @@ export function RecentPolicyChangesTable({
   buildHref,
   emptyTitle = "No policy updates are available in this view yet.",
   emptyDescription = null,
+  showScoreImpact = false,
+  showWhyThisMatters = false,
+  formatRecordType = null,
+  formatDirection = null,
 }) {
   if (!items.length) {
     return (
@@ -1400,6 +1424,7 @@ export function RecentPolicyChangesTable({
               <th className="px-5 py-4">Update</th>
               <th className="px-5 py-4">Date</th>
               <th className="px-5 py-4">Direction</th>
+              {showScoreImpact ? <th className="px-5 py-4">Score impact</th> : null}
               <th className="px-5 py-4">Linked record</th>
             </tr>
           </thead>
@@ -1414,22 +1439,42 @@ export function RecentPolicyChangesTable({
                 item.linked_record ||
                 item.title ||
                 `${item.record_type || "Record"}`;
+              const recordTypeLabel =
+                typeof formatRecordType === "function"
+                  ? formatRecordType(item)
+                  : item.record_type;
+              const directionLabel =
+                typeof formatDirection === "function"
+                  ? formatDirection(item)
+                  : item.impact_direction || item.status || "—";
 
               return (
                 <tr key={`${item.slug || item.id}-${index}`} className="border-b border-white/6 last:border-b-0">
                   <td className="px-5 py-4">
-                    {item.record_type ? (
+                    {recordTypeLabel ? (
                       <div className="mb-2">
-                        <RecordTypeBadge label={item.record_type} />
+                        <RecordTypeBadge label={recordTypeLabel} />
                       </div>
                     ) : null}
-                    <p className="font-medium text-white">{item.title}</p>
+                    <div className="flex items-start gap-2">
+                      <p className="font-medium text-white">{item.title}</p>
+                      {showWhyThisMatters ? (
+                        <RecentUpdateWhyTooltip text={item.why_this_matters_text} />
+                      ) : null}
+                    </div>
                     {item.summary ? <p className="mt-1 text-xs leading-6 text-[var(--ink-soft)]">{item.summary}</p> : null}
                   </td>
                   <td className="px-5 py-4 text-[var(--ink-soft)]">
                     {formatRenderableDate(item.date) || formatRenderableDate(item.latest_action_date) || "—"}
                   </td>
-                  <td className="px-5 py-4 text-[var(--ink-soft)]">{item.impact_direction || item.status || "—"}</td>
+                  <td className="px-5 py-4 text-[var(--ink-soft)]">{directionLabel}</td>
+                  {showScoreImpact ? (
+                    <td className="px-5 py-4">
+                      <StatusPill tone={getImpactDirectionTone(item.score_impact_label || item.impact_direction || item.status)}>
+                        {item.score_impact_label || "Pending score"}
+                      </StatusPill>
+                    </td>
+                  ) : null}
                   <td className="px-5 py-4">
                     {href ? (
                       <Link href={href} className="font-medium text-[var(--ink-soft)] hover:text-white">

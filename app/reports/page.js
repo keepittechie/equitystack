@@ -12,9 +12,9 @@ import {
 } from "@/app/components/public/core";
 import { Panel } from "@/app/components/dashboard/primitives";
 import {
-  RecentPolicyChangesTable,
   ReportCardGrid,
 } from "@/app/components/public/entities";
+import ReportLinkedPolicyMovement from "./ReportLinkedPolicyMovement";
 import { fetchDashboardPolicyRankings } from "@/lib/services/dashboardPolicyService";
 import {
   CategoryImpactChart,
@@ -53,6 +53,86 @@ function isUsefulLabel(value) {
   }
 
   return !/^policy outcome\s+\d+$/i.test(text);
+}
+
+function toFiniteNumber(value) {
+  const numeric = Number(value);
+  return Number.isFinite(numeric) ? numeric : null;
+}
+
+function formatSignedScore(value) {
+  const numeric = toFiniteNumber(value);
+  if (numeric == null) {
+    return null;
+  }
+
+  const formatted = Number.isInteger(numeric) ? String(Math.abs(numeric)) : Math.abs(numeric).toFixed(1);
+  if (numeric > 0) {
+    return `+${formatted} Black Impact`;
+  }
+  if (numeric < 0) {
+    return `-${formatted} Black Impact`;
+  }
+  return "No score change";
+}
+
+function buildScoreImpactLabel(item = {}, direction) {
+  const explicitDelta = toFiniteNumber(item.score_delta);
+  if (explicitDelta != null) {
+    return formatSignedScore(explicitDelta);
+  }
+
+  const previousScore = toFiniteNumber(item.previous_score);
+  const currentScore = toFiniteNumber(item.current_score);
+  if (previousScore != null && currentScore != null) {
+    return formatSignedScore(currentScore - previousScore);
+  }
+
+  const impactScore = toFiniteNumber(item.impact_score ?? item.black_impact_score);
+  if (impactScore != null) {
+    return formatSignedScore(impactScore);
+  }
+
+  const normalizedDirection = cleanText(direction).toLowerCase();
+  if (normalizedDirection.includes("positive")) return "Positive signal";
+  if (normalizedDirection.includes("negative")) return "Negative signal";
+  if (normalizedDirection.includes("mixed")) return "Mixed signal";
+  if (normalizedDirection.includes("blocked") || normalizedDirection.includes("stalled")) {
+    return "Stalled";
+  }
+
+  return cleanText(item.score_status) || "Pending score";
+}
+
+function buildWhyThisMattersText(item = {}, recordType, direction) {
+  const directText =
+    cleanText(item.why_it_matters) ||
+    cleanText(item.impact_summary) ||
+    cleanText(item.summary) ||
+    cleanText(item.evidence_notes) ||
+    cleanText(item.source_notes);
+
+  if (directText) {
+    return directText.split(/\s+/).slice(0, 48).join(" ");
+  }
+
+  const normalizedType = cleanText(recordType).toLowerCase();
+  const normalizedDirection = cleanText(direction).toLowerCase();
+
+  if (normalizedType.includes("bill") && normalizedDirection.includes("blocked")) {
+    return "This tracked bill has not reached enacted status, so its downstream community impact remains pending.";
+  }
+  if (normalizedType.includes("promise") && normalizedDirection.includes("positive")) {
+    return "This promise is linked to a documented action that moved in a positive direction.";
+  }
+  if (normalizedType.includes("promise") && normalizedDirection.includes("mixed")) {
+    return "This promise shows partial progress with unresolved outcomes.";
+  }
+  if (normalizedType.includes("policy") && normalizedDirection.includes("negative")) {
+    return "This update reflects a documented negative shift in the tracked policy record.";
+  }
+
+  return "This update connects a tracked record to policy movement or reviewed evidence.";
 }
 
 function buildReportLinkedPolicyUpdates(items = []) {
@@ -94,8 +174,14 @@ function buildReportLinkedPolicyUpdates(items = []) {
         summary,
         date,
         impact_direction: direction || null,
+        score_impact_label: buildScoreImpactLabel(item, direction),
+        why_this_matters_text: buildWhyThisMattersText(
+          item,
+          item.linked_record_type || item.record_type || item.policy_type,
+          direction
+        ),
         linked_record_title: linkedRecordTitle,
-        record_type: item.record_type || "Policy",
+        record_type: item.linked_record_type || item.record_type || "Policy",
       };
     })
     .filter(Boolean)
@@ -425,7 +511,7 @@ export default async function ReportsPage({ searchParams }) {
           title="Latest report-linked policy movement"
           description="Recent policy updates are the fastest way to move from report context into live policy records."
         />
-        <RecentPolicyChangesTable
+        <ReportLinkedPolicyMovement
           items={reportLinkedPolicyUpdates}
           buildHref={(item) =>
             item.linked_record_href || item.href || "/policies"
