@@ -68,7 +68,7 @@ The goal is not to tell users what to think, but to make the record easier to in
 ## Getting Started
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/keepittechie/equitystack.git
 cd equitystack
 npm install
 npm run dev
