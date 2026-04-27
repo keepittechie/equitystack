@@ -24,7 +24,7 @@ INSERT INTO explainers (
 Drug laws, mandatory minimums, policing priorities, plea bargaining, and long sentences expanded the reach and duration of imprisonment.
 Incarceration remained historically high even as crime later declined, underscoring the importance of policy design.
 Black communities bore a disproportionate share of the resulting imprisonment, family disruption, and civic exclusion.',
-  'The United States has one of the highest incarceration rates in the world. Public debate often treats that fact as a direct reflection of crime. The stronger historical record points instead to the interaction of crime, politics, law, sentencing, and enforcement priorities.',
+  'The United States has one of the highest incarceration rates in the world. Public debate can treat that fact as a direct reflection of crime. The stronger historical record points instead to the interaction of crime, politics, law, sentencing, and enforcement priorities.',
   'This topic matters because incarceration changes far more than prison counts. It affects employment, family stability, health, voting, education, neighborhood life, and long-run inequality. If imprisonment grew mainly because policy intensified punishment and enforcement, then mass incarceration is not merely a social outcome. It is a governance outcome.
 
 This is also one of the clearest places where Black impact becomes visible through state power. Exposure to arrest, harsh sentencing, supervision, and incarceration was not evenly distributed across communities.',
@@ -38,7 +38,7 @@ The strongest claim is therefore structural: mass incarceration was built throug
 1986 | Anti-Drug Abuse Act becomes law
 1994 | Violent Crime Control and Law Enforcement Act becomes law
 2000s | Crime declines while incarceration remains historically high
-2018 | First Step Act creates limited federal reform
+2018 | First Step Act creates federal reform with constrained reach
 2024 | BJS reports more than 5.4 million adults under correctional supervision in 2022',
   'Anti-Drug Abuse Act of 1986; Violent Crime Control and Law Enforcement Act of 1994; mandatory minimums; correctional supervision; First Step Act',
   'This still matters because incarceration has afterlives. A prison sentence affects earnings, housing, family structure, civic participation, and health long after release. Communities with concentrated imprisonment carry those burdens collectively.

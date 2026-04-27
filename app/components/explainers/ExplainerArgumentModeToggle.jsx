@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Panel,
   SectionHeader,
@@ -8,12 +8,51 @@ import {
 } from "@/app/components/dashboard/primitives";
 import ShareableResponseCard from "./ShareableResponseCard";
 
-export default function ExplainerArgumentModeToggle({
+function buildFullArgumentCopyText({
   argumentMode,
   explainerTitle,
   explainerSlug,
 }) {
-  const [mode, setMode] = useState("explainer");
+  const commonClaim = argumentMode.commonClaims?.[0] || null;
+  const sourcePath = explainerSlug
+    ? `equitystack.org/explainers/${explainerSlug}`
+    : "equitystack.org";
+  const keyPoints = (argumentMode.keyPoints || [])
+    .map((item) => `- ${item}`)
+    .join("\n");
+  const debateLines = (argumentMode.debateLines || [])
+    .map((item) => `- ${item}`)
+    .join("\n");
+
+  return [
+    `Claim:\n${commonClaim?.claim || explainerTitle || "Public claim"}`,
+    `Response:\n${commonClaim?.response || argumentMode.summary || ""}`,
+    keyPoints ? `Key point:\n${keyPoints}` : "",
+    debateLines ? `Debate lines:\n${debateLines}` : "",
+    commonClaim?.question ? `Question:\n${commonClaim.question}` : "",
+    `Source:\n${sourcePath}`,
+  ]
+    .filter(Boolean)
+    .join("\n\n");
+}
+
+export default function ExplainerArgumentModeToggle({
+  argumentMode,
+  explainerTitle,
+  explainerSlug,
+  initialMode = "explainer",
+}) {
+  const [mode, setMode] = useState(initialMode === "argument" ? "argument" : "explainer");
+  const [copyStatus, setCopyStatus] = useState("idle");
+  const timeoutRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
   if (!argumentMode) {
     return null;
@@ -24,6 +63,38 @@ export default function ExplainerArgumentModeToggle({
   const commonClaims = argumentMode.commonClaims || [];
   const debateLines = argumentMode.debateLines || [];
   const shareCards = argumentMode.shareCards || [];
+  const fullArgumentText = buildFullArgumentCopyText({
+    argumentMode,
+    explainerTitle,
+    explainerSlug,
+  });
+
+  function scheduleCopyReset() {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    timeoutRef.current = setTimeout(() => {
+      setCopyStatus("idle");
+    }, 1800);
+  }
+
+  async function handleCopyFullArgument() {
+    if (!navigator?.clipboard?.writeText) {
+      setCopyStatus("failed");
+      scheduleCopyReset();
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(fullArgumentText);
+      setCopyStatus("copied");
+      scheduleCopyReset();
+    } catch {
+      setCopyStatus("failed");
+      scheduleCopyReset();
+    }
+  }
 
   return (
     <Panel className="overflow-hidden">
@@ -32,29 +103,44 @@ export default function ExplainerArgumentModeToggle({
         title="Argument mode"
         description="Switch to a condensed version of this explainer for quick claims, responses, questions, and copy-ready lines."
         action={
-          <div
-            className="inline-flex rounded-md border border-[var(--line)] bg-[rgba(18,31,49,0.58)] p-1"
-            role="group"
-            aria-label="Explainer display mode"
-          >
-            {[
-              ["explainer", "Explainer view"],
-              ["argument", "Argument mode"],
-            ].map(([value, label]) => (
-              <button
-                key={value}
-                type="button"
-                onClick={() => setMode(value)}
-                aria-pressed={mode === value}
-                className={`inline-flex min-h-8 items-center rounded px-3 text-[12px] font-semibold transition-[background-color,color,box-shadow] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(132,247,198,0.28)] ${
-                  mode === value
-                    ? "bg-[var(--accent)] text-[#051019]"
-                    : "text-[var(--ink-soft)] hover:bg-[rgba(18,31,49,0.86)] hover:text-white"
-                }`}
-              >
-                {label}
-              </button>
-            ))}
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={handleCopyFullArgument}
+              className="inline-flex min-h-9 items-center justify-center rounded-md border border-[var(--line-strong)] bg-[rgba(18,31,49,0.58)] px-3 text-[12px] font-semibold text-white transition-[background-color,border-color,box-shadow] hover:border-[var(--line-strong)] hover:bg-[rgba(18,31,49,0.86)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(132,247,198,0.28)]"
+              aria-label="Copy full argument"
+              aria-live="polite"
+            >
+              {copyStatus === "copied"
+                ? "Copied"
+                : copyStatus === "failed"
+                  ? "Copy failed"
+                  : "Copy full argument"}
+            </button>
+            <div
+              className="inline-flex rounded-md border border-[var(--line)] bg-[rgba(18,31,49,0.58)] p-1"
+              role="group"
+              aria-label="Explainer display mode"
+            >
+              {[
+                ["explainer", "Explainer view"],
+                ["argument", "Argument mode"],
+              ].map(([value, label]) => (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => setMode(value)}
+                  aria-pressed={mode === value}
+                  className={`inline-flex min-h-8 items-center rounded px-3 text-[12px] font-semibold transition-[background-color,color,box-shadow] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(132,247,198,0.28)] ${
+                    mode === value
+                      ? "bg-[var(--accent)] text-[#051019]"
+                      : "text-[var(--ink-soft)] hover:bg-[rgba(18,31,49,0.86)] hover:text-white"
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
           </div>
         }
       />

@@ -23,15 +23,15 @@ INSERT INTO explainers (
   'Sentencing outcomes are shaped by both statute and discretion, not just by the charged offense.
 Mandatory minimums, charge selection, plea bargaining, and departure practices can widen disparities even under formally neutral laws.
 The crack-versus-powder cocaine disparity remains one of the clearest examples of racially unequal sentencing design and impact.
-Later reforms narrowed some disparities, but measurable sentencing differences and unequal exposure to severe punishment remain.',
-  'Sentencing is often presented as the straightforward application of law to facts. In practice, punishment is shaped by legislation, prosecutorial decisions, plea bargaining, criminal-history rules, judicial discretion, and the availability of relief from mandatory penalties.',
+Later reforms narrowed specific disparities, but measurable sentencing differences and unequal exposure to severe punishment remain.',
+  'Sentencing is frequently presented as the straightforward application of law to facts. In practice, punishment is shaped by legislation, prosecutorial decisions, plea bargaining, criminal-history rules, judicial discretion, and the availability of relief from mandatory penalties.',
   'This topic matters because sentencing is one of the clearest places where policy design becomes lived inequality. Sentence length affects incarceration, family stability, earnings, wealth, voting, and the long-run health of communities. If the system punishes similarly situated people differently, the damage extends far beyond the courtroom.
 
-It also matters because public debate often skips from arrest or conviction straight to punishment as though sentencing were automatic. The record shows that lawmakers and institutions make choices that structure how much punishment is imposed and on whom.',
+It also matters because public debate frequently skips from arrest or conviction straight to punishment as though sentencing were automatic. The record shows that lawmakers and institutions make choices that structure how much punishment is imposed and on whom.',
   'People are sentenced based only on the crime they committed, so disparities simply reflect behavior rather than the system.',
   'In reality, punishment is shaped by more than the offense label. Legislatures set mandatory minimums and drug thresholds. Prosecutors choose charges and plea offers. Judges sentence within or outside guideline ranges. Defendants with different resources, records, and bargaining leverage face different odds at each step.
 
-One of the clearest examples is federal cocaine sentencing. For years, the law punished crack cocaine far more severely than powder cocaine, even though the substances are pharmacologically related. That disparity fell heavily on Black communities. Reforms such as the Fair Sentencing Act and the First Step Act narrowed some of the gap, but did not eliminate every disparity.
+One of the clearest examples is federal cocaine sentencing. For years, the law punished crack cocaine far more severely than powder cocaine, even though the substances are pharmacologically related. That disparity fell heavily on Black communities. Reforms such as the Fair Sentencing Act and the First Step Act narrowed specific parts of the gap, but did not eliminate every disparity.
 
 The strongest claim is therefore structural: sentencing disparities emerge from the interaction of law, discretion, and enforcement, not from a single courtroom moment viewed in isolation.',
   '1986 | Anti-Drug Abuse Act creates the 100-to-1 federal crack-to-powder sentencing disparity

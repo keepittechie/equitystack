@@ -477,8 +477,9 @@ function ExplainerCategoryPage({ categoryData, slug }) {
   );
 }
 
-export default async function ExplainerDetailPage({ params }) {
+export default async function ExplainerDetailPage({ params, searchParams }) {
   const { slug } = await params;
+  const resolvedSearchParams = (await searchParams) || {};
   const [explainer, explainersIndex] = await Promise.all([
     fetchExplainerDetailData(slug),
     fetchExplainersIndexData(),
@@ -636,6 +637,7 @@ export default async function ExplainerDetailPage({ params }) {
         argumentMode={explainer.argument_mode}
         explainerTitle={explainer.title}
         explainerSlug={slug}
+        initialMode={resolvedSearchParams.mode === "argument" ? "argument" : "explainer"}
       />
 
       <PageRoleCallout

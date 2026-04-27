@@ -25,13 +25,13 @@ Public institutions helped build paths into land ownership, homeownership, educa
 The strongest historical question is not whether help existed, but who could access it on equal terms.
 Ignoring policy history turns unequal opportunity into a misleading morality tale about merit alone.',
   'The idea that Americans rise or fall entirely on their own is deeply rooted in public debate. But the history of U.S. mobility is full of public scaffolding: land policy, mortgage systems, labor rules, schools, roads, colleges, and subsidized credit.',
-  'This matters because bootstrap rhetoric is often used to erase the policy structure of opportunity. If some populations repeatedly benefited from government-backed wealth-building while others faced exclusion or partial access, then raw outcome comparisons can no longer be treated as simple reflections of work ethic or character.
+  'This matters because bootstrap rhetoric is used in public debate to erase the policy structure of opportunity. If one population repeatedly benefited from government-backed wealth-building while others faced exclusion or partial access, then raw outcome comparisons can no longer be treated as simple reflections of work ethic or character.
 
 That makes this explainer one of the clearest bridge pages on the site. It ties together housing, land, labor, education, and wealth into a single historical argument about how opportunity was actually built.',
   'Nobody was given anything. People just worked hard, made good choices, and pulled themselves up by their bootstraps.',
   'In reality, upward mobility in the United States was repeatedly supported by public policy. Federal land law distributed acreage. Federal housing institutions widened access to mortgages. The GI Bill expanded education and home loans. Labor law stabilized bargaining power and baseline wages. Higher-education policy deepened access to colleges and institutions serving Black students.
 
-The key issue is not whether hard work mattered. It did. The stronger historical claim is that hard work operated inside systems shaped by law and public resources. Those systems did not treat everyone equally. Black Americans were blocked from slavery-era asset accumulation, constrained in access to land, excluded from many housing opportunities, segmented in labor markets, and often denied equal use of formally race-neutral programs.
+The key issue is not whether hard work mattered. It did. The stronger historical claim is that hard work operated inside systems shaped by law and public resources. Those systems did not treat everyone equally. Black Americans were blocked from slavery-era asset accumulation, constrained in access to land, excluded from documented housing opportunities, segmented in labor markets, and denied equal use of formally race-neutral programs.
 
 The strongest conclusion is therefore structural rather than moralistic: American mobility has long depended on policy-created ladders, and the distribution of those ladders was unequal.',
   '1862 | Homestead Act creates a major land-distribution pathway
@@ -41,12 +41,12 @@ The strongest conclusion is therefore structural rather than moralistic: America
 1944 | GI Bill expands access to education and home loans
 1965 | Higher Education Act deepens federal higher-education support',
   'Homestead Act; FHA-era housing policy; National Labor Relations Act; Fair Labor Standards Act; GI Bill; Higher Education Act',
-  'This still matters because debates about poverty, wealth, and achievement often assume a neutral starting line. The record shows repeated public intervention in building opportunity, along with unequal access to those interventions.
+  'This still matters because debates about poverty, wealth, and achievement frequently assume a neutral starting line. The record shows repeated public intervention in building opportunity, along with unequal access to those interventions.
 
 That means claims about merit and mobility are incomplete unless they also explain who got the policy support that made mobility easier in the first place.',
   'Use this explainer as a high-level frame before opening more specific pages on land, housing, education, or labor. The strongest source mix shows that public support was central to mobility, then asks how racial exclusion changed the results.
 
-For this topic, the clearest Black-impact channel is blocked ladder access: Black communities were often denied equal entry into the very public systems later used to celebrate American self-reliance.',
+For this topic, the clearest Black-impact channel is blocked ladder access: Black communities faced documented barriers to equal entry into the very public systems later used to celebrate American self-reliance.',
   1
 )
 ON DUPLICATE KEY UPDATE

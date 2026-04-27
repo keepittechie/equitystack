@@ -24,8 +24,8 @@ INSERT INTO explainers (
 How equal protection works has depended on courts, legislation, and enforcement, not text alone.
 Some of the most important equal-protection milestones came only after decades of judicial failure and legislative struggle.
 Modern claims about equal treatment need historical context because formal neutrality and equal real-world protection are not the same thing.',
-  'Equal protection under the law is one of the most cited constitutional principles in American politics. It originates in the 14th Amendment and is often invoked as proof that the legal system already guarantees fairness to everyone.',
-  'This topic matters because equal protection is often used in public argument as if the constitutional promise settled the practical question. But American history shows a long distance between declaring a right and enforcing it. Segregation, disenfranchisement, discriminatory housing systems, and unequal access to remedies all persisted long after the 14th Amendment was ratified.
+  'Equal protection under the law is one of the most cited constitutional principles in American politics. It originates in the 14th Amendment and is invoked as proof that the legal system already guarantees fairness to everyone.',
+  'This topic matters because equal protection is used in public debate in public argument as if the constitutional promise settled the practical question. But American history shows a long distance between declaring a right and enforcing it. Segregation, disenfranchisement, discriminatory housing systems, and unequal access to remedies all persisted long after the 14th Amendment was ratified.
 
 This makes equal protection one of the strongest bridge topics on the site. It connects constitutional language to court doctrine, civil-rights law, housing, education, and the real-world administration of justice.',
   'The Constitution guarantees equal protection under the law, so everyone is treated equally today.',
@@ -42,10 +42,10 @@ The strongest claim is therefore not that equal protection failed to matter. It 
   '14th Amendment; Plessy v. Ferguson; Brown v. Board of Education; Civil Rights Act of 1964; Fair Housing Act',
   'This still matters because constitutional language alone does not tell readers whether people received equal treatment in practice. Equal protection remains central to debates over race, voting, education, policing, housing, and access to remedies.
 
-It also matters because many contemporary arguments collapse formal neutrality into substantive fairness. The historical record shows that those are not the same thing.',
+It also matters because contemporary arguments collapse formal neutrality into substantive fairness. The historical record shows that those are not the same thing.',
   'Use this explainer as a constitutional gateway into civil-rights law and enforcement records. The strongest source mix combines the amendment text, landmark cases, and later statutes that tried to make the guarantee more real.
 
-For this topic, the clearest Black-impact channel is the gap between promise and enforcement: Black Americans were the central population for whom equal protection was written, contested, and so often denied in practice.',
+For this topic, the clearest Black-impact channel is the gap between promise and enforcement: Black Americans were the central population for whom equal protection was written, contested, and repeatedly denied in practice.',
   1
 )
 ON DUPLICATE KEY UPDATE

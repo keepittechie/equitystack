@@ -19,19 +19,19 @@ INSERT INTO explainers (
   'crime-statistics-context-and-misuse',
   'Crime Statistics in Context: How the 13/50 Claim Is Used and Misused',
   'Criminal Justice',
-  'A measurement-focused explainer on why race-and-crime slogans collapse unlike data systems, ignore what official statistics can and cannot show, and often hide the role of policy, reporting, and enforcement.',
+  'A measurement-focused explainer on why race-and-crime slogans collapse unlike data systems, ignore what official statistics can and cannot show, and can hide the role of policy, reporting, and enforcement.',
   'Population share, victimization, reported crime, arrests, convictions, and incarceration are different measures.
-Official police data do not capture all crime, and victimization surveys exist precisely because many incidents are never reported or cleared.
+Official police data do not capture all crime, and victimization surveys exist precisely because incidents outside police reporting systems are not captured or cleared.
 Arrest-based or law-enforcement-based statistics cannot by themselves explain broad claims about race, behavior, or public policy.
 Crime data need methodological, geographic, and institutional context before they can support larger conclusions.',
   'One of the most repeated slogans in public argument about race and crime combines a population figure with a crime statistic as if both describe the same thing. A serious analysis has to start by asking what the numbers actually measure.',
-  'This topic matters because crime statistics are often used to justify large claims about race, policing, punishment, and social worth. If the underlying measures are misunderstood, the argument becomes stronger than the data allow.
+  'This topic matters because crime statistics are used in public debate to justify large claims about race, policing, punishment, and social worth. If the underlying measures are misunderstood, the argument becomes stronger than the data allow.
 
 EquityStack treats this as a methodology page before it becomes a politics page. Readers need to understand the difference between reported crime, arrests, victimization, and clearances before they use crime numbers to interpret race or policy.',
   'Black people are 13 percent of the population and commit 50 percent of violent crime, so the statistics speak for themselves.',
-  'The slogan usually mixes unlike categories. The population side comes from demographic data. The crime side is often based on law-enforcement data, such as arrest or offense reporting. Those are not the same thing as convictions, total offending, or the complete universe of victimization.
+  'The slogan mixes unlike categories. The population side comes from demographic data. The crime side is frequently based on law-enforcement data, such as arrest or offense reporting. Those are not the same thing as convictions, total offending, or the complete universe of victimization.
 
-FBI reporting systems measure crimes known to law enforcement, and those systems have changed over time. Clearance rates are incomplete, which means many crimes are not solved by arrest. The National Crime Victimization Survey exists because many incidents are never reported to police at all. That does not make official crime data useless, but it does mean the numbers require careful interpretation.
+FBI reporting systems measure crimes known to law enforcement, and those systems have changed over time. Clearance rates are incomplete, which means unsolved offenses do not produce an identified offender in police data. The National Crime Victimization Survey exists because victimizations outside police reporting systems are not captured in police data. That does not make official crime data useless, but it does mean the numbers require careful interpretation.
 
 The strongest claim is therefore methodological: crime statistics can inform debate, but slogans that jump from raw categories to sweeping conclusions about race or policy misuse what the data are capable of proving.',
   '1930 | Uniform Crime Reporting begins under the FBI
@@ -42,7 +42,7 @@ The strongest claim is therefore methodological: crime statistics can inform deb
   'Uniform Crime Reporting; National Crime Victimization Survey; NIBRS; FBI clearances; crime-data methodology',
   'This still matters because poorly used crime statistics can harden stereotypes, distort policy debate, and short-circuit discussion of policing, poverty, segregation, sentencing, and institutional bias.
 
-It also matters because some of the most polarizing public claims depend less on what the data show than on what listeners are invited to assume from them.',
+It also matters because polarizing public claims can depend less on what the data show than on what listeners are invited to assume from them.',
   'Use this explainer before moving into policing, sentencing, or incarceration pages. The strongest source mix combines FBI reporting-methodology material with the NCVS so readers can see why administrative and survey data answer different questions.
 
 For this topic, the clearest Black-impact channel is interpretive harm: bad statistical framing can be used to justify harsher policing, punishment, and political hostility toward Black communities.',
@@ -94,7 +94,7 @@ INSERT INTO explainer_sources (
   'Government',
   'Bureau of Justice Statistics',
   NULL,
-  'Primary federal survey source showing that many victimizations are measured outside police reporting systems.',
+  'Primary federal survey source showing that victimizations are measured outside police reporting systems.',
   2
 ), (
   @explainer_id,

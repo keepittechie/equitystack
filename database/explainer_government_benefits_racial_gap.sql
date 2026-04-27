@@ -19,19 +19,19 @@ INSERT INTO explainers (
   'government-benefits-racial-gap',
   'Government Benefits and the Racial Gap',
   'Economics',
-  'A cross-policy explainer on how public support helped build wealth and security in the United States, while access to those benefits was often filtered through racial exclusion, local gatekeeping, and unequal institutions.',
-  'Government support did not merely relieve hardship; it often created durable pathways into land ownership, homeownership, education, wages, and wealth.
+  'A cross-policy explainer on how public support helped build wealth and security in the United States, while access to those benefits was filtered in documented ways through racial exclusion, local gatekeeping, and unequal institutions.',
+  'Government support did not merely relieve hardship; it created durable pathways into land ownership, homeownership, education, wages, and wealth.
 The strongest historical question is not whether government intervened, but who could use those interventions fully.
-Black Americans were often excluded outright or disadvantaged in practice through local administration, segregation, underfunding, and discriminatory markets.
+Black Americans faced documented exclusion outright or disadvantaged in practice through local administration, segregation, underfunding, and discriminatory markets.
 Modern fairness debates are distorted when they forget that public help was central to building white middle-class wealth.',
-  'This explainer addresses one of the most persistent contradictions in American politics: government support is often described as unnatural or suspect, even though public policy repeatedly helped build economic security and wealth in the United States.',
-  'This topic matters because many modern arguments imply that white wealth and economic stability emerged mostly through private effort while Black communities are asking for unusual or special public help. The documentary record shows something different. Public institutions repeatedly opened ladders into land, housing, education, labor rights, and credit.
+  'This explainer addresses one of the most persistent contradictions in American politics: government support is described in public debate as unnatural or suspect, even though public policy repeatedly helped build economic security and wealth in the United States.',
+  'This topic matters because modern arguments imply that white wealth and economic stability emerged mostly through private effort while Black communities are asking for unusual or special public help. The documentary record shows something different. Public institutions repeatedly opened ladders into land, housing, education, labor rights, and credit.
 
-The problem was not that government stayed out. The problem was that access to public support was often racially uneven. That makes this explainer a high-level bridge across multiple EquityStack themes: land, housing, labor, education, and wealth.',
+The problem was not that government stayed out. The problem was that access to public support was racially uneven. That makes this explainer a high-level bridge across multiple EquityStack themes: land, housing, labor, education, and wealth.',
   'The government never gave white people handouts, and Black communities are asking for special treatment.',
   'From land policy to mortgage finance, veterans benefits, labor protections, and higher education support, the federal government repeatedly helped structure economic mobility. The strongest historical question is not whether benefits existed. It is who could use them and under what conditions.
 
-The record shows repeated inequality across those channels. Land policy favored those able to claim and retain acreage. FHA-era housing policy widened access to mortgage credit while Black families were often excluded. The GI Bill expanded opportunity for millions, but Black veterans often faced segregated colleges and discriminatory housing markets. Labor law helped stabilize wages and bargaining rights, but exclusion and segmentation in labor markets limited equal gain. Higher-education policy later supported Black colleges, but under conditions shaped by long prior inequality.
+The record shows repeated inequality across those channels. Land policy favored those able to claim and retain acreage. FHA-era housing policy widened access to mortgage credit while Black families were excluded in documented ways. The GI Bill expanded opportunity for millions, but Black veterans faced segregated colleges and discriminatory housing markets. Labor law helped stabilize wages and bargaining rights, but exclusion and segmentation in labor markets limited equal gain. Higher-education policy later supported Black colleges, but under conditions shaped by long prior inequality.
 
 The strongest claim is therefore cumulative: public policy helped build the American middle class, but Black Americans were repeatedly denied equal access to some of the most valuable routes into that outcome.',
   '1862 | Homestead Act opens a major land-distribution pathway

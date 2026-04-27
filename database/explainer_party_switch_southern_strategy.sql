@@ -19,17 +19,17 @@ INSERT INTO explainers (
   'party-switch-southern-strategy',
   'Did the Parties Switch? The Southern Strategy Explained',
   'Politics',
-  'How civil-rights conflict, southern white backlash, and long-term coalition change moved most Black voters into the modern Democratic coalition while many white southern conservatives moved into the Republican coalition.',
+  'How civil-rights conflict, southern white backlash, and long-term coalition change moved most Black voters into the modern Democratic coalition while a large share of white southern conservatives moved into the Republican coalition.',
   'Party realignment happened over decades, not in a single election or a single law.
 Black voters became a core Democratic constituency as national Democrats increasingly embraced civil-rights enforcement.
 Many white southern conservatives moved toward the Republican Party as civil-rights law and federal intervention reshaped regional politics.
 Historical party labels from the 1800s do not map cleanly onto modern ideology, coalition structure, or civil-rights positioning.',
   'This explainer examines one of the most common political-history arguments in modern U.S. debate: whether the Democratic and Republican parties changed in meaningful ways over time, especially around civil rights and Black political alignment.',
-  'This matters because party-switch arguments are often used to flatten history into a slogan. The stronger record is not that the parties magically traded identities overnight. It is that presidential politics, civil-rights law, southern backlash, and national coalition-building reshaped what the parties represented and who their core voters became.
+  'This matters because party-switch arguments are used in public debate to flatten history into a slogan. The stronger record is not that the parties magically traded identities overnight. It is that presidential politics, civil-rights law, southern backlash, and national coalition-building reshaped what the parties represented and who their core voters became.
 
 That distinction is essential for EquityStack. The site tracks laws, promises, and outcomes. Those records make more sense when readers understand that modern party alignment grew out of long conflict over civil rights, voting rights, federal power, and racial politics.',
   'Democrats were the party of slavery, so the parties never changed.',
-  'The strongest evidence points to a long realignment, not a single-day switch. Through much of the 19th and early 20th centuries, the South was dominated by white Democrats committed to segregation and Black disenfranchisement. But by the mid-20th century, national Democratic leaders increasingly backed civil-rights measures, while many southern white conservatives reacted against those moves.
+  'The strongest evidence points to a long realignment, not a single-day switch. Through much of the 19th and early 20th centuries, the South was dominated by white Democrats committed to segregation and Black disenfranchisement. But by the mid-20th century, national Democratic leaders increasingly backed civil-rights measures, while a substantial bloc of southern white conservatives reacted against those moves.
 
 Key markers include the 1948 Dixiecrat revolt, Truman''s desegregation order, the Civil Rights Act of 1964, the Voting Rights Act of 1965, and later Republican electoral strategies that appealed to white southern resistance to federal civil-rights intervention. Black voters, who had already begun moving toward Democrats during the New Deal era, became an even more central Democratic constituency as civil-rights conflict sharpened.
 

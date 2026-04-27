@@ -26,7 +26,7 @@ The model does not directly measure manager qualifications, individual performan
 EquityStack treats the study as a policy-relevant claim that should be evaluated through its assumptions before its headline cost estimate is accepted.',
   'The study is a White House economic analysis titled "The Economic Consequences of DEI." It argues that diversity, equity, and inclusion initiatives changed management hiring and promotion patterns after the mid-2010s and that those changes reduced productivity.
 
-The study matters because economic claims like this can be used to justify anti-DEI policy decisions, contracting rules, enforcement priorities, and institutional changes. This explainer focuses only on the study itself: what it claims, how it measures DEI, and what its methodology can and cannot prove.',
+The study matters because economic claims like this can be used to justify anti-DEI policy decisions, contracting rules, enforcement priorities, and institutional changes. This explainer focuses on the evidence chain: what the study claims, how it measures DEI, what scale its headline estimate asserts, and what its methodology can and cannot prove.',
   'The main methodological problem is that the study turns a demographic residual into a DEI measure. A state-industry cell having more minority managers than the model predicts may be consistent with DEI activity, but it can also reflect local labor supply, recruitment changes, industry composition, firm growth, geography, education pipelines, occupational sorting, or other post-2016 changes.
 
 Proxy is not proof of policy. Correlation is not causation. The analysis assumes that increased minority representation above the model-predicted level reflects non-merit hiring or promotion, but it does not directly observe hiring criteria, applicant qualifications, manager performance, firm-specific DEI programs, or the actual reason a manager was selected.
@@ -39,7 +39,7 @@ Those are the study''s claims. They are not the same thing as direct evidence th
 
 In simple terms, the model asks whether a particular industry in a particular state has more minority managers than would be expected after controlling for broader state, industry, and year patterns. The leftover amount is treated as evidence of DEI activity.
 
-That construction is important. A proxy can be useful when direct measurement is difficult, but it is still an indirect measure. It does not show whether a company adopted a DEI policy, whether a promotion was based on that policy, or whether the selected manager was less qualified or less productive.',
+That construction is important. A proxy can be useful when direct measurement is difficult, but it is still an indirect measure. It does not show whether a company adopted a DEI policy, whether a promotion was based on that policy, or whether the selected manager was less qualified, or whether that manager caused a productivity change.',
   NULL,
   'The study does not prove that minority managers are less qualified.
 

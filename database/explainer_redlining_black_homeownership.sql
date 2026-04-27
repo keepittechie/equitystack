@@ -27,7 +27,7 @@ Modern redlining enforcement shows the problem is not only historical; discrimin
   'This explainer breaks down redlining, federal housing discrimination, and the long-term consequences for Black wealth and homeownership.',
   'Housing is one of the clearest examples of how public policy built wealth for some communities while excluding others. Redlining matters not only because it shaped where Black families could live, but because homeownership has long been one of the main channels for savings, intergenerational wealth, neighborhood stability, and access to appreciating assets.
 
-This topic also matters because redlining is often flattened into a map story from the 1930s. The stronger record is broader: federal mortgage design, underwriting culture, local lending behavior, later disclosure rules, and modern fair-lending enforcement all shape how the Black homeownership gap should be understood.',
+This topic also matters because redlining can be flattened into a map story from the 1930s. The stronger record is broader: federal mortgage design, underwriting culture, local lending behavior, later disclosure rules, and modern fair-lending enforcement all shape how the Black homeownership gap should be understood.',
   'Black families just did not buy homes at the same rate because of personal choices, credit behavior, or ordinary market outcomes.',
   'Federal housing systems, lender behavior, appraisal discrimination, and neighborhood grading practices made mortgage access and appreciation far less available to Black families. These were policy-backed structural barriers, not just individual outcomes.
 

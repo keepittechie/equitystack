@@ -22,16 +22,16 @@ INSERT INTO explainers (
   'A look at how one of the largest wealth-building land transfers in U.S. history operated in practice, and why formal eligibility did not translate into equal Black access to land and durable property ownership.',
   'Land access was one of the most important wealth-building opportunities in U.S. history.
 The Homestead Act did not explicitly ban Black claimants, but formal eligibility was not the same as equal practical access.
-Formerly enslaved people faced violence, poverty, weak federal protection, and limited institutional support when trying to convert formal freedom into land ownership.
+Formerly enslaved people faced violence, poverty, weak federal protection, and constrained institutional support when trying to convert formal freedom into land ownership.
 The resulting land gap mattered because ownership, inheritance, and productive assets compound across generations.',
   'This explainer looks at one of the biggest wealth-building opportunities in U.S. history and asks who could actually access it, under what conditions, and with what lasting effects.',
   'This topic matters because claims about equal opportunity often treat the Homestead Act as if it proved that America broadly distributed wealth-building resources to anyone willing to work. The real record is more complicated. Land policy did create opportunity, but the ability to use that opportunity depended on freedom, capital, physical safety, legal enforcement, and the chance to hold property long enough to keep it.
 
 That makes the Homestead Act a strong EquityStack case study. It shows why a formal opening in the law is not enough if surrounding conditions make it far easier for some groups than for others to claim and retain the benefit.',
   'Anybody could get free land, so America already gave everyone the same opportunity.',
-  'The Homestead Act opened a major land-distribution pathway, but Black Americans did not enter that system from the same starting point as white settlers. Enslavement had denied generations of Black people wages, movable capital, education, and legal autonomy. After emancipation, many Black families still faced debt, violence, racial terror, and weak federal protection.
+  'The Homestead Act opened a major land-distribution pathway, but Black Americans did not enter that system from the same starting point as white settlers. Enslavement had denied generations of Black people wages, movable capital, education, and legal autonomy. After emancipation, Black families still faced debt, violence, racial terror, and weak federal protection.
 
-Although some Black homesteaders did successfully claim land, especially in parts of the Great Plains and Oklahoma, many others lacked the money, tools, livestock, transport, legal support, and physical safety needed to prove up claims and hold them. The short life of the Freedmen''s Bureau and the collapse of Reconstruction narrowed the practical path into land ownership even further.
+Although documented Black homesteaders did successfully claim land, especially in parts of the Great Plains and Oklahoma, others lacked the money, tools, livestock, transport, legal support, and physical safety needed to prove up claims and hold them. The short life of the Freedmen''s Bureau and the collapse of Reconstruction narrowed the practical path into land ownership even further.
 
 The strongest claim is therefore not that Black Americans were universally barred by the text of the Homestead Act. It is that one of the country''s largest land-transfer opportunities unfolded in a society where Black people were emerging from slavery into unequal conditions that made equal benefit far less attainable.',
   '1862 | Homestead Act signed into law
