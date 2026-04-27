@@ -8,6 +8,7 @@ import { getResearchNavItems } from "@/lib/thematic-pages";
 
 const PRIMARY_NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard" },
+  { href: "/#start-here", label: "Start Here" },
   { href: "/policies", label: "Policies" },
   { href: "/bills", label: "Bills" },
   { href: "/presidents", label: "Presidents" },
@@ -89,11 +90,13 @@ const FOOTER_REFERENCE_LINKS = [
 ];
 
 function isActive(pathname, href) {
-  if (href === "/") {
+  const hrefPath = String(href || "").split("#")[0] || "/";
+
+  if (hrefPath === "/") {
     return pathname === "/";
   }
 
-  return pathname === href || pathname?.startsWith(`${href}/`);
+  return pathname === hrefPath || pathname?.startsWith(`${hrefPath}/`);
 }
 
 function SearchIcon() {

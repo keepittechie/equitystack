@@ -1,25 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { buildPageMetadata } from "@/lib/metadata";
-import { fetchHomePageData, buildPolicySlug } from "@/lib/public-site-data";
+import { fetchHomePageData } from "@/lib/public-site-data";
+import { resolvePresidentImageSrc } from "@/lib/president-image-paths";
 import StructuredData from "@/app/components/public/StructuredData";
-import {
-  SectionIntro,
-  KpiCard,
-  MethodologyCallout,
-  SourceTrustPanel,
-} from "@/app/components/public/core";
-import {
-  CategoryImpactChart,
-  DirectionBreakdownChart,
-  ImpactTrendChart,
-} from "@/app/components/public/charts";
-import {
-  PolicyCardList,
-  PresidentCardGrid,
-  RecentPolicyChangesTable,
-} from "@/app/components/public/entities";
-import { Panel, SectionHeader, StatusPill } from "@/app/components/dashboard/primitives";
+import { ScoreBadge, SectionIntro } from "@/app/components/public/core";
+import { PresidentPortrait } from "@/app/components/public/entities";
+import { MetricCard, Panel, StatusPill } from "@/app/components/dashboard/primitives";
 import TrustBar from "@/app/components/public/TrustBar";
 import {
   buildCollectionPageJsonLd,
@@ -43,39 +30,405 @@ export const metadata = buildPageMetadata({
   ],
 });
 
-function pct(value) {
-  const numeric = Number(value || 0);
-  return `${Math.round(numeric * 100)}%`;
+const HOME_EXPLAINER_PRIORITY = [
+  "crime-statistics-context-and-misuse",
+  "mass-incarceration-policy-history",
+  "white-house-dei-economic-study",
+  "hiring-discrimination-and-anti-dei-rollbacks",
+  "government-benefits-racial-gap",
+  "bootstraps-vs-policy-reality",
+];
+
+const START_HERE_STEPS = [
+  {
+    href: "/research/how-black-impact-score-works",
+    step: "01",
+    title: "Understand the Score",
+    description:
+      "See how policies, promises, sources, and outcomes are weighted.",
+    cta: "Read score methodology",
+  },
+  {
+    href: "/presidents",
+    step: "02",
+    title: "Explore a President",
+    description:
+      "Start with a presidential record and follow the receipts.",
+    cta: "Explore presidential records",
+  },
+  {
+    href: "/policies",
+    step: "03",
+    title: "Track Policy Impact",
+    description:
+      "Move from promises to policies and see what changed.",
+    cta: "Open policy records",
+  },
+];
+
+const COUNT_FORMATTER = new Intl.NumberFormat("en-US");
+const CURRENT_YEAR = new Date().getFullYear();
+
+function formatCount(value) {
+  const numeric = Number(value);
+  return Number.isFinite(numeric) ? COUNT_FORMATTER.format(numeric) : null;
+}
+
+function formatScore(value) {
+  const numeric = Number(value);
+
+  if (!Number.isFinite(numeric)) {
+    return value ?? "-";
+  }
+
+  return Number.isInteger(numeric) ? String(numeric) : numeric.toFixed(1);
+}
+
+function formatDate(value) {
+  if (!value) {
+    return null;
+  }
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
+
+function formatTermLabel(start, end) {
+  const startYear = start ? new Date(start).getFullYear() : null;
+  const endYear = end ? new Date(end).getFullYear() : null;
+
+  if (Number.isFinite(startYear) && Number.isFinite(endYear)) {
+    return `${startYear}-${endYear}`;
+  }
+
+  if (Number.isFinite(startYear)) {
+    return `${startYear}-Present`;
+  }
+
+  return null;
+}
+
+function termRecencyValue(termLabel = "") {
+  if (!termLabel) {
+    return 0;
+  }
+
+  if (/present/i.test(termLabel)) {
+    return CURRENT_YEAR + 1;
+  }
+
+  const years = String(termLabel).match(/\d{4}/g) || [];
+  const latestYear = Number(years[years.length - 1]);
+
+  return Number.isFinite(latestYear) ? latestYear : 0;
+}
+
+function sortPresidentsByRecency(items = []) {
+  return items.slice().sort((left, right) => {
+    const yearDifference =
+      termRecencyValue(right.termLabel) - termRecencyValue(left.termLabel);
+
+    if (yearDifference !== 0) {
+      return yearDifference;
+    }
+
+    return String(left.name || left.president || "").localeCompare(
+      String(right.name || right.president || "")
+    );
+  });
+}
+
+function describeImpactPattern(breakdown = {}) {
+  const ordered = ["Mixed", "Negative", "Positive", "Blocked"].map((direction) => ({
+    direction,
+    count: Number(breakdown[direction] || 0),
+  }));
+
+  const top = ordered.slice().sort((left, right) => right.count - left.count)[0];
+
+  if (!top || top.count <= 0) {
+    return "No documented outcomes are tracked here yet.";
+  }
+
+  const peers = ordered.filter((item) => item.count === top.count && item.count > 0);
+  if (peers.length > 1) {
+    return "Current tracked outcomes are split across more than one direction.";
+  }
+
+  if (top.direction === "Mixed") {
+    return "Current tracked outcomes are mostly mixed.";
+  }
+
+  if (top.direction === "Negative") {
+    return "Current tracked outcomes lean negative.";
+  }
+
+  if (top.direction === "Positive") {
+    return "Current tracked outcomes lean positive.";
+  }
+
+  return "Most tracked outcomes remain blocked.";
+}
+
+function selectFeaturedExplainers(items = [], limit = 4) {
+  const explainersBySlug = new Map(
+    items.filter((item) => item?.slug).map((item) => [item.slug, item])
+  );
+  const selected = [];
+  const seen = new Set();
+
+  for (const slug of HOME_EXPLAINER_PRIORITY) {
+    const item = explainersBySlug.get(slug);
+    if (item && !seen.has(item.slug)) {
+      selected.push(item);
+      seen.add(item.slug);
+    }
+    if (selected.length >= limit) {
+      return selected;
+    }
+  }
+
+  const fallbackItems = items
+    .filter((item) => item?.slug && !seen.has(item.slug))
+    .sort((left, right) => {
+      const leftRank = left.argument_ready ? 1 : 0;
+      const rightRank = right.argument_ready ? 1 : 0;
+
+      if (rightRank !== leftRank) {
+        return rightRank - leftRank;
+      }
+
+      return String(left.title || "").localeCompare(String(right.title || ""));
+    });
+
+  for (const item of fallbackItems) {
+    selected.push(item);
+    seen.add(item.slug);
+    if (selected.length >= limit) {
+      break;
+    }
+  }
+
+  return selected;
+}
+
+function selectCurrentSpotlight(presidents = [], currentAdministration = null) {
+  const presidentsBySlug = new Map(
+    presidents.map((item) => [item.slug || item.president_slug, item])
+  );
+
+  if (currentAdministration?.president?.slug) {
+    const scoredRecord = presidentsBySlug.get(currentAdministration.president.slug);
+
+    return {
+      president: {
+        ...currentAdministration.president,
+        ...scoredRecord,
+        slug: scoredRecord?.slug || currentAdministration.president.slug,
+        name:
+          scoredRecord?.name ||
+          currentAdministration.president.president ||
+          currentAdministration.administration_name,
+        party:
+          scoredRecord?.party ||
+          currentAdministration.president.president_party ||
+          null,
+        termLabel:
+          scoredRecord?.termLabel ||
+          formatTermLabel(
+            currentAdministration.president.term_start,
+            currentAdministration.president.term_end
+          ),
+      },
+      overview: currentAdministration,
+      usedFallback: false,
+    };
+  }
+
+  // Prefer the most recent scored presidential record if the dedicated
+  // current-administration overview is unavailable instead of hardcoding a term.
+  const fallbackPresident = sortPresidentsByRecency(presidents)[0] || null;
+
+  return {
+    president: fallbackPresident,
+    overview: null,
+    usedFallback: Boolean(fallbackPresident),
+  };
+}
+
+function PresidentRecordCard({ president }) {
+  const imageSrc = resolvePresidentImageSrc({
+    presidentSlug: president.slug || president.president_slug,
+    presidentName: president.name || president.president,
+  });
+  const scoreValue =
+    president.score ?? president.normalized_score_total ?? president.direct_normalized_score;
+  const summaryMetric =
+    scoreValue != null
+      ? {
+          label: "Impact score",
+          value: formatScore(scoreValue),
+        }
+      : president.outcome_count != null
+        ? {
+            label: "Documented outcomes",
+            value: formatCount(president.outcome_count),
+          }
+        : null;
+  const metaLine = [president.party, president.termLabel].filter(Boolean).join(" | ");
+  const presidentHref = `/presidents/${president.slug || president.president_slug}`;
+
+  return (
+    <Panel
+      as={Link}
+      href={presidentHref}
+      padding="md"
+      interactive
+      className="flex h-full flex-col"
+    >
+      <div className="flex items-start gap-4">
+        <PresidentPortrait
+          imageSrc={imageSrc}
+          alt={`${president.name || president.president} portrait`}
+          context="card"
+        />
+        <div className="min-w-0">
+          {metaLine ? (
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
+              {metaLine}
+            </p>
+          ) : null}
+          <h3 className="mt-2 text-base font-semibold text-white">
+            {president.name || president.president}
+          </h3>
+          {president.narrative_summary ? (
+            <p className="mt-2 line-clamp-3 text-sm leading-6 text-[var(--ink-soft)]">
+              {president.narrative_summary}
+            </p>
+          ) : null}
+        </div>
+      </div>
+      <div className="mt-auto flex items-end justify-between gap-3 pt-4">
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
+            {summaryMetric?.label || "Presidential record"}
+          </p>
+          <p className="mt-1 text-lg font-semibold tracking-[-0.03em] text-white">
+            {summaryMetric?.value || "Open"}
+          </p>
+        </div>
+        <span className="text-[12px] font-semibold text-[var(--ink-soft)]">
+          View record
+        </span>
+      </div>
+    </Panel>
+  );
 }
 
 export default async function HomePage() {
-  const {
-    scores,
-    readiness,
-    featuredPolicies,
-    recentPromises,
-    presidents,
-    categorySummary,
-  } = await fetchHomePageData();
-  const trend = scores.metadata?.impact_trend || { score_by_year: [] };
-  const trust = scores.metadata?.trust || {};
-  const directionData = ["Positive", "Mixed", "Negative", "Blocked"].map((name, index) => ({
-    name,
-    value: Number(
-      scores.records.reduce(
-        (total, row) => total + Number(row.breakdown_by_direction?.[name] || 0),
-        0
-      )
-    ),
-    color: ["#84f7c6", "#fbbf24", "#ff8a8a", "#8da1b9"][index],
-  }));
-  const topicData = (categorySummary || []).slice(0, 6).map((item) => ({
-    name: item.name,
-    score: Number(item.net_weighted_impact || 0),
-  }));
+  const { readiness, presidents, currentAdministration, explainers } =
+    await fetchHomePageData();
+
+  const featuredPresidents = sortPresidentsByRecency(presidents).slice(0, 5);
+  const featuredExplainers = selectFeaturedExplainers(explainers, 4);
+  const currentSpotlight = selectCurrentSpotlight(presidents, currentAdministration);
+  const spotlightPresident = currentSpotlight.president;
+  const spotlightImageSrc = spotlightPresident
+    ? resolvePresidentImageSrc({
+        presidentSlug: spotlightPresident.slug || spotlightPresident.president_slug,
+        presidentName: spotlightPresident.name || spotlightPresident.president,
+      })
+    : null;
+  const spotlightScore =
+    spotlightPresident?.score ??
+    spotlightPresident?.normalized_score_total ??
+    spotlightPresident?.direct_normalized_score;
+  const spotlightLatestDate = currentSpotlight.overview?.recent_activity?.find(
+    (item) => item.latest_action_date
+  )?.latest_action_date;
+  const spotlightStats = currentSpotlight.overview
+    ? [
+        {
+          label: "Tracked promises",
+          value: formatCount(currentSpotlight.overview.total_promises),
+        },
+        {
+          label: "Actions recorded",
+          value: formatCount(currentSpotlight.overview.total_actions),
+        },
+        {
+          label: "Outcomes documented",
+          value: formatCount(currentSpotlight.overview.total_outcomes),
+        },
+      ]
+    : [
+        spotlightPresident?.promise_count != null
+          ? {
+              label: "Tracked promises",
+              value: formatCount(spotlightPresident.promise_count),
+            }
+          : null,
+        spotlightPresident?.outcome_count != null
+          ? {
+              label: "Documented outcomes",
+              value: formatCount(spotlightPresident.outcome_count),
+            }
+          : null,
+        spotlightPresident?.linked_bill_count != null
+          ? {
+              label: "Linked bills",
+              value: formatCount(spotlightPresident.linked_bill_count),
+            }
+          : null,
+      ].filter(Boolean);
+  const dataTools = [
+    {
+      href: "/presidents",
+      title: "Presidential Records",
+      summary:
+        "Compare presidents through scores, timelines, promises, and linked policy records.",
+      detail: presidents.length
+        ? `${formatCount(presidents.length)} presidencies scored`
+        : null,
+    },
+    {
+      href: "/policies",
+      title: "Policy Explorer",
+      summary:
+        "Open laws, executive actions, and court-linked records when you want the underlying evidence layer.",
+      detail:
+        readiness?.total_policy_outcomes != null
+          ? `${formatCount(readiness.total_policy_outcomes)} documented outcomes`
+          : null,
+    },
+    {
+      href: "/promises",
+      title: "Promise Tracker",
+      summary:
+        "Follow commitments, delivery status, and linked outcomes across administrations.",
+      detail: currentSpotlight.overview?.total_promises
+        ? `${formatCount(currentSpotlight.overview.total_promises)} current-term promises visible`
+        : null,
+    },
+    {
+      href: "/reports",
+      title: "Reports",
+      summary:
+        "Use the synthesis layer when you want a broader narrative before returning to records and sources.",
+      detail: null,
+    },
+  ];
 
   return (
-    <main className="space-y-4">
+    <main className="space-y-8 md:space-y-10">
       <StructuredData
         data={[
           buildCollectionPageJsonLd({
@@ -120,6 +473,7 @@ export default async function HomePage() {
           }),
         ]}
       />
+
       <section className="relative left-1/2 right-1/2 w-screen -translate-x-1/2 overflow-hidden border-y border-white/8 bg-[#040911]">
         <div className="absolute inset-0">
           <Image
@@ -128,7 +482,7 @@ export default async function HomePage() {
             fill
             priority
             aria-hidden="true"
-            className="object-cover object-center md:object-[center_38%] scale-[1.02]"
+            className="scale-[1.02] object-cover object-center md:object-[center_38%]"
             sizes="100vw"
           />
           <div className="absolute inset-0 bg-[rgba(0,0,0,0.55)]" />
@@ -144,36 +498,21 @@ export default async function HomePage() {
               Measure how government actions impact Black Americans
             </h1>
             <p className="mt-6 max-w-3xl text-base leading-8 text-[#d8e2ee] md:text-lg">
-              EquityStack is a public-interest research platform for studying Black history,
-              U.S. presidents, campaign promises, legislation, executive actions, and the
+              EquityStack is a public-interest research platform for studying Black
+              history, presidents, promises, legislation, executive actions, and the
               documented policy impact of government decisions on Black Americans.
             </p>
+            <p className="mt-4 text-sm font-semibold uppercase tracking-[0.2em] text-white/80">
+              No spin. Just receipts.
+            </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link href="/policies" className="public-button-primary">
-                Explore civil-rights policy records
-              </Link>
-              <Link href="/presidents" className="public-button-secondary">
-                Browse presidents and Black history
-              </Link>
-              <Link href="/promises" className="public-button-secondary">
-                Track campaign promises
-              </Link>
-            </div>
-            <p className="mt-4 max-w-3xl text-sm leading-7 text-[#d8e2ee]">
-              Use the homepage for the broad public entry. If you want a guided orientation path, open{" "}
-              <Link href="/start" className="font-semibold text-white underline decoration-white/20 underline-offset-4 hover:text-[var(--accent)] hover:decoration-[var(--accent)]">
+              <Link href="/#start-here" className="public-button-primary">
                 Start Here
               </Link>
-              . If you want the evidence-first navigation layer, open{" "}
-              <Link href="/research" className="font-semibold text-white underline decoration-white/20 underline-offset-4 hover:text-[var(--accent)] hover:decoration-[var(--accent)]">
-                Research Hub
+              <Link href="/presidents" className="public-button-secondary">
+                Explore Presidents
               </Link>
-              . If you want evaluation rules, open{" "}
-              <Link href="/methodology" className="font-semibold text-white underline decoration-white/20 underline-offset-4 hover:text-[var(--accent)] hover:decoration-[var(--accent)]">
-                Methodology
-              </Link>
-              .
-            </p>
+            </div>
           </div>
         </div>
 
@@ -182,342 +521,248 @@ export default async function HomePage() {
         </p>
       </section>
 
-      <TrustBar />
-
-      <section>
-        <Panel className="overflow-hidden">
-          <SectionHeader
-            eyebrow="Start here"
-            title="Use the homepage as a handoff into the public record"
-            description="The hero introduces EquityStack. The sections below are the product path: choose the audience lens that fits your question, then move into the records, evidence, and score logic the site actually tracks."
-          />
-          <div className="grid gap-6 p-4 xl:grid-cols-[1.08fr_0.92fr]">
-            <div className="grid gap-x-6 gap-y-5 md:grid-cols-2">
-              {[
-                {
-                  title: "For researchers",
-                  summary:
-                    "Move from a broad question about Black history or presidential records into linked policies, promises, sources, and methodology.",
-                },
-                {
-                  title: "For students",
-                  summary:
-                    "Start with explainers and reports, then open the underlying policies and timelines to see how legal and administrative change unfolded over time.",
-                },
-                {
-                  title: "For journalists",
-                  summary:
-                    "Trace a claim about a president, civil-rights policy, or campaign promise back to the structured public record and visible evidence trail.",
-                },
-                {
-                  title: "For curious readers",
-                  summary:
-                    "Browse presidents, legislation, and promise tracking without needing to know the database structure in advance.",
-                },
-              ].map((item) => (
-                <article key={item.title} className="border-l border-[var(--line)] pl-4">
-                  <h2 className="text-base font-semibold text-white">{item.title}</h2>
-                  <p className="mt-2 text-sm leading-6 text-[var(--ink-soft)]">
-                    {item.summary}
-                  </p>
-                </article>
-              ))}
-            </div>
-            <div className="grid gap-4 border-t border-[var(--line)] pt-5 xl:border-t-0 xl:border-l xl:pl-6 xl:pt-0">
-              {[
-                {
-                  title: "Tracks real policy records",
-                  summary:
-                    "EquityStack organizes federal laws, executive actions, court decisions, and related outcomes into a searchable public record instead of a generic issue feed.",
-                },
-                {
-                  title: "Measures policy impact",
-                  summary:
-                    "Scores, direction labels, time windows, and trend summaries keep the focus on documented effects on Black Americans rather than rhetoric alone.",
-                },
-                {
-                  title: "Shows the evidence",
-                  summary:
-                    "Sources, confidence, completeness, and methodology remain close to every major metric so users can inspect trust directly.",
-                },
-              ].map((item) => (
-                <article key={item.title} className="border-l border-[var(--line)] pl-4">
-                  <StatusPill tone="default">Platform logic</StatusPill>
-                  <h3 className="mt-3 text-base font-semibold text-white">{item.title}</h3>
-                  <p className="mt-2 text-sm leading-6 text-[var(--ink-soft)]">
-                    {item.summary}
-                  </p>
-                </article>
-              ))}
-            </div>
-          </div>
-        </Panel>
-      </section>
-
-      <section className="space-y-4">
-        <SectionIntro
-          eyebrow="Key Questions"
-          title="Start with the major historical questions EquityStack can help you explore"
-          description="These primary thematic guides are designed for first-time visitors who arrive with a serious research question and need the clearest route into presidents, legislation, policy records, reports, and historical context."
-        />
-        <div className="grid gap-4 md:grid-cols-3">
-          {[
-            {
-              href: "/analysis/presidents-and-black-americans",
-              title: "Presidents and Black Americans",
-              summary:
-                "Start with the broad entry guide for comparing presidents, Black history, policy records, promises, and historical context across the site.",
-              cta: "Explore presidents and Black history",
-            },
-            {
-              href: "/analysis/presidential-impact-on-black-americans",
-              title: "Presidential Impact on Black Americans",
-              summary:
-                "Use the synthesis hub when the question is how administrations affected Black Americans across rights, legislation, enforcement, policy, and longer historical change.",
-              cta: "Explore presidential impact on Black Americans",
-            },
-            {
-              href: "/analysis/civil-rights-laws-by-president",
-              title: "Civil Rights Laws by President",
-              summary:
-                "Follow federal legislation, civil-rights policy, and administration context when the question turns on laws affecting Black Americans and how they changed over time.",
-              cta: "Trace civil-rights laws across administrations",
-            },
-          ].map((item) => (
-            <Panel key={item.href} as={Link} href={item.href} padding="md" interactive>
-              <StatusPill tone="info">Research guide</StatusPill>
-              <h2 className="mt-3 text-lg font-semibold text-white">{item.title}</h2>
-              <p className="mt-3 text-sm leading-6 text-[var(--ink-soft)]">{item.summary}</p>
-              <span className="mt-4 inline-flex text-[12px] font-semibold text-[var(--ink-soft)]">
-                {item.cta}
-              </span>
-            </Panel>
-          ))}
-        </div>
-      </section>
-
-      <section className="space-y-4">
-        <SectionIntro
-          eyebrow="Reference Pages"
-          title="Start with the site&apos;s strongest citation and reference pages"
-          description="These pages are the clearest entry points for journalists, researchers, educators, students, and writers who want a shareable overview, a defensible methods page, or a source-backed hub to cite."
-        />
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
-          {[
-            {
-              href: "/research",
-              title: "Research hub",
-              summary:
-                "Use the curated research hub when you need one serious entry point into the site’s strongest thematic guides, flagship reports, explainers, methods, and sources.",
-              cta: "Open the research hub",
-            },
-            {
-              href: "/reports",
-              title: "Reports and analysis hub",
-              summary:
-                "Use the report library when you need a higher-level synthesis page that still routes back into policy records, sources, and methodology.",
-              cta: "Browse reference-ready reports",
-            },
-            {
-              href: "/methodology",
-              title: "Methodology and scoring rules",
-              summary:
-                "Link here when readers need to understand how EquityStack defines scores, promise grading, confidence, attribution, and source quality.",
-              cta: "Review the methodology",
-            },
-            {
-              href: "/sources",
-              title: "Public source library",
-              summary:
-                "Use the source library when a reader needs to inspect the evidence layer behind policies, promises, outcomes, and reports.",
-              cta: "Inspect the source base",
-            },
-            {
-              href: "/start",
-              title: "Guided research path",
-              summary:
-                "Share the guided reading path when someone needs a structured introduction to the site&apos;s core explainers, legal context, and historical themes.",
-              cta: "Open the research guide",
-            },
-          ].map((item) => (
-            <Panel key={item.href} as={Link} href={item.href} padding="md" interactive>
-              <StatusPill tone="verified">Citation-friendly</StatusPill>
-              <h2 className="mt-3 text-lg font-semibold text-white">{item.title}</h2>
-              <p className="mt-3 text-sm leading-6 text-[var(--ink-soft)]">{item.summary}</p>
-              <span className="mt-4 inline-flex text-[12px] font-semibold text-[var(--ink-soft)]">
-                {item.cta}
-              </span>
-            </Panel>
-          ))}
-        </div>
-      </section>
-
-      <section className="space-y-4">
-        <SectionIntro
-          eyebrow="Dataset readout"
-          title="See what the public record currently measures"
-          description="These readouts show coverage, trust, and the patterns shaping the current dataset. They are the quickest transition from the homepage into the dashboard-style analytical layer."
-        />
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <KpiCard
-            label="Tracked outcomes"
-            value={readiness.total_policy_outcomes}
-            delta={`${readiness.current_admin_outcomes} current-admin / ${readiness.legislative_outcomes} legislative`}
-            description="The public scoring and evidence layer runs on unified policy outcomes rather than disconnected record silos."
-            tone="accent"
-          />
-          <KpiCard
-            label="Source coverage"
-            value={pct(readiness.source_coverage_pct)}
-            delta={`${readiness.sourced_outcomes} sourced`}
-            description="Source coverage is visible up front so users know how much of the dataset is evidence-backed."
-          />
-          <KpiCard
-            label="Intent coverage"
-            value={pct(readiness.intent_coverage_pct)}
-            delta={`${readiness.intent_classified_policies} classified`}
-            description="Policy intent remains distinct from outcome, and missing classifications stay visible rather than guessed."
-          />
-          <KpiCard
-            label="Certification status"
-            value={readiness.certification_status}
-            delta={`${pct(readiness.high_confidence_outcome_pct)} high confidence`}
-            description="Trust status reflects whether the public dataset is complete, sourced, and internally consistent."
-          />
-        </div>
-
-        <SourceTrustPanel
-          sourceCount={readiness.sourced_outcomes}
-          sourceQuality="System-wide coverage"
-          confidenceLabel={`${pct(readiness.high_confidence_outcome_pct)} high confidence`}
-          completenessLabel={`${pct(trust.incomplete_outcome_percentage || 0)} incomplete`}
-          includedCount={scores.metadata?.outcomes_included_in_score}
-          excludedCount={scores.metadata?.outcomes_excluded_from_score}
-          summary={scores.metadata?.summary_interpretation}
-        />
-
-        <div className="grid gap-4 xl:grid-cols-[1.15fr_0.85fr]">
-          <ImpactTrendChart
-            data={trend.score_by_year || []}
-            title="How impact changed over time"
-            description={
-              trend.interpretation ||
-              "Track yearly change and cumulative movement across scored outcomes."
-            }
-          />
-          <DirectionBreakdownChart
-            data={directionData}
-            title="Direction of documented outcomes"
-            description="Positive, negative, mixed, and blocked outcomes are counted separately so the headline score never hides distribution."
-          />
-        </div>
-
-        <div className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
-          <CategoryImpactChart
-            data={topicData}
-            title="Leading category contributions"
-            description="Top policy categories currently shaping the measured dataset-wide impact."
-          />
-          <MethodologyCallout description="The Black Impact Score is always paired with inclusion counts, confidence, source coverage, and limitations. Read the method before treating a number as a conclusion." />
-        </div>
-      </section>
-
-      <section className="space-y-4">
-        <SectionIntro
-          eyebrow="What changed recently"
-          title="Latest promise and policy movement"
-          description="Recent records give you the fastest path from broad historical questions into the latest policy, promise, and evidence-backed detail."
-        />
-        <RecentPolicyChangesTable
-          items={[
-            ...recentPromises.slice(0, 5).map((item) => ({
-              ...item,
-              record_type: "Promise",
-            })),
-            ...featuredPolicies.slice(0, 5).map((item) => ({
-              ...item,
-              record_type: "Policy",
-            })),
-          ].slice(0, 8)}
-          buildHref={(item) =>
-            item.slug ? `/promises/${item.slug}` : `/policies/${buildPolicySlug(item)}`
-          }
-        />
-      </section>
-
-      <section className="space-y-4">
-        <SectionIntro
-          eyebrow="Policy explorer"
-          title="Start with the highest-impact documented records"
-          description="Open a policy record to read the summary, score, evidence, time window, related promises, and sources without losing context."
-          actions={
-            <Link href="/policies" className="dashboard-button-secondary">
-              Browse all policies
-            </Link>
-          }
-        />
-        <PolicyCardList
-          items={featuredPolicies.slice(0, 6)}
-          buildHref={(item) => `/policies/${buildPolicySlug(item)}`}
-        />
-      </section>
-
-      <section className="space-y-4">
-        <SectionIntro
-          eyebrow="Entity hubs"
-          title="Navigate by president, promise, legislation, or report"
-          description="The public site is organized for search and research: start with the major topic hub, then move into filters, linked records, and evidence-backed detail pages."
-        />
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          {[
-            {
-              href: "/presidents",
-              title: "Presidents and Black history",
-              summary:
-                "Compare presidents, read profile pages, and trace how presidential records affected Black Americans over time.",
-            },
-            {
-              href: "/policies",
-              title: "Legislation and executive actions",
-              summary:
-                "Browse the structured policy record with filters, impact direction, evidence, and related historical context.",
-            },
-            {
-              href: "/promises",
-              title: "Campaign promises and delivery",
-              summary:
-                "Track presidential promises, status changes, rationale, and linked policy outcomes affecting Black communities.",
-            },
-            {
-              href: "/methodology",
-              title: "Methodology and evidence",
-              summary:
-                "Read how the Black Impact Score, promise grading, confidence, and source rules are defined.",
-            },
-          ].map((item) => (
-            <Panel key={item.href} as={Link} href={item.href} padding="md" interactive>
-              <h3 className="text-xl font-semibold text-white">{item.title}</h3>
-              <p className="mt-3 text-sm leading-6 text-[var(--ink-soft)]">{item.summary}</p>
-            </Panel>
-          ))}
-        </div>
-      </section>
-
       <section className="space-y-4">
         <SectionIntro
           eyebrow="Presidential records"
-          title="Who drives the score"
-          description="President profiles combine direct impact scoring, confidence, promise-tracker context, and evidence-linked policy records."
+          title="Track the Impact of U.S. Presidents"
+          description="Compare presidential records through policies, promises, outcomes, and documented sources."
           actions={
             <Link href="/presidents" className="dashboard-button-secondary">
-              View ranking
+              View All Presidents
             </Link>
           }
         />
-        <PresidentCardGrid
-          items={presidents.slice(0, 6)}
-          buildHref={(item) => `/presidents/${item.slug}`}
+        {featuredPresidents.length ? (
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+            {featuredPresidents.map((president) => (
+              <PresidentRecordCard
+                key={president.slug || president.president_slug}
+                president={president}
+              />
+            ))}
+          </div>
+        ) : (
+          <Panel padding="md">
+            <p className="text-sm leading-7 text-[var(--ink-soft)]">
+              Presidential records are not available in the current homepage payload
+              yet. Open the presidents archive to continue into the full record set.
+            </p>
+          </Panel>
+        )}
+      </section>
+
+      <section className="space-y-4">
+        <SectionIntro
+          eyebrow="Current context"
+          title="What's Happening Right Now"
+          description="Start with the current administration, then trace how promises and policies are changing over time."
         />
+        {spotlightPresident ? (
+          <Panel padding="md" className="space-y-5">
+            <div className="flex flex-wrap items-start justify-between gap-5">
+              <div className="flex min-w-0 flex-1 items-start gap-4">
+                <PresidentPortrait
+                  imageSrc={spotlightImageSrc}
+                  alt={`${spotlightPresident.name || spotlightPresident.president} portrait`}
+                  context="hero"
+                />
+                <div className="min-w-0 max-w-3xl">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <StatusPill tone={currentSpotlight.overview ? "info" : "default"}>
+                      {currentSpotlight.overview ? "Current administration" : "Most recent record"}
+                    </StatusPill>
+                    {spotlightPresident.party ? (
+                      <StatusPill tone="default">{spotlightPresident.party}</StatusPill>
+                    ) : null}
+                  </div>
+                  <h2 className="mt-3 text-2xl font-semibold text-white md:text-3xl">
+                    {spotlightPresident.name || spotlightPresident.president}
+                  </h2>
+                  {spotlightPresident.termLabel ? (
+                    <p className="mt-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
+                      {spotlightPresident.termLabel}
+                    </p>
+                  ) : null}
+                  <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--ink-soft)] md:text-base">
+                    {currentSpotlight.overview
+                      ? describeImpactPattern(currentSpotlight.overview.impact_breakdown)
+                      : spotlightPresident.narrative_summary ||
+                        "Open the latest presidency record for the current score, linked promises, and policy-level receipts."}
+                  </p>
+                  {spotlightLatestDate ? (
+                    <p className="mt-2 text-xs leading-6 text-[var(--ink-muted)]">
+                      Latest reviewed update: {formatDate(spotlightLatestDate)}
+                    </p>
+                  ) : currentSpotlight.usedFallback ? (
+                    <p className="mt-2 text-xs leading-6 text-[var(--ink-muted)]">
+                      Current-administration overview unavailable in this build. Showing the most recent scored presidential record instead.
+                    </p>
+                  ) : null}
+                </div>
+              </div>
+              {spotlightScore != null ? (
+                <ScoreBadge value={formatScore(spotlightScore)} label="Black Impact Score" />
+              ) : null}
+            </div>
+
+            {spotlightStats.length ? (
+              <div className="grid gap-3 md:grid-cols-3">
+                {spotlightStats.map((item) => (
+                  <MetricCard
+                    key={item.label}
+                    label={item.label}
+                    value={item.value}
+                    density="compact"
+                    tone="default"
+                  />
+                ))}
+              </div>
+            ) : null}
+
+            <div>
+              <Link
+                href={
+                  currentSpotlight.overview
+                    ? "/current-administration"
+                    : `/presidents/${
+                        spotlightPresident.slug || spotlightPresident.president_slug
+                      }`
+                }
+                className="dashboard-button-secondary"
+              >
+                View Full Record
+              </Link>
+            </div>
+          </Panel>
+        ) : (
+          <Panel padding="md">
+            <p className="text-sm leading-7 text-[var(--ink-soft)]">
+              A current-administration spotlight is not available yet. Use the presidents
+              archive to continue into the latest scored record.
+            </p>
+          </Panel>
+        )}
+      </section>
+
+      <section className="space-y-4">
+        <SectionIntro
+          eyebrow="Narrative breakers"
+          title="Breaking Down the Narratives"
+          description="Quick, sourced explainers built to help people challenge misleading claims with context, data, and receipts."
+          actions={
+            <Link href="/explainers" className="dashboard-button-secondary">
+              View All Explainers
+            </Link>
+          }
+        />
+        {featuredExplainers.length ? (
+          <div className="grid gap-4 xl:grid-cols-2">
+            {featuredExplainers.map((item) => (
+              <Panel
+                key={item.slug}
+                as={Link}
+                href={`/explainers/${item.slug}`}
+                padding="md"
+                interactive
+                className="flex h-full flex-col"
+              >
+                <div className="flex flex-wrap items-center gap-2">
+                  <StatusPill tone="default">
+                    {item.category || item.editorial_category_label || "Explainer"}
+                  </StatusPill>
+                  {item.argument_ready ? (
+                    <StatusPill tone="info">Argument-ready</StatusPill>
+                  ) : null}
+                </div>
+                <h3 className="mt-3 text-lg font-semibold text-white">{item.title}</h3>
+                <p className="mt-3 line-clamp-3 text-sm leading-6 text-[var(--ink-soft)]">
+                  {item.summary ||
+                    "Open the explainer for context, linked records, and supporting sources."}
+                </p>
+                <span className="mt-auto pt-4 text-[12px] font-semibold text-[var(--ink-soft)]">
+                  Read explainer
+                </span>
+              </Panel>
+            ))}
+          </div>
+        ) : (
+          <Panel padding="md">
+            <p className="text-sm leading-7 text-[var(--ink-soft)]">
+              Explainer records are not available in the current homepage payload yet.
+              Use the explainer archive to continue into the published narrative library.
+            </p>
+          </Panel>
+        )}
+      </section>
+
+      <section id="start-here" className="scroll-mt-32 space-y-4">
+        <SectionIntro
+          eyebrow="Guided path"
+          title="New to EquityStack? Start Here."
+          description="Follow a simple path: understand the score, explore a president, then trace the policy record."
+          actions={
+            <Link href="/start" className="dashboard-button-secondary">
+              Open the full reading guide
+            </Link>
+          }
+        />
+        <div className="grid gap-4 md:grid-cols-3">
+          {START_HERE_STEPS.map((item) => (
+            <Panel
+              key={item.step}
+              as={Link}
+              href={item.href}
+              padding="md"
+              interactive
+              className="flex h-full flex-col"
+            >
+              <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[rgba(132,247,198,0.24)] bg-[rgba(132,247,198,0.08)] text-sm font-semibold text-[var(--accent)]">
+                {item.step}
+              </div>
+              <h3 className="mt-4 text-lg font-semibold text-white">{item.title}</h3>
+              <p className="mt-3 text-sm leading-6 text-[var(--ink-soft)]">
+                {item.description}
+              </p>
+              <span className="mt-auto pt-4 text-[12px] font-semibold text-[var(--ink-soft)]">
+                {item.cta}
+              </span>
+            </Panel>
+          ))}
+        </div>
+      </section>
+
+      <section className="space-y-4">
+        <SectionIntro
+          eyebrow="Deeper tools"
+          title="Dive Into the Data"
+          description="Use the research tools when you're ready to go deeper."
+        />
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          {dataTools.map((item) => (
+            <Panel
+              key={item.href}
+              as={Link}
+              href={item.href}
+              padding="md"
+              interactive
+              className="flex h-full flex-col"
+            >
+              <h3 className="text-lg font-semibold text-white">{item.title}</h3>
+              <p className="mt-3 text-sm leading-6 text-[var(--ink-soft)]">
+                {item.summary}
+              </p>
+              {item.detail ? (
+                <p className="mt-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
+                  {item.detail}
+                </p>
+              ) : null}
+              <span className="mt-auto pt-4 text-[12px] font-semibold text-[var(--ink-soft)]">
+                Open tool
+              </span>
+            </Panel>
+          ))}
+        </div>
+        <TrustBar />
       </section>
     </main>
   );
