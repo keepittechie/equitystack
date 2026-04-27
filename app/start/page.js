@@ -103,20 +103,20 @@ const audienceStartPoints = [
   },
 ];
 
-export default function StartPage() {
+export function StartPageContent({ path = "/start" } = {}) {
   return (
     <main className="max-w-5xl mx-auto p-6 space-y-4">
       <StructuredData
         data={[
           buildBreadcrumbJsonLd(
             [{ href: "/", label: "Home" }, { label: "Start Here" }],
-            "/start"
+            path
           ),
           buildCollectionPageJsonLd({
             title: "How to Use EquityStack",
             description:
               "A guided reading path through EquityStack's strongest explainers, reports, methodology, and source-backed research routes.",
-            path: "/start",
+            path,
             about: [
               "research guide",
               "Black history",
@@ -133,7 +133,7 @@ export default function StartPage() {
             title: "EquityStack guided reading sequence",
             description:
               "The recommended order for first-time visitors moving through EquityStack's strongest explainers.",
-            path: "/start",
+            path,
             items: learningPath.map((item) => ({
               href: `/explainers/${item.slug}`,
               name: item.title,
@@ -301,4 +301,8 @@ export default function StartPage() {
       </section>
     </main>
   );
+}
+
+export default function StartPage() {
+  return <StartPageContent />;
 }

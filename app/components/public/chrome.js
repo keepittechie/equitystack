@@ -8,7 +8,7 @@ import { getResearchNavItems } from "@/lib/thematic-pages";
 
 const PRIMARY_NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard" },
-  { href: "/#start-here", label: "Start Here" },
+  { href: "/start-here", label: "Start Here" },
   { href: "/policies", label: "Policies" },
   { href: "/bills", label: "Bills" },
   { href: "/presidents", label: "Presidents" },

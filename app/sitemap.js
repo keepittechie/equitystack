@@ -74,6 +74,7 @@ export default async function sitemap() {
     "/explainers",
     "/scorecards",
     "/start",
+    "/start-here",
     "/timeline",
     "/sources",
     "/compare",
