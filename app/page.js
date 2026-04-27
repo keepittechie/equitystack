@@ -5,7 +5,10 @@ import { fetchHomePageData } from "@/lib/public-site-data";
 import { resolvePresidentImageSrc } from "@/lib/president-image-paths";
 import StructuredData from "@/app/components/public/StructuredData";
 import { ScoreBadge, SectionIntro } from "@/app/components/public/core";
-import { PresidentPortrait } from "@/app/components/public/entities";
+import {
+  PresidentPortrait,
+  getExplainerClaimType,
+} from "@/app/components/public/entities";
 import {
   getImpactDirectionTone,
   getPromiseStatusTone,
@@ -886,6 +889,7 @@ export default async function HomePage() {
         {featuredExplainers.length ? (
           <div className="grid gap-4 xl:grid-cols-2">
             {featuredExplainers.map((item) => {
+              const claimType = getExplainerClaimType(item);
               const signalLabel =
                 item.argument_signal_label ||
                 (item.argument_ready ? "Argument-ready" : "Narrative breaker");
@@ -895,6 +899,10 @@ export default async function HomePage() {
                   : item.argument_ready
                     ? "info"
                     : "default";
+              const showSignal =
+                signalLabel &&
+                !String(signalLabel).toLowerCase().includes("misused stat") &&
+                String(signalLabel).toLowerCase() !== String(claimType.label).toLowerCase();
 
               return (
                 <Panel
@@ -909,7 +917,8 @@ export default async function HomePage() {
                     <StatusPill tone="default">
                       {item.category || item.editorial_category_label || "Explainer"}
                     </StatusPill>
-                    <StatusPill tone={signalTone}>{signalLabel}</StatusPill>
+                    <StatusPill tone={claimType.tone}>{claimType.label}</StatusPill>
+                    {showSignal ? <StatusPill tone={signalTone}>{signalLabel}</StatusPill> : null}
                   </div>
                   <h3 className="mt-3 text-lg font-semibold text-white">{item.title}</h3>
                   <p className="mt-3 line-clamp-3 text-sm leading-6 text-[var(--ink-soft)]">

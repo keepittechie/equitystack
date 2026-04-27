@@ -14,6 +14,9 @@ import {
   StatusPill,
 } from "@/app/components/dashboard/primitives";
 import {
+  getExplainerClaimType,
+} from "@/app/components/public/entities";
+import {
   buildBreadcrumbJsonLd,
   buildCollectionPageJsonLd,
   buildItemListJsonLd,
@@ -154,11 +157,13 @@ function summarizeClusterTags(items = []) {
 
 function ExplainerMiniCard({ item }) {
   const tags = (item.tags || []).slice(0, 3);
+  const claimType = getExplainerClaimType(item);
 
   return (
     <Panel as="article" padding="md" className="flex h-full flex-col bg-[rgba(18,31,49,0.52)]">
       <div className="flex flex-wrap items-center gap-2">
         <StatusPill tone="default">{item.category || "Explainer"}</StatusPill>
+        <StatusPill tone={claimType.tone}>{claimType.label}</StatusPill>
         {item.argument_ready ? <StatusPill tone="info">Argument-ready</StatusPill> : null}
       </div>
       <h3 className="mt-3 text-base font-semibold text-white">{item.title}</h3>

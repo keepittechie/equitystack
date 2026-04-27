@@ -1018,19 +1018,20 @@ function getExplainerAccentClass(item = {}) {
   return "border-l-[var(--line-strong)]";
 }
 
-function getExplainerClaimType(item = {}) {
+export function getExplainerClaimType(item = {}) {
   const type = normalizeCardToken(item.explainer_type);
+  const category = normalizeCardToken(item.editorial_category || item.category);
   const tags = (item.tags || []).map(normalizeCardToken);
   const hasTag = (value) => tags.includes(value);
 
   if (type === "misused_statistic") {
-    return { label: "Misused statistic", tone: "warning" };
+    return { label: "Statistical claim", tone: "warning" };
   }
   if (hasTag("causation")) {
     return { label: "Causation claim", tone: "warning" };
   }
   if (hasTag("selection-bias")) {
-    return { label: "Selection bias", tone: "info" };
+    return { label: "Selection bias claim", tone: "info" };
   }
   if (hasTag("family-structure")) {
     return { label: "Correlation claim", tone: "warning" };
@@ -1045,16 +1046,40 @@ function getExplainerClaimType(item = {}) {
     return { label: "Election claim", tone: "info" };
   }
   if (hasTag("welfare") || hasTag("public-benefits")) {
-    return { label: "Benefits claim", tone: "info" };
+    return { label: "Policy claim", tone: "info" };
   }
   if (hasTag("framing")) {
     return { label: "Framing claim", tone: "warning" };
   }
   if (type === "misused_claim") {
-    return { label: "Misused claim", tone: "warning" };
+    return { label: "Evidence claim", tone: "warning" };
+  }
+  if (category.includes("criminal") || category.includes("crime")) {
+    return { label: "Public safety claim", tone: "warning" };
+  }
+  if (category.includes("economic") || category.includes("poverty")) {
+    return { label: "Economic claim", tone: "info" };
+  }
+  if (category.includes("history") || category.includes("historical")) {
+    return { label: "Historical claim", tone: "verified" };
+  }
+  if (category.includes("civil") || category.includes("rights")) {
+    return { label: "Civil rights claim", tone: "verified" };
+  }
+  if (category.includes("election") || category.includes("political")) {
+    return { label: "Political claim", tone: "info" };
+  }
+  if (category.includes("education")) {
+    return { label: "Education claim", tone: "info" };
+  }
+  if (category.includes("housing")) {
+    return { label: "Housing claim", tone: "verified" };
+  }
+  if (item.argument_ready) {
+    return { label: "Evidence claim", tone: "info" };
   }
 
-  return null;
+  return { label: "Context claim", tone: "default" };
 }
 
 function getExplainerLearnLine(item = {}) {
@@ -1131,7 +1156,8 @@ export function ExplainerIndexGrid({ items = [] }) {
         const learnLine = getExplainerLearnLine(item);
         const showArgumentSignal =
           item.argument_signal_label &&
-          normalizeCardToken(item.argument_signal_label) !== "misused stat";
+          normalizeCardToken(item.argument_signal_label) !== "misused stat" &&
+          normalizeCardToken(item.argument_signal_label) !== normalizeCardToken(claimType.label);
 
         return (
           <Panel
