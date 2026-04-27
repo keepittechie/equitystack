@@ -148,6 +148,9 @@ export default async function ExplainersPage({ searchParams }) {
         </form>
         {data.editorialCategories?.length ? (
           <div className="flex flex-wrap items-center gap-2">
+            <Link href="/explainers/claim-map" className="dashboard-button-secondary">
+              View claim map
+            </Link>
             <Link href="/explainers" className="dashboard-button-secondary">
               All
             </Link>
