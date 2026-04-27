@@ -84,6 +84,50 @@ function formatScore(value) {
   return Number.isInteger(numeric) ? String(numeric) : numeric.toFixed(1);
 }
 
+function getImpactTone(score) {
+  const numeric = Number(score);
+
+  if (!Number.isFinite(numeric)) {
+    return "default";
+  }
+
+  if (numeric > 0) {
+    return "positive";
+  }
+
+  if (numeric < 0) {
+    return "negative";
+  }
+
+  return "default";
+}
+
+function getImpactLabel(score) {
+  const numeric = Number(score);
+
+  if (!Number.isFinite(numeric)) {
+    return "Neutral or not yet measurable";
+  }
+
+  if (numeric >= 50) {
+    return "Strong positive impact";
+  }
+
+  if (numeric >= 15) {
+    return "Moderate positive impact";
+  }
+
+  if (numeric > 0) {
+    return "Low positive impact";
+  }
+
+  if (numeric === 0) {
+    return "Neutral or not yet measurable";
+  }
+
+  return "Negative impact range";
+}
+
 function formatDate(value) {
   if (!value) {
     return null;
@@ -146,36 +190,93 @@ function sortPresidentsByRecency(items = []) {
   });
 }
 
-function describeImpactPattern(breakdown = {}) {
-  const ordered = ["Mixed", "Negative", "Positive", "Blocked"].map((direction) => ({
+function getCurrentStatusMeta({ overview = null, score = null } = {}) {
+  const breakdown = overview?.impact_breakdown || {};
+  const directionRows = ["Positive", "Negative", "Mixed", "Blocked"].map((direction) => ({
     direction,
     count: Number(breakdown[direction] || 0),
   }));
+  const totalOutcomes = directionRows.reduce((total, item) => total + item.count, 0);
 
-  const top = ordered.slice().sort((left, right) => right.count - left.count)[0];
+  if (totalOutcomes > 0) {
+    const top = directionRows.slice().sort((left, right) => right.count - left.count)[0];
+    const tieCount = directionRows.filter(
+      (item) => item.count > 0 && item.count === top.count
+    ).length;
 
-  if (!top || top.count <= 0) {
-    return "No documented outcomes are tracked here yet.";
+    if (tieCount > 1 || top.direction === "Mixed") {
+      return { label: "Mixed Outcomes", tone: "contested" };
+    }
+
+    if (top.direction === "Positive") {
+      return { label: "Positive Direction", tone: "success" };
+    }
+
+    if (top.direction === "Negative") {
+      return { label: "Negative Direction", tone: "danger" };
+    }
+
+    return { label: "Still Developing", tone: "info" };
   }
 
-  const peers = ordered.filter((item) => item.count === top.count && item.count > 0);
-  if (peers.length > 1) {
-    return "Current tracked outcomes are split across more than one direction.";
+  const numericScore = Number(score);
+  if (!Number.isFinite(numericScore) || numericScore === 0) {
+    return { label: "Still Developing", tone: "info" };
   }
 
-  if (top.direction === "Mixed") {
-    return "Current tracked outcomes are mostly mixed.";
+  return numericScore > 0
+    ? { label: "Positive Direction", tone: "success" }
+    : { label: "Negative Direction", tone: "danger" };
+}
+
+function getTopPolicyArea(currentSpotlight = {}) {
+  const currentTopic = currentSpotlight.overview?.top_topics?.[0];
+
+  if (currentTopic?.topic) {
+    const evidencePoints = [
+      currentTopic.action_count ? `${formatCount(currentTopic.action_count)} actions` : null,
+      currentTopic.promise_count ? `${formatCount(currentTopic.promise_count)} promises` : null,
+      currentTopic.summary || null,
+    ].filter(Boolean);
+
+    return {
+      topic: currentTopic.topic,
+      detail: evidencePoints.join(" | "),
+    };
   }
 
-  if (top.direction === "Negative") {
-    return "Current tracked outcomes lean negative.";
+  const scoredTopic = currentSpotlight.president?.top_topics?.[0];
+  if (scoredTopic?.topic) {
+    return {
+      topic: scoredTopic.topic,
+      detail: "Highest visible scored topic in this record.",
+    };
   }
 
-  if (top.direction === "Positive") {
-    return "Current tracked outcomes lean positive.";
+  return null;
+}
+
+function getCurrentRecordSummary({
+  overview = null,
+  president = null,
+  score = null,
+  topPolicyArea = null,
+} = {}) {
+  const impactLabel = getImpactLabel(score).toLowerCase();
+
+  if (overview && topPolicyArea?.topic) {
+    return `So far, this administration shows ${impactLabel}, with the most visible activity in ${topPolicyArea.topic} and tracked outcomes still developing.`;
   }
 
-  return "Most tracked outcomes remain blocked.";
+  if (overview) {
+    return `So far, this administration shows ${impactLabel}, with tracked promises, actions, and documented outcomes still being reviewed.`;
+  }
+
+  if (president) {
+    return `This most recent scored record currently reads as ${impactLabel}, with linked promises, actions, and documented outcomes still being reviewed.`;
+  }
+
+  return "This record is still developing.";
 }
 
 function selectFeaturedExplainers(items = [], limit = 4) {
@@ -351,6 +452,12 @@ export default async function HomePage() {
     spotlightPresident?.score ??
     spotlightPresident?.normalized_score_total ??
     spotlightPresident?.direct_normalized_score;
+  const spotlightImpactLabel = getImpactLabel(spotlightScore);
+  const spotlightStatus = getCurrentStatusMeta({
+    overview: currentSpotlight.overview,
+    score: spotlightScore,
+  });
+  const spotlightTopPolicyArea = getTopPolicyArea(currentSpotlight);
   const spotlightLatestDate = currentSpotlight.overview?.recent_activity?.find(
     (item) => item.latest_action_date
   )?.latest_action_date;
@@ -389,6 +496,12 @@ export default async function HomePage() {
             }
           : null,
       ].filter(Boolean);
+  const spotlightSummary = getCurrentRecordSummary({
+    overview: currentSpotlight.overview,
+    president: spotlightPresident,
+    score: spotlightScore,
+    topPolicyArea: spotlightTopPolicyArea,
+  });
   const dataTools = [
     {
       href: "/presidents",
@@ -571,6 +684,9 @@ export default async function HomePage() {
                     <StatusPill tone={currentSpotlight.overview ? "info" : "default"}>
                       {currentSpotlight.overview ? "Current administration" : "Most recent record"}
                     </StatusPill>
+                    <StatusPill tone={spotlightStatus.tone}>
+                      {spotlightStatus.label}
+                    </StatusPill>
                     {spotlightPresident.party ? (
                       <StatusPill tone="default">{spotlightPresident.party}</StatusPill>
                     ) : null}
@@ -584,11 +700,16 @@ export default async function HomePage() {
                     </p>
                   ) : null}
                   <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--ink-soft)] md:text-base">
-                    {currentSpotlight.overview
-                      ? describeImpactPattern(currentSpotlight.overview.impact_breakdown)
-                      : spotlightPresident.narrative_summary ||
-                        "Open the latest presidency record for the current score, linked promises, and policy-level receipts."}
+                    {spotlightSummary}
                   </p>
+                  {spotlightTopPolicyArea ? (
+                    <p className="mt-3 text-xs leading-6 text-[var(--ink-muted)]">
+                      Most visible area right now: {spotlightTopPolicyArea.topic}
+                      {spotlightTopPolicyArea.detail
+                        ? ` | ${spotlightTopPolicyArea.detail}`
+                        : ""}
+                    </p>
+                  ) : null}
                   {spotlightLatestDate ? (
                     <p className="mt-2 text-xs leading-6 text-[var(--ink-muted)]">
                       Latest reviewed update: {formatDate(spotlightLatestDate)}
@@ -601,7 +722,12 @@ export default async function HomePage() {
                 </div>
               </div>
               {spotlightScore != null ? (
-                <ScoreBadge value={formatScore(spotlightScore)} label="Black Impact Score" />
+                <ScoreBadge
+                  value={formatScore(spotlightScore)}
+                  label="Black Impact Score"
+                  tone={getImpactTone(spotlightScore)}
+                  context={spotlightImpactLabel}
+                />
               ) : null}
             </div>
 
@@ -630,7 +756,7 @@ export default async function HomePage() {
                 }
                 className="dashboard-button-secondary"
               >
-                View Full Record
+                Explore Full Record -&gt;
               </Link>
             </div>
           </Panel>
@@ -657,33 +783,43 @@ export default async function HomePage() {
         />
         {featuredExplainers.length ? (
           <div className="grid gap-4 xl:grid-cols-2">
-            {featuredExplainers.map((item) => (
-              <Panel
-                key={item.slug}
-                as={Link}
-                href={`/explainers/${item.slug}`}
-                padding="md"
-                interactive
-                className="flex h-full flex-col"
-              >
-                <div className="flex flex-wrap items-center gap-2">
-                  <StatusPill tone="default">
-                    {item.category || item.editorial_category_label || "Explainer"}
-                  </StatusPill>
-                  {item.argument_ready ? (
-                    <StatusPill tone="info">Argument-ready</StatusPill>
-                  ) : null}
-                </div>
-                <h3 className="mt-3 text-lg font-semibold text-white">{item.title}</h3>
-                <p className="mt-3 line-clamp-3 text-sm leading-6 text-[var(--ink-soft)]">
-                  {item.summary ||
-                    "Open the explainer for context, linked records, and supporting sources."}
-                </p>
-                <span className="mt-auto pt-4 text-[12px] font-semibold text-[var(--ink-soft)]">
-                  Read explainer
-                </span>
-              </Panel>
-            ))}
+            {featuredExplainers.map((item) => {
+              const signalLabel =
+                item.argument_signal_label ||
+                (item.argument_ready ? "Argument-ready" : "Narrative breaker");
+              const signalTone =
+                item.argument_signal_label
+                  ? item.argument_signal_tone || "info"
+                  : item.argument_ready
+                    ? "info"
+                    : "default";
+
+              return (
+                <Panel
+                  key={item.slug}
+                  as={Link}
+                  href={`/explainers/${item.slug}`}
+                  padding="md"
+                  interactive
+                  className="flex h-full flex-col"
+                >
+                  <div className="flex flex-wrap items-center gap-2">
+                    <StatusPill tone="default">
+                      {item.category || item.editorial_category_label || "Explainer"}
+                    </StatusPill>
+                    <StatusPill tone={signalTone}>{signalLabel}</StatusPill>
+                  </div>
+                  <h3 className="mt-3 text-lg font-semibold text-white">{item.title}</h3>
+                  <p className="mt-3 line-clamp-3 text-sm leading-6 text-[var(--ink-soft)]">
+                    {item.summary ||
+                      "Open the explainer for context, linked records, and supporting sources."}
+                  </p>
+                  <span className="mt-auto pt-4 text-[12px] font-semibold text-[var(--ink-soft)]">
+                    Read explainer
+                  </span>
+                </Panel>
+              );
+            })}
           </div>
         ) : (
           <Panel padding="md">

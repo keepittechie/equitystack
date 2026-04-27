@@ -11,6 +11,7 @@ import StructuredData from "@/app/components/public/StructuredData";
 import { Breadcrumbs } from "@/app/components/public/chrome";
 import PageRoleCallout from "@/app/components/public/PageRoleCallout";
 import DiscoveryGuidancePanel from "@/app/components/public/DiscoveryGuidancePanel";
+import CopyResponseButton from "@/app/components/public/copy-response-button";
 import {
   MethodologyCallout,
 } from "@/app/components/public/core";
@@ -266,6 +267,90 @@ function parseTimeline(text) {
         summary: rest.join("|").trim() || line,
       };
     });
+}
+
+function ArgumentReadyBreakdown({ breakdown = null }) {
+  if (!breakdown) {
+    return null;
+  }
+
+  const { claim, whyMisleading, dataShows, bottomLine, responseScript, responseContext } =
+    breakdown;
+
+  return (
+    <Panel className="overflow-hidden">
+      <SectionHeader
+        eyebrow="Conversation use"
+        title="Argument-Ready Breakdown"
+        description="Use this module when you need the shortest defensible version of the explainer for a comment, reply, or discussion before opening the full record."
+      />
+      <div className="space-y-4 p-4">
+        {claim || whyMisleading ? (
+          <div className="grid gap-4 md:grid-cols-2">
+            {claim ? (
+              <Panel padding="md" className="h-full">
+                <StatusPill tone="warning">The claim</StatusPill>
+                <p className="mt-3 text-sm leading-7 text-white">{claim}</p>
+              </Panel>
+            ) : null}
+            {whyMisleading ? (
+              <Panel padding="md" className="h-full">
+                <StatusPill tone="info">Why it&apos;s misleading</StatusPill>
+                <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+                  {whyMisleading}
+                </p>
+              </Panel>
+            ) : null}
+          </div>
+        ) : null}
+
+        {dataShows?.length ? (
+          <Panel padding="md">
+            <StatusPill tone="verified">What the data shows</StatusPill>
+            <ul className="mt-3 grid gap-2 text-sm leading-7 text-[var(--ink-soft)]">
+              {dataShows.map((item) => (
+                <li
+                  key={item}
+                  className="rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.42)] px-3 py-2"
+                >
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </Panel>
+        ) : null}
+
+        {bottomLine ? (
+          <Panel padding="md">
+            <StatusPill tone="default">Bottom line</StatusPill>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+              {bottomLine}
+            </p>
+          </Panel>
+        ) : null}
+
+        {responseScript ? (
+          <Panel
+            padding="md"
+            className="border-[rgba(132,247,198,0.28)] bg-[rgba(132,247,198,0.07)]"
+          >
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <StatusPill tone="success">
+                If someone says this, you can respond:
+              </StatusPill>
+              <CopyResponseButton text={responseScript} />
+            </div>
+            <p className="mt-3 text-sm leading-7 text-white">{responseScript}</p>
+            {responseContext ? (
+              <p className="mt-3 text-[12px] leading-6 text-[var(--ink-soft)]">
+                {responseContext}
+              </p>
+            ) : null}
+          </Panel>
+        ) : null}
+      </div>
+    </Panel>
+  );
 }
 
 export async function generateMetadata({ params }) {
@@ -562,6 +647,8 @@ export default async function ExplainerDetailPage({ params }) {
           { href: "/policies", label: "Policy records" },
         ]}
       />
+
+      <ArgumentReadyBreakdown breakdown={explainer.argument_ready_breakdown} />
 
       <Panel prominence="primary" className="overflow-hidden">
         <SectionHeader

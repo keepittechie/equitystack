@@ -1015,7 +1015,11 @@ export function ExplainerIndexGrid({ items = [] }) {
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex flex-wrap items-center gap-2">
               <StatusPill tone="default">{item.category || "Explainer"}</StatusPill>
-              {item.argument_ready ? (
+              {item.argument_signal_label ? (
+                <StatusPill tone={item.argument_signal_tone || "info"}>
+                  {item.argument_signal_label}
+                </StatusPill>
+              ) : item.argument_ready ? (
                 <StatusPill tone="info">Argument-ready</StatusPill>
               ) : null}
             </div>
