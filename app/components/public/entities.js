@@ -992,6 +992,128 @@ export function ReportCardGrid({
   );
 }
 
+function normalizeCardToken(value) {
+  return String(value || "").toLowerCase();
+}
+
+function getExplainerAccentClass(item = {}) {
+  const category = normalizeCardToken(item.editorial_category || item.category);
+
+  if (category.includes("misused-statistics")) {
+    return "border-l-[rgba(251,191,36,0.42)]";
+  }
+  if (category.includes("crime") || category.includes("criminal")) {
+    return "border-l-[rgba(255,138,138,0.34)]";
+  }
+  if (category.includes("economic") || category.includes("poverty")) {
+    return "border-l-[rgba(125,211,252,0.38)]";
+  }
+  if (category.includes("history") || category.includes("historical")) {
+    return "border-l-[rgba(132,247,198,0.34)]";
+  }
+  if (category.includes("election") || category.includes("political")) {
+    return "border-l-[rgba(96,165,250,0.38)]";
+  }
+
+  return "border-l-[var(--line-strong)]";
+}
+
+function getExplainerClaimType(item = {}) {
+  const type = normalizeCardToken(item.explainer_type);
+  const tags = (item.tags || []).map(normalizeCardToken);
+  const hasTag = (value) => tags.includes(value);
+
+  if (type === "misused_statistic") {
+    return { label: "Misused statistic", tone: "warning" };
+  }
+  if (hasTag("causation")) {
+    return { label: "Causation claim", tone: "warning" };
+  }
+  if (hasTag("selection-bias")) {
+    return { label: "Selection bias", tone: "info" };
+  }
+  if (hasTag("family-structure")) {
+    return { label: "Correlation claim", tone: "warning" };
+  }
+  if (hasTag("iq") || hasTag("measurement")) {
+    return { label: "Measurement claim", tone: "info" };
+  }
+  if (hasTag("history") || hasTag("intergenerational-effects")) {
+    return { label: "Historical claim", tone: "verified" };
+  }
+  if (hasTag("elections") || hasTag("voting")) {
+    return { label: "Election claim", tone: "info" };
+  }
+  if (hasTag("welfare") || hasTag("public-benefits")) {
+    return { label: "Benefits claim", tone: "info" };
+  }
+  if (hasTag("framing")) {
+    return { label: "Framing claim", tone: "warning" };
+  }
+  if (type === "misused_claim") {
+    return { label: "Misused claim", tone: "warning" };
+  }
+
+  return null;
+}
+
+function getExplainerLearnLine(item = {}) {
+  const tags = (item.tags || []).map(normalizeCardToken);
+  const hasTag = (value) => tags.includes(value);
+
+  if (hasTag("crime") && hasTag("statistics")) {
+    return "how to separate crime data from unsupported conclusions.";
+  }
+  if (hasTag("welfare") || hasTag("public-benefits")) {
+    return "what benefit data measures, who qualifies, and what it cannot prove.";
+  }
+  if (hasTag("family-structure")) {
+    return "where household data helps and where causal claims overreach.";
+  }
+  if (hasTag("causation") || hasTag("culture")) {
+    return "what evidence is required before naming culture as a cause.";
+  }
+  if (hasTag("iq") || hasTag("measurement")) {
+    return "what test scores measure and where group conclusions exceed the evidence.";
+  }
+  if (hasTag("immigration") || hasTag("selection-bias")) {
+    return "why comparisons need matched starting conditions.";
+  }
+  if (hasTag("history") || hasTag("intergenerational-effects")) {
+    return "how policy timelines and accumulated resources shape present outcomes.";
+  }
+  if (hasTag("elections") || hasTag("voting")) {
+    return "how to separate isolated cases from evidence of systemic impact.";
+  }
+  if (item.argument_ready) {
+    return "how to move from the claim into evidence and debate-ready responses.";
+  }
+
+  return "how the claim connects to records, sources, and policy context.";
+}
+
+function getExplainerDataChips(item = {}) {
+  const tags = (item.tags || []).map(normalizeCardToken);
+  const chips = [];
+  const add = (chip) => {
+    if (!chips.includes(chip)) chips.push(chip);
+  };
+  const hasTag = (value) => tags.includes(value);
+
+  if (hasTag("statistics") || hasTag("data-analysis")) add("Scale mismatch");
+  if (hasTag("policing")) add("Arrest data");
+  if (hasTag("victimization")) add("Victimization context");
+  if (hasTag("family-structure")) add("Correlation issue");
+  if (hasTag("causation")) add("Causation test");
+  if (hasTag("selection-bias")) add("Selection bias");
+  if (hasTag("welfare") || hasTag("public-benefits")) add("Eligibility rules");
+  if (hasTag("iq") || hasTag("measurement")) add("Measurement limits");
+  if (hasTag("history") || hasTag("intergenerational-effects")) add("Policy timeline");
+  if (hasTag("elections") || hasTag("voting")) add("Audit evidence");
+
+  return chips.slice(0, 3);
+}
+
 export function ExplainerIndexGrid({ items = [] }) {
   if (!items.length) {
     return (
@@ -1003,37 +1125,64 @@ export function ExplainerIndexGrid({ items = [] }) {
 
   return (
     <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-      {items.map((item) => (
-        <Panel
-          key={item.slug}
-          as={Link}
-          href={`/explainers/${item.slug}`}
-          padding="md"
-          interactive
-          className="flex h-full flex-col"
-        >
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex flex-wrap items-center gap-2">
-              <StatusPill tone="default">{item.category || "Explainer"}</StatusPill>
-              {item.argument_signal_label ? (
-                <StatusPill tone={item.argument_signal_tone || "info"}>
-                  {item.argument_signal_label}
-                </StatusPill>
-              ) : item.argument_ready ? (
-                <StatusPill tone="info">Argument-ready</StatusPill>
-              ) : null}
+      {items.map((item) => {
+        const claimType = getExplainerClaimType(item);
+        const dataChips = getExplainerDataChips(item);
+        const learnLine = getExplainerLearnLine(item);
+        const showArgumentSignal =
+          item.argument_signal_label &&
+          normalizeCardToken(item.argument_signal_label) !== "misused stat";
+
+        return (
+          <Panel
+            key={item.slug}
+            as={Link}
+            href={`/explainers/${item.slug}`}
+            padding="md"
+            interactive
+            className={`flex h-full flex-col border-l-2 ${getExplainerAccentClass(item)}`}
+          >
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex flex-wrap items-center gap-2">
+                <StatusPill tone="default">{item.category || "Explainer"}</StatusPill>
+                {claimType ? (
+                  <StatusPill tone={claimType.tone}>{claimType.label}</StatusPill>
+                ) : null}
+                {showArgumentSignal ? (
+                  <StatusPill tone={item.argument_signal_tone || "info"}>
+                    {item.argument_signal_label}
+                  </StatusPill>
+                ) : item.argument_ready ? (
+                  <StatusPill tone="info">Argument-ready</StatusPill>
+                ) : null}
+              </div>
+              <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--ink-muted)]">
+                Open explainer
+              </span>
             </div>
-            <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--ink-muted)]">
-              Open explainer
+            <h3 className="mt-3 text-lg font-semibold text-white">{item.title}</h3>
+            <p className="mt-2 text-sm font-semibold leading-6 text-white/90">
+              You&apos;ll learn: {learnLine}
+            </p>
+            <p className="mt-2 line-clamp-4 text-sm leading-6 text-[var(--ink-soft)]">{item.summary}</p>
+            {dataChips.length ? (
+              <div className="mt-4 flex flex-wrap gap-2">
+                {dataChips.map((chip) => (
+                  <span
+                    key={chip}
+                    className="rounded-full border border-[var(--line)] bg-[rgba(18,31,49,0.46)] px-2 py-1 text-[11px] font-semibold text-[var(--ink-muted)]"
+                  >
+                    {chip}
+                  </span>
+                ))}
+              </div>
+            ) : null}
+            <span className="mt-auto pt-4 text-[12px] font-semibold text-[var(--ink-soft)]">
+              Open historical context and linked records
             </span>
-          </div>
-          <h3 className="mt-3 text-lg font-semibold text-white">{item.title}</h3>
-          <p className="mt-3 line-clamp-4 text-sm leading-6 text-[var(--ink-soft)]">{item.summary}</p>
-          <span className="mt-auto pt-4 text-[12px] font-semibold text-[var(--ink-soft)]">
-            Open historical context and linked records
-          </span>
-        </Panel>
-      ))}
+          </Panel>
+        );
+      })}
     </div>
   );
 }
