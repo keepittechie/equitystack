@@ -81,6 +81,19 @@ function getSystemicRecordMeta(item = {}) {
   };
 }
 
+function formatSourceContextLabel(value) {
+  const labels = {
+    government: "Government source",
+    academic: "Academic research",
+    journalism: "Journalism",
+    "primary-data": "Primary data",
+    "secondary-analysis": "Secondary analysis",
+    advocacy: "Advocacy source",
+    unknown: "Source context",
+  };
+  return labels[String(value || "").toLowerCase()] || null;
+}
+
 function RecordTypeBadge({ label }) {
   if (!label) {
     return null;
@@ -442,30 +455,42 @@ export function PolicyHero({ title, summary, score, scoreLabel, badges = [] }) {
 export function EvidenceSourceList({ items = [] }) {
   return (
     <div className="grid gap-3">
-      {items.map((item, index) => (
-        <Panel
-          key={`${item.url || item.source_url || item.title || item.source_title}-${index}`}
-          as="a"
-          href={item.url || item.source_url || "#"}
-          target="_blank"
-          rel="noreferrer"
-          padding="md"
-          interactive
-        >
-          <div className="flex flex-wrap items-center gap-2">
-            <StatusPill tone="default">{item.source_type || item.publisher || "Source"}</StatusPill>
-            {formatRenderableDate(item.published_date) ? (
-              <StatusPill tone="info">{formatRenderableDate(item.published_date)}</StatusPill>
+      {items.map((item, index) => {
+        const sourceContextLabel = formatSourceContextLabel(item.sourceType);
+
+        return (
+          <Panel
+            key={`${item.url || item.source_url || item.title || item.source_title}-${index}`}
+            as="a"
+            href={item.url || item.source_url || "#"}
+            target="_blank"
+            rel="noreferrer"
+            padding="md"
+            interactive
+          >
+            <div className="flex flex-wrap items-center gap-2">
+              <StatusPill tone="default">{item.source_type || item.publisher || "Source"}</StatusPill>
+              {sourceContextLabel ? (
+                <StatusPill tone="info">{sourceContextLabel}</StatusPill>
+              ) : null}
+              {formatRenderableDate(item.published_date) ? (
+                <StatusPill tone="info">{formatRenderableDate(item.published_date)}</StatusPill>
+              ) : null}
+            </div>
+            <h3 className="mt-3 text-base font-medium text-white">
+              {item.source_title || item.title || item.url || item.source_url}
+            </h3>
+            {item.notes ? (
+              <p className="mt-2 text-sm leading-6 text-[var(--ink-soft)]">{item.notes}</p>
             ) : null}
-          </div>
-          <h3 className="mt-3 text-base font-medium text-white">
-            {item.source_title || item.title || item.url || item.source_url}
-          </h3>
-          {item.notes ? (
-            <p className="mt-2 text-sm leading-6 text-[var(--ink-soft)]">{item.notes}</p>
-          ) : null}
-        </Panel>
-      ))}
+            {item.sourceNote ? (
+              <p className="mt-2 text-[12px] leading-5 text-[var(--ink-muted)]">
+                {item.sourceNote}
+              </p>
+            ) : null}
+          </Panel>
+        );
+      })}
     </div>
   );
 }
@@ -988,7 +1013,12 @@ export function ExplainerIndexGrid({ items = [] }) {
           className="flex h-full flex-col"
         >
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <StatusPill tone="default">{item.category || "Explainer"}</StatusPill>
+            <div className="flex flex-wrap items-center gap-2">
+              <StatusPill tone="default">{item.category || "Explainer"}</StatusPill>
+              {item.argument_ready ? (
+                <StatusPill tone="info">Argument-ready</StatusPill>
+              ) : null}
+            </div>
             <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--ink-muted)]">
               Open explainer
             </span>

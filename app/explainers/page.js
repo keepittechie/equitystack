@@ -146,6 +146,22 @@ export default async function ExplainersPage({ searchParams }) {
             Apply filters
           </button>
         </form>
+        {data.editorialCategories?.length ? (
+          <div className="flex flex-wrap items-center gap-2">
+            <Link href="/explainers" className="dashboard-button-secondary">
+              All
+            </Link>
+            {data.editorialCategories.map((item) => (
+              <Link
+                key={item.slug}
+                href={`/explainers/${item.slug}`}
+                className="dashboard-button-secondary"
+              >
+                {item.label}
+              </Link>
+            ))}
+          </div>
+        ) : null}
       </DashboardFilterBar>
 
       <ImpactOverviewCards

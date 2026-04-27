@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { buildPageMetadata } from "@/lib/metadata";
 import {
   buildPolicySlug,
+  fetchExplainerCategoryData,
   fetchExplainerDetailData,
   fetchExplainersIndexData,
 } from "@/lib/public-site-data";
@@ -15,8 +16,10 @@ import {
 } from "@/app/components/public/core";
 import {
   EvidenceSourceList,
+  ExplainerIndexGrid,
   PolicyTimeline,
   PromiseResultsTable,
+  ReportCardGrid,
 } from "@/app/components/public/entities";
 import { getExplainerEditorial } from "@/lib/explainer-editorial";
 import {
@@ -25,7 +28,9 @@ import {
 } from "@/lib/shareable-card-links";
 import {
   buildBreadcrumbJsonLd,
+  buildCollectionPageJsonLd,
   buildExplainerJsonLd,
+  buildItemListJsonLd,
 } from "@/lib/structured-data";
 import {
   getBillStatusTone,
@@ -34,6 +39,7 @@ import {
   SectionHeader,
   StatusPill,
 } from "@/app/components/dashboard/primitives";
+import ExplainerArgumentModeToggle from "@/app/components/explainers/ExplainerArgumentModeToggle";
 
 export const dynamic = "force-dynamic";
 
@@ -267,6 +273,15 @@ export async function generateMetadata({ params }) {
   const explainer = await fetchExplainerDetailData(slug);
 
   if (!explainer) {
+    const categoryData = await fetchExplainerCategoryData(slug);
+    if (categoryData) {
+      return buildPageMetadata({
+        title: `${categoryData.category.label} explainers`,
+        description: `Browse EquityStack explainers in the ${categoryData.category.label} category.`,
+        path: `/explainers/${slug}`,
+      });
+    }
+
     return buildPageMetadata({
       title: "Explainer Not Found",
       description: "The requested explainer could not be found.",
@@ -290,6 +305,93 @@ export async function generateMetadata({ params }) {
   });
 }
 
+function ExplainerCategoryPage({ categoryData, slug }) {
+  const categoryLabel = categoryData.category.label;
+  const explainers = categoryData.items || [];
+
+  return (
+    <main className="space-y-4">
+      <StructuredData
+        data={[
+          buildBreadcrumbJsonLd(
+            [
+              { href: "/", label: "Home" },
+              { href: "/explainers", label: "Explainers" },
+              { label: categoryLabel },
+            ],
+            `/explainers/${slug}`
+          ),
+          buildCollectionPageJsonLd({
+            title: `${categoryLabel} explainers`,
+            description: `EquityStack explainers grouped under ${categoryLabel}.`,
+            path: `/explainers/${slug}`,
+            about: [categoryLabel, "Black history", "U.S. policy"],
+            keywords: [categoryLabel, "EquityStack explainers"],
+          }),
+          buildItemListJsonLd({
+            title: `${categoryLabel} explainer entries`,
+            description: `Published explainers in the ${categoryLabel} category.`,
+            path: `/explainers/${slug}`,
+            items: explainers.map((item) => ({
+              href: `/explainers/${item.slug}`,
+              name: item.title,
+            })),
+          }),
+        ]}
+      />
+      <Breadcrumbs
+        items={[
+          { href: "/", label: "Home" },
+          { href: "/explainers", label: "Explainers" },
+          { label: categoryLabel },
+        ]}
+      />
+
+      <Panel prominence="primary" className="overflow-hidden">
+        <SectionHeader
+          eyebrow="Explainer category"
+          title={`${categoryLabel} explainers`}
+          description="Use this category page to browse explainers that share the same editorial pattern. The cards and routes are the same explainer system used across the public library."
+        />
+        <div className="grid gap-4 p-4 md:grid-cols-3">
+          <MetricCard
+            label="Category"
+            value={categoryLabel}
+            description="Editorial grouping used for browsing."
+            density="compact"
+            showDot
+          />
+          <MetricCard
+            label="Explainers"
+            value={explainers.length}
+            description="Published explainers in this category."
+            density="compact"
+            tone="info"
+          />
+          <MetricCard
+            label="Listing"
+            value="Filtered"
+            description="Uses the same explainer cards as the main archive."
+            density="compact"
+            tone="verified"
+          />
+        </div>
+      </Panel>
+
+      <Panel className="overflow-hidden">
+        <SectionHeader
+          eyebrow="Library"
+          title={`Browse ${categoryLabel.toLowerCase()} explainers`}
+          description="Open an explainer to see its structured sections, sources, related records, and next-step research paths."
+        />
+        <div className="p-4">
+          <ExplainerIndexGrid items={explainers} />
+        </div>
+      </Panel>
+    </main>
+  );
+}
+
 export default async function ExplainerDetailPage({ params }) {
   const { slug } = await params;
   const [explainer, explainersIndex] = await Promise.all([
@@ -298,6 +400,11 @@ export default async function ExplainerDetailPage({ params }) {
   ]);
 
   if (!explainer) {
+    const categoryData = await fetchExplainerCategoryData(slug);
+    if (categoryData) {
+      return <ExplainerCategoryPage categoryData={categoryData} slug={slug} />;
+    }
+
     notFound();
   }
 
@@ -306,6 +413,7 @@ export default async function ExplainerDetailPage({ params }) {
   const relatedPolicies = explainer.related_policies || [];
   const relatedPromises = explainer.related_promises || [];
   const relatedFutureBills = explainer.related_future_bills || [];
+  const relatedReports = explainer.related_reports || [];
   const editorial = getExplainerEditorial(slug);
   const connectedPresidents = buildConnectedPresidents(relatedPromises);
   const researchPaths = buildExplainerResearchPaths({
@@ -379,6 +487,15 @@ export default async function ExplainerDetailPage({ params }) {
               {explainer.summary ||
                 "This explainer connects a common public claim to the relevant historical record and linked policy evidence."}
             </p>
+            {explainer.tags?.length ? (
+              <div className="mt-4 flex flex-wrap gap-2">
+                {explainer.tags.map((tag) => (
+                  <StatusPill key={tag} tone="default">
+                    {tag}
+                  </StatusPill>
+                ))}
+              </div>
+            ) : null}
           </div>
           <aside className="grid content-start gap-3 p-4">
             <MetricCard
@@ -429,6 +546,12 @@ export default async function ExplainerDetailPage({ params }) {
           tone="verified"
         />
       </section>
+
+      <ExplainerArgumentModeToggle
+        argumentMode={explainer.argument_mode}
+        explainerTitle={explainer.title}
+        explainerSlug={slug}
+      />
 
       <PageRoleCallout
         title="Use explainers as the context layer"
@@ -833,6 +956,19 @@ export default async function ExplainerDetailPage({ params }) {
           )}
         </div>
       </Panel>
+
+      {relatedReports.length ? (
+        <Panel className="overflow-hidden">
+          <SectionHeader
+            eyebrow="Related reports"
+            title="Related reports"
+            description="Use these reports when the explainer leads into synthesis or comparative analysis built from the wider public record."
+          />
+          <div className="p-4">
+            <ReportCardGrid items={relatedReports} />
+          </div>
+        </Panel>
+      ) : null}
 
       <Panel className="overflow-hidden">
         <SectionHeader
