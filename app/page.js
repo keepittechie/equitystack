@@ -6,7 +6,13 @@ import { resolvePresidentImageSrc } from "@/lib/president-image-paths";
 import StructuredData from "@/app/components/public/StructuredData";
 import { ScoreBadge, SectionIntro } from "@/app/components/public/core";
 import { PresidentPortrait } from "@/app/components/public/entities";
-import { MetricCard, Panel, StatusPill } from "@/app/components/dashboard/primitives";
+import {
+  getImpactDirectionTone,
+  getPromiseStatusTone,
+  MetricCard,
+  Panel,
+  StatusPill,
+} from "@/app/components/dashboard/primitives";
 import TrustBar from "@/app/components/public/TrustBar";
 import {
   buildCollectionPageJsonLd,
@@ -64,10 +70,36 @@ const START_HERE_STEPS = [
       "Move from promises to policies and see what changed.",
     cta: "Open policy records",
   },
+  {
+    href: "/explainers",
+    step: "04",
+    title: "Break Down a Claim",
+    description:
+      "Use explainers to challenge common narratives with context and receipts.",
+    cta: "Browse explainers",
+  },
+  {
+    href: "/promises",
+    step: "05",
+    title: "Follow a Promise",
+    description:
+      "See how campaign commitments turn into actions, delays, and outcomes.",
+    cta: "Open promise tracker",
+  },
+  {
+    href: "/sources",
+    step: "06",
+    title: "Check the Sources",
+    description:
+      "Verify the evidence trail behind the records, arguments, and summaries.",
+    cta: "Browse sources",
+  },
 ];
 
 const COUNT_FORMATTER = new Intl.NumberFormat("en-US");
 const CURRENT_YEAR = new Date().getFullYear();
+const HERO_TEXT_LINK_CLASS =
+  "font-semibold text-white underline decoration-white/20 underline-offset-4 transition-colors hover:text-[var(--accent)] hover:decoration-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(132,247,198,0.28)] focus-visible:ring-offset-2 focus-visible:ring-offset-[rgba(4,10,18,0.72)]";
 
 function formatCount(value) {
   const numeric = Number(value);
@@ -438,7 +470,7 @@ export default async function HomePage() {
   const { readiness, presidents, currentAdministration, explainers } =
     await fetchHomePageData();
 
-  const featuredPresidents = sortPresidentsByRecency(presidents).slice(0, 5);
+  const featuredPresidents = sortPresidentsByRecency(presidents).slice(0, 10);
   const featuredExplainers = selectFeaturedExplainers(explainers, 4);
   const currentSpotlight = selectCurrentSpotlight(presidents, currentAdministration);
   const spotlightPresident = currentSpotlight.president;
@@ -461,6 +493,9 @@ export default async function HomePage() {
   const spotlightLatestDate = currentSpotlight.overview?.recent_activity?.find(
     (item) => item.latest_action_date
   )?.latest_action_date;
+  const spotlightFeaturedRecords = (
+    currentSpotlight.overview?.featured_records || []
+  ).slice(0, 3);
   const spotlightStats = currentSpotlight.overview
     ? [
         {
@@ -612,8 +647,23 @@ export default async function HomePage() {
             </h1>
             <p className="mt-6 max-w-3xl text-base leading-8 text-[#d8e2ee] md:text-lg">
               EquityStack is a public-interest research platform for studying Black
-              history, presidents, promises, legislation, executive actions, and the
-              documented policy impact of government decisions on Black Americans.
+              history through{" "}
+              <Link href="/presidents" className={HERO_TEXT_LINK_CLASS}>
+                presidents
+              </Link>
+              ,{" "}
+              <Link href="/promises" className={HERO_TEXT_LINK_CLASS}>
+                promises
+              </Link>
+              ,{" "}
+              <Link href="/policies" className={HERO_TEXT_LINK_CLASS}>
+                legislation
+              </Link>
+              , executive actions, and the documented{" "}
+              <Link href="/reports/black-impact-score" className={HERO_TEXT_LINK_CLASS}>
+                policy impact
+              </Link>{" "}
+              of government decisions on Black Americans.
             </p>
             <p className="mt-4 text-sm font-semibold uppercase tracking-[0.2em] text-white/80">
               No spin. Just receipts.
@@ -668,7 +718,7 @@ export default async function HomePage() {
         <SectionIntro
           eyebrow="Current context"
           title="What's Happening Right Now"
-          description="Start with the current administration, then trace how promises and policies are changing over time."
+          description="Start with the current administration, see where the record is most active, then trace how promises and policies are changing over time."
         />
         {spotlightPresident ? (
           <Panel padding="md" className="space-y-5">
@@ -742,6 +792,58 @@ export default async function HomePage() {
                     tone="default"
                   />
                 ))}
+              </div>
+            ) : null}
+
+            {spotlightFeaturedRecords.length ? (
+              <div className="space-y-3 border-t border-[var(--line)] pt-4">
+                <div>
+                  <h3 className="text-sm font-semibold text-white">
+                    Open the current record trail
+                  </h3>
+                  <p className="mt-1 text-sm leading-6 text-[var(--ink-soft)]">
+                    These are a few of the clearest current-term records to open next.
+                  </p>
+                </div>
+                <div className="grid gap-3 md:grid-cols-3">
+                  {spotlightFeaturedRecords.map((record) => (
+                    <Link
+                      key={record.slug}
+                      href={`/promises/${record.slug}`}
+                      className="panel-link p-4"
+                    >
+                      <div className="flex flex-wrap items-center gap-2">
+                        {record.topic ? (
+                          <StatusPill tone="default">{record.topic}</StatusPill>
+                        ) : null}
+                        {record.status ? (
+                          <StatusPill tone={getPromiseStatusTone(record.status)}>
+                            {record.status}
+                          </StatusPill>
+                        ) : null}
+                        {record.impact_direction_for_curation ? (
+                          <StatusPill
+                            tone={getImpactDirectionTone(
+                              record.impact_direction_for_curation
+                            )}
+                          >
+                            {record.impact_direction_for_curation}
+                          </StatusPill>
+                        ) : null}
+                      </div>
+                      <h3 className="mt-3 text-sm font-semibold text-white">
+                        {record.title}
+                      </h3>
+                      <p className="mt-2 line-clamp-3 text-sm leading-6 text-[var(--ink-soft)]">
+                        {record.summary ||
+                          "Open the record for actions, outcomes, and linked sources."}
+                      </p>
+                      <span className="mt-4 block text-[12px] font-semibold text-[var(--ink-soft)]">
+                        Open promise record
+                      </span>
+                    </Link>
+                  ))}
+                </div>
               </div>
             ) : null}
 
@@ -835,14 +937,14 @@ export default async function HomePage() {
         <SectionIntro
           eyebrow="Guided path"
           title="New to EquityStack? Start Here."
-          description="Follow a simple path: understand the score, explore a president, then trace the policy record."
+          description="Follow a simple path from score and presidential context into policy, explainers, promises, and source verification."
           actions={
             <Link href="/start" className="dashboard-button-secondary">
               Open the full reading guide
             </Link>
           }
         />
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {START_HERE_STEPS.map((item) => (
             <Panel
               key={item.step}
