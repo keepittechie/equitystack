@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+from collections import Counter
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -59,6 +60,10 @@ def derive_output_path(args: argparse.Namespace, batch_name: str) -> Path:
     return (get_current_admin_batches_dir() / filename).resolve()
 
 
+def derive_debug_output_path(batch_name: str) -> Path:
+    return (get_current_admin_reports_dir() / f"{batch_name}.discovery-debug.json").resolve()
+
+
 def normalize_promise_sources(values: list[dict[str, Any]] | None) -> list[dict[str, Any]]:
     rows = []
     for source in values or []:
@@ -77,6 +82,100 @@ def normalize_promise_sources(values: list[dict[str, Any]] | None) -> list[dict[
     return rows
 
 
+def merge_source_rows(*groups: list[dict[str, Any]] | None) -> list[dict[str, Any]]:
+    merged = []
+    seen: set[str] = set()
+    for group in groups:
+        for source in normalize_promise_sources(group):
+            dedupe_key = "||".join(
+                [
+                    normalize_nullable_text(source.get("source_url")) or "",
+                    normalize_nullable_text(source.get("source_title")) or "",
+                    normalize_nullable_text(source.get("published_date")) or "",
+                ]
+            )
+            if dedupe_key in seen:
+                continue
+            seen.add(dedupe_key)
+            merged.append(source)
+    return merged
+
+
+def first_source_date(source_rows: list[dict[str, Any]]) -> str | None:
+    for source in source_rows:
+        published = normalize_date(source.get("published_date"))
+        if published:
+            return published
+    return None
+
+
+def build_action_stub(candidate: dict[str, Any]) -> dict[str, Any] | None:
+    item = candidate["item"]
+    if item.get("candidate_type") not in {"new_action", "update_existing_action"}:
+        return None
+
+    suggested = item.get("suggested_changes") or {}
+    feed_item = item.get("feed_item") or {}
+    source_rows = normalize_promise_sources(item.get("source_references") or [])
+    title = normalize_nullable_text(suggested.get("title")) or normalize_nullable_text(feed_item.get("title"))
+    action_type = normalize_nullable_text(suggested.get("action_type"))
+    description = (
+        normalize_nullable_text(suggested.get("summary"))
+        or normalize_nullable_text(feed_item.get("summary"))
+        or normalize_nullable_text(item.get("reasoning"))
+    )
+    action_date = first_source_date(source_rows) or normalize_date(feed_item.get("published_at"))
+    if not title and not action_type and not source_rows:
+        return None
+    return {
+        "action_type": action_type,
+        "action_date": action_date,
+        "title": title,
+        "description": description,
+        "action_sources": source_rows,
+        "outcomes": [],
+    }
+
+
+def merge_action_stubs(action_stubs: list[dict[str, Any] | None]) -> list[dict[str, Any]]:
+    merged: dict[str, dict[str, Any]] = {}
+    for stub in action_stubs:
+        if not stub:
+            continue
+        dedupe_key = "||".join(
+            [
+                normalize_nullable_text(stub.get("action_type")) or "",
+                normalize_nullable_text(stub.get("title")) or "",
+                normalize_nullable_text(stub.get("action_date")) or "",
+            ]
+        )
+        existing = merged.get(dedupe_key)
+        if existing is None:
+            merged[dedupe_key] = {
+                "action_type": normalize_nullable_text(stub.get("action_type")),
+                "action_date": normalize_date(stub.get("action_date")),
+                "title": normalize_nullable_text(stub.get("title")),
+                "description": normalize_nullable_text(stub.get("description")),
+                "action_sources": normalize_promise_sources(stub.get("action_sources") or []),
+                "outcomes": [],
+            }
+            continue
+        existing["action_sources"] = merge_source_rows(
+            existing.get("action_sources") or [],
+            stub.get("action_sources") or [],
+        )
+        if not existing.get("description"):
+            existing["description"] = normalize_nullable_text(stub.get("description"))
+    return sorted(
+        merged.values(),
+        key=lambda action: (
+            normalize_date(action.get("action_date")) or "",
+            normalize_nullable_text(action.get("title")) or "",
+        ),
+        reverse=True,
+    )
+
+
 def candidate_snapshot(candidate: dict[str, Any]) -> dict[str, Any]:
     item = candidate["item"]
     linked = item.get("linked_promise") or {}
@@ -85,9 +184,12 @@ def candidate_snapshot(candidate: dict[str, Any]) -> dict[str, Any]:
         "candidate_number": candidate["candidate_number"],
         "source_section": candidate["section"],
         "candidate_type": item.get("candidate_type"),
+        "suggested_relationship": item.get("suggested_relationship"),
         "linked_promise_slug": linked.get("slug"),
         "reasoning": item.get("reasoning"),
         "confidence": item.get("confidence"),
+        "matched_keywords": item.get("matched_keywords") or [],
+        "source_category": item.get("source_category"),
         "source_references": item.get("source_references") or [],
         "suggested_changes": item.get("suggested_changes") or {},
         "feed_item": item.get("feed_item"),
@@ -99,6 +201,10 @@ def build_existing_record(grouped_candidates: list[dict[str, Any]], president_sl
     linked = first_item.get("linked_promise") or {}
     summary = normalize_nullable_text(linked.get("summary")) or normalize_nullable_text(first_item.get("reasoning")) or normalize_nullable_text(linked.get("title"))
     title = normalize_nullable_text(linked.get("title")) or normalize_nullable_text(linked.get("slug")) or "Untitled current-admin record"
+    discovered_source_rows = merge_source_rows(
+        *[(candidate["item"].get("source_references") or []) for candidate in grouped_candidates]
+    )
+    actions = merge_action_stubs([build_action_stub(candidate) for candidate in grouped_candidates])
     return {
         "slug": normalize_nullable_text(linked.get("slug")) or slugify(title),
         "title": title,
@@ -111,8 +217,8 @@ def build_existing_record(grouped_candidates: list[dict[str, Any]], president_sl
         "status": normalize_nullable_text(linked.get("status")) or "In Progress",
         "summary": summary,
         "notes": normalize_nullable_text(linked.get("notes")),
-        "promise_sources": normalize_promise_sources(linked.get("promise_sources") or []),
-        "actions": [],
+        "promise_sources": merge_source_rows(linked.get("promise_sources") or [], discovered_source_rows),
+        "actions": actions,
         "discovery_context": {
             "generated_at": datetime.now(UTC).replace(microsecond=0).isoformat(),
             "president_slug": president_slug,
@@ -129,6 +235,8 @@ def build_existing_record(grouped_candidates: list[dict[str, Any]], president_sl
                 "outcome_count": linked.get("outcome_count"),
                 "promise_source_count": linked.get("promise_source_count"),
             },
+            "preserved_discovery_sources": discovered_source_rows,
+            "preserved_action_count": len(actions),
             "selected_candidates": [candidate_snapshot(candidate) for candidate in grouped_candidates],
         },
     }
@@ -146,7 +254,7 @@ def first_published_date(candidate: dict[str, Any], report_generated_at: str | N
 def build_new_promise_record(candidate: dict[str, Any], president_slug: str, report_generated_at: str | None) -> dict[str, Any]:
     item = candidate["item"]
     suggested = item.get("suggested_changes") or {}
-    source_refs = normalize_promise_sources(item.get("source_references") or [])
+    source_refs = merge_source_rows(item.get("source_references") or [])
     title = normalize_nullable_text(suggested.get("title")) or normalize_nullable_text((item.get("feed_item") or {}).get("title")) or f"Discovery candidate {candidate['candidate_id']}"
     summary = normalize_nullable_text(suggested.get("summary")) or normalize_nullable_text(item.get("reasoning")) or title
     return {
@@ -171,16 +279,20 @@ def build_new_promise_record(candidate: dict[str, Any], president_slug: str, rep
     }
 
 
-def select_candidates(args: argparse.Namespace, report: dict[str, Any]) -> list[dict[str, Any]]:
-    if not args.all_candidates:
-        require_selection(args)
+def select_candidates(args: argparse.Namespace, report: dict[str, Any]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     indexed = indexed_candidates(report)
     if args.all_candidates:
-        return indexed
-    return [candidate for candidate in indexed if matches_filters(candidate, args)]
+        return indexed, indexed
+    require_selection(args)
+    return indexed, [candidate for candidate in indexed if matches_filters(candidate, args)]
 
 
-def build_batch_payload(report: dict[str, Any], selected: list[dict[str, Any]], batch_name: str, output_path: Path) -> dict[str, Any]:
+def build_batch_payload(
+    report: dict[str, Any],
+    selected: list[dict[str, Any]],
+    batch_name: str,
+    output_path: Path,
+) -> tuple[dict[str, Any], dict[str, Any]]:
     president_slug = normalize_nullable_text(report.get("president_slug")) or "current-admin"
     existing_by_slug: dict[str, list[dict[str, Any]]] = {}
     new_candidates: list[dict[str, Any]] = []
@@ -203,7 +315,7 @@ def build_batch_payload(report: dict[str, Any], selected: list[dict[str, Any]], 
         for candidate in new_candidates
     )
 
-    return {
+    payload = {
         "batch_name": batch_name,
         "president_slug": president_slug,
         "records": records,
@@ -213,15 +325,90 @@ def build_batch_payload(report: dict[str, Any], selected: list[dict[str, Any]], 
             "output_path": str(output_path),
         },
     }
+    grouped_existing_record_count = len(existing_by_slug)
+    selected_existing_candidate_count = sum(len(group) for group in existing_by_slug.values())
+    merged_existing_candidate_count = sum(max(len(group) - 1, 0) for group in existing_by_slug.values())
+    generation_debug = {
+        "selected_existing_candidate_count": selected_existing_candidate_count,
+        "selected_new_promise_candidate_count": len(new_candidates),
+        "grouped_existing_record_count": grouped_existing_record_count,
+        "merged_existing_candidate_count": merged_existing_candidate_count,
+        "dedupe_match_key": "linked_promise_slug",
+        "group_sizes_by_linked_promise_slug": {
+            slug: len(grouped_candidates)
+            for slug, grouped_candidates in sorted(existing_by_slug.items())
+        },
+    }
+    return payload, generation_debug
+
+
+def count_by_section(candidates: list[dict[str, Any]]) -> dict[str, int]:
+    counts: Counter[str] = Counter()
+    for candidate in candidates:
+        counts[candidate.get("section") or "unknown"] += 1
+    return dict(sorted(counts.items()))
+
+
+def count_by_candidate_type(candidates: list[dict[str, Any]]) -> dict[str, int]:
+    counts: Counter[str] = Counter()
+    for candidate in candidates:
+        candidate_type = normalize_nullable_text((candidate.get("item") or {}).get("candidate_type")) or "unknown"
+        counts[candidate_type] += 1
+    return dict(sorted(counts.items()))
+
+
+def build_generation_debug_report(
+    *,
+    args: argparse.Namespace,
+    input_path: Path,
+    raw_candidates: list[dict[str, Any]],
+    selected: list[dict[str, Any]],
+    payload: dict[str, Any] | None,
+    generation_debug: dict[str, Any] | None,
+    output_path: Path,
+    debug_output_path: Path,
+    batch_name: str,
+    status: str,
+) -> dict[str, Any]:
+    skipped_count = max(len(raw_candidates) - len(selected), 0)
+    return {
+        "generated_at": datetime.now(UTC).replace(microsecond=0).isoformat(),
+        "status": status,
+        "batch_name": batch_name,
+        "source_discovery_report_path": str(input_path),
+        "output_path": str(output_path),
+        "debug_output_path": str(debug_output_path),
+        "selection_filters": {
+            "candidate_ids": args.candidate_id or [],
+            "candidate_types": args.candidate_type or [],
+            "linked_promise_slugs": args.linked_promise_slug or [],
+            "all_new_promises": args.all_new_promises,
+            "all_new_actions": args.all_new_actions,
+            "all_candidates": args.all_candidates,
+        },
+        "raw_candidate_count": len(raw_candidates),
+        "raw_candidate_counts_by_section": count_by_section(raw_candidates),
+        "raw_candidate_type_counts": count_by_candidate_type(raw_candidates),
+        "selected_candidate_count": len(selected),
+        "selected_candidate_counts_by_section": count_by_section(selected),
+        "selected_candidate_type_counts": count_by_candidate_type(selected),
+        "skipped_candidate_count": skipped_count,
+        "skip_reason_counts": {"unselected_by_filters": skipped_count} if skipped_count else {},
+        "date_filter_applied": "not_applied_in_batch_generation",
+        "keyword_category_filter_result": "not_applied_in_batch_generation",
+        "action_type_filter_result": "not_applied_in_batch_generation",
+        "dedupe_match_key": "linked_promise_slug",
+        "grouping": generation_debug or {},
+        "final_batch_count": len((payload or {}).get("records") or []),
+        "selected_candidate_ids": [candidate["candidate_id"] for candidate in selected],
+    }
 
 
 def main() -> None:
     args = parse_args()
     input_path = args.input.resolve()
     report = load_discovery_report(input_path)
-    selected = select_candidates(args, report)
-    if not selected:
-        raise SystemExit("No discovery candidates matched the requested filters")
+    raw_candidates, selected = select_candidates(args, report)
 
     if args.batch_name:
         batch_name = slugify(args.batch_name)
@@ -235,21 +422,54 @@ def main() -> None:
         batch_name = f"{president_slug}-discovery-{timestamp}"
 
     output_path = derive_output_path(args, batch_name)
+    debug_output_path = derive_debug_output_path(batch_name)
+
+    if not selected:
+        debug_report = build_generation_debug_report(
+            args=args,
+            input_path=input_path,
+            raw_candidates=raw_candidates,
+            selected=selected,
+            payload=None,
+            generation_debug=None,
+            output_path=output_path,
+            debug_output_path=debug_output_path,
+            batch_name=batch_name,
+            status="no_candidates_selected",
+        )
+        write_json_file(debug_output_path, debug_report)
+        raise SystemExit("No discovery candidates matched the requested filters")
+
     if output_path.exists() and not args.allow_overwrite:
         raise SystemExit(f"Output already exists: {output_path}. Use --allow-overwrite to replace it.")
 
-    payload = build_batch_payload(report, selected, batch_name, output_path)
+    payload, generation_debug = build_batch_payload(report, selected, batch_name, output_path)
     payload["generation_context"] = {
         "generated_at": datetime.now(UTC).replace(microsecond=0).isoformat(),
         "source_discovery_report_path": str(input_path),
         "selected_candidate_ids": [candidate["candidate_id"] for candidate in selected],
         "selected_count": len(selected),
+        "debug_report_path": str(debug_output_path),
     }
+    debug_report = build_generation_debug_report(
+        args=args,
+        input_path=input_path,
+        raw_candidates=raw_candidates,
+        selected=selected,
+        payload=payload,
+        generation_debug=generation_debug,
+        output_path=output_path,
+        debug_output_path=debug_output_path,
+        batch_name=batch_name,
+        status="success",
+    )
+    write_json_file(debug_output_path, debug_report)
     write_json_file(output_path, payload)
 
     print_json(
         {
             "output_path": str(output_path),
+            "debug_output_path": str(debug_output_path),
             "batch_name": batch_name,
             "selected_count": len(selected),
             "record_count": len(payload["records"]),

@@ -13,6 +13,14 @@ DEFAULT_CURRENT_ADMIN_REPORTS_DIRNAME = "current_admin"
 VALID_PROMISE_STATUSES = {"In Progress", "Partial", "Delivered", "Blocked", "Failed"}
 VALID_IMPACT_DIRECTIONS = {"Positive", "Negative", "Mixed", "Blocked"}
 VALID_EVIDENCE_STRENGTHS = {"Strong", "Moderate", "Limited"}
+DB_ENV_KEYS = ("DB_HOST", "DB_PORT", "DB_USER", "DB_PASSWORD", "DB_NAME")
+DEFAULT_DB_SETTINGS = {
+    "DB_HOST": "127.0.0.1",
+    "DB_PORT": "3306",
+    "DB_USER": "root",
+    "DB_PASSWORD": "",
+    "DB_NAME": "black_policy_tracker",
+}
 
 
 def get_project_root() -> Path:
@@ -51,27 +59,64 @@ def load_env_file(env_path: Path) -> dict[str, str]:
 
 
 def get_db_env_values() -> dict[str, str]:
-    values = load_env_file(get_project_root() / ".env.local")
-    for key in ("DB_HOST", "DB_PORT", "DB_USER", "DB_PASSWORD", "DB_NAME"):
+    values, _ = get_db_env_values_with_sources()
+    return values
+
+
+def get_db_env_values_with_sources() -> tuple[dict[str, str], dict[str, str]]:
+    env_path = get_project_root() / ".env.local"
+    file_values = load_env_file(env_path)
+    values: dict[str, str] = {}
+    sources: dict[str, str] = {}
+    for key in DB_ENV_KEYS:
         if os.environ.get(key):
             values[key] = os.environ[key]
-    return values
+            sources[key] = "environment"
+        elif key in file_values:
+            values[key] = file_values[key]
+            sources[key] = str(env_path)
+        else:
+            values[key] = DEFAULT_DB_SETTINGS[key]
+            sources[key] = "default"
+    return values, sources
+
+
+def describe_db_connection_settings() -> dict[str, str]:
+    env_values, env_sources = get_db_env_values_with_sources()
+    return {
+        "host": env_values["DB_HOST"],
+        "port": env_values["DB_PORT"],
+        "database": env_values["DB_NAME"],
+        "host_source": env_sources["DB_HOST"],
+        "port_source": env_sources["DB_PORT"],
+        "database_source": env_sources["DB_NAME"],
+    }
 
 
 def get_db_connection():
     import pymysql
 
-    env_values = get_db_env_values()
-    return pymysql.connect(
-        host=env_values.get("DB_HOST", "127.0.0.1"),
-        port=int(env_values.get("DB_PORT", "3306")),
-        user=env_values.get("DB_USER", "root"),
-        password=env_values.get("DB_PASSWORD", ""),
-        database=env_values.get("DB_NAME", "black_policy_tracker"),
-        charset="utf8mb4",
-        cursorclass=pymysql.cursors.DictCursor,
-        autocommit=False,
-    )
+    env_values, env_sources = get_db_env_values_with_sources()
+    connection_kwargs = {
+        "host": env_values["DB_HOST"],
+        "port": int(env_values["DB_PORT"]),
+        "user": env_values["DB_USER"],
+        "password": env_values["DB_PASSWORD"],
+        "database": env_values["DB_NAME"],
+        "charset": "utf8mb4",
+        "cursorclass": pymysql.cursors.DictCursor,
+        "autocommit": False,
+    }
+    try:
+        return pymysql.connect(**connection_kwargs)
+    except Exception as exc:
+        raise RuntimeError(
+            "Current-admin DB connection failed "
+            f"(host={connection_kwargs['host']}, port={connection_kwargs['port']}, "
+            f"database={connection_kwargs['database']}, host_source={env_sources['DB_HOST']}). "
+            "Override the host with DB_HOST=<reachable-host> ./bin/equitystack current-admin status "
+            f"if localhost is not valid here. Original error: {exc}"
+        ) from exc
 
 
 def utc_timestamp() -> str:

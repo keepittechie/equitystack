@@ -1429,10 +1429,14 @@ run_current_admin_run_command() {
         allow_overwrite="true"
         shift
         ;;
-      --feed-url|--feed-json|--max-promises|--max-feed-items|--lookback-days)
+      --feed-url|--feed-json|--max-promises|--max-feed-items|--lookback-days|--source-config)
         discovery_args+=("$1" "${2:-}")
         [ -n "${2:-}" ] || { echo "$1 requires a value" >&2; exit 1; }
         shift 2
+        ;;
+      --disable-default-sources)
+        discovery_args+=("$1")
+        shift
         ;;
       --model|--verifier-model|--fallback-model|--ollama-url|--timeout|--senior-timeout|--verifier-timeout|--review-mode)
         workflow_args+=("$1" "${2:-}")
@@ -2980,6 +2984,7 @@ Defaults:
     model       $DEFAULT_MODEL_VERIFIER
     timeout     ${DEFAULT_OLLAMA_TIMEOUT_VERIFIER}s
     llm endpoint $DEFAULT_OLLAMA_URL
+    live sources python/config/current_admin_sources.json (unless --disable-default-sources is passed)
 
 Path handling:
   Current-admin path flags accept python-rooted paths like data/... or reports/... .
@@ -3076,6 +3081,10 @@ Wrapper defaults:
   --model $DEFAULT_MODEL_VERIFIER
   --timeout $DEFAULT_OLLAMA_TIMEOUT_VERIFIER
   --ollama-url $DEFAULT_OLLAMA_URL  (legacy alias for the configured LLM endpoint)
+
+By default discovery also loads configured live sources from:
+  python/config/current_admin_sources.json
+Pass --disable-default-sources to inspect only explicit --feed-url/--feed-json inputs.
 EOF
       ;;
     export)

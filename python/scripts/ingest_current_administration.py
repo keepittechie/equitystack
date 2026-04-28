@@ -347,6 +347,39 @@ def build_candidates(source_names: list[str], president_id: int, limit: int) -> 
     return candidates, source_errors
 
 
+def collect_white_house_source_items(source_names: list[str], limit: int) -> tuple[list[dict[str, Any]], list[dict[str, str]]]:
+    source_items: list[dict[str, Any]] = []
+    source_errors: list[dict[str, str]] = []
+
+    for source_name in source_names:
+        try:
+            listing_html = fetch_page(WHITE_HOUSE_LISTINGS[source_name])
+        except requests.RequestException as error:
+            source_errors.append({"source": source_name, "error": str(error)})
+            continue
+
+        for item in extract_items(listing_html, source_name)[:limit]:
+            source_items.append(
+                {
+                    "title": item["title"],
+                    "url": item["canonical_url"],
+                    "published_at": item["publication_date"],
+                    "summary": item["description"] or "",
+                    "source_name": source_name.replace("_", " ").title(),
+                    "source_type": "White House HTML",
+                    "source_category": source_name,
+                    "publisher": "The White House",
+                    "action_type_hint": derive_raw_action_type(
+                        item["title"],
+                        source_name,
+                        item["canonical_url"],
+                    ),
+                }
+            )
+
+    return source_items, source_errors
+
+
 def print_preview(candidates: list[StagedCandidate]) -> None:
     preview = [
         {

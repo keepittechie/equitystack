@@ -1,0 +1,677 @@
+{
+  "batch_name": "donald-j-trump-2025-discovery-20260428t030714z",
+  "president_slug": "donald-j-trump-2025",
+  "records": [
+    {
+      "slug": "donald-j-trump-2025-paying-our-great-transportation-security-administration-officers-and-employees",
+      "title": "Paying Our Great Transportation Security Administration Officers and Employees",
+      "promise_text": "The record has thin source linking at the promise or action level and should be strengthened before later scoring updates.",
+      "promise_date": null,
+      "promise_type": null,
+      "campaign_or_official": null,
+      "topic": "Transportation Security / Workforce",
+      "impacted_group": null,
+      "status": "In Progress",
+      "summary": "The record has thin source linking at the promise or action level and should be strengthened before later scoring updates.",
+      "notes": null,
+      "promise_sources": [],
+      "actions": [],
+      "discovery_context": {
+        "generated_at": "2026-04-28T03:07:14+00:00",
+        "president_slug": "donald-j-trump-2025",
+        "linked_promise_snapshot": {
+          "id": 99,
+          "slug": "donald-j-trump-2025-paying-our-great-transportation-security-administration-officers-and-employees",
+          "title": "Paying Our Great Transportation Security Administration Officers and Employees",
+          "status": "In Progress",
+          "topic": "Transportation Security / Workforce",
+          "summary": null,
+          "promise_date": null,
+          "latest_action_date": null,
+          "action_count": null,
+          "outcome_count": null,
+          "promise_source_count": null
+        },
+        "selected_candidates": [
+          {
+            "candidate_id": "update_candidates:1",
+            "candidate_number": 1,
+            "source_section": "update_candidates",
+            "candidate_type": "thin_sourcing",
+            "linked_promise_slug": "donald-j-trump-2025-paying-our-great-transportation-security-administration-officers-and-employees",
+            "reasoning": "The record has thin source linking at the promise or action level and should be strengthened before later scoring updates.",
+            "confidence": "Medium",
+            "source_references": [],
+            "suggested_changes": {
+              "focus": [
+                "promise_sources",
+                "action_sources"
+              ],
+              "thin_action_count": 0
+            },
+            "feed_item": null
+          }
+        ]
+      }
+    },
+    {
+      "slug": "trump-2025-clear-street-encampments-expand-civil-commitment",
+      "title": "Clear street encampments and expand treatment-oriented street-order responses",
+      "promise_text": "The latest recorded action is 2025-07-24, older than the 120-day review window for an in-progress current-administration record.",
+      "promise_date": null,
+      "promise_type": null,
+      "campaign_or_official": null,
+      "topic": "Housing",
+      "impacted_group": null,
+      "status": "Partial",
+      "summary": "The latest recorded action is 2025-07-24, older than the 120-day review window for an in-progress current-administration record.",
+      "notes": null,
+      "promise_sources": [],
+      "actions": [],
+      "discovery_context": {
+        "generated_at": "2026-04-28T03:07:14+00:00",
+        "president_slug": "donald-j-trump-2025",
+        "linked_promise_snapshot": {
+          "id": 113,
+          "slug": "trump-2025-clear-street-encampments-expand-civil-commitment",
+          "title": "Clear street encampments and expand treatment-oriented street-order responses",
+          "status": "Partial",
+          "topic": "Housing",
+          "summary": null,
+          "promise_date": null,
+          "latest_action_date": null,
+          "action_count": null,
+          "outcome_count": null,
+          "promise_source_count": null
+        },
+        "selected_candidates": [
+          {
+            "candidate_id": "update_candidates:2",
+            "candidate_number": 2,
+            "source_section": "update_candidates",
+            "candidate_type": "stale_record",
+            "linked_promise_slug": "trump-2025-clear-street-encampments-expand-civil-commitment",
+            "reasoning": "The latest recorded action is 2025-07-24, older than the 120-day review window for an in-progress current-administration record.",
+            "confidence": "Medium",
+            "source_references": [
+              {
+                "source_title": "Agenda47: Ending the Nightmare of the Homeless, Drug Addicts, and Dangerously Deranged",
+                "source_url": "https://www.donaldjtrump.com/agenda47/agenda47-ending-the-nightmare-of-the-homeless-drug-addicts-and-dangerously-deranged",
+                "source_type": "Other",
+                "publisher": "DonaldJTrump.com",
+                "published_date": "2023-04-18"
+              }
+            ],
+            "suggested_changes": {
+              "focus": [
+                "actions",
+                "outcomes",
+                "sources"
+              ]
+            },
+            "feed_item": null
+          }
+        ]
+      }
+    },
+    {
+      "slug": "trump-2025-domestic-production-of-critical-medicines",
+      "title": "Expand domestic production of critical medicines",
+      "promise_text": "The latest recorded action is 2025-05-05, older than the 120-day review window for an in-progress current-administration record.",
+      "promise_date": null,
+      "promise_type": null,
+      "campaign_or_official": null,
+      "topic": "Healthcare",
+      "impacted_group": null,
+      "status": "Partial",
+      "summary": "The latest recorded action is 2025-05-05, older than the 120-day review window for an in-progress current-administration record.",
+      "notes": null,
+      "promise_sources": [],
+      "actions": [],
+      "discovery_context": {
+        "generated_at": "2026-04-28T03:07:14+00:00",
+        "president_slug": "donald-j-trump-2025",
+        "linked_promise_snapshot": {
+          "id": 114,
+          "slug": "trump-2025-domestic-production-of-critical-medicines",
+          "title": "Expand domestic production of critical medicines",
+          "status": "Partial",
+          "topic": "Healthcare",
+          "summary": null,
+          "promise_date": null,
+          "latest_action_date": null,
+          "action_count": null,
+          "outcome_count": null,
+          "promise_source_count": null
+        },
+        "selected_candidates": [
+          {
+            "candidate_id": "update_candidates:3",
+            "candidate_number": 3,
+            "source_section": "update_candidates",
+            "candidate_type": "stale_record",
+            "linked_promise_slug": "trump-2025-domestic-production-of-critical-medicines",
+            "reasoning": "The latest recorded action is 2025-05-05, older than the 120-day review window for an in-progress current-administration record.",
+            "confidence": "Medium",
+            "source_references": [
+              {
+                "source_title": "Agenda47: Returning Production of Essential Medicines Back to America and Ending Pharmaceutical Shortages",
+                "source_url": "https://www.donaldjtrump.com/news/7c12c37a-67b0-4824-81f0-3b6307b72065",
+                "source_type": "Other",
+                "publisher": "DonaldJTrump.com",
+                "published_date": "2023-08-29"
+              }
+            ],
+            "suggested_changes": {
+              "focus": [
+                "actions",
+                "outcomes",
+                "sources"
+              ]
+            },
+            "feed_item": null
+          }
+        ]
+      }
+    },
+    {
+      "slug": "trump-2025-election-integrity-proof-citizenship-paper-ballots",
+      "title": "Require proof of citizenship and paper-ballot election safeguards",
+      "promise_text": "The latest recorded action is 2025-03-25, older than the 120-day review window for an in-progress current-administration record.",
+      "promise_date": null,
+      "promise_type": null,
+      "campaign_or_official": null,
+      "topic": "Voting Rights",
+      "impacted_group": null,
+      "status": "Partial",
+      "summary": "The latest recorded action is 2025-03-25, older than the 120-day review window for an in-progress current-administration record.",
+      "notes": null,
+      "promise_sources": [],
+      "actions": [],
+      "discovery_context": {
+        "generated_at": "2026-04-28T03:07:14+00:00",
+        "president_slug": "donald-j-trump-2025",
+        "linked_promise_snapshot": {
+          "id": 110,
+          "slug": "trump-2025-election-integrity-proof-citizenship-paper-ballots",
+          "title": "Require proof of citizenship and paper-ballot election safeguards",
+          "status": "Partial",
+          "topic": "Voting Rights",
+          "summary": null,
+          "promise_date": null,
+          "latest_action_date": null,
+          "action_count": null,
+          "outcome_count": null,
+          "promise_source_count": null
+        },
+        "selected_candidates": [
+          {
+            "candidate_id": "update_candidates:9",
+            "candidate_number": 9,
+            "source_section": "update_candidates",
+            "candidate_type": "stale_record",
+            "linked_promise_slug": "trump-2025-election-integrity-proof-citizenship-paper-ballots",
+            "reasoning": "The latest recorded action is 2025-03-25, older than the 120-day review window for an in-progress current-administration record.",
+            "confidence": "Medium",
+            "source_references": [
+              {
+                "source_title": "2024 Republican Platform",
+                "source_url": "https://prod-static.gop.com/media/RNC2024-Platform.pdf",
+                "source_type": "Other",
+                "publisher": "Republican National Committee",
+                "published_date": "2024-07-08"
+              }
+            ],
+            "suggested_changes": {
+              "focus": [
+                "actions",
+                "outcomes",
+                "sources"
+              ]
+            },
+            "feed_item": null
+          }
+        ]
+      }
+    },
+    {
+      "slug": "trump-2025-end-federal-dei-equity-programs",
+      "title": "End federal DEI and equity-based government programs",
+      "promise_text": "The latest recorded action is 2025-01-20, older than the 120-day review window for an in-progress current-administration record.",
+      "promise_date": null,
+      "promise_type": null,
+      "campaign_or_official": null,
+      "topic": "Economic Opportunity",
+      "impacted_group": null,
+      "status": "Partial",
+      "summary": "The latest recorded action is 2025-01-20, older than the 120-day review window for an in-progress current-administration record.",
+      "notes": null,
+      "promise_sources": [],
+      "actions": [],
+      "discovery_context": {
+        "generated_at": "2026-04-28T03:07:14+00:00",
+        "president_slug": "donald-j-trump-2025",
+        "linked_promise_snapshot": {
+          "id": 111,
+          "slug": "trump-2025-end-federal-dei-equity-programs",
+          "title": "End federal DEI and equity-based government programs",
+          "status": "Partial",
+          "topic": "Economic Opportunity",
+          "summary": null,
+          "promise_date": null,
+          "latest_action_date": null,
+          "action_count": null,
+          "outcome_count": null,
+          "promise_source_count": null
+        },
+        "selected_candidates": [
+          {
+            "candidate_id": "update_candidates:11",
+            "candidate_number": 11,
+            "source_section": "update_candidates",
+            "candidate_type": "stale_record",
+            "linked_promise_slug": "trump-2025-end-federal-dei-equity-programs",
+            "reasoning": "The latest recorded action is 2025-01-20, older than the 120-day review window for an in-progress current-administration record.",
+            "confidence": "Medium",
+            "source_references": [
+              {
+                "source_title": "Ending Radical And Wasteful Government DEI Programs And Preferencing",
+                "source_url": "https://www.whitehouse.gov/presidential-actions/2025/01/ending-radical-and-wasteful-government-dei-programs-and-preferencing/",
+                "source_type": "Government",
+                "publisher": "The White House",
+                "published_date": "2025-01-20"
+              }
+            ],
+            "suggested_changes": {
+              "focus": [
+                "actions",
+                "outcomes",
+                "sources"
+              ]
+            },
+            "feed_item": null
+          }
+        ]
+      }
+    },
+    {
+      "slug": "trump-2025-expand-educational-freedom-for-families",
+      "title": "Expand educational freedom and school-choice options for families",
+      "promise_text": "The latest recorded action is 2025-01-29, older than the 120-day review window for an in-progress current-administration record.",
+      "promise_date": null,
+      "promise_type": null,
+      "campaign_or_official": null,
+      "topic": "Education",
+      "impacted_group": null,
+      "status": "Partial",
+      "summary": "The latest recorded action is 2025-01-29, older than the 120-day review window for an in-progress current-administration record.",
+      "notes": null,
+      "promise_sources": [],
+      "actions": [],
+      "discovery_context": {
+        "generated_at": "2026-04-28T03:07:14+00:00",
+        "president_slug": "donald-j-trump-2025",
+        "linked_promise_snapshot": {
+          "id": 115,
+          "slug": "trump-2025-expand-educational-freedom-for-families",
+          "title": "Expand educational freedom and school-choice options for families",
+          "status": "Partial",
+          "topic": "Education",
+          "summary": null,
+          "promise_date": null,
+          "latest_action_date": null,
+          "action_count": null,
+          "outcome_count": null,
+          "promise_source_count": null
+        },
+        "selected_candidates": [
+          {
+            "candidate_id": "update_candidates:10",
+            "candidate_number": 10,
+            "source_section": "update_candidates",
+            "candidate_type": "stale_record",
+            "linked_promise_slug": "trump-2025-expand-educational-freedom-for-families",
+            "reasoning": "The latest recorded action is 2025-01-29, older than the 120-day review window for an in-progress current-administration record.",
+            "confidence": "Medium",
+            "source_references": [
+              {
+                "source_title": "Expanding Educational Freedom and Opportunity for Families",
+                "source_url": "https://www.whitehouse.gov/presidential-actions/2025/01/expanding-educational-freedom-and-opportunity-for-families/",
+                "source_type": "Government",
+                "publisher": "The White House",
+                "published_date": "2025-01-29"
+              }
+            ],
+            "suggested_changes": {
+              "focus": [
+                "actions",
+                "outcomes",
+                "sources"
+              ]
+            },
+            "feed_item": null
+          }
+        ]
+      }
+    },
+    {
+      "slug": "trump-2025-high-paying-skilled-trade-jobs",
+      "title": "Prepare Americans for high-paying skilled trade jobs",
+      "promise_text": "The latest recorded action is 2025-04-23, older than the 120-day review window for an in-progress current-administration record.",
+      "promise_date": null,
+      "promise_type": null,
+      "campaign_or_official": null,
+      "topic": "Economic Opportunity",
+      "impacted_group": null,
+      "status": "In Progress",
+      "summary": "The latest recorded action is 2025-04-23, older than the 120-day review window for an in-progress current-administration record.",
+      "notes": null,
+      "promise_sources": [],
+      "actions": [],
+      "discovery_context": {
+        "generated_at": "2026-04-28T03:07:14+00:00",
+        "president_slug": "donald-j-trump-2025",
+        "linked_promise_snapshot": {
+          "id": 119,
+          "slug": "trump-2025-high-paying-skilled-trade-jobs",
+          "title": "Prepare Americans for high-paying skilled trade jobs",
+          "status": "In Progress",
+          "topic": "Economic Opportunity",
+          "summary": null,
+          "promise_date": null,
+          "latest_action_date": null,
+          "action_count": null,
+          "outcome_count": null,
+          "promise_source_count": null
+        },
+        "selected_candidates": [
+          {
+            "candidate_id": "update_candidates:5",
+            "candidate_number": 5,
+            "source_section": "update_candidates",
+            "candidate_type": "stale_record",
+            "linked_promise_slug": "trump-2025-high-paying-skilled-trade-jobs",
+            "reasoning": "The latest recorded action is 2025-04-23, older than the 120-day review window for an in-progress current-administration record.",
+            "confidence": "Medium",
+            "source_references": [
+              {
+                "source_title": "Preparing Americans for High-Paying Skilled Trade Jobs of the Future",
+                "source_url": "https://www.whitehouse.gov/presidential-actions/2025/04/preparing-americans-for-high-paying-skilled-trade-jobs-of-the-future/",
+                "source_type": "Government",
+                "publisher": "The White House",
+                "published_date": "2025-04-23"
+              }
+            ],
+            "suggested_changes": {
+              "focus": [
+                "actions",
+                "outcomes",
+                "sources"
+              ]
+            },
+            "feed_item": null
+          }
+        ]
+      }
+    },
+    {
+      "slug": "trump-2025-promote-hbcu-excellence-and-innovation",
+      "title": "Promote excellence and innovation at HBCUs",
+      "promise_text": "The latest recorded action is 2025-04-23, older than the 120-day review window for an in-progress current-administration record.",
+      "promise_date": null,
+      "promise_type": null,
+      "campaign_or_official": null,
+      "topic": "Education",
+      "impacted_group": null,
+      "status": "Partial",
+      "summary": "The latest recorded action is 2025-04-23, older than the 120-day review window for an in-progress current-administration record.",
+      "notes": null,
+      "promise_sources": [],
+      "actions": [],
+      "discovery_context": {
+        "generated_at": "2026-04-28T03:07:14+00:00",
+        "president_slug": "donald-j-trump-2025",
+        "linked_promise_snapshot": {
+          "id": 117,
+          "slug": "trump-2025-promote-hbcu-excellence-and-innovation",
+          "title": "Promote excellence and innovation at HBCUs",
+          "status": "Partial",
+          "topic": "Education",
+          "summary": null,
+          "promise_date": null,
+          "latest_action_date": null,
+          "action_count": null,
+          "outcome_count": null,
+          "promise_source_count": null
+        },
+        "selected_candidates": [
+          {
+            "candidate_id": "update_candidates:7",
+            "candidate_number": 7,
+            "source_section": "update_candidates",
+            "candidate_type": "stale_record",
+            "linked_promise_slug": "trump-2025-promote-hbcu-excellence-and-innovation",
+            "reasoning": "The latest recorded action is 2025-04-23, older than the 120-day review window for an in-progress current-administration record.",
+            "confidence": "Medium",
+            "source_references": [
+              {
+                "source_title": "Fact Sheet: President Donald J. Trump Promotes Excellence and Innovation at HBCUs",
+                "source_url": "https://www.whitehouse.gov/fact-sheets/2025/04/fact-sheet-president-donald-j-trump-promotes-excellence-and-innovation-at-hbcus/",
+                "source_type": "Government",
+                "publisher": "The White House",
+                "published_date": "2025-04-23"
+              }
+            ],
+            "suggested_changes": {
+              "focus": [
+                "actions",
+                "outcomes",
+                "sources"
+              ]
+            },
+            "feed_item": null
+          }
+        ]
+      }
+    },
+    {
+      "slug": "trump-2025-reform-higher-education-accreditation",
+      "title": "Reform higher-education accreditation around student outcomes",
+      "promise_text": "The latest recorded action is 2025-04-23, older than the 120-day review window for an in-progress current-administration record.",
+      "promise_date": null,
+      "promise_type": null,
+      "campaign_or_official": null,
+      "topic": "Education",
+      "impacted_group": null,
+      "status": "In Progress",
+      "summary": "The latest recorded action is 2025-04-23, older than the 120-day review window for an in-progress current-administration record.",
+      "notes": null,
+      "promise_sources": [],
+      "actions": [],
+      "discovery_context": {
+        "generated_at": "2026-04-28T03:07:14+00:00",
+        "president_slug": "donald-j-trump-2025",
+        "linked_promise_snapshot": {
+          "id": 116,
+          "slug": "trump-2025-reform-higher-education-accreditation",
+          "title": "Reform higher-education accreditation around student outcomes",
+          "status": "In Progress",
+          "topic": "Education",
+          "summary": null,
+          "promise_date": null,
+          "latest_action_date": null,
+          "action_count": null,
+          "outcome_count": null,
+          "promise_source_count": null
+        },
+        "selected_candidates": [
+          {
+            "candidate_id": "update_candidates:8",
+            "candidate_number": 8,
+            "source_section": "update_candidates",
+            "candidate_type": "stale_record",
+            "linked_promise_slug": "trump-2025-reform-higher-education-accreditation",
+            "reasoning": "The latest recorded action is 2025-04-23, older than the 120-day review window for an in-progress current-administration record.",
+            "confidence": "Medium",
+            "source_references": [
+              {
+                "source_title": "Reforming Accreditation to Strengthen Higher Education",
+                "source_url": "https://www.whitehouse.gov/presidential-actions/2025/04/reforming-accreditation-to-strengthen-higher-education/",
+                "source_type": "Government",
+                "publisher": "The White House",
+                "published_date": "2025-04-23"
+              }
+            ],
+            "suggested_changes": {
+              "focus": [
+                "actions",
+                "outcomes",
+                "sources"
+              ]
+            },
+            "feed_item": null
+          }
+        ]
+      }
+    },
+    {
+      "slug": "trump-2025-reinstate-school-discipline-policies",
+      "title": "Reinstate school discipline policies without equity-based disparate-impact framing",
+      "promise_text": "The latest recorded action is 2025-04-23, older than the 120-day review window for an in-progress current-administration record.",
+      "promise_date": null,
+      "promise_type": null,
+      "campaign_or_official": null,
+      "topic": "Education",
+      "impacted_group": null,
+      "status": "In Progress",
+      "summary": "The latest recorded action is 2025-04-23, older than the 120-day review window for an in-progress current-administration record.",
+      "notes": null,
+      "promise_sources": [],
+      "actions": [],
+      "discovery_context": {
+        "generated_at": "2026-04-28T03:07:14+00:00",
+        "president_slug": "donald-j-trump-2025",
+        "linked_promise_snapshot": {
+          "id": 118,
+          "slug": "trump-2025-reinstate-school-discipline-policies",
+          "title": "Reinstate school discipline policies without equity-based disparate-impact framing",
+          "status": "In Progress",
+          "topic": "Education",
+          "summary": null,
+          "promise_date": null,
+          "latest_action_date": null,
+          "action_count": null,
+          "outcome_count": null,
+          "promise_source_count": null
+        },
+        "selected_candidates": [
+          {
+            "candidate_id": "update_candidates:6",
+            "candidate_number": 6,
+            "source_section": "update_candidates",
+            "candidate_type": "stale_record",
+            "linked_promise_slug": "trump-2025-reinstate-school-discipline-policies",
+            "reasoning": "The latest recorded action is 2025-04-23, older than the 120-day review window for an in-progress current-administration record.",
+            "confidence": "Medium",
+            "source_references": [
+              {
+                "source_title": "Reinstating Common Sense School Discipline Policies",
+                "source_url": "https://www.whitehouse.gov/presidential-actions/2025/04/reinstating-common-sense-school-discipline-policies/",
+                "source_type": "Government",
+                "publisher": "The White House",
+                "published_date": "2025-04-23"
+              }
+            ],
+            "suggested_changes": {
+              "focus": [
+                "actions",
+                "outcomes",
+                "sources"
+              ]
+            },
+            "feed_item": null
+          }
+        ]
+      }
+    },
+    {
+      "slug": "trump-2025-strengthen-local-law-enforcement",
+      "title": "Increase federal support for state and local law enforcement",
+      "promise_text": "The latest recorded action is 2025-04-28, older than the 120-day review window for an in-progress current-administration record.",
+      "promise_date": null,
+      "promise_type": null,
+      "campaign_or_official": null,
+      "topic": "Criminal Justice",
+      "impacted_group": null,
+      "status": "Partial",
+      "summary": "The latest recorded action is 2025-04-28, older than the 120-day review window for an in-progress current-administration record.",
+      "notes": null,
+      "promise_sources": [],
+      "actions": [],
+      "discovery_context": {
+        "generated_at": "2026-04-28T03:07:14+00:00",
+        "president_slug": "donald-j-trump-2025",
+        "linked_promise_snapshot": {
+          "id": 112,
+          "slug": "trump-2025-strengthen-local-law-enforcement",
+          "title": "Increase federal support for state and local law enforcement",
+          "status": "Partial",
+          "topic": "Criminal Justice",
+          "summary": null,
+          "promise_date": null,
+          "latest_action_date": null,
+          "action_count": null,
+          "outcome_count": null,
+          "promise_source_count": null
+        },
+        "selected_candidates": [
+          {
+            "candidate_id": "update_candidates:4",
+            "candidate_number": 4,
+            "source_section": "update_candidates",
+            "candidate_type": "stale_record",
+            "linked_promise_slug": "trump-2025-strengthen-local-law-enforcement",
+            "reasoning": "The latest recorded action is 2025-04-28, older than the 120-day review window for an in-progress current-administration record.",
+            "confidence": "Medium",
+            "source_references": [
+              {
+                "source_title": "Agenda47: President Trump Announces Plan to End Crime and Restore Law and Order",
+                "source_url": "https://www.donaldjtrump.com/news/b95289b6-0fb3-4404-808c-2e91c09e7bce",
+                "source_type": "Other",
+                "publisher": "DonaldJTrump.com",
+                "published_date": "2023-02-20"
+              }
+            ],
+            "suggested_changes": {
+              "focus": [
+                "actions",
+                "outcomes",
+                "sources"
+              ]
+            },
+            "feed_item": null
+          }
+        ]
+      }
+    }
+  ],
+  "generation_context": {
+    "generated_at": "2026-04-28T03:07:14+00:00",
+    "source_discovery_report_path": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/discovery_report.json",
+    "selected_candidate_ids": [
+      "update_candidates:1",
+      "update_candidates:2",
+      "update_candidates:3",
+      "update_candidates:4",
+      "update_candidates:5",
+      "update_candidates:6",
+      "update_candidates:7",
+      "update_candidates:8",
+      "update_candidates:9",
+      "update_candidates:10",
+      "update_candidates:11"
+    ],
+    "selected_count": 11,
+    "debug_report_path": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/donald-j-trump-2025-discovery-20260428t030714z.discovery-debug.json"
+  }
+}

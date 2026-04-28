@@ -1,0 +1,50 @@
+{
+  "generated_at": "2026-04-28T03:48:46+00:00",
+  "status": "success",
+  "batch_name": "tmp-current-admin-stage2-check",
+  "source_discovery_report_path": "/tmp/current_admin_stage2_fixture/discovery.json",
+  "output_path": "/tmp/current_admin_stage2_fixture/batch.json",
+  "debug_output_path": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/tmp-current-admin-stage2-check.discovery-debug.json",
+  "selection_filters": {
+    "candidate_ids": [],
+    "candidate_types": [],
+    "linked_promise_slugs": [],
+    "all_new_promises": false,
+    "all_new_actions": false,
+    "all_candidates": true
+  },
+  "raw_candidate_count": 1,
+  "raw_candidate_counts_by_section": {
+    "update_candidates": 1
+  },
+  "raw_candidate_type_counts": {
+    "update_existing_action": 1
+  },
+  "selected_candidate_count": 1,
+  "selected_candidate_counts_by_section": {
+    "update_candidates": 1
+  },
+  "selected_candidate_type_counts": {
+    "update_existing_action": 1
+  },
+  "skipped_candidate_count": 0,
+  "skip_reason_counts": {},
+  "date_filter_applied": "not_applied_in_batch_generation",
+  "keyword_category_filter_result": "not_applied_in_batch_generation",
+  "action_type_filter_result": "not_applied_in_batch_generation",
+  "dedupe_match_key": "linked_promise_slug",
+  "grouping": {
+    "selected_existing_candidate_count": 1,
+    "selected_new_promise_candidate_count": 0,
+    "grouped_existing_record_count": 1,
+    "merged_existing_candidate_count": 0,
+    "dedupe_match_key": "linked_promise_slug",
+    "group_sizes_by_linked_promise_slug": {
+      "trade-policy-slug": 1
+    }
+  },
+  "final_batch_count": 1,
+  "selected_candidate_ids": [
+    "update_candidates:1"
+  ]
+}

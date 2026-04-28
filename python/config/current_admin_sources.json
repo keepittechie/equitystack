@@ -1,0 +1,69 @@
+{
+  "version": 1,
+  "sources": [
+    {
+      "name": "White House Presidential Actions",
+      "type": "existing-helper",
+      "helper_source": "presidential_actions",
+      "category": "executive-action",
+      "publisher": "The White House",
+      "enabled": true,
+      "default": true,
+      "max_items": 12
+    },
+    {
+      "name": "White House Briefings and Statements",
+      "type": "existing-helper",
+      "helper_source": "official_statements",
+      "category": "executive-action",
+      "publisher": "The White House",
+      "enabled": true,
+      "default": true,
+      "max_items": 10
+    },
+    {
+      "name": "USTR Press Releases",
+      "type": "html",
+      "parser": "ustr_listing",
+      "url_template": "https://ustr.gov/about/policy-offices/press-office/press-releases/{year}",
+      "category": "trade",
+      "publisher": "Office of the United States Trade Representative",
+      "enabled": true,
+      "default": true,
+      "max_items": 12
+    },
+    {
+      "name": "USTR Fact Sheets",
+      "type": "html",
+      "parser": "ustr_listing",
+      "url_template": "https://ustr.gov/about/policy-offices/press-office/fact-sheets/{year}",
+      "category": "trade",
+      "publisher": "Office of the United States Trade Representative",
+      "enabled": true,
+      "default": true,
+      "max_items": 10
+    },
+    {
+      "name": "Federal Register Presidential Documents",
+      "type": "json",
+      "parser": "federal_register_documents",
+      "url_template": "https://www.federalregister.gov/api/v1/documents.json?conditions[type][]=PRESDOCU&conditions[president][]={federal_register_president}&order=newest&per_page={max_items}",
+      "category": "executive-action",
+      "publisher": "Federal Register",
+      "enabled": true,
+      "default": true,
+      "max_items": 12
+    },
+    {
+      "name": "Federal Register USTR Notices",
+      "type": "json",
+      "parser": "federal_register_documents",
+      "url_template": "https://www.federalregister.gov/api/v1/documents.json?conditions[agencies][]=trade-representative-office-of-united-states&order=newest&per_page={max_items}",
+      "category": "trade",
+      "publisher": "Federal Register",
+      "enabled": true,
+      "default": true,
+      "max_items": 10
+    }
+  ]
+}

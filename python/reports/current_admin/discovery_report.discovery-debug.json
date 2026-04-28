@@ -1,0 +1,98 @@
+{
+  "generated_at": "2026-04-28T03:42:18+00:00",
+  "status": "db_error",
+  "error": "Current-admin DB connection failed (host=10.10.0.13, port=3306, database=black_policy_tracker, host_source=environment). Override the host with DB_HOST=<reachable-host> ./bin/equitystack current-admin status if localhost is not valid here. Original error: (2003, \"Can't connect to MySQL server on '10.10.0.13' ([Errno 111] Connection refused)\")",
+  "output_path": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/discovery_report.json",
+  "president_slug": "donald-j-trump-2025",
+  "db_connection_required": true,
+  "source_query_summary": {
+    "promise_scan_enabled": true,
+    "source_config_path": "/home/josh/Documents/GitHub/equitystack/python/config/current_admin_sources.json",
+    "default_live_sources_enabled": true,
+    "configured_default_source_count": 0,
+    "feed_urls_requested": [],
+    "feed_json_requested": [],
+    "feed_urls_count": 0,
+    "feed_json_count": 0,
+    "source_results": []
+  },
+  "date_filter_applied": {
+    "lookback_days": 120,
+    "stale_before": "2025-12-29",
+    "live_source_year_hint": "2026",
+    "feed_item_date_window": "latest configured live sources sorted by published date before global cap"
+  },
+  "keyword_category_filter": {
+    "mode": "topic_estimation_plus_trade_oversight_legal_heuristics",
+    "supported_topics": [
+      "Criminal Justice",
+      "Economic Opportunity",
+      "Education",
+      "Healthcare",
+      "Housing",
+      "Voting Rights"
+    ],
+    "trade_keywords": [
+      "customs",
+      "customs duties",
+      "customs duty",
+      "duties",
+      "duty",
+      "ieepa",
+      "import",
+      "import tax",
+      "imports",
+      "international emergency economic powers act",
+      "reciprocal tariff",
+      "reciprocal tariffs",
+      "section 232",
+      "section 301",
+      "tariff",
+      "tariff pause",
+      "tariff refund",
+      "tariff refunds",
+      "tariffs",
+      "trade",
+      "trade deficit",
+      "ustr"
+    ]
+  },
+  "action_type_filter": {
+    "mode": "relationship_classification_with_guardrails",
+    "accepted_suggestion_types": [
+      "ignore",
+      "new_action",
+      "new_promise_candidate",
+      "source_context",
+      "update_existing_action"
+    ]
+  },
+  "dedupe": {
+    "mode": "per-source-url dedupe before analysis",
+    "batch_generation_group_key": "linked_promise_slug"
+  },
+  "raw_counts": {
+    "promise_count": 0,
+    "maintenance_candidate_count": 0,
+    "raw_feed_item_count_before_limit": 0,
+    "feed_item_count_after_limit": 0,
+    "live_source_count": 0,
+    "feed_error_count": 0
+  },
+  "candidate_counts": {
+    "maintenance_update_candidates": 0,
+    "new_action_candidates": 0,
+    "feed_update_candidates": 0,
+    "new_promise_candidates": 0,
+    "source_context_candidates": 0,
+    "final_candidate_count": 0
+  },
+  "candidate_type_counts": {},
+  "skipped_counts": {
+    "feed_items_ignored": 0,
+    "feed_items_with_errors": 0
+  },
+  "skip_reason_counts": {},
+  "feed_item_debug_rows": [],
+  "feed_errors": []
+}
