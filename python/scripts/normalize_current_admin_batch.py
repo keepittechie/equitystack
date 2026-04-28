@@ -9,11 +9,13 @@ from current_admin_common import (
     VALID_IMPACT_DIRECTIONS,
     VALID_PROMISE_TYPES,
     VALID_PROMISE_STATUSES,
+    VALID_SOURCE_TYPES,
     derive_csv_path,
     get_current_admin_batches_dir,
     map_evidence_strength,
     normalize_date,
     normalize_nullable_text,
+    normalize_source_type,
     read_batch_payload,
     resolve_default_report_path,
     slugify,
@@ -91,7 +93,11 @@ def normalize_source(source: dict[str, Any]) -> dict[str, Any]:
     return {
         "source_title": normalize_nullable_text(source.get("source_title")),
         "source_url": normalize_nullable_text(source.get("source_url")),
-        "source_type": normalize_nullable_text(source.get("source_type")),
+        "source_type": normalize_source_type(
+            source.get("source_type"),
+            source.get("source_url"),
+            source.get("publisher"),
+        ),
         "publisher": normalize_nullable_text(source.get("publisher")),
         "published_date": normalize_date(source.get("published_date")),
         "notes": normalize_nullable_text(source.get("notes")),
@@ -200,6 +206,40 @@ def validate_batch(payload: dict[str, Any]) -> list[dict[str, Any]]:
                         "field": "outcome_sources",
                         "issue": "Missing outcome-level source",
                     })
+
+        for source_index, source in enumerate(record.get("promise_sources") or [], start=1):
+            if source.get("source_type") not in VALID_SOURCE_TYPES:
+                issues.append({
+                    "record_index": index,
+                    "source_index": source_index,
+                    "field": "source_type",
+                    "issue": "Invalid source type",
+                    "value": source.get("source_type"),
+                })
+
+        for action_index, action in enumerate(record.get("actions") or [], start=1):
+            for source_index, source in enumerate(action.get("action_sources") or [], start=1):
+                if source.get("source_type") not in VALID_SOURCE_TYPES:
+                    issues.append({
+                        "record_index": index,
+                        "action_index": action_index,
+                        "source_index": source_index,
+                        "field": "source_type",
+                        "issue": "Invalid action source type",
+                        "value": source.get("source_type"),
+                    })
+            for outcome_index, outcome in enumerate(action.get("outcomes") or [], start=1):
+                for source_index, source in enumerate(outcome.get("outcome_sources") or [], start=1):
+                    if source.get("source_type") not in VALID_SOURCE_TYPES:
+                        issues.append({
+                            "record_index": index,
+                            "action_index": action_index,
+                            "outcome_index": outcome_index,
+                            "source_index": source_index,
+                            "field": "source_type",
+                            "issue": "Invalid outcome source type",
+                            "value": source.get("source_type"),
+                        })
 
     return issues
 

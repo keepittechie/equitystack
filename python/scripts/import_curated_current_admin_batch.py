@@ -15,6 +15,7 @@ from current_admin_common import (
     map_evidence_strength,
     normalize_date,
     normalize_nullable_text,
+    normalize_source_type,
     print_json,
     read_batch_payload,
     require_apply_confirmation,
@@ -387,6 +388,12 @@ def upsert_source(cursor, source: dict[str, Any], report: dict[str, Any], cache:
         report["sources_reused"] += 1
         return source_id
 
+    canonical_source_type = normalize_source_type(
+        source.get("source_type"),
+        source.get("source_url"),
+        source.get("publisher"),
+    )
+
     cursor.execute(
         """
         INSERT INTO sources (
@@ -403,7 +410,7 @@ def upsert_source(cursor, source: dict[str, Any], report: dict[str, Any], cache:
         (
             source.get("source_title"),
             source.get("source_url"),
-            source.get("source_type"),
+            canonical_source_type,
             source.get("publisher"),
             normalize_date(source.get("published_date")),
             source.get("notes"),

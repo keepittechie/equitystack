@@ -7,6 +7,7 @@ import sys
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlparse
 
 
 DEFAULT_CURRENT_ADMIN_REPORTS_DIRNAME = "current_admin"
@@ -15,6 +16,7 @@ VALID_PROMISE_TYPES = {"Campaign Promise", "Official Promise", "Public Promise",
 VALID_CAMPAIGN_OR_OFFICIAL_VALUES = {"Campaign", "Official"}
 VALID_IMPACT_DIRECTIONS = {"Positive", "Negative", "Mixed", "Blocked"}
 VALID_EVIDENCE_STRENGTHS = {"Strong", "Moderate", "Limited"}
+VALID_SOURCE_TYPES = {"Government", "Academic", "News", "Archive", "Nonprofit", "Other"}
 DEFAULT_DISCOVERY_PROMISE_TYPE = "Official Promise"
 DEFAULT_DISCOVERY_CAMPAIGN_OR_OFFICIAL = "Official"
 DB_ENV_KEYS = ("DB_HOST", "DB_PORT", "DB_USER", "DB_PASSWORD", "DB_NAME")
@@ -160,6 +162,71 @@ def normalize_date(value: Any) -> str | None:
     if len(text) >= 10:
         return text[:10]
     return text or None
+
+
+def normalize_source_type(value: Any, url: Any = None, publisher: Any = None) -> str:
+    text = normalize_nullable_text(value)
+    if text in VALID_SOURCE_TYPES:
+        return text
+
+    normalized = (text or "").lower()
+    parsed = urlparse(normalize_nullable_text(url) or "")
+    hostname = (parsed.netloc or "").lower()
+    if hostname.startswith("www."):
+        hostname = hostname[4:]
+    publisher_text = (normalize_nullable_text(publisher) or "").lower()
+
+    government_host = (
+        hostname.endswith(".gov")
+        or hostname in {
+            "congress.gov",
+            "govinfo.gov",
+            "whitehouse.gov",
+            "ustr.gov",
+            "federalregister.gov",
+        }
+    )
+    if government_host:
+        return "Government"
+
+    if hostname in {"archives.gov", "loc.gov"}:
+        return "Archive"
+    if hostname.endswith(".edu"):
+        return "Academic"
+    if hostname.endswith(".org"):
+        return "Nonprofit"
+
+    if any(
+        token in normalized
+        for token in (
+            "white house",
+            "government",
+            "federal register",
+            "official",
+        )
+    ) or any(
+        token in publisher_text
+        for token in (
+            "white house",
+            "federal register",
+            "united states",
+            "u.s. ",
+            "department of",
+            "office of",
+            "agency",
+        )
+    ):
+        return "Government"
+
+    if "archive" in normalized:
+        return "Archive"
+    if "academic" in normalized or "research" in normalized:
+        return "Academic"
+    if "news" in normalized or "media" in normalized:
+        return "News"
+    if "nonprofit" in normalized or "ngo" in normalized:
+        return "Nonprofit"
+    return "Other"
 
 
 def ensure_parent_dir(path: Path) -> None:

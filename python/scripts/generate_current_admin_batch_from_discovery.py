@@ -13,6 +13,7 @@ from current_admin_common import (
     get_current_admin_reports_dir,
     normalize_date,
     normalize_nullable_text,
+    normalize_source_type,
     print_json,
     slugify,
     write_json_file,
@@ -119,7 +120,11 @@ def normalize_promise_sources(values: list[dict[str, Any]] | None) -> list[dict[
             {
                 "source_title": normalize_nullable_text(source.get("source_title")),
                 "source_url": normalize_nullable_text(source.get("source_url")),
-                "source_type": normalize_nullable_text(source.get("source_type")),
+                "source_type": normalize_source_type(
+                    source.get("source_type"),
+                    source.get("source_url"),
+                    source.get("publisher"),
+                ),
                 "publisher": normalize_nullable_text(source.get("publisher")),
                 "published_date": normalize_date(source.get("published_date")),
                 "notes": normalize_nullable_text(source.get("notes")),
