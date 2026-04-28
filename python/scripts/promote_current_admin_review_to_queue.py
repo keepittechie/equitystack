@@ -5,12 +5,12 @@ from pathlib import Path
 import shutil
 from typing import Any
 
-from apply_current_admin_ai_review import merge_record_with_suggestions
 from current_admin_common import (
     AUTO_APPROVED_QUEUE_KEY,
     AUTO_REJECTED_QUEUE_KEY,
     get_current_admin_reports_dir,
     load_json_file,
+    merge_record_with_suggestions,
     normalize_nullable_text,
     print_json,
     read_batch_payload,
@@ -35,16 +35,16 @@ AUTO_IMPORT_ACTIONS = {"approve", "import_with_pending_impact"}
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Promote an enriched current-admin review artifact into the canonical manual-review queue."
+        description="Promote a current-admin review artifact into the canonical AI-first manual-review queue."
     )
     parser.add_argument(
         "--input",
         type=Path,
-        help="Enriched current-admin .ai-review.json artifact to promote.",
+        help="Current-admin .ai-review.json artifact to promote.",
     )
     parser.add_argument(
         "--batch-name",
-        help="Batch name used to infer a single enriched paired-evaluation review artifact when --input is omitted.",
+        help="Batch name used to infer a single current-admin review artifact when --input is omitted.",
     )
     parser.add_argument(
         "--batch",
@@ -99,13 +99,16 @@ def resolve_review_artifact(args: argparse.Namespace) -> Path:
 
     reports_dir = get_current_admin_reports_dir()
     candidates = sorted(
-        reports_dir.glob(f"{args.batch_name}*.enriched.ai-review.json"),
+        [
+            *reports_dir.glob(f"{args.batch_name}*.enriched.ai-review.json"),
+            *reports_dir.glob(f"{args.batch_name}*.ai-review.json"),
+        ],
         key=lambda path: path.stat().st_mtime,
         reverse=True,
     )
     if not candidates:
         raise FileNotFoundError(
-            f"No enriched paired-evaluation review artifact found for batch_name={args.batch_name}."
+            f"No current-admin review artifact found for batch_name={args.batch_name}."
         )
     if len(candidates) > 1:
         candidate_names = ", ".join(path.name for path in candidates[:10])
@@ -417,7 +420,7 @@ def main() -> None:
         or (
             get_current_admin_reports_dir()
             / "review_decisions"
-            / f"{batch_name}.{timestamp()}.promotion.decision-log.json"
+            / f"{batch_name}.decision-log.json"
         )
     ).resolve()
 

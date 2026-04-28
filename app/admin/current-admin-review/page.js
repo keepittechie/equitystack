@@ -16,21 +16,21 @@ export default async function CurrentAdminReviewPage() {
     <main className="mx-auto max-w-[1700px] space-y-4 px-4 py-4">
       <section className="space-y-3">
         <p className="font-mono text-[11px] uppercase tracking-wide text-[var(--admin-text-muted)]">Canonical review workspace</p>
-        <h1 className="text-lg font-semibold text-[var(--admin-text)]">Current Admin Review</h1>
+        <h1 className="text-lg font-semibold text-[var(--admin-text)]">Current-Admin Manual Review</h1>
         <p className="max-w-5xl text-[12px] text-[var(--admin-text-soft)]">
-          This page mirrors the Python workflow step that sits between AI review and
-          decision logging. Saving writes a decision file only. Finalize calls the
-          existing Python finalize step and keeps the manual review queue as the
-          canonical import source. Approval-style review decisions and queue items
-          approved for import are shown separately so the next gate is explicit.
+          This page is the canonical control surface between AI review and guarded
+          apply. Only the remaining borderline manual-review rows stay editable
+          here. AI-approved and AI-rejected queue outcomes stay visible as pipeline
+          state, and the next gates remain decision-log sync, pre-commit, apply
+          dry-run, final apply, and validation.
         </p>
       </section>
 
       <CurrentAdminWorkflowTracker
         tracker={tracker}
         eyebrow="Current-Admin Pipeline"
-        title="Current-admin workflow step tracker"
-        description="This tracker shows what is complete, what step is active now, what is blocked, and the single next action to continue the canonical workflow."
+        title="Current-admin pipeline tracker"
+        description="This tracker shows what is complete, what stage is active now, what is blocked, and the single next safe action to continue the canonical pipeline."
       />
 
       <CurrentAdminReviewWorkspace workspace={workspace} />

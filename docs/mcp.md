@@ -11,7 +11,7 @@ npm run mcp:equitystack
 Tools:
 
 - `get_system_status` -> recent admin/operator and MCP job-run artifacts
-- `run_current_admin_workflow` -> `./bin/equitystack current-admin workflow start`
+- `run_current_admin` -> `./bin/equitystack current-admin run`
 - `run_legislative_review` -> `./bin/equitystack legislative review`
 - `run_impact_evaluate` -> `./bin/equitystack impact evaluate`
 - `run_impact_promote` -> `./bin/equitystack impact promote`

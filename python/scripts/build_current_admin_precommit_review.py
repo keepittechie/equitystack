@@ -393,7 +393,7 @@ def determine_overall_readiness(items: list[dict[str, Any]]) -> tuple[str, list[
                 "missing_decision_coverage",
                 f"{len(missing_slugs)} approved item(s) are missing decision-log coverage.",
                 "Approved items need explicit operator decisions recorded before import.",
-                "Open the decision template, fill operator_action for every approved item, rerun workflow finalize, then rerun pre-commit.",
+                "Open the decision file, fill operator_action for every approved manual-review item, rerun current-admin review, then rerun pre-commit.",
                 count=len(missing_slugs),
                 slugs=missing_slugs,
             )
@@ -409,7 +409,7 @@ def determine_overall_readiness(items: list[dict[str, Any]]) -> tuple[str, list[
                 "invalid_operator_action",
                 f"{len(invalid_slugs)} approved item(s) have invalid operator_action values.",
                 "Imports rely on a known set of operator actions so queue decisions stay explicit and auditable.",
-                "Regenerate the decision template or correct the decision file, then rerun workflow finalize.",
+                "Refresh or correct the decision file, then rerun current-admin review.",
                 count=len(invalid_slugs),
                 slugs=invalid_slugs,
             )
@@ -500,7 +500,7 @@ def determine_overall_readiness(items: list[dict[str, Any]]) -> tuple[str, list[
         if not selected:
             next_step = "Approve the intended queue items or keep them pending, then rerun pre-commit review."
         elif missing_decision_coverage or invalid_operator_action:
-            next_step = "Regenerate or correct the decision file, rerun workflow finalize, then rerun pre-commit review."
+            next_step = "Refresh or correct the decision file, rerun current-admin review, then rerun pre-commit review."
         elif operator_action_not_import_ready:
             next_step = "Resolve the non-import-ready operator actions in the decision file or queue, then rerun pre-commit review."
         elif missing_final_record:
@@ -669,7 +669,7 @@ def build_linkage_summary(
                 "duplicate_decision_log_slugs",
                 f"Decision log contains duplicate slugs: {', '.join(decision_log_duplicates)}.",
                 "Decision coverage should be one operator decision per slug.",
-                "Regenerate or repair the decision log by rerunning workflow finalize from the correct decision file.",
+                "Regenerate or repair the decision log by rerunning current-admin review from the correct decision file.",
                 count=len(decision_log_duplicates),
                 slugs=decision_log_duplicates,
             )
@@ -680,7 +680,7 @@ def build_linkage_summary(
                 "duplicate_decision_template_slugs",
                 f"Decision file contains duplicate slugs: {', '.join(decision_template_duplicates)}.",
                 "A decision file should only record one operator decision per slug.",
-                "Regenerate the decision template and copy your intended decisions into the clean file.",
+                "Refresh the decision file and copy your intended decisions into the clean file.",
                 count=len(decision_template_duplicates),
                 slugs=decision_template_duplicates,
             )
@@ -719,7 +719,7 @@ def build_linkage_summary(
                 "decision_log_missing_source_review",
                 "Decision log is missing source_review_file metadata.",
                 "The log is still readable, but the review lineage is weaker than expected.",
-                "Prefer regenerating the decision log with workflow finalize so source_review_file is captured.",
+                "Prefer regenerating the decision log with current-admin review so source_review_file is captured.",
                 severity="warning",
             )
         )
@@ -729,7 +729,7 @@ def build_linkage_summary(
                 "decision_log_review_mismatch",
                 "Decision log source_review_file does not match the queue review artifact.",
                 "Import should only use decisions recorded against the exact review artifact that built this queue.",
-                "Run workflow finalize against the matching review artifact, then rerun pre-commit.",
+                "Run current-admin review against the matching review artifact, then rerun pre-commit.",
             )
         )
     if resolved_decision_template is not None and decision_template_source_review and decision_template_source_review != source_review_path:
@@ -738,7 +738,7 @@ def build_linkage_summary(
                 "decision_template_review_mismatch",
                 "Decision file source_review_file does not match the queue review artifact.",
                 "The operator should edit a decision template that comes from the same AI review artifact as the queue.",
-                "Regenerate the decision template from the correct .ai-review.json artifact.",
+                "Refresh the decision file from the correct .ai-review.json artifact.",
             )
         )
     if source_review_payload is not None and decision_log_items:
@@ -759,13 +759,13 @@ def build_linkage_summary(
         if template_outside_review:
             blockers.append(
                 build_issue(
-                    "decision_template_outside_review_slice",
-                    f"{len(template_outside_review)} decision-file slug(s) are not present in the linked review artifact.",
-                    "This suggests the decision file came from a different review slice or batch.",
-                    "Regenerate the decision template from the correct .ai-review.json artifact.",
-                    count=len(template_outside_review),
-                    slugs=template_outside_review,
-                )
+                "decision_template_outside_review_slice",
+                f"{len(template_outside_review)} decision-file slug(s) are not present in the linked review artifact.",
+                "This suggests the decision file came from a different review slice or batch.",
+                "Refresh the decision file from the correct .ai-review.json artifact.",
+                count=len(template_outside_review),
+                slugs=template_outside_review,
+            )
             )
         if len(decision_template_items) != len(review_items):
             warnings.append(
@@ -975,7 +975,7 @@ def main() -> None:
                 "decision_log_batch_mismatch",
                 "Decision log source_review_file does not match the queue batch_name.",
                 "The decision log should come from the same review batch as the queue.",
-                "Run workflow finalize against the matching review artifact before import.",
+                "Run current-admin review against the matching review artifact before import.",
             )
         )
     if openai_batch_safety and openai_batch_safety.get("blocking_issues"):

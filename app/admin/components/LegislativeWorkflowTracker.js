@@ -85,8 +85,8 @@ export default function LegislativeWorkflowTracker({
   tracker,
   compact = false,
   eyebrow = "Legislative Pipeline",
-  title = "Legislative workflow step tracker",
-  description = "This tracker follows the canonical legislative workflow state and highlights the single next valid step.",
+  title = "Legislative pipeline tracker",
+  description = "This tracker follows the canonical legislative pipeline state and highlights the single next safe step.",
 }) {
   if (!tracker) {
     return null;
@@ -102,7 +102,7 @@ export default function LegislativeWorkflowTracker({
     : currentStep
       ? `${currentStep.title} is active`
       : allStepsComplete
-        ? "Legislative workflow complete"
+        ? "Legislative pipeline complete"
         : humanizeToken(tracker.canonicalState);
   const nextStepLabel = allStepsComplete ? "Post-run verification" : nextStep?.title || "No next step";
   const whyItMatters = blockedStep

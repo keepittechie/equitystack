@@ -12,7 +12,7 @@ export async function GET() {
   } catch (error) {
     console.error("dashboard review-workflow error:", error);
     return NextResponse.json(
-      { error: "Failed to load current-admin workflow guide" },
+      { error: "Failed to load current-admin pipeline guide" },
       { status: 500 }
     );
   }

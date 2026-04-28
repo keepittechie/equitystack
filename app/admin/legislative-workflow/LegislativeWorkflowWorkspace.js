@@ -19,6 +19,13 @@ const DECISION_OPTIONS = [
   { value: "dismiss", label: "Dismiss" },
 ];
 
+const SECTION_CLASS = "rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] p-4 text-[var(--admin-text)] shadow-sm";
+const CARD_CLASS = "rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] p-3 text-[var(--admin-text)] shadow-sm";
+const PANEL_CLASS = "rounded border border-[var(--admin-line)] bg-[var(--admin-surface-muted)] p-3 text-[var(--admin-text)]";
+const TABLE_WRAPPER_CLASS = "overflow-x-auto rounded border border-[var(--admin-line)]";
+const TABLE_HEAD_CLASS = "bg-[var(--admin-surface-muted)] text-left text-[11px] uppercase tracking-wide text-[var(--admin-text-muted)]";
+const TABLE_ROW_CLASS = "align-top odd:bg-[var(--admin-surface)] even:bg-[var(--admin-surface-soft)]";
+
 function cloneActions(actions) {
   return (actions || []).map((action) => ({
     ...action,
@@ -34,11 +41,11 @@ function cloneActions(actions) {
 
 function SummaryCard({ title, report, modeLabel }) {
   return (
-    <div className="rounded border border-zinc-300 bg-[var(--admin-surface)] p-3 shadow-sm">
-      <p className="text-[11px] text-gray-600">{title}</p>
+    <div className={CARD_CLASS}>
+      <p className="text-[11px] text-[var(--admin-text-muted)]">{title}</p>
       {report ? (
         <div className="mt-2 space-y-1 text-[12px]">
-          <p className="font-semibold">{modeLabel || report.mode}</p>
+          <p className="font-semibold text-[var(--admin-text)]">{modeLabel || report.mode}</p>
           {"applied_count" in report ? <p>Applied: {report.applied_count}</p> : null}
           {"skipped_count" in report ? <p>Skipped: {report.skipped_count}</p> : null}
           {"rows_selected" in report ? <p>Rows selected: {report.rows_selected}</p> : null}
@@ -48,7 +55,7 @@ function SummaryCard({ title, report, modeLabel }) {
           <p>Errors: {report.error_count || 0}</p>
         </div>
       ) : (
-        <p className="mt-2 text-[12px] text-gray-600">No report available yet.</p>
+        <p className="mt-2 text-[12px] text-[var(--admin-text-soft)]">No report available yet.</p>
       )}
     </div>
   );
@@ -266,30 +273,30 @@ export default function LegislativeWorkflowWorkspace({ workspace }) {
       ) : null}
 
       <section className="grid gap-3 lg:grid-cols-4">
-        <div className="rounded border border-zinc-300 bg-[var(--admin-surface)] p-3 shadow-sm">
-          <p className="text-[11px] text-gray-600">Workflow state</p>
-          <p className="mt-1 text-base font-semibold">{workspace.workflow_status}</p>
+        <div className={CARD_CLASS}>
+          <p className="text-[11px] text-[var(--admin-text-muted)]">Pipeline state</p>
+          <p className="mt-1 text-base font-semibold text-[var(--admin-text)]">{workspace.workflow_status}</p>
         </div>
-        <div className="rounded border border-zinc-300 bg-[var(--admin-surface)] p-3 shadow-sm">
-          <p className="text-[11px] text-gray-600">Requested model</p>
-          <p className="mt-1 text-base font-semibold">
+        <div className={CARD_CLASS}>
+          <p className="text-[11px] text-[var(--admin-text-muted)]">Requested model</p>
+          <p className="mt-1 text-base font-semibold text-[var(--admin-text)]">
             {workspace.requested_model || "Unavailable"}
           </p>
         </div>
-        <div className="rounded border border-zinc-300 bg-[var(--admin-surface)] p-3 shadow-sm">
-          <p className="text-[11px] text-gray-600">Bundle decisions</p>
-          <p className="mt-1 text-base font-semibold">
+        <div className={CARD_CLASS}>
+          <p className="text-[11px] text-[var(--admin-text-muted)]">Bundle decisions</p>
+          <p className="mt-1 text-base font-semibold text-[var(--admin-text)]">
             {workspace.counts.approved_pending_actions} AI-approved / {workspace.counts.pending_unreviewed_actions} pending
           </p>
         </div>
-        <div className="rounded border border-zinc-300 bg-[var(--admin-surface)] p-3 shadow-sm">
-          <p className="text-[11px] text-gray-600">Manual review queue</p>
-          <p className="mt-1 text-base font-semibold">{reviewQueueCount}</p>
+        <div className={CARD_CLASS}>
+          <p className="text-[11px] text-[var(--admin-text-muted)]">Manual review queue</p>
+          <p className="mt-1 text-base font-semibold text-[var(--admin-text)]">{reviewQueueCount}</p>
         </div>
       </section>
 
       {workspace.review_bundle ? (
-      <section id="bundle-approval" className="rounded border border-zinc-300 bg-[var(--admin-surface)] p-4 shadow-sm space-y-3">
+      <section id="bundle-approval" className={`${SECTION_CLASS} space-y-3`}>
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-[11px] text-gray-600">Canonical review bundle</p>
@@ -373,7 +380,7 @@ export default function LegislativeWorkflowWorkspace({ workspace }) {
           </div>
         </div>
         <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-4 text-[12px]">
-          <div className="rounded border p-3 bg-gray-50">
+          <div className={PANEL_CLASS}>
             <p className="font-semibold">Apply dry-run gate</p>
             {(permissions.run_apply_dry_run?.reasons || []).length ? (
               <div className="mt-2 space-y-1 text-[11px] text-gray-700">
@@ -385,7 +392,7 @@ export default function LegislativeWorkflowWorkspace({ workspace }) {
               <p className="mt-2 text-gray-700">Ready to preview approved actions.</p>
             )}
           </div>
-          <div className="rounded border p-3 bg-gray-50">
+          <div className={PANEL_CLASS}>
             <p className="font-semibold">Apply gate</p>
             {(permissions.apply_bundle?.reasons || []).length ? (
               <div className="mt-2 space-y-1 text-[11px] text-gray-700">
@@ -397,7 +404,7 @@ export default function LegislativeWorkflowWorkspace({ workspace }) {
               <p className="mt-2 text-gray-700">Ready for wrapped apply.</p>
             )}
           </div>
-          <div className="rounded border p-3 bg-gray-50">
+          <div className={PANEL_CLASS}>
             <p className="font-semibold">Import dry-run gate</p>
             {(permissions.run_import_dry_run?.reasons || []).length ? (
               <div className="mt-2 space-y-1 text-[11px] text-gray-700">
@@ -409,7 +416,7 @@ export default function LegislativeWorkflowWorkspace({ workspace }) {
               <p className="mt-2 text-gray-700">Ready to preview tracked-bill import.</p>
             )}
           </div>
-          <div className="rounded border p-3 bg-gray-50">
+          <div className={PANEL_CLASS}>
             <p className="font-semibold">Import apply gate</p>
             {(permissions.apply_import?.reasons || []).length ? (
               <div className="mt-2 space-y-1 text-[11px] text-gray-700">
@@ -422,34 +429,34 @@ export default function LegislativeWorkflowWorkspace({ workspace }) {
             )}
           </div>
         </div>
-        {message ? <p className="text-[12px] text-gray-700">{message}</p> : null}
+        {message ? <p className="text-[12px] text-[var(--admin-text-soft)]">{message}</p> : null}
       </section>
       ) : null}
 
       <section className="grid gap-4 xl:grid-cols-[0.9fr_1.1fr]">
-        <div id="workflow-blockers" className="rounded border border-zinc-300 bg-[var(--admin-surface)] p-4 shadow-sm">
-          <h2 className="text-base font-semibold">Workflow blockers</h2>
+        <div id="workflow-blockers" className={SECTION_CLASS}>
+          <h2 className="text-base font-semibold text-[var(--admin-text)]">Workflow blockers</h2>
           <div className="mt-3 space-y-2 text-[12px]">
             {(workspace.blockers || []).length ? (
               workspace.blockers.map((blocker) => (
-                <div key={blocker} className="rounded border p-3 bg-gray-50">
+                <div key={blocker} className={PANEL_CLASS}>
                   {blocker}
                 </div>
               ))
             ) : (
-              <p className="text-gray-600">No explicit blockers are recorded right now.</p>
+              <p className="text-[var(--admin-text-soft)]">No explicit blockers are recorded right now.</p>
             )}
           </div>
         </div>
 
-        <div className="rounded border border-zinc-300 bg-[var(--admin-surface)] p-4 shadow-sm">
-          <h2 className="text-base font-semibold">Next safe step</h2>
-          <p className="mt-3 font-semibold">{workspace.next_step.label}</p>
+        <div className={SECTION_CLASS}>
+          <h2 className="text-base font-semibold text-[var(--admin-text)]">Next safe step</h2>
+          <p className="mt-3 font-semibold text-[var(--admin-text)]">{workspace.next_step.label}</p>
           <div className="mt-4 space-y-2">
             {workspace.next_step.commands.map((command) => (
               <pre
                 key={command}
-                className="overflow-x-auto rounded border bg-[var(--paper)] px-3 py-2 text-[11px]"
+                className="overflow-x-auto rounded border border-[var(--admin-line)] bg-[var(--admin-surface-muted)] px-3 py-2 text-[11px] text-[var(--admin-text)]"
               >
                 <code>{command}</code>
               </pre>
@@ -463,7 +470,7 @@ export default function LegislativeWorkflowWorkspace({ workspace }) {
         <SummaryCard title="Latest import report" report={workspace.import_report} />
       </section>
 
-      <section id="manual-review-queue" className="rounded border border-zinc-300 bg-[var(--admin-surface)] p-4 shadow-sm">
+      <section id="manual-review-queue" className={SECTION_CLASS}>
         <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
           <div>
             <h2 className="text-base font-semibold">Manual review queue</h2>
@@ -480,21 +487,21 @@ export default function LegislativeWorkflowWorkspace({ workspace }) {
         </div>
 
         {manualReviewItems.length ? (
-          <div className="overflow-x-auto rounded border border-zinc-200">
+          <div className={TABLE_WRAPPER_CLASS}>
             <table className="min-w-full text-[12px]">
-              <thead className="bg-zinc-100 text-left text-[11px] uppercase tracking-wide text-zinc-600">
+              <thead className={TABLE_HEAD_CLASS}>
                 <tr>
-                  <th className="border-b border-zinc-200 px-3 py-2">Future bill</th>
-                  <th className="border-b border-zinc-200 px-3 py-2">Current link</th>
-                  <th className="border-b border-zinc-200 px-3 py-2">Decision</th>
-                  <th className="border-b border-zinc-200 px-3 py-2">Why manual review</th>
-                  <th className="border-b border-zinc-200 px-3 py-2">Next step</th>
+                  <th className="border-b border-[var(--admin-line)] px-3 py-2">Future bill</th>
+                  <th className="border-b border-[var(--admin-line)] px-3 py-2">Current link</th>
+                  <th className="border-b border-[var(--admin-line)] px-3 py-2">Decision</th>
+                  <th className="border-b border-[var(--admin-line)] px-3 py-2">Why manual review</th>
+                  <th className="border-b border-[var(--admin-line)] px-3 py-2">Next step</th>
                 </tr>
               </thead>
               <tbody>
                 {manualReviewItems.map((item, index) => (
-                  <tr key={`${item.future_bill_link_id || item.bill_number || item.future_bill_title || "manual"}:${index}`} className="align-top odd:bg-[var(--admin-surface)] even:bg-zinc-50/50">
-                    <td className="border-b border-zinc-200 px-3 py-2">
+                  <tr key={`${item.future_bill_link_id || item.bill_number || item.future_bill_title || "manual"}:${index}`} className={TABLE_ROW_CLASS}>
+                    <td className="border-b border-[var(--admin-line)] px-3 py-2">
                       <div className="font-medium text-[var(--admin-text)]">
                         {item.future_bill_title || "Untitled future bill"}
                       </div>
@@ -502,16 +509,16 @@ export default function LegislativeWorkflowWorkspace({ workspace }) {
                         {item.bill_number || "No bill number"}
                       </div>
                     </td>
-                    <td className="border-b border-zinc-200 px-3 py-2 text-[11px] text-zinc-700">
+                    <td className="border-b border-[var(--admin-line)] px-3 py-2 text-[11px] text-[var(--admin-text-soft)]">
                       <div>{item.tracked_bill_title || "No tracked bill title"}</div>
                       <div className="mt-1">risk: {item.original_risk_level || "unknown"}</div>
                     </td>
-                    <td className="border-b border-zinc-200 px-3 py-2 text-[11px] text-zinc-700">
+                    <td className="border-b border-[var(--admin-line)] px-3 py-2 text-[11px] text-[var(--admin-text-soft)]">
                       <div className="font-medium text-[var(--admin-text)]">{item.final_decision || "review_manually"}</div>
                       <div className="mt-1">match: {item.match_label || "unknown"}</div>
                       <div className="mt-1">score: {item.total_score ?? "n/a"}</div>
                     </td>
-                    <td className="border-b border-zinc-200 px-3 py-2 text-[11px] text-zinc-700">
+                    <td className="border-b border-[var(--admin-line)] px-3 py-2 text-[11px] text-[var(--admin-text-soft)]">
                       <div className="max-w-[360px]">
                         {item.llm_reasoning_short || "No short rationale recorded."}
                       </div>
@@ -523,7 +530,7 @@ export default function LegislativeWorkflowWorkspace({ workspace }) {
                         </ul>
                       ) : null}
                     </td>
-                    <td className="border-b border-zinc-200 px-3 py-2 text-[11px] text-zinc-700">
+                    <td className="border-b border-[var(--admin-line)] px-3 py-2 text-[11px] text-[var(--admin-text-soft)]">
                       {item.suggested_next_step || "Review and classify in this surface"}
                     </td>
                   </tr>
@@ -550,7 +557,7 @@ export default function LegislativeWorkflowWorkspace({ workspace }) {
       </section>
 
       {workspace.review_bundle ? (
-      <section className="rounded border border-zinc-300 bg-[var(--admin-surface)] p-4 shadow-sm">
+      <section className={SECTION_CLASS}>
         <div className="mb-3">
           <h2 className="text-base font-semibold">Bundle approval queue</h2>
           <p className="mt-1 text-[12px] text-gray-600">
@@ -558,20 +565,20 @@ export default function LegislativeWorkflowWorkspace({ workspace }) {
           </p>
         </div>
         {actions.length ? (
-        <div className="overflow-x-auto rounded border border-zinc-200">
+        <div className={TABLE_WRAPPER_CLASS}>
           <table className="min-w-full text-[12px]">
-            <thead className="bg-zinc-100 text-left text-[11px] uppercase tracking-wide text-zinc-600">
+            <thead className={TABLE_HEAD_CLASS}>
               <tr>
-                <th className="border-b border-zinc-200 px-3 py-2">Bundle action</th>
-                <th className="border-b border-zinc-200 px-3 py-2">Status</th>
-                <th className="border-b border-zinc-200 px-3 py-2">Decision</th>
-                <th className="border-b border-zinc-200 px-3 py-2">Inspect / note</th>
+                <th className="border-b border-[var(--admin-line)] px-3 py-2">Bundle action</th>
+                <th className="border-b border-[var(--admin-line)] px-3 py-2">Status</th>
+                <th className="border-b border-[var(--admin-line)] px-3 py-2">Decision</th>
+                <th className="border-b border-[var(--admin-line)] px-3 py-2">Inspect / note</th>
               </tr>
             </thead>
             <tbody>
               {(actions || []).map((action) => (
-                <tr key={action.action_id} className="align-top odd:bg-[var(--admin-surface)] even:bg-zinc-50/50">
-                  <td className="border-b border-zinc-200 px-3 py-2">
+                <tr key={action.action_id} className={TABLE_ROW_CLASS}>
+                  <td className="border-b border-[var(--admin-line)] px-3 py-2">
                     <div className="text-[11px] uppercase tracking-wide text-zinc-500">
                       Future bill {action.future_bill_id}
                     </div>
@@ -580,12 +587,12 @@ export default function LegislativeWorkflowWorkspace({ workspace }) {
                       {action.action_type} • {action.candidate_bill_number || action.target_id || "n/a"}
                     </div>
                   </td>
-                  <td className="border-b border-zinc-200 px-3 py-2 text-[11px] text-zinc-600">
+                  <td className="border-b border-[var(--admin-line)] px-3 py-2 text-[11px] text-[var(--admin-text-muted)]">
                     <div>{action.action_priority}</div>
                     <div className="mt-1">{action.status} / {action.review_state}</div>
                     <div className="mt-1">{action.approved ? "approved" : "not approved"}</div>
                   </td>
-                  <td className="border-b border-zinc-200 px-3 py-2">
+                  <td className="border-b border-[var(--admin-line)] px-3 py-2">
                     <select
                       value={action.decision}
                       onChange={(event) => updateAction(action.action_id, "decision", event.target.value)}
@@ -598,7 +605,7 @@ export default function LegislativeWorkflowWorkspace({ workspace }) {
                       ))}
                     </select>
                   </td>
-                  <td className="border-b border-zinc-200 px-3 py-2">
+                  <td className="border-b border-[var(--admin-line)] px-3 py-2">
                     <details className="rounded border bg-[var(--admin-surface)] p-2">
                       <summary className="cursor-pointer text-[12px] font-medium">Inspect</summary>
                       <div className="mt-2 space-y-2 text-[11px] text-zinc-700">
@@ -643,32 +650,32 @@ export default function LegislativeWorkflowWorkspace({ workspace }) {
       ) : null}
 
       {workspace.review_bundle && autoApprovedBundleActions.length ? (
-      <section className="rounded border border-zinc-300 bg-[var(--admin-surface)] p-4 shadow-sm">
+      <section className={SECTION_CLASS}>
         <div className="mb-3">
           <h2 className="text-base font-semibold">AI-Approved Apply Actions</h2>
           <p className="mt-1 text-[12px] text-gray-600">
             These actions were approved by the legislative automation and are ready for apply preview. They are not waiting on a human decision.
           </p>
         </div>
-        <div className="overflow-x-auto rounded border border-zinc-200">
+        <div className={TABLE_WRAPPER_CLASS}>
           <table className="min-w-full text-[12px]">
-            <thead className="bg-zinc-100 text-left text-[11px] uppercase tracking-wide text-zinc-600">
+            <thead className={TABLE_HEAD_CLASS}>
               <tr>
-                <th className="border-b border-zinc-200 px-3 py-2">Future bill</th>
-                <th className="border-b border-zinc-200 px-3 py-2">Action</th>
-                <th className="border-b border-zinc-200 px-3 py-2">Why it was approved</th>
+                <th className="border-b border-[var(--admin-line)] px-3 py-2">Future bill</th>
+                <th className="border-b border-[var(--admin-line)] px-3 py-2">Action</th>
+                <th className="border-b border-[var(--admin-line)] px-3 py-2">Why it was approved</th>
               </tr>
             </thead>
             <tbody>
               {autoApprovedBundleActions.map((action) => (
-                <tr key={action.action_id} className="align-top odd:bg-[var(--admin-surface)] even:bg-zinc-50/50">
-                  <td className="border-b border-zinc-200 px-3 py-2">
+                <tr key={action.action_id} className={TABLE_ROW_CLASS}>
+                  <td className="border-b border-[var(--admin-line)] px-3 py-2">
                     <div className="text-[11px] uppercase tracking-wide text-zinc-500">
                       Future bill {action.future_bill_id}
                     </div>
                     <div className="font-medium">{action.future_bill_title}</div>
                   </td>
-                  <td className="border-b border-zinc-200 px-3 py-2 text-[11px] text-zinc-700">
+                  <td className="border-b border-[var(--admin-line)] px-3 py-2 text-[11px] text-[var(--admin-text-soft)]">
                     <div>{action.action_type}</div>
                     <div className="mt-1">
                       {action.candidate_bill_number || action.target_id || "n/a"}
@@ -676,7 +683,7 @@ export default function LegislativeWorkflowWorkspace({ workspace }) {
                     </div>
                     <div className="mt-1">{action.action_priority}</div>
                   </td>
-                  <td className="border-b border-zinc-200 px-3 py-2 text-[11px] text-zinc-700">
+                  <td className="border-b border-[var(--admin-line)] px-3 py-2 text-[11px] text-[var(--admin-text-soft)]">
                     {action.rationale || action.auto_triage_reason || "Automation approved this action from the canonical review bundle."}
                   </td>
                 </tr>
@@ -687,8 +694,8 @@ export default function LegislativeWorkflowWorkspace({ workspace }) {
       </section>
       ) : null}
 
-      <section id="artifact-state" className="rounded border border-zinc-300 bg-[var(--admin-surface)] p-4 shadow-sm">
-        <h2 className="text-base font-semibold">Artifact state</h2>
+      <section id="artifact-state" className={SECTION_CLASS}>
+        <h2 className="text-base font-semibold text-[var(--admin-text)]">Artifact state</h2>
         <div className="mt-3 grid gap-3 lg:grid-cols-2 text-[12px]">
           {Object.values(workspace.artifact_status).map((artifact) => (
             <div key={artifact.key} className="rounded border p-3">

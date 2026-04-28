@@ -52,11 +52,11 @@ function deriveStopPoint(job) {
   if (REVIEW_ACTION_IDS.has(nextActionId) || REVIEW_STATES.has(workspaceState)) {
     return {
       phase: "stopped_for_operator_review",
-      marker: "Operator Review required",
-      nextLabel: "Open operator review",
+      marker: "Manual Review required",
+      nextLabel: "Open manual review",
       nextHref: operatorSurfaceHref || sessionHref || "/admin/review-queue",
       nextActionId,
-      nextActionTitle: nextActionTitle || "Operator review",
+      nextActionTitle: nextActionTitle || "Manual review",
       workspaceState,
     };
   }
@@ -177,7 +177,7 @@ export function executionPhaseLabel(phase) {
     return "Running";
   }
   if (phase === "stopped_for_operator_review") {
-    return "Stopped For Operator Review";
+    return "Stopped For Manual Review";
   }
   if (phase === "stopped_for_admin_approval") {
     return "Stopped For Admin Approval";

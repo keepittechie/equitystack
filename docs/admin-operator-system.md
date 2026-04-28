@@ -190,6 +190,30 @@ These remain necessary because they are the actual human checkpoint pages:
 
 The command center links into them when the next step requires human review.
 
+### Pipeline Surface Behavior
+
+- `/admin/current-admin-review`
+  - shows the current-admin pipeline tracker first
+  - keeps only the borderline manual-review slice editable
+  - shows AI-approved and AI-rejected queue outcomes as status, not as more review work
+  - exposes `Run Deep AI Review` for the paired deeper AI pass when the standard review remains ambiguous
+  - uses `Sync Decision Log` for the step that refreshes the append-only decision log and re-synchronizes the canonical manual-review queue before pre-commit
+- `/admin/legislative-workflow`
+  - separates the manual review queue, bundle approval queue, and AI-approved apply-ready actions
+  - keeps dry-run and mutating apply controls visibly distinct
+- `/admin/review-queue`
+  - shows only the remaining human checkpoints
+  - does not duplicate AI-approved apply-ready work that already belongs on the workflow surfaces
+
+### Admin UI Conventions
+
+- The admin shell is a dark control surface.
+- If a panel uses a light utility background, the text must remain dark enough to read, or the panel should be remapped to the admin dark-surface palette.
+- Admin pages should prefer pipeline language over legacy wording:
+  - `manual review` instead of generic `operator review`
+  - `decision-log sync` instead of `finalize` when referring to current-admin review completion
+  - `apply dry-run` and `final apply` as separate guarded steps
+
 Additional human review surface:
 
 - `/admin/source-curation`
@@ -209,7 +233,7 @@ Additional human review surface:
   - persisted session inspectors second
 - `/admin/review-queue`
   - human decision work only
-  - current-admin operator review, apply follow-up, legislative manual review, bundle approval
+  - current-admin manual review, apply follow-up, legislative manual review, bundle approval
   - AI-approved apply-ready work stays on the workflow pages instead of this queue
 
 Logs and raw artifacts support the story. They do not replace the command center, workflow state, or review pages.
@@ -338,8 +362,8 @@ The step sequence is:
 
 1. `Discover / Batch Ready`
 2. `Run current-admin`
-3. `Operator Review`
-4. `Decision Log Finalized`
+3. `Manual Review`
+4. `Decision Log Sync`
 5. `Pre-commit / Apply Readiness`
 6. `Admin Approval / Final Apply`
 7. `Validation / Complete`

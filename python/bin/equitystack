@@ -334,6 +334,8 @@ PY
 detect_current_admin_state() {
   local precommit_status="${1:-missing}"
   local queue_approved_count="0"
+  local queue_pending_count="0"
+  local queue_auto_rejected_count="0"
 
   CURRENT_ADMIN_STATE="DISCOVERY_READY"
   CURRENT_ADMIN_NEXT_STEP="Run the next current-admin batch and prepare operator review"
@@ -364,8 +366,8 @@ detect_current_admin_state() {
 
   if [ ! -f "$CURRENT_ADMIN_QUEUE_PATH" ]; then
     CURRENT_ADMIN_STATE="REVIEW_READY"
-    CURRENT_ADMIN_NEXT_STEP="Build the manual review queue"
-    CURRENT_ADMIN_NEXT_COMMAND="$(cli_hint) current-admin queue --batch $(repo_relative_path "$CURRENT_ADMIN_NORMALIZED_PATH") --review $(repo_relative_path "$CURRENT_ADMIN_REVIEW_PATH")"
+    CURRENT_ADMIN_NEXT_STEP="Promote the canonical AI review into the AI-first queue and inspect remaining manual items"
+    CURRENT_ADMIN_NEXT_COMMAND="$(cli_hint) current-admin review --input $(repo_relative_path "$CURRENT_ADMIN_REVIEW_PATH")"
     CURRENT_ADMIN_MISSING_ARTIFACTS=("manual review queue")
     return 0
   fi
@@ -402,7 +404,8 @@ PY
   fi
 
   if [ -f "$CURRENT_ADMIN_QUEUE_PATH" ]; then
-    queue_approved_count="$(
+    local -a queue_count_lines=()
+    mapfile -t queue_count_lines < <(
       CURRENT_ADMIN_QUEUE_PATH="$CURRENT_ADMIN_QUEUE_PATH" "$VENV_PYTHON" - <<'PY'
 import json
 import os
@@ -411,22 +414,46 @@ from pathlib import Path
 queue_path = Path(os.environ["CURRENT_ADMIN_QUEUE_PATH"]).resolve()
 payload = json.loads(queue_path.read_text()) if queue_path.exists() else {}
 items = payload.get("items") or []
-count = sum(
+auto_items = payload.get("auto_approved_items") or []
+auto_rejected_items = payload.get("auto_rejected_items") or []
+approved_count = sum(
+    1
+    for item in auto_items
+    if isinstance(item, dict)
+)
+approved_count += sum(
     1
     for item in items
     if isinstance(item, dict) and (item.get("approved") or item.get("operator_status") == "approved")
 )
-print(count)
+pending_count = sum(
+    1
+    for item in items
+    if isinstance(item, dict) and item.get("operator_status") in {"pending", "pending_manual_review"}
+)
+auto_rejected_count = sum(1 for item in auto_rejected_items if isinstance(item, dict))
+print(approved_count)
+print(pending_count)
+print(auto_rejected_count)
 PY
-    )"
+    )
+    queue_approved_count="${queue_count_lines[0]:-0}"
+    queue_pending_count="${queue_count_lines[1]:-0}"
+    queue_auto_rejected_count="${queue_count_lines[2]:-0}"
   fi
 
   if [ ! -f "$CURRENT_ADMIN_PRECOMMIT_PATH" ]; then
     if [ "${queue_approved_count:-0}" -le 0 ]; then
-      CURRENT_ADMIN_STATE="BLOCKED"
-      CURRENT_ADMIN_NEXT_STEP="No queue items are approved for import. Reopen current-admin review and rerun finalize if import candidates should proceed."
-      CURRENT_ADMIN_NEXT_COMMAND="$(cli_hint) current-admin review --input $(repo_relative_path "$CURRENT_ADMIN_REVIEW_PATH")"
-      CURRENT_ADMIN_BLOCKING_ISSUES=("no queue items are approved for import")
+      if [ "${queue_pending_count:-0}" -le 0 ] && [ "${queue_auto_rejected_count:-0}" -gt 0 ]; then
+        CURRENT_ADMIN_STATE="COMPLETE"
+        CURRENT_ADMIN_NEXT_STEP="This batch produced no importable records after AI-first review. Start the next batch when ready."
+        CURRENT_ADMIN_NEXT_COMMAND="$(cli_hint) current-admin run"
+      else
+        CURRENT_ADMIN_STATE="BLOCKED"
+        CURRENT_ADMIN_NEXT_STEP="No queue items are approved for import. Reopen current-admin review only if borderline manual rows still need a decision."
+        CURRENT_ADMIN_NEXT_COMMAND="$(cli_hint) current-admin review --input $(repo_relative_path "$CURRENT_ADMIN_REVIEW_PATH")"
+        CURRENT_ADMIN_BLOCKING_ISSUES=("no queue items are approved for import")
+      fi
     else
       CURRENT_ADMIN_STATE="QUEUE_READY"
       CURRENT_ADMIN_NEXT_STEP="Run the guarded apply path starting with pre-commit and dry-run import"
@@ -724,47 +751,7 @@ PY
   print_system_state "$CURRENT_ADMIN_STATE" "$CURRENT_ADMIN_NEXT_STEP" "$CURRENT_ADMIN_NEXT_COMMAND" "${detail_lines[@]}"
 }
 
-run_current_admin_workflow_review() {
-  local summary_requested="false"
-  local preview_requested="false"
-  local -a normalized_args=()
-  local -a passthrough=()
-
-  normalize_current_admin_path_args normalized_args "$@"
-  set -- "${normalized_args[@]}"
-
-  while [ "$#" -gt 0 ]; do
-    case "$1" in
-      --summary)
-        summary_requested="true"
-        passthrough+=("$1")
-        shift
-        ;;
-      --preview)
-        preview_requested="true"
-        passthrough+=("$1")
-        shift
-        ;;
-      -h|--help)
-        current_admin_workflow_subcommand_usage review
-        exit 0
-        ;;
-      *)
-        passthrough+=("$1")
-        shift
-        ;;
-    esac
-  done
-
-  if [ "$summary_requested" = "false" ] && [ "$preview_requested" = "false" ]; then
-    passthrough+=(--summary)
-  fi
-
-  run_step "1/1" "Generate Decision Template" "Decision template generation complete" -- \
-    "$VENV_PYTHON" scripts/generate_current_admin_decision_template.py "${passthrough[@]}"
-}
-
-run_current_admin_workflow_finalize() {
+run_current_admin_finalize_review() {
   local review_path=""
   local decision_file=""
   local log_decisions_set="false"
@@ -797,12 +784,8 @@ run_current_admin_workflow_finalize() {
         feedback_summary="true"
         shift
         ;;
-      -h|--help)
-        current_admin_workflow_subcommand_usage finalize
-        exit 0
-        ;;
       *)
-        echo "Unknown argument for current-admin workflow finalize: $1" >&2
+        echo "Unknown argument for current-admin review finalization: $1" >&2
         exit 1
         ;;
     esac
@@ -897,96 +880,10 @@ run_current_admin_workflow_finalize() {
     "MANUAL QUEUE: $(repo_relative_path "$REVIEW_ARTIFACT_QUEUE_PATH")"
 }
 
-print_current_admin_workflow_resume() {
-  EQUITYSTACK_PYTHON_DIR="$EQUITYSTACK_PYTHON_DIR" "$VENV_PYTHON" - <<'PY'
-import json
-import os
-from pathlib import Path
-
-python_dir = Path(os.environ["EQUITYSTACK_PYTHON_DIR"]).resolve()
-reports_dir = python_dir / "reports" / "current_admin"
-decision_dir = reports_dir / "review_decisions"
-
-
-def newest(paths):
-    paths = [path for path in paths if path.is_file()]
-    if not paths:
-        return None
-    return max(paths, key=lambda path: path.stat().st_mtime)
-
-
-latest_decision = newest(decision_dir.glob("*.json"))
-latest_review = newest(reports_dir.glob("*.ai-review.json"))
-
-if latest_decision is not None:
-    payload = json.loads(latest_decision.read_text())
-    review_path = payload.get("source_review_file") or ""
-    session_id = payload.get("session_id") or latest_decision.stem
-    session_focus = payload.get("session_focus") or "unspecified"
-    generated_at = payload.get("generated_at") or "unknown"
-    item_count = len(payload.get("items") or [])
-    batch_name = Path(review_path).name.replace(".ai-review.json", "") if review_path else "unknown"
-    queue_path = reports_dir / f"{batch_name}.manual-review-queue.json" if batch_name != "unknown" else None
-    queue_payload = json.loads(queue_path.read_text()) if queue_path and queue_path.exists() else {}
-    queue_items = queue_payload.get("items") or []
-    queue_approved = sum(
-        1
-        for item in queue_items
-        if isinstance(item, dict) and (item.get("approved") or item.get("operator_status") == "approved")
-    )
-
-    print(f"LATEST SESSION: {session_id}")
-    print(f"SESSION FOCUS: {session_focus}")
-    print(f"GENERATED: {generated_at}")
-    print(f"ITEMS LOGGED: {item_count}")
-    print(f"SOURCE REVIEW: {review_path or 'unknown'}")
-    if queue_path is not None:
-        print(f"QUEUE APPROVED FOR IMPORT: {queue_approved}")
-    print()
-    if queue_approved > 0:
-        print("SYSTEM STATE: QUEUE_READY")
-        print("NEXT STEP: Run the guarded apply flow starting with pre-commit")
-    else:
-        print("SYSTEM STATE: BLOCKED")
-        print("NEXT STEP: Review decisions are logged, but no queue items are approved for import yet.")
-    if batch_name != "unknown":
-        queue_path_text = f"reports/current_admin/{batch_name}.manual-review-queue.json"
-        if queue_approved > 0:
-            print(f"RECOMMENDED COMMAND: ./bin/equitystack current-admin apply --input {queue_path_text}")
-        else:
-            print(
-                "RECOMMENDED COMMAND: "
-                f"./bin/equitystack current-admin review --input reports/current_admin/{Path(review_path).name}"
-            )
-        print(f"FOLLOW UP: ./bin/equitystack current-admin status --batch-name {batch_name}")
-    else:
-        print("RECOMMENDED COMMAND: ./bin/equitystack current-admin status")
-elif latest_review is not None:
-    payload = json.loads(latest_review.read_text())
-    batch_name = payload.get("batch_name") or latest_review.name.replace(".ai-review.json", "")
-    output_name = latest_review.name.replace(".ai-review.json", ".decision-template.json")
-
-    print(f"LATEST REVIEW ARTIFACT: {latest_review}")
-    print(f"BATCH NAME: {batch_name}")
-    print()
-    print("SYSTEM STATE: REVIEW_READY")
-    print("NEXT STEP: Generate or finalize operator decisions for the review artifact")
-    print(
-        "RECOMMENDED COMMAND: "
-        f"./bin/equitystack current-admin review --input reports/current_admin/{latest_review.name}"
-    )
-else:
-    print("SYSTEM STATE: DISCOVERY_READY")
-    print("NEXT STEP: Start the next current-admin run")
-    print("RECOMMENDED COMMAND: ./bin/equitystack current-admin run")
-PY
-}
-
-run_current_admin_workflow_start() {
+run_current_admin_prepare_flow() {
   local input_path=""
   local batch_name=""
   local review_dry_run="false"
-  local prefill_suggestions="false"
   local review_model=""
   local verifier_model=""
   local fallback_model=""
@@ -1011,10 +908,6 @@ run_current_admin_workflow_start() {
         ;;
       --review-dry-run)
         review_dry_run="true"
-        shift
-        ;;
-      --prefill-suggestions)
-        prefill_suggestions="true"
         shift
         ;;
       --model)
@@ -1066,11 +959,11 @@ run_current_admin_workflow_start() {
         shift 2
         ;;
       -h|--help)
-        current_admin_workflow_subcommand_usage start
+        current_admin_subcommand_usage run
         exit 0
         ;;
       *)
-        echo "Unknown argument for current-admin workflow start: $1" >&2
+        echo "Unknown argument for current-admin run: $1" >&2
         exit 1
         ;;
     esac
@@ -1090,11 +983,15 @@ run_current_admin_workflow_start() {
     fallback_model="$DEFAULT_CURRENT_ADMIN_FALLBACK_MODEL"
   fi
   if [ -z "$review_mode" ]; then
-    review_mode="deep"
+    review_mode="standard"
   fi
   if [ -n "$timeout" ]; then
     senior_timeout="$timeout"
     verifier_timeout="$timeout"
+  fi
+  if [ "$deep_review" = "true" ] || [ "$review_mode" = "deep" ]; then
+    echo "current-admin run only supports the standard single-pass review path. Use 'equitystack current-admin deep-review' when you want a deeper paired AI review." >&2
+    exit 1
   fi
 
   resolve_current_admin_context "$input_path" "$batch_name"
@@ -1117,35 +1014,29 @@ run_current_admin_workflow_start() {
   if [ "$review_dry_run" = "true" ]; then
     review_args+=(--dry-run)
   fi
-  if [ "$deep_review" = "true" ]; then
-    review_args+=(--deep-review)
-  fi
 
   run_step "2/3" "AI Review" "AI review report created" --output "$CURRENT_ADMIN_REVIEW_PATH" -- \
     "${review_args[@]}"
 
   local -a queue_args=(
     "$VENV_PYTHON"
-    scripts/apply_current_admin_ai_review.py
+    scripts/promote_current_admin_review_to_queue.py
+    --input "$CURRENT_ADMIN_REVIEW_PATH"
     --batch "$CURRENT_ADMIN_NORMALIZED_PATH"
-    --review "$CURRENT_ADMIN_REVIEW_PATH"
   )
-  if [ "$prefill_suggestions" = "true" ]; then
-    queue_args+=(--prefill-suggestions)
-  fi
 
-  run_step "3/3" "Build Manual Queue" "Manual review queue created" --output "$CURRENT_ADMIN_QUEUE_PATH" -- \
+  run_step "3/3" "Promote AI-First Queue" "AI-first current-admin queue created" --output "$CURRENT_ADMIN_QUEUE_PATH" -- \
     "${queue_args[@]}"
 
   print_system_state \
     "REVIEW_READY" \
-    "Generate a decision template or inspect batch status" \
-    "$(cli_hint) current-admin workflow review --input $(repo_relative_path "$CURRENT_ADMIN_REVIEW_PATH") --output /tmp/${CURRENT_ADMIN_BATCH_NAME}.decision-template.json" \
+    "Review only the remaining borderline items, or move straight to apply if no manual items remain." \
+    "$(cli_hint) current-admin review --input $(repo_relative_path "$CURRENT_ADMIN_REVIEW_PATH")" \
     "BATCH: $CURRENT_ADMIN_BATCH_NAME" \
     "OPENAI MODEL: $review_model" \
     "VERIFIER MODEL: $verifier_model" \
     "FALLBACK MODEL: $fallback_model" \
-    "OPENAI BASE URL: $DEFAULT_CURRENT_ADMIN_OPENAI_BASE_URL"
+    "OPENAI BASE URL: $openai_base_url"
 }
 
 run_current_admin_review_command() {
@@ -1158,7 +1049,8 @@ run_current_admin_review_command() {
   local has_timeout="false"
   local has_senior_timeout="false"
   local has_verifier_timeout="false"
-  local has_review_mode="false"
+  local review_mode_requested="false"
+  local requested_deep_review="false"
   local has_paired_experiment="false"
 
   normalize_current_admin_path_args normalized_args "$@"
@@ -1247,21 +1139,180 @@ run_current_admin_review_command() {
           shift
         fi
         ;;
-      --review-mode|--review-mode=*|--deep-review)
-        has_review_mode="true"
+      --review-mode|--review-mode=*)
+        review_mode_requested="true"
         passthrough+=("$1")
         if [ "$1" = "--review-mode" ]; then
           [ -n "${2:-}" ] || { echo "--review-mode requires a value" >&2; exit 1; }
+          if [ "${2:-}" = "deep" ]; then
+            requested_deep_review="true"
+          fi
+          passthrough+=("$2")
+          shift 2
+        else
+          if [ "${1#*=}" = "deep" ]; then
+            requested_deep_review="true"
+          fi
+          shift
+        fi
+        ;;
+      --deep-review)
+        requested_deep_review="true"
+        passthrough+=("$1")
+        shift
+        ;;
+      --paired-experiment)
+        has_paired_experiment="true"
+        passthrough+=("$1")
+        shift
+        ;;
+      *)
+        passthrough+=("$1")
+        shift
+        ;;
+    esac
+  done
+
+  if [ "$requested_deep_review" = "true" ] && [ "$has_paired_experiment" != "true" ]; then
+    echo "Use 'equitystack current-admin deep-review ...' for the deeper paired AI review flow. The standard 'current-admin ai-review' path is single-pass only." >&2
+    exit 1
+  fi
+
+  if [ "$has_model" = "false" ]; then
+    passthrough+=(--model "$DEFAULT_CURRENT_ADMIN_REVIEW_MODEL")
+  fi
+  if [ "$has_verifier_model" = "false" ]; then
+    passthrough+=(--verifier-model "$DEFAULT_CURRENT_ADMIN_VERIFIER_MODEL")
+  fi
+  if [ "$has_fallback_model" = "false" ]; then
+    passthrough+=(--fallback-model "$DEFAULT_CURRENT_ADMIN_FALLBACK_MODEL")
+  fi
+  if [ "$has_timeout" = "true" ]; then
+    :
+  else
+    if [ "$has_senior_timeout" = "false" ]; then
+      passthrough+=(--senior-timeout "$DEFAULT_REVIEW_TIMEOUT_SENIOR")
+    fi
+    if [ "$has_verifier_timeout" = "false" ]; then
+      passthrough+=(--verifier-timeout "$DEFAULT_REVIEW_TIMEOUT_VERIFIER")
+    fi
+  fi
+  if [ "$review_mode_requested" = "false" ]; then
+    passthrough+=(--review-mode standard)
+  fi
+  if [ "$has_openai_base_url" = "false" ]; then
+    passthrough+=(--openai-base-url "$DEFAULT_CURRENT_ADMIN_OPENAI_BASE_URL")
+  fi
+
+  local review_script="scripts/review_current_admin_batch_with_openai_batch.py"
+  local review_step_label="AI Review"
+  local review_step_complete="AI review command complete"
+  if [ "$has_paired_experiment" = "true" ]; then
+    review_script="scripts/current_admin_paired_evaluation.py"
+    review_step_label="Paired Review Evaluation"
+    review_step_complete="Paired review evaluation command complete"
+  fi
+
+  run_step "1/1" "$review_step_label" "$review_step_complete" -- \
+    "$VENV_PYTHON" "$review_script" "${passthrough[@]}"
+}
+
+run_current_admin_deep_review_command() {
+  local -a normalized_args=()
+  local -a passthrough=(--paired-experiment)
+  local has_model="false"
+  local has_verifier_model="false"
+  local has_fallback_model="false"
+  local has_openai_base_url="false"
+  local has_timeout="false"
+  local has_senior_timeout="false"
+  local has_verifier_timeout="false"
+
+  normalize_current_admin_path_args normalized_args "$@"
+  set -- "${normalized_args[@]}"
+
+  while [ "$#" -gt 0 ]; do
+    case "$1" in
+      -h|--help)
+        current_admin_subcommand_usage deep-review
+        exit 0
+        ;;
+      --model|--model=*)
+        has_model="true"
+        passthrough+=("$1")
+        if [ "$1" = "--model" ]; then
+          [ -n "${2:-}" ] || { echo "--model requires a value" >&2; exit 1; }
           passthrough+=("$2")
           shift 2
         else
           shift
         fi
         ;;
-      --paired-experiment)
-        has_paired_experiment="true"
+      --verifier-model|--verifier-model=*)
+        has_verifier_model="true"
         passthrough+=("$1")
-        shift
+        if [ "$1" = "--verifier-model" ]; then
+          [ -n "${2:-}" ] || { echo "--verifier-model requires a value" >&2; exit 1; }
+          passthrough+=("$2")
+          shift 2
+        else
+          shift
+        fi
+        ;;
+      --fallback-model|--fallback-model=*)
+        has_fallback_model="true"
+        passthrough+=("$1")
+        if [ "$1" = "--fallback-model" ]; then
+          [ -n "${2:-}" ] || { echo "--fallback-model requires a value" >&2; exit 1; }
+          passthrough+=("$2")
+          shift 2
+        else
+          shift
+        fi
+        ;;
+      --openai-base-url|--openai-base-url=*)
+        has_openai_base_url="true"
+        passthrough+=("$1")
+        if [ "$1" = "--openai-base-url" ]; then
+          [ -n "${2:-}" ] || { echo "--openai-base-url requires a value" >&2; exit 1; }
+          passthrough+=("$2")
+          shift 2
+        else
+          shift
+        fi
+        ;;
+      --timeout|--timeout=*)
+        has_timeout="true"
+        passthrough+=("$1")
+        if [ "$1" = "--timeout" ]; then
+          [ -n "${2:-}" ] || { echo "--timeout requires a value" >&2; exit 1; }
+          passthrough+=("$2")
+          shift 2
+        else
+          shift
+        fi
+        ;;
+      --senior-timeout|--senior-timeout=*)
+        has_senior_timeout="true"
+        passthrough+=("$1")
+        if [ "$1" = "--senior-timeout" ]; then
+          [ -n "${2:-}" ] || { echo "--senior-timeout requires a value" >&2; exit 1; }
+          passthrough+=("$2")
+          shift 2
+        else
+          shift
+        fi
+        ;;
+      --verifier-timeout|--verifier-timeout=*)
+        has_verifier_timeout="true"
+        passthrough+=("$1")
+        if [ "$1" = "--verifier-timeout" ]; then
+          [ -n "${2:-}" ] || { echo "--verifier-timeout requires a value" >&2; exit 1; }
+          passthrough+=("$2")
+          shift 2
+        else
+          shift
+        fi
         ;;
       *)
         passthrough+=("$1")
@@ -1289,24 +1340,12 @@ run_current_admin_review_command() {
       passthrough+=(--verifier-timeout "$DEFAULT_REVIEW_TIMEOUT_VERIFIER")
     fi
   fi
-  if [ "$has_review_mode" = "false" ]; then
-    passthrough+=(--review-mode deep)
-  fi
   if [ "$has_openai_base_url" = "false" ]; then
     passthrough+=(--openai-base-url "$DEFAULT_CURRENT_ADMIN_OPENAI_BASE_URL")
   fi
 
-  local review_script="scripts/review_current_admin_batch_with_openai_batch.py"
-  local review_step_label="AI Review"
-  local review_step_complete="AI review command complete"
-  if [ "$has_paired_experiment" = "true" ]; then
-    review_script="scripts/current_admin_paired_evaluation.py"
-    review_step_label="Paired Review Evaluation"
-    review_step_complete="Paired review evaluation command complete"
-  fi
-
-  run_step "1/1" "$review_step_label" "$review_step_complete" -- \
-    "$VENV_PYTHON" "$review_script" "${passthrough[@]}"
+  run_step "1/1" "Deep AI Review" "Paired deep current-admin review command complete" -- \
+    "$VENV_PYTHON" scripts/current_admin_paired_evaluation.py "${passthrough[@]}"
 }
 
 run_current_admin_discover_command() {
@@ -1453,7 +1492,7 @@ run_current_admin_run_command() {
         [ -n "${2:-}" ] || { echo "$1 requires a value" >&2; exit 1; }
         shift 2
         ;;
-      --review-dry-run|--prefill-suggestions|--deep-review)
+      --review-dry-run|--deep-review)
         workflow_args+=("$1")
         shift
         ;;
@@ -1479,7 +1518,7 @@ run_current_admin_run_command() {
     else
       workflow_args=(--batch-name "$batch_name" "${workflow_args[@]}")
     fi
-    run_current_admin_workflow_start "${workflow_args[@]}"
+    run_current_admin_prepare_flow "${workflow_args[@]}"
     resolve_current_admin_context "$input_path" "$batch_name"
     print_current_admin_run_summary "$CURRENT_ADMIN_INPUT_PATH"
     return 0
@@ -1541,7 +1580,7 @@ run_current_admin_run_command() {
     "$VENV_PYTHON" scripts/generate_current_admin_batch_from_discovery.py "${gen_batch_args[@]}"
 
   workflow_args=(--input "$generated_batch_output" "${workflow_args[@]}")
-  run_current_admin_workflow_start "${workflow_args[@]}"
+  run_current_admin_prepare_flow "${workflow_args[@]}"
   resolve_current_admin_context "$generated_batch_output" ""
   print_current_admin_run_summary "$CURRENT_ADMIN_INPUT_PATH" "$discovery_abs"
 }
@@ -1611,9 +1650,50 @@ run_current_admin_operator_review_command() {
   else
     decision_file="$CURRENT_ADMIN_REVIEW_TARGET_DECISION_TEMPLATE"
   fi
+  if [ -n "$log_decisions_path" ]; then
+    log_decisions_path="$(normalize_python_workspace_path "$log_decisions_path")"
+  else
+    log_decisions_path="$(current_admin_decision_log_dir)/${CURRENT_ADMIN_REVIEW_TARGET_BATCH_NAME}.decision-log.json"
+  fi
 
-  if [ "$refresh_template" = "true" ] || [ ! -f "$decision_file" ]; then
-    run_current_admin_workflow_review --input "$review_path" --output "$decision_file" --summary
+  resolve_review_artifact_context "$review_path"
+  local -a promote_args=(
+    "$VENV_PYTHON"
+    scripts/promote_current_admin_review_to_queue.py
+    --input "$review_path"
+    --batch "$REVIEW_ARTIFACT_NORMALIZED_PATH"
+    --decision-template-output "$decision_file"
+    --decision-log-output "$log_decisions_path"
+  )
+  if [ "$refresh_template" != "true" ]; then
+    promote_args+=(--no-backup)
+  fi
+
+  run_step "1/2" "Promote AI Decisions" "AI-first review queue refreshed from the canonical review artifact" --output "$CURRENT_ADMIN_REVIEW_TARGET_QUEUE_PATH" -- \
+    "${promote_args[@]}"
+
+  local -a queue_count_lines=()
+  mapfile -t queue_count_lines < <(
+    CURRENT_ADMIN_QUEUE_PATH="$CURRENT_ADMIN_REVIEW_TARGET_QUEUE_PATH" "$VENV_PYTHON" - <<'PY'
+import json
+import os
+from pathlib import Path
+
+path = Path(os.environ["CURRENT_ADMIN_QUEUE_PATH"]).resolve()
+payload = json.loads(path.read_text()) if path.exists() else {}
+manual_items = payload.get("items") or []
+auto_approved = payload.get("auto_approved_items") or []
+auto_rejected = payload.get("auto_rejected_items") or []
+print(len([item for item in manual_items if isinstance(item, dict)]))
+print(len([item for item in auto_approved if isinstance(item, dict)]))
+print(len([item for item in auto_rejected if isinstance(item, dict)]))
+PY
+  )
+  local manual_review_count="${queue_count_lines[0]:-0}"
+
+  if [ "${manual_review_count:-0}" -le 0 ]; then
+    print_current_admin_review_summary "$review_path" "$decision_file" "$log_decisions_path" "true"
+    return 0
   fi
 
   local -a decision_status_lines=()
@@ -1629,12 +1709,6 @@ run_current_admin_operator_review_command() {
     return 0
   fi
 
-  if [ -n "$log_decisions_path" ]; then
-    log_decisions_path="$(normalize_python_workspace_path "$log_decisions_path")"
-  else
-    log_decisions_path="$(current_admin_decision_log_dir)/${CURRENT_ADMIN_REVIEW_TARGET_BATCH_NAME}.$(date -u +%Y%m%dT%H%M%SZ).decision-log.json"
-  fi
-
   local -a finalize_args=(
     --review "$review_path"
     --decision-file "$decision_file"
@@ -1644,7 +1718,7 @@ run_current_admin_operator_review_command() {
     finalize_args+=(--feedback-summary)
   fi
 
-  run_current_admin_workflow_finalize "${finalize_args[@]}"
+  run_current_admin_finalize_review "${finalize_args[@]}"
   print_current_admin_review_summary "$review_path" "$decision_file" "$log_decisions_path" "true"
 }
 
@@ -1743,38 +1817,6 @@ run_current_admin_apply_command() {
     "$CURRENT_ADMIN_APPLY_IMPORT_APPLY_PATH" \
     "$CURRENT_ADMIN_APPLY_VALIDATION_PATH" \
     "true"
-}
-
-run_current_admin_workflow_command() {
-  local command="${1:-}"
-  shift || true
-
-  case "$command" in
-    start)
-      run_current_admin_workflow_start "$@"
-      ;;
-    review|generate-decision-template)
-      run_current_admin_workflow_review "$@"
-      ;;
-    finalize)
-      run_current_admin_workflow_finalize "$@"
-      ;;
-    resume)
-      if [ "${1:-}" = "--help" ] || [ "${1:-}" = "-h" ]; then
-        current_admin_workflow_subcommand_usage resume
-        exit 0
-      fi
-      print_current_admin_workflow_resume
-      ;;
-    help|-h|--help|"")
-      current_admin_workflow_usage
-      ;;
-    *)
-      echo "Unknown current-admin workflow command: $command" >&2
-      current_admin_workflow_usage
-      exit 1
-      ;;
-  esac
 }
 
 run_legislative_command() {
@@ -2203,25 +2245,12 @@ run_current_admin_command() {
     ai-review)
       run_current_admin_review_command "$@"
       ;;
-    queue)
+    deep-review)
       if [ "${1:-}" = "--help" ] || [ "${1:-}" = "-h" ]; then
-        current_admin_subcommand_usage queue
+        current_admin_subcommand_usage deep-review
         exit 0
       fi
-      local -a queue_args=()
-      normalize_current_admin_path_args queue_args "$@"
-      run_step "1/1" "Build Manual Queue" "Manual review queue build complete" -- \
-        "$VENV_PYTHON" scripts/apply_current_admin_ai_review.py "${queue_args[@]}"
-      ;;
-    promote-review)
-      if [ "${1:-}" = "--help" ] || [ "${1:-}" = "-h" ]; then
-        current_admin_subcommand_usage promote-review
-        exit 0
-      fi
-      local -a promote_args=()
-      normalize_current_admin_path_args promote_args "$@"
-      run_step "1/1" "Promote Review To Queue" "Current-admin review promotion complete" -- \
-        "$VENV_PYTHON" scripts/promote_current_admin_review_to_queue.py "${promote_args[@]}"
+      run_current_admin_deep_review_command "$@"
       ;;
     pre-commit)
       if [ "${1:-}" = "--help" ] || [ "${1:-}" = "-h" ]; then
@@ -2641,9 +2670,6 @@ run_current_admin_command() {
       fi
       print_current_admin_status "$input_path" "$batch_name" "$output_json" "$focus" "$reason" "$confidence_bucket" "$unresolved_only" "$readiness" "$schema_blocked_only" "$judgment_required_only" "$quality_focus" "$manual_review_only" "$calibration_all_batches" "$simulation_preset" "$simulation_focus" "$include_deltas" "$confidence_auto_approve_threshold" "$confidence_manual_review_floor" "$allow_high_confidence_flagged_items_to_stay_blocked" "$treat_unclear_as_always_manual_review" "$treat_weak_evidence_as_always_manual_review" "$treat_conflicting_sources_as_always_manual_review" "$treat_date_uncertain_as_always_manual_review" "$treat_ambiguous_subject_as_always_manual_review" "$treat_model_manual_review_as_always_manual_review" "$evidence_focus" "$evidence_quality_label" "$source_grounding_label" "$impact_directness_hint" "$evidence_item_id" "$include_items" "$comparison_baseline" "$comparison_enriched" "$paired_experiment_name"
       ;;
-    workflow)
-      run_current_admin_workflow_command "${1:-help}" "${@:2}"
-      ;;
     import)
       if [ "${1:-}" = "--help" ] || [ "${1:-}" = "-h" ]; then
         current_admin_subcommand_usage import
@@ -2708,22 +2734,16 @@ Current-admin commands:
   gen-batch  Generate a canonical current-admin batch from discovery candidates
   export     Export selected discovery suggestions into a draft batch
   normalize  Normalize a curated batch file
-  ai-review  Run conservative OpenAI Batch review on a normalized batch
-  queue      Build the manual review queue from normalized batch plus AI review
-  run        Discover and generate the next batch by default, then normalize, review, and queue it
-  review     Generate or finalize operator decisions for a review artifact
+  ai-review  Run the standard single-pass OpenAI Batch review on a normalized batch
+  deep-review
+             Run the deeper paired AI review path for ambiguous current-admin records
+  run        Discover and generate the next batch by default, then normalize, review, and promote the AI-first queue
+  review     Promote AI decisions and ask for operator input only on the remaining borderline rows
   apply      Run pre-commit, import dry-run, optional apply, and validation
   status     Show current-admin artifact state and recommended next step
-  workflow   Guided wrapper around the canonical current-admin artifact flow
   pre-commit Generate the import guardrail artifact
   import     Dry-run or apply a curated batch import
   validate   Validate imported current-administration records
-
-Current-admin workflow subcommands:
-  workflow start        Run normalize, review, and queue for one batch
-  workflow review       Generate a decision template from a review or worklist artifact
-  workflow finalize     Log explicit operator decisions against a canonical review artifact
-  workflow resume       Show the latest current-admin session and recommended next step
 
 Impact maturation commands:
   evaluate   Build a read-only impact maturation review artifact
@@ -2768,9 +2788,9 @@ Examples:
   $(cli_hint) impact curate-sources --non-interactive --limit 10
   $(cli_hint) current-admin run
   $(cli_hint) current-admin status
+  $(cli_hint) current-admin deep-review --input reports/current_admin/<batch-name>.normalized.json
   $(cli_hint) operator cleanup-stale-workflows --dry-run
   $(cli_hint) admin-reset-operational-state --dry-run
-  $(cli_hint) current-admin workflow start --input data/current_admin_batches/<batch-file>.json
   $(cli_hint) current-admin review --input reports/current_admin/<batch-name>.ai-review.json
 EOF
 }
@@ -2970,21 +2990,19 @@ Commands:
   gen-batch  Wrapper for scripts/generate_current_admin_batch_from_discovery.py
   export     Wrapper for scripts/export_current_admin_discovery_candidates.py
   normalize  Wrapper for scripts/normalize_current_admin_batch.py
-  ai-review  Wrapper for scripts/review_current_admin_batch_with_openai_batch.py
-  queue      Wrapper for scripts/apply_current_admin_ai_review.py
-  promote-review
-             Promote an enriched review artifact into the canonical queue
-  run        Discover and generate the next batch by default, then normalize, review, and queue it
-  review     Generate or finalize operator decisions for a review artifact
+  ai-review  Run the standard single-pass OpenAI Batch review on a normalized batch
+  deep-review
+             Run the deeper paired AI review path for ambiguous current-admin records
+  run        Discover and generate the next batch by default, then normalize, review, and promote the AI-first queue
+  review     Promote AI decisions and ask for operator input only on the remaining borderline rows
   apply      Run pre-commit, import dry-run, optional apply, and validation
   status     Show current-admin batch state and recommended next step
-  workflow   Guided artifact-first operator workflow helpers
   pre-commit Wrapper for scripts/build_current_admin_precommit_review.py
   import     Wrapper for scripts/import_curated_current_admin_batch.py
   validate   Wrapper for scripts/validate_current_admin_import.py
 
 Defaults:
-  current-admin ai-review, current-admin run, and workflow decision steps default to:
+  current-admin ai-review, current-admin deep-review, and current-admin run default to:
     openai-model   $DEFAULT_CURRENT_ADMIN_REVIEW_MODEL
     verifier-model $DEFAULT_CURRENT_ADMIN_VERIFIER_MODEL
     fallback-model $DEFAULT_CURRENT_ADMIN_FALLBACK_MODEL
@@ -3009,71 +3027,6 @@ OpenAI Batch lifecycle:
     --batch-inspect  show local readiness and validation counts
     --batch-resume   poll, fetch, and rebuild the canonical review artifact when ready
 EOF
-}
-
-current_admin_workflow_usage() {
-  cat <<EOF
-Usage:
-  equitystack current-admin workflow <command> [args]
-
-Commands:
-  start                      Run normalize, review, and queue for one batch
-  review                     Generate a decision template from a review or worklist artifact
-  finalize                   Log explicit operator decisions against a canonical review artifact
-  resume                     Show the latest current-admin session and recommended next step
-EOF
-}
-
-current_admin_workflow_subcommand_usage() {
-  local subcommand="$1"
-  case "$subcommand" in
-    start)
-      cat <<EOF
-Usage:
-  equitystack current-admin workflow start [--input <batch-file> | --batch-name <batch-name>] [--review-dry-run] [--prefill-suggestions] [--model <openai-model>] [--verifier-model <name>] [--fallback-model <name>] [--timeout <seconds>] [--senior-timeout <seconds>] [--verifier-timeout <seconds>] [--openai-base-url <url>] [--deep-review | --review-mode <standard|deep>]
-
-Runs the existing safe pre-import workflow:
-  normalize -> review -> queue
-
-This does not import records or write to the database.
-
-Relative --input paths may be given as data/... or python/data/...
-EOF
-      ;;
-    review|generate-decision-template)
-      cat <<EOF
-Usage:
-  equitystack current-admin workflow review --input <ai-review-or-worklist.json> [--output <decision-template.json>] [filters]
-
-Runs:
-  python3 scripts/generate_current_admin_decision_template.py [args]
-
-Relative --input/--output paths may be given as reports/... or python/reports/...
-EOF
-      ;;
-    finalize)
-      cat <<EOF
-Usage:
-  equitystack current-admin workflow finalize --review <ai-review.json> --decision-file <decisions.json> --log-decisions [path] [--feedback-summary]
-
-Reuses the canonical AI review artifact and writes a decision log.
-This does not import records or write to the database.
-
-Relative --review and --decision-file paths may be given as reports/... or python/reports/...
-EOF
-      ;;
-    resume)
-      cat <<EOF
-Usage:
-  equitystack current-admin workflow resume
-
-Shows the latest current-admin review session and the likely next operator step.
-EOF
-      ;;
-    *)
-      current_admin_workflow_usage
-      ;;
-  esac
 }
 
 current_admin_subcommand_usage() {
@@ -3114,7 +3067,7 @@ Usage:
 Runs:
   python3 scripts/generate_current_admin_batch_from_discovery.py [args]
 
-This generates a canonical current-admin batch ready for workflow start or current-admin run --input.
+This generates a canonical current-admin batch ready for current-admin run --input.
 EOF
       ;;
     normalize)
@@ -3131,8 +3084,8 @@ EOF
 Usage:
   equitystack current-admin review [--input <ai-review.json> | --batch-name <batch-name>] [--decision-file <decision-template.json>] [--refresh-template] [--log-decisions [path]] [--feedback-summary]
 
-Generates the canonical decision template when needed and finalizes explicit operator decisions only when the decision file is valid.
-The default decision template path is reports/current_admin/<batch-name>.decision-template.json.
+Promotes AI-approved and AI-rejected rows first, then asks for operator decisions only on the remaining manual-review slice.
+If no borderline items remain, review completes without requiring a decision file edit.
 EOF
       ;;
     ai-review)
@@ -3149,7 +3102,7 @@ Wrapper defaults:
   --fallback-model $DEFAULT_CURRENT_ADMIN_FALLBACK_MODEL
   --senior-timeout $DEFAULT_REVIEW_TIMEOUT_SENIOR
   --verifier-timeout $DEFAULT_REVIEW_TIMEOUT_VERIFIER
-  --review-mode deep
+  --review-mode standard
   --openai-base-url $DEFAULT_CURRENT_ADMIN_OPENAI_BASE_URL
 
 Lifecycle flags:
@@ -3162,44 +3115,32 @@ Lifecycle flags:
 Evidence packaging:
   --evidence-preview  Build and print the model-facing .evidence-pack.json sidecar without submitting review.
 
-Paired evaluation:
-  --paired-experiment        Route to the paired baseline/enriched experiment runner.
-  --experiment-name <name>   Stable local experiment name for artifact naming.
-  --prep-only                Prepare .paired-eval.meta.json without submitting.
-  --poll|--fetch|--resume    Continue both sides without duplicate submission.
-  --compare                 Run comparison when both review artifacts are available.
+For a deeper paired AI review, use:
+  equitystack current-admin deep-review [args]
 EOF
       ;;
-    queue)
+    deep-review)
       cat <<EOF
 Usage:
-  equitystack current-admin queue [args]
+  equitystack current-admin deep-review [args]
 
 Runs:
-  python3 scripts/apply_current_admin_ai_review.py [args]
-EOF
-      ;;
-    promote-review)
-      cat <<EOF
-Usage:
-  equitystack current-admin promote-review --input <enriched.ai-review.json> [--dry-run]
-  equitystack current-admin promote-review --batch-name <batch-name> [--dry-run]
+  python3 scripts/current_admin_paired_evaluation.py --paired-experiment [args]
 
-Regenerates the canonical manual-review queue from an enriched review artifact and
-auto-approves only impact_pending/import_with_pending_impact items. It also writes
-matching promotion decision metadata so pre-commit/import lineage checks remain intact.
+This is the deeper AI review path for ambiguous batches or rows flagged for deeper review.
+It runs paired baseline vs enriched evidence-pack review artifacts instead of the standard single-pass review.
 EOF
       ;;
     run)
       cat <<EOF
 Usage:
-  equitystack current-admin run [--input <batch-file> | --batch-name <batch-name>] [--discovery-dry-run] [--discovery-output <report.json>] [--output <batch.json>] [--output-name <batch-name>] [workflow review args]
+  equitystack current-admin run [--input <batch-file> | --batch-name <batch-name>] [--discovery-dry-run] [--discovery-output <report.json>] [--output <batch.json>] [--output-name <batch-name>] [review args]
 
 Default path without --input:
-  discover -> gen-batch -> workflow start
+  discover -> gen-batch -> normalize -> AI review -> AI-first queue promotion
 
 Manual path with --input:
-  workflow start only
+  normalize -> AI review -> AI-first queue promotion
 EOF
       ;;
     apply)

@@ -107,13 +107,13 @@ function currentAdminSurfaceSummary(workspace, session) {
       ? "Open current-admin blocker"
       : tracker?.reviewHref
         ? "Open current-admin review"
-        : "Open current-admin workflow");
+        : "Open current-admin pipeline");
 
   return {
     id: "current-admin-surface",
     workflow: "Current Admin",
     surfaceHref: "/admin/current-admin-review",
-    surfaceLabel: "Current-admin review surface",
+    surfaceLabel: "Current-admin manual-review surface",
     state: workspace?.batch?.stage || session?.canonicalState || "DISCOVERY_READY",
     summary:
       tracker?.summary ||
@@ -365,12 +365,6 @@ export default async function AdminWorkflowsPage() {
                   tracker?.nextStep?.action || tracker?.currentStep?.action || null;
                 const workflowHref =
                   tracker?.operatorSurfaceHref || session.operatorSurfaceHref || session.href;
-                const workflowLinkLabel =
-                  primaryAction?.type === "link"
-                    ? primaryAction.label || "Open"
-                    : tracker?.nextStep?.status === "blocked"
-                      ? "Inspect blocker"
-                      : "Workflow";
                 const stepLabel =
                   tracker?.nextStep?.title ||
                   tracker?.currentStep?.title ||
@@ -442,7 +436,7 @@ export default async function AdminWorkflowsPage() {
                           href={primaryAction?.href || workflowHref}
                           className="text-[11px] text-[var(--admin-link)] underline"
                         >
-                          {session.workflowFamily === "current-admin" ? "Open current-admin workflow" : "Open legislative workflow"}
+                          {session.workflowFamily === "current-admin" ? "Open current-admin session" : "Open legislative workflow"}
                         </Link>
                       )}
                     </div>

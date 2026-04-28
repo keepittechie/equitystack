@@ -21,10 +21,10 @@ export default function AdminLayout({ children }) {
                 protected by basic auth
               </span>
               <Link href="/admin/current-admin-review" className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] px-2 py-1 text-[var(--admin-text-soft)] hover:bg-[var(--admin-surface-muted)]">
-                current-admin surface
+                current-admin pipeline
               </Link>
               <Link href="/admin/legislative-workflow" className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] px-2 py-1 text-[var(--admin-text-soft)] hover:bg-[var(--admin-surface-muted)]">
-                legislative surface
+                legislative pipeline
               </Link>
               <Link href="/admin/source-curation" className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] px-2 py-1 text-[var(--admin-text-soft)] hover:bg-[var(--admin-surface-muted)]">
                 source curation

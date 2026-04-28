@@ -22,7 +22,7 @@ function queueTypeLabel(item) {
     return "Bundle Approval";
   }
   if (item.workflowFamily === "current-admin" && item.queueType === "operator-review") {
-    return "Current-Admin Operator Review";
+    return "Current-Admin Manual Review";
   }
   if (item.workflowFamily === "current-admin" && item.queueType === "apply-readiness") {
     return item.state === "ready_for_apply_confirmation"
@@ -54,10 +54,11 @@ export default async function AdminReviewQueuePage() {
 
       <section className="space-y-1">
         <p className="font-mono text-[11px] uppercase tracking-wide text-[var(--admin-text-muted)]">Review Queue</p>
-        <h2 className="text-lg font-semibold text-[var(--admin-text)]">Pending operator review work</h2>
+        <h2 className="text-lg font-semibold text-[var(--admin-text)]">Pending human review work</h2>
         <p className="max-w-5xl text-[12px] text-[var(--admin-text-soft)]">
-          This page keeps decision-critical workflow facts inline and pushes deeper inspection to
-          the canonical review surfaces and session inspector.
+          This page only lists the remaining human checkpoints. AI-approved apply-ready work stays on
+          the canonical workflow surfaces, while deeper inspection still lives on the review surfaces
+          and session inspector.
         </p>
       </section>
 

@@ -189,6 +189,47 @@ def record_has_affirmative_black_scope(record: dict[str, Any]) -> bool:
     return False
 
 
+def merge_record_with_suggestions(
+    record: dict[str, Any],
+    suggestions: dict[str, Any],
+    prefill: bool = False,
+) -> dict[str, Any]:
+    merged = dict(record)
+    impact_status = normalize_nullable_text(suggestions.get("impact_status"))
+    if impact_status:
+        merged["impact_status"] = impact_status
+        if impact_status == "impact_pending":
+            merged["impact_pending_reason"] = normalize_nullable_text(
+                suggestions.get("impact_status_reason")
+            )
+    if not prefill:
+        return merged
+
+    field_map = {
+        "title_normalized": "title",
+        "summary_suggestion": "summary",
+        "topic_suggestion": "topic",
+        "impacted_group_suggestion": "impacted_group",
+        "status_suggestion": "status",
+    }
+
+    for suggestion_field, record_field in field_map.items():
+        value = normalize_nullable_text(suggestions.get(suggestion_field))
+        if value:
+            merged[record_field] = value
+
+    first_outcome = (((merged.get("actions") or [{}])[0]).get("outcomes") or [{}])[0]
+    if first_outcome:
+        direction = normalize_nullable_text(suggestions.get("impact_direction_suggestion"))
+        evidence = normalize_nullable_text(suggestions.get("evidence_strength_suggestion"))
+        if direction:
+            first_outcome["impact_direction"] = direction
+        if evidence:
+            first_outcome["evidence_strength"] = evidence
+
+    return merged
+
+
 def queue_manual_items(payload: dict[str, Any]) -> list[dict[str, Any]]:
     return [
         item

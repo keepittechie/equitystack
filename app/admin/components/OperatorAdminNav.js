@@ -51,7 +51,6 @@ export default function OperatorAdminNav() {
           })}
         </div>
         <div className="flex flex-wrap gap-2 text-[11px] text-[var(--admin-text-muted)]">
-          <span className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] px-2 py-1">legacy admin routes hidden from nav</span>
           <span className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] px-2 py-1">canonical review pages kept for workflow checkpoints</span>
         </div>
       </div>

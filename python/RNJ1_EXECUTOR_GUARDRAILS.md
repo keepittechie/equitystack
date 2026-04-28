@@ -15,7 +15,7 @@ Not approved:
 - auto-approving imports
 - auto-inserting records without explicit approved input
 - overriding AI review outcomes
-- bypassing `workflow finalize`
+- bypassing current-admin review decision logging
 - bypassing decision logs
 - bypassing `pre-commit`
 - bypassing dry-run import

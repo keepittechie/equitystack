@@ -15,4 +15,4 @@ Primary docs:
 Notes:
 
 - discovery exports are drafts, not import-ready artifacts
-- the canonical workflow starts with `./bin/equitystack current-admin workflow start --input data/current_admin_batches/<batch-file>.json`
+- the canonical workflow starts with `./bin/equitystack current-admin run --input data/current_admin_batches/<batch-file>.json`

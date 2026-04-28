@@ -238,7 +238,7 @@ function reviewQueueTypeLabel(item) {
     return "Bundle Approval";
   }
   if (item.workflowFamily === "current-admin" && item.metadata?.queueType === "operator-review") {
-    return "Current-Admin Operator Review";
+    return "Current-Admin Manual Review";
   }
   if (item.workflowFamily === "current-admin" && item.metadata?.queueType === "apply-readiness") {
     return item.status === "ready_for_apply_confirmation"
@@ -401,9 +401,6 @@ function getExplicitActionLabel(actionConfig, fallbackLabel = "Inspect", context
   if (actionId === "currentAdmin.status") {
     return "Check current-admin status";
   }
-  if (actionId === "currentAdmin.workflowResume") {
-    return "Resume current-admin workflow";
-  }
   if (actionId === "legislative.run") {
     return "Run legislative workflow";
   }
@@ -484,7 +481,7 @@ function getExplicitActionLabel(actionConfig, fallbackLabel = "Inspect", context
     }
   }
   if (workflowFamily === "current-admin") {
-    return "Open current-admin workflow";
+    return "Open current-admin pipeline";
   }
   if (workflowFamily === "legislative") {
     return "Open legislative workflow";
@@ -676,11 +673,11 @@ function deriveCurrentAdminOutcome(session, currentAdminTracker = null) {
     currentAdminTracker?.currentStep?.title ||
     session?.recommendedAction?.title ||
     "Open workflow";
-  let outcomeSentence = session?.summary || "Current-admin workflow state is active.";
+  let outcomeSentence = session?.summary || "Current-admin pipeline state is active.";
 
   if (session?.canonicalState === "COMPLETE") {
     outcomeSentence =
-      "Current-admin decisions were finalized, applied, and validated successfully.";
+      "Current-admin decision sync, apply, and validation completed successfully.";
   } else if (session?.canonicalState === "IMPORT_READY") {
     outcomeSentence =
       "Current-admin dry-run completed. Final apply is the next guarded operator step.";
@@ -1273,7 +1270,7 @@ function WorkflowSummarySection({ currentAdminOutcome, legislativeOutcome }) {
           outcome={currentAdminOutcome}
           fallbackMessage={{
             title: "Current-admin has no active workflow session.",
-            description: "Run or reopen the canonical current-admin workflow to restore a session summary here.",
+            description: "Run or inspect the canonical current-admin pipeline to restore a session summary here.",
           }}
         />
         <WorkflowSummaryBlock
@@ -1502,7 +1499,7 @@ function ReviewQueueTable({ items, workflowOutcomeMap }) {
       <SectionHeader
         eyebrow="Review Queue"
         title="Human Review Queue"
-        description="Manual review, operator review, and apply follow-up are shown here from canonical queue artifacts."
+        description="Manual review, bundle approval, and apply follow-up are shown here from canonical queue artifacts."
         href="/admin/review-queue"
       />
       <TableShell>
@@ -2460,7 +2457,7 @@ export default async function AdminPage() {
     {
       title: "Review Queue",
       href: "/admin/review-queue",
-      description: "Full operator review queue with current-admin and legislative follow-up items.",
+      description: "Full human review queue with current-admin manual review, legislative follow-up, and apply checkpoints.",
       signal: `${summary.reviewQueueSummary.totalItems || 0} canonical queue item(s)`,
       actionLabel: "Open review queue",
     },
@@ -2553,7 +2550,7 @@ export default async function AdminPage() {
           compact
           eyebrow="Current-Admin Pipeline"
           title="Current-admin step tracker"
-          description="One canonical step is active at a time. Use this to continue the current-admin workflow without reconstructing the pipeline state."
+          description="One canonical step is active at a time. Use this to continue the current-admin pipeline without reconstructing the artifact state."
         />
       ) : null}
 

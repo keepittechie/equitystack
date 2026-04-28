@@ -14,12 +14,7 @@ If local Python is not set up yet:
 ./bin/bootstrap-python-env
 ```
 
-Path handling:
-
-- From `python/`, use `data/...` and `reports/...` with `./bin/equitystack`.
-- From the repo root, the installed `equitystack` wrapper also accepts `python/data/...` and `python/reports/...` for current-admin commands.
-
-## Primary Operator Flow
+## Daily Path
 
 ```bash
 ./bin/equitystack current-admin run
@@ -37,129 +32,105 @@ Manual batch path:
 ./bin/equitystack current-admin apply --input reports/current_admin/<batch-name>.manual-review-queue.json --apply --yes
 ```
 
-Replace:
+If AI or the operator notes call for a deeper pass:
 
-- `<batch-file>` with the JSON file under `data/current_admin_batches/`
-- `<batch-name>` with the `batch_name` inside that file
+```bash
+./bin/equitystack current-admin deep-review --input reports/current_admin/<batch-name>.normalized.json
+```
 
-## What Happens
+## What Each Command Does
 
-After `run`:
+`run`
 
-- if no `--input` is supplied:
-  - runs discovery
-  - generates a canonical current-admin batch from discovery candidates
-- always runs:
-  - normalize
-  - AI review
-  - AI-first queue generation
+- discovers fresh updates unless `--input` is supplied
+- generates the next batch when needed
+- normalizes the batch
+- runs the standard OpenAI review
+- promotes the AI-first queue
 
-- writes `.normalized.json`
-- writes `.ai-review.json`
-- writes `.manual-review-queue.json`
-  - `items` contains only borderline manual-review rows
-  - `auto_approved_items` contains import candidates
-  - `auto_rejected_items` contains filtered-out rows
+`review`
 
-After `review`:
+- refreshes the queue and decision template from the latest `.ai-review.json`
+- auto-resolves AI-approved and AI-rejected rows first
+- asks for operator decisions only on the remaining manual-review rows
+- writes the decision log only when those manual decisions are needed
+- the admin surface labels this step `Sync Decision Log`
 
-- writes or refreshes `reports/current_admin/<batch-name>.decision-template.json` for the manual-review slice
-- finalizes only when that decision file contains valid explicit operator actions or overrides for the remaining manual items
-- writes a decision log under `reports/current_admin/review_decisions/*.decision-log.json`
-- the admin review table can legitimately be empty when the AI-first queue has no borderline rows
-
-After `apply` without `--apply --yes`:
-
-- writes `.pre-commit-review.json`
-- writes `.import-dry-run.json`
-- stops if pre-commit is `blocked`
-- never mutates the database
-
-After `apply --apply --yes`:
+`apply`
 
 - reruns pre-commit
 - reruns import dry-run
-- writes `.import-apply.json`
-- writes `.import-validation.json`
+- never mutates by default
 
-## Guided Admin Workflow
+`apply --apply --yes`
 
-The admin UI now exposes the same current-admin flow as a guided tracker.
+- reruns the same guarded path
+- writes import apply
+- writes validation
 
-You can use it on:
+`deep-review`
+
+- runs the paired deeper AI review path
+- is read-only and advisory
+- is the correct next step when a row or batch needs more AI scrutiny before operator judgment
+
+## What Good Output Looks Like
+
+After `run`:
+
+- `<batch>.normalized.json`
+- `<batch>.ai-review.json`
+- `<batch>.manual-review-queue.json`
+
+The queue splits into:
+
+- `items`
+- `auto_approved_items`
+- `auto_rejected_items`
+
+After `review`:
+
+- `<batch>.decision-template.json`
+- `review_decisions/<batch>.decision-log.json` when manual decisions were needed
+
+After `apply` dry-run:
+
+- `<batch>.pre-commit-review.json`
+- `<batch>.import-dry-run.json`
+
+After `apply --apply --yes`:
+
+- `<batch>.import-apply.json`
+- `<batch>.import-validation.json`
+
+## Admin Surfaces
+
+Use these as the control plane over the same artifacts:
 
 - `/admin`
+- `/admin/current-admin-review`
 - `/admin/workflows`
 - `/admin/workflows/[sessionId]`
-- `/admin/current-admin-review`
 
-Tracked steps:
+The current-admin review page now shows:
 
-1. `Discover / Batch Ready`
-2. `Run current-admin`
-3. `Operator Review`
-4. `Decision Log Finalized`
-5. `Pre-commit / Apply Readiness`
-6. `Admin Approval / Final Apply`
-7. `Validation / Complete`
+- a pipeline path strip for `run -> manual review -> optional deep review -> apply dry-run -> final apply`
+- `Run Deep AI Review` for the paired read-only AI pass
+- `Save Decisions` and `Sync Decision Log` for the manual-review slice
+- only the editable `items` table, not the whole batch
 
-Status meaning:
+## Safety Notes
 
-- green dot: complete
-- yellow dot: current or next required step
-- red dot: blocked
-- gray dot: not yet available
+- Current-admin AI review uses OpenAI only.
+- The default review path is single-pass.
+- `current-admin deep-review` is the explicit deeper AI option.
+- `current-admin apply` is dry-run unless `--apply --yes`.
+- `current-admin status` is the fastest way to see the next valid step.
 
-Use the tracker to answer:
-
-- what is already done
-- what is waiting now
-- why the next step is required
-- where to click next
-
-If a step is blocked, use the tracker link to inspect the blocker on the session page instead of
-guessing from the queue or artifact tables.
-
-Current-admin review is now AI-first:
-
-- `Operator Review` only covers the manual `items` slice from the canonical queue artifact
-- `Decision Log Finalized` means the decision log and AI-first queue artifact are synchronized
-- the review workspace can be empty while the workflow is still ready to move into pre-commit
-
-## Advanced / Manual Commands
-
-These still work and remain the canonical lower-level path:
-
-```bash
-./bin/equitystack current-admin discover
-./bin/equitystack current-admin gen-batch --all-candidates
-./bin/equitystack current-admin workflow start --input data/current_admin_batches/<batch-file>.json
-./bin/equitystack current-admin workflow review --input reports/current_admin/<batch-name>.ai-review.json --output reports/current_admin/<batch-name>.decision-template.json
-./bin/equitystack current-admin workflow finalize --review reports/current_admin/<batch-name>.ai-review.json --decision-file reports/current_admin/<batch-name>.decision-template.json --log-decisions
-./bin/equitystack current-admin pre-commit --input reports/current_admin/<batch-name>.manual-review-queue.json
-./bin/equitystack current-admin import --input reports/current_admin/<batch-name>.manual-review-queue.json
-./bin/equitystack current-admin import --input reports/current_admin/<batch-name>.manual-review-queue.json --apply --yes
-./bin/equitystack current-admin validate --input reports/current_admin/<batch-name>.manual-review-queue.json
-```
-
-## Daily Safety Notes
-
-- Verifier, senior, and fallback review models default to the wrapper defaults shown by `./bin/equitystack --help`.
-- Current-admin AI review uses the OpenAI Batch wrapper, `scripts/review_current_admin_batch_with_openai_batch.py`, unless a paired-evaluation mode is explicitly requested.
-- LLM review timeout defaults to `240` seconds.
-- LLM execution uses the configured provider endpoint from `config/llm.json` or `EQUITYSTACK_LLM_ENDPOINT`.
-- `current-admin status` is the fastest way to see the current state and next command.
-- `pre-commit` is read-only.
-- `import` is dry-run by default.
-- Review artifacts clearly stamp requested model, effective model, backend, and fallback status.
-- DB-backed commands honor runtime overrides such as `DB_HOST=10.10.0.15`.
-- Preferred local path: rebuild `python/venv` with `./bin/bootstrap-python-env`.
-- Fallback override: `EQUITYSTACK_PYTHON_BIN=/path/to/python`.
-- `current-admin run`, `current-admin review`, and `current-admin apply` are thin wrappers over the same canonical artifacts and safety checkpoints.
-
-## When You Are Stuck
+## When Stuck
 
 ```bash
 ./bin/equitystack current-admin status
-./bin/equitystack current-admin workflow resume
+./bin/equitystack current-admin review --input reports/current_admin/<batch-name>.ai-review.json
+./bin/equitystack current-admin deep-review --input reports/current_admin/<batch-name>.normalized.json
 ```

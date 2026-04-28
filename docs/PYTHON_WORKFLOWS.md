@@ -51,8 +51,8 @@ Important scripts:
 | Batch generation | `scripts/generate_current_admin_batch_from_discovery.py` |
 | Normalization | `scripts/normalize_current_admin_batch.py` |
 | AI review | `scripts/review_current_admin_batch_with_openai_batch.py` |
-| AI-first queue build | `scripts/apply_current_admin_ai_review.py` |
-| Decision template | `scripts/generate_current_admin_decision_template.py` |
+| AI-first queue build | `scripts/promote_current_admin_review_to_queue.py` |
+| Deep AI review | `scripts/current_admin_paired_evaluation.py` |
 | Pre-commit | `scripts/build_current_admin_precommit_review.py` |
 | Import | `scripts/import_curated_current_admin_batch.py` |
 | Validation | `scripts/validate_current_admin_import.py` |
@@ -63,6 +63,7 @@ Safety:
 - `current-admin apply` is dry-run unless `--apply --yes` is explicit.
 - the canonical `manual-review-queue.json` artifact now splits into `items`, `auto_approved_items`, and `auto_rejected_items`.
 - current-admin human review is now limited to the `items` slice; AI-approved import candidates move forward without requiring routine operator approval.
+- `current-admin deep-review` is the explicit deeper AI path when the standard review recommends more scrutiny.
 - Current-admin unified outcome sync inserts `impact_score` at creation time.
 - Review artifacts record requested model, effective model, backend, timeout, and fallback status.
 

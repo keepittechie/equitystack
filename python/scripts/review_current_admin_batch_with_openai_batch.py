@@ -998,8 +998,7 @@ def derive_decision_log_path(batch_name: str, arg_value: str | None) -> Path:
         return Path(arg_value)
     reports_dir = resolve_default_report_path(batch_name, "ai-review").parent
     log_dir = reports_dir / "review_decisions"
-    timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    return log_dir / f"{batch_name}.{timestamp}.decision-log.json"
+    return log_dir / f"{batch_name}.decision-log.json"
 
 
 def load_operator_decisions(path: Path) -> tuple[dict[str, dict[str, Any]], dict[str, Any]]:
@@ -1031,14 +1030,14 @@ def load_operator_decisions(path: Path) -> tuple[dict[str, dict[str, Any]], dict
         raise ValueError("Decision file must contain either an 'items' array or a 'decisions' object.")
     if not decisions:
         raise ValueError(
-            "Decision file did not contain any usable item decisions. Regenerate it with 'equitystack current-admin workflow review' and fill explicit operator_action values."
+            "Decision file did not contain any usable item decisions. Regenerate it with 'equitystack current-admin review --refresh-template' and fill explicit operator_action values for the remaining manual-review rows."
         )
     for slug, item in decisions.items():
         action = normalize_nullable_text(item.get("operator_action"))
         if action not in VALID_OPERATOR_ACTIONS:
             raise ValueError(
                 f"Decision file entry for slug={slug} is missing a valid operator_action. "
-                "Regenerate the template with 'equitystack current-admin workflow review' if the file is stale, then fill one of the documented operator actions."
+                "Regenerate the template with 'equitystack current-admin review --refresh-template' if the file is stale, then fill one of the documented operator actions."
             )
     return decisions, metadata
 
@@ -1064,7 +1063,7 @@ def build_decision_log_payload(
     if source_review_file and source_review_file != expected_review_file:
         raise ValueError(
             "Decision file does not match the current review artifact. "
-            "Regenerate the template using 'equitystack current-admin workflow review' from the same .ai-review.json file you plan to finalize."
+            "Regenerate the template using 'equitystack current-admin review --refresh-template' from the same .ai-review.json file you plan to finalize."
         )
 
     log_items = []
@@ -2764,8 +2763,6 @@ def main() -> None:
             raise ValueError("No reviewed items matched the provided decision file after applying the current display filters.")
         decision_log_path = derive_decision_log_path(report["batch_name"], args.log_decisions)
         decision_log_path.parent.mkdir(parents=True, exist_ok=True)
-        if decision_log_path.exists():
-            raise FileExistsError(f"Decision log already exists: {decision_log_path}")
         write_json_file(decision_log_path, decision_log_payload)
 
     if args.preview:

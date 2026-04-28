@@ -359,8 +359,8 @@ Tracked steps:
 
 1. `Discover / Batch Ready`
 2. `Run current-admin`
-3. `Operator Review`
-4. `Decision Log Finalized`
+3. `Manual Review`
+4. `Decision Log Sync`
 5. `Pre-commit / Apply Readiness`
 6. `Admin Approval / Final Apply`
 7. `Validation / Complete`
@@ -605,7 +605,6 @@ Examples:
 
 - `currentAdmin.status`
 - `currentAdmin.run`
-- `currentAdmin.workflowResume`
 - `legislative.run`
 - `legislative.feedback`
 

@@ -84,9 +84,9 @@ function renderAction(actionConfig, fallbackHref, fallbackLabel = "Open") {
 export default function CurrentAdminWorkflowTracker({
   tracker,
   compact = false,
-  eyebrow = "Current-Admin Workflow",
-  title = "Current-admin guided flow",
-  description = "This tracker follows the canonical current-admin workflow state and highlights the single next valid step.",
+  eyebrow = "Current-Admin Pipeline",
+  title = "Current-admin guided pipeline",
+  description = "This tracker follows the canonical current-admin pipeline state and highlights the single next safe step.",
 }) {
   if (!tracker) {
     return null;
@@ -102,7 +102,7 @@ export default function CurrentAdminWorkflowTracker({
     : currentStep
       ? `${currentStep.title} is active`
       : allStepsComplete
-        ? "Current-admin workflow complete"
+        ? "Current-admin pipeline complete"
         : humanizeToken(tracker.canonicalState);
   const nextStepLabel = allStepsComplete ? "Complete" : nextStep?.title || "No next step";
   const whyItMatters = blockedStep

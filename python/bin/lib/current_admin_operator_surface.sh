@@ -393,10 +393,16 @@ if discovery_path and discovery_path.exists():
 
 queue_count = None
 pending_count = None
+auto_approved_count = None
+auto_rejected_count = None
 if queue_path.exists():
     queue_payload = json.loads(queue_path.read_text())
     items = queue_payload.get("items") or []
+    auto_approved = queue_payload.get("auto_approved_items") or []
+    auto_rejected = queue_payload.get("auto_rejected_items") or []
     queue_count = len(items)
+    auto_approved_count = len([item for item in auto_approved if isinstance(item, dict)])
+    auto_rejected_count = len([item for item in auto_rejected if isinstance(item, dict)])
     pending_count = sum(1 for item in items if isinstance(item, dict) and item.get("operator_status") == "pending")
 
 print()
@@ -406,15 +412,26 @@ print(f"BATCH FILE: {repo_relative(batch_path)}")
 if discovered_count is not None:
     print(f"DISCOVERED ITEMS: {discovered_count}")
 if queue_count is not None:
-    print(f"QUEUED ITEMS: {queue_count}")
+    print(f"MANUAL QUEUE ITEMS: {queue_count}")
+if auto_approved_count is not None:
+    print(f"AUTO-APPROVED ITEMS: {auto_approved_count}")
+if auto_rejected_count is not None:
+    print(f"AUTO-REJECTED ITEMS: {auto_rejected_count}")
 if pending_count is not None:
     print(f"MANUAL REVIEW ITEMS: {pending_count}")
 print("ARTIFACTS:")
 print(f"  - {repo_relative(normalized_path)}")
 print(f"  - {repo_relative(review_path)}")
 print(f"  - {repo_relative(queue_path)}")
-print("CURRENT STATE: REVIEW_READY")
-print(f"RECOMMENDED COMMAND: ./bin/equitystack current-admin review --input {repo_relative(review_path)}")
+if pending_count == 0 and (auto_approved_count or 0) > 0:
+    print("CURRENT STATE: QUEUE_READY")
+    print(f"RECOMMENDED COMMAND: ./bin/equitystack current-admin apply --input {repo_relative(queue_path)}")
+elif pending_count == 0 and (auto_approved_count or 0) == 0 and (auto_rejected_count or 0) > 0:
+    print("CURRENT STATE: COMPLETE")
+    print("RECOMMENDED COMMAND: ./bin/equitystack current-admin run")
+else:
+    print("CURRENT STATE: REVIEW_READY")
+    print(f"RECOMMENDED COMMAND: ./bin/equitystack current-admin review --input {repo_relative(review_path)}")
 PY
 }
 
@@ -465,6 +482,7 @@ if finalized and decision_log.exists():
     payload = json.loads(decision_log.read_text())
     queue_payload = json.loads(queue_path.read_text()) if queue_path.exists() else {}
     queue_items = queue_payload.get("items") or []
+    auto_approved_items = queue_payload.get("auto_approved_items") or []
     counts = {}
     for item in payload.get("items") or []:
         if not isinstance(item, dict):
@@ -476,7 +494,8 @@ if finalized and decision_log.exists():
     approval_style = int(counts.get("approve_as_is") or 0) + int(counts.get("approve_with_changes") or 0)
     rejected = int(counts.get("reject") or 0)
     deferred = int(counts.get("defer") or 0)
-    queue_approved = sum(1 for item in queue_items if isinstance(item, dict) and (item.get("approved") or item.get("operator_status") == "approved"))
+    queue_approved = sum(1 for item in auto_approved_items if isinstance(item, dict))
+    queue_approved += sum(1 for item in queue_items if isinstance(item, dict) and (item.get("approved") or item.get("operator_status") == "approved"))
     queue_pending_manual = sum(1 for item in queue_items if isinstance(item, dict) and item.get("operator_status") == "pending_manual_review")
     queue_pending = sum(1 for item in queue_items if isinstance(item, dict) and item.get("operator_status") == "pending")
     print(f"DECISION LOG: {repo_relative(decision_log)}")
@@ -490,13 +509,17 @@ if finalized and decision_log.exists():
         print("CURRENT STATE: QUEUE_READY")
         print("NEXT STEP: Run the guarded apply flow starting with pre-commit.")
         print(f"RECOMMENDED COMMAND: ./bin/equitystack current-admin apply --input {repo_relative(queue_path)}")
+    elif queue_pending_manual == 0 and queue_pending == 0 and rejected > 0:
+        print("CURRENT STATE: COMPLETE")
+        print("NEXT STEP: This batch produced no importable records after AI-first review.")
+        print("RECOMMENDED COMMAND: ./bin/equitystack current-admin run")
     else:
         print("CURRENT STATE: BLOCKED")
-        print("NEXT STEP: No queue items are approved for import. Reopen current-admin review, confirm which rows should move into import, then rerun finalize.")
+        print("NEXT STEP: No queue items are approved for import. Reopen current-admin review only if borderline manual rows still need a decision.")
         print(f"RECOMMENDED COMMAND: ./bin/equitystack current-admin review --input {repo_relative(review_path)} --decision-file {repo_relative(decision_file)}")
 else:
     print("CURRENT STATE: REVIEW_READY")
-    print("NEXT STEP: Fill explicit operator_action values in the decision file, then rerun current-admin review.")
+    print("NEXT STEP: Fill explicit operator_action values only for the remaining manual-review rows, then rerun current-admin review.")
     print(f"RECOMMENDED COMMAND: ./bin/equitystack current-admin review --input {repo_relative(review_path)} --decision-file {repo_relative(decision_file)}")
 PY
 }

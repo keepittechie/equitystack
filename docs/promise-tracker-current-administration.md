@@ -23,7 +23,7 @@ The wrapped CLI remains canonical:
 
 ## Canonical Boundary
 
-The current-admin workflow must not bypass:
+The current-admin pipeline must not bypass:
 
 - AI-first queue classification
 - required operator decisions for borderline or override items
@@ -54,9 +54,12 @@ What each step means:
   - generates the next working batch when no `--input` is supplied
   - starts the canonical workflow and prepares the AI-first queue
 - `review`
-  - refreshes the decision template
+  - refreshes the decision template and AI-first queue split
   - focuses only on the borderline manual-review slice
   - finalizes through the canonical decision-log path when manual decisions or overrides are still needed
+- `deep-review`
+  - runs the paired deeper AI review path when the standard review recommends more scrutiny
+  - does not mutate data
 - `apply`
   - reruns pre-commit
   - runs import dry-run first
@@ -80,8 +83,8 @@ The current-admin steps are:
 
 1. `Discover / Batch Ready`
 2. `Run current-admin`
-3. `Operator Review`
-4. `Decision Log Finalized`
+3. `Manual Review`
+4. `Decision Log Sync`
 5. `Pre-commit / Apply Readiness`
 6. `Admin Approval / Final Apply`
 7. `Validation / Complete`
@@ -92,9 +95,9 @@ How completion is determined:
   - complete when the canonical batch is present
 - `Run current-admin`
   - complete when the review artifact exists
-- `Operator Review`
+- `Manual Review`
   - current only while the manual `items` slice still needs human decisions or overrides
-- `Decision Log Finalized`
+- `Decision Log Sync`
   - complete when the decision log and AI-first queue artifact exist
 - `Pre-commit / Apply Readiness`
   - current when the dry-run path is the next valid checkpoint
@@ -125,6 +128,8 @@ The current-admin review workspace now reflects the queue split directly:
 - the editable table shows only borderline manual-review rows
 - summary cards still show the `auto_approved_items` and `auto_rejected_items` counts
 - an empty review table can mean the AI-first queue is already ready for pre-commit
+- the decision panel uses `Save Decisions` for draft edits and `Sync Decision Log` for the guarded queue refresh step before pre-commit
+- the page exposes `Run Deep AI Review` for the read-only paired AI pass when the standard review still feels ambiguous
 
 The operator should no longer need to guess which current-admin page comes next. The system derives
 the next valid step automatically from canonical state and artifacts.
@@ -156,11 +161,13 @@ Use the operator/admin system as follows:
 - `/admin`
   - daily routine
   - prioritized work buckets
-  - current-admin workflow tracker
+  - current-admin pipeline tracker
   - suggested actions
   - session snapshots
 - `/admin/current-admin-review`
-  - canonical human review and finalize checkpoint for the manual-review slice
+  - canonical manual-review and decision-log sync checkpoint for the manual-review slice
+  - shows the top pipeline path summary: run, manual review, optional deep review, apply dry-run, final apply, validation
+  - keeps AI-approved and AI-rejected queue outcomes visible as status instead of mixing them back into the editable table
 - `/admin/workflows/[sessionId]`
   - inspect state, blockers, artifacts, related jobs, and the full current-admin step tracker
 - `/admin/review-queue`
@@ -178,7 +185,8 @@ Primary scripts:
 - `python/scripts/export_current_admin_discovery_candidates.py`
 - `python/scripts/normalize_current_admin_batch.py`
 - `python/scripts/review_current_admin_batch_with_openai_batch.py`
-- `python/scripts/apply_current_admin_ai_review.py`
+- `python/scripts/promote_current_admin_review_to_queue.py`
+- `python/scripts/current_admin_paired_evaluation.py`
 - `python/scripts/import_curated_current_admin_batch.py`
 - `python/scripts/validate_current_admin_import.py`
 - `python/scripts/sync_current_admin_policy_outcomes.py`
