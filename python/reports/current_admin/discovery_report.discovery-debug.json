@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-04-28T03:42:18+00:00",
-  "status": "db_error",
-  "error": "Current-admin DB connection failed (host=10.10.0.13, port=3306, database=black_policy_tracker, host_source=environment). Override the host with DB_HOST=<reachable-host> ./bin/equitystack current-admin status if localhost is not valid here. Original error: (2003, \"Can't connect to MySQL server on '10.10.0.13' ([Errno 111] Connection refused)\")",
+  "generated_at": "2026-04-28T18:34:50+00:00",
+  "status": "success",
+  "error": null,
   "output_path": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/discovery_report.json",
   "president_slug": "donald-j-trump-2025",
   "db_connection_required": true,
@@ -9,12 +9,112 @@
     "promise_scan_enabled": true,
     "source_config_path": "/home/josh/Documents/GitHub/equitystack/python/config/current_admin_sources.json",
     "default_live_sources_enabled": true,
-    "configured_default_source_count": 0,
+    "configured_default_source_count": 9,
     "feed_urls_requested": [],
     "feed_json_requested": [],
     "feed_urls_count": 0,
     "feed_json_count": 0,
-    "source_results": []
+    "source_results": [
+      {
+        "source_name": "White House Presidential Actions",
+        "source_type": "existing-helper",
+        "source_category": "executive-action",
+        "url": null,
+        "enabled": true,
+        "default": true,
+        "raw_item_count": 10,
+        "deduped_item_count": 10,
+        "skip_reason": null
+      },
+      {
+        "source_name": "White House Briefings and Statements",
+        "source_type": "existing-helper",
+        "source_category": "executive-action",
+        "url": null,
+        "enabled": true,
+        "default": true,
+        "raw_item_count": 0,
+        "deduped_item_count": 0,
+        "skip_reason": null
+      },
+      {
+        "source_name": "USTR Press Releases",
+        "source_type": "html",
+        "source_category": "trade",
+        "url": "https://ustr.gov/about/policy-offices/press-office/press-releases/2026",
+        "enabled": true,
+        "default": true,
+        "raw_item_count": 12,
+        "deduped_item_count": 12,
+        "skip_reason": null
+      },
+      {
+        "source_name": "USTR Fact Sheets",
+        "source_type": "html",
+        "source_category": "trade",
+        "url": "https://ustr.gov/about/policy-offices/press-office/fact-sheets/2026",
+        "enabled": true,
+        "default": true,
+        "raw_item_count": 5,
+        "deduped_item_count": 5,
+        "skip_reason": null
+      },
+      {
+        "source_name": "Federal Register Presidential Documents",
+        "source_type": "json",
+        "source_category": "executive-action",
+        "url": "https://www.federalregister.gov/api/v1/documents.json?conditions[type][]=PRESDOCU&conditions[president][]=donald-trump&order=newest&per_page=12",
+        "enabled": true,
+        "default": true,
+        "raw_item_count": 12,
+        "deduped_item_count": 12,
+        "skip_reason": null
+      },
+      {
+        "source_name": "Federal Register USTR Notices",
+        "source_type": "json",
+        "source_category": "trade",
+        "url": "https://www.federalregister.gov/api/v1/documents.json?conditions[agencies][]=trade-representative-office-of-united-states&order=newest&per_page=10",
+        "enabled": true,
+        "default": true,
+        "raw_item_count": 10,
+        "deduped_item_count": 10,
+        "skip_reason": null
+      },
+      {
+        "source_name": "Department of Justice Press Releases",
+        "source_type": "rss",
+        "source_category": "agency-enforcement",
+        "url": "https://www.justice.gov/news/rss?m=1&type=press_release",
+        "enabled": true,
+        "default": true,
+        "raw_item_count": 25,
+        "deduped_item_count": 25,
+        "skip_reason": null
+      },
+      {
+        "source_name": "Supreme Court Opinions of the Court",
+        "source_type": "html",
+        "source_category": "court",
+        "url": "https://www.supremecourt.gov/opinions/slipopinion/25",
+        "enabled": true,
+        "default": true,
+        "raw_item_count": 6,
+        "deduped_item_count": 6,
+        "skip_reason": null
+      },
+      {
+        "source_name": "Supreme Court Opinions Relating to Orders",
+        "source_type": "html",
+        "source_category": "court",
+        "url": "https://www.supremecourt.gov/opinions/relatingtoorders/25",
+        "enabled": true,
+        "default": true,
+        "raw_item_count": 6,
+        "deduped_item_count": 6,
+        "skip_reason": null
+      }
+    ]
   },
   "date_filter_applied": {
     "lookback_days": 120,
@@ -61,6 +161,7 @@
     "mode": "relationship_classification_with_guardrails",
     "accepted_suggestion_types": [
       "ignore",
+      "legal_context",
       "new_action",
       "new_promise_candidate",
       "source_context",
@@ -72,27 +173,115 @@
     "batch_generation_group_key": "linked_promise_slug"
   },
   "raw_counts": {
-    "promise_count": 0,
-    "maintenance_candidate_count": 0,
-    "raw_feed_item_count_before_limit": 0,
-    "feed_item_count_after_limit": 0,
-    "live_source_count": 0,
+    "promise_count": 10,
+    "maintenance_candidate_count": 10,
+    "raw_feed_item_count_before_limit": 86,
+    "feed_item_count_after_limit": 2,
+    "live_source_count": 9,
     "feed_error_count": 0
   },
   "candidate_counts": {
-    "maintenance_update_candidates": 0,
+    "maintenance_update_candidates": 10,
     "new_action_candidates": 0,
     "feed_update_candidates": 0,
     "new_promise_candidates": 0,
     "source_context_candidates": 0,
-    "final_candidate_count": 0
+    "legal_context_candidates": 1,
+    "final_candidate_count": 10
   },
-  "candidate_type_counts": {},
+  "candidate_type_counts": {
+    "legal_context": 1,
+    "stale_record": 10
+  },
   "skipped_counts": {
-    "feed_items_ignored": 0,
+    "feed_items_ignored": 1,
     "feed_items_with_errors": 0
   },
-  "skip_reason_counts": {},
-  "feed_item_debug_rows": [],
+  "skip_reason_counts": {
+    "ignored_by_classifier": 1
+  },
+  "feed_item_debug_rows": [
+    {
+      "source_queried": "Department of Justice Press Releases",
+      "source_type": "rss",
+      "source_category": "agency-enforcement",
+      "title": "Former Senior NIAID Official Indicted for Concealing Federal Records During COVID-19 Pandemic",
+      "published_at": "2026-04-28",
+      "raw_item_count": 1,
+      "review_backend": "openai",
+      "keyword_category_filter_result": {
+        "topic_estimate": null,
+        "topic_matched": false,
+        "matched_keywords": []
+      },
+      "action_type_filter_result": null,
+      "dedupe_match_key": null,
+      "best_match": {
+        "linked_promise_slug": "trump-2025-expand-educational-freedom-for-families",
+        "match_score": 0.0938
+      },
+      "legal_status": "filed",
+      "court_or_agency": "Department of Justice",
+      "docket_number": null,
+      "candidate_type": "legal_context",
+      "candidate_emitted": true,
+      "confidence_score": 65,
+      "confidence_level": "medium",
+      "confidence_reasons": [
+        "Official government or court source",
+        "Direct keyword or topic signal matched",
+        "Clear action or legal status detected"
+      ],
+      "confidence_penalties": [
+        "No linked existing policy or promise"
+      ],
+      "classification_reason": "The indictment of a former NIAID official for concealing federal records related to COVID-19 research grants is a legal development relevant to federal transparency and accountability but does not directly update or create a tracked policy promise. It is best categorized as legal_context given its nature as an enforcement action and indictment.",
+      "downgrade_reason": null,
+      "skip_reason": null
+    },
+    {
+      "source_queried": "Department of Justice Press Releases",
+      "source_type": "rss",
+      "source_category": "agency-enforcement",
+      "title": "Civil Rights Division Sues Cloudera for Excluding U.S. Workers from Applying to High-Paying Technology Jobs",
+      "published_at": "2026-04-28",
+      "raw_item_count": 1,
+      "review_backend": "openai",
+      "keyword_category_filter_result": {
+        "topic_estimate": "Economic Opportunity",
+        "topic_matched": true,
+        "matched_keywords": [
+          "complaint",
+          "hearing",
+          "lawsuit"
+        ]
+      },
+      "action_type_filter_result": "Enforcement Action",
+      "dedupe_match_key": "trump-2025-high-paying-skilled-trade-jobs",
+      "best_match": {
+        "linked_promise_slug": "trump-2025-high-paying-skilled-trade-jobs",
+        "match_score": 0.1
+      },
+      "legal_status": "filed",
+      "court_or_agency": "Department of Justice",
+      "docket_number": null,
+      "candidate_type": "ignore",
+      "candidate_emitted": false,
+      "confidence_score": 40,
+      "confidence_level": "low",
+      "confidence_reasons": [
+        "Official government or court source",
+        "Direct keyword or topic signal matched",
+        "Clear action or legal status detected"
+      ],
+      "confidence_penalties": [
+        "No linked existing policy or promise",
+        "Weak or unsupported classification for this item"
+      ],
+      "classification_reason": "Oversight items are evidence-only context, not standalone policy records.",
+      "downgrade_reason": "Oversight items are evidence-only context, not standalone policy records.",
+      "skip_reason": "ignored_by_classifier"
+    }
+  ],
   "feed_errors": []
 }

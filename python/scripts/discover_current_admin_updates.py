@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 from collections import Counter
+from email.utils import parsedate_to_datetime
 from html import unescape
 import json
 import re
@@ -33,7 +34,7 @@ from current_admin_common import (
 )
 
 
-DEFAULT_OLLAMA_URL = ""
+DEFAULT_OPENAI_BASE_URL = ""
 DEFAULT_MODEL = default_model_name()
 DEFAULT_TIMEOUT = 240
 DEFAULT_TEMPERATURE = 0.1
@@ -102,6 +103,7 @@ OVERSIGHT_HINTS = {
     "interview",
 }
 LEGAL_HINTS = {
+    "appeal",
     "lawsuit",
     "lawsuits",
     "court",
@@ -116,6 +118,9 @@ LEGAL_HINTS = {
     "litigation",
     "decision",
     "order staying",
+    "stay",
+    "stayed",
+    "dismissed",
 }
 TRADE_KEYWORDS = {
     "tariff",
@@ -146,7 +151,84 @@ DISCOVERY_RELATIONSHIP_TYPES = {
     "update_existing_action",
     "new_promise_candidate",
     "source_context",
+    "legal_context",
     "ignore",
+}
+LEGAL_SOURCE_CATEGORIES = {"legal", "court", "litigation", "agency-enforcement"}
+GENERIC_TITLE_HINTS = {
+    "order list",
+    "miscellaneous order",
+    "press release",
+    "press releases",
+    "statement",
+}
+ENFORCEMENT_HINTS = {
+    "settlement",
+    "consent decree",
+    "final rule",
+    "rule",
+    "rules",
+    "order",
+    "announced order",
+    "announces order",
+    "issued order",
+    "secures settlement",
+    "approved",
+    "approves",
+    "takes actions",
+    "acted to",
+    "rescinds",
+    "withdraws",
+    "places",
+    "published",
+    "publishes",
+    "regulation",
+    "regulations",
+}
+LAWSUIT_ONLY_HINTS = {
+    "lawsuit",
+    "lawsuits",
+    "sues",
+    "suing",
+    "complaint",
+    "complaints",
+    "challenging",
+    "challenge to",
+    "challenge against",
+    "petition for review",
+    "appeal",
+    "appealed",
+    "intervenes in",
+    "intervenes",
+}
+POLICY_SIGNAL_HINTS = {
+    "civil rights",
+    "discrimination",
+    "equal protection",
+    "fair housing",
+    "housing",
+    "school",
+    "education",
+    "student",
+    "students",
+    "tariff",
+    "tariffs",
+    "trade",
+    "imports",
+    "customs",
+    "marijuana",
+    "drug",
+    "health",
+    "medicine",
+    "voting",
+    "vote",
+    "immigration",
+    "worker",
+    "workers",
+    "employment",
+    "dei",
+    "race",
+    "racial",
 }
 PRESIDENT_SOURCE_CONTEXT = {
     DEFAULT_PRESIDENT_SLUG: {
@@ -195,11 +277,11 @@ def parse_args() -> argparse.Namespace:
         default=get_current_admin_reports_dir() / "discovery_report.json",
         help="Discovery report JSON output",
     )
-    parser.add_argument("--dry-run", action="store_true", help="Skip Ollama calls and use heuristics only")
-    parser.add_argument("--model", default=DEFAULT_MODEL, help="Ollama model name")
-    parser.add_argument("--ollama-url", default=DEFAULT_OLLAMA_URL, help="Base URL for the Ollama server")
+    parser.add_argument("--dry-run", action="store_true", help="Skip AI review calls and use heuristics only")
+    parser.add_argument("--model", default=DEFAULT_MODEL, help="OpenAI review model name")
+    parser.add_argument("--openai-base-url", default=DEFAULT_OPENAI_BASE_URL, help="Optional OpenAI-compatible base URL override")
     parser.add_argument("--timeout", type=int, default=DEFAULT_TIMEOUT, help="Per-request timeout in seconds")
-    parser.add_argument("--temperature", type=float, default=DEFAULT_TEMPERATURE, help="Sampling temperature for Ollama")
+    parser.add_argument("--temperature", type=float, default=DEFAULT_TEMPERATURE, help="Sampling temperature for OpenAI-compatible requests")
     parser.add_argument("--lookback-days", type=int, default=120, help="Mark in-progress records as stale after this many days without action")
     parser.add_argument("--max-promises", type=int, help="Limit the number of current-administration promises analyzed")
     parser.add_argument("--max-feed-items", type=int, default=20, help="Cap the number of fetched feed items")
@@ -227,12 +309,14 @@ def parse_args() -> argparse.Namespace:
 
 def source_context_for_president(president_slug: str, max_items: int | None = None) -> dict[str, str]:
     now = datetime.now(UTC)
+    supreme_court_term_year = now.year if now.month >= 10 else now.year - 1
     context = dict(PRESIDENT_SOURCE_CONTEXT.get(president_slug) or {})
     context.setdefault("federal_register_president", "donald-trump")
     context.setdefault("term_start", "2025-01-20")
     context["president_slug"] = president_slug
     context["year"] = str(now.year)
     context["max_items"] = str(max_items or 0)
+    context["supreme_court_term_year"] = f"{supreme_court_term_year % 100:02d}"
     return context
 
 
@@ -266,6 +350,32 @@ def fetch_url_text(url: str, timeout: int) -> str:
 
 def clean_html_fragment(value: Any) -> str:
     return normalize_text(unescape(re.sub(r"<[^>]+>", " ", str(value or ""))))
+
+
+def normalize_feed_date(value: Any) -> str | None:
+    text = normalize_nullable_text(value)
+    if text is None:
+        return None
+
+    try:
+        parsed = parsedate_to_datetime(text)
+    except (TypeError, ValueError, IndexError, OverflowError):
+        parsed = None
+    if parsed is not None:
+        if parsed.tzinfo is None:
+            parsed = parsed.replace(tzinfo=UTC)
+        return parsed.astimezone(UTC).date().isoformat()
+
+    for format_string in ("%Y-%m-%d", "%Y-%m-%dT%H:%M:%S%z", "%Y-%m-%dT%H:%M:%S", "%m/%d/%y", "%m/%d/%Y"):
+        try:
+            parsed_dt = datetime.strptime(text, format_string)
+            if parsed_dt.tzinfo is None:
+                parsed_dt = parsed_dt.replace(tzinfo=UTC)
+            return parsed_dt.astimezone(UTC).date().isoformat()
+        except ValueError:
+            continue
+
+    return normalize_date(text)
 
 
 def extract_html_meta_description(raw_html: str) -> str | None:
@@ -389,6 +499,83 @@ def parse_federal_register_items(payload: dict[str, Any], source: dict[str, Any]
     return [item for item in items if item["title"]]
 
 
+def parse_supreme_court_opinion_table_items(
+    raw_html: str,
+    *,
+    source_url: str,
+    source_name: str,
+    source_category: str,
+    publisher: str,
+    action_type_hint: str | None,
+    legal_status: str | None,
+    court_or_agency: str | None,
+    max_items: int,
+) -> list[dict[str, Any]]:
+    items = []
+    row_pattern = re.compile(
+        r"<tr>\s*"
+        r"(?:<td[^>]*>\s*\d+\s*</td>\s*)?"
+        r"<td[^>]*>\s*([^<]+)\s*</td>\s*"
+        r"<td[^>]*>\s*([^<]+)\s*</td>\s*"
+        r"<td[^>]*>\s*<a href=['\"]([^'\"]+)['\"](?:[^>]*title=['\"]([^'\"]*)['\"])?[^>]*>(.*?)</a>.*?</td>",
+        re.IGNORECASE | re.DOTALL,
+    )
+    for match in row_pattern.finditer(raw_html):
+        published_at = normalize_feed_date(match.group(1))
+        docket_number = normalize_nullable_text(match.group(2))
+        item_url = normalize_nullable_text(urljoin(source_url, match.group(3)))
+        summary = clean_html_fragment(match.group(4))
+        title = clean_html_fragment(match.group(5))
+        if not title or not item_url:
+            continue
+        items.append(
+            {
+                "title": title,
+                "url": item_url,
+                "published_at": published_at,
+                "summary": summary or title,
+                "source_name": source_name,
+                "source_type": "HTML",
+                "source_category": source_category,
+                "publisher": publisher,
+                "action_type_hint": action_type_hint,
+                "legal_status": legal_status,
+                "court_or_agency": court_or_agency or publisher or source_name,
+                "docket_number": docket_number,
+            }
+        )
+        if len(items) >= max_items:
+            break
+    return items
+
+
+def apply_source_metadata_defaults(items: list[dict[str, Any]], source: dict[str, Any]) -> list[dict[str, Any]]:
+    source_name = normalize_text(source.get("name") or "Unnamed source")
+    source_category = normalize_text(source.get("category") or "unknown")
+    publisher = normalize_text(source.get("publisher") or source_name)
+    action_type_hint = normalize_nullable_text(source.get("action_type_hint"))
+    legal_status = normalize_nullable_text(source.get("legal_status"))
+    court_or_agency = normalize_nullable_text(source.get("court_or_agency"))
+
+    normalized_items = []
+    for item in items:
+        if not isinstance(item, dict):
+            continue
+        normalized_items.append(
+            {
+                **item,
+                "source_name": normalize_text(item.get("source_name") or source_name),
+                "source_category": normalize_text(item.get("source_category") or source_category),
+                "publisher": normalize_text(item.get("publisher") or publisher),
+                "action_type_hint": normalize_nullable_text(item.get("action_type_hint") or action_type_hint),
+                "legal_status": normalize_nullable_text(item.get("legal_status") or legal_status),
+                "court_or_agency": normalize_nullable_text(item.get("court_or_agency") or court_or_agency),
+                "docket_number": normalize_nullable_text(item.get("docket_number")),
+            }
+        )
+    return normalized_items
+
+
 def fetch_default_live_source_items(
     args: argparse.Namespace,
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
@@ -465,18 +652,31 @@ def fetch_default_live_source_items(
                     raise ValueError("Missing url/url_template for HTML source")
                 raw_html = fetch_url_text(resolved_url, args.timeout or DEFAULT_SOURCE_TIMEOUT)
                 parser_name = normalize_text(source.get("parser"))
-                if parser_name != "ustr_listing":
+                if parser_name == "ustr_listing":
+                    items = parse_ustr_listing_items(
+                        raw_html,
+                        source_url=resolved_url,
+                        source_name=source_name,
+                        source_category=source_category,
+                        publisher=normalize_text(source.get("publisher") or "Office of the United States Trade Representative"),
+                        target_year=source_context_for_president(args.president_slug)["year"],
+                        timeout=args.timeout or DEFAULT_SOURCE_TIMEOUT,
+                        max_items=max_items,
+                    )
+                elif parser_name == "supreme_court_opinions_table":
+                    items = parse_supreme_court_opinion_table_items(
+                        raw_html,
+                        source_url=resolved_url,
+                        source_name=source_name,
+                        source_category=source_category,
+                        publisher=normalize_text(source.get("publisher") or "Supreme Court of the United States"),
+                        action_type_hint=normalize_nullable_text(source.get("action_type_hint")) or "Court-Related Action",
+                        legal_status=normalize_nullable_text(source.get("legal_status")) or "ruled",
+                        court_or_agency=normalize_nullable_text(source.get("court_or_agency")) or "Supreme Court of the United States",
+                        max_items=max_items,
+                    )
+                else:
                     raise ValueError(f"Unsupported HTML parser: {parser_name or source_name}")
-                items = parse_ustr_listing_items(
-                    raw_html,
-                    source_url=resolved_url,
-                    source_name=source_name,
-                    source_category=source_category,
-                    publisher=normalize_text(source.get("publisher") or "Office of the United States Trade Representative"),
-                    target_year=source_context_for_president(args.president_slug)["year"],
-                    timeout=args.timeout or DEFAULT_SOURCE_TIMEOUT,
-                    max_items=max_items,
-                )
             elif source_type == "json":
                 if not resolved_url:
                     raise ValueError("Missing url/url_template for JSON source")
@@ -492,6 +692,7 @@ def fetch_default_live_source_items(
                 items = parse_federal_register_items(payload.json(), source)
             else:
                 raise ValueError(f"Unsupported source type: {source_type or 'unknown'}")
+            items = apply_source_metadata_defaults(items, source)
         except Exception as exc:  # noqa: BLE001
             source_errors.append(
                 {
@@ -550,6 +751,18 @@ def normalize_confidence(value: Any) -> str:
     return "Medium"
 
 
+def confidence_title_case(level: str) -> str:
+    normalized = normalize_nullable_text(level)
+    if normalized is None:
+        return "Medium"
+    lowered = normalized.lower()
+    if lowered == "high":
+        return "High"
+    if lowered == "low":
+        return "Low"
+    return "Medium"
+
+
 def tokenize(text: Any) -> set[str]:
     tokens = set(re.findall(r"[a-z0-9]+", normalize_text(text).lower()))
     return {token for token in tokens if len(token) > 2 and token not in STOPWORDS}
@@ -585,11 +798,285 @@ def estimate_evidence_strength(source_url: Any) -> str:
     return "Limited"
 
 
-def call_ollama(prompt: str, *, model: str, ollama_url: str, timeout: int, temperature: float) -> dict[str, Any]:
+def extract_docket_number(value: Any) -> str | None:
+    text = normalize_nullable_text(value)
+    if text is None:
+        return None
+    match = re.search(r"\b(\d{1,4}[A-Z]?-\d{1,4}[A-Z]?|\d{1,2}[A-Z]\d{1,4})\b", text)
+    if match:
+        return match.group(1)
+    return None
+
+
+def extract_legal_status(text: str, explicit_status: Any = None, source_category: str | None = None) -> str:
+    explicit = normalize_nullable_text(explicit_status)
+    if explicit in {"filed", "pending", "injunction", "stayed", "ruled", "appealed", "dismissed", "unknown"}:
+        return explicit
+
+    lowered = text.lower()
+    if any(token in lowered for token in ("injunction", "enjoined", "temporary restraining order", "preliminary injunction", "tro")):
+        return "injunction"
+    if any(token in lowered for token in ("stay", "stayed", "order staying", "administrative stay")):
+        return "stayed"
+    if any(token in lowered for token in ("appeal", "appealed", "notice of appeal")):
+        return "appealed"
+    if any(token in lowered for token in ("dismissed", "dismissal")):
+        return "dismissed"
+    if any(
+        token in lowered
+        for token in (
+            "opinion",
+            "ruled",
+            "ruling",
+            "judgment",
+            "judgement",
+            "held",
+            "decision",
+            "reversed",
+            "affirmed",
+            "vacated",
+        )
+    ):
+        return "ruled"
+    if any(token in lowered for token in ("lawsuit", "sues", "suing", "complaint", "complaints", "filed", "charged", "indicted")):
+        return "filed"
+    if normalize_nullable_text(source_category) == "court":
+        return "ruled"
+    return "unknown"
+
+
+def extract_court_or_agency(feed_item: dict[str, Any], combined_text: str) -> str | None:
+    explicit = normalize_nullable_text(feed_item.get("court_or_agency"))
+    if explicit:
+        return explicit
+
+    publisher = normalize_nullable_text(feed_item.get("publisher"))
+    source_name = normalize_nullable_text(feed_item.get("source_name"))
+    source_category = normalize_nullable_text(feed_item.get("source_category"))
+    if source_category in LEGAL_SOURCE_CATEGORIES:
+        return publisher or source_name
+
+    patterns = (
+        r"Supreme Court(?: of the United States)?",
+        r"U\.?S\.? District Court(?: for the [A-Za-z ]+)?",
+        r"District Court(?: for the [A-Za-z ]+)?",
+        r"Court of Appeals(?: for the [A-Za-z ]+)?",
+        r"Department of Justice",
+    )
+    for pattern in patterns:
+        match = re.search(pattern, combined_text, re.IGNORECASE)
+        if match:
+            return normalize_text(match.group(0))
+    return publisher or source_name
+
+
+def looks_like_lawsuit_only(text: str) -> bool:
+    lowered = text.lower()
+    return any(token in lowered for token in LAWSUIT_ONLY_HINTS)
+
+
+def looks_like_enforcement_action(text: str) -> bool:
+    lowered = text.lower()
+    return any(token in lowered for token in ENFORCEMENT_HINTS)
+
+
+def has_policy_signal(text: str, matched_keywords: list[str], topic: str | None = None) -> bool:
+    lowered = text.lower()
+    return bool(matched_keywords or topic or any(token in lowered for token in POLICY_SIGNAL_HINTS))
+
+
+def is_vague_title_or_summary(feed_item: dict[str, Any]) -> bool:
+    title = normalize_text(feed_item.get("title")).lower()
+    summary = normalize_text(feed_item.get("summary")).lower()
+    if title in GENERIC_TITLE_HINTS:
+        return True
+    if len(title) < 18:
+        return True
+    if len(summary) < 40:
+        return True
+    return False
+
+
+def duplicate_like_candidate(feed_item: dict[str, Any], matched_promise: dict[str, Any] | None) -> bool:
+    if not matched_promise:
+        return False
+    published_at = normalize_feed_date(feed_item.get("published_at"))
+    latest_action_date = normalize_date(matched_promise.get("latest_action_date"))
+    if published_at and latest_action_date and published_at == latest_action_date:
+        return True
+    title_tokens = tokenize(feed_item.get("title"))
+    latest_action_title = normalize_nullable_text(((matched_promise.get("actions") or [{}])[0]).get("title"))
+    if latest_action_title and title_tokens and len(title_tokens & tokenize(latest_action_title)) >= max(2, len(title_tokens) // 2):
+        return True
+    return False
+
+
+def build_source_reference_note(
+    *,
+    feed_item: dict[str, Any],
+    suggestion_type: str,
+    legal_status: str,
+    court_or_agency: str | None,
+    docket_number: str | None,
+) -> str | None:
+    parts = []
+    source_category = normalize_nullable_text(feed_item.get("source_category"))
+    if source_category:
+        parts.append(f"category={source_category}")
+    parts.append(f"classification={suggestion_type}")
+    if legal_status and legal_status != "unknown":
+        parts.append(f"legal_status={legal_status}")
+    if court_or_agency:
+        parts.append(f"court_or_agency={court_or_agency}")
+    if docket_number:
+        parts.append(f"docket={docket_number}")
+    return "; ".join(parts) if parts else None
+
+
+def score_discovery_candidate(
+    *,
+    feed_item: dict[str, Any],
+    context: dict[str, Any],
+    matched_promise: dict[str, Any] | None,
+    match_score: float,
+    topic: str | None,
+    suggestion_type: str,
+) -> dict[str, Any]:
+    score = 0
+    reasons: list[str] = []
+    penalties: list[str] = []
+
+    source_url = normalize_nullable_text(feed_item.get("url")) or ""
+    source_type = normalize_nullable_text(feed_item.get("source_type")) or ""
+    source_host = source_url.lower()
+    if any(host in source_host for host in (".gov", "supremecourt.gov", "courtlistener.com", "recapthelaw.org")):
+        score += 25
+        reasons.append("Official government or court source")
+
+    if context["matched_keywords"] or topic:
+        score += 20
+        reasons.append("Direct keyword or topic signal matched")
+
+    if context["is_formal_action"] or context["legal_status"] != "unknown" or context["is_enforcement_action"]:
+        score += 20
+        reasons.append("Clear action or legal status detected")
+
+    if matched_promise and match_score >= 0.12:
+        score += 15
+        reasons.append("Linked to an existing tracked promise")
+    else:
+        score -= 20
+        penalties.append("No linked existing policy or promise")
+
+    published_at = normalize_feed_date(feed_item.get("published_at"))
+    if published_at:
+        try:
+            published_date = datetime.fromisoformat(published_at).date()
+        except ValueError:
+            published_date = None
+        if published_date and (datetime.now(UTC).date() - published_date).days <= 45:
+            score += 10
+            reasons.append("Recently published source")
+    else:
+        score -= 20
+        penalties.append("Missing publication date")
+
+    if normalize_nullable_text(feed_item.get("title")) and normalize_nullable_text(feed_item.get("url")) and published_at:
+        score += 10
+        reasons.append("Usable title, URL, and date present")
+
+    if is_vague_title_or_summary(feed_item):
+        score -= 20
+        penalties.append("Vague title or thin summary")
+
+    if duplicate_like_candidate(feed_item, matched_promise):
+        score -= 15
+        penalties.append("Looks duplicate-like against the latest tracked action")
+
+    if source_type.lower() in {"news", "commentary"} or (".gov" not in source_host and "supremecourt.gov" not in source_host):
+        if not any(host in source_host for host in ("justice.gov", "whitehouse.gov", "federalregister.gov", "ustr.gov", "supremecourt.gov")):
+            score -= 15
+            penalties.append("Commentary or secondary source without a primary document")
+
+    unsupported_classification = (
+        suggestion_type == "ignore"
+        or (suggestion_type == "new_promise_candidate" and context["is_legal_related"] and not context["is_enforcement_action"])
+        or (suggestion_type == "update_existing_action" and not matched_promise)
+        or (suggestion_type == "legal_context" and not has_policy_signal(context["combined_text"], context["matched_keywords"], topic))
+    )
+    if unsupported_classification:
+        score -= 25
+        penalties.append("Weak or unsupported classification for this item")
+
+    score = max(0, min(100, score))
+    if score >= 75:
+        level = "high"
+    elif score >= 50:
+        level = "medium"
+    else:
+        level = "low"
+
+    return {
+        "confidence_score": score,
+        "confidence_level": level,
+        "confidence_reasons": reasons[:5],
+        "confidence_penalties": penalties[:5],
+    }
+
+
+def score_maintenance_candidate(candidate: dict[str, Any], promise: dict[str, Any]) -> dict[str, Any]:
+    score = 0
+    reasons: list[str] = []
+    penalties: list[str] = []
+    source_refs = promise.get("promise_sources") or []
+    if source_refs and any(
+        normalize_nullable_text(source.get("source_url")) and ".gov" in normalize_nullable_text(source.get("source_url")).lower()
+        for source in source_refs
+        if isinstance(source, dict)
+    ):
+        score += 25
+        reasons.append("Existing record already has official source coverage")
+    if normalize_nullable_text(promise.get("slug")):
+        score += 15
+        reasons.append("Linked to an existing tracked promise")
+    if candidate.get("candidate_type") in {"missing_action_record", "missing_outcome_record"}:
+        score += 20
+        reasons.append("Concrete maintenance gap identified")
+    elif candidate.get("candidate_type") in {"stale_record", "weak_evidence", "thin_sourcing"}:
+        score += 15
+        reasons.append("Concrete maintenance review target identified")
+    if normalize_date(promise.get("latest_action_date")) or any(normalize_date(source.get("published_date")) for source in source_refs if isinstance(source, dict)):
+        score += 10
+        reasons.append("Usable record or source date is present")
+    else:
+        score -= 20
+        penalties.append("No usable date on the tracked record or its discovery sources")
+    if normalize_nullable_text(promise.get("title")) and normalize_nullable_text(promise.get("slug")):
+        score += 10
+        reasons.append("Usable record title and slug present")
+    if not source_refs:
+        score -= 20
+        penalties.append("No linked promise sources available")
+    score = max(0, min(100, score))
+    if score >= 75:
+        level = "high"
+    elif score >= 50:
+        level = "medium"
+    else:
+        level = "low"
+    return {
+        "confidence_score": score,
+        "confidence_level": level,
+        "confidence_reasons": reasons[:5],
+        "confidence_penalties": penalties[:5],
+    }
+
+
+def call_openai(prompt: str, *, model: str, openai_base_url: str, timeout: int, temperature: float) -> dict[str, Any]:
     raw_text = generate_text(
         prompt,
         model=model,
-        endpoint=ollama_url or None,
+        openai_base_url=openai_base_url or None,
         timeout_seconds=timeout,
         temperature=temperature,
         response_format="json",
@@ -800,13 +1287,16 @@ def load_local_feed_items(path: Path) -> list[dict[str, Any]]:
             {
                 "title": normalize_text(item.get("title")),
                 "url": normalize_nullable_text(item.get("url") or item.get("link")),
-                "published_at": normalize_date(item.get("published_at") or item.get("published") or item.get("date")),
-                "summary": normalize_text(item.get("summary") or item.get("description")),
+                "published_at": normalize_feed_date(item.get("published_at") or item.get("published") or item.get("date")),
+                "summary": clean_html_fragment(item.get("summary") or item.get("description")),
                 "source_name": normalize_text(item.get("source_name") or path.name),
                 "source_type": normalize_text(item.get("source_type") or "Local Feed JSON"),
                 "source_category": normalize_text(item.get("source_category") or "manual-feed"),
                 "publisher": normalize_text(item.get("publisher") or item.get("source_name") or path.name),
                 "action_type_hint": normalize_nullable_text(item.get("action_type_hint")),
+                "legal_status": normalize_nullable_text(item.get("legal_status")),
+                "court_or_agency": normalize_nullable_text(item.get("court_or_agency")),
+                "docket_number": normalize_nullable_text(item.get("docket_number")),
             }
         )
     return normalized_items
@@ -827,13 +1317,13 @@ def parse_feed_xml(
         title = normalize_text(item.findtext("title"))
         link = normalize_nullable_text(item.findtext("link"))
         description = normalize_text(item.findtext("description"))
-        pub_date = normalize_date(item.findtext("pubDate"))
+        pub_date = normalize_feed_date(item.findtext("pubDate"))
         items.append(
             {
                 "title": title,
                 "url": link,
                 "published_at": pub_date,
-                "summary": description,
+                "summary": clean_html_fragment(description),
                 "source_name": source_name,
                 "source_type": normalize_text(source_type or "RSS"),
                 "source_category": normalize_text(source_category or "manual-feed"),
@@ -845,8 +1335,8 @@ def parse_feed_xml(
     namespace = {"atom": "http://www.w3.org/2005/Atom"}
     for entry in root.findall(".//atom:entry", namespace):
         title = normalize_text(entry.findtext("atom:title", default="", namespaces=namespace))
-        summary = normalize_text(entry.findtext("atom:summary", default="", namespaces=namespace))
-        published = normalize_date(
+        summary = clean_html_fragment(entry.findtext("atom:summary", default="", namespaces=namespace))
+        published = normalize_feed_date(
             entry.findtext("atom:updated", default="", namespaces=namespace)
             or entry.findtext("atom:published", default="", namespaces=namespace)
         )
@@ -931,6 +1421,7 @@ def build_discovery_debug_report(
     feed_update_candidates: list[dict[str, Any]] | None = None,
     new_promise_candidates: list[dict[str, Any]] | None = None,
     source_context_candidates: list[dict[str, Any]] | None = None,
+    legal_context_candidates: list[dict[str, Any]] | None = None,
     feed_errors: list[dict[str, Any]] | None = None,
     source_results: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
@@ -942,6 +1433,7 @@ def build_discovery_debug_report(
     feed_update_candidates = feed_update_candidates or []
     new_promise_candidates = new_promise_candidates or []
     source_context_candidates = source_context_candidates or []
+    legal_context_candidates = legal_context_candidates or []
     feed_errors = feed_errors or []
     source_results = source_results or []
 
@@ -1009,6 +1501,7 @@ def build_discovery_debug_report(
             "feed_update_candidates": len(feed_update_candidates),
             "new_promise_candidates": len(new_promise_candidates),
             "source_context_candidates": len(source_context_candidates),
+            "legal_context_candidates": len(legal_context_candidates),
             "final_candidate_count": promotable_candidate_count,
         },
         "candidate_type_counts": counts_by_candidate_type(
@@ -1017,6 +1510,7 @@ def build_discovery_debug_report(
             feed_update_candidates,
             new_promise_candidates,
             source_context_candidates,
+            legal_context_candidates,
         ),
         "skipped_counts": {
             "feed_items_ignored": ignored_feed_items,
@@ -1114,6 +1608,15 @@ def classify_feed_item_context(feed_item: dict[str, Any]) -> dict[str, Any]:
     legal_matches = matched_keywords(combined_text, LEGAL_HINTS)
     formal_action_matches = matched_keywords(combined_text, FORMAL_ACTION_HINTS)
     source_category = normalize_text(feed_item.get("source_category")).lower()
+    topic_estimate = estimate_topic(combined_text)
+    legal_status = extract_legal_status(combined_text, feed_item.get("legal_status"), source_category)
+    court_or_agency = extract_court_or_agency(feed_item, combined_text)
+    docket_number = normalize_nullable_text(feed_item.get("docket_number")) or extract_docket_number(
+        f"{feed_item.get('title')} {feed_item.get('summary')}"
+    )
+    is_lawsuit_only = looks_like_lawsuit_only(combined_text)
+    is_enforcement_action = source_category in {"agency-enforcement", "agency"} and looks_like_enforcement_action(combined_text)
+    policy_signal = has_policy_signal(combined_text, sorted(set(trade_matches + oversight_matches + legal_matches + formal_action_matches)), topic_estimate)
 
     return {
         "trade_matches": trade_matches,
@@ -1123,10 +1626,18 @@ def classify_feed_item_context(feed_item: dict[str, Any]) -> dict[str, Any]:
         "matched_keywords": sorted(set(trade_matches + oversight_matches + legal_matches + formal_action_matches)),
         "is_trade_related": bool(trade_matches) or source_category == "trade",
         "is_oversight_related": bool(oversight_matches) or source_category == "oversight",
-        "is_legal_related": bool(legal_matches) or source_category == "legal",
-        "is_formal_action": bool(formal_action_matches) or source_category in {"executive-action", "agency"},
+        "is_legal_related": bool(legal_matches) or source_category in LEGAL_SOURCE_CATEGORIES,
+        "is_formal_action": bool(formal_action_matches) or source_category in {"executive-action", "agency", "agency-enforcement"},
         "suggested_action_type": infer_action_type(feed_item),
         "source_category": source_category or "unknown",
+        "legal_status": legal_status,
+        "court_or_agency": court_or_agency,
+        "docket_number": docket_number,
+        "is_lawsuit_only": is_lawsuit_only,
+        "is_enforcement_action": is_enforcement_action,
+        "topic_estimate": topic_estimate,
+        "policy_signal": policy_signal,
+        "combined_text": combined_text,
     }
 
 
@@ -1138,17 +1649,54 @@ def enforce_relationship_guardrails(
     match_score: float,
 ) -> dict[str, Any]:
     suggestion_type = normalize_nullable_text(suggestion.get("suggestion_type")) or "ignore"
+    original_suggestion_type = suggestion_type
     if suggestion_type not in DISCOVERY_RELATIONSHIP_TYPES:
         suggestion_type = "ignore"
+    guardrail_notes: list[str] = []
+    downgrade_reason = None
+    topic = normalize_nullable_text(((suggestion.get("suggested_fields") or {}).get("topic")))
 
     if context["is_oversight_related"] or context["is_legal_related"]:
-        suggestion_type = "source_context" if (matched_promise and match_score >= 0.12) or context["is_trade_related"] else "ignore"
+        if context["is_oversight_related"]:
+            guarded_type = "source_context" if (matched_promise and match_score >= 0.12) or context["is_trade_related"] else "ignore"
+            if guarded_type != suggestion_type:
+                downgrade_reason = "Oversight items are evidence-only context, not standalone policy records."
+            suggestion_type = guarded_type
+        elif context["is_enforcement_action"] and not context["is_lawsuit_only"]:
+            if suggestion_type == "new_action" and not (matched_promise and match_score >= 0.18):
+                suggestion_type = "new_promise_candidate"
+                downgrade_reason = "Unlinked agency-enforcement items should enter review as new promise candidates, not direct actions."
+            elif suggestion_type == "ignore" and context["policy_signal"]:
+                suggestion_type = "legal_context"
+                downgrade_reason = "Policy-relevant legal items should remain visible as legal context when not yet linked to a tracked promise."
+        else:
+            if suggestion_type == "new_action":
+                guarded_type = "update_existing_action" if matched_promise and match_score >= 0.18 else "legal_context"
+                if guarded_type != suggestion_type:
+                    downgrade_reason = "Court and lawsuit items should only update existing actions when clearly linked; otherwise they remain legal context."
+                suggestion_type = guarded_type
+            elif suggestion_type == "new_promise_candidate":
+                guarded_type = "legal_context" if context["policy_signal"] else "ignore"
+                if guarded_type != suggestion_type:
+                    downgrade_reason = "Lawsuits and rulings do not become new policy records unless they reflect a distinct government enforcement action."
+                suggestion_type = guarded_type
+            elif suggestion_type == "update_existing_action" and not (matched_promise and match_score >= 0.18):
+                suggestion_type = "legal_context"
+                downgrade_reason = "A legal item needs a strong tracked-promise match before it can update an existing action."
+            elif suggestion_type in {"source_context", "ignore"} and context["policy_signal"]:
+                suggestion_type = "legal_context"
+                downgrade_reason = "Policy-relevant court items should remain visible as legal context rather than disappearing into generic source context."
 
     if suggestion_type == "new_action" and not context["is_formal_action"]:
         suggestion_type = "update_existing_action" if matched_promise and match_score >= 0.18 else "source_context"
+        downgrade_reason = (
+            "Only formal executive, agency, or clearly linked legal actions should enter as new actions."
+            if suggestion_type != original_suggestion_type
+            else downgrade_reason
+        )
 
     linked_promise_slug = normalize_nullable_text(suggestion.get("linked_promise_slug"))
-    if suggestion_type in {"source_context", "ignore"} and not linked_promise_slug and matched_promise and match_score >= 0.18:
+    if suggestion_type in {"source_context", "legal_context", "ignore"} and not linked_promise_slug and matched_promise and match_score >= 0.18:
         linked_promise_slug = normalize_nullable_text(matched_promise.get("slug"))
 
     suggested_fields = suggestion.get("suggested_fields")
@@ -1158,12 +1706,20 @@ def enforce_relationship_guardrails(
         suggested_fields["action_type"] = context["suggested_action_type"]
     suggested_fields["source_category"] = normalize_text(feed_item.get("source_category"))
     suggested_fields["matched_keywords"] = context["matched_keywords"]
+    suggested_fields["legal_status"] = context["legal_status"]
+    suggested_fields["court_or_agency"] = context["court_or_agency"]
+    suggested_fields["docket_number"] = context["docket_number"]
+    if downgrade_reason:
+        guardrail_notes.append(downgrade_reason)
 
     return {
         **suggestion,
         "suggestion_type": suggestion_type,
         "linked_promise_slug": linked_promise_slug,
         "suggested_fields": suggested_fields,
+        "guardrail_notes": guardrail_notes,
+        "downgrade_reason": downgrade_reason,
+        "classification_reason": normalize_text(downgrade_reason or suggestion.get("classification_reason") or suggestion.get("reasoning")),
     }
 
 
@@ -1183,13 +1739,14 @@ def heuristic_feed_suggestion(feed_item: dict[str, Any], promises: list[dict[str
     if context["is_trade_related"] and topic is None:
         topic = "Economic Opportunity"
 
-    if context["is_oversight_related"] or context["is_legal_related"]:
+    if context["is_oversight_related"]:
         suggestion_type = "source_context" if (matched_promise and match_score >= 0.12) or context["is_trade_related"] else "ignore"
         return {
             "suggestion_type": suggestion_type,
             "linked_promise_slug": matched_promise.get("slug") if matched_promise and suggestion_type == "source_context" else None,
             "confidence": "Medium" if suggestion_type == "source_context" else "Low",
             "reasoning": "This source appears to be oversight, testimony, transcript, or legal context and should be treated as evidence rather than as a standalone policy record.",
+            "classification_reason": "Oversight and hearing materials should stay as source context unless they directly document an existing tracked record.",
             "suggested_fields": {
                 "title": normalize_text(feed_item.get("title")),
                 "summary": normalize_text(feed_item.get("summary"))[:280],
@@ -1199,6 +1756,83 @@ def heuristic_feed_suggestion(feed_item: dict[str, Any], promises: list[dict[str
                 "action_type": context["suggested_action_type"],
                 "source_category": normalize_text(feed_item.get("source_category")),
                 "matched_keywords": context["matched_keywords"],
+                "legal_status": context["legal_status"],
+                "court_or_agency": context["court_or_agency"],
+                "docket_number": context["docket_number"],
+            },
+            "caution_flags": caution_flags,
+        }
+
+    if context["is_legal_related"]:
+        if matched_promise and match_score >= 0.22 and context["legal_status"] in {"injunction", "stayed", "ruled", "appealed"}:
+            return {
+                "suggestion_type": "update_existing_action",
+                "linked_promise_slug": matched_promise.get("slug"),
+                "confidence": "High" if match_score >= 0.3 else "Medium",
+                "reasoning": (
+                    f"The legal item appears to affect the tracked promise '{matched_promise.get('title')}' "
+                    "and should be reviewed as an update to the existing action history."
+                ),
+                "classification_reason": "A court ruling or legal order with a strong tracked-promise match can update an existing action.",
+                "suggested_fields": {
+                    "title": normalize_text(feed_item.get("title")),
+                    "summary": normalize_text(feed_item.get("summary"))[:280],
+                    "topic": matched_promise.get("topic") or topic,
+                    "impact_direction": impact_direction,
+                    "evidence_strength": evidence_strength,
+                    "action_type": context["suggested_action_type"],
+                    "source_category": normalize_text(feed_item.get("source_category")),
+                    "matched_keywords": context["matched_keywords"],
+                    "legal_status": context["legal_status"],
+                    "court_or_agency": context["court_or_agency"],
+                    "docket_number": context["docket_number"],
+                },
+                "caution_flags": caution_flags,
+            }
+
+        if context["is_enforcement_action"] and not context["is_lawsuit_only"]:
+            suggestion_type = "update_existing_action" if matched_promise and match_score >= 0.18 else "new_promise_candidate"
+            return {
+                "suggestion_type": suggestion_type,
+                "linked_promise_slug": matched_promise.get("slug") if suggestion_type == "update_existing_action" else None,
+                "confidence": "Medium",
+                "reasoning": "This appears to be a real agency-enforcement or legal implementation action that should remain in the review-first pipeline.",
+                "classification_reason": "Official agency-enforcement actions can enter review, but lawsuits alone should not be treated as standalone policies.",
+                "suggested_fields": {
+                    "title": normalize_text(feed_item.get("title")),
+                    "summary": normalize_text(feed_item.get("summary"))[:280],
+                    "topic": matched_promise.get("topic") if matched_promise else topic,
+                    "impact_direction": impact_direction,
+                    "evidence_strength": evidence_strength,
+                    "action_type": context["suggested_action_type"],
+                    "source_category": normalize_text(feed_item.get("source_category")),
+                    "matched_keywords": context["matched_keywords"],
+                    "legal_status": context["legal_status"],
+                    "court_or_agency": context["court_or_agency"],
+                    "docket_number": context["docket_number"],
+                },
+                "caution_flags": caution_flags,
+            }
+
+        suggestion_type = "legal_context" if (matched_promise and match_score >= 0.12) or context["is_trade_related"] or context["policy_signal"] else "ignore"
+        return {
+            "suggestion_type": suggestion_type,
+            "linked_promise_slug": matched_promise.get("slug") if matched_promise and suggestion_type == "legal_context" else None,
+            "confidence": "Medium" if suggestion_type == "legal_context" else "Low",
+            "reasoning": "This source is a court or litigation update that should stay in legal context unless it clearly changes a tracked government action.",
+            "classification_reason": "Court rulings, appeals, injunctions, stays, and legal challenges are preserved as legal context unless they clearly update an existing tracked action.",
+            "suggested_fields": {
+                "title": normalize_text(feed_item.get("title")),
+                "summary": normalize_text(feed_item.get("summary"))[:280],
+                "topic": matched_promise.get("topic") if matched_promise else topic,
+                "impact_direction": impact_direction,
+                "evidence_strength": evidence_strength,
+                "action_type": context["suggested_action_type"],
+                "source_category": normalize_text(feed_item.get("source_category")),
+                "matched_keywords": context["matched_keywords"],
+                "legal_status": context["legal_status"],
+                "court_or_agency": context["court_or_agency"],
+                "docket_number": context["docket_number"],
             },
             "caution_flags": caution_flags,
         }
@@ -1216,6 +1850,7 @@ def heuristic_feed_suggestion(feed_item: dict[str, Any], promises: list[dict[str
                 f"The feed item overlaps strongly with the tracked promise '{matched_promise.get('title')}' "
                 f"and may represent a newer action or source update."
             ),
+            "classification_reason": "A strong tracked-promise match suggests the feed item belongs in the existing action history.",
             "suggested_fields": {
                 "title": normalize_text(feed_item.get("title")),
                 "summary": normalize_text(feed_item.get("summary"))[:280],
@@ -1225,6 +1860,9 @@ def heuristic_feed_suggestion(feed_item: dict[str, Any], promises: list[dict[str
                 "action_type": context["suggested_action_type"],
                 "source_category": normalize_text(feed_item.get("source_category")),
                 "matched_keywords": context["matched_keywords"],
+                "legal_status": context["legal_status"],
+                "court_or_agency": context["court_or_agency"],
+                "docket_number": context["docket_number"],
             },
             "caution_flags": caution_flags,
         }
@@ -1235,6 +1873,7 @@ def heuristic_feed_suggestion(feed_item: dict[str, Any], promises: list[dict[str
             "linked_promise_slug": None,
             "confidence": "Medium" if topic or context["is_trade_related"] else "Low",
             "reasoning": "The source appears to describe a real administration or trade action that does not yet map cleanly to an existing tracked promise.",
+            "classification_reason": "A formal administration action without a strong existing-promise match should enter review as a new promise candidate.",
             "suggested_fields": {
                 "title": normalize_text(feed_item.get("title")),
                 "summary": normalize_text(feed_item.get("summary"))[:280],
@@ -1244,6 +1883,9 @@ def heuristic_feed_suggestion(feed_item: dict[str, Any], promises: list[dict[str
                 "action_type": context["suggested_action_type"],
                 "source_category": normalize_text(feed_item.get("source_category")),
                 "matched_keywords": context["matched_keywords"],
+                "legal_status": context["legal_status"],
+                "court_or_agency": context["court_or_agency"],
+                "docket_number": context["docket_number"],
             },
             "caution_flags": caution_flags + (["topic_unclear"] if topic is None else []),
         }
@@ -1253,6 +1895,7 @@ def heuristic_feed_suggestion(feed_item: dict[str, Any], promises: list[dict[str
         "linked_promise_slug": None,
         "confidence": "Low",
         "reasoning": "The source does not map cleanly to a current-administration policy or evidence update candidate.",
+        "classification_reason": "The item lacks a strong policy or tracked-promise connection and should not enter the review queue as a policy record.",
         "suggested_fields": {
             "title": normalize_text(feed_item.get("title")),
             "summary": normalize_text(feed_item.get("summary"))[:280],
@@ -1262,6 +1905,9 @@ def heuristic_feed_suggestion(feed_item: dict[str, Any], promises: list[dict[str
             "action_type": context["suggested_action_type"],
             "source_category": normalize_text(feed_item.get("source_category")),
             "matched_keywords": context["matched_keywords"],
+            "legal_status": context["legal_status"],
+            "court_or_agency": context["court_or_agency"],
+            "docket_number": context["docket_number"],
         },
         "caution_flags": caution_flags + (["topic_unclear"] if topic is None else []),
     }
@@ -1285,6 +1931,8 @@ Rules:
 - do not invent facts
 - hearings, testimony, readouts, speeches, interviews, transcripts, and court/legal updates should usually be source_context rather than a standalone policy
 - suggestion_type must be one of: new_action, update_existing_action, new_promise_candidate, source_context, ignore
+- use legal_context for lawsuits, rulings, injunctions, stays, appeals, dismissals, and legal challenges that matter but should not be treated as standalone policy records
+- suggestion_type must be one of: new_action, update_existing_action, new_promise_candidate, source_context, legal_context, ignore
 - confidence must be one of: High, Medium, Low
 - suggested_fields must be an object with:
   - title
@@ -1295,11 +1943,15 @@ Rules:
   - action_type
   - source_category
   - matched_keywords
+  - legal_status
+  - court_or_agency
+  - docket_number
 - topic should be one of: Voting Rights, Criminal Justice, Housing, Education, Economic Opportunity, Healthcare, or null
 - impact_direction should be one of: Positive, Negative, Mixed, Blocked, or null
 - evidence_strength should be one of: Strong, Moderate, Limited, or null
 - linked_promise_slug should be null for new_promise_candidate or ignore
-- use source_context for evidence-only items such as congressional hearings, testimony, news-like commentary, transcripts, and legal challenges or rulings
+- use source_context for evidence-only items such as congressional hearings, testimony, news-like commentary, transcripts, and commentary around legal developments
+- use legal_context for court rulings, injunctions, stays, appeals, dismissals, and lawsuit developments unless they clearly update an existing tracked action
 
 Feed item:
 {json.dumps(feed_item, indent=2)}
@@ -1309,7 +1961,7 @@ Existing current-administration promise context:
 """.strip()
 
 
-def sanitize_ollama_suggestion(payload: dict[str, Any]) -> dict[str, Any]:
+def sanitize_ai_suggestion(payload: dict[str, Any]) -> dict[str, Any]:
     suggested_fields = payload.get("suggested_fields")
     if not isinstance(suggested_fields, dict):
         suggested_fields = {}
@@ -1333,8 +1985,12 @@ def sanitize_ollama_suggestion(payload: dict[str, Any]) -> dict[str, Any]:
             "action_type": normalize_nullable_text(suggested_fields.get("action_type")),
             "source_category": normalize_nullable_text(suggested_fields.get("source_category")),
             "matched_keywords": [normalize_text(keyword) for keyword in matched_keyword_values if normalize_text(keyword)],
+            "legal_status": normalize_nullable_text(suggested_fields.get("legal_status")),
+            "court_or_agency": normalize_nullable_text(suggested_fields.get("court_or_agency")),
+            "docket_number": normalize_nullable_text(suggested_fields.get("docket_number")),
         },
         "caution_flags": [normalize_text(flag) for flag in (payload.get("caution_flags") or []) if normalize_text(flag)],
+        "classification_reason": normalize_text(payload.get("classification_reason") or payload.get("reasoning")),
     }
 
 
@@ -1369,40 +2025,46 @@ def build_maintenance_candidates(promises: list[dict[str, Any]], lookback_days: 
         linked_promise = compact_linked_promise(promise)
 
         if int(promise.get("action_count") or 0) < 1:
+            candidate = {
+                "candidate_type": "missing_action_record",
+                "linked_promise": linked_promise,
+                "suggested_changes": {"focus": ["actions", "sources"]},
+                "reasoning": "This tracked promise has no recorded actions and should be reviewed for current-term implementation activity.",
+                "source_references": source_refs,
+            }
+            confidence = score_maintenance_candidate(candidate, promise)
             candidates.append(
                 {
-                    "candidate_type": "missing_action_record",
-                    "linked_promise": linked_promise,
-                    "suggested_changes": {"focus": ["actions", "sources"]},
-                    "reasoning": "This tracked promise has no recorded actions and should be reviewed for current-term implementation activity.",
-                    "confidence": "High",
-                    "source_references": source_refs,
+                    **candidate,
+                    "confidence": confidence_title_case(confidence["confidence_level"]),
+                    **confidence,
                 }
             )
 
         if int(promise.get("outcome_count") or 0) < 1:
-            candidates.append(
-                {
-                    "candidate_type": "missing_outcome_record",
-                    "linked_promise": linked_promise,
-                    "suggested_changes": {"focus": ["outcomes", "evidence_strength", "sources"]},
-                    "reasoning": "This tracked promise has actions but no recorded outcome and may need a current evidence review.",
-                    "confidence": "High",
-                    "source_references": source_refs,
-                }
-            )
+            candidate = {
+                "candidate_type": "missing_outcome_record",
+                "linked_promise": linked_promise,
+                "suggested_changes": {"focus": ["outcomes", "evidence_strength", "sources"]},
+                "reasoning": "This tracked promise has actions but no recorded outcome and may need a current evidence review.",
+                "source_references": source_refs,
+            }
+            confidence = score_maintenance_candidate(candidate, promise)
+            candidates.append({**candidate, "confidence": confidence_title_case(confidence["confidence_level"]), **confidence})
 
         latest_action_date = normalize_date(promise.get("latest_action_date"))
         if promise.get("status") in {"In Progress", "Partial"}:
             if latest_action_date is None:
+                confidence = score_maintenance_candidate({"candidate_type": "stale_record"}, promise)
                 candidates.append(
                     {
                         "candidate_type": "stale_record",
                         "linked_promise": linked_promise,
                         "suggested_changes": {"focus": ["actions", "outcomes", "sources"]},
                         "reasoning": "This in-progress record has no dated action history and should be checked for updates or stronger sourcing.",
-                        "confidence": "Medium",
+                        "confidence": confidence_title_case(confidence["confidence_level"]),
                         "source_references": source_refs,
+                        **confidence,
                     }
                 )
             else:
@@ -1411,6 +2073,7 @@ def build_maintenance_candidates(promises: list[dict[str, Any]], lookback_days: 
                 except ValueError:
                     action_date_obj = None
                 if action_date_obj and action_date_obj < stale_before:
+                    confidence = score_maintenance_candidate({"candidate_type": "stale_record"}, promise)
                     candidates.append(
                         {
                             "candidate_type": "stale_record",
@@ -1420,8 +2083,9 @@ def build_maintenance_candidates(promises: list[dict[str, Any]], lookback_days: 
                                 f"The latest recorded action is {latest_action_date}, older than the {lookback_days}-day review window "
                                 "for an in-progress current-administration record."
                             ),
-                            "confidence": "Medium",
+                            "confidence": confidence_title_case(confidence["confidence_level"]),
                             "source_references": source_refs,
+                            **confidence,
                         }
                     )
 
@@ -1432,6 +2096,7 @@ def build_maintenance_candidates(promises: list[dict[str, Any]], lookback_days: 
             or int(outcome.get("outcome_source_count") or 0) < 1
         ]
         if weak_outcomes:
+            confidence = score_maintenance_candidate({"candidate_type": "weak_evidence"}, promise)
             candidates.append(
                 {
                     "candidate_type": "weak_evidence",
@@ -1441,13 +2106,15 @@ def build_maintenance_candidates(promises: list[dict[str, Any]], lookback_days: 
                         "weak_outcome_count": len(weak_outcomes),
                     },
                     "reasoning": "One or more outcomes have limited evidence strength or no linked outcome source and should be reviewed.",
-                    "confidence": "Medium",
+                    "confidence": confidence_title_case(confidence["confidence_level"]),
                     "source_references": source_refs,
+                    **confidence,
                 }
             )
 
         thin_actions = [action for action in promise.get("actions") or [] if int(action.get("action_source_count") or 0) < 1]
         if thin_actions or int(promise.get("promise_source_count") or 0) < 1:
+            confidence = score_maintenance_candidate({"candidate_type": "thin_sourcing"}, promise)
             candidates.append(
                 {
                     "candidate_type": "thin_sourcing",
@@ -1457,8 +2124,9 @@ def build_maintenance_candidates(promises: list[dict[str, Any]], lookback_days: 
                         "thin_action_count": len(thin_actions),
                     },
                     "reasoning": "The record has thin source linking at the promise or action level and should be strengthened before later scoring updates.",
-                    "confidence": "Medium",
+                    "confidence": confidence_title_case(confidence["confidence_level"]),
                     "source_references": source_refs,
+                    **confidence,
                 }
             )
 
@@ -1471,14 +2139,22 @@ def analyze_feed_items(
     *,
     dry_run: bool,
     model: str,
-    ollama_url: str,
+    openai_base_url: str,
     timeout: int,
     temperature: float,
-) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
+) -> tuple[
+    list[dict[str, Any]],
+    list[dict[str, Any]],
+    list[dict[str, Any]],
+    list[dict[str, Any]],
+    list[dict[str, Any]],
+    list[dict[str, Any]],
+]:
     new_action_candidates = []
     update_candidates = []
     new_promise_candidates = []
     source_context_candidates = []
+    legal_context_candidates = []
     debug_rows = []
     promise_context = compact_promise_context(promises)
 
@@ -1492,20 +2168,20 @@ def analyze_feed_items(
             fallback_reason = None
         else:
             try:
-                suggestion = sanitize_ollama_suggestion(
-                    call_ollama(
+                suggestion = sanitize_ai_suggestion(
+                    call_openai(
                         build_feed_prompt(feed_item, promise_context),
                         model=model,
-                        ollama_url=ollama_url,
+                        openai_base_url=openai_base_url,
                         timeout=timeout,
                         temperature=temperature,
                     )
                 )
-                review_mode = "ollama"
+                review_mode = "openai"
                 fallback_reason = None
             except Exception as exc:  # noqa: BLE001
                 suggestion = heuristic_feed_suggestion(feed_item, promises)
-                suggestion.setdefault("caution_flags", []).append("ollama_fallback")
+                suggestion.setdefault("caution_flags", []).append("ai_fallback")
                 fallback_reason = normalize_text(str(exc))
                 suggestion["reasoning"] = f"{suggestion.get('reasoning')} Fallback reason: {fallback_reason}."
                 review_mode = "fallback"
@@ -1518,6 +2194,20 @@ def analyze_feed_items(
             match_score,
         )
         suggestion_type = suggestion.get("suggestion_type")
+        deterministic_confidence = score_discovery_candidate(
+            feed_item=feed_item,
+            context=context,
+            matched_promise=matched_promise,
+            match_score=match_score,
+            topic=normalize_nullable_text((suggestion.get("suggested_fields") or {}).get("topic")) or topic_estimate,
+            suggestion_type=suggestion_type,
+        )
+        legal_status = normalize_nullable_text((suggestion.get("suggested_fields") or {}).get("legal_status")) or context["legal_status"]
+        court_or_agency = normalize_nullable_text((suggestion.get("suggested_fields") or {}).get("court_or_agency")) or context["court_or_agency"]
+        docket_number = normalize_nullable_text((suggestion.get("suggested_fields") or {}).get("docket_number")) or context["docket_number"]
+        classification_reason = normalize_text(
+            suggestion.get("classification_reason") or suggestion.get("reasoning") or ""
+        )
         candidate = {
             "candidate_type": suggestion_type,
             "suggested_relationship": suggestion_type,
@@ -1525,16 +2215,21 @@ def analyze_feed_items(
             "feed_item": feed_item,
             "suggested_changes": suggestion.get("suggested_fields"),
             "reasoning": suggestion.get("reasoning"),
-            "confidence": suggestion.get("confidence"),
+            "classification_reason": classification_reason,
+            "confidence": confidence_title_case(deterministic_confidence["confidence_level"]),
+            **deterministic_confidence,
             "caution_flags": suggestion.get("caution_flags") or [],
             "matched_keywords": suggestion.get("suggested_fields", {}).get("matched_keywords") or context["matched_keywords"],
             "source_category": normalize_text(feed_item.get("source_category")),
+            "legal_status": legal_status,
+            "court_or_agency": court_or_agency,
+            "docket_number": docket_number,
             "requested_model": model,
-            "effective_model": model if review_mode == "ollama" else None,
+            "effective_model": model if review_mode == "openai" else None,
             "review_backend": review_mode,
             "fallback_used": review_mode == "fallback",
             "fallback_reason": fallback_reason,
-            "model_resolution_status": "exact_requested" if review_mode == "ollama" else ("fallback_used" if review_mode == "fallback" else "dry_run"),
+            "model_resolution_status": "exact_requested" if review_mode == "openai" else ("fallback_used" if review_mode == "fallback" else "dry_run"),
             "source_references": [
                 {
                     "source_title": feed_item.get("title"),
@@ -1542,10 +2237,18 @@ def analyze_feed_items(
                     "source_type": feed_item.get("source_type"),
                     "publisher": feed_item.get("publisher") or feed_item.get("source_name"),
                     "published_date": feed_item.get("published_at"),
-                    "notes": normalize_nullable_text(feed_item.get("source_category")),
+                    "notes": build_source_reference_note(
+                        feed_item=feed_item,
+                        suggestion_type=suggestion_type,
+                        legal_status=legal_status or "unknown",
+                        court_or_agency=court_or_agency,
+                        docket_number=docket_number,
+                    ),
                 }
             ],
             "review_mode": review_mode,
+            "downgrade_reason": normalize_nullable_text(suggestion.get("downgrade_reason")),
+            "guardrail_notes": suggestion.get("guardrail_notes") or [],
         }
 
         linked_slug = suggestion.get("linked_promise_slug")
@@ -1563,6 +2266,8 @@ def analyze_feed_items(
             new_promise_candidates.append(candidate)
         elif suggestion_type == "source_context":
             source_context_candidates.append(candidate)
+        elif suggestion_type == "legal_context":
+            legal_context_candidates.append(candidate)
         else:
             skip_reason = "ignored_by_classifier"
 
@@ -1586,18 +2291,33 @@ def analyze_feed_items(
                     "linked_promise_slug": matched_promise.get("slug") if matched_promise else None,
                     "match_score": round(match_score, 4),
                 },
+                "legal_status": legal_status,
+                "court_or_agency": court_or_agency,
+                "docket_number": docket_number,
                 "candidate_type": suggestion_type,
-                "candidate_emitted": suggestion_type in {"new_action", "update_existing_action", "new_promise_candidate", "source_context"},
+                "candidate_emitted": suggestion_type in {"new_action", "update_existing_action", "new_promise_candidate", "source_context", "legal_context"},
+                "confidence_score": deterministic_confidence["confidence_score"],
+                "confidence_level": deterministic_confidence["confidence_level"],
+                "confidence_reasons": deterministic_confidence["confidence_reasons"][:3],
+                "confidence_penalties": deterministic_confidence["confidence_penalties"][:3],
+                "classification_reason": classification_reason,
+                "downgrade_reason": normalize_nullable_text(suggestion.get("downgrade_reason")),
                 "skip_reason": skip_reason,
             }
         )
 
-    return new_action_candidates, update_candidates, new_promise_candidates, source_context_candidates, debug_rows
+    return new_action_candidates, update_candidates, new_promise_candidates, source_context_candidates, legal_context_candidates, debug_rows
 
 
 def build_csv_rows(report: dict[str, Any]) -> list[dict[str, Any]]:
     rows = []
-    for section_name in ("new_action_candidates", "update_candidates", "new_promise_candidates", "source_context_candidates"):
+    for section_name in (
+        "new_action_candidates",
+        "update_candidates",
+        "new_promise_candidates",
+        "source_context_candidates",
+        "legal_context_candidates",
+    ):
         for item in report.get(section_name) or []:
             linked = item.get("linked_promise") or {}
             feed_item = item.get("feed_item") or {}
@@ -1609,12 +2329,18 @@ def build_csv_rows(report: dict[str, Any]) -> list[dict[str, Any]]:
                     "linked_promise_slug": linked.get("slug"),
                     "linked_promise_title": linked.get("title"),
                     "confidence": item.get("confidence"),
+                    "confidence_score": item.get("confidence_score"),
+                    "confidence_level": item.get("confidence_level"),
                     "topic": suggested.get("topic"),
                     "impact_direction": suggested.get("impact_direction"),
                     "evidence_strength": suggested.get("evidence_strength"),
                     "action_type": suggested.get("action_type"),
                     "source_category": suggested.get("source_category"),
+                    "legal_status": suggested.get("legal_status") or item.get("legal_status"),
+                    "court_or_agency": suggested.get("court_or_agency") or item.get("court_or_agency"),
+                    "docket_number": suggested.get("docket_number") or item.get("docket_number"),
                     "matched_keywords": ", ".join(suggested.get("matched_keywords") or []),
+                    "classification_reason": item.get("classification_reason"),
                     "feed_title": feed_item.get("title"),
                     "feed_url": feed_item.get("url"),
                 }
@@ -1692,17 +2418,24 @@ def main() -> None:
         feed_update_candidates,
         new_promise_candidates,
         source_context_candidates,
+        legal_context_candidates,
         feed_item_debug_rows,
     ) = analyze_feed_items(
         feed_items,
         promises,
         dry_run=args.dry_run,
         model=args.model,
-        ollama_url=args.ollama_url,
+        openai_base_url=args.openai_base_url,
         timeout=args.timeout,
         temperature=args.temperature,
     )
-    all_ai_candidates = [*new_action_candidates, *feed_update_candidates, *new_promise_candidates, *source_context_candidates]
+    all_ai_candidates = [
+        *new_action_candidates,
+        *feed_update_candidates,
+        *new_promise_candidates,
+        *source_context_candidates,
+        *legal_context_candidates,
+    ]
     fallback_reasons = sorted({item.get("fallback_reason") for item in all_ai_candidates if item.get("fallback_reason")})
 
     report = {
@@ -1712,7 +2445,7 @@ def main() -> None:
         "model": args.model,
         "requested_model": args.model,
         "effective_model": args.model if not args.dry_run and not any(item.get("fallback_used") for item in all_ai_candidates) else ("mixed" if not args.dry_run else None),
-        "review_backend": "fallback" if any(item.get("fallback_used") for item in all_ai_candidates) else ("ollama" if not args.dry_run else "dry_run"),
+        "review_backend": "fallback" if any(item.get("fallback_used") for item in all_ai_candidates) else ("openai" if not args.dry_run else "dry_run"),
         "fallback_used": any(item.get("fallback_used") for item in all_ai_candidates),
         "fallback_reason": fallback_reasons[0] if len(fallback_reasons) == 1 else ("Multiple fallback reasons; inspect item-level metadata." if fallback_reasons else None),
         "model_resolution_status": ("fallback_used" if any(item.get("fallback_used") for item in all_ai_candidates) else "exact_requested") if not args.dry_run else "dry_run",
@@ -1731,6 +2464,7 @@ def main() -> None:
             "feed_update_candidates": len(feed_update_candidates),
             "new_promise_candidates": len(new_promise_candidates),
             "source_context_candidates": len(source_context_candidates),
+            "legal_context_candidates": len(legal_context_candidates),
             "feed_items_analyzed": len(feed_items),
             "feed_errors": len(feed_errors),
         },
@@ -1738,11 +2472,12 @@ def main() -> None:
         "update_candidates": maintenance_candidates + feed_update_candidates,
         "new_promise_candidates": new_promise_candidates,
         "source_context_candidates": source_context_candidates,
+        "legal_context_candidates": legal_context_candidates,
         "feed_errors": feed_errors,
         "promotion_guidance": {
             "manual_only": True,
             "next_steps": [
-                "Review update candidates, new promise candidates, and source-context evidence manually.",
+                "Review update candidates, new promise candidates, and source or legal context evidence manually.",
                 "Promote approved suggestions into a curated batch JSON or a targeted enrichment batch.",
                 "Run the normal current-administration workflow: normalize, AI review, manual approval, import, validate.",
             ],
@@ -1762,6 +2497,7 @@ def main() -> None:
         feed_update_candidates=feed_update_candidates,
         new_promise_candidates=new_promise_candidates,
         source_context_candidates=source_context_candidates,
+        legal_context_candidates=legal_context_candidates,
         feed_errors=feed_errors,
         source_results=source_results,
     )

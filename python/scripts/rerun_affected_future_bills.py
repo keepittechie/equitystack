@@ -48,7 +48,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--future-bill-id", type=int, action="append", help="One or more future_bill_id values to rerun")
     parser.add_argument("--from-apply-report", type=Path, default=default_apply_report(), help="Apply report JSON used to derive affected future_bill_id values")
     parser.add_argument("--model", default=DEFAULT_MODEL, help="Verifier model for follow-up suggestion/discovery scripts")
-    parser.add_argument("--timeout", type=int, default=DEFAULT_TIMEOUT, help="Ollama timeout in seconds for follow-up verifier stages")
+    parser.add_argument("--timeout", type=int, default=DEFAULT_TIMEOUT, help="AI timeout in seconds for follow-up verifier stages")
     parser.add_argument("--csv", action="store_true", help="Write CSV outputs from rerun scripts where supported")
     parser.add_argument("--output", type=Path, default=default_output_report(), help="Rerun report JSON")
     return parser.parse_args()
@@ -130,7 +130,6 @@ def main() -> None:
             str(future_bill_id),
             "--top-k",
             "5",
-            "--use-ollama",
             "--model",
             args.model,
             "--timeout",
@@ -180,7 +179,6 @@ def main() -> None:
                 str(future_bill_id),
                 "--top-k",
                 "5",
-                "--use-ollama",
                 "--model",
                 args.model,
                 "--timeout",

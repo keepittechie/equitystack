@@ -47,7 +47,7 @@ The wrapper runs these stages in order:
 Inside `run_equitystack_pipeline.py`, the daily pipeline runs:
 
 1. `update_database.py`
-2. `scripts/review_future_bill_audit_with_ollama.py` with verifier, senior, and fallback models from the wrapper defaults
+2. `scripts/review_future_bill_audit.py` with verifier, senior, and fallback models from the wrapper defaults
 3. `scripts/apply_future_bill_ai_review.py`
 4. `scripts/suggest_partial_future_bill_links.py` with the configured verifier model
 5. `scripts/find_candidate_tracked_bills.py` with the configured verifier model only when the suggestion output still needs discovery
@@ -59,7 +59,7 @@ Default review models:
 - verifier / fallback review: wrapper verifier/fallback defaults from `./bin/equitystack --help`
 - default senior/verifier timeout: `240` seconds
 
-Some script names still include `ollama` for compatibility. The provider layer can route OpenAI-style models such as `gpt-4.1-mini` when configured.
+The legislative pipeline uses the OpenAI provider path directly. Wrapper defaults can resolve to OpenAI-style models such as `gpt-4.1-mini`.
 
 Primary outputs:
 
@@ -111,7 +111,7 @@ Interpretation:
 
 ## Dry-Run And Mutating Stages
 
-- `review_future_bill_audit_with_ollama.py` is advisory.
+- `review_future_bill_audit.py` is advisory.
 - `apply_future_bill_ai_review.py` is dry-run unless `--apply --yes` is supplied.
 - `suggest_partial_future_bill_links.py` never mutates the DB.
 - `find_candidate_tracked_bills.py` never mutates the DB unless you explicitly write a seed file.
@@ -168,7 +168,7 @@ python3 scripts/import_approved_tracked_bills.py --input reports/approved_tracke
 Primary supporting scripts:
 
 - `update_database.py`
-- `scripts/review_future_bill_audit_with_ollama.py`
+- `scripts/review_future_bill_audit.py`
 - `scripts/apply_future_bill_ai_review.py`
 - `scripts/suggest_partial_future_bill_links.py`
 - `scripts/find_candidate_tracked_bills.py`

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Run advisory Ollama review over a normalized current-administration batch.
+Run advisory OpenAI review over a normalized current-administration batch.
 
 Provides multi-pass editorial guidance including deep review, conflict detection,
 and suggested operator action workflows. Supports batching, filtering, and decision logging.
@@ -34,7 +34,7 @@ from current_admin_common import (
 )
 
 
-DEFAULT_OLLAMA_URL = ""
+DEFAULT_OPENAI_BASE_URL = ""
 DEFAULT_MODEL = default_model_name()
 DEFAULT_MODEL_SENIOR = DEFAULT_MODEL
 DEFAULT_MODEL_VERIFIER = DEFAULT_MODEL
@@ -82,7 +82,7 @@ SESSION_FOCUS_REASONS = {
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Run an advisory Ollama review over a normalized current-administration batch."
+        description="Run an advisory OpenAI review over a normalized current-administration batch."
     )
     parser.add_argument("--input", type=Path, required=True, help="Normalized current-admin batch JSON")
     parser.add_argument("--output", type=Path, help="AI review report JSON output")
@@ -91,7 +91,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--fallback-model", default=DEFAULT_MODEL_FALLBACK, help="Fallback review model name")
     parser.add_argument("--review-mode", choices=sorted(VALID_REVIEW_MODES), default="deep", help="Review depth to use")
     parser.add_argument("--deep-review", action="store_true", help="Shortcut for --review-mode deep")
-    parser.add_argument("--dry-run", action="store_true", help="Skip Ollama calls and emit heuristic suggestions only")
+    parser.add_argument("--dry-run", action="store_true", help="Skip OpenAI calls and emit heuristic suggestions only")
     parser.add_argument("--max-items", type=int, help="Limit the number of records reviewed")
     parser.add_argument("--only-slug", action="append", help="Limit review to one or more promise slugs")
     parser.add_argument("--sort-by-priority", action="store_true", help="Sort the display output by review_priority_score")
@@ -111,8 +111,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--timeout", type=int, help="Legacy alias that sets both senior and verifier timeouts")
     parser.add_argument("--senior-timeout", type=int, help="Timeout in seconds for the senior review model")
     parser.add_argument("--verifier-timeout", type=int, help="Timeout in seconds for the verifier/fallback review model")
-    parser.add_argument("--temperature", type=float, default=DEFAULT_TEMPERATURE, help="Sampling temperature for Ollama")
-    parser.add_argument("--ollama-url", default=DEFAULT_OLLAMA_URL, help="Base URL for the Ollama server")
+    parser.add_argument("--temperature", type=float, default=DEFAULT_TEMPERATURE, help="Sampling temperature for OpenAI-compatible requests")
+    parser.add_argument("--openai-base-url", default=DEFAULT_OPENAI_BASE_URL, help="Optional OpenAI-compatible base URL override")
     parser.add_argument(
         "--csv",
         nargs="?",
@@ -262,11 +262,11 @@ def heuristic_review(record: dict[str, Any], existing_matches: list[dict[str, An
     }
 
 
-def call_ollama(prompt: str, *, model: str, ollama_url: str, timeout: int, temperature: float) -> dict[str, Any]:
+def call_openai(prompt: str, *, model: str, openai_base_url: str, timeout: int, temperature: float) -> dict[str, Any]:
     raw_text = generate_text(
         prompt,
         model=model,
-        endpoint=ollama_url or None,
+        openai_base_url=openai_base_url or None,
         timeout_seconds=timeout,
         temperature=temperature,
         response_format="json",
@@ -276,14 +276,14 @@ def call_ollama(prompt: str, *, model: str, ollama_url: str, timeout: int, tempe
 
 def append_fallback_reason(base_note: str | None, reason: str) -> str:
     prefix = normalize_nullable_text(base_note) or "Operator should manually verify this advisory suggestion."
-    return f"{prefix} Ollama fallback reason: {reason}."
+    return f"{prefix} OpenAI fallback reason: {reason}."
 
 
-def call_ollama_with_retry(
+def call_openai_with_retry(
     prompt: str,
     *,
     model: str,
-    ollama_url: str,
+    openai_base_url: str,
     timeout: int,
     temperature: float,
 ) -> tuple[dict[str, Any] | None, int, list[str]]:
@@ -293,10 +293,10 @@ def call_ollama_with_retry(
         attempts += 1
         try:
             return (
-                call_ollama(
+                call_openai(
                     prompt,
                     model=model,
-                    ollama_url=ollama_url,
+                    openai_base_url=openai_base_url,
                     timeout=timeout,
                     temperature=temperature,
                 ),
@@ -325,10 +325,10 @@ def execute_review_ladder(
     verifier_requested_model: str,
     fallback_requested_model: str,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
-    senior_raw, senior_attempts, senior_errors = call_ollama_with_retry(
+    senior_raw, senior_attempts, senior_errors = call_openai_with_retry(
         prompt,
         model=senior_requested_model,
-        ollama_url=args.ollama_url,
+        openai_base_url=args.openai_base_url,
         timeout=args.senior_timeout,
         temperature=args.temperature,
     )
@@ -339,7 +339,7 @@ def execute_review_ladder(
         return senior_raw, {
             "resolved_model": senior_requested_model,
             "effective_model": senior_requested_model,
-            "review_backend": "ollama",
+            "review_backend": "openai",
             "fallback_used": False,
             "fallback_reason": None,
             "model_resolution_status": "exact_requested",
@@ -356,10 +356,10 @@ def execute_review_ladder(
             "verifier_failure_reason": None,
         }
 
-    verifier_raw, verifier_attempts, verifier_errors = call_ollama_with_retry(
+    verifier_raw, verifier_attempts, verifier_errors = call_openai_with_retry(
         prompt,
         model=fallback_requested_model,
-        ollama_url=args.ollama_url,
+        openai_base_url=args.openai_base_url,
         timeout=args.verifier_timeout,
         temperature=args.temperature,
     )
@@ -1451,7 +1451,7 @@ def review_record(args: argparse.Namespace, record: dict[str, Any], existing_mat
         senior_retry_attempted = standard_execution["senior_retry_attempted"] or deep_execution["senior_retry_attempted"]
         verifier_attempted = standard_execution["verifier_attempted"] or deep_execution["verifier_attempted"]
         verifier_retry_attempted = standard_execution["verifier_retry_attempted"] or deep_execution["verifier_retry_attempted"]
-        if review_backend == "ollama":
+        if review_backend == "openai":
             deep_review_reason = "operator_requested_with_senior_review"
         elif review_backend == "fallback":
             deep_review_reason = "operator_requested_but_senior_failed_using_verifier_fallback"

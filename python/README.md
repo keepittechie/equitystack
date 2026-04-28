@@ -157,7 +157,7 @@ Important:
 - the legislative manual-review queue now keeps only AI-uncertain rows that still need human inspection.
 - `legislative review` and `/admin/legislative-workflow` now focus on human bundle decisions only; AI-approved bundle actions are shown separately as apply-preview-ready work.
 - review models default to the wrapper defaults shown by `./bin/equitystack --help`; current production defaults resolve to OpenAI-style models such as `gpt-4.1-mini`.
-- legacy script filenames may still include `ollama`, but the provider layer can route OpenAI-style models when configured.
+- pipeline review stages now use the OpenAI provider path directly; wrapper defaults resolve to OpenAI-style models such as `gpt-4.1-mini`.
 - the daily review path uses 240 second senior/verifier timeouts by default.
 - `legislative import` is dry-run unless `--apply --yes` is passed through the wrapper or underlying script.
 

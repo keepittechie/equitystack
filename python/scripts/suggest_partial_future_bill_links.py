@@ -15,7 +15,7 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from lib.llm.provider import default_model_name, generate_text, list_available_models
 
-DEFAULT_OLLAMA_URL = ""
+DEFAULT_OPENAI_BASE_URL = ""
 DEFAULT_MODEL = default_model_name()
 DEFAULT_TIMEOUT = 300
 DEFAULT_TEMPERATURE = 0.1
@@ -304,15 +304,15 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--max-items", type=int, help="Maximum number of target future bills to review")
     parser.add_argument("--only-future-bill-id", type=int, action="append", help="Limit to one or more future_bill_id values")
     parser.add_argument("--only-link-id", type=int, action="append", help="Limit to one or more future_bill_link_id values")
-    parser.add_argument("--use-ollama", action="store_true", help="Use Ollama to judge the top-ranked candidates")
-    parser.add_argument("--model", default=DEFAULT_MODEL, help="Ollama model name")
-    parser.add_argument("--timeout", type=int, default=DEFAULT_TIMEOUT, help="Ollama request timeout in seconds")
-    parser.add_argument("--temperature", type=float, default=DEFAULT_TEMPERATURE, help="Ollama sampling temperature")
+    parser.add_argument("--disable-ai-judge", action="store_true", help="Skip OpenAI judging and keep deterministic ranking only")
+    parser.add_argument("--model", default=DEFAULT_MODEL, help="OpenAI review model name")
+    parser.add_argument("--timeout", type=int, default=DEFAULT_TIMEOUT, help="OpenAI request timeout in seconds")
+    parser.add_argument("--temperature", type=float, default=DEFAULT_TEMPERATURE, help="OpenAI sampling temperature")
     parser.add_argument("--output", type=Path, default=get_default_output_path(), help="Suggestions JSON output path")
     parser.add_argument("--csv", nargs="?", const="", help="Optional CSV output path. Omit value to derive it from --output")
     parser.add_argument("--dry-run", action="store_true", help="Metadata flag only; this script never mutates the database")
     parser.add_argument("--strict-manual-queue", action="store_true", help="Fail if --input-manual-queue is provided but the file does not exist")
-    parser.add_argument("--ollama-url", default=DEFAULT_OLLAMA_URL, help="Ollama base URL")
+    parser.add_argument("--openai-base-url", default=DEFAULT_OPENAI_BASE_URL, help="Optional OpenAI-compatible base URL override")
     return parser.parse_args()
 
 
@@ -487,8 +487,8 @@ def derive_csv_path(csv_arg: str | None, output_path: Path) -> Path | None:
     return Path(csv_arg).resolve()
 
 
-def fetch_available_models(ollama_url: str, timeout_seconds: int) -> list[str]:
-    return list_available_models(endpoint=ollama_url or None, timeout_seconds=timeout_seconds)
+def fetch_available_models(openai_base_url: str, timeout_seconds: int) -> list[str]:
+    return list_available_models(openai_base_url=openai_base_url or None, timeout_seconds=timeout_seconds)
 
 
 def looks_like_openai_model(model_name: str) -> bool:
@@ -514,11 +514,11 @@ def resolve_model_name(requested_model: str, available_models: list[str]) -> str
     raise ValueError(f"Requested model {requested_model} was not found. Available models: {', '.join(available_models)}")
 
 
-def call_ollama(prompt: str, model: str, ollama_url: str, timeout_seconds: int, temperature: float) -> dict[str, Any]:
+def call_openai(prompt: str, model: str, openai_base_url: str, timeout_seconds: int, temperature: float) -> dict[str, Any]:
     body = generate_text(
         prompt,
         model=model,
-        endpoint=ollama_url or None,
+        openai_base_url=openai_base_url or None,
         timeout_seconds=timeout_seconds,
         temperature=temperature,
         response_format="json",
@@ -526,10 +526,10 @@ def call_ollama(prompt: str, model: str, ollama_url: str, timeout_seconds: int, 
     start = body.find("{")
     end = body.rfind("}")
     if start == -1 or end == -1 or end <= start:
-        raise ValueError("Ollama candidate response did not contain a JSON object")
+        raise ValueError("OpenAI candidate response did not contain a JSON object")
     parsed = json.loads(body[start : end + 1])
     if not isinstance(parsed, dict):
-        raise ValueError("Ollama candidate response must be a JSON object")
+        raise ValueError("OpenAI candidate response must be a JSON object")
     return parsed
 
 
@@ -1396,12 +1396,12 @@ def normalize_llm_decision(value: Any) -> str:
     return "no_match"
 
 
-def judge_candidates_with_ollama(
+def judge_candidates_with_openai(
     candidates: list[dict[str, Any]],
     future_bill: dict[str, Any],
     current_candidate: dict[str, Any] | None,
     model: str,
-    ollama_url: str,
+    openai_base_url: str,
     timeout_seconds: int,
     temperature: float,
 ) -> list[dict[str, Any]]:
@@ -1411,7 +1411,7 @@ def judge_candidates_with_ollama(
         llm_decision = None
         llm_reasoning = None
         try:
-            payload = call_ollama(prompt, model, ollama_url, timeout_seconds, temperature)
+            payload = call_openai(prompt, model, openai_base_url, timeout_seconds, temperature)
             llm_decision = normalize_llm_decision(payload.get("decision"))
             llm_reasoning = normalize_whitespace(payload.get("reasoning_short"))[:400]
             better_than_current = bool(payload.get("better_than_current"))
@@ -1419,7 +1419,7 @@ def judge_candidates_with_ollama(
             suitable_as_direct = bool(payload.get("suitable_as_direct"))
         except Exception as error:
             llm_decision = "no_match"
-            llm_reasoning = f"Ollama candidate judge failed: {error}"
+            llm_reasoning = f"OpenAI candidate judge failed: {error}"
             better_than_current = False
             suitable_as_partial = False
             suitable_as_direct = False
@@ -1591,7 +1591,7 @@ def write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
             writer.writerow({field: row.get(field) for field in OUTPUT_FIELDS})
 
 
-def build_summary(rows: list[dict[str, Any]], future_bill_count: int, use_ollama: bool) -> dict[str, int | bool]:
+def build_summary(rows: list[dict[str, Any]], future_bill_count: int, ai_judge_enabled: bool) -> dict[str, int | bool]:
     summary = {
         "future_bills_reviewed": future_bill_count,
         "suggestions_written": len(rows),
@@ -1600,7 +1600,7 @@ def build_summary(rows: list[dict[str, Any]], future_bill_count: int, use_ollama
         "direct_replacement_candidates": 0,
         "partial_candidates": 0,
         "manual_only_rows": 0,
-        "ollama_used": use_ollama,
+        "ai_judge_enabled": ai_judge_enabled,
     }
     for row in rows:
         if row["suggestion_type"] == "partial_conversion":
@@ -1647,9 +1647,10 @@ def main() -> None:
             "No input reports were available. Provide at least one valid AI review report or manual review queue."
         )
 
+    ai_judge_enabled = not args.disable_ai_judge
     resolved_model = None
-    if args.use_ollama:
-        available_models = fetch_available_models(args.ollama_url, args.timeout)
+    if ai_judge_enabled:
+        available_models = fetch_available_models(args.openai_base_url, args.timeout)
         resolved_model = resolve_model_name(args.model, available_models)
         if resolved_model != args.model:
             print(f"Requested model {args.model} not found. Using {resolved_model} instead.")
@@ -1679,7 +1680,7 @@ def main() -> None:
             print("Future Bill Partial Suggestion Engine")
             print(f"Targets: {len(targets)}")
             print(f"Top K alternates: {args.top_k}")
-            print(f"Ollama: {'enabled' if args.use_ollama else 'disabled'}")
+            print(f"AI judge: {'enabled' if ai_judge_enabled else 'disabled'}")
 
             for index, target in enumerate(targets, start=1):
                 future_bill = fetch_future_bill(cursor, target.future_bill_id)
@@ -1705,13 +1706,13 @@ def main() -> None:
                 for rank, candidate in enumerate(top_alternates, start=1):
                     candidate["candidate_rank"] = rank
 
-                if args.use_ollama and top_alternates:
-                    judged = judge_candidates_with_ollama(
+                if ai_judge_enabled and top_alternates:
+                    judged = judge_candidates_with_openai(
                         top_alternates[:DEFAULT_LLM_TOP_CANDIDATES],
                         future_bill,
                         scored_current,
                         resolved_model,
-                        args.ollama_url,
+                        args.openai_base_url,
                         args.timeout,
                         args.temperature,
                     )
@@ -1784,12 +1785,12 @@ def main() -> None:
         "generated_at": datetime.now(UTC).isoformat(),
         "input_review_report": str(args.input_review_report.resolve()) if args.input_review_report else None,
         "input_manual_queue": str(args.input_manual_queue.resolve()) if args.input_manual_queue else None,
-        "use_ollama": args.use_ollama,
-        "requested_model": args.model if args.use_ollama else None,
+        "ai_judge_enabled": ai_judge_enabled,
+        "requested_model": args.model if ai_judge_enabled else None,
         "resolved_model": resolved_model,
         "top_k": args.top_k,
         "dry_run": args.dry_run,
-        "summary": build_summary(rows, len({row['future_bill_id'] for row in rows}), args.use_ollama),
+        "summary": build_summary(rows, len({row['future_bill_id'] for row in rows}), ai_judge_enabled),
         "items": rows,
     }
     write_json(output_path, payload)

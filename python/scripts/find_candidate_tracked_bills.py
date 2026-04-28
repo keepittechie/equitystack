@@ -19,7 +19,7 @@ from lib.llm.provider import generate_text
 
 from suggest_partial_future_bill_links import (
     DEFAULT_MODEL,
-    DEFAULT_OLLAMA_URL,
+    DEFAULT_OPENAI_BASE_URL,
     DEFAULT_SEED,
     DEFAULT_TEMPERATURE,
     DOMAIN_KEYWORDS,
@@ -405,10 +405,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--only-future-bill-id", type=int, action="append", help="Limit discovery to one or more future_bill_id values")
     parser.add_argument("--max-items", type=int, help="Maximum number of future bill concepts to process")
     parser.add_argument("--top-k", type=int, default=DEFAULT_TOP_K, help="Number of ranked discovery candidates to keep per future bill")
-    parser.add_argument("--use-ollama", action="store_true", help="Use Ollama to judge top discovery candidates")
-    parser.add_argument("--model", default=DEFAULT_MODEL, help="Ollama model name")
+    parser.add_argument("--disable-ai-judge", action="store_true", help="Skip OpenAI judging and keep deterministic ranking only")
+    parser.add_argument("--model", default=DEFAULT_MODEL, help="OpenAI review model name")
     parser.add_argument("--timeout", type=int, default=DEFAULT_TIMEOUT, help="Request timeout in seconds")
-    parser.add_argument("--temperature", type=float, default=DEFAULT_TEMPERATURE, help="Ollama sampling temperature")
+    parser.add_argument("--temperature", type=float, default=DEFAULT_TEMPERATURE, help="OpenAI sampling temperature")
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT_PATH, help="Discovery report JSON output path")
     parser.add_argument("--csv", nargs="?", const="", help="Optional CSV output path")
     parser.add_argument("--write-seed", action="store_true", help="Write a conservative candidate seed JSON file")
@@ -416,7 +416,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--trigger-from-suggestions", type=Path, help="Suggestion report JSON path")
     parser.add_argument("--trigger-from-review", type=Path, help="AI review report JSON path")
     parser.add_argument("--dry-run", action="store_true", help="Metadata flag only; this script never mutates the database")
-    parser.add_argument("--ollama-url", default=DEFAULT_OLLAMA_URL, help="Ollama base URL")
+    parser.add_argument("--openai-base-url", default=DEFAULT_OPENAI_BASE_URL, help="Optional OpenAI-compatible base URL override")
     return parser.parse_args()
 
 
@@ -1022,11 +1022,11 @@ def build_llm_prompt(future_bill: dict[str, Any], candidate: dict[str, Any]) -> 
     )
 
 
-def call_ollama(prompt: str, model: str, ollama_url: str, timeout_seconds: int, temperature: float) -> dict[str, Any]:
+def call_openai(prompt: str, model: str, openai_base_url: str, timeout_seconds: int, temperature: float) -> dict[str, Any]:
     body = generate_text(
         prompt,
         model=model,
-        endpoint=ollama_url or None,
+        openai_base_url=openai_base_url or None,
         timeout_seconds=timeout_seconds,
         temperature=temperature,
         response_format="json",
@@ -1049,19 +1049,19 @@ def judge_import_candidates(
     future_bill: dict[str, Any],
     candidates: list[dict[str, Any]],
     model: str,
-    ollama_url: str,
+    openai_base_url: str,
     timeout_seconds: int,
     temperature: float,
 ) -> list[dict[str, Any]]:
     judged = []
     for candidate in candidates:
         try:
-            payload = call_ollama(build_llm_prompt(future_bill, candidate), model, ollama_url, timeout_seconds, temperature)
+            payload = call_openai(build_llm_prompt(future_bill, candidate), model, openai_base_url, timeout_seconds, temperature)
             llm_decision = normalize_llm_import_decision(payload.get("decision"))
             llm_reasoning = normalize_whitespace(payload.get("reasoning_short"))[:400]
         except Exception as error:
             llm_decision = "reject_candidate"
-            llm_reasoning = f"Ollama discovery judge failed: {error}"
+            llm_reasoning = f"OpenAI discovery judge failed: {error}"
 
         updated = dict(candidate)
         updated["llm_import_decision"] = llm_decision
@@ -1095,9 +1095,10 @@ def main() -> None:
     if not suggestion_payload and not review_payload and not args.only_future_bill_id:
         raise SystemExit("Provide --trigger-from-suggestions, --trigger-from-review, or --only-future-bill-id.")
 
+    ai_judge_enabled = not args.disable_ai_judge
     resolved_model = None
-    if args.use_ollama:
-        resolved_model = resolve_model_name(args.model, fetch_available_models(args.ollama_url, args.timeout))
+    if ai_judge_enabled:
+        resolved_model = resolve_model_name(args.model, fetch_available_models(args.openai_base_url, args.timeout))
         if resolved_model != args.model:
             print(f"Requested model {args.model} not found. Using {resolved_model} instead.")
 
@@ -1133,7 +1134,7 @@ def main() -> None:
             print("Future Bill Candidate Discovery")
             print(f"Targets: {len(triggers)}")
             print(f"Top K candidates: {args.top_k}")
-            print(f"Ollama: {'enabled' if args.use_ollama else 'disabled'}")
+            print(f"AI judge: {'enabled' if ai_judge_enabled else 'disabled'}")
 
             for index, trigger in enumerate(triggers, start=1):
                 future_bill = future_bills[trigger["future_bill_id"]]
@@ -1175,12 +1176,12 @@ def main() -> None:
                     candidate["future_bill_id"] = future_bill["id"]
 
                 ranked = ranked[: args.top_k]
-                if args.use_ollama and ranked:
+                if ai_judge_enabled and ranked:
                     judged = judge_import_candidates(
                         future_bill,
                         ranked[: min(3, len(ranked))],
                         resolved_model,
-                        args.ollama_url,
+                        args.openai_base_url,
                         args.timeout,
                         args.temperature,
                     )
@@ -1270,8 +1271,8 @@ def main() -> None:
         "generated_at": datetime.now(UTC).isoformat(),
         "trigger_from_suggestions": str(args.trigger_from_suggestions.resolve()) if args.trigger_from_suggestions else None,
         "trigger_from_review": str(args.trigger_from_review.resolve()) if args.trigger_from_review else None,
-        "use_ollama": args.use_ollama,
-        "requested_model": args.model if args.use_ollama else None,
+        "ai_judge_enabled": ai_judge_enabled,
+        "requested_model": args.model if ai_judge_enabled else None,
         "resolved_model": resolved_model,
         "top_k": args.top_k,
         "dry_run": args.dry_run,

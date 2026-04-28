@@ -834,11 +834,11 @@ run_current_admin_workflow_finalize() {
   fi
   local senior_timeout="$REVIEW_ARTIFACT_TIMEOUT"
   if [ -z "$senior_timeout" ]; then
-    senior_timeout="$DEFAULT_OLLAMA_TIMEOUT_SENIOR"
+    senior_timeout="$DEFAULT_REVIEW_TIMEOUT_SENIOR"
   fi
   local verifier_timeout="$REVIEW_ARTIFACT_VERIFIER_TIMEOUT"
   if [ -z "$verifier_timeout" ]; then
-    verifier_timeout="$DEFAULT_OLLAMA_TIMEOUT_VERIFIER"
+    verifier_timeout="$DEFAULT_REVIEW_TIMEOUT_VERIFIER"
   fi
   local total_steps="2"
   if [ "$feedback_summary" = "true" ]; then
@@ -992,10 +992,10 @@ run_current_admin_workflow_start() {
   local fallback_model=""
   local review_mode=""
   local deep_review="false"
-  local ollama_url="$DEFAULT_OLLAMA_URL"
+  local openai_base_url="$DEFAULT_CURRENT_ADMIN_OPENAI_BASE_URL"
   local timeout=""
-  local senior_timeout="$DEFAULT_OLLAMA_TIMEOUT_SENIOR"
-  local verifier_timeout="$DEFAULT_OLLAMA_TIMEOUT_VERIFIER"
+  local senior_timeout="$DEFAULT_REVIEW_TIMEOUT_SENIOR"
+  local verifier_timeout="$DEFAULT_REVIEW_TIMEOUT_VERIFIER"
 
   while [ "$#" -gt 0 ]; do
     case "$1" in
@@ -1045,9 +1045,9 @@ run_current_admin_workflow_start() {
         deep_review="true"
         shift
         ;;
-      --ollama-url)
-        ollama_url="${2:-}"
-        [ -n "$ollama_url" ] || { echo "--ollama-url requires a value" >&2; exit 1; }
+      --openai-base-url)
+        openai_base_url="${2:-}"
+        [ -n "$openai_base_url" ] || { echo "--openai-base-url requires a value" >&2; exit 1; }
         shift 2
         ;;
       --timeout)
@@ -1112,6 +1112,7 @@ run_current_admin_workflow_start() {
     --senior-timeout "$senior_timeout"
     --verifier-timeout "$verifier_timeout"
     --review-mode "$review_mode"
+    --openai-base-url "$openai_base_url"
   )
   if [ "$review_dry_run" = "true" ]; then
     review_args+=(--dry-run)
@@ -1153,7 +1154,7 @@ run_current_admin_review_command() {
   local has_model="false"
   local has_verifier_model="false"
   local has_fallback_model="false"
-  local has_ollama_url="false"
+  local has_openai_base_url="false"
   local has_timeout="false"
   local has_senior_timeout="false"
   local has_verifier_timeout="false"
@@ -1202,11 +1203,11 @@ run_current_admin_review_command() {
           shift
         fi
         ;;
-      --ollama-url|--ollama-url=*)
-        has_ollama_url="true"
+      --openai-base-url|--openai-base-url=*)
+        has_openai_base_url="true"
         passthrough+=("$1")
-        if [ "$1" = "--ollama-url" ]; then
-          [ -n "${2:-}" ] || { echo "--ollama-url requires a value" >&2; exit 1; }
+        if [ "$1" = "--openai-base-url" ]; then
+          [ -n "${2:-}" ] || { echo "--openai-base-url requires a value" >&2; exit 1; }
           passthrough+=("$2")
           shift 2
         else
@@ -1282,14 +1283,17 @@ run_current_admin_review_command() {
     :
   else
     if [ "$has_senior_timeout" = "false" ]; then
-      passthrough+=(--senior-timeout "$DEFAULT_OLLAMA_TIMEOUT_SENIOR")
+      passthrough+=(--senior-timeout "$DEFAULT_REVIEW_TIMEOUT_SENIOR")
     fi
     if [ "$has_verifier_timeout" = "false" ]; then
-      passthrough+=(--verifier-timeout "$DEFAULT_OLLAMA_TIMEOUT_VERIFIER")
+      passthrough+=(--verifier-timeout "$DEFAULT_REVIEW_TIMEOUT_VERIFIER")
     fi
   fi
   if [ "$has_review_mode" = "false" ]; then
     passthrough+=(--review-mode deep)
+  fi
+  if [ "$has_openai_base_url" = "false" ]; then
+    passthrough+=(--openai-base-url "$DEFAULT_CURRENT_ADMIN_OPENAI_BASE_URL")
   fi
 
   local review_script="scripts/review_current_admin_batch_with_openai_batch.py"
@@ -1308,7 +1312,7 @@ run_current_admin_review_command() {
 run_current_admin_discover_command() {
   local -a passthrough=()
   local has_model="false"
-  local has_ollama_url="false"
+  local has_openai_base_url="false"
   local has_timeout="false"
 
   while [ "$#" -gt 0 ]; do
@@ -1328,11 +1332,11 @@ run_current_admin_discover_command() {
           shift
         fi
         ;;
-      --ollama-url|--ollama-url=*)
-        has_ollama_url="true"
+      --openai-base-url|--openai-base-url=*)
+        has_openai_base_url="true"
         passthrough+=("$1")
-        if [ "$1" = "--ollama-url" ]; then
-          [ -n "${2:-}" ] || { echo "--ollama-url requires a value" >&2; exit 1; }
+        if [ "$1" = "--openai-base-url" ]; then
+          [ -n "${2:-}" ] || { echo "--openai-base-url requires a value" >&2; exit 1; }
           passthrough+=("$2")
           shift 2
         else
@@ -1360,11 +1364,11 @@ run_current_admin_discover_command() {
   if [ "$has_model" = "false" ]; then
     passthrough+=(--model "$DEFAULT_MODEL_CHEAP")
   fi
-  if [ "$has_ollama_url" = "false" ]; then
-    passthrough+=(--ollama-url "$DEFAULT_OLLAMA_URL")
+  if [ "$has_openai_base_url" = "false" ]; then
+    passthrough+=(--openai-base-url "$DEFAULT_CURRENT_ADMIN_OPENAI_BASE_URL")
   fi
   if [ "$has_timeout" = "false" ]; then
-    passthrough+=(--timeout "$DEFAULT_OLLAMA_TIMEOUT_VERIFIER")
+    passthrough+=(--timeout "$DEFAULT_REVIEW_TIMEOUT_VERIFIER")
   fi
 
   run_step "1/1" "Discover Current-Admin Updates" "Discovery run complete" -- \
@@ -1438,7 +1442,13 @@ run_current_admin_run_command() {
         discovery_args+=("$1")
         shift
         ;;
-      --model|--verifier-model|--fallback-model|--ollama-url|--timeout|--senior-timeout|--verifier-timeout|--review-mode)
+      --openai-base-url)
+        discovery_args+=("$1" "${2:-}")
+        workflow_args+=("$1" "${2:-}")
+        [ -n "${2:-}" ] || { echo "$1 requires a value" >&2; exit 1; }
+        shift 2
+        ;;
+      --model|--verifier-model|--fallback-model|--openai-base-url|--timeout|--senior-timeout|--verifier-timeout|--review-mode)
         workflow_args+=("$1" "${2:-}")
         [ -n "${2:-}" ] || { echo "$1 requires a value" >&2; exit 1; }
         shift 2
@@ -1777,8 +1787,8 @@ run_legislative_command() {
       local verifier_model="$DEFAULT_MODEL_VERIFIER"
       local fallback_model="$DEFAULT_MODEL_FALLBACK"
       local timeout=""
-      local senior_timeout="$DEFAULT_OLLAMA_TIMEOUT_SENIOR"
-      local verifier_timeout="$DEFAULT_OLLAMA_TIMEOUT_VERIFIER"
+      local senior_timeout="$DEFAULT_REVIEW_TIMEOUT_SENIOR"
+      local verifier_timeout="$DEFAULT_REVIEW_TIMEOUT_VERIFIER"
       local -a passthrough=()
 
       while [ "$#" -gt 0 ]; do
@@ -2681,9 +2691,9 @@ Shared runtime defaults:
   review AI:        $DEFAULT_MODEL_REVIEW
   fallback AI:      $DEFAULT_MODEL_FALLBACK
   executor model:   $DEFAULT_MODEL_EXECUTOR
-  LLM endpoint:     $DEFAULT_OLLAMA_URL
-  senior timeout:   ${DEFAULT_OLLAMA_TIMEOUT_SENIOR}s
-  verifier timeout: ${DEFAULT_OLLAMA_TIMEOUT_VERIFIER}s
+  OpenAI base URL:  $DEFAULT_OPENAI_BASE_URL
+  senior timeout:   ${DEFAULT_REVIEW_TIMEOUT_SENIOR}s
+  verifier timeout: ${DEFAULT_REVIEW_TIMEOUT_VERIFIER}s
 
 Legislative commands:
   run        Run the daily review-first pipeline, auto-triage safe actions, rebuild the bundle
@@ -2982,8 +2992,8 @@ Defaults:
 
   current-admin discovery defaults to:
     model       $DEFAULT_MODEL_VERIFIER
-    timeout     ${DEFAULT_OLLAMA_TIMEOUT_VERIFIER}s
-    llm endpoint $DEFAULT_OLLAMA_URL
+    timeout     ${DEFAULT_REVIEW_TIMEOUT_VERIFIER}s
+    openai-base-url $DEFAULT_CURRENT_ADMIN_OPENAI_BASE_URL
     live sources python/config/current_admin_sources.json (unless --disable-default-sources is passed)
 
 Path handling:
@@ -3020,7 +3030,7 @@ current_admin_workflow_subcommand_usage() {
     start)
       cat <<EOF
 Usage:
-  equitystack current-admin workflow start [--input <batch-file> | --batch-name <batch-name>] [--review-dry-run] [--prefill-suggestions] [--model <openai-model>] [--verifier-model <name>] [--fallback-model <name>] [--timeout <seconds>] [--senior-timeout <seconds>] [--verifier-timeout <seconds>] [--ollama-url <url>] [--deep-review | --review-mode <standard|deep>]
+  equitystack current-admin workflow start [--input <batch-file> | --batch-name <batch-name>] [--review-dry-run] [--prefill-suggestions] [--model <openai-model>] [--verifier-model <name>] [--fallback-model <name>] [--timeout <seconds>] [--senior-timeout <seconds>] [--verifier-timeout <seconds>] [--openai-base-url <url>] [--deep-review | --review-mode <standard|deep>]
 
 Runs the existing safe pre-import workflow:
   normalize -> review -> queue
@@ -3079,8 +3089,8 @@ Runs:
 
 Wrapper defaults:
   --model $DEFAULT_MODEL_VERIFIER
-  --timeout $DEFAULT_OLLAMA_TIMEOUT_VERIFIER
-  --ollama-url $DEFAULT_OLLAMA_URL  (legacy alias for the configured LLM endpoint)
+  --timeout $DEFAULT_REVIEW_TIMEOUT_VERIFIER
+  --openai-base-url $DEFAULT_CURRENT_ADMIN_OPENAI_BASE_URL
 
 By default discovery also loads configured live sources from:
   python/config/current_admin_sources.json
@@ -3137,8 +3147,8 @@ Wrapper defaults:
   --model $DEFAULT_CURRENT_ADMIN_REVIEW_MODEL
   --verifier-model $DEFAULT_CURRENT_ADMIN_VERIFIER_MODEL
   --fallback-model $DEFAULT_CURRENT_ADMIN_FALLBACK_MODEL
-  --senior-timeout $DEFAULT_OLLAMA_TIMEOUT_SENIOR
-  --verifier-timeout $DEFAULT_OLLAMA_TIMEOUT_VERIFIER
+  --senior-timeout $DEFAULT_REVIEW_TIMEOUT_SENIOR
+  --verifier-timeout $DEFAULT_REVIEW_TIMEOUT_VERIFIER
   --review-mode deep
   --openai-base-url $DEFAULT_CURRENT_ADMIN_OPENAI_BASE_URL
 

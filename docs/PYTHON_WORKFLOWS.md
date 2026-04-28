@@ -88,7 +88,7 @@ Important scripts:
 | Daily pipeline | `run_equitystack_pipeline.py` |
 | Tracked bill sync | `update_database.py` |
 | Link audit | `scripts/audit_future_bill_links.py` |
-| AI review | `scripts/review_future_bill_audit_with_ollama.py` |
+| AI review | `scripts/review_future_bill_audit.py` |
 | AI review apply | `scripts/apply_future_bill_ai_review.py` |
 | Partial-link suggestions | `scripts/suggest_partial_future_bill_links.py` |
 | Candidate discovery | `scripts/find_candidate_tracked_bills.py` |
@@ -108,7 +108,7 @@ Safety:
 - Legislative outcomes are inserted into `policy_outcomes` with `impact_score`, but are excluded from per-president scoring until deterministic president attribution exists.
 - Stale approved `remove_direct_link` actions are treated as already resolved when their target link is already absent.
 
-Note: some legacy script filenames still include `ollama`; the provider layer can route OpenAI-style models such as `gpt-4.1-mini` when configured.
+Note: pipeline review stages now use the OpenAI provider path directly, and wrapper defaults can resolve to OpenAI-style models such as `gpt-4.1-mini`.
 
 ## Impact and Certification Workflow
 

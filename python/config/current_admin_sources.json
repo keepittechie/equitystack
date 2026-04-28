@@ -64,6 +64,44 @@
       "enabled": true,
       "default": true,
       "max_items": 10
+    },
+    {
+      "name": "Department of Justice Press Releases",
+      "type": "rss",
+      "url": "https://www.justice.gov/news/rss?m=1&type=press_release",
+      "category": "agency-enforcement",
+      "publisher": "Department of Justice",
+      "enabled": true,
+      "default": true,
+      "max_items": 6
+    },
+    {
+      "name": "Supreme Court Opinions of the Court",
+      "type": "html",
+      "parser": "supreme_court_opinions_table",
+      "url_template": "https://www.supremecourt.gov/opinions/slipopinion/{supreme_court_term_year}",
+      "category": "court",
+      "publisher": "Supreme Court of the United States",
+      "enabled": true,
+      "default": true,
+      "max_items": 6,
+      "action_type_hint": "Court-Related Action",
+      "legal_status": "ruled",
+      "court_or_agency": "Supreme Court of the United States"
+    },
+    {
+      "name": "Supreme Court Opinions Relating to Orders",
+      "type": "html",
+      "parser": "supreme_court_opinions_table",
+      "url_template": "https://www.supremecourt.gov/opinions/relatingtoorders/{supreme_court_term_year}",
+      "category": "court",
+      "publisher": "Supreme Court of the United States",
+      "enabled": true,
+      "default": true,
+      "max_items": 6,
+      "action_type_hint": "Court-Related Action",
+      "legal_status": "ruled",
+      "court_or_agency": "Supreme Court of the United States"
     }
   ]
 }

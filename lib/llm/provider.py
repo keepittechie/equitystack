@@ -192,6 +192,7 @@ class DefaultLLMProvider(LLMProvider):
         *,
         model: str | None = None,
         endpoint: str | None = None,
+        openai_base_url: str | None = None,
         timeout_seconds: int | None = None,
         temperature: float | None = None,
         response_format: str | None = None,
@@ -199,7 +200,13 @@ class DefaultLLMProvider(LLMProvider):
     ):
         self.config = {**(config or {})}
         self.openai_api_key = self.config.get("openai_api_key")
-        self.openai_base_url = str(self.config.get("openai_base_url") or DEFAULT_OPENAI_BASE_URL).rstrip("/")
+        explicit_openai_base_url = str(openai_base_url or "").strip()
+        self.openai_base_url = (
+            explicit_openai_base_url.rstrip("/")
+            if explicit_openai_base_url
+            else str(self.config.get("openai_base_url") or DEFAULT_OPENAI_BASE_URL).rstrip("/")
+        )
+        self.openai_base_url_was_explicit = bool(explicit_openai_base_url)
         self.requested_model = normalize_model_name(model or self.config.get("model"))
         self.model = (
             resolve_openai_compatible_model(model or self.config.get("model"), self.config)
@@ -215,6 +222,8 @@ class DefaultLLMProvider(LLMProvider):
     def should_use_openai_chat(self) -> bool:
         if not self.openai_api_key:
             return False
+        if self.openai_base_url_was_explicit:
+            return True
         if not self.endpoint:
             return True
         if not self.endpoint_was_explicit and looks_like_openai_model(self.model):
@@ -359,6 +368,7 @@ def get_default_provider(
     *,
     model: str | None = None,
     endpoint: str | None = None,
+    openai_base_url: str | None = None,
     timeout_seconds: int | None = None,
     temperature: float | None = None,
     response_format: str | None = None,
@@ -370,6 +380,7 @@ def get_default_provider(
     return DefaultLLMProvider(
         model=model,
         endpoint=endpoint,
+        openai_base_url=openai_base_url,
         timeout_seconds=timeout_seconds,
         temperature=temperature,
         response_format=response_format,
@@ -383,6 +394,7 @@ def generate_text(
     system: str | None = None,
     model: str | None = None,
     endpoint: str | None = None,
+    openai_base_url: str | None = None,
     timeout_seconds: int | None = None,
     temperature: float | None = None,
     response_format: str | None = "json",
@@ -390,20 +402,39 @@ def generate_text(
     provider = get_default_provider(
         model=model,
         endpoint=endpoint,
+        openai_base_url=openai_base_url,
         timeout_seconds=timeout_seconds,
         temperature=temperature,
         response_format=response_format,
     )
     return provider.generate(prompt, system)
 
-
-def list_available_models(*, endpoint: str | None = None, timeout_seconds: int | None = None) -> list[str]:
+def list_available_models(
+    *,
+    endpoint: str | None = None,
+    openai_base_url: str | None = None,
+    timeout_seconds: int | None = None,
+) -> list[str]:
     config = load_llm_config()
-    models_endpoint = endpoint or config.get("models_endpoint")
+    normalized_openai_base_url = str(openai_base_url or "").strip().rstrip("/")
+    if normalized_openai_base_url:
+        models_endpoint = (
+            normalized_openai_base_url
+            if normalized_openai_base_url.endswith("/models")
+            else f"{normalized_openai_base_url}/models"
+        )
+    else:
+        models_endpoint = endpoint or config.get("models_endpoint")
     headers = {}
-    if not models_endpoint and config.get("openai_api_key"):
+    if (normalized_openai_base_url or not models_endpoint) and config.get("openai_api_key"):
         models_endpoint = f"{str(config.get('openai_base_url') or DEFAULT_OPENAI_BASE_URL).rstrip('/')}/models"
         headers["authorization"] = f"Bearer {config['openai_api_key']}"
+        if normalized_openai_base_url:
+            models_endpoint = (
+                normalized_openai_base_url
+                if normalized_openai_base_url.endswith("/models")
+                else f"{normalized_openai_base_url}/models"
+            )
     if not models_endpoint:
         return []
     response = requests.get(models_endpoint, headers=headers, timeout=int(timeout_seconds or config.get("timeout_seconds") or DEFAULT_TIMEOUT_SECONDS))

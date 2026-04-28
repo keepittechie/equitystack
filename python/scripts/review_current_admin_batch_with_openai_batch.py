@@ -186,7 +186,6 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--senior-timeout", type=int, help="Compatibility-only timeout flag preserved for existing wrappers")
     parser.add_argument("--verifier-timeout", type=int, help="Compatibility-only timeout flag preserved for existing wrappers")
     parser.add_argument("--temperature", type=float, default=DEFAULT_TEMPERATURE, help="Sampling temperature used for the Responses API")
-    parser.add_argument("--ollama-url", default="", help="Compatibility-only flag preserved for existing wrappers")
     parser.add_argument("--openai-base-url", default="", help="Optional OpenAI-compatible base URL override")
     parser.add_argument(
         "--completion-window",

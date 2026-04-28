@@ -18,7 +18,7 @@ if str(PROJECT_ROOT) not in sys.path:
 from lib.llm.provider import default_model_name, generate_text, list_available_models
 
 
-DEFAULT_OLLAMA_URL = ""
+DEFAULT_OPENAI_BASE_URL = ""
 DEFAULT_MODEL = default_model_name()
 DEFAULT_MODEL_VERIFIER = DEFAULT_MODEL
 DEFAULT_MODEL_FALLBACK = DEFAULT_MODEL
@@ -121,7 +121,7 @@ def get_default_output_path() -> Path:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Run a rubric-based Ollama review over the existing future bill link audit report."
+        description="Run a rubric-based OpenAI review over the existing future bill link audit report."
     )
     parser.add_argument("--input", type=Path, default=get_default_input_path(), help="Path to future_bill_link_audit.json")
     parser.add_argument("--output", type=Path, default=get_default_output_path(), help="Path to write the AI review JSON report")
@@ -131,18 +131,18 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--include-medium", action="store_true", help="Review medium-risk items in addition to high-risk items")
     parser.add_argument("--max-items", type=int, help="Limit the number of items reviewed after filtering")
     parser.add_argument("--only-link-id", type=int, help="Review only a single future_bill_link_id")
-    parser.add_argument("--dry-run", action="store_true", help="Skip Ollama calls and emit placeholder manual-review rows")
+    parser.add_argument("--dry-run", action="store_true", help="Skip OpenAI calls and emit placeholder manual-review rows")
     parser.add_argument("--timeout", type=int, help="Legacy alias that sets both senior and verifier timeouts")
     parser.add_argument("--senior-timeout", type=int, help="Timeout in seconds for the senior review model")
     parser.add_argument("--verifier-timeout", type=int, help="Timeout in seconds for the verifier/fallback review model")
-    parser.add_argument("--temperature", type=float, default=DEFAULT_TEMPERATURE, help="Sampling temperature passed to Ollama")
+    parser.add_argument("--temperature", type=float, default=DEFAULT_TEMPERATURE, help="Sampling temperature passed to OpenAI-compatible requests")
     parser.add_argument(
         "--csv",
         nargs="?",
         const="",
         help="Optionally write a CSV review file. Pass a path or omit the value to derive one from --output.",
     )
-    parser.add_argument("--ollama-url", default=DEFAULT_OLLAMA_URL, help="Base URL for the Ollama server")
+    parser.add_argument("--openai-base-url", default=DEFAULT_OPENAI_BASE_URL, help="Optional OpenAI-compatible base URL override")
     args = parser.parse_args()
     shared_timeout = args.timeout
     args.senior_timeout = args.senior_timeout or shared_timeout or DEFAULT_SENIOR_TIMEOUT
@@ -161,8 +161,8 @@ def load_audit_report(path: Path) -> dict[str, Any]:
     return data
 
 
-def fetch_available_models(ollama_url: str, timeout_seconds: int) -> list[str]:
-    return list_available_models(endpoint=ollama_url or None, timeout_seconds=timeout_seconds)
+def fetch_available_models(openai_base_url: str, timeout_seconds: int) -> list[str]:
+    return list_available_models(openai_base_url=openai_base_url or None, timeout_seconds=timeout_seconds)
 
 
 def select_rows(payload: dict[str, Any], include_medium: bool, only_link_id: int | None, max_items: int | None) -> list[dict[str, Any]]:
@@ -517,11 +517,11 @@ def build_prompt(row: dict[str, Any], heuristics: HeuristicContext) -> str:
     )
 
 
-def call_ollama(prompt: str, model: str, ollama_url: str, timeout_seconds: int, temperature: float) -> str:
+def call_openai(prompt: str, model: str, openai_base_url: str, timeout_seconds: int, temperature: float) -> str:
     body = generate_text(
         prompt,
         model=model,
-        endpoint=ollama_url or None,
+        openai_base_url=openai_base_url or None,
         timeout_seconds=timeout_seconds,
         temperature=temperature,
         response_format="json",
@@ -531,10 +531,10 @@ def call_ollama(prompt: str, model: str, ollama_url: str, timeout_seconds: int, 
     return body
 
 
-def call_ollama_with_retry(
+def call_openai_with_retry(
     prompt: str,
     model: str,
-    ollama_url: str,
+    openai_base_url: str,
     timeout_seconds: int,
     temperature: float,
 ) -> tuple[dict[str, Any] | None, int, list[str]]:
@@ -543,7 +543,7 @@ def call_ollama_with_retry(
     for _ in range(2):
         attempts += 1
         try:
-            raw_text = call_ollama(prompt, model, ollama_url, timeout_seconds, temperature)
+            raw_text = call_openai(prompt, model, openai_base_url, timeout_seconds, temperature)
             raw_payload = parse_json_response(raw_text)
             return raw_payload, attempts, errors
         except (json.JSONDecodeError, requests.RequestException, RuntimeError, ValueError) as error:
@@ -565,11 +565,11 @@ def parse_json_response(text: str) -> dict[str, Any]:
     start = candidate.find("{")
     end = candidate.rfind("}")
     if start == -1 or end == -1 or end <= start:
-        raise ValueError("No JSON object found in Ollama response")
+        raise ValueError("No JSON object found in OpenAI response")
 
     parsed = json.loads(candidate[start : end + 1])
     if not isinstance(parsed, dict):
-        raise ValueError("Ollama response JSON must be an object")
+        raise ValueError("OpenAI response JSON must be an object")
     return parsed
 
 
@@ -700,7 +700,7 @@ def fallback_review(row: dict[str, Any], reason: str, heuristics: HeuristicConte
         "signal_evidence_gaps": [reason],
         "signal_ambiguity": "high",
         "signal_conflicts": [],
-        "applied_penalties": ["downgraded to manual review because no usable Ollama result was available"],
+        "applied_penalties": ["downgraded to manual review because no usable OpenAI result was available"],
         "self_check": "A cautious reviewer would not keep or strengthen this link without a usable model result.",
         "llm_reasoning_short": reason,
         "llm_suggested_new_link_type": "None",
@@ -845,7 +845,7 @@ def review_row(
     model: str,
     verifier_model: str,
     fallback_model: str,
-    ollama_url: str,
+    openai_base_url: str,
     senior_timeout_seconds: int,
     verifier_timeout_seconds: int,
     temperature: float,
@@ -858,7 +858,7 @@ def review_row(
     effective_model = None
     fallback_used = False
     fallback_reason = None
-    review_backend = "dry_run" if dry_run else "ollama"
+    review_backend = "dry_run" if dry_run else "openai"
     model_resolution_status = "dry_run" if dry_run else "exact_requested"
     retry_count = 0
     senior_attempted = False
@@ -868,13 +868,13 @@ def review_row(
     resolved_model = None
 
     if dry_run:
-        normalized = fallback_review(row, "Dry run mode skipped the Ollama review call.", heuristics)
+        normalized = fallback_review(row, "Dry run mode skipped the OpenAI review call.", heuristics)
     else:
         prompt = build_prompt(row, heuristics)
-        senior_payload, senior_attempts, senior_errors = call_ollama_with_retry(
+        senior_payload, senior_attempts, senior_errors = call_openai_with_retry(
             prompt,
             model,
-            ollama_url,
+            openai_base_url,
             senior_timeout_seconds,
             temperature,
         )
@@ -887,13 +887,13 @@ def review_row(
             senior_model_used = model
             effective_model = model
             resolved_model = model
-            review_backend = "ollama"
+            review_backend = "openai"
         else:
             senior_reason = build_retry_reason("Senior model", senior_errors)
-            verifier_payload, verifier_attempts, verifier_errors = call_ollama_with_retry(
+            verifier_payload, verifier_attempts, verifier_errors = call_openai_with_retry(
                 prompt,
                 fallback_model,
-                ollama_url,
+                openai_base_url,
                 verifier_timeout_seconds,
                 temperature,
             )
@@ -1049,18 +1049,18 @@ def summarize_failure_reason(fallback_reasons: list[str]) -> str | None:
         or "empty response" in reason
         for reason in lowered
     ):
-        return "ollama_empty_response"
+        return "openai_empty_response"
     if all("timed out" in reason or "timeout" in reason for reason in lowered):
-        return "ollama_timeout"
+        return "openai_timeout"
     if all("connection" in reason or "refused" in reason for reason in lowered):
-        return "ollama_connection_error"
+        return "openai_connection_error"
     return normalized[0] if len(normalized) == 1 else "multiple_failures"
 
 
 def build_workflow_outcome_summary(reviewed_items: list[dict[str, Any]]) -> dict[str, Any]:
     summary = build_summary(reviewed_items)
     total_items = summary["total_reviewed"]
-    primary_model_success = sum(1 for item in reviewed_items if item.get("review_backend") == "ollama")
+    primary_model_success = sum(1 for item in reviewed_items if item.get("review_backend") == "openai")
     fallback_model_success = sum(1 for item in reviewed_items if item.get("review_backend") == "fallback")
     heuristic_fallback = sum(1 for item in reviewed_items if item.get("review_backend") == "heuristic_fallback")
     dry_run_count = sum(1 for item in reviewed_items if item.get("review_backend") == "dry_run")
@@ -1286,7 +1286,7 @@ def main() -> None:
                 model=args.model,
                 verifier_model=args.verifier_model,
                 fallback_model=args.fallback_model,
-                ollama_url=args.ollama_url,
+                openai_base_url=args.openai_base_url,
                 senior_timeout_seconds=args.senior_timeout,
                 verifier_timeout_seconds=args.verifier_timeout,
                 temperature=args.temperature,

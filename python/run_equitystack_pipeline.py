@@ -66,8 +66,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--verifier-model", default=DEFAULT_VERIFIER_MODEL, help="Verifier / first-pass model for draft and fallback review paths")
     parser.add_argument("--fallback-model", default=DEFAULT_FALLBACK_MODEL, help="Fallback model used after senior-review failure")
     parser.add_argument("--timeout", type=int, help="Legacy alias that sets both senior and verifier timeouts")
-    parser.add_argument("--senior-timeout", type=int, help="Ollama timeout in seconds for the senior review stage")
-    parser.add_argument("--verifier-timeout", type=int, help="Ollama timeout in seconds for verifier/fallback stages")
+    parser.add_argument("--senior-timeout", type=int, help="AI timeout in seconds for the senior review stage")
+    parser.add_argument("--verifier-timeout", type=int, help="AI timeout in seconds for verifier/fallback stages")
     parser.add_argument("--csv", action="store_true", help="Write CSV outputs for steps that support it")
     parser.add_argument("--output-report", type=Path, default=default_pipeline_report(), help="Path to write the pipeline summary report")
     args = parser.parse_args()
@@ -187,7 +187,7 @@ def main() -> None:
 
         review_command = [
             sys.executable,
-            "scripts/review_future_bill_audit_with_ollama.py",
+            "scripts/review_future_bill_audit.py",
             "--model",
             review_model,
             "--verifier-model",
@@ -224,7 +224,6 @@ def main() -> None:
             str(manual_queue_path()),
             "--top-k",
             "5",
-            "--use-ollama",
             "--model",
             args.verifier_model,
             "--timeout",
@@ -247,7 +246,6 @@ def main() -> None:
                 str(ai_review_path()),
                 "--top-k",
                 "5",
-                "--use-ollama",
                 "--model",
                 args.verifier_model,
                 "--timeout",

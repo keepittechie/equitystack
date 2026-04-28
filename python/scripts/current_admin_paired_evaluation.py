@@ -61,7 +61,6 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--senior-timeout", type=int)
     parser.add_argument("--verifier-timeout", type=int)
     parser.add_argument("--temperature", type=float)
-    parser.add_argument("--ollama-url", default="")
     parser.add_argument("--openai-base-url", default="")
     parser.add_argument("--completion-window")
     parser.add_argument("--poll-interval-seconds", type=int)
@@ -255,7 +254,6 @@ def review_passthrough_args(args: argparse.Namespace) -> list[str]:
         "senior_timeout",
         "verifier_timeout",
         "temperature",
-        "ollama_url",
         "openai_base_url",
         "completion_window",
         "poll_interval_seconds",
