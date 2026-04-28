@@ -83,9 +83,10 @@ Admin step mapping:
 2. `Run current-admin`
    - complete when the review artifact exists
 3. `Operator Review`
-   - current while operator decisions are still pending
+   - current only while borderline manual-queue items still need an operator decision or override
+   - can be effectively skipped when the AI-first queue has no manual items
 4. `Decision Log Finalized`
-   - complete when the decision log and manual review queue exist
+   - complete when the decision log and canonical AI-first queue artifact exist
 5. `Pre-commit / Apply Readiness`
    - current when pre-commit or dry-run is the next valid checkpoint
    - blocked when the canonical pre-commit report marks readiness as blocked
@@ -117,10 +118,18 @@ Tracker status meaning:
 2. `scripts/review_current_admin_batch_with_openai_batch.py`
 3. `scripts/apply_current_admin_ai_review.py`
 
+`scripts/apply_current_admin_ai_review.py` now writes the canonical queue artifact with three scopes:
+
+- `items`: borderline records that still need human review
+- `auto_approved_items`: import candidates that passed the AI-first mission and readiness filter
+- `auto_rejected_items`: rows rejected as off-mission, unsupported, or not ready for import
+
 `review` wraps:
 
 - `scripts/generate_current_admin_decision_template.py`
 - `scripts/review_current_admin_batch_with_openai_batch.py --decision-file ... --log-decisions`
+
+The wrapped `review` step now operates on the manual-review slice instead of forcing operator decisions on every reviewed record.
 
 `workflow review` still runs only:
 
@@ -164,7 +173,10 @@ The review artifact stores requested model, effective model, backend, fallback s
 - normalized batch: `reports/current_admin/<batch-name>.normalized.json`
 - normalization report: `reports/current_admin/<batch-name>.normalization-report.json`
 - AI review: `reports/current_admin/<batch-name>.ai-review.json`
-- manual review queue: `reports/current_admin/<batch-name>.manual-review-queue.json`
+- AI-first queue artifact: `reports/current_admin/<batch-name>.manual-review-queue.json`
+  - `items` contains only manual-review rows
+  - `auto_approved_items` contains import candidates
+  - `auto_rejected_items` contains rows filtered out before import
 - decision template: `reports/current_admin/<batch-name>.decision-template.json`
 - decision log: `reports/current_admin/review_decisions/<batch-name>.<timestamp>.decision-log.json`
 - pre-commit review: `reports/current_admin/<batch-name>.pre-commit-review.json`
@@ -179,8 +191,8 @@ The review artifact stores requested model, effective model, backend, fallback s
 - export: writes a draft batch file only
 - normalize: read-only
 - AI review: advisory only
-- queue: writes queue artifacts only
-- review: writes a decision template and, when valid operator decisions exist, a decision log only
+- queue: writes the AI-first queue artifact only
+- review: writes a decision template and, when valid manual-review decisions or overrides exist, a decision log only
 - workflow review: writes a decision template only
 - workflow finalize: writes a decision log only
 - apply: dry-run unless `--apply --yes`; validation runs only after a mutating apply
@@ -222,7 +234,8 @@ The admin dashboard should be treated as:
 
 It is not a second ingestion or AI-review pipeline, and it must not bypass:
 
-- explicit operator decisions
+- AI-first queue classification
+- required operator decisions for borderline or override cases
 - decision logs
 - pre-commit review
 - dry-run import

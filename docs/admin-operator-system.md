@@ -42,11 +42,13 @@ The operator-facing data path is:
 Practical examples:
 
 - current-admin:
-  - discovery / normalization / AI review / decision log / queue / pre-commit / import artifacts
+  - discovery / normalization / AI review / decision log / AI-first queue / pre-commit / import artifacts
+  - the canonical queue artifact still lives at `<batch>.manual-review-queue.json`, but now splits into manual `items`, `auto_approved_items`, and `auto_rejected_items`
   - canonical DB updates for current administration promise records
   - admin review surface and public current-administration pages read from the resulting artifact + DB state
 - legislative:
   - pipeline report / AI review / manual-review queue / review bundle / apply / import artifacts
+  - the manual-review queue keeps only unresolved human-review rows, while AI-approved bundle actions remain visible as apply-ready workflow state
   - canonical DB updates for future-bill links, tracked-bill link state, and downstream report data
   - admin workflow surfaces and public legislative/report pages read from those artifacts and DB-backed records
 - unified outcomes:
@@ -113,7 +115,8 @@ on `10.10.0.13` can reach MariaDB on `10.10.0.15`.
 
 - Review work stays separate from execution.
 - Queue items are derived from canonical workflow state and artifacts.
-- Review actions still require human checkpoints.
+- Human checkpoints now cover only borderline, conflicting, or override-worthy items.
+- AI-approved current-admin and legislative actions should show up as apply-ready workflow state, not as more queue work.
 
 ### Schedules
 
@@ -207,6 +210,7 @@ Additional human review surface:
 - `/admin/review-queue`
   - human decision work only
   - current-admin operator review, apply follow-up, legislative manual review, bundle approval
+  - AI-approved apply-ready work stays on the workflow pages instead of this queue
 
 Logs and raw artifacts support the story. They do not replace the command center, workflow state, or review pages.
 
@@ -333,12 +337,12 @@ Tracker-derived next-step state also appears on:
 The step sequence is:
 
 1. `Discover / Batch Ready`
-2. `AI Review`
+2. `Run current-admin`
 3. `Operator Review`
-4. `Finalize Decisions`
+4. `Decision Log Finalized`
 5. `Pre-commit / Apply Readiness`
-6. `Admin Approval`
-7. `Import`
+6. `Admin Approval / Final Apply`
+7. `Validation / Complete`
 
 Step completion is derived from canonical current-admin state and artifacts. The admin does not
 invent a second workflow state machine.
@@ -364,12 +368,12 @@ Only one step should feel like the next thing to do.
 
 Current-admin trust depends on a retained artifact chain.
 
-Before DB import is allowed from the manual-review queue, the canonical chain must exist:
+Before DB import is allowed from the canonical AI-first queue artifact, the canonical chain must exist:
 
 - normalized batch
 - AI review artifact
 - decision log
-- manual-review queue
+- AI-first queue artifact
 - pre-commit review
 
 Import dry-run and apply reports then extend that same chain forward.
@@ -421,6 +425,12 @@ The tracker resolves the next step automatically:
 - if final apply is ready, it exposes the existing confirmed apply path
 
 This is guidance only. It does not auto-run any step or bypass confirmation.
+
+Current-admin queue semantics in the admin UI:
+
+- `/admin/current-admin-review` shows only the manual `items` slice from the canonical queue artifact
+- the workspace summary still shows `auto_approved_items`, `items`, and `auto_rejected_items`
+- an empty current-admin review table can be legitimate when the AI-first filter found no borderline rows
 
 ## Systemic Linkage Coverage Surface
 
@@ -486,6 +496,12 @@ Canonical signals used by the tracker include:
 - apply / import reports
 - pipeline failure and blocker signals
 
+Legislative queue semantics in the admin UI:
+
+- the editable approval table shows only pending human bundle decisions
+- AI-approved bundle actions are listed separately in a read-only apply-ready section
+- `Save Approvals` can be disabled when no human bundle decisions remain
+
 ### Legislative Tracker Meaning
 
 - green dot: step is complete
@@ -501,6 +517,8 @@ Examples:
 - pending bundle approvals:
   - `Bundle Approval` is yellow
   - next action is `Open bundle approval`
+- manual review clear with only AI-approved actions remaining:
+  - the workflow points to apply preview or import readiness instead of showing more review work
 - missing apply or import artifact:
   - the blocked step is red
   - next action is `Inspect missing artifact`
@@ -542,7 +560,7 @@ Fallback is not hidden.
   - AI partial
   - AI failed / fallback-only
 - review queue pages must reflect real pending human work from canonical artifacts
-- a workflow can be technically complete while still requiring manual review before the next guarded step is trustworthy
+- a workflow can be review-complete while AI-approved actions wait for guarded apply or import steps
 
 ## Guardrails
 

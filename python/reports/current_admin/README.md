@@ -14,6 +14,10 @@ Expected report types:
 - `<batch>.normalization-report.json`
 - `<batch>.ai-review.json`
 - `<batch>.manual-review-queue.json`
+  - canonical AI-first queue artifact
+  - `items`: borderline manual-review rows only
+  - `auto_approved_items`: import candidates
+  - `auto_rejected_items`: filtered-out rows
 - `<batch>.pre-commit-review.json`
 - `<batch>.import-dry-run.json`
 - `<batch>.import-apply.json`

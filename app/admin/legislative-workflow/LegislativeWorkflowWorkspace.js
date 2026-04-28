@@ -100,7 +100,13 @@ export default function LegislativeWorkflowWorkspace({ workspace }) {
   const actionableBundleActions = Array.isArray(workspace.actionable_operator_actions)
     ? workspace.actionable_operator_actions
     : workspace.operator_actions || [];
-  const [actions, setActions] = useState(cloneActions(actionableBundleActions));
+  const pendingBundleActions = Array.isArray(workspace.pending_operator_actions)
+    ? workspace.pending_operator_actions
+    : actionableBundleActions.filter((action) => !action.approved);
+  const autoApprovedBundleActions = Array.isArray(workspace.auto_approved_operator_actions)
+    ? workspace.auto_approved_operator_actions
+    : actionableBundleActions.filter((action) => action.approved);
+  const [actions, setActions] = useState(cloneActions(pendingBundleActions));
   const [message, setMessage] = useState("");
   const [isPending, startTransition] = useTransition();
   const permissions = workspace.action_permissions || {};
@@ -271,9 +277,9 @@ export default function LegislativeWorkflowWorkspace({ workspace }) {
           </p>
         </div>
         <div className="rounded border border-zinc-300 bg-[var(--admin-surface)] p-3 shadow-sm">
-          <p className="text-[11px] text-gray-600">Actionable approvals</p>
+          <p className="text-[11px] text-gray-600">Bundle decisions</p>
           <p className="mt-1 text-base font-semibold">
-            {workspace.counts.approved_pending_actions} approved / {workspace.counts.pending_unreviewed_actions} pending
+            {workspace.counts.approved_pending_actions} AI-approved / {workspace.counts.pending_unreviewed_actions} pending
           </p>
         </div>
         <div className="rounded border border-zinc-300 bg-[var(--admin-surface)] p-3 shadow-sm">
@@ -289,8 +295,8 @@ export default function LegislativeWorkflowWorkspace({ workspace }) {
             <p className="text-[11px] text-gray-600">Canonical review bundle</p>
             <p className="break-all font-mono text-[11px]">{reviewBundlePath}</p>
             <p className="mt-3 text-[12px] text-gray-700">
-              Saving updates the bundle artifact only. Apply and import still run through wrapped
-              legislative commands with server-side readiness checks.
+              Only bundle actions that still need a human approve or dismiss decision stay in the approval table.
+              AI-approved actions move straight to the apply preview and import gates below.
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
@@ -529,7 +535,7 @@ export default function LegislativeWorkflowWorkspace({ workspace }) {
           <div className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface-muted)] p-3 text-[12px] text-[var(--admin-text-soft)]">
             <p className="font-medium text-[var(--admin-text)]">No actionable legislative items require manual review.</p>
             <p className="mt-1">
-              Next step: run the legislative workflow again if you expected new review work, or continue to bundle approval if the queue is genuinely clear.
+              Next step: run the legislative workflow again if you expected new review work, or continue to the apply controls if the queue is genuinely clear.
             </p>
             <div className="mt-2 flex flex-wrap gap-3">
               <Link href="/admin/workflows" className="text-[var(--admin-link)] underline underline-offset-2">
@@ -546,11 +552,12 @@ export default function LegislativeWorkflowWorkspace({ workspace }) {
       {workspace.review_bundle ? (
       <section className="rounded border border-zinc-300 bg-[var(--admin-surface)] p-4 shadow-sm">
         <div className="mb-3">
-          <h2 className="text-base font-semibold">Bundle actions</h2>
+          <h2 className="text-base font-semibold">Bundle approval queue</h2>
           <p className="mt-1 text-[12px] text-gray-600">
-            Dense approval table. Only actionable canonical bundle actions are shown here.
+            Only borderline bundle actions that still need a human approve or dismiss decision are shown here.
           </p>
         </div>
+        {actions.length ? (
         <div className="overflow-x-auto rounded border border-zinc-200">
           <table className="min-w-full text-[12px]">
             <thead className="bg-zinc-100 text-left text-[11px] uppercase tracking-wide text-zinc-600">
@@ -622,14 +629,61 @@ export default function LegislativeWorkflowWorkspace({ workspace }) {
             </tbody>
           </table>
         </div>
-        {!actions.length ? (
-          <section className="mt-3 rounded border border-zinc-300 bg-[var(--admin-surface)] p-4 shadow-sm">
-            <p className="font-medium text-[var(--admin-text)]">No bundle approval items are pending.</p>
-            <p className="mt-1 text-[12px] text-[var(--admin-text-soft)]">
-              Next step: continue with manual review, workflow reports, or the next guarded apply/import checkpoint if the bundle is genuinely clear.
+        ) : (
+          <div className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface-muted)] p-3 text-[12px] text-[var(--admin-text-soft)]">
+            <p className="font-medium text-[var(--admin-text)]">No bundle actions are waiting for a human decision.</p>
+            <p className="mt-1">
+              {autoApprovedBundleActions.length > 0
+                ? `${autoApprovedBundleActions.length} AI-approved action(s) are ready for the apply preview below.`
+                : "No manual bundle-approval work remains in this batch."}
             </p>
-          </section>
-        ) : null}
+          </div>
+        )}
+      </section>
+      ) : null}
+
+      {workspace.review_bundle && autoApprovedBundleActions.length ? (
+      <section className="rounded border border-zinc-300 bg-[var(--admin-surface)] p-4 shadow-sm">
+        <div className="mb-3">
+          <h2 className="text-base font-semibold">AI-Approved Apply Actions</h2>
+          <p className="mt-1 text-[12px] text-gray-600">
+            These actions were approved by the legislative automation and are ready for apply preview. They are not waiting on a human decision.
+          </p>
+        </div>
+        <div className="overflow-x-auto rounded border border-zinc-200">
+          <table className="min-w-full text-[12px]">
+            <thead className="bg-zinc-100 text-left text-[11px] uppercase tracking-wide text-zinc-600">
+              <tr>
+                <th className="border-b border-zinc-200 px-3 py-2">Future bill</th>
+                <th className="border-b border-zinc-200 px-3 py-2">Action</th>
+                <th className="border-b border-zinc-200 px-3 py-2">Why it was approved</th>
+              </tr>
+            </thead>
+            <tbody>
+              {autoApprovedBundleActions.map((action) => (
+                <tr key={action.action_id} className="align-top odd:bg-[var(--admin-surface)] even:bg-zinc-50/50">
+                  <td className="border-b border-zinc-200 px-3 py-2">
+                    <div className="text-[11px] uppercase tracking-wide text-zinc-500">
+                      Future bill {action.future_bill_id}
+                    </div>
+                    <div className="font-medium">{action.future_bill_title}</div>
+                  </td>
+                  <td className="border-b border-zinc-200 px-3 py-2 text-[11px] text-zinc-700">
+                    <div>{action.action_type}</div>
+                    <div className="mt-1">
+                      {action.candidate_bill_number || action.target_id || "n/a"}
+                      {action.proposed_link_type ? ` • ${action.proposed_link_type}` : ""}
+                    </div>
+                    <div className="mt-1">{action.action_priority}</div>
+                  </td>
+                  <td className="border-b border-zinc-200 px-3 py-2 text-[11px] text-zinc-700">
+                    {action.rationale || action.auto_triage_reason || "Automation approved this action from the canonical review bundle."}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </section>
       ) : null}
 

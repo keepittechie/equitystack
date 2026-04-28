@@ -51,7 +51,7 @@ Important scripts:
 | Batch generation | `scripts/generate_current_admin_batch_from_discovery.py` |
 | Normalization | `scripts/normalize_current_admin_batch.py` |
 | AI review | `scripts/review_current_admin_batch_with_openai_batch.py` |
-| Manual queue | `scripts/apply_current_admin_ai_review.py` |
+| AI-first queue build | `scripts/apply_current_admin_ai_review.py` |
 | Decision template | `scripts/generate_current_admin_decision_template.py` |
 | Pre-commit | `scripts/build_current_admin_precommit_review.py` |
 | Import | `scripts/import_curated_current_admin_batch.py` |
@@ -61,6 +61,8 @@ Important scripts:
 Safety:
 
 - `current-admin apply` is dry-run unless `--apply --yes` is explicit.
+- the canonical `manual-review-queue.json` artifact now splits into `items`, `auto_approved_items`, and `auto_rejected_items`.
+- current-admin human review is now limited to the `items` slice; AI-approved import candidates move forward without requiring routine operator approval.
 - Current-admin unified outcome sync inserts `impact_score` at creation time.
 - Review artifacts record requested model, effective model, backend, timeout, and fallback status.
 
@@ -102,6 +104,7 @@ Safety:
 - `legislative apply` and `legislative import` are dry-run unless `--apply --yes` is explicit.
 - `legislative repair` is dry-run unless `--apply --yes` is explicit.
 - `legislative materialize-outcomes` is dry-run unless `--apply --yes` is explicit.
+- legislative manual-review artifacts now keep only unresolved human-review rows, while AI-approved bundle actions are treated as apply-ready workflow state.
 - Legislative outcomes are inserted into `policy_outcomes` with `impact_score`, but are excluded from per-president scoring until deterministic president attribution exists.
 - Stale approved `remove_direct_link` actions are treated as already resolved when their target link is already absent.
 

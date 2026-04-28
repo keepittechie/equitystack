@@ -309,9 +309,10 @@ Add 1-3 major missing policies per month only after sourcing them properly. This
 ## Canonical Review Surfaces
 
 - `/admin/current-admin-review`
-  - Current-admin operator review and finalize checkpoint
+  - Current-admin operator review and finalize checkpoint for the remaining manual-review slice
 - `/admin/legislative-workflow`
-  - Legislative bundle review and approval checkpoint
+  - Legislative human bundle review and approval checkpoint
+  - Also shows a separate AI-approved apply-ready section when no human decisions remain
 - `/admin/source-curation`
   - Manual source-gap curation checkpoint
   - Existing-source attach proposals, new-source drafts, and reviewed notes only
@@ -344,8 +345,9 @@ Preferred wrapped flow:
 Notes:
 
 - `run` prepares the next working batch and review session.
-- `review` still requires explicit operator decisions and decision logs.
-- `apply` still reruns pre-commit and dry-run first.
+- `run` now produces the canonical AI-first queue artifact with manual `items`, `auto_approved_items`, and `auto_rejected_items`.
+- `review` only requires explicit operator decisions for the remaining manual-review slice and still produces decision logs.
+- `apply` still reruns pre-commit and dry-run first using the approved import candidates from that AI-first queue.
 - mutating import still requires `--apply --yes`.
 
 ### Guided Current-Admin Workflow
@@ -356,12 +358,12 @@ the next move from artifacts alone.
 Tracked steps:
 
 1. `Discover / Batch Ready`
-2. `AI Review`
+2. `Run current-admin`
 3. `Operator Review`
-4. `Finalize Decisions`
+4. `Decision Log Finalized`
 5. `Pre-commit / Apply Readiness`
-6. `Admin Approval`
-7. `Import`
+6. `Admin Approval / Final Apply`
+7. `Validation / Complete`
 
 The full tracker appears on:
 
@@ -391,6 +393,12 @@ How to use it:
 The tracker is deterministic. It is derived from canonical batch state, artifact presence, review
 counts, blockers, and action permissions. It does not create a second workflow engine.
 
+Current-admin queue interpretation:
+
+- the editable review table now shows only the manual `items` slice
+- `auto_approved_items` are already eligible for pre-commit and dry-run once the queue is synchronized
+- `auto_rejected_items` are visible for audit but do not stay in the human review queue
+
 ## Legislative Daily Flow
 
 Preferred wrapped flow:
@@ -405,7 +413,8 @@ Preferred wrapped flow:
 
 Notes:
 
-- legislative approval remains a human checkpoint.
+- legislative human approval remains a checkpoint only for pending manual-review and bundle-approval rows.
+- AI-approved bundle actions now move forward as apply-ready workflow state instead of staying in the human queue.
 - import remains guarded by the canonical workflow.
 
 ### Guided Legislative Workflow
@@ -443,6 +452,7 @@ How to use it:
 
 - if fallback dominated the run, `Manual Review Queue` turns red and the next action is `Open legislative review`
 - if manual review is clear but bundle approvals remain, `Bundle Approval` turns yellow and the next action is `Open bundle approval`
+- if no manual review or bundle decisions remain but AI-approved actions exist, the workflow advances toward apply preview instead of showing another review task
 - if apply or import is blocked by a missing report or other artifact gap, the blocked step turns red and the next action is `Inspect missing artifact`
 
 This is still a read-only mapping layer on top of the canonical legislative artifacts and reports.
@@ -576,7 +586,7 @@ Every mutation is explicit, confirmed, and auditable. Unsafe duplicate clusters 
 
 ## Current-Admin Provenance Guard
 
-The guarded current-admin queue import now refuses to proceed if the manual-review queue cannot prove its lineage.
+The guarded current-admin queue import now refuses to proceed if the canonical AI-first queue artifact cannot prove its lineage.
 
 Required before queue-based import:
 

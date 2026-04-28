@@ -81,7 +81,9 @@ function currentAdminSurfaceSummary(workspace, session) {
   const importReadiness = workspace?.import_readiness || {};
   const pendingReview = Number(counts.pending_review || counts.pending || 0);
   const importApproved = Number(importReadiness.queue_approved_for_import_count || 0);
-  const heldBack = Number(importReadiness.queue_pending_manual_review_count || 0);
+  const manualQueueCount = Number(importReadiness.queue_item_count || 0);
+  const autoApproved = Number(importReadiness.auto_approved_item_count || 0);
+  const autoRejected = Number(importReadiness.auto_rejected_item_count || 0);
   const fallbackUsed = Boolean(reviewRuntime?.fallback_used);
   const aiStatus = !reviewRuntime
     ? toCanonicalAiState("not_started")
@@ -119,11 +121,15 @@ function currentAdminSurfaceSummary(workspace, session) {
     currentNext: tracker?.nextStep?.title || tracker?.currentStep?.title || "No next step recorded",
     reviewLoad:
       pendingReview > 0
-        ? `${pendingReview} operator review item(s)`
-        : heldBack > 0
-          ? `${heldBack} held for manual follow-up`
-          : importApproved > 0
-            ? `${importApproved} approved for import`
+        ? `${pendingReview} manual-review item(s)`
+        : manualQueueCount > 0
+          ? `${manualQueueCount} in manual queue`
+          : autoApproved > 0
+            ? `${autoApproved} auto-approved item(s) ready for pre-commit`
+            : importApproved > 0
+              ? `${importApproved} import candidate(s) ready`
+              : autoRejected > 0
+                ? `${autoRejected} auto-rejected item(s) filtered out`
             : "No review work pending",
     trustLabel,
     trustTone,
@@ -179,6 +185,8 @@ function legislativeSurfaceSummary(workspace, session) {
         ? `${reviewCount} actionable manual-review item(s)`
         : Number(workspace?.counts?.pending_unreviewed_actions || 0) > 0
           ? `${workspace.counts.pending_unreviewed_actions} bundle approval item(s)`
+          : Number(workspace?.counts?.approved_pending_actions || 0) > 0
+            ? `${workspace.counts.approved_pending_actions} AI-approved action(s) ready for apply preview`
           : "No review work pending",
     trustLabel,
     trustTone,

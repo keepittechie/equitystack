@@ -107,7 +107,7 @@ Use this when:
 
 - `legislative review` shows no real pending work
 - `legislative apply` still complains about an approved `remove_direct_link`
-- the admin legislative tracker is stuck on `Manual Review Queue` or `REVIEW_READY`
+- the admin legislative tracker is stuck on `Manual Review Queue`, `Bundle Approval`, or `REVIEW_READY` even though only old approved actions remain
 
 This repairs canonical artifact state only. It does not invent approvals or create direct admin-side DB writes around the workflow.
 

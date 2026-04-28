@@ -52,17 +52,21 @@ After `run`:
 - always runs:
   - normalize
   - AI review
-  - manual queue generation
+  - AI-first queue generation
 
 - writes `.normalized.json`
 - writes `.ai-review.json`
 - writes `.manual-review-queue.json`
+  - `items` contains only borderline manual-review rows
+  - `auto_approved_items` contains import candidates
+  - `auto_rejected_items` contains filtered-out rows
 
 After `review`:
 
-- writes or refreshes `reports/current_admin/<batch-name>.decision-template.json`
-- finalizes only when that decision file contains valid explicit operator actions
+- writes or refreshes `reports/current_admin/<batch-name>.decision-template.json` for the manual-review slice
+- finalizes only when that decision file contains valid explicit operator actions or overrides for the remaining manual items
 - writes a decision log under `reports/current_admin/review_decisions/*.decision-log.json`
+- the admin review table can legitimately be empty when the AI-first queue has no borderline rows
 
 After `apply` without `--apply --yes`:
 
@@ -115,6 +119,12 @@ Use the tracker to answer:
 
 If a step is blocked, use the tracker link to inspect the blocker on the session page instead of
 guessing from the queue or artifact tables.
+
+Current-admin review is now AI-first:
+
+- `Operator Review` only covers the manual `items` slice from the canonical queue artifact
+- `Decision Log Finalized` means the decision log and AI-first queue artifact are synchronized
+- the review workspace can be empty while the workflow is still ready to move into pre-commit
 
 ## Advanced / Manual Commands
 

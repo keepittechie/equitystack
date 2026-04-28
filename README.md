@@ -205,6 +205,11 @@ Common lower-level operator commands:
 ./python/bin/equitystack impact validate-integrity
 ```
 
+Both major operator pipelines now use AI-first triage:
+
+- current-admin builds a canonical queue artifact where only borderline records remain in the manual review table, while AI-approved import candidates and auto-rejected rows are tracked separately
+- legislative keeps human review focused on unresolved manual-review and bundle-approval items, while AI-approved bundle actions show up as apply-ready workflow state instead of more review work
+
 Pipeline details, supporting scripts, and the full operator runbook are documented in [`python/README.md`](python/README.md), [`python/OPERATIONS.md`](python/OPERATIONS.md), and [`docs/PYTHON_WORKFLOWS.md`](docs/PYTHON_WORKFLOWS.md).
 
 ---

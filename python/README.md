@@ -131,11 +131,13 @@ equitystack current-admin run --input python/data/current_admin_batches/<batch-f
 Important:
 
 - `current-admin run` discovers and generates the next batch by default, or starts directly from `--input`.
-- `current-admin review` writes or refreshes the canonical decision template and finalizes only when explicit operator decisions are valid.
-- `current-admin apply` always reruns pre-commit and import dry-run before any mutating apply.
+- `current-admin run` writes the canonical AI-first queue artifact at `reports/current_admin/<batch-name>.manual-review-queue.json`.
+- that queue artifact now splits records into `items` for borderline manual review, `auto_approved_items` for import candidates, and `auto_rejected_items` for off-mission or unsupported rows.
+- `current-admin review` refreshes the canonical decision template for the manual-review slice and finalizes explicit operator decisions or overrides only where they are still needed.
+- `current-admin apply` uses the AI-approved plus manually approved import candidates, and always reruns pre-commit and import dry-run before any mutating apply.
 - database writes only happen with `--apply --yes`.
 - `current-admin status` prints the current state machine and next step.
-- `/admin`, `/admin/workflows/[sessionId]`, and `/admin/current-admin-review` now expose the same guided current-admin step tracker.
+- `/admin`, `/admin/workflows/[sessionId]`, and `/admin/current-admin-review` now expose the same guided current-admin step tracker and queue split.
 - review artifacts stamp requested model, effective model, backend, fallback status, and fallback reason.
 - legacy/manual commands remain available: `discover`, `gen-batch`, `workflow start`, `workflow review`, `workflow finalize`, `pre-commit`, `import`, `validate`, `status`, `workflow resume`.
 
@@ -152,6 +154,8 @@ From `python/`:
 Important:
 
 - `legislative run` executes verifier-assisted suggestion/discovery, senior audit review, auto-triages safe bundle actions, then rebuilds the review bundle.
+- the legislative manual-review queue now keeps only AI-uncertain rows that still need human inspection.
+- `legislative review` and `/admin/legislative-workflow` now focus on human bundle decisions only; AI-approved bundle actions are shown separately as apply-preview-ready work.
 - review models default to the wrapper defaults shown by `./bin/equitystack --help`; current production defaults resolve to OpenAI-style models such as `gpt-4.1-mini`.
 - legacy script filenames may still include `ollama`, but the provider layer can route OpenAI-style models when configured.
 - the daily review path uses 240 second senior/verifier timeouts by default.

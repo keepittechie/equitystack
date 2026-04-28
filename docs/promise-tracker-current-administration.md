@@ -25,7 +25,8 @@ The wrapped CLI remains canonical:
 
 The current-admin workflow must not bypass:
 
-- explicit operator decisions
+- AI-first queue classification
+- required operator decisions for borderline or override items
 - decision logs
 - pre-commit
 - import dry-run
@@ -51,11 +52,11 @@ What each step means:
 - `run`
   - discovers fresh current-administration updates
   - generates the next working batch when no `--input` is supplied
-  - starts the canonical workflow and prepares review
+  - starts the canonical workflow and prepares the AI-first queue
 - `review`
   - refreshes the decision template
-  - requires explicit operator decisions
-  - finalizes through the canonical decision-log path
+  - focuses only on the borderline manual-review slice
+  - finalizes through the canonical decision-log path when manual decisions or overrides are still needed
 - `apply`
   - reruns pre-commit
   - runs import dry-run first
@@ -92,9 +93,9 @@ How completion is determined:
 - `Run current-admin`
   - complete when the review artifact exists
 - `Operator Review`
-  - current while the review artifact exists and review decisions are still pending
+  - current only while the manual `items` slice still needs human decisions or overrides
 - `Decision Log Finalized`
-  - complete when the decision log and manual review queue exist
+  - complete when the decision log and AI-first queue artifact exist
 - `Pre-commit / Apply Readiness`
   - current when the dry-run path is the next valid checkpoint
   - blocked when pre-commit reports a blocking issue
@@ -119,6 +120,12 @@ How to use the guided flow:
 - if review is next, go to `/admin/current-admin-review`
 - if final apply is next, use the existing guarded confirmation path
 
+The current-admin review workspace now reflects the queue split directly:
+
+- the editable table shows only borderline manual-review rows
+- summary cards still show the `auto_approved_items` and `auto_rejected_items` counts
+- an empty review table can mean the AI-first queue is already ready for pre-commit
+
 The operator should no longer need to guess which current-admin page comes next. The system derives
 the next valid step automatically from canonical state and artifacts.
 
@@ -129,7 +136,7 @@ The operator backend reflects these artifact types as first-class records:
 - normalized batch
 - normalization report
 - ai-review artifact
-- manual-review queue
+- AI-first queue artifact
 - decision template
 - decision log
 - pre-commit artifact
@@ -153,7 +160,7 @@ Use the operator/admin system as follows:
   - suggested actions
   - session snapshots
 - `/admin/current-admin-review`
-  - canonical human review and finalize checkpoint
+  - canonical human review and finalize checkpoint for the manual-review slice
 - `/admin/workflows/[sessionId]`
   - inspect state, blockers, artifacts, related jobs, and the full current-admin step tracker
 - `/admin/review-queue`

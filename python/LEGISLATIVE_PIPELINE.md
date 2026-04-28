@@ -70,9 +70,15 @@ Primary outputs:
 - `reports/future_bill_candidate_discovery.json`
 - `reports/equitystack_review_bundle.json`
 
+Legislative review semantics:
+
+- `future_bill_link_manual_review_queue.json` should now contain only AI-uncertain rows that still need human review
+- the canonical review bundle can carry both pending human bundle decisions and AI-approved actions that are already eligible for apply preview
+- `/admin/legislative-workflow` shows those AI-approved actions in a separate read-only section so the editable approval table stays human-only
+
 Admin visibility:
 
-- `/admin/legislative-workflow` is the web approval surface for the legislative review bundle.
+- `/admin/legislative-workflow` is the web approval surface for the remaining human review and bundle-approval work.
 - The admin page reads the canonical artifacts, saves operator approval decisions back into the review bundle, and only triggers wrapped legislative commands when readiness checks pass.
 - Legislative apply/import still run through wrapped CLI execution. The admin must not create a direct DB write path around the pipeline.
 
@@ -98,6 +104,11 @@ Use these only when needed:
 ./bin/equitystack legislative feedback
 ```
 
+Interpretation:
+
+- `legislative review` now covers only human bundle decisions that are still pending
+- if `/admin/legislative-workflow` shows AI-approved apply actions and no editable pending rows, the review stage is effectively complete and the next work is apply preview or import
+
 ## Dry-Run And Mutating Stages
 
 - `review_future_bill_audit_with_ollama.py` is advisory.
@@ -117,7 +128,7 @@ The canonical review bundle can lag behind current DB state. This usually shows 
 - an approved `remove_direct_link:<future_bill_id>:<future_bill_link_id>` action still present in the bundle
 - `future_bill_link_id` no longer existing in the DB
 - `legislative review` showing no real pending manual items
-- the admin tracker still looking stuck on `Manual Review Queue` or `REVIEW_READY`
+- the admin tracker still looking stuck on `Manual Review Queue`, `Bundle Approval`, or `REVIEW_READY` even though only old approved actions remain
 
 Use:
 

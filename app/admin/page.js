@@ -635,16 +635,20 @@ function deriveCurrentAdminOutcome(session, currentAdminTracker = null) {
   const pendingReview = Number(counts.pendingReview || 0);
   const heldForFollowup = Number(counts.heldForFollowup || 0);
   const importApprovedCount = Number(counts.importApprovedCount || 0);
+  const autoApprovedCount = Number(counts.autoApprovedCount || 0);
+  const autoRejectedCount = Number(counts.autoRejectedCount || 0);
+  const queueItemCount = Number(counts.queueItemCount || 0);
   const queuePendingManualReviewCount = Number(counts.queuePendingManualReviewCount || 0);
   const blockers = Number(counts.blockers || 0);
   const reviewItemTotal =
     pendingReview + Number(counts.approvalStyleDecisions || 0) + heldForFollowup;
   const queueTotal =
     importApprovedCount +
+    autoRejectedCount +
     Number(counts.queuePendingCount || 0) +
     queuePendingManualReviewCount;
   const itemsProcessed = reviewItemTotal || queueTotal || 0;
-  const manualReviewCount = Math.max(heldForFollowup, queuePendingManualReviewCount);
+  const manualReviewCount = Math.max(heldForFollowup, queueItemCount, queuePendingManualReviewCount);
   const fallbackUsed = Boolean(reviewRuntime?.fallback_used);
   const fallbackCount = Number(reviewRuntime?.fallback_count || 0);
   const reviewBackend = normalizeString(reviewRuntime?.review_backend);
@@ -681,10 +685,23 @@ function deriveCurrentAdminOutcome(session, currentAdminTracker = null) {
     outcomeSentence =
       "Current-admin dry-run completed. Final apply is the next guarded operator step.";
   } else if (["QUEUE_READY", "PRECOMMIT_READY"].includes(session?.canonicalState)) {
-    outcomeSentence =
-      importApprovedCount > 0
-        ? `Queue synchronized. ${importApprovedCount} item(s) are approved for import and pre-commit is next.`
-        : session?.summary || "Current-admin is waiting for the next guarded apply-readiness step.";
+    if (importApprovedCount > 0) {
+      const queueBits = [];
+      if (autoApprovedCount > 0) {
+        queueBits.push(`${autoApprovedCount} auto-approved`);
+      }
+      if (manualReviewCount > 0) {
+        queueBits.push(`${manualReviewCount} in manual queue`);
+      }
+      if (autoRejectedCount > 0) {
+        queueBits.push(`${autoRejectedCount} auto-rejected`);
+      }
+      const queueSummary = queueBits.length ? ` Queue split: ${queueBits.join(" • ")}.` : "";
+      outcomeSentence = `Queue synchronized. ${importApprovedCount} item(s) are approved for import and pre-commit is next.${queueSummary}`;
+    } else {
+      outcomeSentence =
+        session?.summary || "Current-admin is waiting for the next guarded apply-readiness step.";
+    }
     } else if (session?.canonicalState === "REVIEW_READY") {
       outcomeSentence =
         pendingReview > 0
@@ -721,15 +738,19 @@ function deriveCurrentAdminOutcome(session, currentAdminTracker = null) {
           : fallbackUsed
             ? getTrustStateTone(toCanonicalTrustState("guarded"))
             : getTrustStateTone(toCanonicalTrustState("high")),
-    attentionCount: pendingReview + manualReviewCount + blockers,
+    attentionCount: pendingReview + manualReviewCount + importApprovedCount + blockers,
     attentionSummary:
       pendingReview > 0
         ? `${pendingReview} review pending`
         : manualReviewCount > 0
-          ? `${manualReviewCount} held for follow-up`
+          ? `${manualReviewCount} in manual queue`
           : blockers > 0
             ? `${blockers} blocker${blockers === 1 ? "" : "s"}`
-            : "No human attention",
+            : importApprovedCount > 0
+              ? autoApprovedCount > 0
+                ? `${autoApprovedCount} auto-approved for pre-commit`
+                : `${importApprovedCount} import-ready`
+              : "No human attention",
     outcome: outcomeSentence,
     reason: metadata.next_action_reason || session?.summary || "",
     itemsProcessed,
@@ -805,7 +826,9 @@ function deriveLegislativeOutcome(session) {
             ? `${outcome.pending_bundle_approvals} bundle approvals`
             : blockers > 0
               ? `${blockers} blocker${blockers === 1 ? "" : "s"}`
-              : "No human attention",
+              : Number(outcome.approved_bundle_actions || 0) > 0
+                ? `${outcome.approved_bundle_actions} AI-approved action${Number(outcome.approved_bundle_actions || 0) === 1 ? "" : "s"} ready for apply`
+                : "No human attention",
       nextAction:
         nextActionLabel,
       nextActionConfig: nextAction,
