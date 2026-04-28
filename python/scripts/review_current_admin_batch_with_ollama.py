@@ -749,37 +749,67 @@ def build_review_priority(
         signals.append({"code": code, "weight": weight, "reason": reason})
 
     if recommendation.get("deep_review_recommended"):
-        add_signal("deep_review_recommended", 1, "The record already shows signals that justify deeper review.")
+        add_signal("deep_review_recommended", 0, "The record already shows signals that justify deeper review.")
 
     if conflict_analysis.get("has_material_conflict"):
-        add_signal("material_cross_pass_conflict", 2, "Standard and deep review disagree on material fields.")
+        add_signal("material_cross_pass_conflict", 3, "Standard and deep review disagree on material fields.")
 
     confidence_level = final_suggestion.get("confidence_level")
     confidence_score = float(final_suggestion.get("confidence_score") or 0.0)
-    if confidence_level == "Low" or confidence_score < 0.55:
-        add_signal("low_confidence", 2, "The final advisory confidence is low.")
+    is_low_confidence = confidence_level == "Low" or confidence_score < 0.55
+    if is_low_confidence:
+        add_signal(
+            "low_confidence",
+            2 if confidence_score < 0.3 else 1,
+            "The final advisory confidence is low.",
+        )
 
     comparison_payload = confidence_comparison.get("confidence_comparison") or {}
     delta = comparison_payload.get("score_delta_after_deep_review")
     if confidence_comparison.get("confidence_changed_after_deep_review") and isinstance(delta, (int, float)) and delta < 0:
         add_signal("confidence_dropped_after_deep_review", 1, "Deep review lowered confidence compared with the standard pass.")
 
-    if normalize_string_list(final_suggestion.get("source_warnings")):
-        add_signal("source_warnings", 2, "Source warnings remain on the final suggestion.")
+    source_warning_count = len(normalize_string_list(final_suggestion.get("source_warnings")))
+    evidence_gap_count = len(normalize_string_list(final_suggestion.get("evidence_needed_to_reduce_risk")))
+    hesitation_count = len(normalize_string_list(final_suggestion.get("hesitation_reasons")))
+    if source_warning_count or evidence_gap_count:
+        if source_warning_count >= 5 or evidence_gap_count >= 5:
+            add_signal(
+                "critical_evidence_gaps",
+                3,
+                "Source coverage and evidence gaps remain severe on the final suggestion.",
+            )
+        elif source_warning_count >= 3 or evidence_gap_count >= 3:
+            add_signal(
+                "evidence_coverage_gaps",
+                2,
+                "Source coverage or evidence gaps remain substantial on the final suggestion.",
+            )
+        else:
+            add_signal(
+                "evidence_coverage_gaps",
+                1,
+                "Some source coverage or evidence gaps remain on the final suggestion.",
+            )
 
-    if normalize_string_list(final_suggestion.get("evidence_needed_to_reduce_risk")):
-        add_signal("evidence_gaps", 1, "The final suggestion still names evidence gaps before import.")
-
-    if len(normalize_string_list(final_suggestion.get("hesitation_reasons"))) >= 2:
+    if hesitation_count >= 4 and not (source_warning_count or evidence_gap_count):
         add_signal("multiple_hesitation_reasons", 1, "The review surfaced multiple hesitation reasons.")
 
-    if final_suggestion.get("record_action_suggestion") == "manual_review":
-        add_signal("manual_review_suggested", 2, "The final suggestion still resolves to manual review.")
+    if (
+        final_suggestion.get("record_action_suggestion") == "manual_review"
+        and not is_low_confidence
+        and not (source_warning_count or evidence_gap_count)
+    ):
+        add_signal("manual_review_suggested", 1, "The final suggestion still resolves to manual review.")
 
     if existing_matches and final_suggestion.get("record_action_suggestion") != "update_existing":
         add_signal("new_vs_update_uncertainty", 1, "Existing matches exist but the final suggestion did not clearly resolve this as an update.")
 
-    if final_suggestion.get("impact_direction_suggestion") == "Mixed":
+    if (
+        final_suggestion.get("impact_direction_suggestion") == "Mixed"
+        and not is_low_confidence
+        and final_suggestion.get("record_action_suggestion") != "manual_review"
+    ):
         add_signal("mixed_impact_direction", 1, "Impact direction remains mixed and needs careful operator interpretation.")
 
     recommendation_codes = {signal.get("code") for signal in recommendation.get("deep_review_recommendation_signals") or []}
@@ -787,10 +817,10 @@ def build_review_priority(
         add_signal("incomplete_suggestions", 1, "Some suggestion fields remain incomplete.")
 
     priority_score = min(sum(int(signal["weight"]) for signal in signals), 10)
-    if priority_score >= 6:
+    if priority_score >= 5:
         review_priority = "high"
         manual_review_severity = "high"
-    elif priority_score >= 3:
+    elif priority_score >= 2:
         review_priority = "medium"
         manual_review_severity = "medium"
     else:
@@ -805,7 +835,10 @@ def build_review_priority(
     if not signals:
         reason = "Low-risk advisory profile based on the current review signals."
     else:
-        ordered = sorted(signals, key=lambda item: (-int(item["weight"]), item["code"]))
+        ordered = sorted(
+            [signal for signal in signals if int(signal["weight"]) > 0] or signals,
+            key=lambda item: (-int(item["weight"]), item["code"]),
+        )
         top_reasons = [signal["reason"] for signal in ordered[:3]]
         reason = " ".join(top_reasons)
 

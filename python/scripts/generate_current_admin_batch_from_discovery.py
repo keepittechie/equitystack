@@ -55,6 +55,21 @@ TOPIC_FALLBACK_KEYWORDS = {
     "Healthcare": {"health", "medicare", "medicine", "medicines", "drug", "drugs", "care", "pharmaceutical"},
 }
 
+ACTION_STUB_SOURCE_CATEGORIES = {"executive-action", "agency", "trade"}
+ACTION_STUB_TITLE_HINTS = (
+    "executive order",
+    "proclamation",
+    "memorandum",
+    "presidential determination",
+    "presidential action",
+    "action plan",
+    "section 232",
+    "section 301",
+    "tariff",
+    "tariffs",
+    "trade",
+)
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
@@ -185,9 +200,33 @@ def infer_candidate_topic(item: dict[str, Any]) -> str | None:
     return None
 
 
+def should_preserve_action_stub(item: dict[str, Any]) -> bool:
+    candidate_type = normalize_nullable_text(item.get("candidate_type")) or ""
+    if candidate_type in {"new_action", "update_existing_action"}:
+        return True
+    if candidate_type != "new_promise_candidate":
+        return False
+
+    suggested = item.get("suggested_changes") or {}
+    action_type = normalize_nullable_text(suggested.get("action_type"))
+    if action_type:
+        return True
+
+    source_category = (normalize_nullable_text(item.get("source_category")) or "").lower()
+    title = " ".join(
+        [
+            normalize_nullable_text(suggested.get("title")) or "",
+            normalize_nullable_text((item.get("feed_item") or {}).get("title")) or "",
+        ]
+    ).lower()
+    return source_category in ACTION_STUB_SOURCE_CATEGORIES and any(
+        hint in title for hint in ACTION_STUB_TITLE_HINTS
+    )
+
+
 def build_action_stub(candidate: dict[str, Any]) -> dict[str, Any] | None:
     item = candidate["item"]
-    if item.get("candidate_type") not in {"new_action", "update_existing_action"}:
+    if not should_preserve_action_stub(item):
         return None
 
     suggested = item.get("suggested_changes") or {}
@@ -388,6 +427,7 @@ def build_new_promise_record(
     source_refs = merge_source_rows(
         *[(candidate["item"].get("source_references") or []) for candidate in grouped_candidates]
     )
+    actions = merge_action_stubs([build_action_stub(candidate) for candidate in grouped_candidates])
     title = None
     summary = None
     impacted_group = None
@@ -418,11 +458,12 @@ def build_new_promise_record(
         "summary": summary,
         "notes": None,
         "promise_sources": source_refs,
-        "actions": [],
+        "actions": actions,
         "discovery_context": {
             "generated_at": datetime.now(UTC).replace(microsecond=0).isoformat(),
             "president_slug": president_slug,
             "dedupe_key": group_key,
+            "preserved_action_count": len(actions),
             "selected_candidates": [candidate_snapshot(candidate) for candidate in grouped_candidates],
         },
     }
