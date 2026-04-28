@@ -272,6 +272,59 @@ def candidate_snapshot(candidate: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def candidate_title(item: dict[str, Any]) -> str | None:
+    suggested = item.get("suggested_changes") or {}
+    feed_item = item.get("feed_item") or {}
+    return normalize_nullable_text(suggested.get("title")) or normalize_nullable_text(feed_item.get("title"))
+
+
+def candidate_summary(item: dict[str, Any]) -> str | None:
+    suggested = item.get("suggested_changes") or {}
+    return (
+        normalize_nullable_text(suggested.get("summary"))
+        or normalize_nullable_text(item.get("reasoning"))
+        or candidate_title(item)
+    )
+
+
+def candidate_impacted_group(item: dict[str, Any]) -> str | None:
+    suggested = item.get("suggested_changes") or {}
+    return normalize_nullable_text(suggested.get("impacted_group"))
+
+
+def candidate_status(item: dict[str, Any]) -> str | None:
+    suggested = item.get("suggested_changes") or {}
+    return normalize_nullable_text(suggested.get("status"))
+
+
+def new_candidate_group_key(candidate: dict[str, Any]) -> str:
+    item = candidate["item"]
+    title = candidate_title(item)
+    if title:
+        return slugify(title)
+    feed_item = item.get("feed_item") or {}
+    feed_url = normalize_nullable_text(feed_item.get("url"))
+    if feed_url:
+        return slugify(feed_url)
+    return slugify(candidate["candidate_id"])
+
+
+def grouped_first_published_date(
+    grouped_candidates: list[dict[str, Any]],
+    report_generated_at: str | None,
+) -> str | None:
+    dates = [
+        published
+        for published in (
+            first_published_date(candidate, report_generated_at) for candidate in grouped_candidates
+        )
+        if published
+    ]
+    if dates:
+        return min(dates)
+    return normalize_date(report_generated_at)
+
+
 def build_existing_record(grouped_candidates: list[dict[str, Any]], president_slug: str) -> dict[str, Any]:
     first_item = grouped_candidates[0]["item"]
     linked = first_item.get("linked_promise") or {}
@@ -327,25 +380,41 @@ def first_published_date(candidate: dict[str, Any], report_generated_at: str | N
     return normalize_date(report_generated_at)
 
 
-def build_new_promise_record(candidate: dict[str, Any], president_slug: str, report_generated_at: str | None) -> dict[str, Any]:
-    item = candidate["item"]
-    suggested = item.get("suggested_changes") or {}
-    source_refs = merge_source_rows(item.get("source_references") or [])
-    title = normalize_nullable_text(suggested.get("title")) or normalize_nullable_text((item.get("feed_item") or {}).get("title")) or f"Discovery candidate {candidate['candidate_id']}"
-    summary = normalize_nullable_text(suggested.get("summary")) or normalize_nullable_text(item.get("reasoning")) or title
-    topic = infer_candidate_topic(item)
+def build_new_promise_record(
+    grouped_candidates: list[dict[str, Any]],
+    president_slug: str,
+    report_generated_at: str | None,
+) -> dict[str, Any]:
+    source_refs = merge_source_rows(
+        *[(candidate["item"].get("source_references") or []) for candidate in grouped_candidates]
+    )
+    title = None
+    summary = None
+    impacted_group = None
+    topic = None
+    status = None
+    for candidate in grouped_candidates:
+        item = candidate["item"]
+        title = title or candidate_title(item)
+        summary = summary or candidate_summary(item)
+        impacted_group = impacted_group or candidate_impacted_group(item)
+        topic = topic or infer_candidate_topic(item)
+        status = status or candidate_status(item)
+    title = title or f"Discovery candidate {grouped_candidates[0]['candidate_id']}"
+    summary = summary or title
+    group_key = new_candidate_group_key(grouped_candidates[0])
     return {
-        "slug": slugify(title),
+        "slug": group_key,
         "title": title,
         "promise_text": summary,
-        "promise_date": first_published_date(candidate, report_generated_at),
+        "promise_date": grouped_first_published_date(grouped_candidates, report_generated_at),
         # Discovery sources for this pipeline are current-administration sources, so
         # unmatched new records default to official promises unless an operator changes them later.
         "promise_type": DEFAULT_DISCOVERY_PROMISE_TYPE,
         "campaign_or_official": DEFAULT_DISCOVERY_CAMPAIGN_OR_OFFICIAL,
         "topic": topic,
-        "impacted_group": normalize_nullable_text(suggested.get("impacted_group")),
-        "status": normalize_nullable_text(suggested.get("status")) or "In Progress",
+        "impacted_group": impacted_group,
+        "status": status or "In Progress",
         "summary": summary,
         "notes": None,
         "promise_sources": source_refs,
@@ -353,7 +422,8 @@ def build_new_promise_record(candidate: dict[str, Any], president_slug: str, rep
         "discovery_context": {
             "generated_at": datetime.now(UTC).replace(microsecond=0).isoformat(),
             "president_slug": president_slug,
-            "selected_candidates": [candidate_snapshot(candidate)],
+            "dedupe_key": group_key,
+            "selected_candidates": [candidate_snapshot(candidate) for candidate in grouped_candidates],
         },
     }
 
@@ -374,14 +444,14 @@ def build_batch_payload(
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     president_slug = normalize_nullable_text(report.get("president_slug")) or "current-admin"
     existing_by_slug: dict[str, list[dict[str, Any]]] = {}
-    new_candidates: list[dict[str, Any]] = []
+    new_candidates_by_key: dict[str, list[dict[str, Any]]] = {}
 
     for candidate in selected:
         item = candidate["item"]
         linked = item.get("linked_promise") or {}
         linked_slug = normalize_nullable_text(linked.get("slug"))
         if item.get("candidate_type") == "new_promise_candidate" or not linked_slug:
-            new_candidates.append(candidate)
+            new_candidates_by_key.setdefault(new_candidate_group_key(candidate), []).append(candidate)
             continue
         existing_by_slug.setdefault(linked_slug, []).append(candidate)
 
@@ -390,8 +460,8 @@ def build_batch_payload(
         for slug in sorted(existing_by_slug)
     ]
     records.extend(
-        build_new_promise_record(candidate, president_slug, report.get("generated_at"))
-        for candidate in new_candidates
+        build_new_promise_record(grouped_candidates, president_slug, report.get("generated_at"))
+        for _, grouped_candidates in sorted(new_candidates_by_key.items())
     )
 
     payload = {
@@ -407,15 +477,27 @@ def build_batch_payload(
     grouped_existing_record_count = len(existing_by_slug)
     selected_existing_candidate_count = sum(len(group) for group in existing_by_slug.values())
     merged_existing_candidate_count = sum(max(len(group) - 1, 0) for group in existing_by_slug.values())
+    grouped_new_record_count = len(new_candidates_by_key)
+    selected_new_candidate_count = sum(len(group) for group in new_candidates_by_key.values())
+    merged_new_candidate_count = sum(max(len(group) - 1, 0) for group in new_candidates_by_key.values())
     generation_debug = {
         "selected_existing_candidate_count": selected_existing_candidate_count,
-        "selected_new_promise_candidate_count": len(new_candidates),
+        "selected_new_promise_candidate_count": selected_new_candidate_count,
         "grouped_existing_record_count": grouped_existing_record_count,
         "merged_existing_candidate_count": merged_existing_candidate_count,
-        "dedupe_match_key": "linked_promise_slug",
+        "grouped_new_record_count": grouped_new_record_count,
+        "merged_new_candidate_count": merged_new_candidate_count,
+        "dedupe_match_key": {
+            "existing_candidates": "linked_promise_slug",
+            "new_candidates": "slugified_title_or_feed_url",
+        },
         "group_sizes_by_linked_promise_slug": {
             slug: len(grouped_candidates)
             for slug, grouped_candidates in sorted(existing_by_slug.items())
+        },
+        "group_sizes_by_new_record_key": {
+            key: len(grouped_candidates)
+            for key, grouped_candidates in sorted(new_candidates_by_key.items())
         },
     }
     return payload, generation_debug
@@ -476,7 +558,7 @@ def build_generation_debug_report(
         "date_filter_applied": "not_applied_in_batch_generation",
         "keyword_category_filter_result": "not_applied_in_batch_generation",
         "action_type_filter_result": "not_applied_in_batch_generation",
-        "dedupe_match_key": "linked_promise_slug",
+        "dedupe_match_key": (generation_debug or {}).get("dedupe_match_key") or "linked_promise_slug",
         "grouping": generation_debug or {},
         "final_batch_count": len((payload or {}).get("records") or []),
         "selected_candidate_ids": [candidate["candidate_id"] for candidate in selected],

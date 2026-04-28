@@ -1099,6 +1099,30 @@ def select_records(payload: dict[str, Any], only_slugs: list[str] | None, max_it
     return records
 
 
+def ensure_unique_record_entity_ids(records: list[dict[str, Any]]) -> None:
+    indices_by_entity_id: dict[str, list[int]] = {}
+    for index, record in enumerate(records, start=1):
+        entity_id = normalize_nullable_text(record.get("slug")) or slugify(record.get("title") or f"record-{index}")
+        indices_by_entity_id.setdefault(entity_id, []).append(index)
+
+    duplicates = {
+        entity_id: indices
+        for entity_id, indices in indices_by_entity_id.items()
+        if len(indices) > 1
+    }
+    if not duplicates:
+        return
+
+    duplicate_summary = "; ".join(
+        f"{entity_id} (records {', '.join(str(value) for value in indices)})"
+        for entity_id, indices in sorted(duplicates.items())
+    )
+    raise ValueError(
+        "AI review input contains duplicate record ids/slugs: "
+        f"{duplicate_summary}. Regenerate the batch or resolve duplicate slugs before AI review."
+    )
+
+
 def resolve_model(args: argparse.Namespace) -> str:
     requested = normalize_nullable_text(args.model)
     if requested and requested not in LEGACY_MODEL_NAMES:
@@ -1256,9 +1280,25 @@ def write_batch_input_file(
         prefix = entity_id[:51].rstrip("-")
         return f"{prefix}-{digest}"
 
+    def reserve_unique_batch_custom_id(entity_id: str, seen_custom_ids: set[str]) -> str:
+        base = safe_batch_custom_id(entity_id)
+        if base not in seen_custom_ids:
+            seen_custom_ids.add(base)
+            return base
+
+        counter = 2
+        while True:
+            digest = hashlib.sha1(f"{entity_id}:{counter}".encode("utf-8")).hexdigest()[:8]
+            candidate = f"{base[:54].rstrip('-')}-{digest}"
+            if candidate not in seen_custom_ids:
+                seen_custom_ids.add(candidate)
+                return candidate
+            counter += 1
+
     input_path = batch_artifact_path(output_path, "input.jsonl")
     input_path.parent.mkdir(parents=True, exist_ok=True)
     lines = []
+    seen_custom_ids: set[str] = set()
     request_map: dict[str, Any] = {
         "artifact_version": ARTIFACT_VERSION,
         "generated_at": now_iso(),
@@ -1273,7 +1313,7 @@ def write_batch_input_file(
             evidence_packs_by_slug.get(record_slug) if evidence_packs_by_slug is not None else None,
         )
         entity_id = normalize_nullable_text(record_payload["entity_id"]) or slugify(record.get("title") or "record")
-        custom_id = safe_batch_custom_id(entity_id)
+        custom_id = reserve_unique_batch_custom_id(entity_id, seen_custom_ids)
         request_map["items"][custom_id] = {
             "entity_id": entity_id,
             "slug": record_slug,
@@ -2179,6 +2219,7 @@ def build_review_report(
     batch_runtime_override: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     selected_records = select_records(batch_payload, args.only_slug, args.max_items)
+    ensure_unique_record_entity_ids(selected_records)
     model = resolve_model(args)
 
     items: list[dict[str, Any]] = []

@@ -1,0 +1,57 @@
+{
+  "generated_at": "2026-04-28T06:05:39+00:00",
+  "status": "success",
+  "batch_name": "tmp-duplicate-dedupe-check",
+  "source_discovery_report_path": "/tmp/current_admin_duplicate_dedupe/discovery.json",
+  "output_path": "/tmp/current_admin_duplicate_dedupe/batch.json",
+  "debug_output_path": "/home/josh/Documents/GitHub/equitystack/python/reports/current_admin/tmp-duplicate-dedupe-check.discovery-debug.json",
+  "selection_filters": {
+    "candidate_ids": [],
+    "candidate_types": [],
+    "linked_promise_slugs": [],
+    "all_new_promises": false,
+    "all_new_actions": false,
+    "all_candidates": true
+  },
+  "raw_candidate_count": 2,
+  "raw_candidate_counts_by_section": {
+    "new_promise_candidates": 2
+  },
+  "raw_candidate_type_counts": {
+    "new_promise_candidate": 2
+  },
+  "selected_candidate_count": 2,
+  "selected_candidate_counts_by_section": {
+    "new_promise_candidates": 2
+  },
+  "selected_candidate_type_counts": {
+    "new_promise_candidate": 2
+  },
+  "skipped_candidate_count": 0,
+  "skip_reason_counts": {},
+  "date_filter_applied": "not_applied_in_batch_generation",
+  "keyword_category_filter_result": "not_applied_in_batch_generation",
+  "action_type_filter_result": "not_applied_in_batch_generation",
+  "dedupe_match_key": "linked_promise_slug",
+  "grouping": {
+    "selected_existing_candidate_count": 0,
+    "selected_new_promise_candidate_count": 2,
+    "grouped_existing_record_count": 0,
+    "merged_existing_candidate_count": 0,
+    "grouped_new_record_count": 1,
+    "merged_new_candidate_count": 1,
+    "dedupe_match_key": {
+      "existing_candidates": "linked_promise_slug",
+      "new_candidates": "slugified_title_or_feed_url"
+    },
+    "group_sizes_by_linked_promise_slug": {},
+    "group_sizes_by_new_record_key": {
+      "presidential-determination-on-coal-supply-chains-and-baseload-power-generation-capacity": 2
+    }
+  },
+  "final_batch_count": 1,
+  "selected_candidate_ids": [
+    "new_promise_candidates:1",
+    "new_promise_candidates:2"
+  ]
+}
