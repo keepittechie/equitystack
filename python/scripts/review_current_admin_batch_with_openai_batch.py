@@ -8,6 +8,7 @@ queue, decision-template, finalize, pre-commit, and import flows keep working.
 
 import argparse
 from datetime import datetime, timezone
+import hashlib
 import json
 import os
 import time
@@ -1244,16 +1245,40 @@ def write_batch_input_file(
     output_path: Path,
     evidence_packs_by_slug: dict[str, dict[str, Any]] | None = None,
 ) -> Path:
+    def request_map_path_for_review(path: Path) -> Path:
+        return batch_artifact_path(path, "request-map.json")
+
+    def safe_batch_custom_id(entity_id: str) -> str:
+        entity_id = normalize_nullable_text(entity_id) or "record"
+        if len(entity_id) <= 64:
+            return entity_id
+        digest = hashlib.sha1(entity_id.encode("utf-8")).hexdigest()[:12]
+        prefix = entity_id[:51].rstrip("-")
+        return f"{prefix}-{digest}"
+
     input_path = batch_artifact_path(output_path, "input.jsonl")
     input_path.parent.mkdir(parents=True, exist_ok=True)
     lines = []
+    request_map: dict[str, Any] = {
+        "artifact_version": ARTIFACT_VERSION,
+        "generated_at": now_iso(),
+        "review_artifact": str(output_path),
+        "input_artifact": str(input_path),
+        "items": {},
+    }
     for record in records:
         record_slug = normalize_nullable_text(record.get("slug")) or slugify(record.get("title") or "record")
         record_payload = build_record_payload(
             record,
             evidence_packs_by_slug.get(record_slug) if evidence_packs_by_slug is not None else None,
         )
-        custom_id = normalize_nullable_text(record_payload["entity_id"]) or slugify(record.get("title") or "record")
+        entity_id = normalize_nullable_text(record_payload["entity_id"]) or slugify(record.get("title") or "record")
+        custom_id = safe_batch_custom_id(entity_id)
+        request_map["items"][custom_id] = {
+            "entity_id": entity_id,
+            "slug": record_slug,
+            "title": normalize_nullable_text(record.get("title")),
+        }
         lines.append(
             json.dumps(
                 {
@@ -1276,6 +1301,7 @@ def write_batch_input_file(
             )
         )
     input_path.write_text("\n".join(lines) + ("\n" if lines else ""))
+    write_json_file(request_map_path_for_review(output_path), request_map)
     return input_path
 
 
@@ -1306,6 +1332,75 @@ def parse_jsonl_lines(raw_text: str) -> list[dict[str, Any]]:
 
 def now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
+
+
+def request_map_path_for_review(review_path: Path) -> Path:
+    return batch_artifact_path(review_path, "request-map.json")
+
+
+def load_request_id_map(review_path: Path) -> dict[str, str]:
+    path = request_map_path_for_review(review_path)
+    if not path.exists():
+        return {}
+    try:
+        payload = json.loads(path.read_text())
+    except Exception:  # noqa: BLE001
+        return {}
+    items = payload.get("items") if isinstance(payload, dict) else None
+    if not isinstance(items, dict):
+        return {}
+
+    mapping: dict[str, str] = {}
+    for custom_id, item in items.items():
+        if not isinstance(item, dict):
+            continue
+        entity_id = normalize_nullable_text(item.get("entity_id")) or normalize_nullable_text(item.get("slug"))
+        if entity_id:
+            mapping[str(custom_id)] = entity_id
+    return mapping
+
+
+def resolve_item_id(custom_id: str, id_map: dict[str, str], parsed: dict[str, Any] | None = None) -> str:
+    if isinstance(parsed, dict):
+        entity_id = normalize_nullable_text(parsed.get("entity_id"))
+        if entity_id:
+            return entity_id
+    return id_map.get(custom_id, custom_id)
+
+
+def summarize_batch_errors(errors: Any) -> list[str]:
+    messages: list[str] = []
+    if isinstance(errors, dict):
+        data = errors.get("data")
+        if isinstance(data, list):
+            for item in data:
+                if not isinstance(item, dict):
+                    continue
+                message = normalize_nullable_text(item.get("message"))
+                code = normalize_nullable_text(item.get("code"))
+                param = normalize_nullable_text(item.get("param"))
+                parts = [part for part in [message, f"code={code}" if code else None, f"param={param}" if param else None] if part]
+                if parts:
+                    messages.append(" | ".join(parts))
+        else:
+            message = normalize_nullable_text(errors.get("message"))
+            if message:
+                messages.append(message)
+    elif isinstance(errors, list):
+        for item in errors:
+            if isinstance(item, dict):
+                message = normalize_nullable_text(item.get("message"))
+                if message:
+                    messages.append(message)
+            else:
+                message = normalize_nullable_text(item)
+                if message:
+                    messages.append(message)
+    else:
+        message = normalize_nullable_text(errors)
+        if message:
+            messages.append(message)
+    return messages
 
 
 def resolve_openai_client(args: argparse.Namespace) -> OpenAIBatchClient:
@@ -1390,54 +1485,59 @@ def update_metadata_local_file_state(output_path: Path, metadata: dict[str, Any]
     return write_batch_metadata(output_path, metadata)
 
 
-def parse_batch_output_text(raw_text: str) -> tuple[dict[str, dict[str, Any]], dict[str, str]]:
+def parse_batch_output_text(raw_text: str, id_map: dict[str, str] | None = None) -> tuple[dict[str, dict[str, Any]], dict[str, str]]:
     results_by_slug: dict[str, dict[str, Any]] = {}
     error_by_slug: dict[str, str] = {}
+    id_map = id_map or {}
     for row in parse_jsonl_lines(raw_text):
         custom_id = normalize_nullable_text(row.get("custom_id"))
         if not custom_id:
             continue
         response = row.get("response") if isinstance(row.get("response"), dict) else {}
+        item_id = resolve_item_id(custom_id, id_map)
         if response.get("status_code") != 200:
-            error_by_slug[custom_id] = normalize_nullable_text(response.get("body")) or "Non-200 response from OpenAI Batch."
+            error_by_slug[item_id] = normalize_nullable_text(response.get("body")) or "Non-200 response from OpenAI Batch."
             continue
         body = response.get("body") if isinstance(response.get("body"), dict) else {}
         text = extract_response_text(body)
         if not text:
-            error_by_slug[custom_id] = "OpenAI Batch returned no structured response text."
+            error_by_slug[item_id] = "OpenAI Batch returned no structured response text."
             continue
         try:
             parsed = json.loads(text)
             if isinstance(parsed, dict):
-                results_by_slug[custom_id] = parsed
+                results_by_slug[resolve_item_id(custom_id, id_map, parsed)] = parsed
             else:
-                error_by_slug[custom_id] = "OpenAI Batch response JSON was not an object."
+                error_by_slug[item_id] = "OpenAI Batch response JSON was not an object."
         except Exception as exc:  # noqa: BLE001
-            error_by_slug[custom_id] = normalize_nullable_text(str(exc)) or "Failed to parse OpenAI response JSON."
+            error_by_slug[item_id] = normalize_nullable_text(str(exc)) or "Failed to parse OpenAI response JSON."
     return results_by_slug, error_by_slug
 
 
-def parse_batch_error_text(raw_text: str) -> dict[str, str]:
+def parse_batch_error_text(raw_text: str, id_map: dict[str, str] | None = None) -> dict[str, str]:
     error_by_slug: dict[str, str] = {}
+    id_map = id_map or {}
     for row in parse_jsonl_lines(raw_text):
         custom_id = normalize_nullable_text(row.get("custom_id"))
         if not custom_id:
             continue
         error = row.get("error") if isinstance(row.get("error"), dict) else {}
-        error_by_slug.setdefault(custom_id, normalize_nullable_text(error.get("message")) or "OpenAI Batch item error.")
+        item_id = resolve_item_id(custom_id, id_map)
+        error_by_slug.setdefault(item_id, normalize_nullable_text(error.get("message")) or "OpenAI Batch item error.")
     return error_by_slug
 
 
 def load_local_batch_results(output_path: Path) -> tuple[dict[str, dict[str, Any]], dict[str, str]]:
     results_by_slug: dict[str, dict[str, Any]] = {}
     error_by_slug: dict[str, str] = {}
+    id_map = load_request_id_map(output_path)
     local_output_path = output_path_for_review(output_path)
     if local_output_path.exists():
-        results_by_slug, output_errors = parse_batch_output_text(local_output_path.read_text())
+        results_by_slug, output_errors = parse_batch_output_text(local_output_path.read_text(), id_map)
         error_by_slug.update(output_errors)
     local_error_path = error_path_for_review(output_path)
     if local_error_path.exists():
-        error_by_slug.update(parse_batch_error_text(local_error_path.read_text()))
+        error_by_slug.update(parse_batch_error_text(local_error_path.read_text(), id_map))
     return results_by_slug, error_by_slug
 
 
@@ -1738,6 +1838,7 @@ def run_batch_reviews(
                     "output_file_id": existing_metadata.get("output_file_id"),
                     "error_file_id": existing_metadata.get("error_file_id"),
                     "request_counts": existing_metadata.get("request_counts") or {},
+                    "errors": (existing_metadata.get("raw_batch") or {}).get("errors") or existing_metadata.get("errors") or {},
                     "base_url": existing_metadata.get("base_url") or client.base_url,
                     "error_by_slug": error_by_slug,
                     "metadata_path": str(metadata_path),
@@ -1762,6 +1863,7 @@ def run_batch_reviews(
                 "output_file_id": existing_metadata.get("output_file_id"),
                 "error_file_id": existing_metadata.get("error_file_id"),
                 "request_counts": existing_metadata.get("request_counts") or {},
+                "errors": (existing_metadata.get("raw_batch") or {}).get("errors") or existing_metadata.get("errors") or {},
                 "base_url": existing_metadata.get("base_url") or client.base_url,
                 "error_by_slug": error_by_slug,
                 "metadata_path": str(metadata_path),
@@ -1849,25 +1951,35 @@ def derive_batch_fallback_reason(
     parsed_result_count = int(batch_runtime.get("parsed_result_count") or 0)
     parsed_error_count = int(batch_runtime.get("parsed_error_count") or 0)
     expected = int(batch_runtime.get("expected_record_count") or expected_record_count or 0)
+    batch_error_messages = summarize_batch_errors(batch_runtime.get("errors"))
 
     if expected <= 0:
         expected = expected_record_count
 
     if parsed_result_count == 0 and parsed_error_count == 0:
-        return (
+        base = (
             f"OpenAI Batch status={status} but no classifier rows were parsed from the local output artifacts "
             f"for the expected {expected} item(s)."
         )
+        if batch_error_messages:
+            return base + " Batch errors: " + " | ".join(batch_error_messages[:3])
+        return base
     if parsed_result_count == 0 and parsed_error_count > 0:
-        return (
+        base = (
             f"OpenAI Batch status={status} but none of the expected {expected} item(s) produced a usable "
             f"classifier result; {parsed_error_count} item error row(s) were parsed."
         )
+        if batch_error_messages:
+            return base + " Batch errors: " + " | ".join(batch_error_messages[:3])
+        return base
     if expected and parsed_result_count < expected:
-        return (
+        base = (
             f"OpenAI Batch returned usable classifier results for {parsed_result_count}/{expected} item(s); "
             f"{parsed_error_count} item(s) fell back."
         )
+        if batch_error_messages:
+            return base + " Batch errors: " + " | ".join(batch_error_messages[:3])
+        return base
     return None
 
 
@@ -2224,6 +2336,7 @@ def build_review_report(
         metadata["review_artifact_rebuilt_at"] = metadata.get("review_artifact_rebuilt_at") or now_iso()
         metadata["reviewed_count"] = len(items)
         metadata["validation_artifact"] = str(validation_path_for_review(output_path))
+        metadata["request_map_artifact"] = str(request_map_path_for_review(output_path))
         metadata["packaging_mode"] = args.packaging_mode
         if evidence_pack_path:
             metadata["evidence_pack_artifact"] = str(evidence_pack_path)
@@ -2335,6 +2448,7 @@ def format_batch_inspect_lines(context: dict[str, Any], metadata: dict[str, Any]
         f"Review artifact: {output_path}",
         f"Metadata artifact: {metadata_path_for_review(output_path)}",
         f"Validation artifact: {validation_path_for_review(output_path)}",
+        f"Request map artifact: {request_map_path_for_review(output_path)}",
         f"Batch id: {safety.get('batch_id') or (metadata or {}).get('batch_id') or 'n/a'}",
         f"Model: {safety.get('model') or (metadata or {}).get('model') or 'n/a'}",
         f"Status: {safety.get('status') or (metadata or {}).get('status') or 'unknown'}",
@@ -2350,6 +2464,11 @@ def format_batch_inspect_lines(context: dict[str, Any], metadata: dict[str, Any]
         f"Validation-ready: {'yes' if safety.get('safe_to_finalize') else 'no'}",
         f"Finalize/apply safe: {'yes' if safety.get('safe_to_apply') else 'no'}",
     ]
+    batch_errors = summarize_batch_errors(((metadata or {}).get("raw_batch") or {}).get("errors"))
+    if batch_errors:
+        lines.append("Batch errors:")
+        for message in batch_errors[:5]:
+            lines.append(f"- {message}")
     if safety.get("blocking_issues"):
         lines.append("Blocking issues:")
         for issue in safety["blocking_issues"]:
