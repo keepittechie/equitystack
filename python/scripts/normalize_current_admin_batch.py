@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Any
 
 from current_admin_common import (
+    VALID_ACTION_TYPES,
     VALID_CAMPAIGN_OR_OFFICIAL_VALUES,
     VALID_EVIDENCE_STRENGTHS,
     VALID_IMPACT_DIRECTIONS,
@@ -12,6 +13,7 @@ from current_admin_common import (
     VALID_SOURCE_TYPES,
     derive_csv_path,
     get_current_admin_batches_dir,
+    normalize_action_type,
     map_evidence_strength,
     normalize_date,
     normalize_nullable_text,
@@ -106,7 +108,7 @@ def normalize_source(source: dict[str, Any]) -> dict[str, Any]:
 
 def normalize_action(action: dict[str, Any]) -> dict[str, Any]:
     return {
-        "action_type": normalize_nullable_text(action.get("action_type")),
+        "action_type": normalize_action_type(action.get("action_type"), action.get("title")),
         "action_date": normalize_date(action.get("action_date")),
         "title": normalize_nullable_text(action.get("title")),
         "description": normalize_nullable_text(action.get("description")),
@@ -171,6 +173,14 @@ def validate_batch(payload: dict[str, Any]) -> list[dict[str, Any]]:
             issues.append({"record_index": index, "field": "promise_sources", "issue": "Missing promise-level source"})
 
         for action_index, action in enumerate(record.get("actions") or [], start=1):
+            if action.get("action_type") not in VALID_ACTION_TYPES:
+                issues.append({
+                    "record_index": index,
+                    "action_index": action_index,
+                    "field": "action_type",
+                    "issue": "Invalid action type",
+                    "value": action.get("action_type"),
+                })
             if not action.get("action_sources"):
                 issues.append({
                     "record_index": index,

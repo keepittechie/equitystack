@@ -13,6 +13,7 @@ from current_admin_common import (
     get_project_root,
     load_json_file,
     map_evidence_strength,
+    normalize_action_type,
     normalize_date,
     normalize_nullable_text,
     normalize_source_type,
@@ -319,8 +320,9 @@ def apply_promise_update(cursor, promise_id: int, updates: dict[str, Any]) -> bo
 
 def collect_action_updates(existing: dict[str, Any], incoming: dict[str, Any], report: dict[str, Any]) -> dict[str, Any]:
     updates: dict[str, Any] = {}
+    incoming_action_type = normalize_action_type(incoming.get("action_type"), incoming.get("title"))
     fields = [
-        ("action_type", incoming.get("action_type")),
+        ("action_type", incoming_action_type),
         ("action_date", normalize_date(incoming.get("action_date"))),
         ("title", incoming.get("title")),
         ("description", incoming.get("description")),
@@ -722,6 +724,10 @@ def main() -> None:
                     link_join_table(cursor, "promise_sources", "promise_id", promise_id, source_id)
 
                 for action in record.get("actions") or []:
+                    canonical_action_type = normalize_action_type(
+                        action.get("action_type"),
+                        action.get("title"),
+                    )
                     existing_action = find_existing_action(cursor, promise_id, action)
                     if existing_action:
                         action_id = int(existing_action["id"])
@@ -751,7 +757,7 @@ def main() -> None:
                             """,
                             (
                                 promise_id,
-                                action.get("action_type"),
+                                canonical_action_type,
                                 normalize_date(action.get("action_date")),
                                 action.get("title"),
                                 action.get("description"),

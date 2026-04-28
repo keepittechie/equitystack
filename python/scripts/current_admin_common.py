@@ -17,6 +17,16 @@ VALID_CAMPAIGN_OR_OFFICIAL_VALUES = {"Campaign", "Official"}
 VALID_IMPACT_DIRECTIONS = {"Positive", "Negative", "Mixed", "Blocked"}
 VALID_EVIDENCE_STRENGTHS = {"Strong", "Moderate", "Limited"}
 VALID_SOURCE_TYPES = {"Government", "Academic", "News", "Archive", "Nonprofit", "Other"}
+VALID_ACTION_TYPES = {
+    "Executive Order",
+    "Bill",
+    "Policy",
+    "Agency Action",
+    "Court-Related Action",
+    "Public Reversal",
+    "Statement",
+    "Other",
+}
 DEFAULT_DISCOVERY_PROMISE_TYPE = "Official Promise"
 DEFAULT_DISCOVERY_CAMPAIGN_OR_OFFICIAL = "Official"
 DB_ENV_KEYS = ("DB_HOST", "DB_PORT", "DB_USER", "DB_PASSWORD", "DB_NAME")
@@ -227,6 +237,103 @@ def normalize_source_type(value: Any, url: Any = None, publisher: Any = None) ->
     if "nonprofit" in normalized or "ngo" in normalized:
         return "Nonprofit"
     return "Other"
+
+
+def normalize_action_type(value: Any, title: Any = None) -> str:
+    text = normalize_nullable_text(value)
+    title_text = (normalize_nullable_text(title) or "").lower()
+    normalized = (text or "").lower()
+
+    if text in VALID_ACTION_TYPES:
+        return text
+
+    if "court" in normalized or "lawsuit" in normalized or "ruling" in normalized or "injunction" in normalized:
+        return "Court-Related Action"
+    if "court" in title_text or "lawsuit" in title_text or "ruling" in title_text or "injunction" in title_text:
+        return "Court-Related Action"
+
+    if "bill" in normalized or "bill signed" in title_text or "signed into law" in title_text:
+        return "Bill"
+
+    if "veto" in normalized or "reversal" in normalized or "rescission" in normalized:
+        return "Public Reversal"
+    if "veto" in title_text or "reversal" in title_text or "rescission" in title_text:
+        return "Public Reversal"
+
+    if "statement" in normalized or "press release" in normalized or "readout" in normalized or "remarks" in normalized:
+        return "Statement"
+    if any(token in title_text for token in ("statement", "readout", "remarks", "press release", "speech", "interview")):
+        return "Statement"
+
+    if "executive order" in normalized or "executive order" in title_text:
+        return "Executive Order"
+
+    if normalized in {
+        "proclamation",
+        "memorandum",
+        "presidential memorandum",
+        "presidential document",
+        "executive action",
+    }:
+        return "Executive Order"
+
+    if any(
+        token in title_text
+        for token in (
+            "proclamation",
+            "memorandum",
+            "presidential determination",
+            "presidential action",
+            "national security presidential memorandum",
+        )
+    ):
+        return "Executive Order"
+
+    if normalized in {
+        "federal register notice",
+        "federal register rule",
+        "federal register proposed rule",
+        "federal register document",
+        "agency action",
+        "trade investigation",
+    }:
+        return "Agency Action"
+    if any(
+        token in title_text
+        for token in (
+            "federal register",
+            "section 232",
+            "section 301",
+            "investigation",
+            "notice of",
+            "rule",
+        )
+    ):
+        return "Agency Action"
+
+    if normalized in {
+        "fact sheet",
+        "trade update",
+        "trade agreement / policy coordination",
+        "policy",
+    }:
+        return "Policy"
+    if any(
+        token in title_text
+        for token in (
+            "fact sheet",
+            "trade",
+            "tariff",
+            "action plan",
+            "supply chain",
+        )
+    ):
+        return "Policy"
+
+    if normalized == "other":
+        return "Other"
+
+    return "Policy"
 
 
 def ensure_parent_dir(path: Path) -> None:

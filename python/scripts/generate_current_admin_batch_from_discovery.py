@@ -11,6 +11,7 @@ from current_admin_common import (
     DEFAULT_DISCOVERY_PROMISE_TYPE,
     get_current_admin_batches_dir,
     get_current_admin_reports_dir,
+    normalize_action_type,
     normalize_date,
     normalize_nullable_text,
     normalize_source_type,
@@ -238,7 +239,10 @@ def build_action_stub(candidate: dict[str, Any]) -> dict[str, Any] | None:
     feed_item = item.get("feed_item") or {}
     source_rows = normalize_promise_sources(item.get("source_references") or [])
     title = normalize_nullable_text(suggested.get("title")) or normalize_nullable_text(feed_item.get("title"))
-    action_type = normalize_nullable_text(suggested.get("action_type"))
+    action_type = normalize_action_type(
+        suggested.get("action_type"),
+        title or normalize_nullable_text(feed_item.get("title")),
+    )
     description = (
         normalize_nullable_text(suggested.get("summary"))
         or normalize_nullable_text(feed_item.get("summary"))
