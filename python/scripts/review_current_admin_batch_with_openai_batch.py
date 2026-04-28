@@ -1441,6 +1441,19 @@ def load_local_batch_results(output_path: Path) -> tuple[dict[str, dict[str, Any
     return results_by_slug, error_by_slug
 
 
+def batch_result_counts(
+    results_by_slug: dict[str, dict[str, Any]],
+    error_by_slug: dict[str, str],
+) -> dict[str, int]:
+    parsed_result_count = len(results_by_slug)
+    parsed_error_count = len(error_by_slug)
+    return {
+        "parsed_result_count": parsed_result_count,
+        "parsed_error_count": parsed_error_count,
+        "parsed_total_count": parsed_result_count + parsed_error_count,
+    }
+
+
 def validate_raw_classifier_payload(raw: dict[str, Any] | None, item_id: str, error_message: str | None) -> dict[str, Any]:
     notes: list[str] = []
     enum_errors: list[str] = []
@@ -1659,25 +1672,29 @@ def fetch_available_batch_files(
     client: OpenAIBatchClient,
     output_path: Path,
     metadata: dict[str, Any],
+    *,
+    force: bool = False,
 ) -> dict[str, str]:
     fetched: dict[str, str] = {}
     output_file_id = normalize_nullable_text(metadata.get("output_file_id"))
     local_output_path = output_path_for_review(output_path)
     if output_file_id:
-        if local_output_path.exists():
+        existed = local_output_path.exists()
+        if existed and not force:
             fetched["output"] = "already_present"
         else:
             local_output_path.write_text(client.download_file_content(output_file_id))
-            fetched["output"] = "downloaded"
+            fetched["output"] = "refreshed" if existed else "downloaded"
 
     error_file_id = normalize_nullable_text(metadata.get("error_file_id"))
     local_error_path = error_path_for_review(output_path)
     if error_file_id:
-        if local_error_path.exists():
+        existed = local_error_path.exists()
+        if existed and not force:
             fetched["error"] = "already_present"
         else:
             local_error_path.write_text(client.download_file_content(error_file_id))
-            fetched["error"] = "downloaded"
+            fetched["error"] = "refreshed" if existed else "downloaded"
 
     update_metadata_local_file_state(output_path, metadata)
     return fetched
@@ -1694,30 +1711,50 @@ def run_batch_reviews(
     existing_metadata, metadata_path = read_batch_metadata(output_path)
     if existing_metadata and existing_metadata.get("batch_id"):
         local_output_path = output_path_for_review(output_path)
+        local_error_path = error_path_for_review(output_path)
         status = normalize_nullable_text(existing_metadata.get("status")) or "unknown"
-        if local_output_path.exists():
+        expected_record_count = int((existing_metadata.get("request_counts") or {}).get("total") or len(records))
+        if local_output_path.exists() or local_error_path.exists():
             classifier_by_slug, error_by_slug = load_local_batch_results(output_path)
+            counts = batch_result_counts(classifier_by_slug, error_by_slug)
+            fetched_files: dict[str, str] = {}
+            if (
+                status == "completed"
+                and counts["parsed_total_count"] < expected_record_count
+                and (
+                    normalize_nullable_text(existing_metadata.get("output_file_id"))
+                    or normalize_nullable_text(existing_metadata.get("error_file_id"))
+                )
+            ):
+                fetched_files = fetch_available_batch_files(client, output_path, existing_metadata, force=True)
+                classifier_by_slug, error_by_slug = load_local_batch_results(output_path)
+                counts = batch_result_counts(classifier_by_slug, error_by_slug)
             update_metadata_local_file_state(output_path, existing_metadata)
-            return classifier_by_slug, {
-                "batch_id": existing_metadata.get("batch_id"),
-                "status": status,
-                "input_file_id": existing_metadata.get("input_file_id"),
-                "output_file_id": existing_metadata.get("output_file_id"),
-                "error_file_id": existing_metadata.get("error_file_id"),
-                "request_counts": existing_metadata.get("request_counts") or {},
-                "base_url": existing_metadata.get("base_url") or client.base_url,
-                "error_by_slug": error_by_slug,
-                "metadata_path": str(metadata_path),
-                "resumed_from_local_output": True,
-            }
+            if counts["parsed_total_count"] > 0:
+                return classifier_by_slug, {
+                    "batch_id": existing_metadata.get("batch_id"),
+                    "status": status,
+                    "input_file_id": existing_metadata.get("input_file_id"),
+                    "output_file_id": existing_metadata.get("output_file_id"),
+                    "error_file_id": existing_metadata.get("error_file_id"),
+                    "request_counts": existing_metadata.get("request_counts") or {},
+                    "base_url": existing_metadata.get("base_url") or client.base_url,
+                    "error_by_slug": error_by_slug,
+                    "metadata_path": str(metadata_path),
+                    "expected_record_count": expected_record_count,
+                    **counts,
+                    "fetched_files": fetched_files,
+                    "resumed_from_local_output": True,
+                }
         if status in INCOMPLETE_BATCH_STATUSES or status not in TERMINAL_BATCH_STATUSES:
             raise ValueError(
                 f"Existing OpenAI Batch metadata found with status={status}; not submitting a duplicate batch. "
                 "Run this command with --batch-resume or --batch-poll to continue lifecycle handling."
             )
         if status == "completed" and existing_metadata.get("output_file_id"):
-            fetch_available_batch_files(client, output_path, existing_metadata)
+            fetched_files = fetch_available_batch_files(client, output_path, existing_metadata, force=True)
             classifier_by_slug, error_by_slug = load_local_batch_results(output_path)
+            counts = batch_result_counts(classifier_by_slug, error_by_slug)
             return classifier_by_slug, {
                 "batch_id": existing_metadata.get("batch_id"),
                 "status": status,
@@ -1728,6 +1765,9 @@ def run_batch_reviews(
                 "base_url": existing_metadata.get("base_url") or client.base_url,
                 "error_by_slug": error_by_slug,
                 "metadata_path": str(metadata_path),
+                "expected_record_count": expected_record_count,
+                **counts,
+                "fetched_files": fetched_files,
                 "resumed_from_remote_output": True,
             }
         raise ValueError(
@@ -1777,8 +1817,9 @@ def run_batch_reviews(
     results_by_slug: dict[str, dict[str, Any]] = {}
     error_by_slug: dict[str, str] = {}
 
-    fetch_available_batch_files(client, output_path, metadata)
+    fetched_files = fetch_available_batch_files(client, output_path, metadata, force=True)
     results_by_slug, error_by_slug = load_local_batch_results(output_path)
+    counts = batch_result_counts(results_by_slug, error_by_slug)
 
     return results_by_slug, {
         "batch_id": batch_payload.get("id"),
@@ -1791,7 +1832,69 @@ def run_batch_reviews(
         "base_url": client.base_url,
         "error_by_slug": error_by_slug,
         "metadata_path": str(metadata_path_for_review(output_path)),
+        "expected_record_count": len(records),
+        **counts,
+        "fetched_files": fetched_files,
     }
+
+
+def derive_batch_fallback_reason(
+    batch_runtime: dict[str, Any] | None,
+    expected_record_count: int,
+) -> str | None:
+    if not batch_runtime:
+        return None
+
+    status = normalize_nullable_text(batch_runtime.get("status")) or "unknown"
+    parsed_result_count = int(batch_runtime.get("parsed_result_count") or 0)
+    parsed_error_count = int(batch_runtime.get("parsed_error_count") or 0)
+    expected = int(batch_runtime.get("expected_record_count") or expected_record_count or 0)
+
+    if expected <= 0:
+        expected = expected_record_count
+
+    if parsed_result_count == 0 and parsed_error_count == 0:
+        return (
+            f"OpenAI Batch status={status} but no classifier rows were parsed from the local output artifacts "
+            f"for the expected {expected} item(s)."
+        )
+    if parsed_result_count == 0 and parsed_error_count > 0:
+        return (
+            f"OpenAI Batch status={status} but none of the expected {expected} item(s) produced a usable "
+            f"classifier result; {parsed_error_count} item error row(s) were parsed."
+        )
+    if expected and parsed_result_count < expected:
+        return (
+            f"OpenAI Batch returned usable classifier results for {parsed_result_count}/{expected} item(s); "
+            f"{parsed_error_count} item(s) fell back."
+        )
+    return None
+
+
+def batch_review_failure_reason(
+    report: dict[str, Any],
+    validation_summary: dict[str, Any],
+) -> str | None:
+    if report.get("dry_run"):
+        return None
+
+    reviewed_count = int(report.get("reviewed_count") or 0)
+    fallback_count = int(report.get("fallback_count") or 0)
+    valid_items = int(validation_summary.get("valid_items") or 0)
+
+    if reviewed_count and fallback_count >= reviewed_count:
+        return (
+            f"OpenAI Batch review did not produce usable AI results for any of the {reviewed_count} item(s). "
+            f"{normalize_nullable_text(report.get('fallback_reason')) or 'The review artifact was rebuilt entirely from heuristic fallback rows.'}"
+        )
+
+    if reviewed_count and valid_items == 0:
+        return (
+            f"OpenAI Batch review completed without any structurally valid classifier payloads for {reviewed_count} item(s). "
+            "Inspect the validation and metadata sidecars before continuing."
+        )
+
+    return None
 
 
 def classifier_to_suggestion(
@@ -1994,12 +2097,14 @@ def build_review_report(
             evidence_packs_by_slug,
         )
 
+    generic_fallback_reason = derive_batch_fallback_reason(batch_runtime, len(selected_records))
+
     for record in selected_records:
         existing_matches = fetch_existing_matches(record)
         slug = normalize_nullable_text(record.get("slug")) or slugify(record.get("title") or "record")
         raw_classifier = classifier_by_slug.get(slug)
         error_by_slug = (batch_runtime or {}).get("error_by_slug") or {}
-        fallback_reason = error_by_slug.get(slug)
+        fallback_reason = error_by_slug.get(slug) or generic_fallback_reason
 
         if raw_classifier is None:
             if args.dry_run:
@@ -2055,6 +2160,10 @@ def build_review_report(
     review_backends = sorted({item.get("review_backend") for item in items if item.get("review_backend")})
     model_statuses = sorted({item.get("model_resolution_status") for item in items if item.get("model_resolution_status")})
     fallback_reasons = sorted({item.get("fallback_reason") for item in items if item.get("fallback_reason")})
+    if not fallback_reasons and any(bool(item.get("fallback_used")) for item in items):
+        derived_reason = derive_batch_fallback_reason(batch_runtime, len(items))
+        if derived_reason:
+            fallback_reasons = [derived_reason]
     suggested_batches, suggested_batch_counts = build_suggested_batch_summary(items)
 
     report = {
@@ -2119,6 +2228,13 @@ def build_review_report(
         if evidence_pack_path:
             metadata["evidence_pack_artifact"] = str(evidence_pack_path)
         write_batch_metadata(output_path, metadata)
+
+    failure_reason = batch_review_failure_reason(report, validation_summary)
+    if failure_reason:
+        raise SystemExit(
+            failure_reason
+            + f" Inspect {metadata_path_for_review(output_path)} and {validation_path_for_review(output_path)}."
+        )
     return report
 
 
