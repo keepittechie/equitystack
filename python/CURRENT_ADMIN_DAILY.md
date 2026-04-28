@@ -52,6 +52,7 @@ If AI or the operator notes call for a deeper pass:
 
 - refreshes the queue and decision template from the latest `.ai-review.json`
 - auto-resolves AI-approved and AI-rejected rows first
+- auto-resolves already-tracked rows when discovery only shows no material change or a source-refresh update
 - asks for operator decisions only on the remaining manual-review rows
 - writes the decision log only when those manual decisions are needed
 - the admin surface labels this step `Sync Decision Log`
@@ -87,6 +88,8 @@ The queue splits into:
 - `items`
 - `auto_approved_items`
 - `auto_rejected_items`
+
+`items` should be the true ambiguous remainder. Existing tracked rows with no material change or source-only refresh context are expected to resolve out of the editable queue before you open the admin review page.
 
 After `review`:
 

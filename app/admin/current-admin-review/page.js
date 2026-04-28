@@ -19,10 +19,11 @@ export default async function CurrentAdminReviewPage() {
         <h1 className="text-lg font-semibold text-[var(--admin-text)]">Current-Admin Manual Review</h1>
         <p className="max-w-5xl text-[12px] text-[var(--admin-text-soft)]">
           This page is the canonical control surface between AI review and guarded
-          apply. Only the remaining borderline manual-review rows stay editable
-          here. AI-approved and AI-rejected queue outcomes stay visible as pipeline
-          state, and the next gates remain decision-log sync, pre-commit, apply
-          dry-run, final apply, and validation.
+          apply. Existing tracked rows with no material change or only source-refresh
+          updates should auto-resolve before they reach this page. Only the remaining
+          borderline manual-review rows stay editable here. AI-approved and AI-rejected
+          queue outcomes stay visible as pipeline state, and the next gates remain
+          decision-log sync, pre-commit, apply dry-run, final apply, and validation.
         </p>
       </section>
 

@@ -8,6 +8,7 @@ from typing import Any
 from current_admin_common import (
     AUTO_APPROVED_QUEUE_KEY,
     AUTO_REJECTED_QUEUE_KEY,
+    existing_record_auto_resolution,
     get_current_admin_reports_dir,
     load_json_file,
     merge_record_with_suggestions,
@@ -175,6 +176,13 @@ def classifier_recommended_action(suggestions: dict[str, Any]) -> str | None:
     return normalize_nullable_text(suggestions.get("classifier_recommended_action"))
 
 
+def suggestion_has_safe_auto_resolution(suggestions: dict[str, Any]) -> bool:
+    resolution = normalize_nullable_text(suggestions.get("existing_update_resolution"))
+    if suggestions.get("safe_auto_resolution") is True:
+        return True
+    return resolution in {"no_material_change", "source_only_refresh"}
+
+
 def determine_queue_resolution(
     *,
     ai_item: dict[str, Any],
@@ -185,6 +193,18 @@ def determine_queue_resolution(
     classifier_action = classifier_recommended_action(suggestions)
     has_black_scope = record_has_affirmative_black_scope(final_record)
     has_material_conflict = bool(ai_item.get("has_material_conflict"))
+    existing_resolution = existing_record_auto_resolution(
+        final_record,
+        ai_item.get("existing_matches") if isinstance(ai_item.get("existing_matches"), list) else [],
+    )
+    safe_auto_resolution = suggestion_has_safe_auto_resolution(suggestions) or bool(
+        existing_resolution.get("safe_auto_resolution")
+    )
+
+    if not has_material_conflict and safe_auto_resolution:
+        if has_black_scope and recommended_action != "reject":
+            return "auto_approved", normalize_nullable_text(existing_resolution.get("reason")) or AUTO_APPROVAL_REASON
+        return "auto_rejected", normalize_nullable_text(existing_resolution.get("reason")) or AUTO_REJECTION_REASON
 
     if has_black_scope and not has_material_conflict and recommended_action in AUTO_IMPORT_ACTIONS:
         return "auto_approved", AUTO_APPROVAL_REASON
@@ -217,6 +237,10 @@ def build_queue_item(
 ) -> tuple[dict[str, Any], str]:
     suggestions = review_item_suggestions(ai_item)
     final_record = merge_record_with_suggestions(record, suggestions, prefill=False)
+    existing_resolution = existing_record_auto_resolution(
+        final_record,
+        ai_item.get("existing_matches") if isinstance(ai_item.get("existing_matches"), list) else [],
+    )
     queue_resolution, reason = determine_queue_resolution(
         ai_item=ai_item,
         suggestions=suggestions,
@@ -246,6 +270,8 @@ def build_queue_item(
         "ai_review": ai_item,
         "final_record": final_record,
         "queue_resolution": queue_resolution,
+        "existing_update_resolution": existing_resolution.get("resolution"),
+        "safe_auto_resolution": bool(existing_resolution.get("safe_auto_resolution")),
         "automation_decision": (
             {
                 "decision_source": "queue_promotion",

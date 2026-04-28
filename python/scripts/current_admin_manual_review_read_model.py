@@ -139,6 +139,8 @@ def classification_from_suggestion(suggestion: dict[str, Any]) -> str:
 
 
 def recommended_action_from_suggestion(suggestion: dict[str, Any]) -> str:
+    if safe_auto_resolution_from_suggestion(suggestion):
+        return "approve"
     record_action = normalize_nullable_text(suggestion.get("record_action_suggestion")) or ""
     operator_action = normalize_nullable_text(suggestion.get("suggested_operator_next_action")) or ""
     if record_action in {"new_record", "update_existing"} and operator_action != "manual_review_required":
@@ -152,6 +154,15 @@ def source_quality_from_suggestion(suggestion: dict[str, Any]) -> str:
     evidence = normalize_nullable_text(suggestion.get("evidence_strength_suggestion")) or ""
     mapping = {"Strong": "high", "Moderate": "medium", "Limited": "low", "Weak": "low"}
     return mapping.get(evidence, "low")
+
+
+def safe_auto_resolution_from_suggestion(suggestion: dict[str, Any]) -> bool:
+    if suggestion.get("safe_auto_resolution") is True:
+        return True
+    return normalize_nullable_text(suggestion.get("existing_update_resolution")) in {
+        "no_material_change",
+        "source_only_refresh",
+    }
 
 
 def flags_from_suggestion(item: dict[str, Any], suggestion: dict[str, Any], source_quality: str) -> dict[str, bool]:
@@ -284,13 +295,16 @@ def reason_labels_for(context: dict[str, Any], validation: dict[str, Any], item:
     flags = context["flags"]
     if flags.get("conflicting_sources") or item.get("has_material_conflict"):
         labels.append("conflicting sources")
+    suggestion = item.get("suggestions") if isinstance(item.get("suggestions"), dict) else {}
+    if safe_auto_resolution_from_suggestion(suggestion) and not labels:
+        return []
     if flags.get("weak_evidence") or context.get("source_quality") == "low" or context.get("source_issues") or context.get("missing_information"):
         labels.append("weak evidence")
     if context.get("classification") == "unclear":
         labels.append("unclear classification")
     if float(context.get("confidence") or 0.0) < 0.75:
         labels.append("low confidence")
-    if context.get("recommended_action") == "needs_manual_review" or item.get("suggestions", {}).get("record_action_suggestion") == "manual_review":
+    if context.get("recommended_action") == "needs_manual_review" or suggestion.get("record_action_suggestion") == "manual_review":
         labels.append("manual review requested by model")
     if flags.get("ambiguous_subject") and "ambiguous subject" not in labels:
         labels.append("ambiguous subject")

@@ -29,6 +29,12 @@ VALID_ACTION_TYPES = {
     "Statement",
     "Other",
 }
+AUTO_RESOLVABLE_EXISTING_CANDIDATE_TYPES = {
+    "legal_context",
+    "source_context",
+    "stale_record",
+    "thin_sourcing",
+}
 DEFAULT_DISCOVERY_PROMISE_TYPE = "Official Promise"
 DEFAULT_DISCOVERY_CAMPAIGN_OR_OFFICIAL = "Official"
 DB_ENV_KEYS = ("DB_HOST", "DB_PORT", "DB_USER", "DB_PASSWORD", "DB_NAME")
@@ -187,6 +193,117 @@ def record_has_affirmative_black_scope(record: dict[str, Any]) -> bool:
                 return True
 
     return False
+
+
+def existing_record_auto_resolution(
+    record: dict[str, Any],
+    existing_matches: list[dict[str, Any]] | None = None,
+) -> dict[str, Any]:
+    discovery_context = record.get("discovery_context") if isinstance(record.get("discovery_context"), dict) else {}
+    linked_snapshot = (
+        discovery_context.get("linked_promise_snapshot")
+        if isinstance(discovery_context.get("linked_promise_snapshot"), dict)
+        else {}
+    )
+    selected_candidates = [
+        candidate
+        for candidate in (discovery_context.get("selected_candidates") or [])
+        if isinstance(candidate, dict)
+    ]
+    candidate_types = sorted(
+        {
+            candidate_type
+            for candidate_type in (
+                normalize_nullable_text(candidate.get("candidate_type")) for candidate in selected_candidates
+            )
+            if candidate_type
+        }
+    )
+    preserved_sources = [
+        source
+        for source in (discovery_context.get("preserved_discovery_sources") or [])
+        if isinstance(source, dict)
+    ]
+    preserved_action_count = int(discovery_context.get("preserved_action_count") or 0)
+    first_match = existing_matches[0] if existing_matches else {}
+
+    reference_slug = normalize_nullable_text(linked_snapshot.get("slug")) or normalize_nullable_text(first_match.get("slug"))
+    reference_title = normalize_nullable_text(linked_snapshot.get("title")) or normalize_nullable_text(first_match.get("title"))
+    reference_status = normalize_nullable_text(linked_snapshot.get("status")) or normalize_nullable_text(first_match.get("status"))
+    reference_topic = normalize_nullable_text(linked_snapshot.get("topic")) or normalize_nullable_text(first_match.get("topic"))
+    reference_impacted_group = normalize_nullable_text(first_match.get("impacted_group"))
+
+    changed_fields = [
+        field
+        for field, current_value, reference_value in (
+            ("slug", record.get("slug"), reference_slug),
+            ("title", record.get("title"), reference_title),
+            ("status", record.get("status"), reference_status),
+            ("topic", record.get("topic"), reference_topic),
+            ("impacted_group", record.get("impacted_group"), reference_impacted_group),
+        )
+        if reference_value is not None and normalize_nullable_text(current_value) != reference_value
+    ]
+
+    has_existing_reference = bool(existing_matches) or bool(reference_slug) or linked_snapshot.get("id") is not None
+    auto_resolve_safe = False
+    material_change_detected = False
+    resolution: str | None = None
+    reason = "The record does not map cleanly to a tracked promise yet."
+
+    if has_existing_reference:
+        if preserved_action_count > 0:
+            material_change_detected = True
+            resolution = "material_change_or_new_information"
+            reason = (
+                f"Discovery preserved {preserved_action_count} action stub(s), so this still looks like a substantive update."
+            )
+        elif changed_fields:
+            material_change_detected = True
+            resolution = "material_change_or_new_information"
+            reason = (
+                "Core tracked fields changed relative to the linked promise snapshot: "
+                + ", ".join(changed_fields)
+                + "."
+            )
+        else:
+            non_auto_candidate_types = [
+                candidate_type
+                for candidate_type in candidate_types
+                if candidate_type not in AUTO_RESOLVABLE_EXISTING_CANDIDATE_TYPES
+            ]
+            if non_auto_candidate_types:
+                material_change_detected = True
+                resolution = "material_change_or_new_information"
+                reason = (
+                    "Discovery emitted higher-risk candidate types that should stay out of the safe existing-record path: "
+                    + ", ".join(non_auto_candidate_types)
+                    + "."
+                )
+            else:
+                auto_resolve_safe = True
+                resolution = "source_only_refresh" if preserved_sources else "no_material_change"
+                if resolution == "source_only_refresh":
+                    reason = (
+                        "This record is already tracked and discovery only preserved source refresh context without a new action stub."
+                    )
+                else:
+                    reason = (
+                        "This record is already tracked and discovery did not preserve any substantive change to the tracked promise."
+                    )
+
+    return {
+        "has_existing_reference": has_existing_reference,
+        "safe_auto_resolution": auto_resolve_safe,
+        "material_change_detected": material_change_detected,
+        "resolution": resolution,
+        "reason": reason,
+        "candidate_types": candidate_types,
+        "preserved_action_count": preserved_action_count,
+        "preserved_source_count": len(preserved_sources),
+        "changed_fields": changed_fields,
+        "linked_promise_slug": reference_slug,
+    }
 
 
 def merge_record_with_suggestions(

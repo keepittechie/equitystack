@@ -17,6 +17,7 @@ from typing import Any
 
 from current_admin_common import (
     derive_csv_path,
+    existing_record_auto_resolution,
     get_db_connection,
     get_project_root,
     map_evidence_strength,
@@ -278,6 +279,13 @@ def source_warnings(record: dict[str, Any]) -> list[str]:
     return sorted(set(warnings))
 
 
+def suggestion_has_safe_auto_resolution(suggestion: dict[str, Any]) -> bool:
+    resolution = normalize_nullable_text(suggestion.get("existing_update_resolution"))
+    if suggestion.get("safe_auto_resolution") is True:
+        return True
+    return resolution in {"no_material_change", "source_only_refresh"}
+
+
 def normalize_string_list(value: Any) -> list[str]:
     if isinstance(value, list):
         return [item.strip() for item in (normalize_nullable_text(item) for item in value) if item]
@@ -489,7 +497,10 @@ def suggested_operator_next_action(
     record_action_suggestion: str | None,
     warnings: list[str],
     deep_review_ran: bool,
+    safe_auto_resolution: bool = False,
 ) -> str:
+    if safe_auto_resolution and record_action_suggestion == "update_existing":
+        return "check_sources_before_import" if warnings else "review_queue_and_dry_run_import"
     if confidence_level == "Low" or record_action_suggestion == "manual_review":
         return "manual_review_required"
     if warnings:
@@ -514,6 +525,7 @@ def build_confidence_details(
     source_flags = normalize_string_list(suggestion.get("source_warnings"))
     evidence_gaps = normalize_string_list(suggestion.get("evidence_needed_to_reduce_risk"))
     caution_flags = normalize_string_list(suggestion.get("caution_flags"))
+    safe_auto_resolution = suggestion_has_safe_auto_resolution(suggestion)
 
     if confidence_level == "Low" or confidence_score < 0.55:
         add_signal("low_confidence", "reduces", "The normalized confidence score remains low after review.")
@@ -529,6 +541,13 @@ def build_confidence_details(
 
     if suggestion.get("record_action_suggestion") == "manual_review":
         add_signal("manual_review_required", "reduces", "The pass recommends manual review instead of a confident import path.")
+    elif safe_auto_resolution:
+        add_signal(
+            "existing_safe_update",
+            "supports",
+            normalize_nullable_text(suggestion.get("existing_update_resolution_reason"))
+            or "This item is already tracked and only needs a no-material-change or source-refresh update path.",
+        )
 
     if suggestion.get("impact_direction_suggestion") == "Mixed":
         add_signal("mixed_impact_direction", "reduces", "Mixed impact direction makes the downstream interpretation less settled.")
@@ -536,7 +555,7 @@ def build_confidence_details(
     if evidence_gaps:
         add_signal("evidence_gaps_present", "reduces", "The pass identified evidence gaps that should be closed before import.")
 
-    if existing_matches and suggestion.get("record_action_suggestion") != "update_existing":
+    if existing_matches and suggestion.get("record_action_suggestion") != "update_existing" and not safe_auto_resolution:
         add_signal("existing_match_uncertainty", "reduces", "Existing promise matches exist, but the pass did not confidently resolve this as an update.")
 
     if "implementation_still_in_progress" in caution_flags or record.get("status") in {"In Progress", "Partial"}:
@@ -581,6 +600,16 @@ def build_deep_review_recommendation(
     suggestion: dict[str, Any],
     existing_matches: list[dict[str, Any]],
 ) -> dict[str, Any]:
+    if suggestion_has_safe_auto_resolution(suggestion):
+        reason = normalize_nullable_text(suggestion.get("existing_update_resolution_reason")) or (
+            "The item is already tracked and only needs a no-material-change or source-refresh resolution."
+        )
+        return {
+            "deep_review_recommended": False,
+            "deep_review_recommendation_reason": reason,
+            "deep_review_recommendation_signals": [],
+        }
+
     signals: list[dict[str, str]] = []
 
     def add_signal(code: str, reason: str) -> None:
@@ -632,6 +661,28 @@ def build_review_priority(
     existing_matches: list[dict[str, Any]],
     recommendation: dict[str, Any],
 ) -> dict[str, Any]:
+    if suggestion_has_safe_auto_resolution(final_suggestion):
+        return {
+            "review_priority": "low",
+            "review_priority_score": 0,
+            "review_priority_reason": normalize_nullable_text(
+                final_suggestion.get("existing_update_resolution_reason")
+            )
+            or "Existing tracked record can move through the safe no-material-change/source-refresh path.",
+            "review_priority_signals": [
+                {
+                    "code": "existing_safe_update",
+                    "weight": 0,
+                    "reason": normalize_nullable_text(
+                        final_suggestion.get("existing_update_resolution_reason")
+                    )
+                    or "Existing tracked record can move through the safe no-material-change/source-refresh path.",
+                }
+            ],
+            "manual_review_severity": "low",
+            "operator_attention_needed": False,
+        }
+
     signals: list[dict[str, Any]] = []
 
     def add_signal(code: str, weight: int, reason: str) -> None:
@@ -734,6 +785,19 @@ def build_suggested_batch(
     recommendation: dict[str, Any],
     review_priority: dict[str, Any],
 ) -> dict[str, Any]:
+    if suggestion_has_safe_auto_resolution(final_suggestion):
+        source_checks_remaining = normalize_string_list(final_suggestion.get("source_warnings")) or normalize_string_list(
+            final_suggestion.get("evidence_needed_to_reduce_risk")
+        )
+        return {
+            "suggested_batch": "source_check_needed" if source_checks_remaining else "likely_straightforward",
+            "suggested_batch_reason": normalize_nullable_text(
+                final_suggestion.get("existing_update_resolution_reason")
+            )
+            or "Existing tracked record can move through the safe no-material-change/source-refresh path.",
+            "suggested_batch_tags": ["existing_safe_update"],
+        }
+
     tags: list[str] = []
 
     def add_tag(tag: str) -> None:
@@ -2090,6 +2154,7 @@ def classifier_to_suggestion(
     score = normalize_confidence_score(classifier.get("confidence"))
     classification = classifier.get("classification")
     recommended_action = classifier.get("recommended_action")
+    existing_resolution = existing_record_auto_resolution(record, existing_matches)
     if classification == "unclear" or recommended_action != "approve":
         score = min(score, 0.5)
     level = normalize_confidence_level(None, score)
@@ -2118,14 +2183,23 @@ def classifier_to_suggestion(
     for key, enabled in flags.items():
         if enabled:
             caution_flags.append(key)
-    if recommended_action != "approve":
+    safe_auto_resolution = bool(existing_resolution.get("safe_auto_resolution")) and recommended_action != "reject"
+    if recommended_action != "approve" and not safe_auto_resolution:
         caution_flags.append("manual_review_required")
     if fallback_reason:
         caution_flags.append("batch_fallback_used")
     caution_flags = sorted(set(caution_flags))
 
     has_slug_match = any(match.get("slug") == record.get("slug") for match in existing_matches)
-    if recommended_action == "approve":
+    if safe_auto_resolution:
+        record_action_suggestion = "update_existing"
+        if effective_recommended_action not in {"approve", "import_with_pending_impact"}:
+            effective_recommended_action = "import_with_pending_impact"
+        if effective_recommended_action == "approve" and (merged_warnings or missing_information or score < 0.75):
+            effective_recommended_action = "import_with_pending_impact"
+        impact_status = "impact_pending" if effective_recommended_action == "import_with_pending_impact" else "impact_scored"
+        impact_status_reason = normalize_nullable_text(existing_resolution.get("reason")) or impact_status_reason
+    elif recommended_action == "approve":
         record_action_suggestion = "update_existing" if has_slug_match else ("manual_review" if existing_matches else "new_record")
     else:
         record_action_suggestion = "manual_review"
@@ -2153,11 +2227,16 @@ def classifier_to_suggestion(
             record_action_suggestion=record_action_suggestion,
             warnings=merged_warnings,
             deep_review_ran=False,
+            safe_auto_resolution=safe_auto_resolution,
         ),
         "caution_flags": caution_flags,
         "source_warnings": merged_warnings,
         "missing_source_warnings": merged_warnings,
         "ambiguity_notes": " ".join(reasoning_notes[:3]) if reasoning_notes else "Operator should manually verify this advisory suggestion.",
+        "existing_update_resolution": existing_resolution.get("resolution"),
+        "existing_update_resolution_reason": existing_resolution.get("reason"),
+        "safe_auto_resolution": safe_auto_resolution,
+        "existing_update_candidate_types": existing_resolution.get("candidate_types") or [],
     }
     suggestion.update(build_confidence_details(record, suggestion, existing_matches))
     return suggestion
@@ -2186,6 +2265,8 @@ def build_review_item(
         "title": record.get("title"),
         "impact_status": final_suggestion.get("impact_status"),
         "recommended_action": final_suggestion.get("recommended_action"),
+        "existing_update_resolution": final_suggestion.get("existing_update_resolution"),
+        "safe_auto_resolution": bool(final_suggestion.get("safe_auto_resolution")),
         "requested_model": model,
         "effective_model": model if uses_model else None,
         "resolved_model": model if uses_model else None,

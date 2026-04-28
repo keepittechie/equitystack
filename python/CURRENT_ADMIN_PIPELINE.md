@@ -50,6 +50,7 @@ Current-admin now follows this operator model:
    - promotes the AI-first queue
 2. `current-admin review`
    - resolves AI decisions first
+   - auto-resolves already-tracked rows when discovery shows no material change or only source-refresh context
    - shows only the remaining manual-review slice
    - writes the canonical decision log only when manual decisions are still needed
 3. `current-admin apply`
@@ -122,6 +123,13 @@ Queue structure:
 - `items`: only borderline rows that still need human action
 - `auto_approved_items`: AI-cleared import candidates
 - `auto_rejected_items`: off-mission or unsupported rows
+
+The queue promotion step is intentionally conservative but now short-circuits two common no-op cases:
+
+- existing tracked records with no material change
+- existing tracked records with source-only refresh context and no preserved action stub
+
+Those rows should be auto-resolved before they show up in `/admin/current-admin-review`. Deep review is for the smaller ambiguous remainder, not for stale or source-refresh maintenance rows.
 
 ## Read-Only vs Mutating
 

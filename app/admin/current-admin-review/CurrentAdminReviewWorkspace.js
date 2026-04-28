@@ -214,8 +214,10 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
             <h2 className="mt-1 text-base font-semibold text-[var(--admin-text)]">AI-first review, then guarded apply</h2>
             <p className="mt-1 max-w-5xl text-[12px] text-[var(--admin-text-soft)]">
               `current-admin run` prepares the batch, normalizes it, runs the standard AI review, and splits the queue.
-              This page only edits the remaining manual-review slice. Deep review is optional when the standard pass
-              still leaves ambiguity before decision-log sync, pre-commit, apply dry-run, final apply, and validation.
+              Existing tracked rows with no material change or only source-refresh updates should auto-resolve before
+              they reach this page. This page only edits the remaining manual-review slice. Deep review is optional
+              when the standard pass still leaves ambiguity before decision-log sync, pre-commit, apply dry-run,
+              final apply, and validation.
             </p>
           </div>
           <div className={PANEL_CLASS}>
