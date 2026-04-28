@@ -11,6 +11,8 @@ from urllib.parse import urlparse
 
 
 DEFAULT_CURRENT_ADMIN_REPORTS_DIRNAME = "current_admin"
+AUTO_APPROVED_QUEUE_KEY = "auto_approved_items"
+AUTO_REJECTED_QUEUE_KEY = "auto_rejected_items"
 VALID_PROMISE_STATUSES = {"In Progress", "Partial", "Delivered", "Blocked", "Failed"}
 VALID_PROMISE_TYPES = {"Campaign Promise", "Official Promise", "Public Promise", "Executive Agenda", "Other"}
 VALID_CAMPAIGN_OR_OFFICIAL_VALUES = {"Campaign", "Official"}
@@ -146,6 +148,86 @@ def normalize_text(value: Any) -> str:
 def normalize_nullable_text(value: Any) -> str | None:
     text = normalize_text(value)
     return text or None
+
+
+NEGATED_BLACK_SCOPE_PHRASES = (
+    "no black-community-specific effect",
+    "no black community specific effect",
+    "no black-community effect",
+    "no direct or indirect evidence of impact on black americans",
+    "no direct evidence of impact on black americans",
+    "no information about how or whether this action affects black americans",
+    "no evidence of impact on black americans",
+)
+
+
+def has_affirmative_black_scope_text(value: Any) -> bool:
+    text = normalize_nullable_text(value)
+    if text is None:
+        return False
+    lowered = text.lower()
+    if "black" not in lowered:
+        return False
+    return not any(phrase in lowered for phrase in NEGATED_BLACK_SCOPE_PHRASES)
+
+
+def record_has_affirmative_black_scope(record: dict[str, Any]) -> bool:
+    if has_affirmative_black_scope_text(record.get("impacted_group")):
+        return True
+    if has_affirmative_black_scope_text(record.get("notes")):
+        return True
+
+    for action in record.get("actions") or []:
+        if not isinstance(action, dict):
+            continue
+        for outcome in action.get("outcomes") or []:
+            if not isinstance(outcome, dict):
+                continue
+            if has_affirmative_black_scope_text(outcome.get("black_community_impact_note")):
+                return True
+
+    return False
+
+
+def queue_manual_items(payload: dict[str, Any]) -> list[dict[str, Any]]:
+    return [
+        item
+        for item in payload.get("items") or []
+        if isinstance(item, dict)
+    ]
+
+
+def queue_auto_approved_items(payload: dict[str, Any]) -> list[dict[str, Any]]:
+    return [
+        item
+        for item in payload.get(AUTO_APPROVED_QUEUE_KEY) or []
+        if isinstance(item, dict)
+    ]
+
+
+def queue_auto_rejected_items(payload: dict[str, Any]) -> list[dict[str, Any]]:
+    return [
+        item
+        for item in payload.get(AUTO_REJECTED_QUEUE_KEY) or []
+        if isinstance(item, dict)
+    ]
+
+
+def queue_review_coverage_items(payload: dict[str, Any]) -> list[dict[str, Any]]:
+    return (
+        queue_manual_items(payload)
+        + queue_auto_approved_items(payload)
+        + queue_auto_rejected_items(payload)
+    )
+
+
+def queue_import_candidate_items(payload: dict[str, Any]) -> list[dict[str, Any]]:
+    approved_manual_items = [
+        item
+        for item in queue_manual_items(payload)
+        if item.get("approved") or item.get("operator_status") == "approved"
+    ]
+    return queue_auto_approved_items(payload) + approved_manual_items
 
 
 def normalize_slug(value: Any) -> str:

@@ -8,6 +8,7 @@ from current_admin_common import (
     load_json_file,
     normalize_nullable_text,
     print_json,
+    queue_import_candidate_items,
     read_batch_payload,
     resolve_default_report_path,
     write_csv_rows,
@@ -39,8 +40,8 @@ def load_records(path: Path) -> dict:
     else:
         records = [
             item.get("final_record")
-            for item in payload.get("items") or []
-            if isinstance(item.get("final_record"), dict) and (item.get("approved") or item.get("operator_status") == "approved")
+            for item in queue_import_candidate_items(payload)
+            if isinstance(item.get("final_record"), dict)
         ]
         payload = {
             "batch_name": payload.get("batch_name"),

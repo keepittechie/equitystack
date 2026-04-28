@@ -18,7 +18,9 @@ from current_admin_common import (
     normalize_nullable_text,
     normalize_source_type,
     print_json,
+    queue_import_candidate_items,
     read_batch_payload,
+    record_has_affirmative_black_scope,
     require_apply_confirmation,
     resolve_default_report_path,
     short_description,
@@ -72,11 +74,10 @@ def read_import_input(path: Path) -> dict[str, Any]:
         }
     else:
         records = []
-        for item in payload.get("items") or []:
-            if item.get("approved") or item.get("operator_status") == "approved":
-                final_record = item.get("final_record")
-                if isinstance(final_record, dict):
-                    records.append(final_record)
+        for item in queue_import_candidate_items(payload):
+            final_record = item.get("final_record")
+            if isinstance(final_record, dict):
+                records.append(final_record)
         payload = {
             "batch_name": payload.get("batch_name"),
             "president_slug": payload.get("president_slug"),
@@ -92,6 +93,23 @@ def read_import_input(path: Path) -> dict[str, Any]:
 
 def impact_status_for_record(record: dict[str, Any]) -> str:
     return normalize_nullable_text(record.get("impact_status")) or "impact_scored"
+
+
+def approved_queue_items(queue_payload: dict[str, Any]) -> list[dict[str, Any]]:
+    return queue_import_candidate_items(queue_payload)
+
+
+def approved_item_requires_manual_review(item: dict[str, Any]) -> bool:
+    ai_review = item.get("ai_review") or {}
+    suggestions = ai_review.get("suggestions") or {}
+    if isinstance(item.get("automation_decision"), dict):
+        return False
+    return (
+        ai_review.get("recommended_action") == "needs_manual_review"
+        or suggestions.get("recommended_action") == "needs_manual_review"
+        or suggestions.get("suggested_operator_next_action") == "manual_review_required"
+        or suggestions.get("record_action_suggestion") == "manual_review"
+    )
 
 
 def validate_new_promise_record(record: dict[str, Any]) -> None:
@@ -220,6 +238,40 @@ def validate_queue_import_lineage(input_path: Path, payload: dict[str, Any]) -> 
     if decision_log_review_path is not None and decision_log_review_path.resolve() != source_review_path.resolve():
         raise ValueError(
             "Queue provenance is incomplete: the decision log does not match the queue review artifact."
+        )
+
+    queue_payload = load_json_file(input_path)
+    if not isinstance(queue_payload, dict):
+        raise ValueError("Queue provenance is incomplete: queue artifact is unreadable.")
+
+    manual_review_only_slugs: list[str] = []
+    missing_black_scope_slugs: list[str] = []
+    missing_final_record_slugs: list[str] = []
+    for item in approved_queue_items(queue_payload):
+        slug = normalize_nullable_text(item.get("slug")) or "<unknown>"
+        final_record = item.get("final_record")
+        if not isinstance(final_record, dict):
+            missing_final_record_slugs.append(slug)
+            continue
+        if approved_item_requires_manual_review(item):
+            manual_review_only_slugs.append(slug)
+        if not record_has_affirmative_black_scope(final_record):
+            missing_black_scope_slugs.append(slug)
+
+    if missing_final_record_slugs:
+        raise ValueError(
+            "Queue provenance is incomplete: approved queue items are missing final_record payloads: "
+            + ", ".join(sorted(missing_final_record_slugs))
+        )
+    if manual_review_only_slugs:
+        raise ValueError(
+            "Approved queue items still require manual review and cannot be imported: "
+            + ", ".join(sorted(manual_review_only_slugs))
+        )
+    if missing_black_scope_slugs:
+        raise ValueError(
+            "Approved queue items do not contain an affirmative Black-impact rationale and cannot be imported: "
+            + ", ".join(sorted(missing_black_scope_slugs))
         )
 
     return {

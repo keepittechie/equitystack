@@ -152,7 +152,7 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
           </p>
         </div>
         <div className="rounded border border-zinc-300 bg-[var(--admin-surface)] p-3 shadow-sm">
-          <p className="text-[11px] text-gray-600">Review items</p>
+          <p className="text-[11px] text-gray-600">Manual review items</p>
           <p className="mt-1 text-base font-semibold">{workspace.counts.total_items}</p>
           <p className="mt-1 text-[11px] text-gray-600">
             Approval-style decisions: {workspace.counts.approval_style_decisions} • Pending review:{" "}
@@ -165,9 +165,9 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
             {importReadiness.readiness_label || "Review In Progress"}
           </p>
           <p className="mt-1 text-[11px] text-gray-600">
-            Queue approved: {importReadiness.queue_approved_for_import_count || 0} • Held in queue:{" "}
-            {importReadiness.queue_pending_manual_review_count || 0} • Queue pending:{" "}
-            {importReadiness.queue_pending_count || 0}
+            Auto-approved: {importReadiness.auto_approved_item_count || 0} • In manual queue:{" "}
+            {importReadiness.queue_item_count || 0} • Auto-rejected:{" "}
+            {importReadiness.auto_rejected_item_count || 0}
           </p>
         </div>
         <div className="rounded border border-zinc-300 bg-[var(--admin-surface)] p-3 shadow-sm">
@@ -189,13 +189,17 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
               </p>
             </div>
             <span className="rounded-full border border-amber-500 bg-[var(--admin-surface)] px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-amber-800">
-              Impact Pending
+              AI-first
             </span>
           </div>
           <div className="mt-3 grid gap-2 text-[12px] text-amber-950 md:grid-cols-3">
-            <p>Approved for import: {queuePromotionState.approved_item_count || 0}</p>
+            <p>Auto-approved: {queuePromotionState.auto_approved_item_count || queuePromotionState.approved_item_count || 0}</p>
+            <p>Manual review queue: {queuePromotionState.manual_review_item_count || 0}</p>
+            <p>Auto-rejected: {queuePromotionState.auto_rejected_item_count || 0}</p>
+          </div>
+          <div className="mt-2 grid gap-2 text-[12px] text-amber-950 md:grid-cols-2">
             <p>Pending impact: {queuePromotionState.pending_impact_item_count || 0}</p>
-            <p>Non-promoted: {queuePromotionState.non_promoted_item_count || 0}</p>
+            <p>Reviewed: {queuePromotionState.reviewed_item_count || 0}</p>
           </div>
           <p className="mt-2 text-[11px] text-amber-900">
             Source review: {queuePromotionState.source_review_path || "unknown"}
@@ -751,11 +755,12 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
 
       <section id="review-items" className="rounded border border-zinc-300 bg-[var(--admin-surface)] p-4 shadow-sm">
         <div className="mb-3">
-          <h2 className="text-base font-semibold">Review items</h2>
+          <h2 className="text-base font-semibold">Manual review queue</h2>
           <p className="mt-1 text-[12px] text-gray-600">
-            Dense operator review table. Use quick row actions for common decisions and expand rows for notes and full context.
+            Only borderline items stay here. AI-resolved approvals and rejections are kept out of the operator table.
           </p>
         </div>
+        {items.length ? (
         <div className="overflow-x-auto rounded border border-zinc-200">
           <table className="min-w-full text-[12px]">
             <thead className="bg-zinc-100 text-left text-[11px] uppercase tracking-wide text-zinc-600">
@@ -843,6 +848,9 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
             </tbody>
           </table>
         </div>
+        ) : (
+          <p className="text-[12px] text-gray-600">No borderline items are waiting for manual review in this batch.</p>
+        )}
       </section>
     </div>
   );

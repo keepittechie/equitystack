@@ -10,6 +10,10 @@ from current_admin_common import (
     derive_csv_path,
     load_json_file,
     print_json,
+    queue_auto_approved_items,
+    queue_manual_items,
+    queue_review_coverage_items,
+    record_has_affirmative_black_scope,
     resolve_default_report_path,
     write_csv_rows,
     write_json_file,
@@ -225,12 +229,18 @@ def missing_import_required_fields(queue_item: dict[str, Any]) -> list[str]:
     return [field for field in required_fields if not final_record.get(field)]
 
 
+def embedded_operator_action(queue_item: dict[str, Any]) -> str | None:
+    value = queue_item.get("operator_action")
+    return value if isinstance(value, str) and value else None
+
+
 def summarize_item(queue_item: dict[str, Any], decision_item: dict[str, Any] | None) -> dict[str, Any]:
     ai_review = queue_item.get("ai_review") or {}
     suggestions = ai_review.get("suggestions") or {}
+    final_record = queue_item.get("final_record") if isinstance(queue_item.get("final_record"), dict) else {}
     slug = queue_item.get("slug")
     title = (
-        queue_item.get("final_record", {}).get("title")
+        final_record.get("title")
         or queue_item.get("original_record", {}).get("title")
         or ai_review.get("title")
     )
@@ -242,9 +252,16 @@ def summarize_item(queue_item: dict[str, Any], decision_item: dict[str, Any] | N
         )
     )
     evidence_gaps = normalize_list(suggestions.get("evidence_needed_to_reduce_risk"))
-    operator_action = decision_item.get("operator_action") if decision_item else None
-    decision_alignment = decision_item.get("decision_alignment") if decision_item else None
+    operator_action = (
+        (decision_item.get("operator_action") if decision_item else None)
+        or embedded_operator_action(queue_item)
+    )
+    decision_alignment = (
+        (decision_item.get("decision_alignment") if decision_item else None)
+        or queue_item.get("decision_alignment")
+    )
     operator_action_valid = operator_action in VALID_OPERATOR_ACTIONS if operator_action else False
+    auto_decision = isinstance(queue_item.get("automation_decision"), dict)
 
     blockers: list[str] = []
     warnings: list[str] = []
@@ -255,9 +272,23 @@ def summarize_item(queue_item: dict[str, Any], decision_item: dict[str, Any] | N
         missing_fields = missing_import_required_fields(queue_item)
         if missing_fields:
             blockers.append("missing_import_required_fields")
-        if decision_item is None:
+        if (
+            not auto_decision
+            and (
+                ai_review.get("recommended_action") == "needs_manual_review"
+                or suggestions.get("recommended_action") == "needs_manual_review"
+                or suggestions.get("suggested_operator_next_action") == "manual_review_required"
+                or suggestions.get("record_action_suggestion") == "manual_review"
+            )
+        ):
+            blockers.append("ai_manual_review_required")
+        if not record_has_affirmative_black_scope(final_record):
+            blockers.append("missing_black_impact_scope")
+        if decision_item is None and not auto_decision:
             blockers.append("missing_decision_coverage")
-        elif not operator_action_valid:
+        elif operator_action is None:
+            blockers.append("missing_decision_coverage")
+        elif operator_action and not operator_action_valid:
             blockers.append("invalid_operator_action")
         elif operator_action not in APPROVAL_ACTIONS:
             blockers.append("operator_action_not_import_ready")
@@ -318,6 +349,7 @@ def summarize_item(queue_item: dict[str, Any], decision_item: dict[str, Any] | N
         "missing_import_required_fields": missing_fields,
         "blocking_issues": blockers,
         "warning_signals": warnings,
+        "queue_resolution": queue_item.get("queue_resolution"),
     }
 
 
@@ -328,6 +360,8 @@ def determine_overall_readiness(items: list[dict[str, Any]]) -> tuple[str, list[
     operator_action_not_import_ready = any("operator_action_not_import_ready" in item["blocking_issues"] for item in selected)
     missing_final_record = any("missing_final_record" in item["blocking_issues"] for item in selected)
     missing_import_required_fields = any("missing_import_required_fields" in item["blocking_issues"] for item in selected)
+    ai_manual_review_required = any("ai_manual_review_required" in item["blocking_issues"] for item in selected)
+    missing_black_impact_scope = any("missing_black_impact_scope" in item["blocking_issues"] for item in selected)
     warning_counts = {
         "material_conflict_present": sum("material_conflict_present" in item["warning_signals"] for item in selected),
         "source_or_evidence_gaps": sum("source_or_evidence_gaps" in item["warning_signals"] for item in selected),
@@ -428,6 +462,38 @@ def determine_overall_readiness(items: list[dict[str, Any]]) -> tuple[str, list[
                 slugs=invalid_field_slugs,
             )
         )
+    if ai_manual_review_required:
+        blocked_slugs = sorted(
+            item["slug"]
+            for item in selected
+            if "ai_manual_review_required" in item["blocking_issues"]
+        )
+        blocking_issues.append(
+            build_issue(
+                "ai_manual_review_required",
+                f"{len(blocked_slugs)} approved item(s) still require manual review according to the AI review artifact.",
+                "Items marked needs_manual_review are not cleared for safe production import.",
+                "Keep those items out of import or strengthen the record until the AI/manual review result no longer requires manual review, then rerun pre-commit.",
+                count=len(blocked_slugs),
+                slugs=blocked_slugs,
+            )
+        )
+    if missing_black_impact_scope:
+        blocked_slugs = sorted(
+            item["slug"]
+            for item in selected
+            if "missing_black_impact_scope" in item["blocking_issues"]
+        )
+        blocking_issues.append(
+            build_issue(
+                "missing_black_impact_scope",
+                f"{len(blocked_slugs)} approved item(s) do not contain an affirmative Black-impact rationale.",
+                "Current-administration records on EquityStack should explicitly connect the record to effects on Black Americans, not just document a generic federal action.",
+                "Add an affirmative Black-impact rationale in impacted_group, notes, or outcome black_community_impact_note, or keep the item out of production.",
+                count=len(blocked_slugs),
+                slugs=blocked_slugs,
+            )
+        )
 
     if blocking_issues:
         readiness = "blocked"
@@ -441,6 +507,10 @@ def determine_overall_readiness(items: list[dict[str, Any]]) -> tuple[str, list[
             next_step = "Rebuild or repair the manual review queue so approved items have final_record payloads, then rerun pre-commit review."
         elif missing_import_required_fields:
             next_step = "Regenerate the batch and queue after fixing missing final_record metadata, then rerun pre-commit review."
+        elif ai_manual_review_required:
+            next_step = "Remove manual-review-only items from the import set or improve the evidence until they clear review, then rerun pre-commit review."
+        elif missing_black_impact_scope:
+            next_step = "Add an affirmative Black-impact rationale or remove those items from the import set, then rerun pre-commit review."
         else:
             next_step = "Resolve the blocking issues, then rerun pre-commit review."
     elif any(count > 0 for count in warning_counts.values()):
@@ -472,13 +542,13 @@ def summarize_diff_preview(
             or ai_review.get("title")
         )
         decision_item = decision_map.get(slug) or {}
-        operator_action = decision_item.get("operator_action")
+        operator_action = decision_item.get("operator_action") or embedded_operator_action(queue_item)
         approved = bool(queue_item.get("approved") or queue_item.get("operator_status") == "approved")
         entry = {
             "slug": slug,
             "title": title,
             "operator_action": operator_action,
-            "decision_alignment": decision_item.get("decision_alignment"),
+            "decision_alignment": decision_item.get("decision_alignment") or queue_item.get("decision_alignment"),
         }
 
         if approved and operator_action in APPROVAL_ACTIONS:
@@ -530,7 +600,7 @@ def build_linkage_summary(
     blockers: list[dict[str, Any]] = []
     warnings: list[dict[str, Any]] = []
 
-    queue_items = [item for item in queue_payload.get("items") or [] if isinstance(item, dict)]
+    queue_items = queue_review_coverage_items(queue_payload)
     queue_slugs = unique_slug_list(queue_items)
     queue_duplicates = find_duplicates(queue_slugs)
 
@@ -634,9 +704,9 @@ def build_linkage_summary(
             warnings.append(
                 build_issue(
                     "queue_missing_review_items",
-                    f"{len(missing_from_queue)} review item(s) are not present in the manual review queue.",
+                    f"{len(missing_from_queue)} review item(s) are not present in the queue coverage artifact.",
                     "This can be valid for a filtered slice, but it weakens lineage and should be intentional.",
-                    "Confirm you are using the correct queue file for this review slice before import.",
+                    "Confirm the queue artifact intentionally covers only a subset of review items before import.",
                     severity="warning",
                     count=len(missing_from_queue),
                     slugs=missing_from_queue[:20],
@@ -870,10 +940,10 @@ def main() -> None:
             else read_batch_name_from_review_path(decision_log_source_review)
         )
 
+    queue_items_for_review = queue_manual_items(queue_payload) + queue_auto_approved_items(queue_payload)
     items = [
         summarize_item(queue_item, decisions_by_slug.get(queue_item.get("slug")))
-        for queue_item in queue_payload.get("items") or []
-        if isinstance(queue_item, dict)
+        for queue_item in queue_items_for_review
     ]
     readiness, blocking_issues, warning_counts, next_step = determine_overall_readiness(items)
     selected = [item for item in items if item["selected_for_import"]]
@@ -938,12 +1008,7 @@ def main() -> None:
     summary = {
         "total_items": len(items),
         "approved_items": len(selected),
-        "manual_review_items": sum(
-            1
-            for item in items
-            if item.get("operator_action") in NON_READY_ACTIONS
-            or item.get("operator_status") == "pending_manual_review"
-        ),
+        "manual_review_items": len(queue_manual_items(queue_payload)),
         "missing_decisions": sum(1 for item in selected if not item["operator_action"]),
         "invalid_actions": sum(
             1 for item in selected if item["operator_action"] and item["operator_action_valid"] is False
@@ -965,7 +1030,7 @@ def main() -> None:
         for item in selected
         if "low_confidence" in item["warning_signals"]
     ]
-    diff_preview = summarize_diff_preview(queue_payload.get("items") or [], decisions_by_slug)
+    diff_preview = summarize_diff_preview(queue_items_for_review, decisions_by_slug)
 
     payload = {
         "batch_name": batch_name,
