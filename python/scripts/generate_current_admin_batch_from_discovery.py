@@ -3,6 +3,7 @@ import argparse
 from collections import Counter
 from datetime import UTC, datetime
 from pathlib import Path
+import re
 from typing import Any
 
 from current_admin_common import (
@@ -25,6 +26,34 @@ from export_current_admin_discovery_candidates import (
 
 
 DEFAULT_DISCOVERY_PATH = get_current_admin_reports_dir() / "discovery_report.json"
+TOPIC_FALLBACK_KEYWORDS = {
+    "Voting Rights": {"vote", "voter", "election", "ballot", "citizenship", "registration"},
+    "Criminal Justice": {"crime", "police", "law", "enforcement", "justice", "cartel", "prison"},
+    "Housing": {"housing", "homeless", "encampment", "rent", "mortgage", "homeownership", "suburb"},
+    "Education": {"school", "education", "student", "students", "college", "hbcu", "accreditation", "discipline"},
+    "Economic Opportunity": {
+        "job",
+        "jobs",
+        "worker",
+        "workers",
+        "trade",
+        "tariff",
+        "tariffs",
+        "import",
+        "imports",
+        "duty",
+        "duties",
+        "customs",
+        "ustr",
+        "reciprocal",
+        "section",
+        "ieepa",
+        "apprentice",
+        "apprenticeship",
+        "dei",
+    },
+    "Healthcare": {"health", "medicare", "medicine", "medicines", "drug", "drugs", "care", "pharmaceutical"},
+}
 
 
 def parse_args() -> argparse.Namespace:
@@ -108,6 +137,51 @@ def first_source_date(source_rows: list[dict[str, Any]]) -> str | None:
         published = normalize_date(source.get("published_date"))
         if published:
             return published
+    return None
+
+
+def tokenize_topic_text(value: Any) -> set[str]:
+    text = normalize_nullable_text(value)
+    if text is None:
+        return set()
+    return set(re.findall(r"[a-z0-9]+", text.lower()))
+
+
+def infer_candidate_topic(item: dict[str, Any]) -> str | None:
+    suggested = item.get("suggested_changes") or {}
+    explicit_topic = normalize_nullable_text(suggested.get("topic"))
+    if explicit_topic:
+        return explicit_topic
+
+    linked = item.get("linked_promise") or {}
+    linked_topic = normalize_nullable_text(linked.get("topic"))
+    if linked_topic:
+        return linked_topic
+
+    search_text = " ".join(
+        [
+            normalize_nullable_text((item.get("feed_item") or {}).get("title")) or "",
+            normalize_nullable_text((item.get("feed_item") or {}).get("summary")) or "",
+            normalize_nullable_text(item.get("reasoning")) or "",
+            " ".join(item.get("matched_keywords") or []),
+            normalize_nullable_text(item.get("source_category")) or "",
+        ]
+    ).lower()
+    tokens = tokenize_topic_text(search_text)
+
+    best_topic = None
+    best_score = 0
+    for topic, keywords in TOPIC_FALLBACK_KEYWORDS.items():
+        score = len(tokens & keywords)
+        if score > best_score:
+            best_topic = topic
+            best_score = score
+
+    if best_topic:
+        return best_topic
+
+    if (normalize_nullable_text(item.get("source_category")) or "").lower() == "trade":
+        return "Economic Opportunity"
     return None
 
 
@@ -259,6 +333,7 @@ def build_new_promise_record(candidate: dict[str, Any], president_slug: str, rep
     source_refs = merge_source_rows(item.get("source_references") or [])
     title = normalize_nullable_text(suggested.get("title")) or normalize_nullable_text((item.get("feed_item") or {}).get("title")) or f"Discovery candidate {candidate['candidate_id']}"
     summary = normalize_nullable_text(suggested.get("summary")) or normalize_nullable_text(item.get("reasoning")) or title
+    topic = infer_candidate_topic(item)
     return {
         "slug": slugify(title),
         "title": title,
@@ -268,7 +343,7 @@ def build_new_promise_record(candidate: dict[str, Any], president_slug: str, rep
         # unmatched new records default to official promises unless an operator changes them later.
         "promise_type": DEFAULT_DISCOVERY_PROMISE_TYPE,
         "campaign_or_official": DEFAULT_DISCOVERY_CAMPAIGN_OR_OFFICIAL,
-        "topic": normalize_nullable_text(suggested.get("topic")),
+        "topic": topic,
         "impacted_group": normalize_nullable_text(suggested.get("impacted_group")),
         "status": normalize_nullable_text(suggested.get("status")) or "In Progress",
         "summary": summary,

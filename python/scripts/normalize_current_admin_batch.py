@@ -122,6 +122,14 @@ def normalize_outcome(outcome: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def is_existing_discovery_record(record: dict[str, Any]) -> bool:
+    discovery_context = record.get("discovery_context")
+    if not isinstance(discovery_context, dict):
+        return False
+    linked_snapshot = discovery_context.get("linked_promise_snapshot")
+    return isinstance(linked_snapshot, dict) and normalize_nullable_text(linked_snapshot.get("slug")) is not None
+
+
 def validate_batch(payload: dict[str, Any]) -> list[dict[str, Any]]:
     issues: list[dict[str, Any]] = []
     seen_slugs: set[str] = set()
@@ -153,7 +161,7 @@ def validate_batch(payload: dict[str, Any]) -> list[dict[str, Any]]:
         if record.get("status") not in VALID_PROMISE_STATUSES:
             issues.append({"record_index": index, "field": "status", "issue": "Invalid status", "value": record.get("status")})
 
-        if not record.get("promise_sources"):
+        if not record.get("promise_sources") and not is_existing_discovery_record(record):
             issues.append({"record_index": index, "field": "promise_sources", "issue": "Missing promise-level source"})
 
         for action_index, action in enumerate(record.get("actions") or [], start=1):
