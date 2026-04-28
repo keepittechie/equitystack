@@ -608,6 +608,8 @@ def fetch_promises(president_slug: str, max_promises: int | None) -> list[dict[s
                   p.id,
                   p.slug,
                   p.title,
+                  p.promise_type,
+                  p.campaign_or_official,
                   p.topic,
                   p.status,
                   p.summary,
@@ -626,7 +628,18 @@ def fetch_promises(president_slug: str, max_promises: int | None) -> list[dict[s
                 LEFT JOIN promise_sources ps ON ps.promise_id = p.id
                 WHERE pr.slug = %s
                 GROUP BY
-                  p.id, p.slug, p.title, p.topic, p.status, p.summary, p.impacted_group, p.notes, p.promise_date, pr.slug
+                  p.id,
+                  p.slug,
+                  p.title,
+                  p.promise_type,
+                  p.campaign_or_official,
+                  p.topic,
+                  p.status,
+                  p.summary,
+                  p.impacted_group,
+                  p.notes,
+                  p.promise_date,
+                  pr.slug
                 ORDER BY COALESCE(MAX(pa.action_date), p.promise_date) DESC, p.id DESC
                 {limit_clause}
                 """,
@@ -750,6 +763,8 @@ def fetch_promises(president_slug: str, max_promises: int | None) -> list[dict[s
                     "id": promise_id,
                     "slug": row["slug"],
                     "title": row["title"],
+                    "promise_type": row["promise_type"],
+                    "campaign_or_official": row["campaign_or_official"],
                     "topic": row["topic"],
                     "status": row["status"],
                     "summary": row["summary"],
@@ -1328,6 +1343,8 @@ def compact_linked_promise(promise: dict[str, Any]) -> dict[str, Any]:
         "id": promise.get("id"),
         "slug": promise.get("slug"),
         "title": promise.get("title"),
+        "promise_type": promise.get("promise_type"),
+        "campaign_or_official": promise.get("campaign_or_official"),
         "topic": promise.get("topic"),
         "status": promise.get("status"),
         "summary": promise.get("summary"),

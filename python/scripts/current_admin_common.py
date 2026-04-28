@@ -11,8 +11,12 @@ from typing import Any
 
 DEFAULT_CURRENT_ADMIN_REPORTS_DIRNAME = "current_admin"
 VALID_PROMISE_STATUSES = {"In Progress", "Partial", "Delivered", "Blocked", "Failed"}
+VALID_PROMISE_TYPES = {"Campaign Promise", "Official Promise", "Public Promise", "Executive Agenda", "Other"}
+VALID_CAMPAIGN_OR_OFFICIAL_VALUES = {"Campaign", "Official"}
 VALID_IMPACT_DIRECTIONS = {"Positive", "Negative", "Mixed", "Blocked"}
 VALID_EVIDENCE_STRENGTHS = {"Strong", "Moderate", "Limited"}
+DEFAULT_DISCOVERY_PROMISE_TYPE = "Official Promise"
+DEFAULT_DISCOVERY_CAMPAIGN_OR_OFFICIAL = "Official"
 DB_ENV_KEYS = ("DB_HOST", "DB_PORT", "DB_USER", "DB_PASSWORD", "DB_NAME")
 DEFAULT_DB_SETTINGS = {
     "DB_HOST": "127.0.0.1",

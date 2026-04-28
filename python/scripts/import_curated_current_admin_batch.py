@@ -4,6 +4,9 @@ from pathlib import Path
 from typing import Any
 
 from current_admin_common import (
+    VALID_CAMPAIGN_OR_OFFICIAL_VALUES,
+    VALID_PROMISE_STATUSES,
+    VALID_PROMISE_TYPES,
     derive_csv_path,
     get_db_connection,
     get_current_admin_reports_dir,
@@ -87,6 +90,36 @@ def read_import_input(path: Path) -> dict[str, Any]:
 
 def impact_status_for_record(record: dict[str, Any]) -> str:
     return normalize_nullable_text(record.get("impact_status")) or "impact_scored"
+
+
+def validate_new_promise_record(record: dict[str, Any]) -> None:
+    missing_fields = [
+        field
+        for field in ("title", "slug", "promise_text", "promise_type", "campaign_or_official", "status")
+        if normalize_nullable_text(record.get(field)) is None
+    ]
+    if missing_fields:
+        label = normalize_nullable_text(record.get("slug")) or normalize_nullable_text(record.get("title")) or "<unknown>"
+        raise ValueError(
+            f"Cannot import new promise record {label}: missing required fields {', '.join(missing_fields)}. "
+            "Regenerate the batch/queue or repair final_record metadata before import."
+        )
+
+    if record.get("promise_type") not in VALID_PROMISE_TYPES:
+        raise ValueError(
+            f"Cannot import new promise record {record.get('slug') or record.get('title')}: "
+            f"invalid promise_type {record.get('promise_type')!r}."
+        )
+    if record.get("campaign_or_official") not in VALID_CAMPAIGN_OR_OFFICIAL_VALUES:
+        raise ValueError(
+            f"Cannot import new promise record {record.get('slug') or record.get('title')}: "
+            f"invalid campaign_or_official value {record.get('campaign_or_official')!r}."
+        )
+    if record.get("status") not in VALID_PROMISE_STATUSES:
+        raise ValueError(
+            f"Cannot import new promise record {record.get('slug') or record.get('title')}: "
+            f"invalid status {record.get('status')!r}."
+        )
 
 
 def resolve_lineage_path(raw_value: Any, reference_path: Path) -> Path | None:
@@ -617,6 +650,7 @@ def main() -> None:
                     )
                 match_type, existing_promise = find_promise(cursor, int(president["id"]), record)
                 if existing_promise is None:
+                    validate_new_promise_record(record)
                     cursor.execute(
                         """
                         INSERT INTO promises (

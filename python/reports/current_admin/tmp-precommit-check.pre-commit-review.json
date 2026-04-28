@@ -1,0 +1,144 @@
+{
+  "batch_name": "tmp-precommit-check",
+  "generated_at": "2026-04-28T04:32:17.356800+00:00",
+  "source_queue_file": "/tmp/current_admin_precommit_fixture/queue.manual-review-queue.json",
+  "source_review_file": "/tmp/current_admin_precommit_fixture/review.ai-review.json",
+  "source_decision_template": null,
+  "source_decision_log": "/tmp/current_admin_precommit_fixture/review.decisions.decision-log.json",
+  "decision_template_source_review_file": null,
+  "decision_log_source_review_file": "/tmp/current_admin_precommit_fixture/review.ai-review.json",
+  "reviewed_item_count": 1,
+  "decision_log_resolution": "explicit",
+  "artifact_linkage": {
+    "queue_to_review": "ok",
+    "decision_template_to_review": "missing",
+    "decision_log_to_review": "ok"
+  },
+  "openai_batch_safety": {
+    "review_path": "/tmp/current_admin_precommit_fixture/review.ai-review.json",
+    "metadata_path": "/tmp/current_admin_precommit_fixture/review.openai-batch.meta.json",
+    "validation_path": "/tmp/current_admin_precommit_fixture/review.openai-batch.validation.json",
+    "metadata_present": false,
+    "validation_present": false,
+    "blocking_issues": [],
+    "warnings": [
+      {
+        "type": "openai_batch_metadata_missing",
+        "message": "No OpenAI Batch metadata sidecar was found; treating this as a legacy, dry-run, or non-Batch review artifact."
+      }
+    ],
+    "safe_to_finalize": true,
+    "safe_to_apply": true,
+    "validation_counts": {},
+    "status": "no_batch_metadata"
+  },
+  "total_item_count": 1,
+  "selected_for_import_count": 1,
+  "decision_covered_count": 1,
+  "decision_missing_count": 0,
+  "invalid_operator_action_count": 0,
+  "unresolved_manual_review_count": 0,
+  "material_conflict_count": 0,
+  "source_gap_count": 0,
+  "high_attention_count": 0,
+  "readiness_status": "blocked",
+  "readiness_label": "Blocked",
+  "readiness_explanation": "You cannot proceed. Fix the issues below.",
+  "readiness_details": {
+    "label": "Blocked",
+    "meaning": "Something is incomplete, mismatched, or missing for at least one import candidate.",
+    "operator_guidance": "Fix the listed blockers, then rerun pre-commit review."
+  },
+  "readiness_formula": {
+    "ready": "Safe to proceed to import.",
+    "ready_with_warnings": "You can proceed, but review warnings first.",
+    "blocked": "You cannot proceed. Fix the issues below."
+  },
+  "summary": {
+    "total_items": 1,
+    "approved_items": 1,
+    "manual_review_items": 0,
+    "missing_decisions": 0,
+    "invalid_actions": 0,
+    "high_attention_items": 0,
+    "low_confidence_items": 0
+  },
+  "warning_counts": {
+    "material_conflict_present": 0,
+    "source_or_evidence_gaps": 0,
+    "high_attention_item": 0,
+    "low_confidence": 0,
+    "impact_pending": 0,
+    "deep_review_recommended": 0,
+    "decision_mismatch": 0
+  },
+  "blocking_issues": [
+    {
+      "type": "missing_import_required_fields",
+      "severity": "blocking",
+      "message": "1 approved item(s) are missing import-required final_record fields.",
+      "why": "The import step cannot safely create new promise rows when required fields such as promise_type or campaign_or_official are blank.",
+      "fix": "Regenerate the batch and queue after repairing upstream record metadata, or edit the final_record payloads before rerunning pre-commit.",
+      "count": 1,
+      "slugs": [
+        "tmp-slug"
+      ]
+    }
+  ],
+  "linkage_warnings": [
+    {
+      "type": "openai_batch_metadata_missing",
+      "severity": "warning",
+      "message": "No OpenAI Batch metadata sidecar was found; treating this as a legacy, dry-run, or non-Batch review artifact.",
+      "why": "This warning does not block legacy or dry-run review artifacts.",
+      "fix": "If this should be an OpenAI Batch artifact, run current-admin ai-review --batch-inspect."
+    }
+  ],
+  "low_confidence_items": [],
+  "diff_preview": {
+    "new_records": [
+      {
+        "slug": "tmp-slug",
+        "title": "Tmp Title",
+        "operator_action": "approve_as_is",
+        "decision_alignment": "aligned",
+        "preview": "new record",
+        "reason": "approved as-is"
+      }
+    ],
+    "updated_records": [],
+    "skipped_items": []
+  },
+  "recommended_next_step": "Regenerate the batch and queue after fixing missing final_record metadata, then rerun pre-commit review.",
+  "items": [
+    {
+      "slug": "tmp-slug",
+      "title": "Tmp Title",
+      "selected_for_import": true,
+      "operator_status": "approved",
+      "approved": true,
+      "operator_action": "approve_as_is",
+      "operator_action_valid": true,
+      "decision_alignment": "aligned",
+      "review_priority": "low",
+      "review_priority_score": null,
+      "suggested_batch": null,
+      "has_material_conflict": false,
+      "source_warnings": [],
+      "evidence_gap_count": 0,
+      "confidence_level": "High",
+      "confidence_score": 0.9,
+      "record_action_suggestion": "new_record",
+      "impact_status": null,
+      "import_readiness": "blocked",
+      "missing_import_required_fields": [
+        "promise_type",
+        "campaign_or_official"
+      ],
+      "blocking_issues": [
+        "missing_import_required_fields"
+      ],
+      "warning_signals": []
+    }
+  ]
+}

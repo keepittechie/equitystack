@@ -4,8 +4,10 @@ from pathlib import Path
 from typing import Any
 
 from current_admin_common import (
+    VALID_CAMPAIGN_OR_OFFICIAL_VALUES,
     VALID_EVIDENCE_STRENGTHS,
     VALID_IMPACT_DIRECTIONS,
+    VALID_PROMISE_TYPES,
     VALID_PROMISE_STATUSES,
     derive_csv_path,
     get_current_admin_batches_dir,
@@ -133,9 +135,20 @@ def validate_batch(payload: dict[str, Any]) -> list[dict[str, Any]]:
         else:
             seen_slugs.add(slug)
 
-        for field in ("title", "promise_text", "promise_date", "status", "summary", "topic"):
+        for field in ("title", "promise_text", "promise_date", "promise_type", "campaign_or_official", "status", "summary", "topic"):
             if not record.get(field):
                 issues.append({"record_index": index, "field": field, "issue": "Missing required field"})
+
+        if record.get("promise_type") not in VALID_PROMISE_TYPES:
+            issues.append({"record_index": index, "field": "promise_type", "issue": "Invalid promise type", "value": record.get("promise_type")})
+
+        if record.get("campaign_or_official") not in VALID_CAMPAIGN_OR_OFFICIAL_VALUES:
+            issues.append({
+                "record_index": index,
+                "field": "campaign_or_official",
+                "issue": "Invalid campaign_or_official value",
+                "value": record.get("campaign_or_official"),
+            })
 
         if record.get("status") not in VALID_PROMISE_STATUSES:
             issues.append({"record_index": index, "field": "status", "issue": "Invalid status", "value": record.get("status")})

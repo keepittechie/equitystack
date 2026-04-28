@@ -5,6 +5,8 @@ from pathlib import Path
 from typing import Any
 
 from current_admin_common import (
+    DEFAULT_DISCOVERY_CAMPAIGN_OR_OFFICIAL,
+    DEFAULT_DISCOVERY_PROMISE_TYPE,
     get_current_admin_batches_dir,
     get_current_admin_reports_dir,
     load_json_file,
@@ -142,8 +144,8 @@ def make_draft_entry(candidate: dict[str, Any]) -> dict[str, Any]:
                 "title": title,
                 "promise_text": summary,
                 "promise_date": None,
-                "promise_type": None,
-                "campaign_or_official": None,
+                "promise_type": DEFAULT_DISCOVERY_PROMISE_TYPE,
+                "campaign_or_official": DEFAULT_DISCOVERY_CAMPAIGN_OR_OFFICIAL,
                 "topic": topic,
                 "impacted_group": None,
                 "status": "In Progress",

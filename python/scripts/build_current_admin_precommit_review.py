@@ -211,6 +211,20 @@ def action_label(value: str | None) -> str:
     return ACTION_LABELS.get(value, value)
 
 
+def missing_import_required_fields(queue_item: dict[str, Any]) -> list[str]:
+    final_record = queue_item.get("final_record")
+    if not isinstance(final_record, dict):
+        return []
+
+    ai_review = queue_item.get("ai_review") or {}
+    suggestions = ai_review.get("suggestions") or {}
+    record_action_suggestion = suggestions.get("record_action_suggestion")
+    required_fields = ["slug", "title", "promise_text", "status"]
+    if record_action_suggestion != "update_existing":
+        required_fields.extend(["promise_type", "campaign_or_official"])
+    return [field for field in required_fields if not final_record.get(field)]
+
+
 def summarize_item(queue_item: dict[str, Any], decision_item: dict[str, Any] | None) -> dict[str, Any]:
     ai_review = queue_item.get("ai_review") or {}
     suggestions = ai_review.get("suggestions") or {}
@@ -238,12 +252,17 @@ def summarize_item(queue_item: dict[str, Any], decision_item: dict[str, Any] | N
     if selected_for_import:
         if not isinstance(queue_item.get("final_record"), dict):
             blockers.append("missing_final_record")
+        missing_fields = missing_import_required_fields(queue_item)
+        if missing_fields:
+            blockers.append("missing_import_required_fields")
         if decision_item is None:
             blockers.append("missing_decision_coverage")
         elif not operator_action_valid:
             blockers.append("invalid_operator_action")
         elif operator_action not in APPROVAL_ACTIONS:
             blockers.append("operator_action_not_import_ready")
+    else:
+        missing_fields = []
 
     if ai_review.get("has_material_conflict"):
         warnings.append("material_conflict_present")
@@ -296,6 +315,7 @@ def summarize_item(queue_item: dict[str, Any], decision_item: dict[str, Any] | N
         "record_action_suggestion": record_action_suggestion,
         "impact_status": impact_status,
         "import_readiness": readiness,
+        "missing_import_required_fields": missing_fields,
         "blocking_issues": blockers,
         "warning_signals": warnings,
     }
@@ -307,6 +327,7 @@ def determine_overall_readiness(items: list[dict[str, Any]]) -> tuple[str, list[
     invalid_operator_action = any("invalid_operator_action" in item["blocking_issues"] for item in selected)
     operator_action_not_import_ready = any("operator_action_not_import_ready" in item["blocking_issues"] for item in selected)
     missing_final_record = any("missing_final_record" in item["blocking_issues"] for item in selected)
+    missing_import_required_fields = any("missing_import_required_fields" in item["blocking_issues"] for item in selected)
     warning_counts = {
         "material_conflict_present": sum("material_conflict_present" in item["warning_signals"] for item in selected),
         "source_or_evidence_gaps": sum("source_or_evidence_gaps" in item["warning_signals"] for item in selected),
@@ -391,6 +412,22 @@ def determine_overall_readiness(items: list[dict[str, Any]]) -> tuple[str, list[
                 slugs=missing_record_slugs,
             )
         )
+    if missing_import_required_fields:
+        invalid_field_slugs = sorted(
+            item["slug"]
+            for item in selected
+            if "missing_import_required_fields" in item["blocking_issues"]
+        )
+        blocking_issues.append(
+            build_issue(
+                "missing_import_required_fields",
+                f"{len(invalid_field_slugs)} approved item(s) are missing import-required final_record fields.",
+                "The import step cannot safely create new promise rows when required fields such as promise_type or campaign_or_official are blank.",
+                "Regenerate the batch and queue after repairing upstream record metadata, or edit the final_record payloads before rerunning pre-commit.",
+                count=len(invalid_field_slugs),
+                slugs=invalid_field_slugs,
+            )
+        )
 
     if blocking_issues:
         readiness = "blocked"
@@ -402,6 +439,8 @@ def determine_overall_readiness(items: list[dict[str, Any]]) -> tuple[str, list[
             next_step = "Resolve the non-import-ready operator actions in the decision file or queue, then rerun pre-commit review."
         elif missing_final_record:
             next_step = "Rebuild or repair the manual review queue so approved items have final_record payloads, then rerun pre-commit review."
+        elif missing_import_required_fields:
+            next_step = "Regenerate the batch and queue after fixing missing final_record metadata, then rerun pre-commit review."
         else:
             next_step = "Resolve the blocking issues, then rerun pre-commit review."
     elif any(count > 0 for count in warning_counts.values()):

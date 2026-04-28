@@ -6,6 +6,8 @@ from pathlib import Path
 from typing import Any
 
 from current_admin_common import (
+    DEFAULT_DISCOVERY_CAMPAIGN_OR_OFFICIAL,
+    DEFAULT_DISCOVERY_PROMISE_TYPE,
     get_current_admin_batches_dir,
     get_current_admin_reports_dir,
     normalize_date,
@@ -262,8 +264,10 @@ def build_new_promise_record(candidate: dict[str, Any], president_slug: str, rep
         "title": title,
         "promise_text": summary,
         "promise_date": first_published_date(candidate, report_generated_at),
-        "promise_type": None,
-        "campaign_or_official": None,
+        # Discovery sources for this pipeline are current-administration sources, so
+        # unmatched new records default to official promises unless an operator changes them later.
+        "promise_type": DEFAULT_DISCOVERY_PROMISE_TYPE,
+        "campaign_or_official": DEFAULT_DISCOVERY_CAMPAIGN_OR_OFFICIAL,
         "topic": normalize_nullable_text(suggested.get("topic")),
         "impacted_group": normalize_nullable_text(suggested.get("impacted_group")),
         "status": normalize_nullable_text(suggested.get("status")) or "In Progress",
