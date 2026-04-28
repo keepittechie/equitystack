@@ -83,6 +83,13 @@ def load_json(path: Path) -> dict[str, Any] | None:
     return json.loads(path.read_text())
 
 
+def clear_stale_output(path: Path) -> bool:
+    if not path.exists():
+        return False
+    path.unlink()
+    return True
+
+
 def build_workflow_outcome_summary(
     ai_review_payload: dict[str, Any] | None,
     manual_queue_payload: dict[str, Any] | None,
@@ -260,6 +267,17 @@ def main() -> None:
         else:
             print("\n==> discover_missing_tracked_bills")
             print("Skipped: no unresolved suggestion rows or --skip-discovery was used.")
+            if not args.skip_discovery:
+                removed = []
+                if clear_stale_output(discovery_path()):
+                    removed.append(str(discovery_path()))
+                discovery_csv_path = discovery_path().with_suffix(".csv")
+                if clear_stale_output(discovery_csv_path):
+                    removed.append(str(discovery_csv_path))
+                if removed:
+                    print("Cleared stale discovery artifacts:")
+                    for removed_path in removed:
+                        print(f"  - {removed_path}")
 
         bundle_command = [
             sys.executable,

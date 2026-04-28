@@ -1071,11 +1071,11 @@ def build_workflow_outcome_summary(reviewed_items: list[dict[str, Any]]) -> dict
     )
 
     if total_items == 0:
-        workflow_status = "not_started"
-        ai_status = "not_started"
-        confidence_level = "low"
-        trust_warning = True
-        user_message = "No legislative AI review results are recorded yet."
+        workflow_status = "completed_with_ai"
+        ai_status = "success"
+        confidence_level = "high"
+        trust_warning = False
+        user_message = "No audit items required AI review."
     elif dry_run_count == total_items:
         workflow_status = "completed_with_fallback"
         ai_status = "skipped"
@@ -1256,13 +1256,30 @@ def main() -> None:
     audit_payload = load_audit_report(input_path)
     rows = select_rows(audit_payload, args.include_medium, args.only_link_id, args.max_items)
 
-    if not rows:
-        print("No audit items matched the requested review filters.")
-        return
-
     output_path.parent.mkdir(parents=True, exist_ok=True)
     if csv_path:
         csv_path.parent.mkdir(parents=True, exist_ok=True)
+
+    if not rows:
+        write_json_report(
+            output_path,
+            input_path,
+            args.model,
+            args.verifier_model,
+            args.fallback_model,
+            args.include_medium,
+            args.dry_run,
+            args.senior_timeout,
+            args.verifier_timeout,
+            [],
+        )
+        if csv_path:
+            write_csv_report(csv_path, [])
+        print("No audit items matched the requested review filters.")
+        print(f"Wrote empty AI review report to {output_path}")
+        if csv_path:
+            print(f"Wrote empty CSV review report to {csv_path}")
+        return
 
     print("Future Bill Link AI Review")
     print(f"Input report: {input_path}")

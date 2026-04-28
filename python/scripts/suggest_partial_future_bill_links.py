@@ -1617,6 +1617,35 @@ def build_summary(rows: list[dict[str, Any]], future_bill_count: int, ai_judge_e
     return summary
 
 
+def write_output_reports(
+    output_path: Path,
+    csv_path: Path | None,
+    *,
+    args: argparse.Namespace,
+    rows: list[dict[str, Any]],
+    ai_judge_enabled: bool,
+    resolved_model: str | None,
+) -> None:
+    payload = {
+        "generated_at": datetime.now(UTC).isoformat(),
+        "input_review_report": str(args.input_review_report.resolve()) if args.input_review_report else None,
+        "input_manual_queue": str(args.input_manual_queue.resolve()) if args.input_manual_queue else None,
+        "ai_judge_enabled": ai_judge_enabled,
+        "requested_model": args.model if ai_judge_enabled else None,
+        "resolved_model": resolved_model,
+        "top_k": args.top_k,
+        "dry_run": args.dry_run,
+        "summary": build_summary(rows, len({row["future_bill_id"] for row in rows}), ai_judge_enabled),
+        "items": rows,
+    }
+    write_json(output_path, payload)
+    print(f"Wrote suggestion report to {output_path}")
+
+    if csv_path:
+        write_csv(csv_path, rows)
+        print(f"Wrote suggestion CSV to {csv_path}")
+
+
 def main() -> None:
     args = parse_args()
     if args.max_items is not None and args.max_items <= 0:
@@ -1627,6 +1656,9 @@ def main() -> None:
         raise SystemExit("--timeout must be greater than 0")
     if not 0.0 <= args.temperature <= 1.0:
         raise SystemExit("--temperature must be between 0.0 and 1.0")
+
+    output_path = args.output.resolve()
+    csv_path = derive_csv_path(args.csv, output_path)
 
     review_payload = None
     manual_queue_payload = None
@@ -1671,6 +1703,14 @@ def main() -> None:
             )
             if not targets:
                 print("No eligible future bill targets were found.")
+                write_output_reports(
+                    output_path,
+                    csv_path,
+                    args=args,
+                    rows=[],
+                    ai_judge_enabled=ai_judge_enabled,
+                    resolved_model=resolved_model,
+                )
                 return
 
             candidate_pool = fetch_candidate_bills(cursor)
@@ -1778,27 +1818,14 @@ def main() -> None:
                 )
     finally:
         conn.close()
-
-    output_path = args.output.resolve()
-    csv_path = derive_csv_path(args.csv, output_path)
-    payload = {
-        "generated_at": datetime.now(UTC).isoformat(),
-        "input_review_report": str(args.input_review_report.resolve()) if args.input_review_report else None,
-        "input_manual_queue": str(args.input_manual_queue.resolve()) if args.input_manual_queue else None,
-        "ai_judge_enabled": ai_judge_enabled,
-        "requested_model": args.model if ai_judge_enabled else None,
-        "resolved_model": resolved_model,
-        "top_k": args.top_k,
-        "dry_run": args.dry_run,
-        "summary": build_summary(rows, len({row['future_bill_id'] for row in rows}), ai_judge_enabled),
-        "items": rows,
-    }
-    write_json(output_path, payload)
-    print(f"Wrote suggestion report to {output_path}")
-
-    if csv_path:
-        write_csv(csv_path, rows)
-        print(f"Wrote suggestion CSV to {csv_path}")
+    write_output_reports(
+        output_path,
+        csv_path,
+        args=args,
+        rows=rows,
+        ai_judge_enabled=ai_judge_enabled,
+        resolved_model=resolved_model,
+    )
 
 
 if __name__ == "__main__":
