@@ -2774,7 +2774,7 @@ Current-admin commands:
   validate   Validate imported current-administration records
 
 Impact maturation commands:
-  evaluate   Build a read-only impact maturation review artifact
+  evaluate   Build a read-only impact maturation review artifact; optional strict supplemental auto-approval stays dry-run at evaluate time
   promote    Promote approved safe forward impact transitions
   backfill-outcome-sources  Audit optional safe canonical policy_outcome_sources links
   sync-current-admin-outcomes  Sync promise_outcomes into policy_outcomes
@@ -2885,6 +2885,7 @@ Examples:
   $(cli_hint) impact evaluate
   $(cli_hint) impact evaluate --input reports/current_admin/<batch>.manual-review-queue.json
   $(cli_hint) impact evaluate --input reports/current_admin/<batch>.manual-review-queue.json --outcome-evidence reports/current_admin/<batch>.outcome-evidence.json
+  $(cli_hint) impact evaluate --input reports/current_admin/<batch>.manual-review-queue.json --outcome-evidence reports/current_admin/<batch>.outcome-evidence.json --auto-approve-safe-supplemental --dry-run
   $(cli_hint) impact promote --dry-run
   $(cli_hint) impact promote --apply --yes
   $(cli_hint) impact promote --apply --yes --approve-safe

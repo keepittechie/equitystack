@@ -35,6 +35,11 @@ DIRECTION_FALLBACK_IMPACT_SCORE = {
     "Blocked": 0.0,
 }
 SUPPLEMENTAL_OUTCOME_EVIDENCE_ACTIVATION_MODE = "dry_run_only"
+SAFE_SUPPLEMENTAL_AUTO_APPROVAL_MODE = "validated_safe_auto_approval"
+SAFE_SUPPLEMENTAL_RECOMMENDED_ACTIONS = {
+    "review_for_implementation_update",
+    "review_for_outcome_maturation",
+}
 
 
 def utc_timestamp() -> str:
@@ -163,6 +168,19 @@ def normalize_confidence_score(value: Any) -> float | None:
         return max(0.0, min(1.0, score / 100.0 if score > 1 else score))
     except (TypeError, ValueError):
         return None
+
+
+def normalize_percentage_score(value: Any) -> float | None:
+    if value in (None, ""):
+        return None
+    try:
+        score = float(value)
+    except (TypeError, ValueError):
+        normalized = normalize_confidence_score(value)
+        return round(normalized * 100.0, 2) if normalized is not None else None
+    if score <= 1:
+        score *= 100.0
+    return max(0.0, min(100.0, score))
 
 
 def state_rank(state: str | None) -> int:
@@ -363,6 +381,37 @@ def extract_records_from_artifact(path: Path) -> list[dict[str, Any]]:
     ):
         return extract_current_admin_records(path, payload)
     if isinstance(payload, dict) and "records" in payload:
+        records = payload.get("records") or []
+        if any(
+            isinstance(record, dict)
+            and (
+                normalize_nullable_text(record.get("promise_text"))
+                or isinstance(record.get("actions"), list)
+                or isinstance(record.get("promise_sources"), list)
+            )
+            for record in records
+        ):
+            extracted: list[dict[str, Any]] = []
+            for record in records:
+                if not isinstance(record, dict):
+                    continue
+                impact_status = normalize_impact_status(record.get("impact_status")) or "impact_pending"
+                if impact_status not in {"impact_pending", "impact_review_ready"}:
+                    continue
+                extracted.append(
+                    {
+                        "record_type": "current_admin",
+                        "record_key": normalize_nullable_text(record.get("slug")),
+                        "slug": record.get("slug"),
+                        "title": record_title(record),
+                        "previous_impact_status": impact_status,
+                        "confidence": record.get("confidence_score") or record.get("confidence"),
+                        "source_quality": record.get("source_quality"),
+                        "source_artifact": str(path),
+                        "record": record,
+                    }
+                )
+            return extracted
         return [
             {
                 "record_type": "current_admin",
@@ -398,11 +447,231 @@ def find_supplemental_outcome_evidence(item: dict[str, Any], evidence_index: dic
     return None
 
 
+def supplemental_matched_evidence_items(supplemental: dict[str, Any] | None) -> list[dict[str, Any]]:
+    if not isinstance(supplemental, dict):
+        return []
+    return [item for item in (supplemental.get("matched_evidence_items") or []) if isinstance(item, dict)]
+
+
+def evidence_is_legal_context(evidence_item: dict[str, Any]) -> bool:
+    evidence_kind = normalize_review_text(evidence_item.get("evidence_kind"))
+    source_category = normalize_review_text(evidence_item.get("source_category"))
+    next_action = normalize_review_text(evidence_item.get("recommended_next_action"))
+    return evidence_kind == "legal_context" or source_category in {"legal", "court", "litigation"} or next_action == "judicial_context_only"
+
+
+def evidence_has_blocking_warnings(evidence_item: dict[str, Any]) -> bool:
+    return bool([warning for warning in (evidence_item.get("match_warnings") or []) if normalize_nullable_text(warning)])
+
+
+def evidence_date_window_matched(evidence_item: dict[str, Any]) -> bool:
+    date_window = evidence_item.get("date_window_match") if isinstance(evidence_item.get("date_window_match"), dict) else {}
+    return bool(date_window.get("matched"))
+
+
+def evidence_is_broad_federal_register_item(evidence_item: dict[str, Any]) -> bool:
+    source_family = normalize_review_text(evidence_item.get("source_family"))
+    if not source_family or not source_family.startswith("federal_register"):
+        return False
+    return not any(
+        evidence_item.get(field)
+        for field in (
+            "policy_query_hits",
+            "program_overlap",
+            "mechanism_overlap",
+            "jurisdiction_overlap",
+            "affected_group_overlap",
+        )
+    )
+
+
+def projected_supplemental_source_quality(supplemental: dict[str, Any] | None, evidence_item: dict[str, Any] | None) -> str:
+    candidate_values = [
+        (evidence_item or {}).get("evidence_strength"),
+        (evidence_item or {}).get("source_quality"),
+        (supplemental or {}).get("source_quality"),
+        (supplemental or {}).get("confidence_level"),
+    ]
+    for value in candidate_values:
+        normalized = normalize_source_quality(value)
+        if normalized != "low" or normalize_nullable_text(value):
+            return normalized
+    return "low"
+
+
+def projected_supplemental_confidence_score(supplemental: dict[str, Any] | None, evidence_item: dict[str, Any] | None) -> float | None:
+    candidate_values = [
+        (evidence_item or {}).get("confidence_score"),
+        (supplemental or {}).get("best_confidence_score"),
+        (supplemental or {}).get("confidence_score"),
+    ]
+    for value in candidate_values:
+        normalized = normalize_percentage_score(value)
+        if normalized is not None:
+            return normalized
+    return None
+
+
+def summarize_evidence_for_approval(evidence_item: dict[str, Any] | None) -> dict[str, Any] | None:
+    if not isinstance(evidence_item, dict):
+        return None
+    return {
+        "evidence_title": normalize_nullable_text(evidence_item.get("evidence_title") or evidence_item.get("title")),
+        "evidence_url": normalize_nullable_text(evidence_item.get("evidence_url") or evidence_item.get("url")),
+        "evidence_date": normalize_nullable_text(evidence_item.get("evidence_date") or evidence_item.get("published_at")),
+        "source_family": normalize_nullable_text(evidence_item.get("source_family")),
+        "evidence_type": normalize_nullable_text(evidence_item.get("evidence_type")),
+        "match_score": evidence_item.get("match_score"),
+        "match_bucket": normalize_nullable_text(evidence_item.get("match_bucket")),
+        "recommended_next_action": normalize_nullable_text(evidence_item.get("recommended_next_action")),
+        "matched_policy_id": normalize_nullable_text(evidence_item.get("matched_policy_id")),
+        "matched_promise_id": normalize_nullable_text(evidence_item.get("matched_promise_id")),
+        "matched_action_id": normalize_nullable_text(evidence_item.get("matched_action_id")),
+    }
+
+
+def aggregate_reason_counts(reason_lists: list[list[str]]) -> dict[str, int]:
+    counts: dict[str, int] = {}
+    for reasons in reason_lists:
+        for reason in reasons:
+            text = normalize_nullable_text(reason)
+            if not text:
+                continue
+            counts[text] = counts.get(text, 0) + 1
+    return counts
+
+
+def validate_safe_supplemental_auto_approval(
+    item: dict[str, Any],
+    supplemental: dict[str, Any] | None,
+    *,
+    enabled: bool,
+) -> dict[str, Any]:
+    evidence_items = supplemental_matched_evidence_items(supplemental)
+    sorted_evidence_items = sorted(
+        evidence_items,
+        key=lambda row: (
+            float(row.get("match_score") or 0),
+            float(projected_supplemental_confidence_score(supplemental, row) or 0),
+        ),
+        reverse=True,
+    )
+    strongest_evidence = sorted_evidence_items[0] if sorted_evidence_items else None
+    implementation_count = int((supplemental or {}).get("implementation_evidence_count") or 0)
+    outcome_count = int((supplemental or {}).get("outcome_evidence_count") or 0)
+    legal_context_count = int((supplemental or {}).get("legal_context_count") or 0)
+    matched_policy_id = normalize_nullable_text((supplemental or {}).get("matched_policy_id"))
+    matched_promise_id = normalize_nullable_text((supplemental or {}).get("matched_promise_id"))
+    matched_action_id = normalize_nullable_text((supplemental or {}).get("matched_action_id"))
+    projected_source_quality = projected_supplemental_source_quality(supplemental, strongest_evidence)
+    projected_confidence = projected_supplemental_confidence_score(supplemental, strongest_evidence)
+    approval_reasons: list[str] = []
+    blocked_reasons: list[str] = []
+    candidate_block_reasons: list[list[str]] = []
+    eligible_evidence_items: list[dict[str, Any]] = []
+
+    validation = {
+        "requested": enabled,
+        "checked": False,
+        "approved": False,
+        "supplemental_evidence_present": bool(supplemental and ((implementation_count + outcome_count + legal_context_count) > 0 or evidence_items)),
+        "projected_source_quality": projected_source_quality,
+        "projected_confidence_score": projected_confidence,
+        "implementation_evidence_count": implementation_count,
+        "outcome_evidence_count": outcome_count,
+        "legal_context_count": legal_context_count,
+        "matched_policy_id": matched_policy_id,
+        "matched_promise_id": matched_promise_id,
+        "matched_action_id": matched_action_id,
+        "strong_match_candidate_count": sum(
+            normalize_review_text(row.get("match_bucket")) == "strong_match" for row in evidence_items
+        ),
+        "approval_reasons": [],
+        "blocked_reasons": [],
+        "approving_evidence": None,
+    }
+
+    if not enabled:
+        return validation
+
+    validation["checked"] = True
+    previous_status = normalize_impact_status(item.get("previous_impact_status"))
+    if previous_status != "impact_pending":
+        blocked_reasons.append("only impact_pending records are eligible for safe supplemental auto-approval")
+
+    if not validation["supplemental_evidence_present"]:
+        blocked_reasons.append("supplemental evidence is not present")
+    if projected_source_quality != "high":
+        blocked_reasons.append("projected source quality is not high")
+    if projected_confidence is None or projected_confidence < 90:
+        blocked_reasons.append("projected confidence score is below 90")
+    if implementation_count < 1 and outcome_count < 1:
+        blocked_reasons.append("supplemental evidence does not include implementation or outcome matches")
+    if legal_context_count != 0:
+        blocked_reasons.append("supplemental evidence includes legal-context matches")
+    if not matched_policy_id:
+        blocked_reasons.append("matched_policy_id is missing")
+    if not matched_promise_id:
+        blocked_reasons.append("matched_promise_id is missing")
+    if validation["strong_match_candidate_count"] < 1:
+        blocked_reasons.append("no strong_match evidence item is available for approval")
+
+    for evidence_item in evidence_items:
+        if normalize_review_text(evidence_item.get("match_bucket")) != "strong_match":
+            continue
+        candidate_reasons: list[str] = []
+        if evidence_has_blocking_warnings(evidence_item):
+            candidate_reasons.append("strong supplemental evidence still has match warnings")
+        if evidence_is_legal_context(evidence_item):
+            candidate_reasons.append("legal-context evidence cannot be used for approval")
+        if not evidence_date_window_matched(evidence_item):
+            candidate_reasons.append("approval evidence is not date-window aligned")
+        if normalize_review_text(evidence_item.get("recommended_next_action")) not in SAFE_SUPPLEMENTAL_RECOMMENDED_ACTIONS:
+            candidate_reasons.append("approval evidence does not recommend an implementation/outcome review action")
+        if evidence_is_broad_federal_register_item(evidence_item):
+            candidate_reasons.append("broad Federal Register evidence is not eligible for auto-approval")
+        if not normalize_nullable_text(evidence_item.get("matched_policy_id") or matched_policy_id):
+            candidate_reasons.append("approval evidence is missing matched_policy_id")
+        if not normalize_nullable_text(evidence_item.get("matched_promise_id") or matched_promise_id):
+            candidate_reasons.append("approval evidence is missing matched_promise_id")
+        if candidate_reasons:
+            candidate_block_reasons.append(candidate_reasons)
+            continue
+        eligible_evidence_items.append(evidence_item)
+
+    if not eligible_evidence_items and evidence_items:
+        blocked_reasons.extend(reason for reasons in candidate_block_reasons for reason in reasons)
+
+    blocked_reasons = sorted(set(blocked_reasons))
+    if not blocked_reasons and eligible_evidence_items:
+        approving_evidence = eligible_evidence_items[0]
+        approval_reasons.extend(
+            [
+                "supplemental evidence is present",
+                "projected source quality is high",
+                f"projected confidence score is {int(round(projected_confidence or 0))}",
+                "implementation or outcome evidence is present",
+                "legal-context evidence is absent",
+                "matched policy and promise identifiers are present",
+                "approval evidence is a strong_match with no warnings",
+                "approval evidence is date-window aligned",
+                "approval evidence recommends implementation or outcome review",
+            ]
+        )
+        validation["approved"] = True
+        validation["approving_evidence"] = summarize_evidence_for_approval(approving_evidence)
+
+    validation["approval_reasons"] = approval_reasons
+    validation["blocked_reasons"] = blocked_reasons
+    return validation
+
+
 def evaluate_record(
     item: dict[str, Any],
     ledger: dict[str, Any],
     *,
     supplemental_outcome_evidence_index: dict[str, dict[str, Any]] | None = None,
+    auto_approve_safe_supplemental: bool = False,
 ) -> dict[str, Any]:
     key = record_key(item)
     ledger_status = normalize_impact_status((ledger.get("records") or {}).get(key, {}).get("impact_status"))
@@ -422,6 +691,12 @@ def evaluate_record(
     supplemental_implementation_count = int((supplemental or {}).get("implementation_evidence_count") or 0)
     supplemental_best_confidence = normalize_confidence_score((supplemental or {}).get("best_confidence_score"))
     supplemental_used = False
+    supplemental_activation_mode = None
+    supplemental_auto_approval = validate_safe_supplemental_auto_approval(
+        item,
+        supplemental,
+        enabled=auto_approve_safe_supplemental,
+    )
 
     if sources > 0:
         reasoning.append(f"{sources} linked source reference(s) are available")
@@ -440,14 +715,34 @@ def evaluate_record(
         )
         if supplemental_best_confidence is not None:
             reasoning.append(f"supplemental confidence_score={supplemental_best_confidence:.2f}")
+    if auto_approve_safe_supplemental:
+        if supplemental_auto_approval.get("approved"):
+            approval_evidence = supplemental_auto_approval.get("approving_evidence") or {}
+            reasoning.append(
+                "strict supplemental validator approved impact_review_ready promotion using "
+                f"{normalize_nullable_text(approval_evidence.get('evidence_title')) or 'strong supplemental evidence'}"
+            )
+        elif supplemental_auto_approval.get("blocked_reasons"):
+            reasoning.append(
+                "strict supplemental validator blocked auto-approval: "
+                + "; ".join(supplemental_auto_approval.get("blocked_reasons") or [])
+            )
 
     next_status = previous_status
     if previous_status == "impact_pending":
         if source_quality in {"medium", "high"} and sources > 0 and (confidence_score is None or confidence_score >= 0.55):
             next_status = "impact_review_ready"
-        elif supplemental_outcome_count > 0 and (supplemental_best_confidence is None or supplemental_best_confidence >= 0.60):
+        elif supplemental_auto_approval.get("approved"):
             next_status = "impact_review_ready"
             supplemental_used = True
+            supplemental_activation_mode = SAFE_SUPPLEMENTAL_AUTO_APPROVAL_MODE
+            reasoning.append("supplemental evidence passed the strict auto-approval validator")
+        elif (not auto_approve_safe_supplemental) and supplemental_outcome_count > 0 and (
+            supplemental_best_confidence is None or supplemental_best_confidence >= 0.60
+        ):
+            next_status = "impact_review_ready"
+            supplemental_used = True
+            supplemental_activation_mode = SUPPLEMENTAL_OUTCOME_EVIDENCE_ACTIVATION_MODE
             reasoning.append("supplemental outcome evidence suggests review-ready status in dry-run mode only")
         else:
             reasoning.append("record remains pending because source/confidence evidence is not review-ready")
@@ -456,9 +751,12 @@ def evaluate_record(
             confidence_score is None or confidence_score >= 0.65
         ):
             next_status = "impact_scored"
-        elif supplemental_outcome_count > 0 and (supplemental_best_confidence is None or supplemental_best_confidence >= 0.70):
+        elif (not auto_approve_safe_supplemental) and supplemental_outcome_count > 0 and (
+            supplemental_best_confidence is None or supplemental_best_confidence >= 0.70
+        ):
             next_status = "impact_scored"
             supplemental_used = True
+            supplemental_activation_mode = SUPPLEMENTAL_OUTCOME_EVIDENCE_ACTIVATION_MODE
             reasoning.append("supplemental outcome evidence suggests scoring readiness in dry-run mode only")
         else:
             reasoning.append("record remains review-ready because measurable outcome evidence is not scoring-ready")
@@ -485,16 +783,21 @@ def evaluate_record(
                 "implementation_evidence_count": supplemental_implementation_count,
                 "best_confidence_score": supplemental_best_confidence,
                 "recommended_next_action": (supplemental or {}).get("recommended_next_action"),
+                "supplemental_evidence_present": supplemental_auto_approval.get("supplemental_evidence_present"),
+                "projected_source_quality": supplemental_auto_approval.get("projected_source_quality"),
+                "projected_confidence_score": supplemental_auto_approval.get("projected_confidence_score"),
+                "matched_policy_id": supplemental_auto_approval.get("matched_policy_id"),
+                "matched_promise_id": supplemental_auto_approval.get("matched_promise_id"),
+                "matched_action_id": supplemental_auto_approval.get("matched_action_id"),
             }
             if supplemental
             else None
         ),
         "supplemental_outcome_evidence_used": supplemental_used,
-        "supplemental_outcome_evidence_activation_mode": (
-            SUPPLEMENTAL_OUTCOME_EVIDENCE_ACTIVATION_MODE if supplemental_used else None
-        ),
+        "supplemental_outcome_evidence_activation_mode": supplemental_activation_mode,
+        "supplemental_safe_auto_approval": supplemental_auto_approval,
         "reasoning": reasoning,
-        "approved": False,
+        "approved": bool(supplemental_auto_approval.get("approved")),
         "record": item["record"],
     }
 
@@ -524,8 +827,14 @@ def run_evaluate(args: argparse.Namespace) -> None:
             item,
             ledger,
             supplemental_outcome_evidence_index=supplemental_index,
+            auto_approve_safe_supplemental=args.auto_approve_safe_supplemental,
         )
         for item in items
+    ]
+    auto_approval_summaries = [
+        item.get("supplemental_safe_auto_approval")
+        for item in evaluated
+        if isinstance(item.get("supplemental_safe_auto_approval"), dict) and item["supplemental_safe_auto_approval"].get("checked")
     ]
     counts = {
         "total_items": len(evaluated),
@@ -534,21 +843,50 @@ def run_evaluate(args: argparse.Namespace) -> None:
         "unchanged": sum(item["recommended_impact_status"] == item["previous_impact_status"] for item in evaluated),
         "blocked_transition": sum(not item["transition_allowed"] for item in evaluated),
         "supplemental_outcome_evidence_used": sum(bool(item.get("supplemental_outcome_evidence_used")) for item in evaluated),
+        "auto_approved_count": sum(bool(item.get("approved")) for item in evaluated),
+        "blocked_count": sum(not summary.get("approved") for summary in auto_approval_summaries),
     }
     output = {
-        "artifact_version": 1,
+        "artifact_version": 2,
         "generated_at": utc_timestamp(),
         "workflow": "impact_maturation_evaluation",
+        "mode": "dry_run",
         "inputs": [str(path) for path in input_paths],
         "supplemental_outcome_evidence_inputs": [str(path) for path in supplemental_outcome_evidence_paths],
         "ledger_path": str(args.ledger.resolve()),
         "allowed_transitions": {key: sorted(value) for key, value in ALLOWED_TRANSITIONS.items()},
+        "auto_approve_safe_supplemental_requested": bool(args.auto_approve_safe_supplemental),
         "counts": counts,
+        "supplemental_auto_approval_summary": {
+            "requested": bool(args.auto_approve_safe_supplemental),
+            "auto_approved_count": counts["auto_approved_count"],
+            "blocked_count": counts["blocked_count"],
+            "blocked_reasons": aggregate_reason_counts(
+                [summary.get("blocked_reasons") or [] for summary in auto_approval_summaries]
+            ),
+            "approval_reasons": aggregate_reason_counts(
+                [summary.get("approval_reasons") or [] for summary in auto_approval_summaries if summary.get("approved")]
+            ),
+            "approved_items": [
+                {
+                    "record_key": item.get("record_key"),
+                    "slug": item.get("slug"),
+                    "title": item.get("title"),
+                    "matched_policy_id": (item.get("supplemental_safe_auto_approval") or {}).get("matched_policy_id"),
+                    "matched_promise_id": (item.get("supplemental_safe_auto_approval") or {}).get("matched_promise_id"),
+                    "matched_action_id": (item.get("supplemental_safe_auto_approval") or {}).get("matched_action_id"),
+                    "approval_reasons": (item.get("supplemental_safe_auto_approval") or {}).get("approval_reasons") or [],
+                    "approving_evidence": (item.get("supplemental_safe_auto_approval") or {}).get("approving_evidence"),
+                }
+                for item in evaluated
+                if item.get("approved")
+            ],
+        },
         "skipped_inputs": skipped_inputs,
         "items": evaluated,
         "operator_guidance": (
-            "Review recommended transitions, set approved=true only for intended safe promotions, "
-            "then run impact promote. Use --approve-safe only when intentionally approving every safe forward transition."
+            "Review recommended transitions, then run impact promote. Supplemental evidence can only auto-approve rows "
+            "when --auto-approve-safe-supplemental is used during evaluate; impact promote will not infer supplemental approval on its own."
         ),
     }
     write_json_file(args.output.resolve(), output)
@@ -918,12 +1256,18 @@ def insert_outcomes(cursor, item: dict[str, Any], report: dict[str, Any]) -> int
 def transition_decision(item: dict[str, Any], *, approve_safe: bool) -> tuple[bool, str | None]:
     previous = normalize_impact_status(item.get("previous_impact_status"))
     new = normalize_impact_status(item.get("recommended_impact_status"))
+    activation_mode = normalize_review_text(item.get("supplemental_outcome_evidence_activation_mode"))
     if previous is None or new is None:
         return False, "missing or invalid impact status"
     if previous == new:
         return False, "no forward transition recommended"
     if not valid_forward_transition(previous, new):
         return False, f"unsafe transition: {previous} -> {new}"
+    if activation_mode in {
+        normalize_review_text(SUPPLEMENTAL_OUTCOME_EVIDENCE_ACTIVATION_MODE),
+        normalize_review_text(SAFE_SUPPLEMENTAL_AUTO_APPROVAL_MODE),
+    } and item.get("approved") is not True:
+        return False, "supplemental transition is not explicitly validator-approved"
     if not (item.get("approved") is True or approve_safe):
         return False, "transition is not operator-approved"
     return True, None
@@ -1038,7 +1382,8 @@ def run_promote(args: argparse.Namespace) -> None:
         supplemental_blocked_items = [
             item
             for item in approved_items
-            if item.get("supplemental_outcome_evidence_activation_mode") == SUPPLEMENTAL_OUTCOME_EVIDENCE_ACTIVATION_MODE
+            if normalize_review_text(item.get("supplemental_outcome_evidence_activation_mode"))
+            == normalize_review_text(SUPPLEMENTAL_OUTCOME_EVIDENCE_ACTIVATION_MODE)
         ]
         if supplemental_blocked_items:
             report["precommit"]["readiness_status"] = "blocked"
@@ -1055,7 +1400,8 @@ def run_promote(args: argparse.Namespace) -> None:
             approved_items = [
                 item
                 for item in approved_items
-                if item.get("supplemental_outcome_evidence_activation_mode") != SUPPLEMENTAL_OUTCOME_EVIDENCE_ACTIVATION_MODE
+                if normalize_review_text(item.get("supplemental_outcome_evidence_activation_mode"))
+                != normalize_review_text(SUPPLEMENTAL_OUTCOME_EVIDENCE_ACTIVATION_MODE)
             ]
             report["precommit"]["blocking_issue_count"] = len(report["precommit"]["blocked_items"])
 
@@ -1149,6 +1495,16 @@ def build_parser() -> argparse.ArgumentParser:
         type=Path,
         action="append",
         help="Optional current-admin outcome-evidence artifact(s) to use for dry-run-only maturation recommendations.",
+    )
+    evaluate.add_argument(
+        "--auto-approve-safe-supplemental",
+        action="store_true",
+        help="Validate supplemental outcome-evidence with the strict safe gate and explicitly approve only eligible impact_review_ready transitions.",
+    )
+    evaluate.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Explicit read-only mode for supplemental safe-auto-approval evaluation. Evaluate is read-only by default.",
     )
     evaluate.add_argument("--output", type=Path, default=default_evaluation_output(), help="Maturation review artifact output")
     evaluate.add_argument("--ledger", type=Path, default=default_ledger_path(), help="Local impact maturation status ledger")
