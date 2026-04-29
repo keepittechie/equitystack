@@ -35,6 +35,93 @@ AUTO_RESOLVABLE_EXISTING_CANDIDATE_TYPES = {
     "stale_record",
     "thin_sourcing",
 }
+LOW_SIGNAL_EXISTING_UPDATE_SOURCE_CATEGORIES = {
+    "agency",
+    "federal-register",
+    "funding",
+    "grants",
+}
+LOW_SIGNAL_EXISTING_UPDATE_TEXT_HINTS = (
+    "notice",
+    "notices",
+    "system of records",
+    "data mart",
+    "effective date",
+    "delay",
+    "delayed",
+    "funding opportunity",
+    "grant opportunity",
+    "grant awards",
+    "availability of",
+    "proposed collection",
+    "information collection",
+    "request for comments",
+    "administrative requirements",
+)
+EXISTING_RECORD_GENERIC_TOKENS = {
+    "a",
+    "an",
+    "and",
+    "the",
+    "of",
+    "for",
+    "to",
+    "in",
+    "on",
+    "with",
+    "by",
+    "from",
+    "at",
+    "trump",
+    "2025",
+    "expand",
+    "increase",
+    "promote",
+    "reform",
+    "strengthen",
+    "support",
+    "end",
+    "require",
+    "prepare",
+    "federal",
+    "state",
+    "local",
+    "public",
+    "official",
+    "policy",
+    "policies",
+    "program",
+    "programs",
+    "initiative",
+    "initiatives",
+    "action",
+    "actions",
+    "government",
+    "agency",
+    "administration",
+    "americans",
+    "america",
+    "american",
+    "new",
+    "existing",
+}
+EXISTING_RECORD_GENERIC_MATCH_KEYWORDS = {
+    "agency",
+    "court",
+    "federal",
+    "housing",
+    "health",
+    "healthcare",
+    "education",
+    "employment",
+    "funding",
+    "grant",
+    "grants",
+    "guidance",
+    "notice",
+    "rule",
+    "rules",
+}
 DEFAULT_DISCOVERY_PROMISE_TYPE = "Official Promise"
 DEFAULT_DISCOVERY_CAMPAIGN_OR_OFFICIAL = "Official"
 DB_ENV_KEYS = ("DB_HOST", "DB_PORT", "DB_USER", "DB_PASSWORD", "DB_NAME")
@@ -156,6 +243,17 @@ def normalize_nullable_text(value: Any) -> str | None:
     return text or None
 
 
+def normalize_token_set(value: Any) -> set[str]:
+    text = normalize_nullable_text(value)
+    if text is None:
+        return set()
+    return {
+        token
+        for token in re.findall(r"[a-z0-9]+", text.lower())
+        if token and token not in EXISTING_RECORD_GENERIC_TOKENS
+    }
+
+
 NEGATED_BLACK_SCOPE_PHRASES = (
     "no black-community-specific effect",
     "no black community specific effect",
@@ -210,15 +308,6 @@ def existing_record_auto_resolution(
         for candidate in (discovery_context.get("selected_candidates") or [])
         if isinstance(candidate, dict)
     ]
-    candidate_types = sorted(
-        {
-            candidate_type
-            for candidate_type in (
-                normalize_nullable_text(candidate.get("candidate_type")) for candidate in selected_candidates
-            )
-            if candidate_type
-        }
-    )
     preserved_sources = [
         source
         for source in (discovery_context.get("preserved_discovery_sources") or [])
@@ -232,6 +321,110 @@ def existing_record_auto_resolution(
     reference_status = normalize_nullable_text(linked_snapshot.get("status")) or normalize_nullable_text(first_match.get("status"))
     reference_topic = normalize_nullable_text(linked_snapshot.get("topic")) or normalize_nullable_text(first_match.get("topic"))
     reference_impacted_group = normalize_nullable_text(first_match.get("impacted_group"))
+    record_reference_tokens = set().union(
+        normalize_token_set(record.get("slug")),
+        normalize_token_set(record.get("title")),
+        normalize_token_set(reference_slug),
+        normalize_token_set(reference_title),
+        normalize_token_set(reference_topic),
+    )
+
+    def candidate_text_fragments(candidate: dict[str, Any]) -> list[str]:
+        suggested = candidate.get("suggested_changes") if isinstance(candidate.get("suggested_changes"), dict) else {}
+        feed_item = candidate.get("feed_item") if isinstance(candidate.get("feed_item"), dict) else {}
+        source_rows = [
+            source
+            for source in (candidate.get("source_references") or [])
+            if isinstance(source, dict)
+        ]
+        values = [
+            candidate.get("reasoning"),
+            candidate.get("classification_reason"),
+            candidate.get("target_program"),
+            candidate.get("mechanism_of_effect"),
+            candidate.get("funding_signal"),
+            candidate.get("court_or_agency"),
+            suggested.get("title"),
+            suggested.get("summary"),
+            feed_item.get("title"),
+            feed_item.get("summary"),
+        ]
+        values.extend(source.get("source_title") for source in source_rows)
+        return [
+            text
+            for text in (normalize_nullable_text(value) for value in values)
+            if text
+        ]
+
+    def candidate_meaningful_keywords(candidate: dict[str, Any]) -> list[str]:
+        return [
+            keyword
+            for keyword in (
+                normalize_nullable_text(keyword)
+                for keyword in (candidate.get("matched_keywords") or [])
+            )
+            if keyword and keyword.lower() not in EXISTING_RECORD_GENERIC_MATCH_KEYWORDS
+        ]
+
+    def low_signal_existing_update_candidate(candidate: dict[str, Any]) -> bool:
+        candidate_type = normalize_nullable_text(candidate.get("candidate_type")) or ""
+        if candidate_type not in {"new_action", "update_existing_action"}:
+            return False
+
+        source_category = (normalize_nullable_text(candidate.get("source_category")) or "").lower()
+        if source_category not in LOW_SIGNAL_EXISTING_UPDATE_SOURCE_CATEGORIES:
+            return False
+
+        if normalize_nullable_text(candidate.get("legal_status")):
+            return False
+        if normalize_nullable_text(candidate.get("docket_number")):
+            return False
+        if normalize_nullable_text(candidate.get("target_program")):
+            return False
+        if normalize_nullable_text(candidate.get("mechanism_of_effect")):
+            return False
+        if normalize_nullable_text(candidate.get("suggested_relationship")):
+            return False
+        if normalize_nullable_text(candidate.get("affected_institutions")):
+            return False
+
+        fragments = candidate_text_fragments(candidate)
+        combined_text = " ".join(fragments).lower()
+        if not any(hint in combined_text for hint in LOW_SIGNAL_EXISTING_UPDATE_TEXT_HINTS):
+            return False
+
+        candidate_tokens = set().union(*(normalize_token_set(fragment) for fragment in fragments))
+        overlap_tokens = sorted(candidate_tokens & record_reference_tokens)
+        if overlap_tokens:
+            return False
+        if candidate_meaningful_keywords(candidate):
+            return False
+        return True
+
+    ignored_low_signal_candidates = [
+        candidate
+        for candidate in selected_candidates
+        if low_signal_existing_update_candidate(candidate)
+    ]
+    ignored_low_signal_candidate_ids = [
+        normalize_nullable_text(candidate.get("candidate_id")) or f"candidate-{index}"
+        for index, candidate in enumerate(ignored_low_signal_candidates, start=1)
+    ]
+    effective_candidates = [
+        candidate
+        for candidate in selected_candidates
+        if candidate not in ignored_low_signal_candidates
+    ]
+    candidate_types = sorted(
+        {
+            candidate_type
+            for candidate_type in (
+                normalize_nullable_text(candidate.get("candidate_type")) for candidate in effective_candidates
+            )
+            if candidate_type
+        }
+    )
+    effective_preserved_action_count = max(0, preserved_action_count - len(ignored_low_signal_candidates))
 
     changed_fields = [
         field
@@ -252,11 +445,11 @@ def existing_record_auto_resolution(
     reason = "The record does not map cleanly to a tracked promise yet."
 
     if has_existing_reference:
-        if preserved_action_count > 0:
+        if effective_preserved_action_count > 0:
             material_change_detected = True
             resolution = "material_change_or_new_information"
             reason = (
-                f"Discovery preserved {preserved_action_count} action stub(s), so this still looks like a substantive update."
+                f"Discovery preserved {effective_preserved_action_count} action stub(s), so this still looks like a substantive update."
             )
         elif changed_fields:
             material_change_detected = True
@@ -291,6 +484,11 @@ def existing_record_auto_resolution(
                     reason = (
                         "This record is already tracked and discovery did not preserve any substantive change to the tracked promise."
                     )
+                if ignored_low_signal_candidates:
+                    reason += (
+                        f" Ignored {len(ignored_low_signal_candidates)} low-signal administrative notice candidate(s)"
+                        " that did not show a specific linked update."
+                    )
 
     return {
         "has_existing_reference": has_existing_reference,
@@ -300,9 +498,12 @@ def existing_record_auto_resolution(
         "reason": reason,
         "candidate_types": candidate_types,
         "preserved_action_count": preserved_action_count,
+        "effective_preserved_action_count": effective_preserved_action_count,
         "preserved_source_count": len(preserved_sources),
         "changed_fields": changed_fields,
         "linked_promise_slug": reference_slug,
+        "ignored_low_signal_candidate_count": len(ignored_low_signal_candidates),
+        "ignored_low_signal_candidate_ids": ignored_low_signal_candidate_ids,
     }
 
 

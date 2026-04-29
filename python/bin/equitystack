@@ -725,6 +725,13 @@ PY
     return 0
   fi
 
+  if [ "${queue_pending_count:-0}" -gt 0 ]; then
+    CURRENT_ADMIN_STATE="EXCEPTION_QUEUE_READY"
+    CURRENT_ADMIN_NEXT_STEP="The approved subset has been applied, but manual-review exceptions still remain unresolved."
+    CURRENT_ADMIN_NEXT_COMMAND="$(cli_hint) current-admin review --input $(repo_relative_path "$CURRENT_ADMIN_REVIEW_PATH")"
+    return 0
+  fi
+
   CURRENT_ADMIN_STATE="COMPLETE"
   CURRENT_ADMIN_NEXT_STEP="Workflow complete. Start the next discovery or review cycle."
   CURRENT_ADMIN_NEXT_COMMAND="$(cli_hint) current-admin run"

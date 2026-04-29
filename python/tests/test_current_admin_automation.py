@@ -17,6 +17,7 @@ if "pymysql" not in sys.modules:
     sys.modules["pymysql"] = types.ModuleType("pymysql")
 
 import apply_current_admin_outcome_enrichment as enrichment  # noqa: E402
+import current_admin_common as current_admin  # noqa: E402
 import evaluate_impact_maturation as impact  # noqa: E402
 
 
@@ -107,6 +108,99 @@ def sample_enrichment_record(**overrides) -> dict:
 
 
 class CurrentAdminAutomationTests(unittest.TestCase):
+    def test_existing_record_auto_resolution_ignores_low_signal_admin_notice_candidates(self) -> None:
+        record = {
+            "slug": "trump-2025-domestic-production-of-critical-medicines",
+            "title": "Expand domestic production of critical medicines",
+            "topic": "Healthcare",
+            "status": "Partial",
+            "discovery_context": {
+                "linked_promise_snapshot": {
+                    "id": 114,
+                    "slug": "trump-2025-domestic-production-of-critical-medicines",
+                    "title": "Expand domestic production of critical medicines",
+                    "status": "Partial",
+                    "topic": "Healthcare",
+                },
+                "preserved_action_count": 1,
+                "selected_candidates": [
+                    {
+                        "candidate_id": "update_candidates:1",
+                        "candidate_type": "new_action",
+                        "source_category": "agency",
+                        "reasoning": "Broad HRSA notice that was loosely matched during discovery.",
+                        "source_references": [
+                            {
+                                "source_title": "Rural Hospital Provider Assistance Program grant opportunity notice",
+                                "source_url": "https://www.hrsa.gov/example",
+                            }
+                        ],
+                        "matched_keywords": [],
+                    },
+                    {
+                        "candidate_id": "update_candidates:2",
+                        "candidate_type": "stale_record",
+                        "reasoning": "Existing record is older than the refresh window.",
+                    },
+                ],
+                "preserved_discovery_sources": [
+                    {
+                        "source_title": "Agenda47 domestic medicines pledge",
+                        "source_url": "https://www.donaldjtrump.com/example",
+                    }
+                ],
+            },
+        }
+
+        result = current_admin.existing_record_auto_resolution(record, existing_matches=[])
+
+        self.assertTrue(result["safe_auto_resolution"])
+        self.assertEqual(result["resolution"], "source_only_refresh")
+        self.assertEqual(result["ignored_low_signal_candidate_count"], 1)
+        self.assertEqual(result["effective_preserved_action_count"], 0)
+
+    def test_existing_record_auto_resolution_keeps_specific_program_updates_manual(self) -> None:
+        record = {
+            "slug": "trump-2025-high-paying-skilled-trade-jobs",
+            "title": "Prepare Americans for high-paying skilled trade jobs",
+            "topic": "Economic Opportunity",
+            "status": "In Progress",
+            "discovery_context": {
+                "linked_promise_snapshot": {
+                    "id": 119,
+                    "slug": "trump-2025-high-paying-skilled-trade-jobs",
+                    "title": "Prepare Americans for high-paying skilled trade jobs",
+                    "status": "In Progress",
+                    "topic": "Economic Opportunity",
+                },
+                "preserved_action_count": 1,
+                "selected_candidates": [
+                    {
+                        "candidate_id": "update_candidates:1",
+                        "candidate_type": "update_existing_action",
+                        "source_category": "agency",
+                        "target_program": "Registered Apprenticeship expansion",
+                        "reasoning": "DOL apprenticeship expansion grant directly advances the tracked workforce promise.",
+                        "source_references": [
+                            {
+                                "source_title": "US Department of Labor announces grant awards for Registered Apprenticeship expansion",
+                                "source_url": "https://www.dol.gov/example",
+                            }
+                        ],
+                        "matched_keywords": ["apprenticeship", "workforce"],
+                    }
+                ],
+                "preserved_discovery_sources": [],
+            },
+        }
+
+        result = current_admin.existing_record_auto_resolution(record, existing_matches=[])
+
+        self.assertFalse(result["safe_auto_resolution"])
+        self.assertEqual(result["resolution"], "material_change_or_new_information")
+        self.assertEqual(result["ignored_low_signal_candidate_count"], 0)
+        self.assertEqual(result["effective_preserved_action_count"], 1)
+
     def test_strict_supplemental_validator_approves_strong_match(self) -> None:
         result = impact.validate_safe_supplemental_auto_approval(
             sample_impact_item(),

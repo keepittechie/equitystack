@@ -626,8 +626,11 @@ def repo_relative(path: Path | None) -> str:
 
 queue_payload = json.loads(queue_path.read_text())
 batch_name = queue_payload.get("batch_name") or queue_path.name.removesuffix(".manual-review-queue.json")
+review_path = queue_path.parent / f"{batch_name}.ai-review.json"
 precommit_payload = json.loads(precommit_path.read_text()) if precommit_path.exists() else {}
 precommit_status = precommit_payload.get("readiness_status") or "missing"
+items = [item for item in (queue_payload.get("items") or []) if isinstance(item, dict)]
+pending_count = sum(1 for item in items if item.get("operator_status") in {"pending", "pending_manual_review"})
 
 print()
 print("OPERATOR SUMMARY")
@@ -651,8 +654,13 @@ if apply_ran and validation_path.exists():
     print(f"VALIDATION ARTIFACT: {repo_relative(validation_path)}")
 
 if apply_ran:
-    print("CURRENT STATE: COMPLETE")
-    print("RECOMMENDED COMMAND: ./bin/equitystack current-admin run")
+    if pending_count > 0:
+        print("CURRENT STATE: EXCEPTION_QUEUE_READY")
+        print(f"NEXT STEP: Resolve the remaining {pending_count} manual-review exception(s), then resync the queue.")
+        print(f"RECOMMENDED COMMAND: ./bin/equitystack current-admin review --input {repo_relative(review_path)}")
+    else:
+        print("CURRENT STATE: COMPLETE")
+        print("RECOMMENDED COMMAND: ./bin/equitystack current-admin run")
 else:
     print("CURRENT STATE: PRECOMMIT_READY")
     print(f"RECOMMENDED COMMAND: ./bin/equitystack current-admin apply --input {repo_relative(queue_path)} --apply --yes")
