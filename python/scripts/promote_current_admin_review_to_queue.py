@@ -8,6 +8,7 @@ from typing import Any
 from current_admin_common import (
     AUTO_APPROVED_QUEUE_KEY,
     AUTO_REJECTED_QUEUE_KEY,
+    decision_available_operator_actions,
     existing_record_auto_resolution,
     get_current_admin_reports_dir,
     load_json_file,
@@ -303,6 +304,7 @@ def build_queue_item(
 def build_decision_item(index: int, queue_item: dict[str, Any]) -> dict[str, Any]:
     ai_review = queue_item.get("ai_review") or {}
     suggestions = ai_review.get("suggestions") or {}
+    structured_edit_payload = None
     return {
         "index": index,
         "slug": queue_item.get("slug"),
@@ -314,6 +316,11 @@ def build_decision_item(index: int, queue_item: dict[str, Any]) -> dict[str, Any
         "operator_notes": "",
         "final_decision_summary": "",
         "timestamp": None,
+        "structured_edit_payload": structured_edit_payload,
+        "has_structured_edit_payload": False,
+        "available_operator_actions": decision_available_operator_actions(
+            {"structured_edit_payload": structured_edit_payload}
+        ),
         "ai_record_action_suggestion": suggestions.get("record_action_suggestion"),
         "impact_status": queue_item.get("impact_status"),
         "ai_recommended_action": ai_review.get("recommended_action") or suggestions.get("recommended_action"),

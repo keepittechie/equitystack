@@ -5,16 +5,32 @@ import { useEffect, useState, useTransition } from "react";
 import { readAdminJsonResponse } from "@/app/admin/components/readAdminJsonResponse";
 import OperatorActionButton from "@/app/admin/components/OperatorActionButton";
 
-const DECISION_OPTIONS = [
-  { value: "", label: "Choose action" },
-  { value: "approve_as_is", label: "approve_as_is" },
-  { value: "approve_with_changes", label: "approve_with_changes" },
-  { value: "manual_review_required", label: "manual_review_required" },
-  { value: "needs_more_sources", label: "needs_more_sources" },
-  { value: "defer", label: "defer" },
-  { value: "reject", label: "reject" },
-  { value: "escalate", label: "escalate" },
-];
+const DECISION_LABELS = {
+  "": "Choose action",
+  approve_as_is: "approve_as_is",
+  approve_with_changes: "approve_with_changes",
+  manual_review_required: "manual_review_required",
+  needs_more_sources: "needs_more_sources",
+  defer: "defer",
+  reject: "reject",
+  escalate: "escalate",
+};
+
+function decisionOptionsForItem(item) {
+  const configured = Array.isArray(item?.available_operator_actions)
+    ? item.available_operator_actions
+        .map((entry) => normalizeString(entry))
+        .filter(Boolean)
+    : [];
+  const values = configured.length ? configured : ["approve_as_is", "manual_review_required", "needs_more_sources", "defer", "reject", "escalate"];
+  return [
+    { value: "", label: DECISION_LABELS[""] },
+    ...values.map((value) => ({
+      value,
+      label: DECISION_LABELS[value] || value,
+    })),
+  ];
+}
 
 function cloneItems(items) {
   return items.map((item) => ({ ...item, suggested_checks: [...(item.suggested_checks || [])] }));
@@ -1209,7 +1225,8 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
           refreshes the append-only decision log, and re-synchronizes manual-review queue state before pre-commit.
         </p>
         <p className="text-[12px] text-[var(--admin-text-soft)]">
-          `approve_as_is` and `approve_with_changes` only resolve the editable manual-review slice.
+          `approve_as_is` resolves the editable manual-review slice. `needs_more_sources` now queues a read-only
+          evidence refresh, `escalate` queues paired deep review, and `defer` parks the row outside the active slice.
           Import eligibility still comes from the canonical queue plus pre-commit and import dry-run.
         </p>
         {!finalizePermission.allowed ? (
@@ -1471,12 +1488,17 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
                       onChange={(event) => updateItem(item.slug, "operator_action", event.target.value)}
                       className="w-full min-w-[11rem] rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] px-2 py-1 text-[12px] text-[var(--admin-text)]"
                     >
-                      {DECISION_OPTIONS.map((option) => (
+                      {decisionOptionsForItem(item).map((option) => (
                         <option key={option.value || "blank"} value={option.value}>
                           {option.label}
                         </option>
                       ))}
                     </select>
+                    {!item.has_structured_edit_payload ? (
+                      <div className="mt-1 text-[11px] text-[var(--admin-text-soft)]">
+                        `approve_with_changes` stays hidden until a structured edit payload exists for this row.
+                      </div>
+                    ) : null}
                   </td>
                   <td className="border-b border-[var(--admin-line)] px-3 py-2">
                     <details className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] p-2">

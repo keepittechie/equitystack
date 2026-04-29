@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import Any
 
 from current_admin_common import (
+    has_structured_edit_payload,
     derive_csv_path,
     existing_record_auto_resolution,
     get_db_connection,
@@ -1103,6 +1104,11 @@ def load_operator_decisions(path: Path) -> tuple[dict[str, dict[str, Any]], dict
                 f"Decision file entry for slug={slug} is missing a valid operator_action. "
                 "Regenerate the template with 'equitystack current-admin review --refresh-template' if the file is stale, then fill one of the documented operator actions."
             )
+        if action == "approve_with_changes" and not has_structured_edit_payload(item):
+            raise ValueError(
+                f"Decision file entry for slug={slug} uses approve_with_changes but does not carry a structured_edit_payload. "
+                "Use approve_as_is for source-identical approval, or add a structured edit payload before approving with changes."
+            )
     return decisions, metadata
 
 
@@ -1150,6 +1156,7 @@ def build_decision_log_payload(
                 "operator_notes": normalize_nullable_text(decision.get("operator_notes")),
                 "final_decision_summary": normalize_nullable_text(decision.get("final_decision_summary")),
                 "timestamp": normalize_nullable_text(decision.get("timestamp")) or datetime.now(timezone.utc).isoformat(),
+                "structured_edit_payload": decision.get("structured_edit_payload"),
                 "ai_record_action_suggestion": ai_record_action_suggestion,
                 "decision_alignment": determine_decision_alignment(ai_record_action_suggestion, operator_action),
                 "ai_suggestions_snapshot": suggestion,

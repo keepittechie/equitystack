@@ -1078,6 +1078,43 @@ run_current_admin_finalize_review() {
   if [ "$feedback_summary" = "true" ]; then
     total_steps="3"
   fi
+  resolve_current_admin_automation_artifacts "$REVIEW_ARTIFACT_BATCH_NAME"
+
+  local -a follow_up_plan=()
+  mapfile -t follow_up_plan < <(
+    CURRENT_ADMIN_DECISION_FILE="$decision_file" "$VENV_PYTHON" - <<'PY'
+import json
+import os
+from pathlib import Path
+
+decision_file = Path(os.environ["CURRENT_ADMIN_DECISION_FILE"]).resolve()
+payload = json.loads(decision_file.read_text()) if decision_file.exists() else {}
+items = [item for item in (payload.get("items") or []) if isinstance(item, dict)]
+
+def slugs_for(action: str) -> list[str]:
+    return [
+        str(item.get("slug")).strip()
+        for item in items
+        if str(item.get("operator_action") or "").strip() == action and str(item.get("slug") or "").strip()
+    ]
+
+needs_more_sources = slugs_for("needs_more_sources")
+escalated = slugs_for("escalate")
+print(len(needs_more_sources))
+print(",".join(needs_more_sources))
+print(len(escalated))
+print(",".join(escalated))
+PY
+  )
+  local needs_more_sources_count="${follow_up_plan[0]:-0}"
+  local needs_more_sources_csv="${follow_up_plan[1]:-}"
+  local escalated_count="${follow_up_plan[2]:-0}"
+  local escalated_csv="${follow_up_plan[3]:-}"
+  total_steps="$((total_steps + (needs_more_sources_count > 0 ? 1 : 0) + (escalated_count > 0 ? 1 : 0)))"
+  local next_step_number="3"
+  if [ "$feedback_summary" = "true" ]; then
+    next_step_number="4"
+  fi
 
   local -a finalize_args=(
     "$VENV_PYTHON"
@@ -1122,10 +1159,49 @@ run_current_admin_finalize_review() {
       node scripts/export_current_admin_feedback_summary.mjs
   fi
 
+  if [ "${needs_more_sources_count:-0}" -gt 0 ]; then
+    local -a evidence_refresh_args=(
+      "$VENV_PYTHON"
+      scripts/discover_current_admin_outcome_evidence.py
+      --input "$REVIEW_ARTIFACT_NORMALIZED_PATH"
+      --include-all-statuses
+      --output "$CURRENT_ADMIN_OUTCOME_EVIDENCE_PATH"
+    )
+    local refresh_slug=""
+    IFS=',' read -r -a _current_admin_refresh_slugs <<< "$needs_more_sources_csv"
+    for refresh_slug in "${_current_admin_refresh_slugs[@]}"; do
+      if [ -n "$refresh_slug" ]; then
+        evidence_refresh_args+=(--only-record-key "$refresh_slug")
+      fi
+    done
+    run_step "${next_step_number}/${total_steps}" "Refresh Outcome Evidence" "Read-only outcome-evidence refresh complete for needs_more_sources items" --output "$CURRENT_ADMIN_OUTCOME_EVIDENCE_PATH" -- \
+      "${evidence_refresh_args[@]}"
+    next_step_number="$((next_step_number + 1))"
+  fi
+
+  if [ "${escalated_count:-0}" -gt 0 ]; then
+    local -a deep_review_args=(
+      "$VENV_PYTHON"
+      scripts/current_admin_paired_evaluation.py
+      --paired-experiment
+      --input "$REVIEW_ARTIFACT_NORMALIZED_PATH"
+      --experiment-name "operator-escalation"
+    )
+    local escalated_slug=""
+    IFS=',' read -r -a _current_admin_escalated_slugs <<< "$escalated_csv"
+    for escalated_slug in "${_current_admin_escalated_slugs[@]}"; do
+      if [ -n "$escalated_slug" ]; then
+        deep_review_args+=(--only-slug "$escalated_slug")
+      fi
+    done
+    run_step "${next_step_number}/${total_steps}" "Run Escalated Deep Review" "Paired deep-review follow-up prepared for escalated items" -- \
+      "${deep_review_args[@]}"
+  fi
+
   print_system_state \
-    "QUEUE_READY" \
-    "Generate the pre-commit artifact from the synchronized manual review queue" \
-    "$(cli_hint) current-admin pre-commit --input $(repo_relative_path "$REVIEW_ARTIFACT_QUEUE_PATH")" \
+    "DECISION_SYNC_COMPLETE" \
+    "Decision sync finished and any requested follow-up automation has been queued." \
+    "$(cli_hint) current-admin status --batch-name $REVIEW_ARTIFACT_BATCH_NAME" \
     "REVIEW ARTIFACT: $(repo_relative_path "$REVIEW_ARTIFACT_PATH")" \
     "DECISION FILE: $decision_file" \
     "MANUAL QUEUE: $(repo_relative_path "$REVIEW_ARTIFACT_QUEUE_PATH")"

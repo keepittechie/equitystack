@@ -116,6 +116,18 @@ This is review-first and artifact-first. It does not bypass:
 1. refreshes the queue split and decision template from `scripts/promote_current_admin_review_to_queue.py`
 2. if manual rows remain and the decision file is valid, replays those decisions with `scripts/review_current_admin_batch_with_openai_batch.py --decision-file ... --log-decisions`
 3. syncs queue approval state with `scripts/sync_current_admin_queue_decisions.py`
+4. if any row is marked `needs_more_sources`, runs a read-only `current-admin outcome-evidence` refresh for those rows
+5. if any row is marked `escalate`, runs a paired deep-review follow-up for those rows
+
+Manual-review operator actions are now operational, not just labels:
+
+- `approve_as_is`: marks the row import-ready
+- `approve_with_changes`: only valid when the decision item carries a real `structured_edit_payload`
+- `manual_review_required`: keeps the row in the active manual-review slice
+- `needs_more_sources`: removes the row from the active slice and queues a read-only evidence refresh
+- `escalate`: removes the row from the active slice and queues paired deep review
+- `defer`: parks the row outside the active slice without approving it for import
+- `reject`: resolves the row out of the active slice without approving it for import
 
 `current-admin deep-review` runs:
 

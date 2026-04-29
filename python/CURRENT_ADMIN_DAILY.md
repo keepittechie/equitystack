@@ -84,6 +84,10 @@ Useful flags:
 - auto-resolves already-tracked rows when discovery only shows no material change or a source-refresh update
 - asks for operator decisions only on the remaining manual-review rows
 - writes the decision log only when those manual decisions are needed
+- `needs_more_sources` queues a read-only outcome-evidence refresh for those rows
+- `escalate` queues paired deep review for those rows
+- `defer` parks the row so it stops surfacing as active manual-review noise
+- `approve_with_changes` is only valid when a structured edit payload exists
 - the admin surface labels this step `Sync Decision Log`
 
 `apply`

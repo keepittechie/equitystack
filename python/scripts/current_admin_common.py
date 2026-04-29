@@ -124,6 +124,14 @@ EXISTING_RECORD_GENERIC_MATCH_KEYWORDS = {
 }
 DEFAULT_DISCOVERY_PROMISE_TYPE = "Official Promise"
 DEFAULT_DISCOVERY_CAMPAIGN_OR_OFFICIAL = "Official"
+APPROVAL_ACTIONS = {"approve_as_is", "approve_with_changes"}
+FOLLOW_UP_OPERATOR_ACTIONS = {"needs_more_sources", "defer", "reject", "escalate"}
+ACTIVE_MANUAL_REVIEW_OPERATOR_ACTIONS = {"manual_review_required"}
+STRUCTURED_EDIT_PAYLOAD_KEYS = (
+    "structured_edit_payload",
+    "field_changes",
+    "edit_payload",
+)
 DB_ENV_KEYS = ("DB_HOST", "DB_PORT", "DB_USER", "DB_PASSWORD", "DB_NAME")
 DEFAULT_DB_SETTINGS = {
     "DB_HOST": "127.0.0.1",
@@ -241,6 +249,43 @@ def normalize_text(value: Any) -> str:
 def normalize_nullable_text(value: Any) -> str | None:
     text = normalize_text(value)
     return text or None
+
+
+def has_structured_edit_payload(value: Any) -> bool:
+    if not isinstance(value, dict):
+        return False
+    for key in STRUCTURED_EDIT_PAYLOAD_KEYS:
+        payload = value.get(key)
+        if isinstance(payload, dict) and payload:
+            return True
+        if isinstance(payload, list) and payload:
+            return True
+        if isinstance(payload, str) and payload.strip():
+            return True
+    return False
+
+
+def decision_available_operator_actions(value: Any) -> list[str]:
+    options = ["approve_as_is"]
+    if has_structured_edit_payload(value):
+        options.append("approve_with_changes")
+    options.extend(
+        [
+            "manual_review_required",
+            "needs_more_sources",
+            "defer",
+            "reject",
+            "escalate",
+        ]
+    )
+    return options
+
+
+def operator_action_keeps_active_manual_review(operator_action: Any) -> bool:
+    action = normalize_text(operator_action)
+    if not action:
+        return True
+    return action in ACTIVE_MANUAL_REVIEW_OPERATOR_ACTIONS
 
 
 def normalize_token_set(value: Any) -> set[str]:

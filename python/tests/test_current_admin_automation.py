@@ -19,6 +19,7 @@ if "pymysql" not in sys.modules:
 import apply_current_admin_outcome_enrichment as enrichment  # noqa: E402
 import current_admin_common as current_admin  # noqa: E402
 import evaluate_impact_maturation as impact  # noqa: E402
+import sync_current_admin_queue_decisions as queue_sync  # noqa: E402
 
 
 def sample_evidence_match(**overrides) -> dict:
@@ -108,6 +109,45 @@ def sample_enrichment_record(**overrides) -> dict:
 
 
 class CurrentAdminAutomationTests(unittest.TestCase):
+    def test_approve_with_changes_requires_structured_edit_payload(self) -> None:
+        self.assertNotIn("approve_with_changes", current_admin.decision_available_operator_actions({}))
+        self.assertIn(
+            "approve_with_changes",
+            current_admin.decision_available_operator_actions(
+                {"structured_edit_payload": {"title": "Revised title"}}
+            ),
+        )
+        self.assertTrue(
+            current_admin.has_structured_edit_payload(
+                {"structured_edit_payload": {"title": "Revised title"}}
+            )
+        )
+
+    def test_queue_follow_up_states_are_distinct_from_manual_review(self) -> None:
+        approved = queue_sync.derive_queue_state("approve_as_is")
+        needs_more_sources = queue_sync.derive_queue_state("needs_more_sources")
+        deferred = queue_sync.derive_queue_state("defer")
+        escalated = queue_sync.derive_queue_state("escalate")
+
+        self.assertEqual(approved, (True, "approved", None, None, None))
+        self.assertEqual(needs_more_sources[1], "needs_more_sources")
+        self.assertEqual(needs_more_sources[2], "evidence_refresh")
+        self.assertEqual(needs_more_sources[3], "queued")
+        self.assertEqual(deferred[1], "deferred")
+        self.assertEqual(deferred[2], "park_for_later")
+        self.assertEqual(deferred[3], "parked")
+        self.assertEqual(escalated[1], "escalated")
+        self.assertEqual(escalated[2], "deep_review")
+        self.assertEqual(escalated[3], "queued")
+
+    def test_operator_action_keeps_active_manual_review_only_for_blank_or_manual_required(self) -> None:
+        self.assertTrue(current_admin.operator_action_keeps_active_manual_review(""))
+        self.assertTrue(current_admin.operator_action_keeps_active_manual_review("manual_review_required"))
+        self.assertFalse(current_admin.operator_action_keeps_active_manual_review("needs_more_sources"))
+        self.assertFalse(current_admin.operator_action_keeps_active_manual_review("defer"))
+        self.assertFalse(current_admin.operator_action_keeps_active_manual_review("reject"))
+        self.assertFalse(current_admin.operator_action_keeps_active_manual_review("escalate"))
+
     def test_existing_record_auto_resolution_ignores_low_signal_admin_notice_candidates(self) -> None:
         record = {
             "slug": "trump-2025-domestic-production-of-critical-medicines",

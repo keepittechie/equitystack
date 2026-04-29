@@ -71,6 +71,7 @@ Safety:
 - `current-admin apply` is dry-run unless `--apply --yes` is explicit.
 - the canonical `manual-review-queue.json` artifact now splits into `items`, `auto_approved_items`, and `auto_rejected_items`.
 - current-admin human review is now limited to the `items` slice; safe batches continue through guarded import, evidence, impact, and enrichment without routine operator decisions.
+- within that manual slice, `needs_more_sources` now queues read-only outcome-evidence refresh, `escalate` queues paired deep review, `defer` parks the row outside the active slice, and `approve_with_changes` is only valid when a structured edit payload exists.
 - `current-admin deep-review` is the explicit deeper AI path when the standard review recommends more scrutiny.
 - `current-admin outcome-evidence` is active and read-only. It now runs inside the default full `current-admin run` path after guarded import.
 - `impact evaluate --auto-approve-safe-supplemental --dry-run` is read-only and is the only path that can mark supplemental impact transitions as explicitly validator-approved.

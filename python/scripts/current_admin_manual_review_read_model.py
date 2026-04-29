@@ -6,7 +6,13 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from current_admin_common import get_current_admin_reports_dir, normalize_nullable_text
+from current_admin_common import (
+    decision_available_operator_actions,
+    get_current_admin_reports_dir,
+    has_structured_edit_payload,
+    normalize_nullable_text,
+    operator_action_keeps_active_manual_review,
+)
 from current_admin_openai_batch_guardrails import output_path_for_review, validation_path_for_review
 
 
@@ -422,7 +428,13 @@ def load_operator_actions(review_path: Path) -> dict[str, dict[str, Any]]:
             slug = normalize_nullable_text(item.get("slug"))
             action = normalize_nullable_text(item.get("operator_action"))
             if slug and action:
-                actions[slug] = {"operator_action": action, "decision_source": source, "decision_artifact_path": str(template_path)}
+                actions[slug] = {
+                    "operator_action": action,
+                    "decision_source": source,
+                    "decision_artifact_path": str(template_path),
+                    "has_structured_edit_payload": has_structured_edit_payload(item),
+                    "available_operator_actions": decision_available_operator_actions(item),
+                }
 
     decisions_dir = get_current_admin_reports_dir() / "review_decisions"
     if decisions_dir.exists():
@@ -437,7 +449,13 @@ def load_operator_actions(review_path: Path) -> dict[str, dict[str, Any]]:
                 slug = normalize_nullable_text(item.get("slug"))
                 action = normalize_nullable_text(item.get("operator_action"))
                 if slug and action:
-                    actions[slug] = {"operator_action": action, "decision_source": "decision_log", "decision_artifact_path": str(log_path)}
+                    actions[slug] = {
+                        "operator_action": action,
+                        "decision_source": "decision_log",
+                        "decision_artifact_path": str(log_path),
+                        "has_structured_edit_payload": has_structured_edit_payload(item),
+                        "available_operator_actions": decision_available_operator_actions(item),
+                    }
     return actions
 
 
@@ -458,6 +476,9 @@ def build_manual_review_items(review_path: Path) -> list[dict[str, Any]]:
             continue
         reason_label = primary_reason_label(reason_labels)
         action = operator_actions.get(item_id, {})
+        operator_action = action.get("operator_action")
+        if operator_action and not operator_action_keeps_active_manual_review(operator_action):
+            continue
         unresolved = not bool(action.get("operator_action"))
         blocked_by_malformed_output = reason_label == "schema/validation issue"
         decision_checklist = decision_checklist_for(
@@ -513,9 +534,12 @@ def build_manual_review_items(review_path: Path) -> list[dict[str, Any]]:
                 "primary_decision_check": decision_checklist[0] if decision_checklist else None,
                 "decision_support_summary": decision_support_summary,
                 "unresolved": unresolved,
-                "operator_action": action.get("operator_action"),
+                "operator_action": operator_action,
                 "decision_source": action.get("decision_source"),
                 "decision_artifact_path": action.get("decision_artifact_path"),
+                "has_structured_edit_payload": bool(action.get("has_structured_edit_payload")),
+                "available_operator_actions": action.get("available_operator_actions")
+                or decision_available_operator_actions(action),
                 "classifier_fields_source": context["classifier_fields_source"],
             }
         )

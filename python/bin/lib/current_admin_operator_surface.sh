@@ -333,6 +333,17 @@ VALID_OPERATOR_ACTIONS = {
     "escalate",
 }
 
+def has_structured_edit_payload(item: dict) -> bool:
+    for key in ("structured_edit_payload", "field_changes", "edit_payload"):
+        value = item.get(key)
+        if isinstance(value, dict) and value:
+            return True
+        if isinstance(value, list) and value:
+            return True
+        if isinstance(value, str) and value.strip():
+            return True
+    return False
+
 review_path = Path(os.environ["CURRENT_ADMIN_REVIEW_PATH"]).resolve()
 decision_file = Path(os.environ["CURRENT_ADMIN_DECISION_FILE"]).resolve()
 
@@ -380,6 +391,9 @@ for item in items:
         continue
     action = str(item.get("operator_action") or "").strip()
     if action not in VALID_OPERATOR_ACTIONS:
+        invalid += 1
+        continue
+    if action == "approve_with_changes" and not has_structured_edit_payload(item):
         invalid += 1
         continue
     counts[action] += 1
@@ -552,21 +566,39 @@ if finalized and decision_log.exists():
     approval_style = int(counts.get("approve_as_is") or 0) + int(counts.get("approve_with_changes") or 0)
     rejected = int(counts.get("reject") or 0)
     deferred = int(counts.get("defer") or 0)
+    needs_more_sources = int(counts.get("needs_more_sources") or 0)
+    escalated = int(counts.get("escalate") or 0)
+    manual_review_required = int(counts.get("manual_review_required") or 0)
     queue_approved = sum(1 for item in auto_approved_items if isinstance(item, dict))
     queue_approved += sum(1 for item in queue_items if isinstance(item, dict) and (item.get("approved") or item.get("operator_status") == "approved"))
     queue_pending_manual = sum(1 for item in queue_items if isinstance(item, dict) and item.get("operator_status") == "pending_manual_review")
     queue_pending = sum(1 for item in queue_items if isinstance(item, dict) and item.get("operator_status") == "pending")
+    queue_deferred = sum(1 for item in queue_items if isinstance(item, dict) and item.get("operator_status") == "deferred")
+    queue_needs_more_sources = sum(1 for item in queue_items if isinstance(item, dict) and item.get("operator_status") == "needs_more_sources")
+    queue_escalated = sum(1 for item in queue_items if isinstance(item, dict) and item.get("operator_status") == "escalated")
+    queue_rejected = sum(1 for item in queue_items if isinstance(item, dict) and item.get("operator_status") == "rejected")
     print(f"DECISION LOG: {repo_relative(decision_log)}")
     print(f"APPROVAL-STYLE DECISIONS: {approval_style}")
+    print(f"MANUAL REVIEW REQUIRED: {manual_review_required}")
+    print(f"NEEDS MORE SOURCES: {needs_more_sources}")
+    print(f"ESCALATED: {escalated}")
+    print(f"DEFERRED: {deferred}")
     print(f"QUEUE APPROVED FOR IMPORT: {queue_approved}")
     print(f"QUEUE HELD FOR REVIEW: {queue_pending_manual}")
     print(f"QUEUE STILL PENDING: {queue_pending}")
+    print(f"QUEUE NEEDS MORE SOURCES: {queue_needs_more_sources}")
+    print(f"QUEUE ESCALATED: {queue_escalated}")
+    print(f"QUEUE DEFERRED: {queue_deferred}")
     print(f"REJECTED: {rejected}")
-    print(f"DEFERRED: {deferred}")
+    print(f"QUEUE REJECTED: {queue_rejected}")
     if queue_approved > 0:
         print("CURRENT STATE: QUEUE_READY")
         print("NEXT STEP: Run the guarded apply flow starting with pre-commit.")
         print(f"RECOMMENDED COMMAND: ./bin/equitystack current-admin apply --input {repo_relative(queue_path)}")
+    elif queue_needs_more_sources > 0 or queue_escalated > 0 or queue_deferred > 0:
+        print("CURRENT STATE: FOLLOW_UP_QUEUED")
+        print("NEXT STEP: Inspect the refreshed evidence or paired deep-review artifacts before reopening review.")
+        print(f"RECOMMENDED COMMAND: ./bin/equitystack current-admin status --batch-name {batch_name}")
     elif queue_pending_manual == 0 and queue_pending == 0 and rejected > 0:
         print("CURRENT STATE: COMPLETE")
         print("NEXT STEP: This batch produced no importable records after AI-first review.")
