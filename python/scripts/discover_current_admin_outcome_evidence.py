@@ -343,6 +343,84 @@ GENERIC_TOPIC_LABELS = {
     "Voting Rights",
     "Transportation Security / Workforce",
 }
+POLICY_QUERY_TERM_EXPANSIONS = {
+    "encampment": [
+        "encampment clearance policy",
+        "civil commitment homelessness enforcement",
+        "street-order responses",
+        "homelessness enforcement guidance",
+    ],
+    "civil commitment": [
+        "civil commitment homelessness enforcement",
+        "street-order responses",
+    ],
+    "skilled trade": [
+        "high-paying skilled trade jobs of the future",
+        "registered apprenticeship expansion",
+        "registered apprenticeship modernization",
+        "apprenticeship grant funding",
+    ],
+    "apprenticeship": [
+        "registered apprenticeship expansion",
+        "registered apprenticeship system guidance",
+        "apprenticeship grant funding",
+    ],
+    "school discipline": [
+        "common sense school discipline policies",
+        "student discipline guidance",
+        "discipline disparate impact guidance",
+    ],
+    "hbcu": [
+        "hbcu excellence and innovation",
+        "historically black colleges and universities initiative",
+        "white house initiative on hbcus",
+    ],
+    "law enforcement": [
+        "state and local law enforcement support",
+        "restore law and order policing",
+        "local policing support",
+    ],
+    "proof of citizenship": [
+        "proof of citizenship election order",
+        "paper ballot safeguards",
+        "election integrity order",
+    ],
+    "paper-ballot": [
+        "paper ballot safeguards",
+        "election integrity order",
+    ],
+    "school choice": [
+        "education freedom initiative",
+        "school choice guidance",
+        "education freedom programs",
+    ],
+    "educational freedom": [
+        "education freedom initiative",
+        "school choice guidance",
+    ],
+    "accreditation": [
+        "accreditation reform student outcomes",
+        "higher education accreditor guidance",
+    ],
+    "critical medicines": [
+        "critical medicines production",
+        "domestic pharmaceutical supply chain",
+        "essential medicines manufacturing",
+    ],
+    "dei": [
+        "dei program rescission",
+        "equity program termination",
+        "anti-dei guidance",
+    ],
+}
+BROAD_RELEVANCE_TITLE_HINTS = {
+    "unemployment insurance weekly claims report",
+    "national apprenticeship week",
+}
+BROAD_RELEVANCE_SUMMARY_HINTS = {
+    "advance figure for seasonally adjusted initial claims",
+    "4-week moving average",
+}
 
 
 def parse_args() -> argparse.Namespace:
@@ -537,6 +615,14 @@ def compact_text_list(values: list[str]) -> list[str]:
     return compacted
 
 
+def compact_lower_text_list(values: list[str]) -> list[str]:
+    return [
+        value.lower()
+        for value in compact_text_list(values)
+        if normalize_nullable_text(value)
+    ]
+
+
 def evidence_match_tokens(text: Any) -> set[str]:
     from discover_current_admin_updates import tokenize
 
@@ -606,6 +692,15 @@ def parse_iso_date(value: Any) -> datetime | None:
         return datetime.fromisoformat(text)
     except ValueError:
         return None
+
+
+def cleaned_policy_title(value: Any) -> str | None:
+    text = normalize_nullable_text(value)
+    if not text:
+        return None
+    cleaned = re.sub(r"^(Fact Sheet:|Agenda47:)\s*", "", text, flags=re.IGNORECASE)
+    cleaned = re.sub(r"^President Donald J\. Trump\s+", "", cleaned, flags=re.IGNORECASE)
+    return normalize_nullable_text(cleaned)
 
 
 def record_text_fragments(record: dict[str, Any], promise_like_record: dict[str, Any]) -> list[str]:
@@ -698,6 +793,24 @@ def record_source_fragments(record_payload: dict[str, Any]) -> list[str]:
     return compact_text_list([fragment for fragment in fragments if fragment])
 
 
+def record_source_dates(record_payload: dict[str, Any]) -> list[str]:
+    discovery_context = record_payload.get("discovery_context") if isinstance(record_payload.get("discovery_context"), dict) else {}
+    dates: list[str] = []
+    for source in (record_payload.get("promise_sources") or [])[:8]:
+        if isinstance(source, dict):
+            dates.append(normalize_feed_date(source.get("published_date") or source.get("source_date")) or "")
+    for source in (discovery_context.get("preserved_discovery_sources") or [])[:8]:
+        if isinstance(source, dict):
+            dates.append(normalize_feed_date(source.get("published_date") or source.get("source_date")) or "")
+    for candidate in (discovery_context.get("selected_candidates") or [])[:6]:
+        if not isinstance(candidate, dict):
+            continue
+        for source in (candidate.get("source_references") or [])[:6]:
+            if isinstance(source, dict):
+                dates.append(normalize_feed_date(source.get("published_date") or source.get("source_date")) or "")
+    return [value for value in dates if value]
+
+
 def record_exact_phrases(record: dict[str, Any], promise_like_record: dict[str, Any]) -> list[str]:
     record_payload = record.get("record") or {}
     discovery_context = record_payload.get("discovery_context") if isinstance(record_payload.get("discovery_context"), dict) else {}
@@ -725,6 +838,63 @@ def record_exact_phrases(record: dict[str, Any], promise_like_record: dict[str, 
     ]
 
 
+def generate_policy_query_terms(record: dict[str, Any], promise_like_record: dict[str, Any]) -> list[str]:
+    record_payload = record.get("record") or {}
+    discovery_context = record_payload.get("discovery_context") if isinstance(record_payload.get("discovery_context"), dict) else {}
+    linked_snapshot = discovery_context.get("linked_promise_snapshot") if isinstance(discovery_context.get("linked_promise_snapshot"), dict) else {}
+    base_titles = compact_text_list(
+        [
+            cleaned_policy_title(promise_like_record.get("title")),
+            cleaned_policy_title(linked_snapshot.get("title")),
+            *[
+                cleaned_policy_title(source.get("source_title"))
+                for source in (discovery_context.get("preserved_discovery_sources") or [])[:4]
+                if isinstance(source, dict)
+            ],
+            *[
+                cleaned_policy_title(source.get("source_title"))
+                for candidate in (discovery_context.get("selected_candidates") or [])[:4]
+                if isinstance(candidate, dict)
+                for source in (candidate.get("source_references") or [])[:4]
+                if isinstance(source, dict)
+            ],
+        ]
+    )
+    query_terms = list(base_titles)
+    combined = normalize_text(
+        " ".join(
+            [
+                record.get("slug") or "",
+                promise_like_record.get("title") or "",
+                linked_snapshot.get("title") or "",
+                *(base_titles or []),
+            ]
+        )
+    ).lower()
+    for trigger, expansions in POLICY_QUERY_TERM_EXPANSIONS.items():
+        if trigger in combined:
+            query_terms.extend(expansions)
+    agencies = extract_canonical_hints(combined, AGENCY_HINTS)
+    programs = extract_canonical_hints(combined, PROGRAM_HINTS)
+    for agency in agencies[:2]:
+        for program in programs[:3]:
+            query_terms.append(f"{agency} {program}")
+    return [
+        term
+        for term in compact_text_list(query_terms)
+        if len((term or "").split()) >= 2 and term not in GENERIC_TOPIC_LABELS
+    ]
+
+
+def policy_query_hits(record_profile: dict[str, Any], feed_profile: dict[str, Any]) -> list[str]:
+    feed_text = feed_profile.get("text") or ""
+    return [
+        term
+        for term in (record_profile.get("policy_query_terms") or [])
+        if len(term.split()) >= 2 and text_contains_phrase(feed_text, term)
+    ]
+
+
 def feed_metadata_fragments(feed_item: dict[str, Any]) -> list[str]:
     return compact_text_list(
         [
@@ -746,6 +916,7 @@ def build_record_profile(record: dict[str, Any], promise_like_record: dict[str, 
     linked_snapshot = discovery_context.get("linked_promise_snapshot") if isinstance(discovery_context.get("linked_promise_snapshot"), dict) else {}
     text_fragments = record_text_fragments(record, promise_like_record)
     source_fragments = record_source_fragments(record_payload)
+    query_terms = generate_policy_query_terms(record, promise_like_record)
     linked_snapshot_fragments = compact_text_list(
         [
             normalize_nullable_text(linked_snapshot.get("title")),
@@ -754,7 +925,16 @@ def build_record_profile(record: dict[str, Any], promise_like_record: dict[str, 
             normalize_nullable_text(linked_snapshot.get("status")),
         ]
     )
-    combined_text = normalize_text(" ".join([*text_fragments, *source_fragments])).lower()
+    combined_text = normalize_text(" ".join([*text_fragments, *source_fragments, *query_terms])).lower()
+    source_dates = record_source_dates(record_payload)
+    anchor_candidates = [
+        normalize_feed_date(promise_like_record.get("latest_action_date")),
+        normalize_feed_date(record_payload.get("promise_date")),
+        normalize_feed_date(linked_snapshot.get("latest_action_date")),
+        normalize_feed_date(linked_snapshot.get("promise_date")),
+        *source_dates,
+    ]
+    anchor_date = max((value for value in anchor_candidates if value), default=None)
     return {
         "record_key": normalize_nullable_text(record.get("record_key")),
         "slug": normalize_nullable_text(record.get("slug")),
@@ -763,6 +943,7 @@ def build_record_profile(record: dict[str, Any], promise_like_record: dict[str, 
             [
                 normalize_nullable_text(promise_like_record.get("title")),
                 normalize_nullable_text(linked_snapshot.get("title")),
+                *query_terms,
                 *record_exact_phrases(record, promise_like_record),
             ]
         ),
@@ -783,13 +964,11 @@ def build_record_profile(record: dict[str, Any], promise_like_record: dict[str, 
         "policy_id": normalize_nullable_text(
             record_payload.get("policy_id") or record_payload.get("id") or promise_like_record.get("id") or linked_snapshot.get("id")
         ),
-        "anchor_date": normalize_nullable_text(promise_like_record.get("latest_action_date"))
-        or normalize_nullable_text(record_payload.get("promise_date"))
-        or normalize_nullable_text(linked_snapshot.get("latest_action_date"))
-        or normalize_nullable_text(linked_snapshot.get("promise_date")),
+        "anchor_date": anchor_date,
         "topic": normalize_nullable_text(promise_like_record.get("topic")),
         "linked_slug": normalize_nullable_text((discovery_context.get("linked_promise_slug") or linked_snapshot.get("slug"))),
         "linked_snapshot_fragments": linked_snapshot_fragments,
+        "policy_query_terms": compact_lower_text_list(query_terms),
     }
 
 
@@ -894,6 +1073,27 @@ def title_match_component(record_profile: dict[str, Any], feed_profile: dict[str
     if best_ratio >= 0.58:
         return 10, [f"Partial title similarity to tracked source text ({best_ratio:.2f}): {best_label}"], []
     return 0, [], ["Title similarity is weak"]
+
+
+def policy_relevance_guard(
+    feed_item: dict[str, Any],
+    record_profile: dict[str, Any],
+    feed_profile: dict[str, Any],
+    *,
+    query_hits: list[str],
+    date_window_match: dict[str, Any],
+    title_points: int,
+) -> str | None:
+    title = normalize_text(feed_item.get("title")).lower()
+    summary = normalize_text(feed_item.get("summary")).lower()
+    if title in BROAD_RELEVANCE_TITLE_HINTS and not query_hits:
+        return "Broad agency update lacks any policy-specific query-term linkage"
+    if any(hint in summary for hint in BROAD_RELEVANCE_SUMMARY_HINTS) and not query_hits:
+        return "General statistical or administrative release is not directly tied to the tracked policy language"
+    days_delta = date_window_match.get("days_delta")
+    if days_delta is not None and abs(int(days_delta)) > 365 and not query_hits and title_points < 16:
+        return "Evidence falls well outside the policy action window without explicit policy-language linkage"
+    return None
 
 
 def direct_source_quality_component(feed_item: dict[str, Any], context: dict[str, Any]) -> tuple[int, str, str]:
@@ -1202,6 +1402,22 @@ def compute_scored_match(feed_item: dict[str, Any], record: dict[str, Any], prom
         warnings.append(low_signal)
         score = min(score, 39)
 
+    query_hits = policy_query_hits(record_profile, feed_profile)
+    if query_hits:
+        reasons.append(f"Policy-aware query terms matched: {', '.join(query_hits[:3])}")
+
+    policy_relevance_warning = policy_relevance_guard(
+        feed_item,
+        record_profile,
+        feed_profile,
+        query_hits=query_hits,
+        date_window_match=date_window_match,
+        title_points=title_points,
+    )
+    if policy_relevance_warning:
+        warnings.append(policy_relevance_warning)
+        score = min(score, 45 if query_hits else 39)
+
     if structural_signal_count == 0 and score >= REVIEW_MATCH_MIN:
         warnings.append("No structural match beyond generic text was found; capping to weak match")
         score = min(score, 59)
@@ -1246,6 +1462,7 @@ def compute_scored_match(feed_item: dict[str, Any], record: dict[str, Any], prom
         "match_bucket": match_bucket,
         "match_reasons": compact_text_list(reasons)[:6],
         "match_warnings": compact_text_list(warnings)[:6],
+        "policy_query_hits": compact_lower_text_list(query_hits)[:4],
         "topic_overlap": topic_overlap[:4],
         "agency_overlap": agency_overlap[:3],
         "program_overlap": program_overlap[:4],
@@ -1261,6 +1478,7 @@ def compute_scored_match(feed_item: dict[str, Any], record: dict[str, Any], prom
         "matched_promise_id": record_profile.get("promise_id"),
         "matched_policy_id": record_profile.get("policy_id"),
         "matched_action_id": best_matching_action_id(record, feed_item),
+        "policy_query_terms": record_profile.get("policy_query_terms") or [],
     }
 
 
@@ -1298,6 +1516,8 @@ def build_match(
         "match_bucket": scored["match_bucket"],
         "match_reasons": scored["match_reasons"],
         "match_warnings": scored["match_warnings"],
+        "policy_query_terms": scored["policy_query_terms"],
+        "policy_query_hits": scored["policy_query_hits"],
         "matched_topic_tags": scored["topic_overlap"],
         "topic_overlap": scored["topic_overlap"],
         "agency_overlap": scored["agency_overlap"],
