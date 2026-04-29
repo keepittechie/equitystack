@@ -40,6 +40,12 @@ Deeper AI review path:
 ./bin/equitystack current-admin deep-review --input reports/current_admin/<batch-name>.normalized.json
 ```
 
+Optional evidence path:
+
+```bash
+./bin/equitystack current-admin outcome-evidence --input reports/current_admin/<batch-name>.manual-review-queue.json
+```
+
 ## Practical Model
 
 Current-admin now follows this operator model:
@@ -96,6 +102,12 @@ This is review-first and artifact-first. It does not bypass:
 
 Use it when the standard AI review or operator notes say a batch needs deeper review. It is advisory only. It does not import or mutate data.
 
+`current-admin outcome-evidence` runs:
+
+1. `scripts/discover_current_admin_outcome_evidence.py`
+
+Use it to collect implementation and downstream outcome evidence for already-tracked current-admin rows. This stage is active, but read-only. It is not part of the default `current-admin run` path and does not change review/apply behavior.
+
 `current-admin apply` wraps:
 
 1. `scripts/build_current_admin_precommit_review.py`
@@ -111,6 +123,7 @@ Main artifacts under `reports/current_admin/`:
 - `<batch>.normalization-report.json`
 - `<batch>.ai-review.json`
 - `<batch>.manual-review-queue.json`
+- `<batch>.outcome-evidence.json`
 - `<batch>.decision-template.json`
 - `review_decisions/<batch>.decision-log.json`
 - `<batch>.pre-commit-review.json`
@@ -131,6 +144,22 @@ The queue promotion step is intentionally conservative but now short-circuits tw
 
 Those rows should be auto-resolved before they show up in `/admin/current-admin-review`. Deep review is for the smaller ambiguous remainder, not for stale or source-refresh maintenance rows.
 
+## Controlled Rollout Activation
+
+Active now:
+
+- Phase 1 implementation / execution evidence in discovery and batch context
+- Phase 2 `current-admin outcome-evidence` collection
+
+Built but intentionally not operational:
+
+- Phase 3 impact maturation integration is dry-run only through `impact evaluate --outcome-evidence ...`
+- Phase 4 current-admin unified outcome enrichment is report-only through `impact preview-current-admin-outcome-enrichment`
+- Phase 5 judicial impact is scaffold-only through `impact discover-judicial-candidates`, `impact import-judicial-batch`, and `impact materialize-judicial-outcomes`
+- Phase 6 UI behavior is unchanged; any future rendering of these fields must stay read-only unless separately activated
+
+These controlled-rollout stages do not change current-admin scoring, Black Impact Score logic, current-admin apply behavior, or existing admin layout.
+
 ## Read-Only vs Mutating
 
 - `discover`: read-only
@@ -138,6 +167,7 @@ Those rows should be auto-resolved before they show up in `/admin/current-admin-
 - `normalize`: writes normalized/report artifacts only
 - `ai-review`: advisory only
 - `deep-review`: advisory only
+- `outcome-evidence`: read-only artifact generation only
 - `review`: writes queue/template/log artifacts only
 - `pre-commit`: read-only
 - `apply`: dry-run unless `--apply --yes`
@@ -187,6 +217,8 @@ The review page can legitimately be empty when `auto_approved_items` exist and `
 - Current-admin review uses OpenAI only.
 - The standard review path is single-pass.
 - `current-admin deep-review` is the explicit deeper AI option for ambiguous or higher-risk cases.
+- `current-admin outcome-evidence` never writes DB rows or `policy_outcomes`.
+- `impact promote --apply --yes` blocks any transition that depends on supplemental outcome-evidence recommendations in this rollout.
 - DB-backed commands honor runtime overrides such as `DB_HOST=10.10.0.15`.
 - Preferred local path: rebuild `python/venv` with `./bin/bootstrap-python-env`.
 

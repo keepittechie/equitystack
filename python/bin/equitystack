@@ -2117,6 +2117,22 @@ run_impact_command() {
       run_step "1/1" "Sync Current-Admin Policy Outcomes" "Current-admin policy_outcomes sync complete" --output "$EQUITYSTACK_PYTHON_DIR/reports/current-admin-policy-outcomes-sync.dry-run.json" -- \
         "$VENV_PYTHON" scripts/sync_current_admin_policy_outcomes.py "$@"
       ;;
+    preview-current-admin-outcome-enrichment)
+      run_step "1/1" "Preview Current-Admin Policy Outcome Enrichment" "Current-admin policy_outcome enrichment preview complete" --output "$EQUITYSTACK_PYTHON_DIR/reports/current-admin-policy-outcome-enrichment-preview.json" -- \
+        "$VENV_PYTHON" scripts/preview_current_admin_policy_outcome_enrichment.py "$@"
+      ;;
+    discover-judicial-candidates)
+      run_step "1/1" "Discover Judicial Impact Candidates" "Judicial impact scaffold discovery complete" --output "$EQUITYSTACK_PYTHON_DIR/reports/judicial_impact_candidates.json" -- \
+        "$VENV_PYTHON" scripts/discover_judicial_impact_candidates.py "$@"
+      ;;
+    import-judicial-batch)
+      run_step "1/1" "Validate Judicial Impact Batch" "Judicial impact scaffold import validation complete" --output "$EQUITYSTACK_PYTHON_DIR/reports/judicial_impact_import_report.json" -- \
+        "$VENV_PYTHON" scripts/import_judicial_impact_batch.py "$@"
+      ;;
+    materialize-judicial-outcomes)
+      run_step "1/1" "Preview Judicial Policy Outcomes" "Judicial policy_outcome scaffold preview complete" --output "$EQUITYSTACK_PYTHON_DIR/reports/judicial_policy_outcomes_materialize_report.json" -- \
+        "$VENV_PYTHON" scripts/materialize_judicial_policy_outcomes.py "$@"
+      ;;
     audit-historical-duplicates)
       run_step "1/1" "Audit Historical Policy Duplicates" "Historical policy duplicate audit complete" --output "$EQUITYSTACK_PYTHON_DIR/reports/historical-policy-duplicate-audit.json" -- \
         "$VENV_PYTHON" scripts/audit_historical_policy_duplicates.py "$@"
@@ -2238,6 +2254,16 @@ run_current_admin_command() {
       normalize_current_admin_path_args normalize_args "$@"
       run_step "1/1" "Normalize Batch" "Normalization complete" -- \
         "$VENV_PYTHON" scripts/normalize_current_admin_batch.py "${normalize_args[@]}"
+      ;;
+    outcome-evidence)
+      if [ "${1:-}" = "--help" ] || [ "${1:-}" = "-h" ]; then
+        current_admin_subcommand_usage outcome-evidence
+        exit 0
+      fi
+      local -a outcome_evidence_args=()
+      normalize_current_admin_path_args outcome_evidence_args "$@"
+      run_step "1/1" "Collect Outcome Evidence" "Current-admin outcome evidence collection complete" -- \
+        "$VENV_PYTHON" scripts/discover_current_admin_outcome_evidence.py "${outcome_evidence_args[@]}"
       ;;
     review)
       run_current_admin_operator_review_command "$@"
@@ -2737,6 +2763,8 @@ Current-admin commands:
   ai-review  Run the standard single-pass OpenAI Batch review on a normalized batch
   deep-review
              Run the deeper paired AI review path for ambiguous current-admin records
+  outcome-evidence
+             Read-only implementation and outcome evidence collection for existing current-admin rows
   run        Discover and generate the next batch by default, then normalize, review, and promote the AI-first queue
   review     Promote AI decisions and ask for operator input only on the remaining borderline rows
   apply      Run pre-commit, import dry-run, optional apply, and validation
@@ -2761,6 +2789,10 @@ Impact maturation commands:
   backfill-policy-time-intent  Dry-run or apply safe policy time and intent backfills
   curate-policy-intent  Manually classify missing historical policy intent
   curate-sources  Manually attach operator-provided sources to policy outcomes
+  preview-current-admin-outcome-enrichment  Report-only preview of future current-admin policy_outcomes enrichment
+  discover-judicial-candidates  Scaffold-only judicial impact discovery
+  import-judicial-batch  Scaffold-only judicial impact ingestion validation
+  materialize-judicial-outcomes  Scaffold-only judicial policy_outcomes preview
 
 Operational maintenance:
   weekly-run   Run the low-touch weekly operator check and summary
@@ -2784,10 +2816,13 @@ Examples:
   $(cli_hint) impact validate-integrity
   $(cli_hint) impact complete-certification-readiness
   $(cli_hint) impact backfill-policy-time-intent
+  $(cli_hint) impact preview-current-admin-outcome-enrichment --input reports/current_admin/<batch>.manual-review-queue.json --outcome-evidence reports/current_admin/<batch>.outcome-evidence.json
+  $(cli_hint) impact discover-judicial-candidates
   $(cli_hint) impact curate-policy-intent --non-interactive --limit 10
   $(cli_hint) impact curate-sources --non-interactive --limit 10
   $(cli_hint) current-admin run
   $(cli_hint) current-admin status
+  $(cli_hint) current-admin outcome-evidence --input reports/current_admin/<batch>.manual-review-queue.json
   $(cli_hint) current-admin deep-review --input reports/current_admin/<batch-name>.normalized.json
   $(cli_hint) operator cleanup-stale-workflows --dry-run
   $(cli_hint) admin-reset-operational-state --dry-run
@@ -2837,10 +2872,19 @@ Commands:
              Manually classify missing historical policy intent without overwriting existing values
   curate-sources
              Manually attach operator-provided sources to current-admin policy outcomes
+  preview-current-admin-outcome-enrichment
+             Report-only preview of future current-admin policy_outcomes enrichment
+  discover-judicial-candidates
+             Scaffold-only judicial impact discovery; no scoring or writes
+  import-judicial-batch
+             Scaffold-only judicial impact ingestion validation; apply disabled
+  materialize-judicial-outcomes
+             Scaffold-only judicial policy_outcomes materialization preview; apply disabled
 
 Examples:
   $(cli_hint) impact evaluate
   $(cli_hint) impact evaluate --input reports/current_admin/<batch>.manual-review-queue.json
+  $(cli_hint) impact evaluate --input reports/current_admin/<batch>.manual-review-queue.json --outcome-evidence reports/current_admin/<batch>.outcome-evidence.json
   $(cli_hint) impact promote --dry-run
   $(cli_hint) impact promote --apply --yes
   $(cli_hint) impact promote --apply --yes --approve-safe
@@ -2862,6 +2906,10 @@ Examples:
   $(cli_hint) impact audit-policy-intent-gaps
   $(cli_hint) impact backfill-policy-time-intent
   $(cli_hint) impact backfill-policy-time-intent --apply --yes
+  $(cli_hint) impact preview-current-admin-outcome-enrichment --input reports/current_admin/<batch>.manual-review-queue.json --outcome-evidence reports/current_admin/<batch>.outcome-evidence.json
+  $(cli_hint) impact discover-judicial-candidates
+  $(cli_hint) impact import-judicial-batch --input reports/judicial_impact_candidates.json
+  $(cli_hint) impact materialize-judicial-outcomes --input reports/judicial_impact_candidates.json
   $(cli_hint) impact curate-policy-intent --non-interactive --limit 10
   $(cli_hint) impact curate-policy-intent --only-policy-id 157 --category equity_expanding --summary "..." --source-reference "..." --apply --yes
   $(cli_hint) impact curate-sources --non-interactive --limit 10
@@ -2891,6 +2939,13 @@ Safety:
   Manual source curation never auto-discovers sources. It only attaches
   operator-provided URLs, avoids duplicate URL creation, rejects low/unverified
   source quality, and requires --apply --yes for writes.
+  Supplemental current-admin outcome-evidence integration is dry-run only
+  during the controlled rollout. `impact promote --apply --yes` blocks any
+  transition that depends on those supplemental recommendations.
+  Current-admin policy_outcome enrichment preview is report-only and never
+  writes promise_outcomes or unified policy_outcomes.
+  Judicial impact commands are scaffold-only and do not contribute to scoring
+  or perform database writes in this rollout.
 EOF
 }
 
@@ -2993,6 +3048,8 @@ Commands:
   ai-review  Run the standard single-pass OpenAI Batch review on a normalized batch
   deep-review
              Run the deeper paired AI review path for ambiguous current-admin records
+  outcome-evidence
+             Read-only implementation and outcome evidence collection for existing current-admin rows
   run        Discover and generate the next batch by default, then normalize, review, and promote the AI-first queue
   review     Promote AI decisions and ask for operator input only on the remaining borderline rows
   apply      Run pre-commit, import dry-run, optional apply, and validation
@@ -3013,6 +3070,11 @@ Defaults:
     timeout     ${DEFAULT_REVIEW_TIMEOUT_VERIFIER}s
     openai-base-url $DEFAULT_CURRENT_ADMIN_OPENAI_BASE_URL
     live sources python/config/current_admin_sources.json (unless --disable-default-sources is passed)
+
+  current-admin outcome-evidence defaults to:
+    source config python/config/current_admin_outcome_sources.json
+    activation   active but read-only
+    writes       artifacts only, no database changes
 
 Path handling:
   Current-admin path flags accept python-rooted paths like data/... or reports/... .
@@ -3077,6 +3139,21 @@ Usage:
 
 Runs:
   python3 scripts/normalize_current_admin_batch.py [args]
+EOF
+      ;;
+    outcome-evidence)
+      cat <<EOF
+Usage:
+  equitystack current-admin outcome-evidence [--input <manual-review-queue.json|normalized.json>] [--source-config <path>] [--feed-url <rss>] [--feed-json <path>] [--csv [path]]
+
+Runs:
+  python3 scripts/discover_current_admin_outcome_evidence.py [args]
+
+This is Phase 2 of the controlled rollout:
+  - active and read-only
+  - writes JSON/CSV artifacts only
+  - never writes current-admin rows or policy_outcomes
+  - not part of the default current-admin run/apply path
 EOF
       ;;
     review)

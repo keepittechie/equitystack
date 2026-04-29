@@ -128,7 +128,7 @@ normalize_current_admin_path_args() {
 
   while [ "$#" -gt 0 ]; do
     case "$1" in
-      --input|--output|--report|--batch|--review|--decision-log|--decision-file|--export-worklist)
+      --input|--output|--report|--batch|--review|--decision-log|--decision-file|--export-worklist|--source-config|--feed-json|--outcome-evidence)
         local flag="$1"
         local value="${2:-}"
         [ -n "$value" ] || { output_args_ref+=("$1"); shift; continue; }
@@ -145,7 +145,7 @@ normalize_current_admin_path_args() {
           shift
         fi
         ;;
-      --input=*|--output=*|--report=*|--batch=*|--review=*|--decision-log=*|--decision-file=*|--export-worklist=*|--csv=*|--log-decisions=*)
+      --input=*|--output=*|--report=*|--batch=*|--review=*|--decision-log=*|--decision-file=*|--export-worklist=*|--source-config=*|--feed-json=*|--outcome-evidence=*|--csv=*|--log-decisions=*)
         local flag="${1%%=*}"
         local value="${1#*=}"
         output_args_ref+=("$flag=$(normalize_python_workspace_path "$value")")

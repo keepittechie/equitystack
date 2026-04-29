@@ -133,6 +133,7 @@ Important:
 - `current-admin run` discovers and generates the next batch by default, or starts directly from `--input`.
 - `current-admin run` writes the canonical AI-first queue artifact at `reports/current_admin/<batch-name>.manual-review-queue.json`.
 - that queue artifact now splits records into `items` for borderline manual review, `auto_approved_items` for import candidates, and `auto_rejected_items` for off-mission or unsupported rows.
+- `current-admin outcome-evidence` is available as an optional read-only collector for implementation and downstream outcome evidence. It writes `<batch>.outcome-evidence.json` and optional CSV sidecars, but it does not change the current-admin workflow or write to the DB.
 - `current-admin review` refreshes the canonical decision template for the manual-review slice and finalizes explicit operator decisions or overrides only where they are still needed.
 - `current-admin deep-review` is the explicit deeper paired AI review path for ambiguous batches or rows flagged for additional AI scrutiny.
 - `current-admin apply` uses the AI-approved plus manually approved import candidates, and always reruns pre-commit and import dry-run before any mutating apply.
@@ -141,6 +142,15 @@ Important:
 - `/admin`, `/admin/workflows/[sessionId]`, and `/admin/current-admin-review` now expose the same guided current-admin step tracker and queue split.
 - review artifacts stamp requested model, effective model, backend, fallback status, and fallback reason.
 - supporting commands remain available: `discover`, `gen-batch`, `normalize`, `ai-review`, `deep-review`, `pre-commit`, `import`, `validate`, `status`.
+
+Controlled rollout status:
+
+- Phase 1 implementation/execution evidence is active through the discovery layer and preserved in batch context.
+- Phase 2 outcome-evidence collection is active, but read-only and artifact-first.
+- Phase 3 impact maturation integration is dry-run only via `impact evaluate --outcome-evidence ...`; `impact promote --apply --yes` blocks transitions that depend on supplemental outcome-evidence recommendations.
+- Phase 4 current-admin unified outcome enrichment is report-only through `impact preview-current-admin-outcome-enrichment`.
+- Phase 5 judicial impact is scaffold-only through `impact discover-judicial-candidates`, `impact import-judicial-batch`, and `impact materialize-judicial-outcomes`.
+- Phase 6 UI work is intentionally inactive unless read surfaces later choose to render these optional fields.
 
 ## Legislative Safe Path
 
@@ -197,6 +207,23 @@ The final score report now reads:
 - policy systemic metadata from `policies.systemic_impact_category` and `policies.systemic_impact_summary`
 
 For current-admin rows, intent and systemic metadata should resolve through canonical `promise_actions.related_policy_id` links. Read-side exact-title fallback still exists for a small number of legacy rows, but operators should treat those as cleanup work surfaced on `/admin/systemic-linkage`, not as the preferred linkage model.
+
+Optional controlled-rollout evidence commands:
+
+```bash
+./bin/equitystack current-admin outcome-evidence \
+  --input reports/current_admin/<batch>.manual-review-queue.json
+
+./bin/equitystack impact evaluate \
+  --input reports/current_admin/<batch>.manual-review-queue.json \
+  --outcome-evidence reports/current_admin/<batch>.outcome-evidence.json
+
+./bin/equitystack impact preview-current-admin-outcome-enrichment \
+  --input reports/current_admin/<batch>.manual-review-queue.json \
+  --outcome-evidence reports/current_admin/<batch>.outcome-evidence.json
+```
+
+These commands do not change scoring or write `policy_outcomes` in this rollout.
 
 ## Manual Curation Path
 

@@ -38,6 +38,12 @@ If AI or the operator notes call for a deeper pass:
 ./bin/equitystack current-admin deep-review --input reports/current_admin/<batch-name>.normalized.json
 ```
 
+If you want more implementation or downstream evidence before impact work:
+
+```bash
+./bin/equitystack current-admin outcome-evidence --input reports/current_admin/<batch-name>.manual-review-queue.json
+```
+
 ## What Each Command Does
 
 `run`
@@ -75,6 +81,13 @@ If AI or the operator notes call for a deeper pass:
 - is read-only and advisory
 - is the correct next step when a row or batch needs more AI scrutiny before operator judgment
 
+`outcome-evidence`
+
+- collects implementation and downstream outcome evidence for existing current-admin rows
+- is active, but read-only
+- writes `<batch>.outcome-evidence.json` and optional CSV only
+- does not change the normal `run -> review -> apply` path
+
 ## What Good Output Looks Like
 
 After `run`:
@@ -96,6 +109,11 @@ After `review`:
 - `<batch>.decision-template.json`
 - `review_decisions/<batch>.decision-log.json` when manual decisions were needed
 
+After `outcome-evidence`:
+
+- `<batch>.outcome-evidence.json`
+- optional `<batch>.outcome-evidence.csv`
+
 After `apply` dry-run:
 
 - `<batch>.pre-commit-review.json`
@@ -105,6 +123,20 @@ After `apply --apply --yes`:
 
 - `<batch>.import-apply.json`
 - `<batch>.import-validation.json`
+
+Optional controlled-rollout impact commands:
+
+```bash
+./bin/equitystack impact evaluate \
+  --input reports/current_admin/<batch-name>.manual-review-queue.json \
+  --outcome-evidence reports/current_admin/<batch-name>.outcome-evidence.json
+
+./bin/equitystack impact preview-current-admin-outcome-enrichment \
+  --input reports/current_admin/<batch-name>.manual-review-queue.json \
+  --outcome-evidence reports/current_admin/<batch-name>.outcome-evidence.json
+```
+
+These are not part of the normal daily apply path. `impact evaluate` remains read-only, and the enrichment preview is report-only.
 
 ## Admin Surfaces
 
@@ -127,6 +159,8 @@ The current-admin review page now shows:
 - Current-admin AI review uses OpenAI only.
 - The default review path is single-pass.
 - `current-admin deep-review` is the explicit deeper AI option.
+- `current-admin outcome-evidence` is active but read-only.
+- supplemental outcome-evidence recommendations stay dry-run only during this rollout.
 - `current-admin apply` is dry-run unless `--apply --yes`.
 - `current-admin status` is the fastest way to see the next valid step.
 

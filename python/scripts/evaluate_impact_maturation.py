@@ -16,6 +16,7 @@ from current_admin_common import (
     require_apply_confirmation,
     write_json_file,
 )
+from current_admin_outcome_evidence_common import outcome_evidence_index, record_key_variants
 
 
 IMPACT_STATES = ["impact_pending", "impact_review_ready", "impact_scored", "impact_verified"]
@@ -33,6 +34,7 @@ DIRECTION_FALLBACK_IMPACT_SCORE = {
     "Negative": -1.0,
     "Blocked": 0.0,
 }
+SUPPLEMENTAL_OUTCOME_EVIDENCE_ACTIVATION_MODE = "dry_run_only"
 
 
 def utc_timestamp() -> str:
@@ -389,7 +391,19 @@ def discover_default_inputs() -> list[Path]:
     return [path for path in candidates if path.exists()]
 
 
-def evaluate_record(item: dict[str, Any], ledger: dict[str, Any]) -> dict[str, Any]:
+def find_supplemental_outcome_evidence(item: dict[str, Any], evidence_index: dict[str, dict[str, Any]]) -> dict[str, Any] | None:
+    for key in record_key_variants(item):
+        if key in evidence_index:
+            return evidence_index[key]
+    return None
+
+
+def evaluate_record(
+    item: dict[str, Any],
+    ledger: dict[str, Any],
+    *,
+    supplemental_outcome_evidence_index: dict[str, dict[str, Any]] | None = None,
+) -> dict[str, Any]:
     key = record_key(item)
     ledger_status = normalize_impact_status((ledger.get("records") or {}).get(key, {}).get("impact_status"))
     previous_status = ledger_status or item.get("previous_impact_status") or "impact_pending"
@@ -399,6 +413,15 @@ def evaluate_record(item: dict[str, Any], ledger: dict[str, Any]) -> dict[str, A
     measurable_outcome = has_measurable_outcome(item["record"])
     sources = source_count(item["record"])
     reasoning: list[str] = []
+    supplemental = (
+        find_supplemental_outcome_evidence(item, supplemental_outcome_evidence_index or {})
+        if supplemental_outcome_evidence_index
+        else None
+    )
+    supplemental_outcome_count = int((supplemental or {}).get("outcome_evidence_count") or 0)
+    supplemental_implementation_count = int((supplemental or {}).get("implementation_evidence_count") or 0)
+    supplemental_best_confidence = normalize_confidence_score((supplemental or {}).get("best_confidence_score"))
+    supplemental_used = False
 
     if sources > 0:
         reasoning.append(f"{sources} linked source reference(s) are available")
@@ -411,11 +434,21 @@ def evaluate_record(item: dict[str, Any], ledger: dict[str, Any]) -> dict[str, A
     reasoning.append(f"source_quality={source_quality}")
     if confidence_score is not None:
         reasoning.append(f"confidence_score={confidence_score:.2f}")
+    if supplemental:
+        reasoning.append(
+            f"supplemental outcome-evidence artifact: outcome={supplemental_outcome_count}, implementation={supplemental_implementation_count}"
+        )
+        if supplemental_best_confidence is not None:
+            reasoning.append(f"supplemental confidence_score={supplemental_best_confidence:.2f}")
 
     next_status = previous_status
     if previous_status == "impact_pending":
         if source_quality in {"medium", "high"} and sources > 0 and (confidence_score is None or confidence_score >= 0.55):
             next_status = "impact_review_ready"
+        elif supplemental_outcome_count > 0 and (supplemental_best_confidence is None or supplemental_best_confidence >= 0.60):
+            next_status = "impact_review_ready"
+            supplemental_used = True
+            reasoning.append("supplemental outcome evidence suggests review-ready status in dry-run mode only")
         else:
             reasoning.append("record remains pending because source/confidence evidence is not review-ready")
     elif previous_status == "impact_review_ready":
@@ -423,6 +456,10 @@ def evaluate_record(item: dict[str, Any], ledger: dict[str, Any]) -> dict[str, A
             confidence_score is None or confidence_score >= 0.65
         ):
             next_status = "impact_scored"
+        elif supplemental_outcome_count > 0 and (supplemental_best_confidence is None or supplemental_best_confidence >= 0.70):
+            next_status = "impact_scored"
+            supplemental_used = True
+            reasoning.append("supplemental outcome evidence suggests scoring readiness in dry-run mode only")
         else:
             reasoning.append("record remains review-ready because measurable outcome evidence is not scoring-ready")
 
@@ -442,6 +479,20 @@ def evaluate_record(item: dict[str, Any], ledger: dict[str, Any]) -> dict[str, A
         "outcome_evidence_strength": outcome_strength,
         "has_measurable_outcome": measurable_outcome,
         "source_count": sources,
+        "supplemental_outcome_evidence_summary": (
+            {
+                "outcome_evidence_count": supplemental_outcome_count,
+                "implementation_evidence_count": supplemental_implementation_count,
+                "best_confidence_score": supplemental_best_confidence,
+                "recommended_next_action": (supplemental or {}).get("recommended_next_action"),
+            }
+            if supplemental
+            else None
+        ),
+        "supplemental_outcome_evidence_used": supplemental_used,
+        "supplemental_outcome_evidence_activation_mode": (
+            SUPPLEMENTAL_OUTCOME_EVIDENCE_ACTIVATION_MODE if supplemental_used else None
+        ),
         "reasoning": reasoning,
         "approved": False,
         "record": item["record"],
@@ -450,6 +501,7 @@ def evaluate_record(item: dict[str, Any], ledger: dict[str, Any]) -> dict[str, A
 
 def run_evaluate(args: argparse.Namespace) -> None:
     input_paths = [path.resolve() for path in args.input] if args.input else discover_default_inputs()
+    supplemental_outcome_evidence_paths = [path.resolve() for path in (args.outcome_evidence or [])]
     ledger = load_ledger(args.ledger.resolve())
     items: list[dict[str, Any]] = []
     skipped_inputs: list[dict[str, Any]] = []
@@ -466,19 +518,29 @@ def run_evaluate(args: argparse.Namespace) -> None:
         wanted = set(args.only_record_key)
         items = [item for item in items if record_key(item) in wanted or normalize_nullable_text(item.get("slug")) in wanted]
 
-    evaluated = [evaluate_record(item, ledger) for item in items]
+    supplemental_index = outcome_evidence_index(supplemental_outcome_evidence_paths) if supplemental_outcome_evidence_paths else {}
+    evaluated = [
+        evaluate_record(
+            item,
+            ledger,
+            supplemental_outcome_evidence_index=supplemental_index,
+        )
+        for item in items
+    ]
     counts = {
         "total_items": len(evaluated),
         "recommended_review_ready": sum(item["recommended_impact_status"] == "impact_review_ready" for item in evaluated),
         "recommended_scored": sum(item["recommended_impact_status"] == "impact_scored" for item in evaluated),
         "unchanged": sum(item["recommended_impact_status"] == item["previous_impact_status"] for item in evaluated),
         "blocked_transition": sum(not item["transition_allowed"] for item in evaluated),
+        "supplemental_outcome_evidence_used": sum(bool(item.get("supplemental_outcome_evidence_used")) for item in evaluated),
     }
     output = {
         "artifact_version": 1,
         "generated_at": utc_timestamp(),
         "workflow": "impact_maturation_evaluation",
         "inputs": [str(path) for path in input_paths],
+        "supplemental_outcome_evidence_inputs": [str(path) for path in supplemental_outcome_evidence_paths],
         "ledger_path": str(args.ledger.resolve()),
         "allowed_transitions": {key: sorted(value) for key, value in ALLOWED_TRANSITIONS.items()},
         "counts": counts,
@@ -972,6 +1034,31 @@ def run_promote(args: argparse.Namespace) -> None:
         report["precommit"]["readiness_status"] = "ready_with_warnings"
         report["precommit"]["warnings"].append("some transitions were skipped because they were unchanged or not approved")
 
+    if args.apply:
+        supplemental_blocked_items = [
+            item
+            for item in approved_items
+            if item.get("supplemental_outcome_evidence_activation_mode") == SUPPLEMENTAL_OUTCOME_EVIDENCE_ACTIVATION_MODE
+        ]
+        if supplemental_blocked_items:
+            report["precommit"]["readiness_status"] = "blocked"
+            report["precommit"]["warnings"].append(
+                "supplemental outcome-evidence recommendations are dry-run only during the controlled rollout"
+            )
+            for item in supplemental_blocked_items:
+                report["precommit"]["blocked_items"].append(
+                    {
+                        "record_key": item.get("record_key"),
+                        "reason": "supplemental outcome-evidence activation remains dry-run only",
+                    }
+                )
+            approved_items = [
+                item
+                for item in approved_items
+                if item.get("supplemental_outcome_evidence_activation_mode") != SUPPLEMENTAL_OUTCOME_EVIDENCE_ACTIVATION_MODE
+            ]
+            report["precommit"]["blocking_issue_count"] = len(report["precommit"]["blocked_items"])
+
     ledger = load_ledger(args.ledger.resolve())
     if report["precommit"]["readiness_status"] == "blocked":
         write_json_file(args.output.resolve(), report)
@@ -1057,6 +1144,12 @@ def build_parser() -> argparse.ArgumentParser:
 
     evaluate = subparsers.add_parser("evaluate", help="Build an impact maturation review artifact")
     evaluate.add_argument("--input", type=Path, action="append", help="Input artifact to inspect. May be repeated.")
+    evaluate.add_argument(
+        "--outcome-evidence",
+        type=Path,
+        action="append",
+        help="Optional current-admin outcome-evidence artifact(s) to use for dry-run-only maturation recommendations.",
+    )
     evaluate.add_argument("--output", type=Path, default=default_evaluation_output(), help="Maturation review artifact output")
     evaluate.add_argument("--ledger", type=Path, default=default_ledger_path(), help="Local impact maturation status ledger")
     evaluate.add_argument("--only-record-key", action="append", help="Limit to a specific record key or slug")

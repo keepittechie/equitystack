@@ -1,0 +1,79 @@
+{
+  "version": 1,
+  "sources": [
+    {
+      "name": "Department of Justice Press Releases",
+      "type": "rss",
+      "url": "https://www.justice.gov/news/rss?m=1&type=press_release",
+      "category": "agency-enforcement",
+      "publisher": "Department of Justice",
+      "enabled": true,
+      "default": true,
+      "max_items": 8,
+      "implementation_stage_hint": "enforcement",
+      "mechanism_of_effect": "enforcement, settlement, or compliance action",
+      "target_agency": "Department of Justice"
+    },
+    {
+      "name": "Federal Register Department of Education Documents",
+      "type": "json",
+      "parser": "federal_register_documents",
+      "url_template": "https://www.federalregister.gov/api/v1/documents.json?conditions[agencies][]=education-department&order=newest&per_page={max_items}",
+      "category": "agency",
+      "publisher": "Department of Education / Federal Register",
+      "enabled": true,
+      "default": true,
+      "max_items": 8,
+      "target_agency": "Department of Education",
+      "implementation_stage_hint": "rulemaking",
+      "mechanism_of_effect": "regulatory guidance or program administration",
+      "affected_institutions": "schools, districts, colleges, universities, and education grantees"
+    },
+    {
+      "name": "Federal Register HUD Documents",
+      "type": "json",
+      "parser": "federal_register_documents",
+      "url_template": "https://www.federalregister.gov/api/v1/documents.json?conditions[agencies][]=housing-and-urban-development-department&order=newest&per_page={max_items}",
+      "category": "agency",
+      "publisher": "Department of Housing and Urban Development / Federal Register",
+      "enabled": true,
+      "default": true,
+      "max_items": 8,
+      "target_agency": "Department of Housing and Urban Development",
+      "implementation_stage_hint": "funding_or_rulemaking",
+      "mechanism_of_effect": "housing program administration or funding allocation",
+      "funding_signal": "possible",
+      "affected_institutions": "housing authorities, grantees, local governments, landlords, and tenants"
+    },
+    {
+      "name": "Federal Register Department of Labor Documents",
+      "type": "json",
+      "parser": "federal_register_documents",
+      "url_template": "https://www.federalregister.gov/api/v1/documents.json?conditions[agencies][]=labor-department&order=newest&per_page={max_items}",
+      "category": "agency",
+      "publisher": "Department of Labor / Federal Register",
+      "enabled": true,
+      "default": true,
+      "max_items": 8,
+      "target_agency": "Department of Labor",
+      "implementation_stage_hint": "rulemaking",
+      "mechanism_of_effect": "labor regulation, workforce compliance, or grant administration",
+      "affected_institutions": "employers, workers, apprenticeship sponsors, and workforce grantees"
+    },
+    {
+      "name": "Federal Register HHS Documents",
+      "type": "json",
+      "parser": "federal_register_documents",
+      "url_template": "https://www.federalregister.gov/api/v1/documents.json?conditions[agencies][]=health-and-human-services-department&order=newest&per_page={max_items}",
+      "category": "agency",
+      "publisher": "Department of Health and Human Services / Federal Register",
+      "enabled": true,
+      "default": true,
+      "max_items": 8,
+      "target_agency": "Department of Health and Human Services",
+      "implementation_stage_hint": "rulemaking",
+      "mechanism_of_effect": "health program administration or regulatory change",
+      "affected_institutions": "health providers, insurers, state agencies, and patients"
+    }
+  ]
+}

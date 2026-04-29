@@ -49,6 +49,7 @@ Important scripts:
 | --- | --- |
 | Discovery | `scripts/discover_current_admin_updates.py` |
 | Batch generation | `scripts/generate_current_admin_batch_from_discovery.py` |
+| Optional outcome evidence | `scripts/discover_current_admin_outcome_evidence.py` |
 | Normalization | `scripts/normalize_current_admin_batch.py` |
 | AI review | `scripts/review_current_admin_batch_with_openai_batch.py` |
 | AI-first queue build | `scripts/promote_current_admin_review_to_queue.py` |
@@ -64,8 +65,17 @@ Safety:
 - the canonical `manual-review-queue.json` artifact now splits into `items`, `auto_approved_items`, and `auto_rejected_items`.
 - current-admin human review is now limited to the `items` slice; AI-approved import candidates move forward without requiring routine operator approval.
 - `current-admin deep-review` is the explicit deeper AI path when the standard review recommends more scrutiny.
+- `current-admin outcome-evidence` is active but read-only. It generates evidence artifacts only and does not alter `current-admin run`, `current-admin review`, or `current-admin apply`.
 - Current-admin unified outcome sync inserts `impact_score` at creation time.
 - Review artifacts record requested model, effective model, backend, timeout, and fallback status.
+
+Controlled rollout additions:
+
+- Phase 1 implementation/execution evidence is active in discovery and batch context.
+- Phase 2 outcome-evidence collection is active and artifact-first.
+- Phase 3 `impact evaluate --outcome-evidence ...` is dry-run only; `impact promote --apply --yes` blocks supplemental-evidence-driven transitions.
+- Phase 4 `impact preview-current-admin-outcome-enrichment` is report-only.
+- Phase 5 judicial impact commands are scaffold-only and perform no writes or scoring changes.
 
 ## Legislative Workflow
 
@@ -120,6 +130,10 @@ These commands are the core read-only and guarded write surface for unified outc
 | `impact evaluate` | `scripts/evaluate_impact_maturation.py evaluate` | Read-only review artifact |
 | `impact promote` | `scripts/evaluate_impact_maturation.py promote` | Dry-run unless `--apply --yes` |
 | `impact sync-current-admin-outcomes` | `scripts/sync_current_admin_policy_outcomes.py` | Dry-run unless `--apply --yes` |
+| `impact preview-current-admin-outcome-enrichment` | `scripts/preview_current_admin_policy_outcome_enrichment.py` | Report-only; never writes |
+| `impact discover-judicial-candidates` | `scripts/discover_judicial_impact_candidates.py` | Scaffold-only; no scoring or writes |
+| `impact import-judicial-batch` | `scripts/import_judicial_impact_batch.py` | Scaffold-only validation; apply disabled |
+| `impact materialize-judicial-outcomes` | `scripts/materialize_judicial_policy_outcomes.py` | Scaffold-only preview; apply disabled |
 | `impact report-final-black-impact-score` | `scripts/report_final_black_impact_score.py` | Read-only |
 | `impact certify-production-data` | `scripts/audit_production_certification.py` | Read-only |
 | `impact validate-integrity` | `scripts/validate_policy_outcome_integrity.py` | Read-only |

@@ -155,6 +155,7 @@ DISCOVERY_RELATIONSHIP_TYPES = {
     "ignore",
 }
 LEGAL_SOURCE_CATEGORIES = {"legal", "court", "litigation", "agency-enforcement"}
+IMPLEMENTATION_SOURCE_CATEGORIES = {"agency", "agency-enforcement", "executive-action", "trade"}
 GENERIC_TITLE_HINTS = {
     "order list",
     "miscellaneous order",
@@ -184,6 +185,54 @@ ENFORCEMENT_HINTS = {
     "publishes",
     "regulation",
     "regulations",
+}
+RULEMAKING_HINTS = {
+    "rule",
+    "rules",
+    "final rule",
+    "proposed rule",
+    "interim final rule",
+    "notice of proposed rulemaking",
+    "nprm",
+    "comment period",
+}
+GUIDANCE_HINTS = {
+    "guidance",
+    "dear colleague",
+    "faq",
+    "frequently asked questions",
+    "directive",
+    "implementation memo",
+}
+FUNDING_HINTS = {
+    "grant",
+    "grants",
+    "funding",
+    "award",
+    "awards",
+    "allocation",
+    "allocations",
+    "appropriation",
+    "appropriations",
+    "notice inviting applications",
+}
+ELIGIBILITY_HINTS = {
+    "eligibility",
+    "eligible",
+    "qualification",
+    "certification",
+    "compliance",
+    "reporting",
+    "audit",
+    "monitoring",
+}
+PROCUREMENT_HINTS = {
+    "procurement",
+    "contract",
+    "contracts",
+    "purchasing",
+    "acquisition",
+    "vendor",
 }
 LAWSUIT_ONLY_HINTS = {
     "lawsuit",
@@ -556,6 +605,12 @@ def apply_source_metadata_defaults(items: list[dict[str, Any]], source: dict[str
     action_type_hint = normalize_nullable_text(source.get("action_type_hint"))
     legal_status = normalize_nullable_text(source.get("legal_status"))
     court_or_agency = normalize_nullable_text(source.get("court_or_agency"))
+    implementation_stage_hint = normalize_nullable_text(source.get("implementation_stage_hint"))
+    target_agency = normalize_nullable_text(source.get("target_agency"))
+    target_program = normalize_nullable_text(source.get("target_program"))
+    mechanism_of_effect = normalize_nullable_text(source.get("mechanism_of_effect"))
+    funding_signal = normalize_nullable_text(source.get("funding_signal"))
+    affected_institutions = normalize_nullable_text(source.get("affected_institutions"))
 
     normalized_items = []
     for item in items:
@@ -571,6 +626,18 @@ def apply_source_metadata_defaults(items: list[dict[str, Any]], source: dict[str
                 "legal_status": normalize_nullable_text(item.get("legal_status") or legal_status),
                 "court_or_agency": normalize_nullable_text(item.get("court_or_agency") or court_or_agency),
                 "docket_number": normalize_nullable_text(item.get("docket_number")),
+                "implementation_stage_hint": normalize_nullable_text(
+                    item.get("implementation_stage_hint") or implementation_stage_hint
+                ),
+                "target_agency": normalize_nullable_text(item.get("target_agency") or target_agency),
+                "target_program": normalize_nullable_text(item.get("target_program") or target_program),
+                "mechanism_of_effect": normalize_nullable_text(
+                    item.get("mechanism_of_effect") or mechanism_of_effect
+                ),
+                "funding_signal": normalize_nullable_text(item.get("funding_signal") or funding_signal),
+                "affected_institutions": normalize_nullable_text(
+                    item.get("affected_institutions") or affected_institutions
+                ),
             }
         )
     return normalized_items
@@ -870,6 +937,120 @@ def extract_court_or_agency(feed_item: dict[str, Any], combined_text: str) -> st
     return publisher or source_name
 
 
+def extract_target_agency(feed_item: dict[str, Any], combined_text: str) -> str | None:
+    explicit = normalize_nullable_text(feed_item.get("target_agency"))
+    if explicit:
+        return explicit
+
+    court_or_agency = normalize_nullable_text(feed_item.get("court_or_agency"))
+    source_category = normalize_nullable_text(feed_item.get("source_category"))
+    if court_or_agency and source_category in LEGAL_SOURCE_CATEGORIES:
+        return court_or_agency
+
+    publisher = normalize_nullable_text(feed_item.get("publisher"))
+    source_name = normalize_nullable_text(feed_item.get("source_name"))
+    for candidate in (publisher, source_name):
+        if candidate and any(token in candidate.lower() for token in ("department", "agency", "office", "administration")):
+            return candidate
+
+    patterns = (
+        r"Department of [A-Za-z &]+",
+        r"Office of [A-Za-z &]+",
+        r"Administration for [A-Za-z &]+",
+        r"U\.?S\.? [A-Za-z &]+ Agency",
+    )
+    for pattern in patterns:
+        match = re.search(pattern, combined_text, re.IGNORECASE)
+        if match:
+            return normalize_text(match.group(0))
+    return publisher or source_name
+
+
+def extract_implementation_stage(feed_item: dict[str, Any], combined_text: str, source_category: str) -> str | None:
+    explicit = normalize_nullable_text(feed_item.get("implementation_stage_hint"))
+    if explicit:
+        return explicit
+
+    lowered = combined_text.lower()
+    if source_category in LEGAL_SOURCE_CATEGORIES:
+        return "legal_context"
+    if any(token in lowered for token in FUNDING_HINTS):
+        return "funding_execution"
+    if any(token in lowered for token in RULEMAKING_HINTS):
+        return "rulemaking"
+    if any(token in lowered for token in GUIDANCE_HINTS):
+        return "guidance"
+    if any(token in lowered for token in ENFORCEMENT_HINTS):
+        return "enforcement"
+    if any(token in lowered for token in ("implemented", "implementation", "launched", "rollout", "rolled out")):
+        return "implementation"
+    if any(token in lowered for token in FORMAL_ACTION_HINTS):
+        return "directive"
+    if source_category in IMPLEMENTATION_SOURCE_CATEGORIES:
+        return "administrative_action"
+    return None
+
+
+def extract_mechanism_of_effect(feed_item: dict[str, Any], combined_text: str) -> str | None:
+    explicit = normalize_nullable_text(feed_item.get("mechanism_of_effect"))
+    if explicit:
+        return explicit
+
+    lowered = combined_text.lower()
+    if any(token in lowered for token in FUNDING_HINTS):
+        return "funding allocation or grant administration"
+    if any(token in lowered for token in ENFORCEMENT_HINTS):
+        return "enforcement, settlement, or compliance action"
+    if any(token in lowered for token in RULEMAKING_HINTS):
+        return "regulatory change or rulemaking"
+    if any(token in lowered for token in ELIGIBILITY_HINTS):
+        return "eligibility, reporting, or compliance requirements"
+    if any(token in lowered for token in PROCUREMENT_HINTS):
+        return "procurement or contracting rules"
+    if any(token in lowered for token in LEGAL_HINTS):
+        return "court or litigation posture"
+    return None
+
+
+def extract_funding_signal(feed_item: dict[str, Any], combined_text: str) -> str | None:
+    explicit = normalize_nullable_text(feed_item.get("funding_signal"))
+    if explicit:
+        return explicit
+    lowered = combined_text.lower()
+    if any(token in lowered for token in FUNDING_HINTS):
+        return "present"
+    if any(token in lowered for token in ("formula", "appropriation", "grant")):
+        return "possible"
+    return None
+
+
+def extract_affected_institutions(feed_item: dict[str, Any], combined_text: str, topic: str | None) -> str | None:
+    explicit = normalize_nullable_text(feed_item.get("affected_institutions"))
+    if explicit:
+        return explicit
+
+    lowered = combined_text.lower()
+    if "hbcu" in lowered:
+        return "HBCUs and higher-education institutions"
+    if any(token in lowered for token in ("school", "schools", "district", "student", "students", "college", "university")):
+        return "schools, districts, colleges, universities, and education grantees"
+    if any(token in lowered for token in ("housing authority", "voucher", "homeless", "landlord", "public housing")):
+        return "housing authorities, grantees, local governments, landlords, and tenants"
+    if any(token in lowered for token in ("apprenticeship", "employer", "worker", "workers", "labor", "wage")):
+        return "employers, workers, apprenticeship sponsors, and workforce grantees"
+    if any(token in lowered for token in ("hospital", "clinic", "provider", "providers", "insurer", "medicare", "medicaid")):
+        return "health providers, insurers, state agencies, and patients"
+    if topic == "Education":
+        return "schools, districts, colleges, universities, and education grantees"
+    if topic == "Housing":
+        return "housing authorities, grantees, local governments, landlords, and tenants"
+    if topic == "Economic Opportunity":
+        return "employers, workers, contractors, and workforce grantees"
+    if topic == "Healthcare":
+        return "health providers, insurers, state agencies, and patients"
+    return None
+
+
 def looks_like_lawsuit_only(text: str) -> bool:
     lowered = text.lower()
     return any(token in lowered for token in LAWSUIT_ONLY_HINTS)
@@ -918,6 +1099,10 @@ def build_source_reference_note(
     legal_status: str,
     court_or_agency: str | None,
     docket_number: str | None,
+    implementation_stage: str | None,
+    target_agency: str | None,
+    mechanism_of_effect: str | None,
+    funding_signal: str | None,
 ) -> str | None:
     parts = []
     source_category = normalize_nullable_text(feed_item.get("source_category"))
@@ -930,6 +1115,14 @@ def build_source_reference_note(
         parts.append(f"court_or_agency={court_or_agency}")
     if docket_number:
         parts.append(f"docket={docket_number}")
+    if implementation_stage:
+        parts.append(f"implementation_stage={implementation_stage}")
+    if target_agency:
+        parts.append(f"target_agency={target_agency}")
+    if mechanism_of_effect:
+        parts.append(f"mechanism={mechanism_of_effect}")
+    if funding_signal:
+        parts.append(f"funding_signal={funding_signal}")
     return "; ".join(parts) if parts else None
 
 
@@ -1297,6 +1490,12 @@ def load_local_feed_items(path: Path) -> list[dict[str, Any]]:
                 "legal_status": normalize_nullable_text(item.get("legal_status")),
                 "court_or_agency": normalize_nullable_text(item.get("court_or_agency")),
                 "docket_number": normalize_nullable_text(item.get("docket_number")),
+                "implementation_stage_hint": normalize_nullable_text(item.get("implementation_stage_hint")),
+                "target_agency": normalize_nullable_text(item.get("target_agency")),
+                "target_program": normalize_nullable_text(item.get("target_program")),
+                "mechanism_of_effect": normalize_nullable_text(item.get("mechanism_of_effect")),
+                "funding_signal": normalize_nullable_text(item.get("funding_signal")),
+                "affected_institutions": normalize_nullable_text(item.get("affected_institutions")),
             }
         )
     return normalized_items
@@ -1611,6 +1810,11 @@ def classify_feed_item_context(feed_item: dict[str, Any]) -> dict[str, Any]:
     topic_estimate = estimate_topic(combined_text)
     legal_status = extract_legal_status(combined_text, feed_item.get("legal_status"), source_category)
     court_or_agency = extract_court_or_agency(feed_item, combined_text)
+    target_agency = extract_target_agency(feed_item, combined_text)
+    implementation_stage = extract_implementation_stage(feed_item, combined_text, source_category)
+    mechanism_of_effect = extract_mechanism_of_effect(feed_item, combined_text)
+    funding_signal = extract_funding_signal(feed_item, combined_text)
+    affected_institutions = extract_affected_institutions(feed_item, combined_text, topic_estimate)
     docket_number = normalize_nullable_text(feed_item.get("docket_number")) or extract_docket_number(
         f"{feed_item.get('title')} {feed_item.get('summary')}"
     )
@@ -1632,7 +1836,13 @@ def classify_feed_item_context(feed_item: dict[str, Any]) -> dict[str, Any]:
         "source_category": source_category or "unknown",
         "legal_status": legal_status,
         "court_or_agency": court_or_agency,
+        "target_agency": target_agency,
+        "target_program": normalize_nullable_text(feed_item.get("target_program")),
         "docket_number": docket_number,
+        "implementation_stage": implementation_stage,
+        "mechanism_of_effect": mechanism_of_effect,
+        "funding_signal": funding_signal,
+        "affected_institutions": affected_institutions,
         "is_lawsuit_only": is_lawsuit_only,
         "is_enforcement_action": is_enforcement_action,
         "topic_estimate": topic_estimate,
@@ -1709,6 +1919,12 @@ def enforce_relationship_guardrails(
     suggested_fields["legal_status"] = context["legal_status"]
     suggested_fields["court_or_agency"] = context["court_or_agency"]
     suggested_fields["docket_number"] = context["docket_number"]
+    suggested_fields["target_agency"] = context["target_agency"]
+    suggested_fields["target_program"] = context["target_program"]
+    suggested_fields["implementation_stage"] = context["implementation_stage"]
+    suggested_fields["mechanism_of_effect"] = context["mechanism_of_effect"]
+    suggested_fields["funding_signal"] = context["funding_signal"]
+    suggested_fields["affected_institutions"] = context["affected_institutions"]
     if downgrade_reason:
         guardrail_notes.append(downgrade_reason)
 
@@ -2224,6 +2440,12 @@ def analyze_feed_items(
             "legal_status": legal_status,
             "court_or_agency": court_or_agency,
             "docket_number": docket_number,
+            "target_agency": context["target_agency"],
+            "target_program": context["target_program"],
+            "implementation_stage": context["implementation_stage"],
+            "mechanism_of_effect": context["mechanism_of_effect"],
+            "funding_signal": context["funding_signal"],
+            "affected_institutions": context["affected_institutions"],
             "requested_model": model,
             "effective_model": model if review_mode == "openai" else None,
             "review_backend": review_mode,
@@ -2243,6 +2465,10 @@ def analyze_feed_items(
                         legal_status=legal_status or "unknown",
                         court_or_agency=court_or_agency,
                         docket_number=docket_number,
+                        implementation_stage=context["implementation_stage"],
+                        target_agency=context["target_agency"],
+                        mechanism_of_effect=context["mechanism_of_effect"],
+                        funding_signal=context["funding_signal"],
                     ),
                 }
             ],
@@ -2294,6 +2520,12 @@ def analyze_feed_items(
                 "legal_status": legal_status,
                 "court_or_agency": court_or_agency,
                 "docket_number": docket_number,
+                "target_agency": context["target_agency"],
+                "target_program": context["target_program"],
+                "implementation_stage": context["implementation_stage"],
+                "mechanism_of_effect": context["mechanism_of_effect"],
+                "funding_signal": context["funding_signal"],
+                "affected_institutions": context["affected_institutions"],
                 "candidate_type": suggestion_type,
                 "candidate_emitted": suggestion_type in {"new_action", "update_existing_action", "new_promise_candidate", "source_context", "legal_context"},
                 "confidence_score": deterministic_confidence["confidence_score"],
@@ -2339,6 +2571,12 @@ def build_csv_rows(report: dict[str, Any]) -> list[dict[str, Any]]:
                     "legal_status": suggested.get("legal_status") or item.get("legal_status"),
                     "court_or_agency": suggested.get("court_or_agency") or item.get("court_or_agency"),
                     "docket_number": suggested.get("docket_number") or item.get("docket_number"),
+                    "target_agency": suggested.get("target_agency") or item.get("target_agency"),
+                    "target_program": suggested.get("target_program"),
+                    "implementation_stage": suggested.get("implementation_stage"),
+                    "mechanism_of_effect": suggested.get("mechanism_of_effect"),
+                    "funding_signal": suggested.get("funding_signal"),
+                    "affected_institutions": suggested.get("affected_institutions"),
                     "matched_keywords": ", ".join(suggested.get("matched_keywords") or []),
                     "classification_reason": item.get("classification_reason"),
                     "feed_title": feed_item.get("title"),

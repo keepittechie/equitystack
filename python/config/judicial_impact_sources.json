@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "sources": [
+    {
+      "name": "Supreme Court Opinions of the Court",
+      "type": "html",
+      "parser": "supreme_court_opinions_table",
+      "url_template": "https://www.supremecourt.gov/opinions/slipopinion/{supreme_court_term_year}",
+      "category": "court",
+      "publisher": "Supreme Court of the United States",
+      "enabled": true,
+      "default": true,
+      "max_items": 10,
+      "action_type_hint": "Court-Related Action",
+      "legal_status": "ruled",
+      "court_or_agency": "Supreme Court of the United States"
+    },
+    {
+      "name": "Supreme Court Opinions Relating to Orders",
+      "type": "html",
+      "parser": "supreme_court_opinions_table",
+      "url_template": "https://www.supremecourt.gov/opinions/relatingtoorders/{supreme_court_term_year}",
+      "category": "court",
+      "publisher": "Supreme Court of the United States",
+      "enabled": true,
+      "default": true,
+      "max_items": 10,
+      "action_type_hint": "Court-Related Action",
+      "legal_status": "ruled",
+      "court_or_agency": "Supreme Court of the United States"
+    }
+  ]
+}
