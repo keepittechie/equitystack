@@ -1,0 +1,65 @@
+[
+  {
+    "title": "Louisiana v. Callais",
+    "policy_type": "Court Case",
+    "summary": "The Supreme Court invalidated Louisiana's remedial second majority-Black congressional district and rewrote Section 2 redistricting doctrine to require stronger race-versus-politics and intentional-discrimination showings.",
+    "year_enacted": 2026,
+    "date_enacted": "2026-04-29",
+    "era": "Contemporary Era",
+    "president": "Donald J. Trump",
+    "primary_party": null,
+    "house_party": null,
+    "senate_party": null,
+    "bipartisan": false,
+    "direct_black_impact": true,
+    "outcome_summary": "Weakened Section 2 of the Voting Rights Act as a tool for challenging vote dilution in redistricting and reduced legal protection for Black voting power.",
+    "status": "Active",
+    "impact_direction": "Negative",
+    "impact_notes": "A major contemporary voting-rights rollback. The ruling did not formally strike Section 2 from the statute, but it raised the burden for plaintiffs and invalidated Louisiana's remedial second majority-Black district.",
+    "categories": ["Voting Rights", "Civil Rights", "Constitutional Rights"],
+    "scores": {
+      "directness_score": 5,
+      "material_impact_score": 5,
+      "evidence_score": 5,
+      "durability_score": 4,
+      "equity_score": 5,
+      "harm_offset_score": 0,
+      "notes": "Major rollback of Section 2 redistricting enforcement without formally repealing the statute."
+    },
+    "sources": [
+      {
+        "source_title": "Louisiana v. Callais, 608 U.S. ___ (2026) slip opinion",
+        "source_url": "https://www.supremecourt.gov/opinions/25pdf/24-109_21o3.pdf",
+        "source_type": "Government",
+        "publisher": "Supreme Court of the United States",
+        "published_date": "2026-04-29",
+        "notes": "Official slip opinion PDF released by the Court."
+      },
+      {
+        "source_title": "Louisiana v. Callais, Kagan dissent within slip opinion",
+        "source_url": "https://www.supremecourt.gov/opinions/25pdf/24-109_21o3.pdf",
+        "source_type": "Government",
+        "publisher": "Supreme Court of the United States",
+        "published_date": "2026-04-29",
+        "notes": "The same official slip-opinion PDF includes Justice Kagan's dissent, which argues the ruling effectively guts Section 2's vote-dilution protection."
+      },
+      {
+        "source_title": "Section 2 of the Voting Rights Act at the Supreme Court",
+        "source_url": "https://www.brennancenter.org/our-work/research-reports/section-2-voting-rights-act-supreme-court",
+        "source_type": "Nonprofit",
+        "publisher": "Brennan Center for Justice",
+        "published_date": "2025-10-15",
+        "notes": "Expert legal analysis explaining Section 2 doctrine, the Gingles framework, and the stakes of the Callais litigation."
+      },
+      {
+        "source_title": "NAACP Condemns Supreme Court's Ruling Against Voting Rights",
+        "source_url": "https://naacp.org/articles/naacp-condemns-supreme-courts-ruling-against-voting-rights",
+        "source_type": "Nonprofit",
+        "publisher": "NAACP",
+        "published_date": "2026-04-29",
+        "notes": "Civil-rights response describing the ruling as a major setback for Black voters and democratic participation."
+      }
+    ],
+    "metrics": []
+  }
+]

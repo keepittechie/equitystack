@@ -1,0 +1,21 @@
+{
+  "batch_name": "trump-2025-callais-judicial-action",
+  "validated_count": 1,
+  "records": [
+    {
+      "id": 155,
+      "slug": "louisiana-v-callais-narrows-section-2-redistricting-protections",
+      "title": "Supreme Court narrows Section 2 redistricting protections in Louisiana v. Callais",
+      "status": "Failed",
+      "topic": "Courts / Voting Rights / Civil Rights",
+      "president_slug": "donald-j-trump-2025",
+      "action_count": 1,
+      "outcome_count": 1,
+      "promise_source_count": 1
+    }
+  ],
+  "score_summary": {
+    "Negative": 1
+  },
+  "issues": []
+}

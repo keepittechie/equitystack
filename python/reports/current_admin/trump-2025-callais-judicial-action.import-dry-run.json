@@ -1,0 +1,37 @@
+{
+  "mode": "dry-run",
+  "batch_name": "trump-2025-callais-judicial-action",
+  "president_slug": "donald-j-trump-2025",
+  "source_input_path": "/home/josh/Documents/GitHub/equitystack/python/data/current_admin_batches/trump_2025_callais_judicial_action.json",
+  "provenance_guard": {
+    "status": "skipped",
+    "input_mode": "records",
+    "reason": "Import input is not the canonical manual-review queue artifact."
+  },
+  "promises_created": 1,
+  "promises_updated": 0,
+  "existing_promises_enriched": 0,
+  "actions_created": 1,
+  "actions_updated": 0,
+  "existing_actions_enriched": 0,
+  "outcomes_created": 1,
+  "impact_pending_records": 0,
+  "impact_pending_outcomes_deferred": 0,
+  "impact_pending_existing_outcomes_preserved": 0,
+  "impact_pending_items": [],
+  "sources_created": 3,
+  "sources_reused": 2,
+  "skipped_duplicates": [],
+  "conflicts": [],
+  "notes": [
+    "The live schema links outcomes to promise_id rather than action_id, so outcome dedupe and inserts are performed at the promise level.",
+    "Records with impact_status=impact_pending may import promise/action/source facts, but outcome rows are deferred so they are not treated as finalized impact scores.",
+    "Existing promise/action records are enriched additively: missing fields and new linked sources/actions may be added, while conflicting populated fields are preserved and reported."
+  ],
+  "validation": {
+    "promises_missing_actions": [],
+    "promises_missing_sources": [],
+    "orphan_actions": 0,
+    "orphan_outcomes": 0
+  }
+}

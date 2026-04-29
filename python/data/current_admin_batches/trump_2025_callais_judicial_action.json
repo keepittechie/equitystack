@@ -1,0 +1,84 @@
+{
+  "batch_name": "trump-2025-callais-judicial-action",
+  "president_slug": "donald-j-trump-2025",
+  "records": [
+    {
+      "slug": "louisiana-v-callais-narrows-section-2-redistricting-protections",
+      "title": "Supreme Court narrows Section 2 redistricting protections in Louisiana v. Callais",
+      "promise_text": "In Louisiana v. Callais, the Supreme Court held that Louisiana's remedial second majority-Black congressional district was an unconstitutional racial gerrymander, concluded that Section 2 did not require an additional majority-minority district on the record before it, and revised the Gingles framework to require stronger proof disentangling race from politics and supporting an inference of intentional discrimination.",
+      "promise_date": "2026-04-29",
+      "promise_type": "Other",
+      "campaign_or_official": "Official",
+      "topic": "Courts / Voting Rights / Civil Rights",
+      "impacted_group": "Black voters and other minority voters whose ability to challenge vote dilution under Section 2 depends on federal redistricting enforcement",
+      "status": "Failed",
+      "summary": "The Court invalidated Louisiana's remedial second majority-Black district and made Section 2 vote-dilution claims harder to win without formally repealing the statute.",
+      "notes": "Modeled as a current-term judicial action because the ruling changed the live voting-rights enforcement environment during the current administration. This record does not treat the White House as the author of the opinion; it tracks the judicial action's public impact during the term.",
+      "promise_sources": [
+        {
+          "source_title": "Louisiana v. Callais, 608 U.S. ___ (2026) slip opinion",
+          "source_url": "https://www.supremecourt.gov/opinions/25pdf/24-109_21o3.pdf",
+          "source_type": "Government",
+          "publisher": "Supreme Court of the United States",
+          "published_date": "2026-04-29",
+          "notes": "Primary promise-level source."
+        }
+      ],
+      "actions": [
+        {
+          "action_type": "Court-Related Action",
+          "action_date": "2026-04-29",
+          "title": "Supreme Court decides Louisiana v. Callais",
+          "description": "The Court affirmed the invalidation of Louisiana's SB8 map, held that Section 2 did not require an additional majority-minority district on this record, and revised the Gingles framework to require stronger race-versus-politics and intentional-discrimination showings.",
+          "action_sources": [
+            {
+              "source_title": "Louisiana v. Callais, 608 U.S. ___ (2026) slip opinion",
+              "source_url": "https://www.supremecourt.gov/opinions/25pdf/24-109_21o3.pdf",
+              "source_type": "Government",
+              "publisher": "Supreme Court of the United States",
+              "published_date": "2026-04-29",
+              "notes": "Primary action-level source."
+            }
+          ],
+          "outcomes": [
+            {
+              "outcome_summary": "The ruling invalidated Louisiana's remedial second majority-Black congressional district and narrowed the proof path for Section 2 redistricting claims without formally striking Section 2 from the statute books.",
+              "outcome_type": "Voting Outcome",
+              "measurable_impact": "Voters challenging vote dilution under Section 2 now face a higher burden to show maps denied equal electoral opportunity, including tighter race-versus-politics proof requirements and an intentional-discrimination inference standard.",
+              "impact_direction": "Negative",
+              "black_community_impact_note": "The clearest Black-impact channel is political power. Black voters in Louisiana and other jurisdictions relying on Section 2 redistricting suits face weaker federal protection against vote dilution and a harder path to securing effective opportunity districts.",
+              "evidence_strength": "Strong",
+              "status_override": "Failed",
+              "outcome_sources": [
+                {
+                  "source_title": "Louisiana v. Callais, 608 U.S. ___ (2026) slip opinion",
+                  "source_url": "https://www.supremecourt.gov/opinions/25pdf/24-109_21o3.pdf",
+                  "source_type": "Government",
+                  "publisher": "Supreme Court of the United States",
+                  "published_date": "2026-04-29",
+                  "notes": "Primary outcome-level source."
+                },
+                {
+                  "source_title": "Section 2 of the Voting Rights Act at the Supreme Court",
+                  "source_url": "https://www.brennancenter.org/our-work/research-reports/section-2-voting-rights-act-supreme-court",
+                  "source_type": "Nonprofit",
+                  "publisher": "Brennan Center for Justice",
+                  "published_date": "2025-10-15",
+                  "notes": "Doctrine and litigation context for the Section 2 standards at issue."
+                },
+                {
+                  "source_title": "NAACP Condemns Supreme Court's Ruling Against Voting Rights",
+                  "source_url": "https://naacp.org/articles/naacp-condemns-supreme-courts-ruling-against-voting-rights",
+                  "source_type": "Nonprofit",
+                  "publisher": "NAACP",
+                  "published_date": "2026-04-29",
+                  "notes": "Civil-rights response focused on consequences for Black voters."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

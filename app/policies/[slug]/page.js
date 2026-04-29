@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { fetchInternalJson } from "@/lib/api";
 import { buildPageMetadata } from "@/lib/metadata";
-import { fetchPolicyDetailBySlug } from "@/lib/public-site-data";
+import { buildPolicySlug, fetchPolicyDetailBySlug } from "@/lib/public-site-data";
 import { computePolicyImpactScore } from "@/lib/analytics/impactAggregator";
 import {
   buildEvidenceCoverage,
