@@ -84,6 +84,7 @@ function getSystemicRecordMeta(item = {}) {
 function formatSourceContextLabel(value) {
   const labels = {
     government: "Government source",
+    "congressional-record": "Congressional record",
     academic: "Academic research",
     journalism: "Journalism",
     "primary-data": "Primary data",
