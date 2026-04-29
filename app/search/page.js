@@ -8,7 +8,10 @@ import {
   SectionIntro,
 } from "@/app/components/public/core";
 import { Panel } from "@/app/components/dashboard/primitives";
-import { SearchResultGroup } from "@/app/components/public/entities";
+import {
+  ExplainerIndexGrid,
+  SearchResultGroup,
+} from "@/app/components/public/entities";
 
 export const dynamic = "force-dynamic";
 
@@ -111,6 +114,18 @@ export default async function SearchPage({ searchParams }) {
               },
             ]}
           />
+
+          {(results.suggested_explainers || []).length ? (
+            <section className="space-y-4">
+              <Panel padding="md">
+                <h2 className="text-2xl font-semibold text-white">Suggested explainers</h2>
+                <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+                  These explainers match common claim patterns or debate frames in your search. Start here when the query is really asking for argument context instead of only a record lookup.
+                </p>
+              </Panel>
+              <ExplainerIndexGrid items={results.suggested_explainers} />
+            </section>
+          ) : null}
 
           {populatedSections.length ? (
             <section className="grid gap-6 xl:grid-cols-2">

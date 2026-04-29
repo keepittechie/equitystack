@@ -43,6 +43,7 @@ import WhyThisScorePanel from "@/app/components/public/WhyThisScorePanel";
 import LinkedAgendaItemsPanel from "@/app/components/public/LinkedAgendaItemsPanel";
 import {
   EvidenceSourceList,
+  ExplainerIndexGrid,
   PolicyTimeline,
   PromiseResultsTable,
 } from "@/app/components/public/entities";
@@ -1317,6 +1318,15 @@ export default async function PolicyDetailPage({ params }) {
     currentYear: policy.year_enacted,
     editorial: flagshipEditorial,
   });
+  const suggestedExplainers = Array.isArray(policy.suggested_explainers)
+    ? policy.suggested_explainers.filter((item) => item?.slug && item?.title)
+    : [];
+  const suggestedExplainerSlugSet = new Set(
+    suggestedExplainers.map((item) => item.slug)
+  );
+  const remainingRelatedExplainers = (policy.related_explainers || []).filter(
+    (item) => item?.slug && item?.title && !suggestedExplainerSlugSet.has(item.slug)
+  );
   const linkedAgendaItems = getLinkedAgendaItemsForEntity("policy", policy.id);
   const linkedCases = getCasesForPolicy(policy.id);
   const localSectionOffsetClass = "scroll-mt-28 md:scroll-mt-32";
@@ -1856,6 +1866,22 @@ export default async function PolicyDetailPage({ params }) {
             description="Use this short path when you want the clearest next click first. The full promise, explainer, report, and research links remain visible below."
             items={bestNextReviewItems}
           />
+          {suggestedExplainers.length ? (
+            <div className="space-y-4">
+              <Panel padding="md" className="space-y-2">
+                <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
+                  Suggested explainers
+                </p>
+                <h2 className="text-lg font-semibold text-white">
+                  Start with the closest claim-pattern explainer
+                </h2>
+                <p className="text-sm leading-7 text-[var(--ink-soft)]">
+                  These explainers are surfaced from the policy topic, tags, and likely debate frames attached to this record. They prioritize argument-mechanics explainers when the policy opens into a common claim pattern.
+                </p>
+              </Panel>
+              <ExplainerIndexGrid items={suggestedExplainers} />
+            </div>
+          ) : null}
           <LinkedAgendaItemsPanel items={linkedAgendaItems} />
           <RelatedCasesPanel items={linkedCases} />
           {(policy.related_promises || []).length ? (
@@ -1866,7 +1892,7 @@ export default async function PolicyDetailPage({ params }) {
             </Panel>
           )}
           <div className="grid gap-4 md:grid-cols-2">
-            {(policy.related_explainers || []).map((item) => (
+            {remainingRelatedExplainers.map((item) => (
               <Panel
                 key={item.slug}
                 as={Link}

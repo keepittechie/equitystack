@@ -35,6 +35,7 @@ import WhyThisScorePanel from "@/app/components/public/WhyThisScorePanel";
 import DiscoveryGuidancePanel from "@/app/components/public/DiscoveryGuidancePanel";
 import InsightCard from "@/app/components/public/InsightCard";
 import {
+  ExplainerIndexGrid,
   PresidentPolicyTable,
   PromiseTimeline,
 } from "@/app/components/public/entities";
@@ -1601,6 +1602,9 @@ export default async function PresidentProfilePage({ params }) {
     topPolicies,
     flagshipEditorial,
   });
+  const suggestedExplainers = Array.isArray(profile.suggested_explainers)
+    ? profile.suggested_explainers.filter((item) => item?.slug && item?.title)
+    : [];
   const agendaOverlap = getAgendaOverlapForPromiseRecords(promises, "project-2025");
   const legalContext = buildPresidentLegalContext(topPolicies);
   const quickRead = buildPresidentQuickRead({
@@ -2339,25 +2343,43 @@ export default async function PresidentProfilePage({ params }) {
           title="Keep researching this president through linked records"
           description="Every presidential profile should make it easy to move from summary into promises, legislation, comparison tools, and methodology."
         />
-        <div className="grid gap-4 p-4 md:grid-cols-2">
-          <Panel as={Link} href={`/promises/president/${slug}`} padding="md" interactive>
-            <h3 className="text-lg font-semibold text-white">Open this president&apos;s promise tracker</h3>
-            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-              Review delivered, partial, failed, and blocked promises for this presidency term in one place.
-            </p>
-          </Panel>
-          <Panel as={Link} href={presidentPoliciesHref} padding="md" interactive>
-            <h3 className="text-lg font-semibold text-white">Browse policies under {presidentName}</h3>
-            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-              Open the policy index filtered to this president to study legislation, executive actions, and court-era context tied to this record.
-            </p>
-          </Panel>
-          <Panel as={Link} href="/explainers" padding="md" interactive>
-            <h3 className="text-lg font-semibold text-white">Read related Black history explainers</h3>
-            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-              Use explainers when you need more historical or legal context before returning to the president, promise, or policy detail pages.
-            </p>
-          </Panel>
+        <div className="space-y-4 p-4">
+          {suggestedExplainers.length ? (
+            <div className="space-y-4">
+              <Panel padding="md" className="space-y-2">
+                <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
+                  Suggested explainers
+                </p>
+                <h2 className="text-lg font-semibold text-white">
+                  Start with the closest debate-context explainer
+                </h2>
+                <p className="text-sm leading-7 text-[var(--ink-soft)]">
+                  These explainers are matched from the policy mix, topic drivers, and common claim patterns around this presidential record.
+                </p>
+              </Panel>
+              <ExplainerIndexGrid items={suggestedExplainers} />
+            </div>
+          ) : null}
+          <div className="grid gap-4 md:grid-cols-2">
+            <Panel as={Link} href={`/promises/president/${slug}`} padding="md" interactive>
+              <h3 className="text-lg font-semibold text-white">Open this president&apos;s promise tracker</h3>
+              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+                Review delivered, partial, failed, and blocked promises for this presidency term in one place.
+              </p>
+            </Panel>
+            <Panel as={Link} href={presidentPoliciesHref} padding="md" interactive>
+              <h3 className="text-lg font-semibold text-white">Browse policies under {presidentName}</h3>
+              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+                Open the policy index filtered to this president to study legislation, executive actions, and court-era context tied to this record.
+              </p>
+            </Panel>
+            <Panel as={Link} href="/explainers" padding="md" interactive>
+              <h3 className="text-lg font-semibold text-white">Read related Black history explainers</h3>
+              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+                Use explainers when you need more historical or legal context before returning to the president, promise, or policy detail pages.
+              </p>
+            </Panel>
+          </div>
         </div>
       </Panel>
     </main>

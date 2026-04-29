@@ -7,9 +7,11 @@ import PresidentAvatar from "@/app/components/PresidentAvatar";
 import StructuredData from "@/app/components/public/StructuredData";
 import { Breadcrumbs } from "@/app/components/public/chrome";
 import TrustBar from "@/app/components/public/TrustBar";
+import { ExplainerIndexGrid } from "@/app/components/public/entities";
 import { Panel, SectionHeader } from "@/app/components/dashboard/primitives";
 import { buildPageMetadata } from "@/lib/metadata";
 import { fetchCivilRightsTimeline } from "@/lib/services/promiseService";
+import { fetchExplainersIndexData } from "@/lib/public-site-data";
 import {
   buildBreadcrumbJsonLd,
   buildReportJsonLd,
@@ -48,6 +50,12 @@ const ERA_HELPER_COPY = {
   "modern-continuity":
     "This section extends the timeline into modern debates over voting rights, policing, courts, and federal accountability.",
 };
+
+const SUGGESTED_EXPLAINER_SLUGS = [
+  "states-rights-vs-civil-rights-claims",
+  "disparate-impact-vs-intent-claims",
+  "party-voting-records-racial-policy",
+];
 
 function MetaPill({ children }) {
   return (
@@ -169,9 +177,18 @@ function TimelineEntry({ item }) {
 }
 
 export default async function CivilRightsTimelinePage() {
-  const timeline = await fetchCivilRightsTimeline();
+  const [timeline, explainersIndex] = await Promise.all([
+    fetchCivilRightsTimeline(),
+    fetchExplainersIndexData(),
+  ]);
   const eras = timeline.eras || [];
   const totalEntries = timeline.items?.length || 0;
+  const explainersBySlug = new Map(
+    (explainersIndex.items || []).map((item) => [item.slug, item])
+  );
+  const suggestedExplainers = SUGGESTED_EXPLAINER_SLUGS.map((slug) =>
+    explainersBySlug.get(slug)
+  ).filter(Boolean);
 
   return (
     <main className="report-shell w-full pt-4 pb-6 space-y-4">
@@ -322,6 +339,22 @@ export default async function CivilRightsTimelinePage() {
             Use these next steps when the timeline raises a deeper question about one administration, a specific law, a related promise, or the methodology behind the public record.
           </p>
         </div>
+        {suggestedExplainers.length ? (
+          <div className="mt-5 space-y-4">
+            <Panel padding="md" className="space-y-2">
+              <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
+                Suggested explainers
+              </p>
+              <h2 className="text-lg font-semibold text-white">
+                Start with the closest civil-rights debate explainer
+              </h2>
+              <p className="text-sm leading-7 text-[var(--ink-soft)]">
+                These explainers are surfaced because timeline readers often need federal-versus-state context, impact-versus-intent framing, or voting-record context before moving back into the chronology.
+              </p>
+            </Panel>
+            <ExplainerIndexGrid items={suggestedExplainers} />
+          </div>
+        ) : null}
         <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           <Link href="/promises" className="panel-link block rounded-[1.25rem] p-5">
             <h3 className="text-lg font-semibold">Review promise records</h3>

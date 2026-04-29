@@ -3,6 +3,7 @@ import HelpfulFeedback from "@/app/components/feedback/HelpfulFeedback";
 import PresidentAvatar from "@/app/components/PresidentAvatar";
 import { Breadcrumbs } from "@/app/components/public/chrome";
 import StructuredData from "@/app/components/public/StructuredData";
+import { ExplainerIndexGrid } from "@/app/components/public/entities";
 import { ImpactBadge, statusPillClasses } from "@/app/components/policy-badges";
 import TrackedLink from "@/app/components/telemetry/TrackedLink";
 import { fetchInternalJson } from "@/lib/api";
@@ -26,6 +27,7 @@ import {
   buildBreadcrumbJsonLd,
   buildReportJsonLd,
 } from "@/lib/structured-data";
+import { fetchExplainersIndexData } from "@/lib/public-site-data";
 import CopyShareLinkButton from "./CopyShareLinkButton";
 import SnapshotLibraryPanel from "./SnapshotLibraryPanel";
 import {
@@ -39,6 +41,11 @@ const REPORT_PATH = "/reports/black-impact-score";
 const DEFAULT_TITLE = "Black Impact Score | Outcome-Based Presidential Report";
 const DEFAULT_DESCRIPTION =
   "See how presidential records affected Black communities using reviewed, source-backed outcomes rather than campaign promises alone.";
+const SUGGESTED_EXPLAINER_SLUGS = [
+  "systemic-vs-individual-racism-claims",
+  "anecdote-vs-data-claims",
+  "disparate-impact-vs-intent-claims",
+];
 
 function normalizeSearchParamEntries(value) {
   const items = Array.isArray(value) ? value : value ? [value] : [];
@@ -3252,9 +3259,18 @@ export default async function BlackImpactScorePage({ searchParams }) {
       ? resolvedSearchParams.model
       : "outcome";
   const requestedScoringReadyOnly = resolvedSearchParams.scoring_ready === "1";
-  const data = await getBlackImpactScores(requestedModel);
+  const [data, explainersIndex] = await Promise.all([
+    getBlackImpactScores(requestedModel),
+    fetchExplainersIndexData(),
+  ]);
   const comparisonMode = data.model === "compare";
   const publicOutcomeMethodology = getBlackImpactScoreMethodology();
+  const explainersBySlug = new Map(
+    (explainersIndex.items || []).map((item) => [item.slug, item])
+  );
+  const suggestedExplainers = SUGGESTED_EXPLAINER_SLUGS.map((slug) =>
+    explainersBySlug.get(slug)
+  ).filter(Boolean);
 
   let methodology = null;
   let presidents = [];
@@ -3925,6 +3941,21 @@ export default async function BlackImpactScorePage({ searchParams }) {
         isScoringReadyFilterActive={isScoringReadyFilterActive}
         usingLegacyModel={usingLegacyModel}
       />
+
+      {suggestedExplainers.length ? (
+        <section className="card-surface p-4">
+          <div className="max-w-3xl">
+            <p className="eyebrow mb-3">Suggested explainers</p>
+            <h2 className="text-2xl font-semibold">Open the right argument explainer before debating the score</h2>
+            <p className="mt-3 text-sm text-[var(--ink-soft)] leading-7">
+              These explainers are surfaced because score readers often need help separating system-level evidence from individual blame, population data from anecdote, and unequal effects from motive claims.
+            </p>
+          </div>
+          <div className="mt-5">
+            <ExplainerIndexGrid items={suggestedExplainers} />
+          </div>
+        </section>
+      ) : null}
 
       <MethodologySection
         methodology={methodology}

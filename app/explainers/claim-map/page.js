@@ -1,6 +1,10 @@
 import Link from "next/link";
 import { buildPageMetadata } from "@/lib/metadata";
-import { fetchExplainersIndexData } from "@/lib/public-site-data";
+import {
+  buildPolicySlug,
+  fetchExplainerDetailData,
+  fetchExplainersIndexData,
+} from "@/lib/public-site-data";
 import StructuredData from "@/app/components/public/StructuredData";
 import { Breadcrumbs } from "@/app/components/public/chrome";
 import {
@@ -38,6 +42,19 @@ export const metadata = buildPageMetadata({
 });
 
 const CLAIM_CLUSTERS = [
+  {
+    id: "argument-mechanics-evidence-tests",
+    title: "Argument mechanics and evidence tests",
+    description:
+      "Claim-pattern explainers that help users identify common debate moves, distinguish similar concepts, and choose the right evidence standard before arguing about outcomes.",
+    slugs: [
+      "disparate-impact-vs-intent-claims",
+      "systemic-vs-individual-racism-claims",
+      "equal-opportunity-claims",
+      "states-rights-vs-civil-rights-claims",
+      "anecdote-vs-data-claims",
+    ],
+  },
   {
     id: "crime-public-safety",
     title: "Crime and public safety",
@@ -118,10 +135,40 @@ const CLAIM_CLUSTERS = [
 
 const CLAIM_PATTERNS = [
   {
+    name: "No intent -> no discrimination",
+    description:
+      "The absence of direct motive evidence is treated as enough to dismiss the policy effect question.",
+    slug: "disparate-impact-vs-intent-claims",
+  },
+  {
+    name: "System claim -> personal denial",
+    description:
+      "A structural or institutional argument is rejected because it does not name one obviously biased individual.",
+    slug: "systemic-vs-individual-racism-claims",
+  },
+  {
+    name: "Formal access -> equal opportunity",
+    description:
+      "Equal eligibility on paper is treated as proof that starting conditions and access are already comparable.",
+    slug: "equal-opportunity-claims",
+  },
+  {
+    name: "States' rights -> rights answer",
+    description:
+      "A power-allocation slogan is treated as enough to settle whether equal rights are being protected.",
+    slug: "states-rights-vs-civil-rights-claims",
+  },
+  {
+    name: "Story -> population proof",
+    description:
+      "A vivid example is used as if it could measure prevalence, scale, or typicality by itself.",
+    slug: "anecdote-vs-data-claims",
+  },
+  {
     name: "Anecdote -> system claim",
     description:
       "A single case or short list is treated as proof of a broad, recurring pattern.",
-    slug: "non-citizen-voting-claims",
+    slug: "anecdote-vs-data-claims",
   },
   {
     name: "Disparity -> causation claim",
@@ -163,7 +210,7 @@ const CLAIM_PATTERNS = [
     name: "Paper neutrality -> equal outcomes",
     description:
       "Race-neutral legal wording is treated as proof that enforcement or outcomes must also be equal.",
-    slug: "equal-protection-under-the-law",
+    slug: "disparate-impact-vs-intent-claims",
   },
   {
     name: "Program exists -> equal access",
@@ -270,6 +317,11 @@ export default async function ClaimMapPage() {
   );
   const itemsBySlug = new Map((data.items || []).map((item) => [item.slug, item]));
   const visiblePatternItems = CLAIM_PATTERNS.filter((item) => itemsBySlug.has(item.slug));
+  const patternDetailEntries = await Promise.all(
+    [...new Set(visiblePatternItems.map((item) => item.slug))]
+      .map(async (slug) => [slug, await fetchExplainerDetailData(slug, { index: data }).catch(() => null)])
+  );
+  const patternExplainersBySlug = new Map(patternDetailEntries);
 
   return (
     <main className="space-y-4">
@@ -441,7 +493,14 @@ export default async function ClaimMapPage() {
         />
         <div className="grid gap-4 p-4 md:grid-cols-2 xl:grid-cols-3">
           {visiblePatternItems.map((item) => {
-            const explainer = itemsBySlug.get(item.slug);
+            const explainer =
+              patternExplainersBySlug.get(item.slug) || itemsBySlug.get(item.slug);
+            const policyEvidence = explainer?.related_policies?.[0]
+              ? {
+                  href: `/policies/${buildPolicySlug(explainer.related_policies[0])}`,
+                  title: explainer.related_policies[0].title,
+                }
+              : null;
 
             return (
               <Panel key={item.name} padding="md" className="flex h-full flex-col">
@@ -449,14 +508,24 @@ export default async function ClaimMapPage() {
                 <p className="mt-2 text-sm leading-6 text-[var(--ink-soft)]">
                   {item.description}
                 </p>
-                {explainer ? (
-                  <Link
-                    href={`/explainers/${explainer.slug}`}
-                    className="mt-auto pt-4 text-sm font-semibold text-[var(--ink-soft)] transition-[color] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(132,247,198,0.28)]"
-                  >
-                    Related explainer: {explainer.title}
-                  </Link>
-                ) : null}
+                <div className="mt-auto flex flex-wrap gap-3 pt-4">
+                  {explainer ? (
+                    <Link
+                      href={`/explainers/${explainer.slug}`}
+                      className="text-sm font-semibold text-[var(--ink-soft)] transition-[color] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(132,247,198,0.28)]"
+                    >
+                      Related explainer: {explainer.title}
+                    </Link>
+                  ) : null}
+                  {policyEvidence ? (
+                    <Link
+                      href={policyEvidence.href}
+                      className="text-sm font-semibold text-[var(--ink-soft)] transition-[color] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(132,247,198,0.28)]"
+                    >
+                      Policy evidence: {policyEvidence.title}
+                    </Link>
+                  ) : null}
+                </div>
               </Panel>
             );
           })}

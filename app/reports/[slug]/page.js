@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buildPageMetadata } from "@/lib/metadata";
 import {
+  fetchExplainersIndexData,
   fetchReportDetailData,
   fetchReportsHubData,
 } from "@/lib/public-site-data";
@@ -18,6 +19,7 @@ import TrustBar from "@/app/components/public/TrustBar";
 import ScoreExplanation from "@/app/components/public/ScoreExplanation";
 import InsightCard from "@/app/components/public/InsightCard";
 import {
+  ExplainerIndexGrid,
   PolicyCardList,
   RecentPolicyChangesTable,
   ReportCardGrid,
@@ -34,6 +36,29 @@ import {
 import { Panel } from "@/app/components/dashboard/primitives";
 
 export const dynamic = "force-dynamic";
+
+const REPORT_SUGGESTED_EXPLAINER_FALLBACKS = {
+  "black-impact-score": [
+    "systemic-vs-individual-racism-claims",
+    "anecdote-vs-data-claims",
+    "disparate-impact-vs-intent-claims",
+  ],
+  "civil-rights-timeline": [
+    "states-rights-vs-civil-rights-claims",
+    "disparate-impact-vs-intent-claims",
+    "party-voting-records-racial-policy",
+  ],
+  "historical-distribution": [
+    "party-voting-records-racial-policy",
+    "systemic-vs-individual-racism-claims",
+    "disparate-impact-vs-intent-claims",
+  ],
+  "executive-overview": [
+    "systemic-vs-individual-racism-claims",
+    "anecdote-vs-data-claims",
+    "equal-opportunity-claims",
+  ],
+};
 
 function buildRelatedPathCards(report) {
   const fallbackTitle = report.category || report.theme || "this report";
@@ -218,9 +243,10 @@ export async function generateMetadata({ params }) {
 
 export default async function ReportDetailPage({ params }) {
   const { slug } = await params;
-  const [report, hub] = await Promise.all([
+  const [report, hub, explainersIndex] = await Promise.all([
     fetchReportDetailData(slug),
     fetchReportsHubData(),
+    fetchExplainersIndexData(),
   ]);
 
   if (!report) {
@@ -229,6 +255,21 @@ export default async function ReportDetailPage({ params }) {
 
   const relatedPathCards = buildRelatedPathCards(report);
   const reportEditorial = getFlagshipReportEditorial(slug);
+  const explainersBySlug = new Map(
+    (explainersIndex.items || []).map((item) => [item.slug, item])
+  );
+  const fallbackSuggestedExplainers = (REPORT_SUGGESTED_EXPLAINER_FALLBACKS[slug] || [])
+    .map((itemSlug) => explainersBySlug.get(itemSlug))
+    .filter(Boolean);
+  const suggestedExplainers = [
+    ...fallbackSuggestedExplainers,
+    ...(report.suggested_explainers || []),
+  ].filter((item, index, items) => {
+    if (!item?.slug || !item?.title) {
+      return false;
+    }
+    return items.findIndex((candidate) => candidate?.slug === item.slug) === index;
+  }).slice(0, 3);
 
   return (
     <main className="space-y-4">
@@ -465,6 +506,22 @@ export default async function ReportDetailPage({ params }) {
           title="Continue through reports, explainers, public records, and trust pages"
           description="Choose the next path based on your question: explainers for context, president or policy pages for records, and trust pages for verification."
         />
+        {suggestedExplainers.length ? (
+          <div className="space-y-4">
+            <Panel padding="md" className="space-y-2">
+              <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
+                Suggested explainers
+              </p>
+              <h2 className="text-lg font-semibold text-white">
+                Start with the closest context explainer
+              </h2>
+              <p className="text-sm leading-7 text-[var(--ink-soft)]">
+                These explainers are matched from the report&apos;s theme, findings, and likely public claim patterns. Argument-mechanics explainers rise first when the report is likely to trigger a recurring debate frame.
+              </p>
+            </Panel>
+            <ExplainerIndexGrid items={suggestedExplainers} />
+          </div>
+        ) : null}
         <ReportCardGrid
           items={
             report.relatedReports?.length
