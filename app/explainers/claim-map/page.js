@@ -42,21 +42,25 @@ const CLAIM_CLUSTERS = [
     id: "crime-public-safety",
     title: "Crime and public safety",
     description:
-      "Claims that use crime data, victimization patterns, or vague cultural explanations to make racial conclusions that the data does not prove.",
+      "Claims that use crime data, sentencing, victimization patterns, or vague cultural explanations to make racial conclusions that the record does not prove.",
     slugs: [
       "understanding-13-50-crime-statistic",
       "black-on-black-crime-claim",
       "culture-causes-crime-claim",
+      "crime-statistics-context-and-misuse",
+      "sentencing-disparities-united-states",
     ],
   },
   {
     id: "poverty-public-benefits",
     title: "Poverty and public benefits",
     description:
-      "Claims that treat poverty, benefit usage, or family structure as simple evidence of behavior while ignoring eligibility, measurement, and policy context.",
+      "Claims that treat poverty, public support, or mobility as simple evidence of behavior while ignoring eligibility, measurement, and policy context.",
     slugs: [
       "welfare-dependency-claims",
       "family-structure-and-poverty-claims",
+      "government-benefits-racial-gap",
+      "bootstraps-vs-policy-reality",
     ],
   },
   {
@@ -71,6 +75,16 @@ const CLAIM_CLUSTERS = [
     ],
   },
   {
+    id: "law-rights-formal-neutrality",
+    title: "Law, rights, and formal neutrality",
+    description:
+      "Claims that treat constitutional language, equal-treatment rhetoric, or anti-DEI rollback arguments as proof that institutions are already fair in practice.",
+    slugs: [
+      "equal-protection-under-the-law",
+      "hiring-discrimination-and-anti-dei-rollbacks",
+    ],
+  },
+  {
     id: "historical-impact-policy-memory",
     title: "Historical impact and policy memory",
     description:
@@ -78,8 +92,19 @@ const CLAIM_CLUSTERS = [
     slugs: [
       "historical-impact-denial-claims",
       "mass-incarceration-policy-history",
-      "redlining-and-housing-wealth-gap",
-      "gi-bill-racial-inequality",
+      "redlining-black-homeownership",
+      "gi-bill-access-and-impact",
+      "homestead-act-exclusion",
+    ],
+  },
+  {
+    id: "party-history-realignment",
+    title: "Party history and realignment",
+    description:
+      "Claims that use party labels as timeless proof while skipping coalition shifts, regional splits, and the actual voting record on civil-rights policy.",
+    slugs: [
+      "party-switch-southern-strategy",
+      "party-voting-records-racial-policy",
     ],
   },
   {
@@ -127,6 +152,42 @@ const CLAIM_PATTERNS = [
     description:
       "Current outcomes are separated from policy timelines, institutions, and accumulated resources.",
     slug: "historical-impact-denial-claims",
+  },
+  {
+    name: "Party label -> timeless proof",
+    description:
+      "A party name is treated as enough evidence without checking coalition shifts, regional splits, or the underlying vote.",
+    slug: "party-voting-records-racial-policy",
+  },
+  {
+    name: "Paper neutrality -> equal outcomes",
+    description:
+      "Race-neutral legal wording is treated as proof that enforcement or outcomes must also be equal.",
+    slug: "equal-protection-under-the-law",
+  },
+  {
+    name: "Program exists -> equal access",
+    description:
+      "A benefit or opportunity is treated as equally available because it existed on paper.",
+    slug: "government-benefits-racial-gap",
+  },
+  {
+    name: "Reform happened -> problem solved",
+    description:
+      "A later reform is used to erase the earlier policy problem or to claim the system is now fully fair.",
+    slug: "sentencing-disparities-united-states",
+  },
+  {
+    name: "Self-reliance slogan -> structural denial",
+    description:
+      "A call for personal responsibility is used to dismiss how policy shaped access to mobility in the first place.",
+    slug: "bootstraps-vs-policy-reality",
+  },
+  {
+    name: "Crime number -> policy conclusion",
+    description:
+      "A headline statistic is used to justify a much broader claim about race, danger, or policy without enough measurement context.",
+    slug: "crime-statistics-context-and-misuse",
   },
 ];
 
