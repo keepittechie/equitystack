@@ -97,8 +97,8 @@ function buildExplainerResearchPaths({
       title: `Review ${president.name}'s broader presidential record`,
       description:
         president.promiseTitles[0]
-          ? `This explainer already connects to promise and policy context under ${president.name}, including ${president.promiseTitles[0]}.`
-          : `Open ${president.name}'s profile to place this topic inside a fuller presidential record on Black Americans.`,
+          ? `Use this only if you want administration-level context beyond this explainer, including ${president.promiseTitles[0]}.`
+          : `Use this only if you want to place the explainer inside a broader presidential record on Black Americans.`,
     });
   }
 
@@ -106,9 +106,9 @@ function buildExplainerResearchPaths({
     items.push({
       href: "/promises",
       eyebrow: "Promise tracker",
-      title: "Compare promises with follow-through",
+      title: "Compare promises with follow-through if needed",
       description:
-        "Use the promise tracker to compare campaign or governing commitments against the public record that followed.",
+        "This is a deeper follow-up path for readers who want to compare campaign or governing commitments against the public record that followed.",
     });
   }
 
@@ -117,26 +117,26 @@ function buildExplainerResearchPaths({
   items.push({
     href: "/policies",
     eyebrow: "Policy explorer",
-    title: "Browse the underlying policy records",
+    title: "Open the underlying policy records only if you want the raw record",
     description:
-      "Policy pages expose the laws, executive actions, and court decisions that help verify or complicate the narrative on this explainer page.",
+      "Policy pages expose the laws, executive actions, and court decisions that help verify or complicate the narrative already summarized on this explainer page.",
   });
 
   items.push({
     href: "/reports",
     eyebrow: "Reports",
-    title: "Read report analysis built from the same public record",
+    title: "Read report analysis only if you want a broader synthesis",
     description:
-      "Reports synthesize patterns across presidents, policies, and time when you need comparison rather than one topic page.",
+      "Reports synthesize patterns across presidents, policies, and time when you need comparison beyond this one topic page.",
   });
 
   if (relatedFutureBills.length) {
     items.push({
       href: "/future-bills",
       eyebrow: "Legislation and proposals",
-      title: "Browse linked reform proposals and tracked bills",
+      title: "Browse linked reform proposals and tracked bills if you want current follow-on paths",
       description:
-        "Use the legislative layer when this topic leads into current reform ideas, tracked bills, or future-facing policy proposals.",
+        "Use the legislative layer only when this topic leads into current reform ideas, tracked bills, or future-facing policy proposals.",
       note: `${relatedFutureBills.length} related proposal${relatedFutureBills.length === 1 ? "" : "s"} linked on this page.`,
     });
   }
@@ -144,9 +144,9 @@ function buildExplainerResearchPaths({
   items.push({
     href: "/sources",
     eyebrow: "Sources",
-    title: "Inspect the evidence base behind this topic",
+    title: "Inspect the evidence base only if you want to verify the citations directly",
     description:
-      "The source library helps readers move from one explainer's citations into the wider evidence base behind EquityStack's public record.",
+      "The source library helps readers move from this explainer's citations into the wider evidence base behind EquityStack's public record.",
   });
 
   const seen = new Set();
@@ -157,23 +157,17 @@ function buildExplainerResearchPaths({
   });
 }
 
-function buildExplainerUtilityNotes(explainer, editorial) {
+function buildExplainerUtilityNotes(editorial) {
   return [
     editorial.pagePurpose,
     editorial.whyThisMatters,
-    `This page currently connects to ${explainer.related_policies?.length || 0} policy record${
-      (explainer.related_policies?.length || 0) === 1 ? "" : "s"
-    }, ${explainer.related_promises?.length || 0} promise record${
-      (explainer.related_promises?.length || 0) === 1 ? "" : "s"
-    }, and ${explainer.related_future_bills?.length || 0} reform or bill path${
-      (explainer.related_future_bills?.length || 0) === 1 ? "" : "s"
-    }.`,
+    "This page should answer the core question on its own. The linked records, reports, and sources are there to verify the answer or take the topic deeper, not to replace the explanation.",
   ].filter(Boolean);
 }
 
 function buildPageMethodNote() {
   return (
-    "Explainers are interpretation layers. They help frame the record, but methodology and sources still determine how much weight a reader should place on the claim."
+    "Explainers should give the reader the answer first. Methodology and sources are still necessary, but mainly to verify how strong that answer is and where its limits are."
   );
 }
 
@@ -182,37 +176,37 @@ function buildRelatedExplainerResearchPaths() {
     {
       href: "/research",
       eyebrow: "Research hub",
-      title: "Return to the curated research hub",
+      title: "Open the research hub only if this topic becomes a broader question",
       description:
-        "Use the research hub when this topic opens into a broader question and you need the strongest thematic, report, or trust-page path.",
+        "This is an optional follow-up path when the explainer leads into a wider thematic question and you want the strongest thematic, report, or trust-page route.",
     },
     {
       href: "/reports",
       eyebrow: "Reports",
-      title: "Read reports built from the same public record",
+      title: "Read reports only if you want broader synthesis",
       description:
-        "Reports synthesize broader patterns across presidents, policies, and time, making them the next step when you need comparative analysis instead of a single explainer.",
+        "Reports synthesize broader patterns across presidents, policies, and time when you want comparative analysis beyond a single explainer.",
     },
     {
       href: "/policies",
       eyebrow: "Policy explorer",
-      title: "Browse the underlying policy records",
+      title: "Open policy records only if you want the underlying law or action pages",
       description:
-        "Policy pages expose the laws, executive actions, and court decisions that help verify or complicate the narrative on this explainer page.",
+        "Policy pages expose the laws, executive actions, and court decisions that help verify or complicate the narrative already summarized on this page.",
     },
     {
       href: "/sources",
       eyebrow: "Sources",
-      title: "Inspect the broader source library",
+      title: "Inspect the broader source library only if you want deeper citation review",
       description:
-        "The source library helps readers move from one explainer's citations into the wider evidence base behind EquityStack's public record.",
+        "The source library helps readers move from this explainer's citations into the wider evidence base behind EquityStack's public record.",
     },
     {
       href: "/glossary",
       eyebrow: "Glossary",
-      title: "Clarify the site’s key concepts and page types",
+      title: "Open the glossary only if you need help with site terms",
       description:
-        "Use the glossary when you need quick definitions for terms like record, report, thematic page, outcome, or source before moving deeper into the site.",
+        "The glossary is a support path for readers who want quick definitions for terms like record, report, thematic page, outcome, or source.",
     },
   ];
 }
@@ -222,25 +216,25 @@ const EXPLAINER_SYSTEM_GUIDANCE = [
     href: "/reports",
     label: "Synthesis",
     tone: "info",
-    title: "Reports show the broader pattern around this topic",
+    title: "Reports are optional when you want the broader pattern",
     description:
-      "Use reports when the question becomes comparative, historical across many records, or more analytical than one topic page can hold.",
+      "Use reports only when the question becomes comparative, historical across many records, or more analytical than one topic page can hold.",
   },
   {
     href: "/sources",
     label: "Evidence",
     tone: "verified",
-    title: "Sources let you verify the record beneath the narrative",
+    title: "Sources are for direct verification of the record",
     description:
-      "Use the source library when you want to inspect the evidence base supporting the policy, promise, and outcome claims around this topic.",
+      "Use the source library only when you want to inspect the evidence base supporting the policy, promise, and outcome claims around this topic.",
   },
   {
     href: "/policies",
     label: "Records",
     tone: "default",
-    title: "Policy pages turn topic context into concrete records",
+    title: "Policy pages expose the concrete records behind the explanation",
     description:
-      "Use policy and promise pages when you want the specific laws, actions, outcomes, and related Black-impact rows underneath the explainer.",
+      "Use policy and promise pages only when you want the specific laws, actions, outcomes, and related Black-impact rows underneath the explainer.",
   },
 ];
 
@@ -508,7 +502,7 @@ export default async function ExplainerDetailPage({ params, searchParams }) {
     relatedPromises,
     relatedFutureBills,
   });
-  const utilityNotes = buildExplainerUtilityNotes(explainer, editorial);
+  const utilityNotes = buildExplainerUtilityNotes(editorial);
   const flagshipCards = buildFlagshipExplainerCards(editorial);
   const genericResourceLinks = buildRelatedExplainerResearchPaths();
   const relatedExplainers =
@@ -635,14 +629,16 @@ export default async function ExplainerDetailPage({ params, searchParams }) {
 
       <ExplainerArgumentModeToggle
         argumentMode={explainer.argument_mode}
+        argumentReadyBreakdown={explainer.argument_ready_breakdown}
         explainerTitle={explainer.title}
         explainerSlug={slug}
+        explainerSummary={explainer.summary}
         initialMode={resolvedSearchParams.mode === "argument" ? "argument" : "explainer"}
       />
 
       <PageRoleCallout
-        title="Use explainers as the context layer"
-        description="Explainers are the context layer. They help readers understand a legal, historical, or policy question before moving into the record layer or the evidence layer. Reports remain the synthesis layer."
+        title="Use explainers as the answer-first layer"
+        description="Explainers should answer the main legal, historical, or policy question on-page. Linked records, reports, and sources are for verification, comparison, or deeper follow-up when the reader wants more than the direct answer."
         links={[
           { href: "/reports", label: "Reports" },
           { href: "/sources", label: "Sources" },
@@ -655,10 +651,10 @@ export default async function ExplainerDetailPage({ params, searchParams }) {
       <Panel prominence="primary" className="overflow-hidden">
         <SectionHeader
           eyebrow={editorial.lens || "Read this for"}
-          title="What this explainer helps clarify"
+          title="What this explainer answers first"
           description={
             editorial.pagePurpose ||
-            "The best use of an explainer is to clarify the claim, connect it to Black history or policy history, and make the next evidentiary click obvious."
+            "The best use of an explainer is to answer the core claim clearly, connect it to Black history or policy history, and make verification possible without forcing extra clicks."
           }
         />
         <div className="space-y-4 p-4">
@@ -671,8 +667,8 @@ export default async function ExplainerDetailPage({ params, searchParams }) {
           </div>
           <DiscoveryGuidancePanel
             eyebrow="How this explainer supports the platform"
-            title="Read this explainer with records, reports, and sources nearby"
-            description="Explainers give topic context first. The next step is usually a linked record, a report, or the evidence layer."
+            title="Use linked records only when you want deeper verification"
+            description="This explainer should stand on its own first. The surrounding records, reports, and sources are there when a reader wants more detail or wants to inspect the evidence directly."
             items={EXPLAINER_SYSTEM_GUIDANCE}
           />
           <MethodologyCallout description={buildPageMethodNote()} />
@@ -682,8 +678,8 @@ export default async function ExplainerDetailPage({ params, searchParams }) {
       <Panel className="overflow-hidden">
         <SectionHeader
           eyebrow="Page structure"
-          title="Connected records and supporting context"
-          description="Use these grouped records to move from the explainer narrative into linked policy, promise, and reform evidence."
+          title="The answer, explained"
+          description="Start here for the full explanation. Linked records appear later on the page for verification or deeper research, not because this page is supposed to leave the question unanswered."
         />
         <div className="space-y-4 p-4">
           {featuredCards.map((card) => (
@@ -709,7 +705,7 @@ export default async function ExplainerDetailPage({ params, searchParams }) {
           ) : null}
 
           <Panel padding="md" className="space-y-4">
-            <h2 className="text-xl font-semibold text-white">Connected records on this page</h2>
+            <h2 className="text-xl font-semibold text-white">Verification paths attached to this page</h2>
             <div className="grid gap-3 md:grid-cols-3">
               <MetricCard
                 label="Policies"
@@ -734,7 +730,7 @@ export default async function ExplainerDetailPage({ params, searchParams }) {
           </Panel>
 
           <Panel padding="md" className="space-y-4">
-            <h2 className="text-xl font-semibold text-white">How to use this page well</h2>
+            <h2 className="text-xl font-semibold text-white">Optional next steps</h2>
             <div className="grid gap-3">
               {genericResourceLinks.slice(0, 3).map((item) => (
                 <Panel
@@ -785,9 +781,9 @@ export default async function ExplainerDetailPage({ params, searchParams }) {
       {researchPaths.length ? (
         <Panel className="overflow-hidden">
           <SectionHeader
-            eyebrow="Research paths"
-            title="Where to go next from this explainer"
-            description="These routes help turn one explainer page into a fuller research path across presidents, promises, policies, legislation, reports, and thematic guides."
+            eyebrow="Optional research paths"
+            title="Go deeper only if you need more than the explainer"
+            description="These routes are follow-up paths for readers who want adjacent records, broader comparison, or primary-source verification after reading the answer on this page."
           />
           <div className="grid gap-4 p-4 md:grid-cols-2 xl:grid-cols-3">
             {researchPaths.map((item) => (
@@ -1062,8 +1058,8 @@ export default async function ExplainerDetailPage({ params, searchParams }) {
       <Panel className="overflow-hidden">
         <SectionHeader
           eyebrow="Continue exploring"
-          title="Move from this explainer into records, reports, and trust pages"
-          description="Use these next steps when you want to turn one topic page into a broader research path across records, synthesis, and verification."
+          title="Broader site paths if you want to keep going"
+          description="These are optional site-wide routes for readers who want broader browsing after the explainer, not prerequisites for understanding the topic."
         />
         <div className="grid gap-4 p-4 md:grid-cols-2 xl:grid-cols-4">
           {genericResourceLinks.slice(0, 4).map((item) => (

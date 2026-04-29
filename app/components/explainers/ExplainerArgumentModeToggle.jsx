@@ -38,8 +38,10 @@ function buildFullArgumentCopyText({
 
 export default function ExplainerArgumentModeToggle({
   argumentMode,
+  argumentReadyBreakdown,
   explainerTitle,
   explainerSlug,
+  explainerSummary,
   initialMode = "explainer",
 }) {
   const [mode, setMode] = useState(initialMode === "argument" ? "argument" : "explainer");
@@ -61,8 +63,25 @@ export default function ExplainerArgumentModeToggle({
   const isArgumentMode = mode === "argument";
   const keyPoints = argumentMode.keyPoints || [];
   const commonClaims = argumentMode.commonClaims || [];
+  const primaryClaim = commonClaims[0] || null;
   const debateLines = argumentMode.debateLines || [];
   const shareCards = argumentMode.shareCards || [];
+  const previewPoints = (
+    argumentReadyBreakdown?.dataShows?.length
+      ? argumentReadyBreakdown.dataShows
+      : keyPoints
+  ).slice(0, 3);
+  const previewAnswer =
+    argumentReadyBreakdown?.bottomLine ||
+    primaryClaim?.response ||
+    argumentMode.summary ||
+    explainerSummary ||
+    "";
+  const previewContext =
+    argumentReadyBreakdown?.whyMisleading ||
+    argumentMode.summary ||
+    "";
+  const previewQuestion = primaryClaim?.question || null;
   const fullArgumentText = buildFullArgumentCopyText({
     argumentMode,
     explainerTitle,
@@ -101,7 +120,11 @@ export default function ExplainerArgumentModeToggle({
       <SectionHeader
         eyebrow="Debate-ready layer"
         title="Argument mode"
-        description="Switch to a condensed version of this explainer for quick claims, responses, questions, and copy-ready lines."
+        description={
+          isArgumentMode
+            ? "Use this condensed version for quick claims, responses, questions, and copy-ready lines."
+            : "Read the short answer first. Switch modes only if you want the condensed debate-ready version."
+        }
         action={
           <div className="flex flex-wrap items-center gap-2">
             <button
@@ -234,7 +257,51 @@ export default function ExplainerArgumentModeToggle({
             </div>
           ) : null}
         </div>
-      ) : null}
+      ) : (
+        <div className="space-y-4 p-4">
+          {previewAnswer ? (
+            <Panel padding="md">
+              <StatusPill tone="info">Short answer</StatusPill>
+              {primaryClaim?.claim ? (
+                <p className="mt-3 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
+                  Addresses this claim
+                </p>
+              ) : null}
+              {primaryClaim?.claim ? (
+                <p className="mt-2 text-sm leading-7 text-white">{primaryClaim.claim}</p>
+              ) : null}
+              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+                {previewAnswer}
+              </p>
+              {previewContext && previewContext !== previewAnswer ? (
+                <p className="mt-3 text-[12px] leading-6 text-[var(--ink-muted)]">
+                  {previewContext}
+                </p>
+              ) : null}
+            </Panel>
+          ) : null}
+
+          {previewPoints.length ? (
+            <div className="grid gap-3 md:grid-cols-3">
+              {previewPoints.map((item) => (
+                <Panel key={item} padding="md" className="h-full">
+                  <StatusPill tone="verified">Key point</StatusPill>
+                  <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item}</p>
+                </Panel>
+              ))}
+            </div>
+          ) : null}
+
+          {previewQuestion ? (
+            <Panel padding="md">
+              <StatusPill tone="warning">Question to test the claim</StatusPill>
+              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+                {previewQuestion}
+              </p>
+            </Panel>
+          ) : null}
+        </div>
+      )}
     </Panel>
   );
 }
