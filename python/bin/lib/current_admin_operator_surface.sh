@@ -256,6 +256,64 @@ PY
   CURRENT_ADMIN_APPLY_VALIDATION_PATH="${context_lines[5]}"
 }
 
+current_admin_queue_metrics() {
+  local queue_path="$1"
+
+  CURRENT_ADMIN_QUEUE_PATH="$queue_path" "$VENV_PYTHON" - <<'PY'
+import json
+import os
+from pathlib import Path
+
+path = Path(os.environ["CURRENT_ADMIN_QUEUE_PATH"]).resolve()
+payload = json.loads(path.read_text()) if path.exists() else {}
+items = [item for item in (payload.get("items") or []) if isinstance(item, dict)]
+auto_approved = [item for item in (payload.get("auto_approved_items") or []) if isinstance(item, dict)]
+auto_rejected = [item for item in (payload.get("auto_rejected_items") or []) if isinstance(item, dict)]
+importable_manual = [
+    item for item in items
+    if item.get("approved") or item.get("operator_status") == "approved"
+]
+print(len(items))
+print(len(auto_approved))
+print(len(auto_rejected))
+print(len(auto_approved) + len(importable_manual))
+PY
+}
+
+current_admin_should_auto_deep_review() {
+  local queue_path="$1"
+
+  CURRENT_ADMIN_QUEUE_PATH="$queue_path" "$VENV_PYTHON" - <<'PY'
+import json
+import os
+from pathlib import Path
+
+path = Path(os.environ["CURRENT_ADMIN_QUEUE_PATH"]).resolve()
+payload = json.loads(path.read_text()) if path.exists() else {}
+items = [item for item in (payload.get("items") or []) if isinstance(item, dict)]
+should_run = False
+for item in items:
+    ai_review = item.get("ai_review") if isinstance(item.get("ai_review"), dict) else {}
+    caution_flags = {
+        str(flag).strip().lower().replace("-", "_").replace(" ", "_")
+        for flag in (ai_review.get("caution_flags") or [])
+        if str(flag or "").strip()
+    }
+    source_quality = str(ai_review.get("source_quality") or "").strip().lower()
+    if source_quality not in {"medium", "high"}:
+        continue
+    if "weak_evidence" in caution_flags:
+        continue
+    if "conflicting_sources" in caution_flags:
+        continue
+    if "manual_review_required" not in caution_flags:
+        continue
+    should_run = True
+    break
+print("true" if should_run else "false")
+PY
+}
+
 current_admin_decision_file_status() {
   local review_path="$1"
   local decision_file="$2"

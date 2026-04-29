@@ -16,50 +16,61 @@ Bootstrap local Python first if needed:
 
 ## Canonical Commands
 
-Normal path:
+Canonical automation path:
 
 ```bash
 ./bin/equitystack current-admin run
-./bin/equitystack current-admin review
-./bin/equitystack current-admin apply
-./bin/equitystack current-admin apply --apply --yes
+./bin/equitystack current-admin run --stop-after review
+./bin/equitystack current-admin run --stop-after apply
+./bin/equitystack current-admin run --stop-after impact-evaluate
+./bin/equitystack current-admin run --stop-after impact-promote
+./bin/equitystack current-admin run --stop-after enrichment
 ```
 
-Manual batch path:
+Manual recovery path:
 
 ```bash
-./bin/equitystack current-admin run --input data/current_admin_batches/<batch-file>.json
-./bin/equitystack current-admin review --input reports/current_admin/<batch-name>.ai-review.json
-./bin/equitystack current-admin apply --input reports/current_admin/<batch-name>.manual-review-queue.json
-./bin/equitystack current-admin apply --input reports/current_admin/<batch-name>.manual-review-queue.json --apply --yes
+./bin/equitystack current-admin review --input reports/current_admin/<batch>.ai-review.json
+./bin/equitystack current-admin apply --input reports/current_admin/<batch>.manual-review-queue.json
+./bin/equitystack current-admin apply --input reports/current_admin/<batch>.manual-review-queue.json --apply --yes
 ```
 
 Deeper AI review path:
 
 ```bash
-./bin/equitystack current-admin deep-review --input reports/current_admin/<batch-name>.normalized.json
+./bin/equitystack current-admin deep-review --input reports/current_admin/<batch>.normalized.json
 ```
 
-Optional evidence path:
+Direct evidence and impact path:
 
 ```bash
-./bin/equitystack current-admin outcome-evidence --input reports/current_admin/<batch-name>.manual-review-queue.json
+./bin/equitystack current-admin outcome-evidence --input reports/current_admin/<batch>.normalized.json
+./bin/equitystack impact evaluate --input reports/current_admin/<batch>.normalized.json --outcome-evidence reports/current_admin/<batch>.outcome-evidence.json --auto-approve-safe-supplemental --dry-run
+./bin/equitystack impact promote --input reports/current_admin/<batch>.impact-evaluate.json --dry-run
+./bin/equitystack impact apply-current-admin-outcome-enrichment --input reports/current_admin/<batch>.normalized.json --outcome-evidence reports/current_admin/<batch>.outcome-evidence.json --impact-evaluation reports/current_admin/<batch>.impact-evaluate.json --dry-run
 ```
 
 ## Practical Model
 
-Current-admin now follows this operator model:
+Current-admin now follows an exceptions-only automation model:
 
 1. `current-admin run`
-   - prepares the batch
-   - runs standard AI review
+   - discovers fresh updates unless `--input` is supplied
+   - generates the next batch when needed
+   - normalizes the batch
+   - runs the standard OpenAI review
    - promotes the AI-first queue
+   - stops immediately if exception-only manual review remains
+   - otherwise runs the guarded import path
+   - then runs outcome-evidence, strict impact evaluation, strict impact promotion, enrichment preview, enrichment dry-run, strict enrichment apply, and unified outcome sync
+   - writes batch-scoped automation artifacts and an exception queue when anything remains blocked outside the safe automated path
 2. `current-admin review`
-   - resolves AI decisions first
-   - auto-resolves already-tracked rows when discovery shows no material change or only source-refresh context
-   - shows only the remaining manual-review slice
+   - is the exception-only recovery surface
+   - refreshes the AI-first queue and decision template
+   - shows only the remaining borderline manual-review slice
    - writes the canonical decision log only when manual decisions are still needed
 3. `current-admin apply`
+   - remains the direct guarded import surface
    - dry-run by default
    - reruns pre-commit and import dry-run
 4. `current-admin apply --apply --yes`
@@ -73,6 +84,8 @@ This is review-first and artifact-first. It does not bypass:
 - pre-commit review
 - import dry-run
 - `--apply --yes`
+- strict supplemental validation
+- strict enrichment validation
 
 ## Stage Map
 
@@ -83,12 +96,20 @@ This is review-first and artifact-first. It does not bypass:
 3. `scripts/normalize_current_admin_batch.py`
 4. `scripts/review_current_admin_batch_with_openai_batch.py`
 5. `scripts/promote_current_admin_review_to_queue.py`
+6. `scripts/build_current_admin_precommit_review.py` and `scripts/import_curated_current_admin_batch.py` when no manual-review exceptions remain
+7. `scripts/discover_current_admin_outcome_evidence.py`
+8. `scripts/evaluate_impact_maturation.py evaluate --auto-approve-safe-supplemental --dry-run`
+9. `scripts/evaluate_impact_maturation.py promote --dry-run`, then `--apply --yes` only for explicit validator-approved rows
+10. `scripts/preview_current_admin_policy_outcome_enrichment.py`
+11. `scripts/apply_current_admin_outcome_enrichment.py --dry-run`, then `--apply --yes` only for explicit validator-approved rows
+12. `scripts/sync_current_admin_policy_outcomes.py --apply --yes` only after enrichment apply touches approved outcome rows
 
 `current-admin run --input ...` skips discovery and batch generation:
 
 1. `scripts/normalize_current_admin_batch.py`
 2. `scripts/review_current_admin_batch_with_openai_batch.py`
 3. `scripts/promote_current_admin_review_to_queue.py`
+4. the same guarded import / impact / enrichment path when no manual-review exceptions remain
 
 `current-admin review`:
 
@@ -106,7 +127,7 @@ Use it when the standard AI review or operator notes say a batch needs deeper re
 
 1. `scripts/discover_current_admin_outcome_evidence.py`
 
-Use it to collect implementation and downstream outcome evidence for already-tracked current-admin rows. This stage is active, but read-only. It is not part of the default `current-admin run` path and does not change review/apply behavior.
+Use it to collect implementation and downstream outcome evidence for already-tracked current-admin rows. This stage is active, read-only, and is part of the default full `current-admin run` path after the guarded import phase.
 
 `current-admin apply` wraps:
 
@@ -124,6 +145,15 @@ Main artifacts under `reports/current_admin/`:
 - `<batch>.ai-review.json`
 - `<batch>.manual-review-queue.json`
 - `<batch>.outcome-evidence.json`
+- `<batch>.impact-evaluate.json`
+- `<batch>.impact-promote-dry-run.json`
+- `<batch>.impact-promote-apply.json`
+- `<batch>.outcome-enrichment-preview.json`
+- `<batch>.outcome-enrichment-dry-run.json`
+- `<batch>.outcome-enrichment-apply.json`
+- `<batch>.current-admin-outcome-sync-apply.json`
+- `<batch>.automation-report.json`
+- `<batch>.exception-queue.json`
 - `<batch>.decision-template.json`
 - `review_decisions/<batch>.decision-log.json`
 - `<batch>.pre-commit-review.json`
@@ -150,15 +180,15 @@ Active now:
 
 - Phase 1 implementation / execution evidence in discovery and batch context
 - Phase 2 `current-admin outcome-evidence` collection
+- Phase 3 strict supplemental auto-approval for `impact_pending -> impact_review_ready`, but only through explicit validator-approved rows
+- Phase 4 strict current-admin outcome enrichment through the canonical `impact apply-current-admin-outcome-enrichment` command
 
-Built but intentionally not operational:
+Built but intentionally constrained:
 
-- Phase 3 impact maturation integration is dry-run only through `impact evaluate --outcome-evidence ...`
-- Phase 4 current-admin unified outcome enrichment is report-only through `impact preview-current-admin-outcome-enrichment`
-- Phase 5 judicial impact is scaffold-only through `impact discover-judicial-candidates`, `impact import-judicial-batch`, and `impact materialize-judicial-outcomes`
+- Phase 5 judicial impact is scaffold-only through `impact judicial-run`, `impact judicial-review`, and `impact judicial-apply`
 - Phase 6 UI behavior is unchanged; any future rendering of these fields must stay read-only unless separately activated
 
-These controlled-rollout stages do not change current-admin scoring, Black Impact Score logic, current-admin apply behavior, or existing admin layout.
+These controlled-rollout stages do not change current-admin scoring formulas, Black Impact Score logic, or existing admin layout.
 
 ## Read-Only vs Mutating
 
@@ -168,26 +198,21 @@ These controlled-rollout stages do not change current-admin scoring, Black Impac
 - `ai-review`: advisory only
 - `deep-review`: advisory only
 - `outcome-evidence`: read-only artifact generation only
+- `impact evaluate`: read-only artifact generation only
+- `impact promote`: dry-run unless `--apply --yes`
+- `apply-current-admin-outcome-enrichment`: dry-run unless `--apply --yes`
 - `review`: writes queue/template/log artifacts only
 - `pre-commit`: read-only
 - `apply`: dry-run unless `--apply --yes`
 - `import`: dry-run unless `--apply --yes`
 - `validate`: read-only
 
-## State Machine
+## State Model
 
-`./bin/equitystack current-admin status` reports:
+`./bin/equitystack current-admin status` still reports the canonical current-admin progression and the next safe step. For fully automated batches, the automation and exception artifacts provide the clearest phase-level detail:
 
-- `DISCOVERY_READY`
-- `NORMALIZED`
-- `REVIEW_READY`
-- `QUEUE_READY`
-- `PRECOMMIT_READY`
-- `IMPORT_READY`
-- `COMPLETE`
-- `BLOCKED`
-
-It also prints artifact presence, blocking issues, and the recommended next command.
+- `<batch>.automation-report.json`
+- `<batch>.exception-queue.json`
 
 ## Admin Mapping
 
@@ -204,11 +229,11 @@ Tracker model:
 
 1. discover / batch ready
 2. AI review
-3. operator review for the manual slice only
-4. decision-log sync
-5. pre-commit / apply readiness
-6. final apply confirmation
-7. validation / complete
+3. exception-only manual review when needed
+4. guarded pre-commit / import readiness
+5. guarded import apply
+6. outcome-evidence / impact evaluate / impact promote
+7. outcome enrichment / unified outcome sync / complete
 
 The review page can legitimately be empty when `auto_approved_items` exist and `items` is empty.
 
@@ -218,7 +243,9 @@ The review page can legitimately be empty when `auto_approved_items` exist and `
 - The standard review path is single-pass.
 - `current-admin deep-review` is the explicit deeper AI option for ambiguous or higher-risk cases.
 - `current-admin outcome-evidence` never writes DB rows or `policy_outcomes`.
-- `impact promote --apply --yes` blocks any transition that depends on supplemental outcome-evidence recommendations in this rollout.
+- `impact evaluate --auto-approve-safe-supplemental --dry-run` is read-only and is the only place supplemental evidence can become explicitly validator-approved.
+- `impact promote --apply --yes` never infers approval on its own. Supplemental transitions must already be marked `approved=true` by the strict validator.
+- `impact apply-current-admin-outcome-enrichment --apply --yes` only writes source links and measurable outcome enrichment for validator-approved rows. It never promotes implementation-only, weak-only, legal-context, or broad Federal Register evidence.
 - DB-backed commands honor runtime overrides such as `DB_HOST=10.10.0.15`.
 - Preferred local path: rebuild `python/venv` with `./bin/bootstrap-python-env`.
 
@@ -226,6 +253,7 @@ The review page can legitimately be empty when `auto_approved_items` exist and `
 
 ```bash
 ./bin/equitystack current-admin status
-./bin/equitystack current-admin review --input reports/current_admin/<batch-name>.ai-review.json
-./bin/equitystack current-admin deep-review --input reports/current_admin/<batch-name>.normalized.json
+./bin/equitystack current-admin review --input reports/current_admin/<batch>.ai-review.json
+./bin/equitystack current-admin deep-review --input reports/current_admin/<batch>.normalized.json
+./bin/equitystack impact evaluate --input reports/current_admin/<batch>.normalized.json --outcome-evidence reports/current_admin/<batch>.outcome-evidence.json --auto-approve-safe-supplemental --dry-run
 ```

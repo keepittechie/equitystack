@@ -159,6 +159,35 @@ normalize_current_admin_path_args() {
   done
 }
 
+normalize_impact_path_args() {
+  local -n output_args_ref="$1"
+  shift || true
+
+  output_args_ref=()
+
+  while [ "$#" -gt 0 ]; do
+    case "$1" in
+      --input|--output|--report|--ledger|--outcome-evidence|--impact-evaluation|--source-config|--feed-json|--csv)
+        local flag="$1"
+        local value="${2:-}"
+        [ -n "$value" ] || { output_args_ref+=("$1"); shift; continue; }
+        output_args_ref+=("$flag" "$(normalize_python_workspace_path "$value")")
+        shift 2
+        ;;
+      --input=*|--output=*|--report=*|--ledger=*|--outcome-evidence=*|--impact-evaluation=*|--source-config=*|--feed-json=*|--csv=*)
+        local flag="${1%%=*}"
+        local value="${1#*=}"
+        output_args_ref+=("$flag=$(normalize_python_workspace_path "$value")")
+        shift
+        ;;
+      *)
+        output_args_ref+=("$1")
+        shift
+        ;;
+    esac
+  done
+}
+
 artifact_status_text() {
   local artifact_path="$1"
 

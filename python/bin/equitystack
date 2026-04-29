@@ -56,6 +56,250 @@ current_admin_decision_log_dir() {
   printf '%s/review_decisions\n' "$(current_admin_reports_dir)"
 }
 
+current_admin_automation_artifact_path() {
+  local batch_name="$1"
+  local suffix="$2"
+  printf '%s/%s.%s.json\n' "$(current_admin_reports_dir)" "$batch_name" "$suffix"
+}
+
+resolve_current_admin_automation_artifacts() {
+  local batch_name="$1"
+  CURRENT_ADMIN_OUTCOME_EVIDENCE_PATH="$(current_admin_automation_artifact_path "$batch_name" "outcome-evidence")"
+  CURRENT_ADMIN_IMPACT_EVALUATE_PATH="$(current_admin_automation_artifact_path "$batch_name" "impact-evaluate")"
+  CURRENT_ADMIN_IMPACT_PROMOTE_DRY_RUN_PATH="$(current_admin_automation_artifact_path "$batch_name" "impact-promote-dry-run")"
+  CURRENT_ADMIN_IMPACT_PROMOTE_APPLY_PATH="$(current_admin_automation_artifact_path "$batch_name" "impact-promote-apply")"
+  CURRENT_ADMIN_OUTCOME_ENRICHMENT_PREVIEW_PATH="$(current_admin_automation_artifact_path "$batch_name" "outcome-enrichment-preview")"
+  CURRENT_ADMIN_OUTCOME_ENRICHMENT_DRY_RUN_PATH="$(current_admin_automation_artifact_path "$batch_name" "outcome-enrichment-dry-run")"
+  CURRENT_ADMIN_OUTCOME_ENRICHMENT_APPLY_PATH="$(current_admin_automation_artifact_path "$batch_name" "outcome-enrichment-apply")"
+  CURRENT_ADMIN_OUTCOME_SYNC_APPLY_PATH="$(current_admin_automation_artifact_path "$batch_name" "current-admin-outcome-sync-apply")"
+  CURRENT_ADMIN_AUTOMATION_REPORT_PATH="$(current_admin_automation_artifact_path "$batch_name" "automation-report")"
+  CURRENT_ADMIN_EXCEPTION_QUEUE_PATH="$(current_admin_automation_artifact_path "$batch_name" "exception-queue")"
+}
+
+write_current_admin_exception_queue() {
+  local batch_name="$1"
+  local stage="$2"
+  local source_artifact="$3"
+  local next_step="$4"
+  local recommended_command="$5"
+  local reason="$6"
+
+  CURRENT_ADMIN_BATCH_NAME="$batch_name" \
+  CURRENT_ADMIN_STAGE="$stage" \
+  CURRENT_ADMIN_SOURCE_ARTIFACT="$source_artifact" \
+  CURRENT_ADMIN_NEXT_STEP="$next_step" \
+  CURRENT_ADMIN_RECOMMENDED_COMMAND="$recommended_command" \
+  CURRENT_ADMIN_REASON="$reason" \
+  CURRENT_ADMIN_EXCEPTION_QUEUE_PATH="$CURRENT_ADMIN_EXCEPTION_QUEUE_PATH" \
+  "$VENV_PYTHON" - <<'PY'
+import json
+import os
+from pathlib import Path
+
+batch_name = os.environ["CURRENT_ADMIN_BATCH_NAME"]
+stage = os.environ["CURRENT_ADMIN_STAGE"]
+source_artifact = Path(os.environ["CURRENT_ADMIN_SOURCE_ARTIFACT"]).resolve()
+next_step = os.environ["CURRENT_ADMIN_NEXT_STEP"]
+recommended_command = os.environ["CURRENT_ADMIN_RECOMMENDED_COMMAND"]
+reason = os.environ["CURRENT_ADMIN_REASON"]
+output_path = Path(os.environ["CURRENT_ADMIN_EXCEPTION_QUEUE_PATH"]).resolve()
+
+payload = {}
+if source_artifact.exists():
+    try:
+        payload = json.loads(source_artifact.read_text())
+    except Exception:
+        payload = {}
+
+items = []
+summary = {}
+
+if stage == "manual_review":
+    manual_items = [item for item in (payload.get("items") or []) if isinstance(item, dict)]
+    items = [
+        {
+            "record_key": item.get("slug"),
+            "slug": item.get("slug"),
+            "impact_status": item.get("impact_status"),
+            "operator_status": item.get("operator_status"),
+            "title": ((item.get("final_record") or {}).get("title") or (item.get("original_record") or {}).get("title")),
+            "source_quality": ((item.get("ai_review") or {}).get("source_quality")),
+            "caution_flags": ((item.get("ai_review") or {}).get("caution_flags") or []),
+        }
+        for item in manual_items
+    ]
+    summary = {
+        "manual_review_count": len(items),
+        "auto_approved_count": len([item for item in (payload.get("auto_approved_items") or []) if isinstance(item, dict)]),
+        "auto_rejected_count": len([item for item in (payload.get("auto_rejected_items") or []) if isinstance(item, dict)]),
+    }
+elif stage == "apply_blocked":
+    items = [item for item in (payload.get("blocking_issues") or []) if isinstance(item, dict)]
+    summary = {
+        "readiness_status": payload.get("readiness_status"),
+        "blocking_issue_count": len(items),
+    }
+elif stage == "impact_blocked":
+    impact_items = [item for item in (payload.get("items") or []) if isinstance(item, dict)]
+    items = [
+        {
+            "record_key": item.get("record_key"),
+            "slug": item.get("slug"),
+            "title": item.get("title"),
+            "blocked_reasons": ((item.get("supplemental_safe_auto_approval") or {}).get("blocked_reasons") or []),
+        }
+        for item in impact_items
+        if ((item.get("supplemental_safe_auto_approval") or {}).get("blocked_reasons") or [])
+    ]
+    summary = {
+        "auto_approved_count": ((payload.get("counts") or {}).get("auto_approved_count") or 0),
+        "blocked_count": ((payload.get("counts") or {}).get("blocked_count") or 0),
+    }
+elif stage == "enrichment_blocked":
+    enrichment_items = [item for item in (payload.get("items") or []) if isinstance(item, dict)]
+    items = [
+        {
+            "record_key": item.get("record_key"),
+            "slug": item.get("slug"),
+            "title": item.get("title"),
+            "blocked_reasons": item.get("blocked_reasons") or [],
+        }
+        for item in enrichment_items
+        if item.get("approved") is not True
+    ]
+    summary = {
+        "approved_count": ((payload.get("summary") or {}).get("approved_count") or 0),
+        "blocked_count": ((payload.get("summary") or {}).get("blocked_count") or 0),
+    }
+
+output = {
+    "artifact_version": 1,
+    "generated_at": __import__("datetime").datetime.now(__import__("datetime").timezone.utc).replace(microsecond=0).isoformat(),
+    "workflow": "current_admin_exception_queue",
+    "batch_name": batch_name,
+    "stage": stage,
+    "reason": reason,
+    "source_artifact": str(source_artifact),
+    "summary": summary,
+    "items": items,
+    "next_step": next_step,
+    "recommended_command": recommended_command,
+}
+output_path.parent.mkdir(parents=True, exist_ok=True)
+output_path.write_text(json.dumps(output, indent=2) + "\n")
+PY
+}
+
+write_current_admin_automation_report() {
+  local batch_name="$1"
+  local status="$2"
+  local current_stage="$3"
+  local message="$4"
+
+  CURRENT_ADMIN_BATCH_NAME="$batch_name" \
+  CURRENT_ADMIN_AUTOMATION_STATUS="$status" \
+  CURRENT_ADMIN_AUTOMATION_STAGE="$current_stage" \
+  CURRENT_ADMIN_AUTOMATION_MESSAGE="$message" \
+  CURRENT_ADMIN_INPUT_PATH="$CURRENT_ADMIN_INPUT_PATH" \
+  CURRENT_ADMIN_NORMALIZED_PATH="$CURRENT_ADMIN_NORMALIZED_PATH" \
+  CURRENT_ADMIN_REVIEW_PATH="$CURRENT_ADMIN_REVIEW_PATH" \
+  CURRENT_ADMIN_QUEUE_PATH="$CURRENT_ADMIN_QUEUE_PATH" \
+  CURRENT_ADMIN_PRECOMMIT_PATH="$CURRENT_ADMIN_PRECOMMIT_PATH" \
+  CURRENT_ADMIN_IMPORT_DRY_RUN_PATH="$CURRENT_ADMIN_IMPORT_DRY_RUN_PATH" \
+  CURRENT_ADMIN_IMPORT_APPLY_PATH="$CURRENT_ADMIN_IMPORT_APPLY_PATH" \
+  CURRENT_ADMIN_VALIDATION_PATH="$CURRENT_ADMIN_VALIDATION_PATH" \
+  CURRENT_ADMIN_OUTCOME_EVIDENCE_PATH="$CURRENT_ADMIN_OUTCOME_EVIDENCE_PATH" \
+  CURRENT_ADMIN_IMPACT_EVALUATE_PATH="$CURRENT_ADMIN_IMPACT_EVALUATE_PATH" \
+  CURRENT_ADMIN_IMPACT_PROMOTE_DRY_RUN_PATH="$CURRENT_ADMIN_IMPACT_PROMOTE_DRY_RUN_PATH" \
+  CURRENT_ADMIN_IMPACT_PROMOTE_APPLY_PATH="$CURRENT_ADMIN_IMPACT_PROMOTE_APPLY_PATH" \
+  CURRENT_ADMIN_OUTCOME_ENRICHMENT_PREVIEW_PATH="$CURRENT_ADMIN_OUTCOME_ENRICHMENT_PREVIEW_PATH" \
+  CURRENT_ADMIN_OUTCOME_ENRICHMENT_DRY_RUN_PATH="$CURRENT_ADMIN_OUTCOME_ENRICHMENT_DRY_RUN_PATH" \
+  CURRENT_ADMIN_OUTCOME_ENRICHMENT_APPLY_PATH="$CURRENT_ADMIN_OUTCOME_ENRICHMENT_APPLY_PATH" \
+  CURRENT_ADMIN_OUTCOME_SYNC_APPLY_PATH="$CURRENT_ADMIN_OUTCOME_SYNC_APPLY_PATH" \
+  CURRENT_ADMIN_EXCEPTION_QUEUE_PATH="$CURRENT_ADMIN_EXCEPTION_QUEUE_PATH" \
+  CURRENT_ADMIN_AUTOMATION_REPORT_PATH="$CURRENT_ADMIN_AUTOMATION_REPORT_PATH" \
+  "$VENV_PYTHON" - <<'PY'
+import json
+import os
+from pathlib import Path
+
+output_path = Path(os.environ["CURRENT_ADMIN_AUTOMATION_REPORT_PATH"]).resolve()
+artifact_paths = {
+    key.lower().replace("current_admin_", "").removesuffix("_path"): Path(value).resolve()
+    for key, value in os.environ.items()
+    if key.startswith("CURRENT_ADMIN_") and key.endswith("_PATH") and key not in {"CURRENT_ADMIN_AUTOMATION_REPORT_PATH"}
+}
+
+def load_json(path: Path):
+    if not path.exists():
+        return None
+    try:
+        return json.loads(path.read_text())
+    except Exception:
+        return None
+
+queue_payload = load_json(artifact_paths.get("queue"))
+impact_payload = load_json(artifact_paths.get("impact_evaluate"))
+enrichment_payload = load_json(artifact_paths.get("outcome_enrichment_dry_run"))
+report = {
+    "artifact_version": 1,
+    "generated_at": __import__("datetime").datetime.now(__import__("datetime").timezone.utc).replace(microsecond=0).isoformat(),
+    "workflow": "current_admin_full_automation",
+    "batch_name": os.environ["CURRENT_ADMIN_BATCH_NAME"],
+    "status": os.environ["CURRENT_ADMIN_AUTOMATION_STATUS"],
+    "current_stage": os.environ["CURRENT_ADMIN_AUTOMATION_STAGE"],
+    "message": os.environ["CURRENT_ADMIN_AUTOMATION_MESSAGE"],
+    "artifacts": {name: str(path) for name, path in artifact_paths.items()},
+    "summary": {
+        "manual_review_count": len([item for item in ((queue_payload or {}).get("items") or []) if isinstance(item, dict)]),
+        "queue_auto_approved_count": len([item for item in ((queue_payload or {}).get("auto_approved_items") or []) if isinstance(item, dict)]),
+        "queue_auto_rejected_count": len([item for item in ((queue_payload or {}).get("auto_rejected_items") or []) if isinstance(item, dict)]),
+        "impact_auto_approved_count": (((impact_payload or {}).get("counts") or {}).get("auto_approved_count") or 0),
+        "impact_blocked_count": (((impact_payload or {}).get("counts") or {}).get("blocked_count") or 0),
+        "enrichment_approved_count": (((enrichment_payload or {}).get("summary") or {}).get("approved_count") or 0),
+        "enrichment_blocked_count": (((enrichment_payload or {}).get("summary") or {}).get("blocked_count") or 0),
+    },
+}
+output_path.parent.mkdir(parents=True, exist_ok=True)
+output_path.write_text(json.dumps(report, indent=2) + "\n")
+PY
+}
+
+current_admin_impact_evaluate_counts() {
+  local report_path="$1"
+
+  CURRENT_ADMIN_IMPACT_REPORT_PATH="$report_path" "$VENV_PYTHON" - <<'PY'
+import json
+import os
+from pathlib import Path
+
+path = Path(os.environ["CURRENT_ADMIN_IMPACT_REPORT_PATH"]).resolve()
+payload = json.loads(path.read_text()) if path.exists() else {}
+counts = payload.get("counts") or {}
+print(int(counts.get("auto_approved_count") or 0))
+print(int(counts.get("blocked_count") or 0))
+PY
+}
+
+current_admin_enrichment_counts() {
+  local report_path="$1"
+
+  CURRENT_ADMIN_ENRICHMENT_REPORT_PATH="$report_path" "$VENV_PYTHON" - <<'PY'
+import json
+import os
+from pathlib import Path
+
+path = Path(os.environ["CURRENT_ADMIN_ENRICHMENT_REPORT_PATH"]).resolve()
+payload = json.loads(path.read_text()) if path.exists() else {}
+summary = payload.get("summary") or {}
+touched_ids = payload.get("touched_promise_outcome_ids") or []
+print(int(summary.get("approved_count") or 0))
+print(int(summary.get("blocked_count") or 0))
+print(int(payload.get("records_applied") or 0))
+print(",".join(str(int(value)) for value in touched_ids if value is not None))
+PY
+}
+
 apply_report_has_affected_bills() {
   local report_path
   report_path="$(apply_report_path)"
@@ -893,6 +1137,7 @@ run_current_admin_prepare_flow() {
   local timeout=""
   local senior_timeout="$DEFAULT_REVIEW_TIMEOUT_SENIOR"
   local verifier_timeout="$DEFAULT_REVIEW_TIMEOUT_VERIFIER"
+  local suppress_summary="${CURRENT_ADMIN_PREPARE_SUPPRESS_SUMMARY:-false}"
 
   while [ "$#" -gt 0 ]; do
     case "$1" in
@@ -1028,15 +1273,17 @@ run_current_admin_prepare_flow() {
   run_step "3/3" "Promote AI-First Queue" "AI-first current-admin queue created" --output "$CURRENT_ADMIN_QUEUE_PATH" -- \
     "${queue_args[@]}"
 
-  print_system_state \
-    "REVIEW_READY" \
-    "Review only the remaining borderline items, or move straight to apply if no manual items remain." \
-    "$(cli_hint) current-admin review --input $(repo_relative_path "$CURRENT_ADMIN_REVIEW_PATH")" \
-    "BATCH: $CURRENT_ADMIN_BATCH_NAME" \
-    "OPENAI MODEL: $review_model" \
-    "VERIFIER MODEL: $verifier_model" \
-    "FALLBACK MODEL: $fallback_model" \
-    "OPENAI BASE URL: $openai_base_url"
+  if [ "$suppress_summary" != "true" ]; then
+    print_system_state \
+      "REVIEW_READY" \
+      "Review only the remaining borderline items, or move straight to apply if no manual items remain." \
+      "$(cli_hint) current-admin review --input $(repo_relative_path "$CURRENT_ADMIN_REVIEW_PATH")" \
+      "BATCH: $CURRENT_ADMIN_BATCH_NAME" \
+      "OPENAI MODEL: $review_model" \
+      "VERIFIER MODEL: $verifier_model" \
+      "FALLBACK MODEL: $fallback_model" \
+      "OPENAI BASE URL: $openai_base_url"
+  fi
 }
 
 run_current_admin_review_command() {
@@ -1434,6 +1681,11 @@ run_current_admin_run_command() {
   local batch_output=""
   local output_name=""
   local allow_overwrite="false"
+  local full_auto="true"
+  local no_auto_apply="false"
+  local no_impact_automation="false"
+  local stop_after=""
+  local review_dry_run_requested="false"
   local -a discovery_args=()
   local -a workflow_args=()
 
@@ -1472,6 +1724,30 @@ run_current_admin_run_command() {
         allow_overwrite="true"
         shift
         ;;
+      --full-auto)
+        full_auto="true"
+        shift
+        ;;
+      --stop-after)
+        stop_after="${2:-}"
+        [ -n "$stop_after" ] || { echo "--stop-after requires a value" >&2; exit 1; }
+        case "$stop_after" in
+          review|apply|impact-evaluate|impact-promote|enrichment) ;;
+          *)
+            echo "--stop-after must be one of: review, apply, impact-evaluate, impact-promote, enrichment" >&2
+            exit 1
+            ;;
+        esac
+        shift 2
+        ;;
+      --no-auto-apply)
+        no_auto_apply="true"
+        shift
+        ;;
+      --no-impact-automation)
+        no_impact_automation="true"
+        shift
+        ;;
       --feed-url|--feed-json|--max-promises|--max-feed-items|--lookback-days|--source-config)
         discovery_args+=("$1" "${2:-}")
         [ -n "${2:-}" ] || { echo "$1 requires a value" >&2; exit 1; }
@@ -1492,7 +1768,12 @@ run_current_admin_run_command() {
         [ -n "${2:-}" ] || { echo "$1 requires a value" >&2; exit 1; }
         shift 2
         ;;
-      --review-dry-run|--deep-review)
+      --review-dry-run)
+        workflow_args+=("$1")
+        review_dry_run_requested="true"
+        shift
+        ;;
+      --deep-review)
         workflow_args+=("$1")
         shift
         ;;
@@ -1518,71 +1799,435 @@ run_current_admin_run_command() {
     else
       workflow_args=(--batch-name "$batch_name" "${workflow_args[@]}")
     fi
-    run_current_admin_prepare_flow "${workflow_args[@]}"
+    CURRENT_ADMIN_PREPARE_SUPPRESS_SUMMARY="true" run_current_admin_prepare_flow "${workflow_args[@]}"
     resolve_current_admin_context "$input_path" "$batch_name"
+  else
+    local discovery_path="${discovery_output:-$(current_admin_reports_dir)/discovery_report.json}"
+    discovery_path="$(normalize_python_workspace_path "$discovery_path")"
+    if [ "$discovery_dry_run" = "true" ]; then
+      discovery_args=(--dry-run "${discovery_args[@]}")
+    fi
+    discovery_args=(--output "$discovery_path" "${discovery_args[@]}")
+    run_current_admin_discover_command "${discovery_args[@]}"
+
+    discovery_path="$(normalize_python_workspace_path "$discovery_path")"
+    local discovery_abs="$EQUITYSTACK_PYTHON_DIR/$discovery_path"
+    if [ ! -f "$discovery_abs" ]; then
+      discovery_abs="$discovery_path"
+    fi
+
+    local discovered_count="0"
+    discovered_count="$(current_admin_total_discovery_candidates "$discovery_abs")"
+    if [ "${discovered_count:-0}" = "0" ]; then
+      print_system_state \
+        "DISCOVERY_CLEAR" \
+        "No current-admin discovery candidates were found. Run discovery again later or provide --input for a manual batch." \
+        "$(cli_hint) current-admin discover" \
+        "DISCOVERY REPORT: $(repo_relative_path "$discovery_abs")" \
+        "DISCOVERED ITEMS: 0"
+      return 0
+    fi
+
+    local generated_batch_name=""
+    if [ -n "$output_name" ]; then
+      generated_batch_name="$(normalize_python_workspace_path "$output_name")"
+      generated_batch_name="$(basename "$generated_batch_name")"
+      generated_batch_name="${generated_batch_name%.json}"
+    else
+      generated_batch_name="$(current_admin_generate_auto_batch_name "$discovery_abs")"
+    fi
+
+    local generated_batch_output="$batch_output"
+    if [ -n "$generated_batch_output" ]; then
+      generated_batch_output="$(normalize_python_workspace_path "$generated_batch_output")"
+    else
+      generated_batch_output="data/current_admin_batches/${generated_batch_name}.json"
+    fi
+
+    local -a gen_batch_args=(
+      --input "$discovery_path"
+      --all-candidates
+      --batch-name "$generated_batch_name"
+      --output "$generated_batch_output"
+    )
+    if [ "$allow_overwrite" = "true" ]; then
+      gen_batch_args+=(--allow-overwrite)
+    fi
+
+    run_step "1/1" "Generate Current-Admin Batch" "Canonical batch generation complete" --output "$generated_batch_output" -- \
+      "$VENV_PYTHON" scripts/generate_current_admin_batch_from_discovery.py "${gen_batch_args[@]}"
+
+    workflow_args=(--input "$generated_batch_output" "${workflow_args[@]}")
+    CURRENT_ADMIN_PREPARE_SUPPRESS_SUMMARY="true" run_current_admin_prepare_flow "${workflow_args[@]}"
+    resolve_current_admin_context "$generated_batch_output" ""
+  fi
+
+  resolve_current_admin_automation_artifacts "$CURRENT_ADMIN_BATCH_NAME"
+
+  if [ "$review_dry_run_requested" = "true" ] && [ -z "$stop_after" ]; then
+    stop_after="review"
+  fi
+
+  if [ "$full_auto" != "true" ]; then
     print_current_admin_run_summary "$CURRENT_ADMIN_INPUT_PATH"
     return 0
   fi
 
-  local discovery_path="${discovery_output:-$(current_admin_reports_dir)/discovery_report.json}"
-  discovery_path="$(normalize_python_workspace_path "$discovery_path")"
-  if [ "$discovery_dry_run" = "true" ]; then
-    discovery_args=(--dry-run "${discovery_args[@]}")
-  fi
-  discovery_args=(--output "$discovery_path" "${discovery_args[@]}")
-  run_current_admin_discover_command "${discovery_args[@]}"
+  local -a queue_metrics=()
+  mapfile -t queue_metrics < <(current_admin_queue_metrics "$CURRENT_ADMIN_QUEUE_PATH")
+  local manual_review_count="${queue_metrics[0]:-0}"
+  local auto_approved_count="${queue_metrics[1]:-0}"
+  local auto_rejected_count="${queue_metrics[2]:-0}"
+  local importable_count="${queue_metrics[3]:-0}"
 
-  discovery_path="$(normalize_python_workspace_path "$discovery_path")"
-  local discovery_abs="$EQUITYSTACK_PYTHON_DIR/$discovery_path"
-  if [ ! -f "$discovery_abs" ]; then
-    discovery_abs="$discovery_path"
-  fi
-
-  local discovered_count="0"
-  discovered_count="$(current_admin_total_discovery_candidates "$discovery_abs")"
-  if [ "${discovered_count:-0}" = "0" ]; then
+  if [ "${manual_review_count:-0}" -gt 0 ]; then
+    local auto_deep_review_ran="false"
+    if [ "$review_dry_run_requested" != "true" ] && [ "$(current_admin_should_auto_deep_review "$CURRENT_ADMIN_QUEUE_PATH")" = "true" ]; then
+      local deep_review_experiment="auto-deep-review"
+      run_current_admin_deep_review_command --input "$CURRENT_ADMIN_NORMALIZED_PATH" --experiment-name "$deep_review_experiment"
+      auto_deep_review_ran="true"
+    fi
+    local manual_reason="remaining borderline records still require exception handling before apply"
+    if [ "$auto_deep_review_ran" = "true" ]; then
+      manual_reason="$manual_reason; paired deep-review evidence has also been prepared"
+    fi
+    write_current_admin_exception_queue \
+      "$CURRENT_ADMIN_BATCH_NAME" \
+      "manual_review" \
+      "$CURRENT_ADMIN_QUEUE_PATH" \
+      "Inspect the remaining exception-only manual-review rows." \
+      "$(cli_hint) current-admin review --input $(repo_relative_path "$CURRENT_ADMIN_REVIEW_PATH")" \
+      "$manual_reason"
+    write_current_admin_automation_report \
+      "$CURRENT_ADMIN_BATCH_NAME" \
+      "exception_queue_ready" \
+      "manual_review" \
+      "Automation stopped because manual-review exceptions remain."
     print_system_state \
-      "DISCOVERY_CLEAR" \
-      "No current-admin discovery candidates were found. Run discovery again later or provide --input for a manual batch." \
-      "$(cli_hint) current-admin discover" \
-      "DISCOVERY REPORT: $(repo_relative_path "$discovery_abs")" \
-      "DISCOVERED ITEMS: 0"
+      "EXCEPTION_QUEUE_READY" \
+      "Inspect the remaining exception-only manual-review rows." \
+      "$(cli_hint) current-admin review --input $(repo_relative_path "$CURRENT_ADMIN_REVIEW_PATH")" \
+      "BATCH: $CURRENT_ADMIN_BATCH_NAME" \
+      "MANUAL REVIEW ITEMS: $manual_review_count" \
+      "AUTO-APPROVED ITEMS: $auto_approved_count" \
+      "AUTO-REJECTED ITEMS: $auto_rejected_count" \
+      "EXCEPTION QUEUE: $(repo_relative_path "$CURRENT_ADMIN_EXCEPTION_QUEUE_PATH")" \
+      "AUTOMATION REPORT: $(repo_relative_path "$CURRENT_ADMIN_AUTOMATION_REPORT_PATH")"
     return 0
   fi
 
-  local generated_batch_name=""
-  if [ -n "$output_name" ]; then
-    generated_batch_name="$(normalize_python_workspace_path "$output_name")"
-    generated_batch_name="$(basename "$generated_batch_name")"
-    generated_batch_name="${generated_batch_name%.json}"
+  if [ "$stop_after" = "review" ]; then
+    write_current_admin_automation_report \
+      "$CURRENT_ADMIN_BATCH_NAME" \
+      "stopped" \
+      "review" \
+      "Automation stopped after the AI-first review split."
+    write_current_admin_exception_queue \
+      "$CURRENT_ADMIN_BATCH_NAME" \
+      "resolved" \
+      "$CURRENT_ADMIN_AUTOMATION_REPORT_PATH" \
+      "The review split is complete." \
+      "$(cli_hint) current-admin apply --input $(repo_relative_path "$CURRENT_ADMIN_QUEUE_PATH")" \
+      "review stop requested"
+    print_system_state \
+      "REVIEW_COMPLETE" \
+      "Run the guarded import path or rerun with deeper automation enabled." \
+      "$(cli_hint) current-admin apply --input $(repo_relative_path "$CURRENT_ADMIN_QUEUE_PATH")" \
+      "BATCH: $CURRENT_ADMIN_BATCH_NAME" \
+      "IMPORTABLE ITEMS: $importable_count" \
+      "AUTOMATION REPORT: $(repo_relative_path "$CURRENT_ADMIN_AUTOMATION_REPORT_PATH")"
+    return 0
+  fi
+
+  local apply_message=""
+  if [ "${importable_count:-0}" -gt 0 ]; then
+    resolve_current_admin_apply_target "" "$CURRENT_ADMIN_BATCH_NAME"
+    run_current_admin_guarded_apply_flow "false" "false"
+    if [ "$CURRENT_ADMIN_GUARDED_APPLY_STATUS" = "blocked" ]; then
+      write_current_admin_exception_queue \
+        "$CURRENT_ADMIN_BATCH_NAME" \
+        "apply_blocked" \
+        "$CURRENT_ADMIN_APPLY_PRECOMMIT_PATH" \
+        "Resolve the blocking pre-commit issues before any apply step." \
+        "$(cli_hint) current-admin apply --input $(repo_relative_path "$CURRENT_ADMIN_APPLY_QUEUE_PATH")" \
+        "guarded pre-commit blocked the import path"
+      write_current_admin_automation_report \
+        "$CURRENT_ADMIN_BATCH_NAME" \
+        "blocked" \
+        "apply" \
+        "Automation stopped because the guarded pre-commit review is blocked."
+      print_system_state \
+        "APPLY_BLOCKED" \
+        "Resolve the blocking pre-commit issues before any apply step." \
+        "$(cli_hint) current-admin apply --input $(repo_relative_path "$CURRENT_ADMIN_APPLY_QUEUE_PATH")" \
+        "BATCH: $CURRENT_ADMIN_BATCH_NAME" \
+        "PRE-COMMIT REVIEW: $(repo_relative_path "$CURRENT_ADMIN_APPLY_PRECOMMIT_PATH")" \
+        "EXCEPTION QUEUE: $(repo_relative_path "$CURRENT_ADMIN_EXCEPTION_QUEUE_PATH")" \
+        "AUTOMATION REPORT: $(repo_relative_path "$CURRENT_ADMIN_AUTOMATION_REPORT_PATH")"
+      return 0
+    fi
+    if [ "$no_auto_apply" != "true" ]; then
+      run_current_admin_guarded_apply_flow "true" "false"
+      apply_message="Guarded import apply and validation completed."
+    else
+      apply_message="Guarded import apply was skipped because --no-auto-apply was set."
+    fi
   else
-    generated_batch_name="$(current_admin_generate_auto_batch_name "$discovery_abs")"
+    apply_message="No importable queue items remained after AI-first review."
   fi
 
-  local generated_batch_output="$batch_output"
-  if [ -n "$generated_batch_output" ]; then
-    generated_batch_output="$(normalize_python_workspace_path "$generated_batch_output")"
-  else
-    generated_batch_output="data/current_admin_batches/${generated_batch_name}.json"
+  if [ "$stop_after" = "apply" ] || [ "$no_impact_automation" = "true" ]; then
+    write_current_admin_automation_report \
+      "$CURRENT_ADMIN_BATCH_NAME" \
+      "stopped" \
+      "apply" \
+      "$apply_message"
+    write_current_admin_exception_queue \
+      "$CURRENT_ADMIN_BATCH_NAME" \
+      "resolved" \
+      "$CURRENT_ADMIN_AUTOMATION_REPORT_PATH" \
+      "The guarded apply phase is complete." \
+      "$(cli_hint) current-admin run --input $(repo_relative_path "$CURRENT_ADMIN_INPUT_PATH") --stop-after impact-evaluate" \
+      "apply stop requested"
+    print_system_state \
+      "APPLY_COMPLETE" \
+      "Continue into outcome-evidence and impact automation when ready." \
+      "$(cli_hint) current-admin run --input $(repo_relative_path "$CURRENT_ADMIN_INPUT_PATH") --stop-after impact-evaluate" \
+      "BATCH: $CURRENT_ADMIN_BATCH_NAME" \
+      "MESSAGE: $apply_message" \
+      "AUTOMATION REPORT: $(repo_relative_path "$CURRENT_ADMIN_AUTOMATION_REPORT_PATH")"
+    return 0
   fi
 
-  local -a gen_batch_args=(
-    --input "$discovery_path"
-    --all-candidates
-    --batch-name "$generated_batch_name"
-    --output "$generated_batch_output"
-  )
-  if [ "$allow_overwrite" = "true" ]; then
-    gen_batch_args+=(--allow-overwrite)
+  run_step "1/5" "Collect Outcome Evidence" "Current-admin outcome evidence collection complete" --output "$CURRENT_ADMIN_OUTCOME_EVIDENCE_PATH" -- \
+    "$VENV_PYTHON" scripts/discover_current_admin_outcome_evidence.py \
+      --input "$CURRENT_ADMIN_NORMALIZED_PATH" \
+      --include-all-statuses \
+      --output "$CURRENT_ADMIN_OUTCOME_EVIDENCE_PATH"
+
+  run_step "2/5" "Evaluate Impact Maturation" "Impact maturation review artifact generated" --output "$CURRENT_ADMIN_IMPACT_EVALUATE_PATH" -- \
+    "$VENV_PYTHON" scripts/evaluate_impact_maturation.py evaluate \
+      --input "$CURRENT_ADMIN_NORMALIZED_PATH" \
+      --outcome-evidence "$CURRENT_ADMIN_OUTCOME_EVIDENCE_PATH" \
+      --auto-approve-safe-supplemental \
+      --dry-run \
+      --output "$CURRENT_ADMIN_IMPACT_EVALUATE_PATH"
+
+  local -a impact_counts=()
+  mapfile -t impact_counts < <(current_admin_impact_evaluate_counts "$CURRENT_ADMIN_IMPACT_EVALUATE_PATH")
+  local impact_auto_approved_count="${impact_counts[0]:-0}"
+  local impact_blocked_count="${impact_counts[1]:-0}"
+  local exception_stage=""
+
+  if [ "${impact_blocked_count:-0}" -gt 0 ]; then
+    exception_stage="impact_blocked"
   fi
 
-  run_step "1/1" "Generate Current-Admin Batch" "Canonical batch generation complete" --output "$generated_batch_output" -- \
-    "$VENV_PYTHON" scripts/generate_current_admin_batch_from_discovery.py "${gen_batch_args[@]}"
+  if [ "$stop_after" = "impact-evaluate" ]; then
+    write_current_admin_automation_report \
+      "$CURRENT_ADMIN_BATCH_NAME" \
+      "stopped" \
+      "impact_evaluate" \
+      "Impact evaluation completed in dry-run mode."
+    if [ -n "$exception_stage" ]; then
+      write_current_admin_exception_queue \
+        "$CURRENT_ADMIN_BATCH_NAME" \
+        "$exception_stage" \
+        "$CURRENT_ADMIN_IMPACT_EVALUATE_PATH" \
+        "Inspect the remaining blocked supplemental-evidence transitions." \
+        "$(cli_hint) impact evaluate --input $(repo_relative_path "$CURRENT_ADMIN_NORMALIZED_PATH") --outcome-evidence $(repo_relative_path "$CURRENT_ADMIN_OUTCOME_EVIDENCE_PATH") --auto-approve-safe-supplemental --dry-run" \
+        "impact evaluation left blocked supplemental rows"
+      print_system_state \
+        "EXCEPTION_QUEUE_READY" \
+        "Inspect the remaining blocked supplemental-evidence transitions." \
+        "$(cli_hint) impact evaluate --input $(repo_relative_path "$CURRENT_ADMIN_NORMALIZED_PATH") --outcome-evidence $(repo_relative_path "$CURRENT_ADMIN_OUTCOME_EVIDENCE_PATH") --auto-approve-safe-supplemental --dry-run" \
+        "BATCH: $CURRENT_ADMIN_BATCH_NAME" \
+        "IMPACT AUTO-APPROVED: $impact_auto_approved_count" \
+        "IMPACT BLOCKED: $impact_blocked_count" \
+        "EXCEPTION QUEUE: $(repo_relative_path "$CURRENT_ADMIN_EXCEPTION_QUEUE_PATH")" \
+        "AUTOMATION REPORT: $(repo_relative_path "$CURRENT_ADMIN_AUTOMATION_REPORT_PATH")"
+      return 0
+    fi
+    write_current_admin_exception_queue \
+      "$CURRENT_ADMIN_BATCH_NAME" \
+      "resolved" \
+      "$CURRENT_ADMIN_AUTOMATION_REPORT_PATH" \
+      "Impact evaluation dry-run is complete." \
+      "$(cli_hint) current-admin run --input $(repo_relative_path "$CURRENT_ADMIN_INPUT_PATH") --stop-after impact-promote" \
+      "impact evaluation stop requested"
+    print_system_state \
+      "IMPACT_EVALUATE_COMPLETE" \
+      "Continue into impact promotion or rerun with later automation enabled." \
+      "$(cli_hint) current-admin run --input $(repo_relative_path "$CURRENT_ADMIN_INPUT_PATH") --stop-after impact-promote" \
+      "BATCH: $CURRENT_ADMIN_BATCH_NAME" \
+      "IMPACT AUTO-APPROVED: $impact_auto_approved_count" \
+      "AUTOMATION REPORT: $(repo_relative_path "$CURRENT_ADMIN_AUTOMATION_REPORT_PATH")"
+    return 0
+  fi
 
-  workflow_args=(--input "$generated_batch_output" "${workflow_args[@]}")
-  run_current_admin_prepare_flow "${workflow_args[@]}"
-  resolve_current_admin_context "$generated_batch_output" ""
-  print_current_admin_run_summary "$CURRENT_ADMIN_INPUT_PATH" "$discovery_abs"
+  if [ "${impact_auto_approved_count:-0}" -gt 0 ]; then
+    run_step "3/5" "Promote Impact Maturation Dry-Run" "Impact maturation promotion dry-run complete" --output "$CURRENT_ADMIN_IMPACT_PROMOTE_DRY_RUN_PATH" -- \
+      "$VENV_PYTHON" scripts/evaluate_impact_maturation.py promote \
+        --input "$CURRENT_ADMIN_IMPACT_EVALUATE_PATH" \
+        --dry-run \
+        --output "$CURRENT_ADMIN_IMPACT_PROMOTE_DRY_RUN_PATH"
+    if [ "$no_auto_apply" != "true" ]; then
+      run_step "4/5" "Promote Impact Maturation Apply" "Impact maturation promotion apply complete" --output "$CURRENT_ADMIN_IMPACT_PROMOTE_APPLY_PATH" -- \
+        "$VENV_PYTHON" scripts/evaluate_impact_maturation.py promote \
+          --input "$CURRENT_ADMIN_IMPACT_EVALUATE_PATH" \
+          --apply \
+          --yes \
+          --output "$CURRENT_ADMIN_IMPACT_PROMOTE_APPLY_PATH"
+    fi
+  fi
+
+  if [ "$stop_after" = "impact-promote" ]; then
+    write_current_admin_automation_report \
+      "$CURRENT_ADMIN_BATCH_NAME" \
+      "stopped" \
+      "impact_promote" \
+      "Impact promotion completed for validator-approved rows."
+    if [ -n "$exception_stage" ]; then
+      write_current_admin_exception_queue \
+        "$CURRENT_ADMIN_BATCH_NAME" \
+        "$exception_stage" \
+        "$CURRENT_ADMIN_IMPACT_EVALUATE_PATH" \
+        "Inspect the remaining blocked supplemental-evidence transitions." \
+        "$(cli_hint) impact promote --input $(repo_relative_path "$CURRENT_ADMIN_IMPACT_EVALUATE_PATH") --dry-run" \
+        "impact promotion left blocked supplemental rows unresolved"
+      print_system_state \
+        "EXCEPTION_QUEUE_READY" \
+        "Inspect the remaining blocked supplemental-evidence transitions." \
+        "$(cli_hint) impact promote --input $(repo_relative_path "$CURRENT_ADMIN_IMPACT_EVALUATE_PATH") --dry-run" \
+        "BATCH: $CURRENT_ADMIN_BATCH_NAME" \
+        "EXCEPTION QUEUE: $(repo_relative_path "$CURRENT_ADMIN_EXCEPTION_QUEUE_PATH")" \
+        "AUTOMATION REPORT: $(repo_relative_path "$CURRENT_ADMIN_AUTOMATION_REPORT_PATH")"
+      return 0
+    fi
+    write_current_admin_exception_queue \
+      "$CURRENT_ADMIN_BATCH_NAME" \
+      "resolved" \
+      "$CURRENT_ADMIN_AUTOMATION_REPORT_PATH" \
+      "Impact promotion is complete." \
+      "$(cli_hint) current-admin run --input $(repo_relative_path "$CURRENT_ADMIN_INPUT_PATH") --stop-after enrichment" \
+      "impact promotion stop requested"
+    print_system_state \
+      "IMPACT_PROMOTE_COMPLETE" \
+      "Continue into outcome enrichment when ready." \
+      "$(cli_hint) current-admin run --input $(repo_relative_path "$CURRENT_ADMIN_INPUT_PATH") --stop-after enrichment" \
+      "BATCH: $CURRENT_ADMIN_BATCH_NAME" \
+      "AUTOMATION REPORT: $(repo_relative_path "$CURRENT_ADMIN_AUTOMATION_REPORT_PATH")"
+    return 0
+  fi
+
+  run_step "5/5" "Preview Outcome Enrichment" "Current-admin policy_outcome enrichment preview complete" --output "$CURRENT_ADMIN_OUTCOME_ENRICHMENT_PREVIEW_PATH" -- \
+    "$VENV_PYTHON" scripts/preview_current_admin_policy_outcome_enrichment.py \
+      --input "$CURRENT_ADMIN_NORMALIZED_PATH" \
+      --outcome-evidence "$CURRENT_ADMIN_OUTCOME_EVIDENCE_PATH" \
+      --output "$CURRENT_ADMIN_OUTCOME_ENRICHMENT_PREVIEW_PATH"
+
+  run_step "1/3" "Outcome Enrichment Dry-Run" "Current-admin outcome enrichment dry-run complete" --output "$CURRENT_ADMIN_OUTCOME_ENRICHMENT_DRY_RUN_PATH" -- \
+    "$VENV_PYTHON" scripts/apply_current_admin_outcome_enrichment.py \
+      --input "$CURRENT_ADMIN_NORMALIZED_PATH" \
+      --outcome-evidence "$CURRENT_ADMIN_OUTCOME_EVIDENCE_PATH" \
+      --impact-evaluation "$CURRENT_ADMIN_IMPACT_EVALUATE_PATH" \
+      --dry-run \
+      --output "$CURRENT_ADMIN_OUTCOME_ENRICHMENT_DRY_RUN_PATH"
+
+  local -a enrichment_counts=()
+  mapfile -t enrichment_counts < <(current_admin_enrichment_counts "$CURRENT_ADMIN_OUTCOME_ENRICHMENT_DRY_RUN_PATH")
+  local enrichment_approved_count="${enrichment_counts[0]:-0}"
+  local enrichment_blocked_count="${enrichment_counts[1]:-0}"
+  if [ -z "$exception_stage" ] && [ "${enrichment_blocked_count:-0}" -gt 0 ]; then
+    exception_stage="enrichment_blocked"
+  fi
+
+  if [ "${enrichment_approved_count:-0}" -gt 0 ] && [ "$no_auto_apply" != "true" ]; then
+    run_step "2/3" "Outcome Enrichment Apply" "Current-admin outcome enrichment apply complete" --output "$CURRENT_ADMIN_OUTCOME_ENRICHMENT_APPLY_PATH" -- \
+      "$VENV_PYTHON" scripts/apply_current_admin_outcome_enrichment.py \
+        --input "$CURRENT_ADMIN_NORMALIZED_PATH" \
+        --outcome-evidence "$CURRENT_ADMIN_OUTCOME_EVIDENCE_PATH" \
+        --impact-evaluation "$CURRENT_ADMIN_IMPACT_EVALUATE_PATH" \
+        --apply \
+        --yes \
+        --output "$CURRENT_ADMIN_OUTCOME_ENRICHMENT_APPLY_PATH"
+
+    mapfile -t enrichment_counts < <(current_admin_enrichment_counts "$CURRENT_ADMIN_OUTCOME_ENRICHMENT_APPLY_PATH")
+    local enrichment_applied_count="${enrichment_counts[2]:-0}"
+    local touched_outcome_ids_csv="${enrichment_counts[3]:-}"
+    if [ "${enrichment_applied_count:-0}" -gt 0 ] && [ -n "$touched_outcome_ids_csv" ]; then
+      local -a sync_args=(--apply --yes --output "$CURRENT_ADMIN_OUTCOME_SYNC_APPLY_PATH")
+      local touched_id=""
+      IFS=',' read -r -a _current_admin_touched_ids <<< "$touched_outcome_ids_csv"
+      for touched_id in "${_current_admin_touched_ids[@]}"; do
+        if [ -n "$touched_id" ]; then
+          sync_args+=(--only-outcome-id "$touched_id")
+        fi
+      done
+      if [ "${#sync_args[@]}" -gt 4 ]; then
+        run_step "3/3" "Sync Current-Admin Policy Outcomes" "Current-admin policy_outcomes sync complete" --output "$CURRENT_ADMIN_OUTCOME_SYNC_APPLY_PATH" -- \
+          "$VENV_PYTHON" scripts/sync_current_admin_policy_outcomes.py "${sync_args[@]}"
+      fi
+    fi
+  fi
+
+  local final_status="complete"
+  local final_stage="enrichment"
+  local final_message="Full current-admin automation completed."
+  if [ "$no_auto_apply" = "true" ]; then
+    final_status="dry_run_complete"
+    final_message="Read-only automation completed; guarded apply steps were skipped because --no-auto-apply was set."
+  fi
+  if [ "$stop_after" = "enrichment" ]; then
+    final_status="stopped"
+    final_message="Automation stopped after the enrichment phase."
+  fi
+  write_current_admin_automation_report "$CURRENT_ADMIN_BATCH_NAME" "$final_status" "$final_stage" "$final_message"
+
+  if [ -n "$exception_stage" ]; then
+    local exception_source="$CURRENT_ADMIN_IMPACT_EVALUATE_PATH"
+    local exception_command="$(cli_hint) impact evaluate --input $(repo_relative_path "$CURRENT_ADMIN_NORMALIZED_PATH") --outcome-evidence $(repo_relative_path "$CURRENT_ADMIN_OUTCOME_EVIDENCE_PATH") --auto-approve-safe-supplemental --dry-run"
+    local exception_step="Inspect the remaining blocked impact or enrichment exceptions."
+    local exception_reason="validator-blocked supplemental or enrichment rows remain outside the automated write path"
+    if [ "$exception_stage" = "enrichment_blocked" ]; then
+      exception_source="$CURRENT_ADMIN_OUTCOME_ENRICHMENT_DRY_RUN_PATH"
+      exception_command="$(cli_hint) impact apply-current-admin-outcome-enrichment --input $(repo_relative_path "$CURRENT_ADMIN_NORMALIZED_PATH") --outcome-evidence $(repo_relative_path "$CURRENT_ADMIN_OUTCOME_EVIDENCE_PATH") --impact-evaluation $(repo_relative_path "$CURRENT_ADMIN_IMPACT_EVALUATE_PATH") --dry-run"
+    fi
+    write_current_admin_exception_queue \
+      "$CURRENT_ADMIN_BATCH_NAME" \
+      "$exception_stage" \
+      "$exception_source" \
+      "$exception_step" \
+      "$exception_command" \
+      "$exception_reason"
+    print_system_state \
+      "EXCEPTION_QUEUE_READY" \
+      "$exception_step" \
+      "$exception_command" \
+      "BATCH: $CURRENT_ADMIN_BATCH_NAME" \
+      "OUTCOME EVIDENCE: $(repo_relative_path "$CURRENT_ADMIN_OUTCOME_EVIDENCE_PATH")" \
+      "IMPACT EVALUATE: $(repo_relative_path "$CURRENT_ADMIN_IMPACT_EVALUATE_PATH")" \
+      "ENRICHMENT DRY-RUN: $(repo_relative_path "$CURRENT_ADMIN_OUTCOME_ENRICHMENT_DRY_RUN_PATH")" \
+      "EXCEPTION QUEUE: $(repo_relative_path "$CURRENT_ADMIN_EXCEPTION_QUEUE_PATH")" \
+      "AUTOMATION REPORT: $(repo_relative_path "$CURRENT_ADMIN_AUTOMATION_REPORT_PATH")"
+    return 0
+  fi
+
+  write_current_admin_exception_queue \
+    "$CURRENT_ADMIN_BATCH_NAME" \
+    "resolved" \
+    "$CURRENT_ADMIN_AUTOMATION_REPORT_PATH" \
+    "Automation completed without remaining exception-only queue items." \
+    "$(cli_hint) current-admin run" \
+    "all automatable stages completed"
+  print_system_state \
+    "COMPLETE" \
+    "Start the next current-admin automation cycle when new candidates appear." \
+    "$(cli_hint) current-admin run" \
+    "BATCH: $CURRENT_ADMIN_BATCH_NAME" \
+    "OUTCOME EVIDENCE: $(repo_relative_path "$CURRENT_ADMIN_OUTCOME_EVIDENCE_PATH")" \
+    "IMPACT EVALUATE: $(repo_relative_path "$CURRENT_ADMIN_IMPACT_EVALUATE_PATH")" \
+    "AUTOMATION REPORT: $(repo_relative_path "$CURRENT_ADMIN_AUTOMATION_REPORT_PATH")"
 }
 
 run_current_admin_operator_review_command() {
@@ -1722,6 +2367,66 @@ PY
   print_current_admin_review_summary "$review_path" "$decision_file" "$log_decisions_path" "true"
 }
 
+run_current_admin_guarded_apply_flow() {
+  local explicit_apply="$1"
+  local print_summary="${2:-false}"
+
+  CURRENT_ADMIN_GUARDED_APPLY_STATUS="unknown"
+
+  run_step "1/4" "Build Pre-Commit Review" "Pre-commit review build complete" --output "$CURRENT_ADMIN_APPLY_PRECOMMIT_PATH" -- \
+    "$VENV_PYTHON" scripts/build_current_admin_precommit_review.py --input "$CURRENT_ADMIN_APPLY_QUEUE_PATH"
+
+  local precommit_status="missing"
+  precommit_status="$(read_precommit_status "$CURRENT_ADMIN_APPLY_PRECOMMIT_PATH")"
+  if [ "$precommit_status" = "blocked" ]; then
+    CURRENT_ADMIN_GUARDED_APPLY_STATUS="blocked"
+    if [ "$print_summary" = "true" ]; then
+      print_current_admin_apply_summary \
+        "$CURRENT_ADMIN_APPLY_QUEUE_PATH" \
+        "$CURRENT_ADMIN_APPLY_PRECOMMIT_PATH" \
+        "$CURRENT_ADMIN_APPLY_DRY_RUN_PATH" \
+        "$CURRENT_ADMIN_APPLY_IMPORT_APPLY_PATH" \
+        "$CURRENT_ADMIN_APPLY_VALIDATION_PATH" \
+        "false"
+    fi
+    return 0
+  fi
+
+  run_step "2/4" "Import Dry-Run" "Current-admin import dry-run complete" --output "$CURRENT_ADMIN_APPLY_DRY_RUN_PATH" -- \
+    "$VENV_PYTHON" scripts/import_curated_current_admin_batch.py --input "$CURRENT_ADMIN_APPLY_QUEUE_PATH" --output "$CURRENT_ADMIN_APPLY_DRY_RUN_PATH"
+
+  if [ "$explicit_apply" != "true" ]; then
+    CURRENT_ADMIN_GUARDED_APPLY_STATUS="dry_run_ready"
+    if [ "$print_summary" = "true" ]; then
+      print_current_admin_apply_summary \
+        "$CURRENT_ADMIN_APPLY_QUEUE_PATH" \
+        "$CURRENT_ADMIN_APPLY_PRECOMMIT_PATH" \
+        "$CURRENT_ADMIN_APPLY_DRY_RUN_PATH" \
+        "$CURRENT_ADMIN_APPLY_IMPORT_APPLY_PATH" \
+        "$CURRENT_ADMIN_APPLY_VALIDATION_PATH" \
+        "false"
+    fi
+    return 0
+  fi
+
+  run_step "3/4" "Import Apply" "Current-admin import apply complete" --output "$CURRENT_ADMIN_APPLY_IMPORT_APPLY_PATH" -- \
+    "$VENV_PYTHON" scripts/import_curated_current_admin_batch.py --input "$CURRENT_ADMIN_APPLY_QUEUE_PATH" --output "$CURRENT_ADMIN_APPLY_IMPORT_APPLY_PATH" --apply --yes
+
+  run_step "4/4" "Validate Import" "Current-admin validation complete" --output "$CURRENT_ADMIN_APPLY_VALIDATION_PATH" -- \
+    "$VENV_PYTHON" scripts/validate_current_admin_import.py --input "$CURRENT_ADMIN_APPLY_QUEUE_PATH" --output "$CURRENT_ADMIN_APPLY_VALIDATION_PATH"
+
+  CURRENT_ADMIN_GUARDED_APPLY_STATUS="applied"
+  if [ "$print_summary" = "true" ]; then
+    print_current_admin_apply_summary \
+      "$CURRENT_ADMIN_APPLY_QUEUE_PATH" \
+      "$CURRENT_ADMIN_APPLY_PRECOMMIT_PATH" \
+      "$CURRENT_ADMIN_APPLY_DRY_RUN_PATH" \
+      "$CURRENT_ADMIN_APPLY_IMPORT_APPLY_PATH" \
+      "$CURRENT_ADMIN_APPLY_VALIDATION_PATH" \
+      "true"
+  fi
+}
+
 run_current_admin_apply_command() {
   local input_path=""
   local batch_name=""
@@ -1773,50 +2478,7 @@ run_current_admin_apply_command() {
   fi
 
   resolve_current_admin_apply_target "$input_path" "$batch_name"
-
-  run_step "1/4" "Build Pre-Commit Review" "Pre-commit review build complete" --output "$CURRENT_ADMIN_APPLY_PRECOMMIT_PATH" -- \
-    "$VENV_PYTHON" scripts/build_current_admin_precommit_review.py --input "$CURRENT_ADMIN_APPLY_QUEUE_PATH"
-
-  local precommit_status="missing"
-  precommit_status="$(read_precommit_status "$CURRENT_ADMIN_APPLY_PRECOMMIT_PATH")"
-  if [ "$precommit_status" = "blocked" ]; then
-    print_current_admin_apply_summary \
-      "$CURRENT_ADMIN_APPLY_QUEUE_PATH" \
-      "$CURRENT_ADMIN_APPLY_PRECOMMIT_PATH" \
-      "$CURRENT_ADMIN_APPLY_DRY_RUN_PATH" \
-      "$CURRENT_ADMIN_APPLY_IMPORT_APPLY_PATH" \
-      "$CURRENT_ADMIN_APPLY_VALIDATION_PATH" \
-      "false"
-    return 0
-  fi
-
-  run_step "2/4" "Import Dry-Run" "Current-admin import dry-run complete" --output "$CURRENT_ADMIN_APPLY_DRY_RUN_PATH" -- \
-    "$VENV_PYTHON" scripts/import_curated_current_admin_batch.py --input "$CURRENT_ADMIN_APPLY_QUEUE_PATH" --output "$CURRENT_ADMIN_APPLY_DRY_RUN_PATH"
-
-  if [ "$explicit_apply" != "true" ]; then
-    print_current_admin_apply_summary \
-      "$CURRENT_ADMIN_APPLY_QUEUE_PATH" \
-      "$CURRENT_ADMIN_APPLY_PRECOMMIT_PATH" \
-      "$CURRENT_ADMIN_APPLY_DRY_RUN_PATH" \
-      "$CURRENT_ADMIN_APPLY_IMPORT_APPLY_PATH" \
-      "$CURRENT_ADMIN_APPLY_VALIDATION_PATH" \
-      "false"
-    return 0
-  fi
-
-  run_step "3/4" "Import Apply" "Current-admin import apply complete" --output "$CURRENT_ADMIN_APPLY_IMPORT_APPLY_PATH" -- \
-    "$VENV_PYTHON" scripts/import_curated_current_admin_batch.py --input "$CURRENT_ADMIN_APPLY_QUEUE_PATH" --output "$CURRENT_ADMIN_APPLY_IMPORT_APPLY_PATH" --apply --yes
-
-  run_step "4/4" "Validate Import" "Current-admin validation complete" --output "$CURRENT_ADMIN_APPLY_VALIDATION_PATH" -- \
-    "$VENV_PYTHON" scripts/validate_current_admin_import.py --input "$CURRENT_ADMIN_APPLY_QUEUE_PATH" --output "$CURRENT_ADMIN_APPLY_VALIDATION_PATH"
-
-  print_current_admin_apply_summary \
-    "$CURRENT_ADMIN_APPLY_QUEUE_PATH" \
-    "$CURRENT_ADMIN_APPLY_PRECOMMIT_PATH" \
-    "$CURRENT_ADMIN_APPLY_DRY_RUN_PATH" \
-    "$CURRENT_ADMIN_APPLY_IMPORT_APPLY_PATH" \
-    "$CURRENT_ADMIN_APPLY_VALIDATION_PATH" \
-    "true"
+  run_current_admin_guarded_apply_flow "$explicit_apply" "true"
 }
 
 run_legislative_command() {
@@ -2099,6 +2761,9 @@ run_legislative_command() {
 run_impact_command() {
   local command="${1:-}"
   shift || true
+  local -a normalized_args=()
+  normalize_impact_path_args normalized_args "$@"
+  set -- "${normalized_args[@]}"
 
   case "$command" in
     evaluate)
@@ -2121,6 +2786,10 @@ run_impact_command() {
       run_step "1/1" "Preview Current-Admin Policy Outcome Enrichment" "Current-admin policy_outcome enrichment preview complete" --output "$EQUITYSTACK_PYTHON_DIR/reports/current-admin-policy-outcome-enrichment-preview.json" -- \
         "$VENV_PYTHON" scripts/preview_current_admin_policy_outcome_enrichment.py "$@"
       ;;
+    apply-current-admin-outcome-enrichment)
+      run_step "1/1" "Apply Current-Admin Policy Outcome Enrichment" "Current-admin policy_outcome enrichment command complete" --output "$EQUITYSTACK_PYTHON_DIR/reports/current-admin-policy-outcome-enrichment-apply.json" -- \
+        "$VENV_PYTHON" scripts/apply_current_admin_outcome_enrichment.py "$@"
+      ;;
     discover-judicial-candidates)
       run_step "1/1" "Discover Judicial Impact Candidates" "Judicial impact scaffold discovery complete" --output "$EQUITYSTACK_PYTHON_DIR/reports/judicial_impact_candidates.json" -- \
         "$VENV_PYTHON" scripts/discover_judicial_impact_candidates.py "$@"
@@ -2131,6 +2800,18 @@ run_impact_command() {
       ;;
     materialize-judicial-outcomes)
       run_step "1/1" "Preview Judicial Policy Outcomes" "Judicial policy_outcome scaffold preview complete" --output "$EQUITYSTACK_PYTHON_DIR/reports/judicial_policy_outcomes_materialize_report.json" -- \
+        "$VENV_PYTHON" scripts/materialize_judicial_policy_outcomes.py "$@"
+      ;;
+    judicial-run)
+      run_step "1/1" "Judicial Impact Discovery" "Judicial scaffold workflow step complete" --output "$EQUITYSTACK_PYTHON_DIR/reports/judicial_impact_candidates.json" -- \
+        "$VENV_PYTHON" scripts/discover_judicial_impact_candidates.py "$@"
+      ;;
+    judicial-review)
+      run_step "1/1" "Judicial Impact Review" "Judicial scaffold review step complete" --output "$EQUITYSTACK_PYTHON_DIR/reports/judicial_impact_import_report.json" -- \
+        "$VENV_PYTHON" scripts/import_judicial_impact_batch.py "$@"
+      ;;
+    judicial-apply)
+      run_step "1/1" "Judicial Impact Apply Preview" "Judicial scaffold apply step complete" --output "$EQUITYSTACK_PYTHON_DIR/reports/judicial_policy_outcomes_materialize_report.json" -- \
         "$VENV_PYTHON" scripts/materialize_judicial_policy_outcomes.py "$@"
       ;;
     audit-historical-duplicates)
@@ -2765,8 +3446,8 @@ Current-admin commands:
              Run the deeper paired AI review path for ambiguous current-admin records
   outcome-evidence
              Read-only implementation and outcome evidence collection for existing current-admin rows
-  run        Discover and generate the next batch by default, then normalize, review, and promote the AI-first queue
-  review     Promote AI decisions and ask for operator input only on the remaining borderline rows
+  run        Canonical full automation entrypoint with exception-only manual handoff
+  review     Exception-only recovery surface for the remaining borderline rows
   apply      Run pre-commit, import dry-run, optional apply, and validation
   status     Show current-admin artifact state and recommended next step
   pre-commit Generate the import guardrail artifact
@@ -2790,9 +3471,13 @@ Impact maturation commands:
   curate-policy-intent  Manually classify missing historical policy intent
   curate-sources  Manually attach operator-provided sources to policy outcomes
   preview-current-admin-outcome-enrichment  Report-only preview of future current-admin policy_outcomes enrichment
+  apply-current-admin-outcome-enrichment  Strict validator-gated enrichment dry-run/apply for current-admin outcomes
   discover-judicial-candidates  Scaffold-only judicial impact discovery
   import-judicial-batch  Scaffold-only judicial impact ingestion validation
   materialize-judicial-outcomes  Scaffold-only judicial policy_outcomes preview
+  judicial-run  Scaffold-only canonical judicial discovery alias
+  judicial-review  Scaffold-only canonical judicial review alias
+  judicial-apply  Scaffold-only canonical judicial apply-preview alias
 
 Operational maintenance:
   weekly-run   Run the low-touch weekly operator check and summary
@@ -2816,13 +3501,15 @@ Examples:
   $(cli_hint) impact validate-integrity
   $(cli_hint) impact complete-certification-readiness
   $(cli_hint) impact backfill-policy-time-intent
-  $(cli_hint) impact preview-current-admin-outcome-enrichment --input reports/current_admin/<batch>.manual-review-queue.json --outcome-evidence reports/current_admin/<batch>.outcome-evidence.json
-  $(cli_hint) impact discover-judicial-candidates
+  $(cli_hint) impact preview-current-admin-outcome-enrichment --input reports/current_admin/<batch>.normalized.json --outcome-evidence reports/current_admin/<batch>.outcome-evidence.json
+  $(cli_hint) impact apply-current-admin-outcome-enrichment --input reports/current_admin/<batch>.normalized.json --outcome-evidence reports/current_admin/<batch>.outcome-evidence.json --impact-evaluation reports/current_admin/<batch>.impact-evaluate.json --dry-run
+  $(cli_hint) impact judicial-run
   $(cli_hint) impact curate-policy-intent --non-interactive --limit 10
   $(cli_hint) impact curate-sources --non-interactive --limit 10
   $(cli_hint) current-admin run
+  $(cli_hint) current-admin run --stop-after impact-evaluate
   $(cli_hint) current-admin status
-  $(cli_hint) current-admin outcome-evidence --input reports/current_admin/<batch>.manual-review-queue.json
+  $(cli_hint) current-admin outcome-evidence --input reports/current_admin/<batch>.normalized.json
   $(cli_hint) current-admin deep-review --input reports/current_admin/<batch-name>.normalized.json
   $(cli_hint) operator cleanup-stale-workflows --dry-run
   $(cli_hint) admin-reset-operational-state --dry-run
@@ -2874,18 +3561,26 @@ Commands:
              Manually attach operator-provided sources to current-admin policy outcomes
   preview-current-admin-outcome-enrichment
              Report-only preview of future current-admin policy_outcomes enrichment
+  apply-current-admin-outcome-enrichment
+             Strict validator-gated current-admin outcome enrichment dry-run/apply
   discover-judicial-candidates
              Scaffold-only judicial impact discovery; no scoring or writes
   import-judicial-batch
              Scaffold-only judicial impact ingestion validation; apply disabled
   materialize-judicial-outcomes
              Scaffold-only judicial policy_outcomes materialization preview; apply disabled
+  judicial-run
+             Scaffold-only canonical judicial discovery alias
+  judicial-review
+             Scaffold-only canonical judicial review alias
+  judicial-apply
+             Scaffold-only canonical judicial apply-preview alias
 
 Examples:
   $(cli_hint) impact evaluate
-  $(cli_hint) impact evaluate --input reports/current_admin/<batch>.manual-review-queue.json
-  $(cli_hint) impact evaluate --input reports/current_admin/<batch>.manual-review-queue.json --outcome-evidence reports/current_admin/<batch>.outcome-evidence.json
-  $(cli_hint) impact evaluate --input reports/current_admin/<batch>.manual-review-queue.json --outcome-evidence reports/current_admin/<batch>.outcome-evidence.json --auto-approve-safe-supplemental --dry-run
+  $(cli_hint) impact evaluate --input reports/current_admin/<batch>.normalized.json
+  $(cli_hint) impact evaluate --input reports/current_admin/<batch>.normalized.json --outcome-evidence reports/current_admin/<batch>.outcome-evidence.json
+  $(cli_hint) impact evaluate --input reports/current_admin/<batch>.normalized.json --outcome-evidence reports/current_admin/<batch>.outcome-evidence.json --auto-approve-safe-supplemental --dry-run
   $(cli_hint) impact promote --dry-run
   $(cli_hint) impact promote --apply --yes
   $(cli_hint) impact promote --apply --yes --approve-safe
@@ -2907,10 +3602,11 @@ Examples:
   $(cli_hint) impact audit-policy-intent-gaps
   $(cli_hint) impact backfill-policy-time-intent
   $(cli_hint) impact backfill-policy-time-intent --apply --yes
-  $(cli_hint) impact preview-current-admin-outcome-enrichment --input reports/current_admin/<batch>.manual-review-queue.json --outcome-evidence reports/current_admin/<batch>.outcome-evidence.json
-  $(cli_hint) impact discover-judicial-candidates
-  $(cli_hint) impact import-judicial-batch --input reports/judicial_impact_candidates.json
-  $(cli_hint) impact materialize-judicial-outcomes --input reports/judicial_impact_candidates.json
+  $(cli_hint) impact preview-current-admin-outcome-enrichment --input reports/current_admin/<batch>.normalized.json --outcome-evidence reports/current_admin/<batch>.outcome-evidence.json
+  $(cli_hint) impact apply-current-admin-outcome-enrichment --input reports/current_admin/<batch>.normalized.json --outcome-evidence reports/current_admin/<batch>.outcome-evidence.json --impact-evaluation reports/current_admin/<batch>.impact-evaluate.json --dry-run
+  $(cli_hint) impact judicial-run
+  $(cli_hint) impact judicial-review --input reports/judicial_impact_candidates.json
+  $(cli_hint) impact judicial-apply --input reports/judicial_impact_candidates.json
   $(cli_hint) impact curate-policy-intent --non-interactive --limit 10
   $(cli_hint) impact curate-policy-intent --only-policy-id 157 --category equity_expanding --summary "..." --source-reference "..." --apply --yes
   $(cli_hint) impact curate-sources --non-interactive --limit 10
@@ -2940,11 +3636,13 @@ Safety:
   Manual source curation never auto-discovers sources. It only attaches
   operator-provided URLs, avoids duplicate URL creation, rejects low/unverified
   source quality, and requires --apply --yes for writes.
-  Supplemental current-admin outcome-evidence integration is dry-run only
-  during the controlled rollout. `impact promote --apply --yes` blocks any
-  transition that depends on those supplemental recommendations.
-  Current-admin policy_outcome enrichment preview is report-only and never
-  writes promise_outcomes or unified policy_outcomes.
+  Supplemental current-admin outcome-evidence can auto-approve only the
+  strict validator-gated impact_pending -> impact_review_ready path.
+  `impact promote --apply --yes` still refuses any supplemental transition
+  that was not explicitly approved during `impact evaluate`.
+  Current-admin policy_outcome enrichment is dry-run by default and only
+  applies validator-approved, outcome-oriented evidence rows when
+  `--apply --yes` is explicit.
   Judicial impact commands are scaffold-only and do not contribute to scoring
   or perform database writes in this rollout.
 EOF
@@ -3145,16 +3843,16 @@ EOF
     outcome-evidence)
       cat <<EOF
 Usage:
-  equitystack current-admin outcome-evidence [--input <manual-review-queue.json|normalized.json>] [--source-config <path>] [--feed-url <rss>] [--feed-json <path>] [--csv [path]]
+  equitystack current-admin outcome-evidence [--input <normalized.json|manual-review-queue.json>] [--source-config <path>] [--feed-url <rss>] [--feed-json <path>] [--csv [path]]
 
 Runs:
   python3 scripts/discover_current_admin_outcome_evidence.py [args]
 
-This is Phase 2 of the controlled rollout:
+This is the read-only evidence collector used by the automated current-admin run flow:
   - active and read-only
   - writes JSON/CSV artifacts only
   - never writes current-admin rows or policy_outcomes
-  - not part of the default current-admin run/apply path
+  - can also be run directly for debugging or batch-specific review
 EOF
       ;;
     review)
@@ -3164,6 +3862,7 @@ Usage:
 
 Promotes AI-approved and AI-rejected rows first, then asks for operator decisions only on the remaining manual-review slice.
 If no borderline items remain, review completes without requiring a decision file edit.
+This is the exception-only recovery surface, not the default happy path.
 EOF
       ;;
     ai-review)
@@ -3212,13 +3911,28 @@ EOF
     run)
       cat <<EOF
 Usage:
-  equitystack current-admin run [--input <batch-file> | --batch-name <batch-name>] [--discovery-dry-run] [--discovery-output <report.json>] [--output <batch.json>] [--output-name <batch-name>] [review args]
+  equitystack current-admin run [--input <batch-file> | --batch-name <batch-name>] [--discovery-dry-run] [--discovery-output <report.json>] [--output <batch.json>] [--output-name <batch-name>] [--full-auto] [--stop-after <review|apply|impact-evaluate|impact-promote|enrichment>] [--no-auto-apply] [--no-impact-automation] [review args]
 
 Default path without --input:
   discover -> gen-batch -> normalize -> AI review -> AI-first queue promotion
+  -> exception-only manual stop OR guarded import path
+  -> outcome-evidence -> impact evaluate -> impact promote
+  -> outcome enrichment -> current-admin outcome sync
 
 Manual path with --input:
   normalize -> AI review -> AI-first queue promotion
+  -> same exception-only automation tail
+
+Batch-scoped automation artifacts are written under:
+  reports/current_admin/<batch>.outcome-evidence.json
+  reports/current_admin/<batch>.impact-evaluate.json
+  reports/current_admin/<batch>.impact-promote-dry-run.json
+  reports/current_admin/<batch>.impact-promote-apply.json
+  reports/current_admin/<batch>.outcome-enrichment-preview.json
+  reports/current_admin/<batch>.outcome-enrichment-dry-run.json
+  reports/current_admin/<batch>.outcome-enrichment-apply.json
+  reports/current_admin/<batch>.automation-report.json
+  reports/current_admin/<batch>.exception-queue.json
 EOF
       ;;
     apply)

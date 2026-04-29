@@ -38,9 +38,11 @@ Canonical commands:
 
 ```bash
 ./python/bin/equitystack current-admin run
-./python/bin/equitystack current-admin review
-./python/bin/equitystack current-admin apply
-./python/bin/equitystack current-admin apply --apply --yes
+./python/bin/equitystack current-admin run --stop-after review
+./python/bin/equitystack current-admin run --stop-after apply
+./python/bin/equitystack current-admin run --stop-after impact-evaluate
+./python/bin/equitystack current-admin run --stop-after impact-promote
+./python/bin/equitystack current-admin run --stop-after enrichment
 ```
 
 Important scripts:
@@ -49,7 +51,11 @@ Important scripts:
 | --- | --- |
 | Discovery | `scripts/discover_current_admin_updates.py` |
 | Batch generation | `scripts/generate_current_admin_batch_from_discovery.py` |
-| Optional outcome evidence | `scripts/discover_current_admin_outcome_evidence.py` |
+| Outcome evidence | `scripts/discover_current_admin_outcome_evidence.py` |
+| Impact evaluate | `scripts/evaluate_impact_maturation.py evaluate` |
+| Impact promote | `scripts/evaluate_impact_maturation.py promote` |
+| Outcome enrichment preview | `scripts/preview_current_admin_policy_outcome_enrichment.py` |
+| Outcome enrichment apply | `scripts/apply_current_admin_outcome_enrichment.py` |
 | Normalization | `scripts/normalize_current_admin_batch.py` |
 | AI review | `scripts/review_current_admin_batch_with_openai_batch.py` |
 | AI-first queue build | `scripts/promote_current_admin_review_to_queue.py` |
@@ -61,11 +67,15 @@ Important scripts:
 
 Safety:
 
+- `current-admin run` is now the canonical automation entrypoint. It stops only for true exception rows or strict validator blocks.
 - `current-admin apply` is dry-run unless `--apply --yes` is explicit.
 - the canonical `manual-review-queue.json` artifact now splits into `items`, `auto_approved_items`, and `auto_rejected_items`.
-- current-admin human review is now limited to the `items` slice; AI-approved import candidates move forward without requiring routine operator approval.
+- current-admin human review is now limited to the `items` slice; safe batches continue through guarded import, evidence, impact, and enrichment without routine operator decisions.
 - `current-admin deep-review` is the explicit deeper AI path when the standard review recommends more scrutiny.
-- `current-admin outcome-evidence` is active but read-only. It generates evidence artifacts only and does not alter `current-admin run`, `current-admin review`, or `current-admin apply`.
+- `current-admin outcome-evidence` is active and read-only. It now runs inside the default full `current-admin run` path after guarded import.
+- `impact evaluate --auto-approve-safe-supplemental --dry-run` is read-only and is the only path that can mark supplemental impact transitions as explicitly validator-approved.
+- `impact promote --apply --yes` never infers approval on its own for supplemental evidence rows.
+- `impact apply-current-admin-outcome-enrichment --apply --yes` is the only path that can write strict current-admin measurable-outcome enrichment from supplemental evidence.
 - Current-admin unified outcome sync inserts `impact_score` at creation time.
 - Review artifacts record requested model, effective model, backend, timeout, and fallback status.
 
@@ -73,9 +83,9 @@ Controlled rollout additions:
 
 - Phase 1 implementation/execution evidence is active in discovery and batch context.
 - Phase 2 outcome-evidence collection is active and artifact-first.
-- Phase 3 `impact evaluate --outcome-evidence ...` is dry-run only; `impact promote --apply --yes` blocks supplemental-evidence-driven transitions.
-- Phase 4 `impact preview-current-admin-outcome-enrichment` is report-only.
-- Phase 5 judicial impact commands are scaffold-only and perform no writes or scoring changes.
+- Phase 3 strict supplemental impact promotion is operational only through explicit validator-approved rows written by `impact evaluate --auto-approve-safe-supplemental --dry-run`.
+- Phase 4 strict current-admin outcome enrichment is operational only through `impact apply-current-admin-outcome-enrichment --dry-run|--apply --yes`.
+- Phase 5 judicial impact commands remain scaffold-only and perform no writes or scoring changes.
 
 ## Legislative Workflow
 
@@ -131,6 +141,10 @@ These commands are the core read-only and guarded write surface for unified outc
 | `impact promote` | `scripts/evaluate_impact_maturation.py promote` | Dry-run unless `--apply --yes` |
 | `impact sync-current-admin-outcomes` | `scripts/sync_current_admin_policy_outcomes.py` | Dry-run unless `--apply --yes` |
 | `impact preview-current-admin-outcome-enrichment` | `scripts/preview_current_admin_policy_outcome_enrichment.py` | Report-only; never writes |
+| `impact apply-current-admin-outcome-enrichment` | `scripts/apply_current_admin_outcome_enrichment.py` | Dry-run unless `--apply --yes`; writes only strict validator-approved measurable-outcome enrichment |
+| `impact judicial-run` | wrapper over scaffold judicial scripts | Scaffold-only; no scoring or writes |
+| `impact judicial-review` | wrapper over scaffold judicial scripts | Scaffold-only; no scoring or writes |
+| `impact judicial-apply` | wrapper over scaffold judicial scripts | Scaffold-only; no scoring or writes |
 | `impact discover-judicial-candidates` | `scripts/discover_judicial_impact_candidates.py` | Scaffold-only; no scoring or writes |
 | `impact import-judicial-batch` | `scripts/import_judicial_impact_batch.py` | Scaffold-only validation; apply disabled |
 | `impact materialize-judicial-outcomes` | `scripts/materialize_judicial_policy_outcomes.py` | Scaffold-only preview; apply disabled |
