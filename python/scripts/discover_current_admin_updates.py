@@ -5,6 +5,7 @@ from email.utils import parsedate_to_datetime
 from html import unescape
 import json
 import re
+import subprocess
 import sys
 import xml.etree.ElementTree as ET
 from datetime import UTC, datetime, timedelta
@@ -387,6 +388,31 @@ def resolve_source_url(source: dict[str, Any], president_slug: str, max_items: i
     return normalize_nullable_text(url_template.format(**context))
 
 
+def looks_like_challenge_validation_page(raw_html: str) -> bool:
+    lowered = raw_html.lower()
+    return (
+        "challenge validation" in lowered
+        and "cp_clge_done" in lowered
+        and "sessionstorage" in lowered
+    )
+
+
+def fetch_url_text_via_curl(url: str, timeout: int) -> str:
+    result = subprocess.run(
+        [
+            "curl",
+            "-L",
+            "-s",
+            url,
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+        timeout=max(timeout or DEFAULT_SOURCE_TIMEOUT, 10),
+    )
+    return result.stdout
+
+
 def fetch_url_text(url: str, timeout: int) -> str:
     response = requests.get(
         url,
@@ -394,11 +420,41 @@ def fetch_url_text(url: str, timeout: int) -> str:
         headers={"User-Agent": "Mozilla/5.0 (compatible; current-admin-discovery/1.0)"},
     )
     response.raise_for_status()
+    if "dol.gov" in url.lower() and looks_like_challenge_validation_page(response.text):
+        try:
+            fallback_text = fetch_url_text_via_curl(url, timeout)
+            if normalize_nullable_text(fallback_text):
+                return fallback_text
+        except (OSError, subprocess.SubprocessError):
+            pass
     return response.text
 
 
 def clean_html_fragment(value: Any) -> str:
     return normalize_text(unescape(re.sub(r"<[^>]+>", " ", str(value or ""))))
+
+
+def normalize_string_list(value: Any) -> list[str]:
+    if isinstance(value, list):
+        raw_values = value
+    else:
+        text = normalize_nullable_text(value)
+        if text is None:
+            return []
+        raw_values = re.split(r"[,;|]", text)
+
+    normalized = []
+    seen: set[str] = set()
+    for item in raw_values:
+        text = normalize_nullable_text(item)
+        if not text:
+            continue
+        lowered = text.lower()
+        if lowered in seen:
+            continue
+        seen.add(lowered)
+        normalized.append(text)
+    return normalized
 
 
 def normalize_feed_date(value: Any) -> str | None:
@@ -415,7 +471,15 @@ def normalize_feed_date(value: Any) -> str | None:
             parsed = parsed.replace(tzinfo=UTC)
         return parsed.astimezone(UTC).date().isoformat()
 
-    for format_string in ("%Y-%m-%d", "%Y-%m-%dT%H:%M:%S%z", "%Y-%m-%dT%H:%M:%S", "%m/%d/%y", "%m/%d/%Y"):
+    for format_string in (
+        "%Y-%m-%d",
+        "%Y-%m-%dT%H:%M:%S%z",
+        "%Y-%m-%dT%H:%M:%S",
+        "%m/%d/%y",
+        "%m/%d/%Y",
+        "%B %d, %Y",
+        "%b %d, %Y",
+    ):
         try:
             parsed_dt = datetime.strptime(text, format_string)
             if parsed_dt.tzinfo is None:
@@ -548,6 +612,344 @@ def parse_federal_register_items(payload: dict[str, Any], source: dict[str, Any]
     return [item for item in items if item["title"]]
 
 
+def parse_doj_news_listing_items(
+    raw_html: str,
+    *,
+    source_url: str,
+    source_name: str,
+    source_category: str,
+    publisher: str,
+    max_items: int,
+) -> list[dict[str, Any]]:
+    items = []
+    pattern = re.compile(
+        r"<article class=\"news-content-listing[^\"]*\">.*?"
+        r"<h2 class=\"news-title\">\s*<a href=\"([^\"]+)\"[^>]*>\s*<span[^>]*>(.*?)</span>\s*</a>.*?"
+        r"<time datetime=\"([^\"]+)\"[^>]*>(.*?)</time>",
+        re.IGNORECASE | re.DOTALL,
+    )
+    for match in pattern.finditer(raw_html):
+        item_url = normalize_nullable_text(urljoin(source_url, match.group(1)))
+        title = clean_html_fragment(match.group(2))
+        published_at = normalize_feed_date(match.group(3) or match.group(4))
+        if not title or not item_url:
+            continue
+        items.append(
+            {
+                "title": title,
+                "url": item_url,
+                "published_at": published_at,
+                "summary": title,
+                "source_name": source_name,
+                "source_type": "HTML",
+                "source_category": source_category,
+                "publisher": publisher,
+            }
+        )
+        if len(items) >= max_items:
+            break
+    return items
+
+
+def parse_ed_press_release_items(
+    raw_html: str,
+    *,
+    source_url: str,
+    source_name: str,
+    source_category: str,
+    publisher: str,
+    max_items: int,
+) -> list[dict[str, Any]]:
+    items = []
+    pattern = re.compile(
+        r"<div class=\"views-row\">.*?"
+        r"<div class=\"views-field views-field-title newsroom-title results-list-title\"><span class=\"field-content\">"
+        r"<a href=\"([^\"]+)\"[^>]*>(.*?)</a></span></div>"
+        r".*?<div class=\"views-field views-field-body newsroom-body results-list-body\"><div class=\"field-content\">(.*?)</div>"
+        r".*?<div class=\"newsroom-date results-list-date\"><span><div><time datetime=\"([^\"]+)\"",
+        re.IGNORECASE | re.DOTALL,
+    )
+    for match in pattern.finditer(raw_html):
+        item_url = normalize_nullable_text(urljoin(source_url, match.group(1)))
+        title = clean_html_fragment(match.group(2))
+        summary = clean_html_fragment(match.group(3)) or title
+        published_at = normalize_feed_date(match.group(4))
+        if not title or not item_url:
+            continue
+        items.append(
+            {
+                "title": title,
+                "url": item_url,
+                "published_at": published_at,
+                "summary": summary,
+                "source_name": source_name,
+                "source_type": "HTML",
+                "source_category": source_category,
+                "publisher": publisher,
+            }
+        )
+        if len(items) >= max_items:
+            break
+    return items
+
+
+def parse_eeoc_newsroom_items(
+    raw_html: str,
+    *,
+    source_url: str,
+    source_name: str,
+    source_category: str,
+    publisher: str,
+    max_items: int,
+) -> list[dict[str, Any]]:
+    items = []
+    pattern = re.compile(
+        r"<article[^>]*class=\"press_release\"[^>]*>.*?"
+        r"<h2>\s*<a href=\"([^\"]+)\"[^>]*>(.*?)</a>\s*</h2>"
+        r".*?<div class=\"clearfix text-formatted field field--name-body field--type-text-with-summary field--label-hidden field__item\">(.*?)</div>"
+        r".*?<div class=\"field field--name-field-published-date field--type-datetime field--label-hidden field__item\">(.*?)</div>",
+        re.IGNORECASE | re.DOTALL,
+    )
+    for match in pattern.finditer(raw_html):
+        item_url = normalize_nullable_text(urljoin(source_url, match.group(1)))
+        title = clean_html_fragment(match.group(2))
+        summary = clean_html_fragment(match.group(3)) or title
+        published_at = normalize_feed_date(match.group(4))
+        if not title or not item_url:
+            continue
+        items.append(
+            {
+                "title": title,
+                "url": item_url,
+                "published_at": published_at,
+                "summary": summary,
+                "source_name": source_name,
+                "source_type": "HTML",
+                "source_category": source_category,
+                "publisher": publisher,
+            }
+        )
+        if len(items) >= max_items:
+            break
+    return items
+
+
+def parse_dol_news_release_items(
+    raw_html: str,
+    *,
+    source_url: str,
+    source_name: str,
+    source_category: str,
+    publisher: str,
+    max_items: int,
+) -> list[dict[str, Any]]:
+    items = []
+    pattern = re.compile(
+        r"<div data-history-node-id=\"[^\"]+\" about=\"([^\"]+)\" class=\"left-teaser-text\">.*?"
+        r"<p class=\"dol-date-text\">(.*?)</p>.*?"
+        r"<a href=\"\s*([^\"]+)\s*\">\s*<h3>\s*<span>(.*?)</span>\s*</h3>\s*</a>"
+        r".*?<div class=\"field field--name-field-press-body field--type-text-with-summary field--label-hidden clearfix\">(.*?)</div>",
+        re.IGNORECASE | re.DOTALL,
+    )
+    for match in pattern.finditer(raw_html):
+        about_url = normalize_nullable_text(match.group(1))
+        href_url = normalize_nullable_text(match.group(3))
+        item_url = normalize_nullable_text(urljoin(source_url, href_url or about_url))
+        title = clean_html_fragment(match.group(4))
+        summary = clean_html_fragment(match.group(5)) or title
+        published_at = normalize_feed_date(match.group(2))
+        if not title or not item_url:
+            continue
+        items.append(
+            {
+                "title": title,
+                "url": item_url,
+                "published_at": published_at,
+                "summary": summary,
+                "source_name": source_name,
+                "source_type": "HTML",
+                "source_category": source_category,
+                "publisher": publisher,
+            }
+        )
+        if len(items) >= max_items:
+            break
+    return items
+
+
+def parse_hud_news_archive_items(
+    raw_html: str,
+    *,
+    source_url: str,
+    source_name: str,
+    source_category: str,
+    publisher: str,
+    max_items: int,
+) -> list[dict[str, Any]]:
+    section_match = re.search(
+        r"<h2 class=\"headertwo\" id=\"PR\">Press Releases</h2><div class=\"newsbox\"><div class=\"collapse\" id=\"news1\"[^>]*>(.*?)<p><a href=\"https://archives\.hud\.gov/news/index\.cfm\">More Press Releases</a></p>",
+        raw_html,
+        re.IGNORECASE | re.DOTALL,
+    )
+    if not section_match:
+        return []
+
+    items = []
+    pattern = re.compile(
+        r"<p>\s*[^<]*,\s*([A-Za-z]+ \d{1,2}, \d{4})<br>\s*<a href=\"([^\"]+)\">(.*?)</a>\s*</p>",
+        re.IGNORECASE | re.DOTALL,
+    )
+    for match in pattern.finditer(section_match.group(1)):
+        published_at = normalize_feed_date(match.group(1))
+        item_url = normalize_nullable_text(urljoin(source_url, match.group(2)))
+        title = clean_html_fragment(match.group(3))
+        if not title or not item_url:
+            continue
+        items.append(
+            {
+                "title": title,
+                "url": item_url,
+                "published_at": published_at,
+                "summary": title,
+                "source_name": source_name,
+                "source_type": "HTML",
+                "source_category": source_category,
+                "publisher": publisher,
+            }
+        )
+        if len(items) >= max_items:
+            break
+    return items
+
+
+def parse_cfpb_enforcement_items(
+    raw_html: str,
+    *,
+    source_url: str,
+    source_name: str,
+    source_category: str,
+    publisher: str,
+    max_items: int,
+) -> list[dict[str, Any]]:
+    items = []
+    pattern = re.compile(
+        r"<article class=\"o-post-preview\"[^>]*>.*?"
+        r"<time datetime=\"([^\"]+)\"[^>]*>.*?</time>.*?"
+        r"<h3 class=\"o-post-preview__title\">\s*<a href=\"([^\"]+)\"[^>]*>(.*?)</a>\s*</h3>"
+        r".*?<div class=\"o-post-preview__description\">(.*?)</div>",
+        re.IGNORECASE | re.DOTALL,
+    )
+    for match in pattern.finditer(raw_html):
+        published_at = normalize_feed_date(match.group(1))
+        item_url = normalize_nullable_text(urljoin(source_url, match.group(2)))
+        title = clean_html_fragment(match.group(3))
+        summary = clean_html_fragment(match.group(4)) or title
+        if not title or not item_url:
+            continue
+        items.append(
+            {
+                "title": title,
+                "url": item_url,
+                "published_at": published_at,
+                "summary": summary,
+                "source_name": source_name,
+                "source_type": "HTML",
+                "source_category": source_category,
+                "publisher": publisher,
+            }
+        )
+        if len(items) >= max_items:
+            break
+    return items
+
+
+def parse_anchor_list_items(
+    raw_html: str,
+    *,
+    source_url: str,
+    source_name: str,
+    source_category: str,
+    publisher: str,
+    max_items: int,
+) -> list[dict[str, Any]]:
+    items = []
+    pattern = re.compile(r"<a[^>]+href=['\"]([^'\"]+)['\"][^>]*>(.*?)</a>", re.IGNORECASE | re.DOTALL)
+    for match in pattern.finditer(raw_html):
+        item_url = normalize_nullable_text(urljoin(source_url, match.group(1)))
+        title = clean_html_fragment(match.group(2))
+        if not title or not item_url or len(title) < 12:
+            continue
+        items.append(
+            {
+                "title": title,
+                "url": item_url,
+                "published_at": None,
+                "summary": title,
+                "source_name": source_name,
+                "source_type": "HTML",
+                "source_category": source_category,
+                "publisher": publisher,
+            }
+        )
+        if len(items) >= max_items * 5:
+            break
+    return items
+
+
+def parse_epa_civil_rights_update_items(
+    raw_html: str,
+    *,
+    source_url: str,
+    source_name: str,
+    source_category: str,
+    publisher: str,
+    max_items: int,
+) -> list[dict[str, Any]]:
+    update_block = re.search(
+        r"<li><strong>Latest Updates</strong>:(.*?)</li>\s*</ul>",
+        raw_html,
+        re.IGNORECASE | re.DOTALL,
+    )
+    if not update_block:
+        return []
+
+    items = []
+    segments = re.split(r"<br[^>]*>", update_block.group(1))
+    for segment in segments:
+        text = clean_html_fragment(segment)
+        if not text:
+            continue
+        match = re.search(r"On ([A-Za-z]+ \d{1,2}, \d{4}),\s*(.+?)\s+\(([^)]+)\)\s+(.*)", text)
+        if not match:
+            continue
+        published_at = normalize_feed_date(match.group(1))
+        entity = normalize_text(match.group(2))
+        docket_number = normalize_nullable_text(match.group(3))
+        status_text = normalize_text(match.group(4)).rstrip(".")
+        link_match = re.search(r"href=\"([^\"]+)\"", segment, re.IGNORECASE)
+        item_url = normalize_nullable_text(urljoin(source_url, link_match.group(1))) if link_match else source_url
+        title = normalize_text(f"{entity} ({docket_number}) {status_text}")
+        if not title:
+            continue
+        items.append(
+            {
+                "title": title,
+                "url": item_url,
+                "published_at": published_at,
+                "summary": text,
+                "source_name": source_name,
+                "source_type": "HTML",
+                "source_category": source_category,
+                "publisher": publisher,
+                "docket_number": docket_number,
+                "court_or_agency": "Environmental Protection Agency",
+            }
+        )
+        if len(items) >= max_items:
+            break
+    return items
+
+
 def parse_supreme_court_opinion_table_items(
     raw_html: str,
     *,
@@ -611,6 +1013,11 @@ def apply_source_metadata_defaults(items: list[dict[str, Any]], source: dict[str
     mechanism_of_effect = normalize_nullable_text(source.get("mechanism_of_effect"))
     funding_signal = normalize_nullable_text(source.get("funding_signal"))
     affected_institutions = normalize_nullable_text(source.get("affected_institutions"))
+    source_family = normalize_nullable_text(source.get("source_family"))
+    evidence_type = normalize_nullable_text(source.get("evidence_type"))
+    topic_tags = normalize_string_list(source.get("topic_tags"))
+    trust_level = normalize_nullable_text(source.get("trust_level"))
+    default_match_strength = normalize_nullable_text(source.get("default_match_strength"))
 
     normalized_items = []
     for item in items:
@@ -638,9 +1045,45 @@ def apply_source_metadata_defaults(items: list[dict[str, Any]], source: dict[str
                 "affected_institutions": normalize_nullable_text(
                     item.get("affected_institutions") or affected_institutions
                 ),
+                "source_family": normalize_nullable_text(item.get("source_family") or source_family),
+                "evidence_type": normalize_nullable_text(item.get("evidence_type") or evidence_type),
+                "topic_tags": normalize_string_list(item.get("topic_tags")) or topic_tags,
+                "trust_level": normalize_nullable_text(item.get("trust_level") or trust_level),
+                "default_match_strength": normalize_nullable_text(
+                    item.get("default_match_strength") or default_match_strength
+                ),
             }
         )
     return normalized_items
+
+
+def item_matches_source_filters(item: dict[str, Any], source: dict[str, Any]) -> bool:
+    combined_text = normalize_text(
+        " ".join(
+            [
+                item.get("title") or "",
+                item.get("summary") or "",
+                item.get("url") or "",
+                item.get("source_name") or "",
+            ]
+        )
+    ).lower()
+    required_keywords_any = [keyword.lower() for keyword in normalize_string_list(source.get("required_keywords_any"))]
+    blocked_keywords_any = [keyword.lower() for keyword in normalize_string_list(source.get("blocked_keywords_any"))]
+    required_url_patterns_any = normalize_string_list(source.get("required_url_patterns_any"))
+    item_url = normalize_nullable_text(item.get("url")) or ""
+
+    if required_keywords_any and not any(keyword in combined_text for keyword in required_keywords_any):
+        return False
+    if blocked_keywords_any and any(keyword in combined_text for keyword in blocked_keywords_any):
+        return False
+    if required_url_patterns_any and not any(re.search(pattern, item_url, re.IGNORECASE) for pattern in required_url_patterns_any):
+        return False
+    return True
+
+
+def filter_source_items(items: list[dict[str, Any]], source: dict[str, Any]) -> list[dict[str, Any]]:
+    return [item for item in items if item_matches_source_filters(item, source)]
 
 
 def fetch_default_live_source_items(
@@ -663,6 +1106,11 @@ def fetch_default_live_source_items(
         source_category = normalize_text(source.get("category") or "unknown")
         max_items = int(source.get("max_items") or args.max_feed_items or 20)
         resolved_url = resolve_source_url(source, args.president_slug, max_items=max_items)
+        source_family = normalize_nullable_text(source.get("source_family"))
+        evidence_type = normalize_nullable_text(source.get("evidence_type"))
+        topic_tags = normalize_string_list(source.get("topic_tags"))
+        trust_level = normalize_nullable_text(source.get("trust_level"))
+        default_match_strength = normalize_nullable_text(source.get("default_match_strength"))
 
         if not enabled or not default_enabled:
             source_results.append(
@@ -673,6 +1121,11 @@ def fetch_default_live_source_items(
                     "url": resolved_url,
                     "enabled": enabled,
                     "default": default_enabled,
+                    "source_family": source_family,
+                    "evidence_type": evidence_type,
+                    "topic_tags": topic_tags,
+                    "trust_level": trust_level,
+                    "default_match_strength": default_match_strength,
                     "raw_item_count": 0,
                     "deduped_item_count": 0,
                     "skip_reason": "disabled_in_source_config",
@@ -742,6 +1195,78 @@ def fetch_default_live_source_items(
                         court_or_agency=normalize_nullable_text(source.get("court_or_agency")) or "Supreme Court of the United States",
                         max_items=max_items,
                     )
+                elif parser_name == "doj_news_listing":
+                    items = parse_doj_news_listing_items(
+                        raw_html,
+                        source_url=resolved_url,
+                        source_name=source_name,
+                        source_category=source_category,
+                        publisher=normalize_text(source.get("publisher") or "Department of Justice"),
+                        max_items=max_items,
+                    )
+                elif parser_name == "ed_press_release_listing":
+                    items = parse_ed_press_release_items(
+                        raw_html,
+                        source_url=resolved_url,
+                        source_name=source_name,
+                        source_category=source_category,
+                        publisher=normalize_text(source.get("publisher") or "Department of Education"),
+                        max_items=max_items,
+                    )
+                elif parser_name == "eeoc_newsroom_listing":
+                    items = parse_eeoc_newsroom_items(
+                        raw_html,
+                        source_url=resolved_url,
+                        source_name=source_name,
+                        source_category=source_category,
+                        publisher=normalize_text(source.get("publisher") or "Equal Employment Opportunity Commission"),
+                        max_items=max_items,
+                    )
+                elif parser_name == "dol_news_release_listing":
+                    items = parse_dol_news_release_items(
+                        raw_html,
+                        source_url=resolved_url,
+                        source_name=source_name,
+                        source_category=source_category,
+                        publisher=normalize_text(source.get("publisher") or "Department of Labor"),
+                        max_items=max_items,
+                    )
+                elif parser_name == "hud_news_archive":
+                    items = parse_hud_news_archive_items(
+                        raw_html,
+                        source_url=resolved_url,
+                        source_name=source_name,
+                        source_category=source_category,
+                        publisher=normalize_text(source.get("publisher") or "Department of Housing and Urban Development"),
+                        max_items=max_items,
+                    )
+                elif parser_name == "cfpb_enforcement_listing":
+                    items = parse_cfpb_enforcement_items(
+                        raw_html,
+                        source_url=resolved_url,
+                        source_name=source_name,
+                        source_category=source_category,
+                        publisher=normalize_text(source.get("publisher") or "Consumer Financial Protection Bureau"),
+                        max_items=max_items,
+                    )
+                elif parser_name == "anchor_list":
+                    items = parse_anchor_list_items(
+                        raw_html,
+                        source_url=resolved_url,
+                        source_name=source_name,
+                        source_category=source_category,
+                        publisher=normalize_text(source.get("publisher") or source_name),
+                        max_items=max_items,
+                    )
+                elif parser_name == "epa_civil_rights_updates":
+                    items = parse_epa_civil_rights_update_items(
+                        raw_html,
+                        source_url=resolved_url,
+                        source_name=source_name,
+                        source_category=source_category,
+                        publisher=normalize_text(source.get("publisher") or "Environmental Protection Agency"),
+                        max_items=max_items,
+                    )
                 else:
                     raise ValueError(f"Unsupported HTML parser: {parser_name or source_name}")
             elif source_type == "json":
@@ -759,6 +1284,7 @@ def fetch_default_live_source_items(
                 items = parse_federal_register_items(payload.json(), source)
             else:
                 raise ValueError(f"Unsupported source type: {source_type or 'unknown'}")
+            items = filter_source_items(items, source)
             items = apply_source_metadata_defaults(items, source)
         except Exception as exc:  # noqa: BLE001
             source_errors.append(
@@ -767,6 +1293,8 @@ def fetch_default_live_source_items(
                     "error": normalize_text(str(exc)),
                     "source_category": source_category,
                     "source_url": resolved_url,
+                    "source_family": source_family,
+                    "evidence_type": evidence_type,
                 }
             )
             source_results.append(
@@ -777,6 +1305,11 @@ def fetch_default_live_source_items(
                     "url": resolved_url,
                     "enabled": enabled,
                     "default": default_enabled,
+                    "source_family": source_family,
+                    "evidence_type": evidence_type,
+                    "topic_tags": topic_tags,
+                    "trust_level": trust_level,
+                    "default_match_strength": default_match_strength,
                     "raw_item_count": 0,
                     "deduped_item_count": 0,
                     "skip_reason": normalize_text(str(exc)) or "source_fetch_failed",
@@ -794,6 +1327,11 @@ def fetch_default_live_source_items(
                 "url": resolved_url,
                 "enabled": enabled,
                 "default": default_enabled,
+                "source_family": source_family,
+                "evidence_type": evidence_type,
+                "topic_tags": topic_tags,
+                "trust_level": trust_level,
+                "default_match_strength": default_match_strength,
                 "raw_item_count": len(items),
                 "deduped_item_count": len(deduped_items),
                 "skip_reason": None,
@@ -1106,8 +1644,23 @@ def build_source_reference_note(
 ) -> str | None:
     parts = []
     source_category = normalize_nullable_text(feed_item.get("source_category"))
+    source_family = normalize_nullable_text(feed_item.get("source_family"))
+    evidence_type = normalize_nullable_text(feed_item.get("evidence_type"))
+    topic_tags = normalize_string_list(feed_item.get("topic_tags"))
+    trust_level = normalize_nullable_text(feed_item.get("trust_level"))
+    default_match_strength = normalize_nullable_text(feed_item.get("default_match_strength"))
     if source_category:
         parts.append(f"category={source_category}")
+    if source_family:
+        parts.append(f"source_family={source_family}")
+    if evidence_type:
+        parts.append(f"evidence_type={evidence_type}")
+    if topic_tags:
+        parts.append(f"topic_tags={','.join(topic_tags)}")
+    if trust_level:
+        parts.append(f"trust_level={trust_level}")
+    if default_match_strength:
+        parts.append(f"default_match_strength={default_match_strength}")
     parts.append(f"classification={suggestion_type}")
     if legal_status and legal_status != "unknown":
         parts.append(f"legal_status={legal_status}")
@@ -1496,6 +2049,11 @@ def load_local_feed_items(path: Path) -> list[dict[str, Any]]:
                 "mechanism_of_effect": normalize_nullable_text(item.get("mechanism_of_effect")),
                 "funding_signal": normalize_nullable_text(item.get("funding_signal")),
                 "affected_institutions": normalize_nullable_text(item.get("affected_institutions")),
+                "source_family": normalize_nullable_text(item.get("source_family")),
+                "evidence_type": normalize_nullable_text(item.get("evidence_type")),
+                "topic_tags": normalize_string_list(item.get("topic_tags")),
+                "trust_level": normalize_nullable_text(item.get("trust_level")),
+                "default_match_strength": normalize_nullable_text(item.get("default_match_strength")),
             }
         )
     return normalized_items
@@ -1528,6 +2086,7 @@ def parse_feed_xml(
                 "source_category": normalize_text(source_category or "manual-feed"),
                 "publisher": normalize_text(publisher or source_name),
                 "action_type_hint": None,
+                "topic_tags": [],
             }
         )
 
@@ -1556,6 +2115,7 @@ def parse_feed_xml(
                 "source_category": normalize_text(source_category or "manual-feed"),
                 "publisher": normalize_text(publisher or source_name),
                 "action_type_hint": None,
+                "topic_tags": [],
             }
         )
 
@@ -2446,6 +3006,11 @@ def analyze_feed_items(
             "mechanism_of_effect": context["mechanism_of_effect"],
             "funding_signal": context["funding_signal"],
             "affected_institutions": context["affected_institutions"],
+            "source_family": normalize_nullable_text(feed_item.get("source_family")),
+            "evidence_type": normalize_nullable_text(feed_item.get("evidence_type")),
+            "topic_tags": normalize_string_list(feed_item.get("topic_tags")),
+            "trust_level": normalize_nullable_text(feed_item.get("trust_level")),
+            "default_match_strength": normalize_nullable_text(feed_item.get("default_match_strength")),
             "requested_model": model,
             "effective_model": model if review_mode == "openai" else None,
             "review_backend": review_mode,
@@ -2506,6 +3071,11 @@ def analyze_feed_items(
                 "published_at": normalize_nullable_text(feed_item.get("published_at")),
                 "raw_item_count": 1,
                 "review_backend": review_mode,
+                "source_family": normalize_nullable_text(feed_item.get("source_family")),
+                "evidence_type": normalize_nullable_text(feed_item.get("evidence_type")),
+                "topic_tags": normalize_string_list(feed_item.get("topic_tags")),
+                "trust_level": normalize_nullable_text(feed_item.get("trust_level")),
+                "default_match_strength": normalize_nullable_text(feed_item.get("default_match_strength")),
                 "keyword_category_filter_result": {
                     "topic_estimate": topic_estimate,
                     "topic_matched": topic_estimate is not None,
@@ -2577,6 +3147,11 @@ def build_csv_rows(report: dict[str, Any]) -> list[dict[str, Any]]:
                     "mechanism_of_effect": suggested.get("mechanism_of_effect"),
                     "funding_signal": suggested.get("funding_signal"),
                     "affected_institutions": suggested.get("affected_institutions"),
+                    "source_family": item.get("source_family"),
+                    "evidence_type": item.get("evidence_type"),
+                    "topic_tags": ", ".join(item.get("topic_tags") or []),
+                    "trust_level": item.get("trust_level"),
+                    "default_match_strength": item.get("default_match_strength"),
                     "matched_keywords": ", ".join(suggested.get("matched_keywords") or []),
                     "classification_reason": item.get("classification_reason"),
                     "feed_title": feed_item.get("title"),

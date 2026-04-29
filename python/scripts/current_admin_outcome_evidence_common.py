@@ -10,7 +10,7 @@ from current_admin_common import (
 )
 
 
-ARTIFACT_VERSION = 1
+ARTIFACT_VERSION = 2
 OUTCOME_EVIDENCE_SUFFIX = "outcome-evidence"
 OUTCOME_EVIDENCE_BATCH_SUFFIX = ".outcome-evidence.json"
 
@@ -62,6 +62,9 @@ def record_key_variants(item: dict[str, Any]) -> set[str]:
             normalize_nullable_text(item.get("record_key")),
             normalize_nullable_text(item.get("slug")),
             normalize_nullable_text(item.get("linked_promise_slug")),
+            normalize_nullable_text(item.get("matched_policy_id")),
+            normalize_nullable_text(item.get("matched_promise_id")),
+            normalize_nullable_text(item.get("matched_action_id")),
         )
         if value
     }
@@ -71,6 +74,7 @@ def record_key_variants(item: dict[str, Any]) -> set[str]:
         for value in (
             normalize_nullable_text(record.get("slug")),
             normalize_nullable_text(record.get("title")),
+            normalize_nullable_text(record.get("id")),
         )
         if value
     )
