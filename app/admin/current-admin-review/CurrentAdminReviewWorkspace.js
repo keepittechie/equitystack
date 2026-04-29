@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { readAdminJsonResponse } from "@/app/admin/components/readAdminJsonResponse";
 import OperatorActionButton from "@/app/admin/components/OperatorActionButton";
 
@@ -30,6 +30,64 @@ const TABLE_WRAPPER_CLASS = "overflow-x-auto rounded border border-[var(--admin-
 const TABLE_HEAD_CLASS = "bg-[var(--admin-surface-muted)] text-left text-[11px] uppercase tracking-wide text-[var(--admin-text-muted)]";
 const TABLE_ROW_CLASS = "align-top odd:bg-[var(--admin-surface)] even:bg-[var(--admin-surface-soft)]";
 
+function normalizeString(value) {
+  return typeof value === "string" ? value.trim() : "";
+}
+
+function humanizeToken(value) {
+  const normalized = normalizeString(value);
+  if (!normalized) {
+    return "Unknown";
+  }
+
+  return normalized
+    .replace(/[_-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/\b\w/g, (character) => character.toUpperCase());
+}
+
+function statusBadgeClass(status) {
+  switch (normalizeString(status).toLowerCase()) {
+    case "passed":
+    case "complete":
+    case "dry_run_complete":
+      return "border-emerald-700/40 bg-emerald-500/10 text-emerald-200";
+    case "running":
+      return "border-sky-700/40 bg-sky-500/10 text-sky-100";
+    case "blocked":
+    case "exception_queue_ready":
+      return "border-amber-700/40 bg-amber-500/10 text-amber-100";
+    case "failed":
+      return "border-[var(--admin-danger-line)] bg-[var(--admin-danger-surface)] text-[var(--danger)]";
+    case "skipped":
+    case "stopped":
+      return "border-[var(--admin-line)] bg-[var(--admin-surface-muted)] text-[var(--admin-text)]";
+    default:
+      return "border-[var(--admin-line)] bg-[var(--admin-surface)] text-[var(--admin-text)]";
+  }
+}
+
+function prettyJson(value) {
+  try {
+    return JSON.stringify(value, null, 2);
+  } catch {
+    return "";
+  }
+}
+
+function formatBlockedDetails(item) {
+  const blockedReasons = Array.isArray(item?.blocked_reasons) ? item.blocked_reasons : [];
+  if (blockedReasons.length) {
+    return blockedReasons;
+  }
+  const cautionFlags = Array.isArray(item?.caution_flags) ? item.caution_flags : [];
+  if (cautionFlags.length) {
+    return cautionFlags;
+  }
+  return [];
+}
+
 export default function CurrentAdminReviewWorkspace({ workspace }) {
   const router = useRouter();
   const [items, setItems] = useState(cloneItems(workspace.review_items || []));
@@ -55,9 +113,28 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
   const comparisonState = workspace.comparison_state || {};
   const comparisonDeltas = comparisonState.aggregate_deltas || {};
   const pairedEvaluationState = workspace.paired_evaluation_state || {};
+  const automationState = workspace.automation_state || {};
+  const automationArtifacts = automationState.viewer_artifacts || [];
   const pairedBaselineStatus = pairedEvaluationState.baseline_status || {};
   const pairedEnrichedStatus = pairedEvaluationState.enriched_status || {};
   const editableManualReviewCount = manualReviewCounts.total || workspace.counts.total_items || 0;
+  const automationBatchName = automationState.batch_name || batch?.batch_name || "";
+  const automationBatchInput = batch?.input_file || batch?.paths?.input || "";
+  const activeBatch = batch || {
+    batch_name: automationBatchName || "Unavailable",
+    stage: "AUTOMATION_ONLY",
+    model: null,
+    review_mode: "automation",
+    paths: {},
+  };
+  const [selectedAutomationArtifactKey, setSelectedAutomationArtifactKey] = useState(
+    automationState.default_viewer_artifact_key || "automation_report"
+  );
+  const [automationArtifactViewer, setAutomationArtifactViewer] = useState({
+    loading: false,
+    error: "",
+    artifact: null,
+  });
   const deepReviewInput = batch?.paths?.normalized
     ? { input: batch.paths.normalized }
     : batch?.batch_name
@@ -74,6 +151,33 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
     pairedEvaluationState.status === "enriched_ready" ||
     (typeof pairedEvaluationState.recommendation === "string" &&
       pairedEvaluationState.recommendation.toLowerCase().includes("recommend"));
+  const currentAdminRunAction = {
+    id: "currentAdmin.run",
+    title: "Current-Admin Run",
+    workflowFamily: "current-admin",
+  };
+
+  const automationRunInputBase = automationBatchInput
+    ? { input: automationBatchInput }
+    : automationBatchName
+      ? { batchName: automationBatchName }
+      : {};
+  const liveAutomationConfirmation = {
+    title: "Confirm full current-admin automation",
+    description:
+      "This requests the canonical full-auto current-admin run. Guarded --apply --yes steps may run only when the existing validators pass. This confirmation does not bypass review, pre-commit, dry-run, or canonical apply guardrails.",
+    checkboxLabel:
+      "I understand guarded import, impact promotion, enrichment, and outcome sync may run only if validators pass.",
+    requireTypedYes: true,
+  };
+  const impactEvaluateStopConfirmation = {
+    title: "Confirm stop-after impact evaluate",
+    description:
+      "This run may execute the guarded import path before it stops at impact evaluate. Guarded mutating steps still require the canonical validators to pass and are not bypassed by this confirmation.",
+    checkboxLabel:
+      "I understand this may run guarded apply steps before stopping at impact evaluate if the validators allow it.",
+    requireTypedYes: true,
+  };
 
   function updateItem(slug, field, value) {
     setItems((current) =>
@@ -133,7 +237,75 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
     );
   }
 
-  if (!batch) {
+  function focusAutomationArtifact(artifactKey) {
+    setSelectedAutomationArtifactKey(artifactKey);
+    if (typeof document !== "undefined") {
+      document.getElementById("automation-artifact-viewer")?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  }
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadArtifact() {
+      if (!automationBatchName || !selectedAutomationArtifactKey) {
+        setAutomationArtifactViewer({
+          loading: false,
+          error: "",
+          artifact: null,
+        });
+        return;
+      }
+
+      setAutomationArtifactViewer((current) => ({
+        ...current,
+        loading: true,
+        error: "",
+      }));
+
+      try {
+        const params = new URLSearchParams({
+          batchName: automationBatchName,
+          artifactKey: selectedAutomationArtifactKey,
+        });
+        const url = `/api/admin/current-admin/automation-artifact?${params.toString()}`;
+        const response = await fetch(url, {
+          method: "GET",
+          cache: "no-store",
+        });
+        const payload = await readAdminJsonResponse(response, url);
+        if (!response.ok || !payload.success) {
+          throw new Error(payload.error?.message || payload.error || "Failed to load the automation artifact.");
+        }
+        if (!cancelled) {
+          setAutomationArtifactViewer({
+            loading: false,
+            error: "",
+            artifact: payload.artifact || null,
+          });
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setAutomationArtifactViewer({
+            loading: false,
+            error: error instanceof Error ? error.message : "Failed to load the automation artifact.",
+            artifact: null,
+          });
+        }
+      }
+    }
+
+    loadArtifact();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [automationBatchName, selectedAutomationArtifactKey]);
+
+  if (!batch && !automationState.available) {
     return (
       <section className={SECTION_CLASS}>
         <p className="text-[var(--admin-text)]">No current-admin review artifact is available yet.</p>
@@ -173,13 +345,13 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
       <section className="grid gap-3 lg:grid-cols-5">
         <div className={CARD_CLASS}>
           <p className={LABEL_CLASS}>Batch</p>
-          <p className="mt-1 text-base font-semibold text-[var(--admin-text)]">{batch.batch_name}</p>
-          <p className="mt-1 text-[11px] text-[var(--admin-text-muted)]">Stage: {batch.stage}</p>
+          <p className="mt-1 text-base font-semibold text-[var(--admin-text)]">{activeBatch.batch_name}</p>
+          <p className="mt-1 text-[11px] text-[var(--admin-text-muted)]">Stage: {activeBatch.stage}</p>
         </div>
         <div className={CARD_CLASS}>
           <p className={LABEL_CLASS}>Model / mode</p>
           <p className="mt-1 text-base font-semibold text-[var(--admin-text)]">
-            {batch.model || "unknown"} / {batch.review_mode || "standard"}
+            {activeBatch.model || "unknown"} / {activeBatch.review_mode || "standard"}
           </p>
         </div>
         <div className={CARD_CLASS}>
@@ -205,6 +377,282 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
           <p className={LABEL_CLASS}>Next recommended action</p>
           <p className="mt-1 font-semibold text-[var(--admin-text)]">{workspace.next_recommended_action.next_step_label}</p>
         </div>
+      </section>
+
+      <section className={SECTION_CLASS}>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <p className="text-[11px] uppercase tracking-wide text-[var(--admin-text-muted)]">Current-admin automation</p>
+            <h2 className="mt-1 text-base font-semibold text-[var(--admin-text)]">Exceptions-only automation control surface</h2>
+            <p className="mt-1 max-w-5xl text-[12px] text-[var(--admin-text-soft)]">
+              The full-auto pipeline now runs discovery, AI review, guarded import, outcome evidence, strict impact
+              validation, safe impact promotion, enrichment preview/apply, and outcome sync through the canonical
+              Python workflow. This page only becomes a hands-on review surface when true exception rows remain.
+            </p>
+          </div>
+          <div className={PANEL_CLASS}>
+            <p className={LABEL_CLASS}>Latest run</p>
+            <p className="mt-1 font-semibold text-[var(--admin-text)]">
+              {humanizeToken(automationState.latest_run?.status || "not_started")}
+            </p>
+            <p className="mt-1 text-[11px] text-[var(--admin-text-soft)]">
+              {automationState.latest_run?.current_stage_label || "Pending"} •{" "}
+              {automationState.latest_run?.generated_at || "No automation report yet"}
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-3 grid gap-3 xl:grid-cols-[1.1fr_0.9fr]">
+          <div className="space-y-3">
+            <div className="grid gap-3 md:grid-cols-3 xl:grid-cols-6">
+              <div className={CARD_CLASS}>
+                <p className={LABEL_CLASS}>Batch</p>
+                <p className="mt-1 text-[13px] font-semibold text-[var(--admin-text)]">{automationState.batch_name || "Unavailable"}</p>
+              </div>
+              <div className={CARD_CLASS}>
+                <p className={LABEL_CLASS}>Run status</p>
+                <span className={`mt-1 inline-flex rounded-full border px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide ${statusBadgeClass(automationState.latest_run?.status)}`}>
+                  {humanizeToken(automationState.latest_run?.status || "not_started")}
+                </span>
+              </div>
+              <div className={CARD_CLASS}>
+                <p className={LABEL_CLASS}>Current stage</p>
+                <p className="mt-1 text-[13px] font-semibold text-[var(--admin-text)]">
+                  {automationState.latest_run?.current_stage_label || "Pending"}
+                </p>
+              </div>
+              <div className={CARD_CLASS}>
+                <p className={LABEL_CLASS}>Exceptions</p>
+                <p className="mt-1 text-[13px] font-semibold text-[var(--admin-text)]">
+                  {automationState.summary?.exception_count || 0}
+                </p>
+              </div>
+              <div className={CARD_CLASS}>
+                <p className={LABEL_CLASS}>Impact promoted</p>
+                <p className="mt-1 text-[13px] font-semibold text-[var(--admin-text)]">
+                  {automationState.summary?.promoted_count || 0}
+                </p>
+              </div>
+              <div className={CARD_CLASS}>
+                <p className={LABEL_CLASS}>Enrichment</p>
+                <p className="mt-1 text-[13px] font-semibold text-[var(--admin-text)]">
+                  {automationState.summary?.enrichment_approved_count || 0} approved /{" "}
+                  {automationState.summary?.enrichment_blocked_count || 0} blocked
+                </p>
+              </div>
+            </div>
+
+            <div className="grid gap-3 md:grid-cols-3 xl:grid-cols-5">
+              <div className={CARD_CLASS}>
+                <p className={LABEL_CLASS}>Records scanned</p>
+                <p className="mt-1 text-[13px] font-semibold text-[var(--admin-text)]">
+                  {automationState.summary?.records_scanned || 0}
+                </p>
+              </div>
+              <div className={CARD_CLASS}>
+                <p className={LABEL_CLASS}>Implementation matches</p>
+                <p className="mt-1 text-[13px] font-semibold text-[var(--admin-text)]">
+                  {automationState.summary?.implementation_evidence_matches || 0}
+                </p>
+              </div>
+              <div className={CARD_CLASS}>
+                <p className={LABEL_CLASS}>Outcome matches</p>
+                <p className="mt-1 text-[13px] font-semibold text-[var(--admin-text)]">
+                  {automationState.summary?.outcome_evidence_matches || 0}
+                </p>
+              </div>
+              <div className={CARD_CLASS}>
+                <p className={LABEL_CLASS}>Strong / review</p>
+                <p className="mt-1 text-[13px] font-semibold text-[var(--admin-text)]">
+                  {automationState.summary?.strong_matches || 0} / {automationState.summary?.review_matches || 0}
+                </p>
+              </div>
+              <div className={CARD_CLASS}>
+                <p className={LABEL_CLASS}>Weak / blocked</p>
+                <p className="mt-1 text-[13px] font-semibold text-[var(--admin-text)]">
+                  {automationState.summary?.weak_matches || 0} / {automationState.summary?.impact_blocked_count || 0}
+                </p>
+              </div>
+            </div>
+
+            <div className={PANEL_CLASS}>
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <p className={LABEL_CLASS}>Automation actions</p>
+                  <p className="mt-1 text-[12px] text-[var(--admin-text-soft)]">
+                    These controls only call allowlisted broker actions. Live mode still relies on the canonical
+                    validators before any guarded `--apply --yes` step runs.
+                  </p>
+                </div>
+                <div className="text-[11px] text-[var(--admin-text-muted)]">
+                  Last run: {automationState.latest_run?.generated_at || "not yet run"}
+                </div>
+              </div>
+              <div className="mt-3 flex flex-wrap gap-3">
+                <OperatorActionButton
+                  action={currentAdminRunAction}
+                  label="Run Full Automation Safe"
+                  input={{ ...automationRunInputBase, fullAuto: true, noAutoApply: true }}
+                  tone="default"
+                  helperText="Runs the full automation chain in safe mode and skips guarded apply steps."
+                />
+                <OperatorActionButton
+                  action={currentAdminRunAction}
+                  label="Run Full Automation Live"
+                  input={{ ...automationRunInputBase, fullAuto: true }}
+                  tone="primary"
+                  helperText="May run guarded import, impact promotion, enrichment apply, and outcome sync only when validators pass."
+                  confirmation={liveAutomationConfirmation}
+                />
+                <OperatorActionButton
+                  action={currentAdminRunAction}
+                  label="Stop After Review"
+                  input={{ ...automationRunInputBase, fullAuto: true, stopAfter: "review" }}
+                  tone="default"
+                  helperText="Runs through the AI-first review split and stops before guarded import."
+                />
+                <OperatorActionButton
+                  action={currentAdminRunAction}
+                  label="Stop After Impact Evaluate"
+                  input={{ ...automationRunInputBase, fullAuto: true, stopAfter: "impact-evaluate" }}
+                  tone="default"
+                  helperText="Runs through guarded import and stops after strict impact evaluation."
+                  confirmation={impactEvaluateStopConfirmation}
+                />
+              </div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => focusAutomationArtifact("exception_queue")}
+                  className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] px-3 py-1.5 text-[12px] text-[var(--admin-text)]"
+                >
+                  View Latest Exception Queue
+                </button>
+                <button
+                  type="button"
+                  onClick={() => focusAutomationArtifact("automation_report")}
+                  className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] px-3 py-1.5 text-[12px] text-[var(--admin-text)]"
+                >
+                  View Latest Automation Report
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className={PANEL_CLASS}>
+            <p className={LABEL_CLASS}>Pipeline stage timeline</p>
+            <p className="mt-1 text-[12px] text-[var(--admin-text-soft)]">
+              Each stage reflects the latest batch-scoped automation artifacts and the most recent automation report.
+            </p>
+            <div className="mt-3 space-y-2">
+              {(automationState.stages || []).map((stage) => (
+                <div
+                  key={stage.key}
+                  className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] p-3"
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                      <p className="font-semibold text-[var(--admin-text)]">{stage.label}</p>
+                      {stage.detail ? (
+                        <p className="mt-1 text-[11px] text-[var(--admin-text-soft)]">{stage.detail}</p>
+                      ) : null}
+                    </div>
+                    <span className={`inline-flex rounded-full border px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide ${statusBadgeClass(stage.status)}`}>
+                      {humanizeToken(stage.status)}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {automationState.exception_queue?.present &&
+        (automationState.exception_queue?.item_count > 0 ||
+          normalizeString(automationState.exception_queue?.reason) ||
+          normalizeString(automationState.latest_run?.status) === "exception_queue_ready") ? (
+          <div className={`${WARNING_SECTION_CLASS} mt-3`}>
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <p className="text-[11px] uppercase tracking-wide text-[var(--admin-text-muted)]">Exception-first recovery</p>
+                <h3 className="mt-1 text-base font-semibold text-[var(--admin-text)]">
+                  Automation stopped because exception-only work remains
+                </h3>
+                <p className="mt-1 text-[12px] text-[var(--admin-text-soft)]">
+                  {automationState.latest_run?.message || automationState.exception_queue?.reason || "Review the remaining blocked rows."}
+                </p>
+              </div>
+              <div className="text-[11px] text-[var(--admin-text-muted)]">
+                <p>Exception count: {automationState.exception_queue?.item_count || 0}</p>
+                <p>Artifact: {automationState.exception_queue?.artifact_path || "Unavailable"}</p>
+              </div>
+            </div>
+            <div className="mt-3 grid gap-3 md:grid-cols-2">
+              <div className={WARNING_PANEL_CLASS}>
+                <p className="font-semibold text-[var(--admin-text)]">Recommended recovery</p>
+                <p className="mt-2 text-[12px] text-[var(--admin-text)]">
+                  {automationState.exception_queue?.next_step || "Inspect the exception queue artifact."}
+                </p>
+                {automationState.exception_queue?.recommended_command ? (
+                  <p className="mt-2 break-all font-mono text-[11px] text-[var(--admin-text-soft)]">
+                    {automationState.exception_queue.recommended_command}
+                  </p>
+                ) : null}
+              </div>
+              <div className={WARNING_PANEL_CLASS}>
+                <p className="font-semibold text-[var(--admin-text)]">Blocked reason</p>
+                <p className="mt-2 text-[12px] text-[var(--admin-text)]">
+                  {automationState.exception_queue?.reason || "The latest automation report left exception-only items behind."}
+                </p>
+                {automationState.exception_queue?.source_artifact ? (
+                  <p className="mt-2 break-all font-mono text-[11px] text-[var(--admin-text-soft)]">
+                    {automationState.exception_queue.source_artifact}
+                  </p>
+                ) : null}
+              </div>
+            </div>
+            {(automationState.exception_queue?.items || []).length ? (
+              <div className={`mt-3 ${TABLE_WRAPPER_CLASS}`}>
+                <table className="min-w-full text-[12px]">
+                  <thead className={TABLE_HEAD_CLASS}>
+                    <tr>
+                      <th className="border-b border-[var(--admin-line)] px-3 py-2">Record</th>
+                      <th className="border-b border-[var(--admin-line)] px-3 py-2">Stage context</th>
+                      <th className="border-b border-[var(--admin-line)] px-3 py-2">Blocked details</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {automationState.exception_queue.items.map((item) => (
+                      <tr key={item.record_key || item.slug || item.title} className={TABLE_ROW_CLASS}>
+                        <td className="border-b border-[var(--admin-line)] px-3 py-2">
+                          <div className="font-mono text-[11px] text-[var(--admin-text-muted)]">
+                            {item.slug || item.record_key || "unknown-record"}
+                          </div>
+                          <div className="font-medium text-[var(--admin-text)]">{item.title || "Untitled record"}</div>
+                        </td>
+                        <td className="border-b border-[var(--admin-line)] px-3 py-2 text-[11px] text-[var(--admin-text-soft)]">
+                          <div>impact: {item.impact_status || "n/a"}</div>
+                          <div className="mt-1">operator: {item.operator_status || item.source_quality || "n/a"}</div>
+                        </td>
+                        <td className="border-b border-[var(--admin-line)] px-3 py-2 text-[11px] text-[var(--admin-text-soft)]">
+                          {formatBlockedDetails(item).length ? (
+                            <ul className="list-disc pl-4">
+                              {formatBlockedDetails(item).map((entry) => (
+                                <li key={entry}>{entry}</li>
+                              ))}
+                            </ul>
+                          ) : (
+                            <p>No additional blocked details were attached.</p>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : null}
+          </div>
+        ) : null}
       </section>
 
       <section className={SECTION_CLASS}>
@@ -262,7 +710,7 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
           />
           <div className="text-[11px] text-[var(--admin-text-muted)]">
             <p>Normalized artifact</p>
-            <p className="mt-1 break-all font-mono text-[var(--admin-text-soft)]">{batch.paths.normalized || "Unavailable"}</p>
+            <p className="mt-1 break-all font-mono text-[var(--admin-text-soft)]">{activeBatch.paths.normalized || "Unavailable"}</p>
           </div>
         </div>
       </section>
@@ -439,7 +887,7 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
           </div>
           <div className="text-[11px] text-gray-600">
             <p>Mode: {comparisonState.identification_mode || "not inferred"}</p>
-            <p>Batch: {comparisonState.compared_batch_name || batch.batch_name}</p>
+            <p>Batch: {comparisonState.compared_batch_name || activeBatch.batch_name}</p>
           </div>
         </div>
         <div className="mt-3 grid gap-3 text-[12px] md:grid-cols-3">
@@ -733,9 +1181,9 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className={LABEL_CLASS}>Review artifact</p>
-            <p className="break-all font-mono text-[11px] text-[var(--admin-text)]">{batch.paths.review}</p>
+            <p className="break-all font-mono text-[11px] text-[var(--admin-text)]">{activeBatch.paths.review || "Unavailable"}</p>
             <p className={`mt-2 ${LABEL_CLASS}`}>Decision file</p>
-            <p className="break-all font-mono text-[11px] text-[var(--admin-text)]">{batch.paths.decision_template}</p>
+            <p className="break-all font-mono text-[11px] text-[var(--admin-text)]">{activeBatch.paths.decision_template || "Unavailable"}</p>
           </div>
           <div className="flex flex-wrap gap-3">
             <button
@@ -838,6 +1286,139 @@ export default function CurrentAdminReviewWorkspace({ workspace }) {
                 ) : null}
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="automation-artifact-viewer" className={SECTION_CLASS}>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <p className={LABEL_CLASS}>Automation artifact viewer</p>
+            <h2 className="mt-1 text-base font-semibold text-[var(--admin-text)]">Read-only automation artifacts</h2>
+            <p className="mt-1 text-[12px] text-[var(--admin-text-soft)]">
+              View the latest batch-scoped automation report, exception queue, impact artifacts, and enrichment
+              artifacts without editing any canonical files from the UI.
+            </p>
+          </div>
+          <div className="min-w-[18rem]">
+            <label className="block text-[11px] text-[var(--admin-text-muted)]">
+              Artifact
+              <select
+                value={selectedAutomationArtifactKey}
+                onChange={(event) => setSelectedAutomationArtifactKey(event.target.value)}
+                className="mt-1 w-full rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] px-2 py-1.5 text-[12px] text-[var(--admin-text)]"
+              >
+                {automationArtifacts.map((artifact) => (
+                  <option key={artifact.key} value={artifact.key}>
+                    {artifact.label}
+                    {artifact.exists ? "" : " (missing)"}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <div className="mt-3 grid gap-3 lg:grid-cols-[0.75fr_1.25fr]">
+          <div className={PANEL_CLASS}>
+            <p className={LABEL_CLASS}>Available artifacts</p>
+            <div className="mt-2 space-y-2 text-[12px]">
+              {automationArtifacts.map((artifact) => (
+                <button
+                  key={artifact.key}
+                  type="button"
+                  onClick={() => setSelectedAutomationArtifactKey(artifact.key)}
+                  className={`block w-full rounded border px-3 py-2 text-left ${
+                    selectedAutomationArtifactKey === artifact.key
+                      ? "border-[var(--admin-link)] bg-[var(--admin-surface)] text-[var(--admin-text)]"
+                      : "border-[var(--admin-line)] bg-[var(--admin-surface-soft)] text-[var(--admin-text)]"
+                  }`}
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="font-medium">{artifact.label}</span>
+                    <span className={`rounded-full border px-2 py-0.5 text-[10px] uppercase tracking-wide ${statusBadgeClass(artifact.exists ? "passed" : "pending")}`}>
+                      {artifact.exists ? "present" : "missing"}
+                    </span>
+                  </div>
+                  <p className="mt-1 break-all font-mono text-[10px] text-[var(--admin-text-soft)]">
+                    {artifact.path || "Unavailable"}
+                  </p>
+                  {artifact.summary ? (
+                    <p className="mt-1 text-[11px] text-[var(--admin-text-muted)]">{artifact.summary}</p>
+                  ) : null}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className={PANEL_CLASS}>
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <p className={LABEL_CLASS}>Viewer payload</p>
+                <p className="mt-1 font-semibold text-[var(--admin-text)]">
+                  {automationArtifactViewer.artifact?.label || humanizeToken(selectedAutomationArtifactKey)}
+                </p>
+                <p className="mt-1 break-all font-mono text-[11px] text-[var(--admin-text-soft)]">
+                  {automationArtifactViewer.artifact?.path || "Unavailable"}
+                </p>
+              </div>
+              <div className="text-[11px] text-[var(--admin-text-muted)]">
+                <p>Batch: {automationBatchName || "Unavailable"}</p>
+                <p>Updated: {automationArtifactViewer.artifact?.generated_at || "n/a"}</p>
+              </div>
+            </div>
+
+            {automationArtifactViewer.loading ? (
+              <p className="mt-3 text-[12px] text-[var(--admin-text-soft)]">Loading artifact…</p>
+            ) : null}
+            {automationArtifactViewer.error ? (
+              <div className={`${WARNING_PANEL_CLASS} mt-3`}>
+                <p className="font-semibold text-[var(--admin-text)]">Artifact load failed</p>
+                <p className="mt-2">{automationArtifactViewer.error}</p>
+              </div>
+            ) : null}
+            {!automationArtifactViewer.loading && !automationArtifactViewer.error ? (
+              automationArtifactViewer.artifact?.exists ? (
+                selectedAutomationArtifactKey === "exception_queue" &&
+                Array.isArray(automationArtifactViewer.artifact?.payload?.items) ? (
+                  <div className={`mt-3 ${TABLE_WRAPPER_CLASS}`}>
+                    <table className="min-w-full text-[12px]">
+                      <thead className={TABLE_HEAD_CLASS}>
+                        <tr>
+                          <th className="border-b border-[var(--admin-line)] px-3 py-2">Record</th>
+                          <th className="border-b border-[var(--admin-line)] px-3 py-2">Details</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {(automationArtifactViewer.artifact.payload.items || []).map((item) => (
+                          <tr key={item.record_key || item.slug || item.title} className={TABLE_ROW_CLASS}>
+                            <td className="border-b border-[var(--admin-line)] px-3 py-2">
+                              <div className="font-mono text-[11px] text-[var(--admin-text-muted)]">
+                                {item.slug || item.record_key || "unknown-record"}
+                              </div>
+                              <div className="font-medium text-[var(--admin-text)]">{item.title || "Untitled record"}</div>
+                            </td>
+                            <td className="border-b border-[var(--admin-line)] px-3 py-2 text-[11px] text-[var(--admin-text-soft)]">
+                              {prettyJson(item)}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <pre className="mt-3 max-h-[34rem] overflow-auto rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] p-3 text-[11px] text-[var(--admin-text-soft)]">
+                    {prettyJson(automationArtifactViewer.artifact?.payload)}
+                  </pre>
+                )
+              ) : (
+                <div className={`${PANEL_CLASS} mt-3`}>
+                  <p className="text-[12px] text-[var(--admin-text-soft)]">
+                    This batch does not have that automation artifact yet.
+                  </p>
+                </div>
+              )
+            ) : null}
           </div>
         </div>
       </section>

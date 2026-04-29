@@ -16,14 +16,12 @@ export default async function CurrentAdminReviewPage() {
     <main className="mx-auto max-w-[1700px] space-y-4 px-4 py-4">
       <section className="space-y-3">
         <p className="font-mono text-[11px] uppercase tracking-wide text-[var(--admin-text-muted)]">Canonical review workspace</p>
-        <h1 className="text-lg font-semibold text-[var(--admin-text)]">Current-Admin Manual Review</h1>
+        <h1 className="text-lg font-semibold text-[var(--admin-text)]">Current-Admin Automation</h1>
         <p className="max-w-5xl text-[12px] text-[var(--admin-text-soft)]">
-          This page is the canonical control surface between AI review and guarded
-          apply. Existing tracked rows with no material change or only source-refresh
-          updates should auto-resolve before they reach this page. Only the remaining
-          borderline manual-review rows stay editable here. AI-approved and AI-rejected
-          queue outcomes stay visible as pipeline state, and the next gates remain
-          decision-log sync, pre-commit, apply dry-run, final apply, and validation.
+          This page now wraps the full exceptions-only current-admin automation flow.
+          Full-auto runs stay on the canonical Python pipeline and artifacts, guarded
+          `--apply --yes` steps remain behind validator checks, and only the remaining
+          exception rows fall back to manual review on this surface.
         </p>
       </section>
 
