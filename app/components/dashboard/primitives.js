@@ -182,6 +182,7 @@ export function SectionHeader({
   description,
   action = null,
   eyebrow = null,
+  as: HeadingTag = "h2",
 }) {
   return (
     <div className="flex flex-col gap-3 border-b border-[var(--line)] px-4 py-3 lg:flex-row lg:items-center lg:justify-between">
@@ -191,9 +192,9 @@ export function SectionHeader({
             {eyebrow}
           </p>
         ) : null}
-        <h2 className="text-base font-semibold text-white md:text-lg">
+        <HeadingTag className="text-base font-semibold text-white md:text-lg">
           {title}
-        </h2>
+        </HeadingTag>
         {description ? (
           <p className="mt-1 max-w-[calc(100vw-4rem)] break-words text-[12px] leading-5 text-[var(--ink-soft)] md:max-w-3xl md:text-sm md:leading-6">
             {description}

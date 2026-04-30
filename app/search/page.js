@@ -52,7 +52,7 @@ export default async function SearchPage({ searchParams }) {
           title="Search across the public intelligence layer."
           description="Search is designed to move users across entity types without forcing them to know the database structure in advance. Policies, presidents, promises, reports, explainers, and sources should be discoverable from one query."
         />
-        <form action="/search" method="GET" className="mt-6 flex max-w-3xl items-center gap-3 rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] px-3 py-3">
+        <form action="/search" method="GET" className="mt-6 flex max-w-3xl flex-col gap-3 rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] px-3 py-3 sm:flex-row sm:items-center">
           <input
             type="search"
             name="q"
@@ -60,7 +60,7 @@ export default async function SearchPage({ searchParams }) {
             placeholder="Search policies, presidents, promises, reports, explainers, and sources"
             className="min-w-0 flex-1 border-0 bg-transparent text-sm text-white placeholder:text-[var(--ink-muted)] focus:outline-none"
           />
-          <button type="submit" className="dashboard-button-primary">
+          <button type="submit" className="dashboard-button-primary w-full sm:w-auto">
             Search
           </button>
         </form>

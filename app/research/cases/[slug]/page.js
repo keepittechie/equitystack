@@ -114,6 +114,7 @@ export default async function ResearchCaseDetailPage({ params }) {
 
       <Panel prominence="primary" className="overflow-hidden">
         <SectionHeader
+          as="h1"
           eyebrow="Research case"
           title={researchCase.title}
           description={researchCase.summary}
@@ -161,4 +162,3 @@ export default async function ResearchCaseDetailPage({ params }) {
     </main>
   );
 }
-
