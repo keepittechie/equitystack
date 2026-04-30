@@ -1,11 +1,49 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { useEffect, useRef } from "react";
 import { Footer, SiteHeader } from "@/app/components/public/chrome";
 
 export default function MainLayout({ children }) {
   const pathname = usePathname();
   const isAdminPath = pathname?.startsWith("/admin");
+  const hasMountedRef = useRef(false);
+  const preserveNextScrollRef = useRef(false);
+
+  useEffect(() => {
+    const markPopStateNavigation = () => {
+      preserveNextScrollRef.current = true;
+    };
+
+    window.addEventListener("popstate", markPopStateNavigation);
+    return () => window.removeEventListener("popstate", markPopStateNavigation);
+  }, []);
+
+  useEffect(() => {
+    if (isAdminPath) {
+      return;
+    }
+
+    if (!hasMountedRef.current) {
+      hasMountedRef.current = true;
+      return;
+    }
+
+    if (preserveNextScrollRef.current) {
+      preserveNextScrollRef.current = false;
+      return;
+    }
+
+    if (window.location.hash) {
+      return;
+    }
+
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "auto",
+    });
+  }, [isAdminPath, pathname]);
 
   if (isAdminPath) {
     return <div className="admin-shell min-h-screen">{children}</div>;
