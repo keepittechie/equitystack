@@ -529,6 +529,11 @@ export default async function ExplainerDetailPage({ params, searchParams }) {
   ];
   const featuredCards = explainerContentCards.slice(0, 2);
   const gridCards = explainerContentCards.slice(2);
+  const heroShortAnswer =
+    explainer.argument_ready_breakdown?.bottomLine ||
+    explainer.argument_mode?.summary ||
+    null;
+  const heroQuestion = explainer.argument_mode?.commonClaims?.[0]?.question || null;
 
   return (
     <main className="space-y-4">
@@ -567,6 +572,17 @@ export default async function ExplainerDetailPage({ params, searchParams }) {
               {explainer.summary ||
                 "This explainer connects a common public claim to the relevant historical record and linked policy evidence."}
             </p>
+            {heroShortAnswer ? (
+              <Panel padding="md" className="mt-5 space-y-3">
+                <StatusPill tone="info">Short answer</StatusPill>
+                <p className="text-sm leading-7 text-[var(--ink-soft)]">{heroShortAnswer}</p>
+                {heroQuestion ? (
+                  <p className="text-xs leading-6 text-[var(--ink-muted)]">
+                    Test question: {heroQuestion}
+                  </p>
+                ) : null}
+              </Panel>
+            ) : null}
             {explainer.tags?.length ? (
               <div className="mt-4 flex flex-wrap gap-2">
                 {explainer.tags.map((tag) => (
@@ -579,9 +595,9 @@ export default async function ExplainerDetailPage({ params, searchParams }) {
           </div>
           <aside className="grid content-start gap-3 p-4">
             <MetricCard
-              label="Primary read"
+              label="This page helps with"
               value={editorial.lens || "Historical context"}
-              description="Start here before opening the linked records."
+              description="Start with the short answer, then use the rest of the page for context and verification."
               density="compact"
               showDot
             />
@@ -600,6 +616,15 @@ export default async function ExplainerDetailPage({ params, searchParams }) {
           </aside>
         </div>
       </Panel>
+
+      <ExplainerArgumentModeToggle
+        argumentMode={explainer.argument_mode}
+        argumentReadyBreakdown={explainer.argument_ready_breakdown}
+        explainerTitle={explainer.title}
+        explainerSlug={slug}
+        explainerSummary={explainer.summary}
+        initialMode={resolvedSearchParams.mode === "argument" ? "argument" : "explainer"}
+      />
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <MetricCard
@@ -626,15 +651,6 @@ export default async function ExplainerDetailPage({ params, searchParams }) {
           tone="verified"
         />
       </section>
-
-      <ExplainerArgumentModeToggle
-        argumentMode={explainer.argument_mode}
-        argumentReadyBreakdown={explainer.argument_ready_breakdown}
-        explainerTitle={explainer.title}
-        explainerSlug={slug}
-        explainerSummary={explainer.summary}
-        initialMode={resolvedSearchParams.mode === "argument" ? "argument" : "explainer"}
-      />
 
       <PageRoleCallout
         title="Use explainers as the answer-first layer"

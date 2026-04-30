@@ -49,8 +49,8 @@ export default async function SearchPage({ searchParams }) {
         <SectionIntro
           as="h1"
           eyebrow="Universal search"
-          title="Search across the public intelligence layer."
-          description="Search is designed to move users across entity types without forcing them to know the database structure in advance. Policies, presidents, promises, reports, explainers, and sources should be discoverable from one query."
+          title="Search policies, promises, presidents, reports, and explainers."
+          description="Search helps you find the right public page without needing to know how EquityStack is organized first. Use it to jump into a policy, promise, report, explainer, or source from one query."
         />
         <form action="/search" method="GET" className="mt-6 flex max-w-3xl flex-col gap-3 rounded-lg border border-[var(--line)] bg-[rgba(11,20,33,0.92)] px-3 py-3 sm:flex-row sm:items-center">
           <input
@@ -98,14 +98,14 @@ export default async function SearchPage({ searchParams }) {
                 tone: "accent",
               },
               {
-                label: "Total matches",
+                label: "Direct matches",
                 value: results.total_results || 0,
-                description: "Visible results across all public entity groups.",
+                description: "Record matches found directly from the query.",
               },
               {
-                label: "Groups hit",
+                label: "Direct result groups",
                 value: populatedSections.length,
-                description: "Public entity groups that currently have matches.",
+                description: "Result types with direct record matches.",
               },
               {
                 label: "Search mode",
@@ -120,7 +120,9 @@ export default async function SearchPage({ searchParams }) {
               <Panel padding="md">
                 <h2 className="text-2xl font-semibold text-white">Suggested explainers</h2>
                 <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-                  These explainers match common claim patterns or debate frames in your search. Start here when the query is really asking for argument context instead of only a record lookup.
+                  {populatedSections.length
+                    ? "These explainers match the argument or misconception behind your search. Start here when you need the reasoning, not just a record lookup."
+                    : "There may be no direct record match for this query yet, but it does map to a common argument. Start here for the clearest explanation first."}
                 </p>
               </Panel>
               <ExplainerIndexGrid items={results.suggested_explainers} />

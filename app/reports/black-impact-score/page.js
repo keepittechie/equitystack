@@ -3611,23 +3611,6 @@ export default async function BlackImpactScorePage({ searchParams }) {
       <main
         className={`report-shell w-full ${isPublicView ? "pt-4 pb-8 space-y-4" : "pt-4 pb-6 space-y-4"}`}
       >
-      {!isPublicView ? (
-        <div className="flex flex-wrap gap-3 print:hidden">
-          <Link
-            href="/promises"
-            className="dashboard-button-secondary"
-          >
-            Open Promise Tracker
-          </Link>
-          <Link
-            href="/reports"
-            className="dashboard-button-secondary"
-          >
-            Back to Reports
-          </Link>
-        </div>
-      ) : null}
-
       {isPublicShareView ? (
         <SourceAwareShareHeader
           shareUrl={shareUrl}
@@ -3643,7 +3626,7 @@ export default async function BlackImpactScorePage({ searchParams }) {
       {isDebateMode ? <DebateModeHeader /> : null}
 
       <section className="hero-panel p-4">
-        <p className="eyebrow mb-4">Promise Tracker Report</p>
+        <p className="eyebrow mb-4">Outcome report</p>
         <h1 className="page-title">Black Impact Score</h1>
         <p className="text-base md:text-lg text-[var(--ink-soft)] mt-4 max-w-3xl leading-8">
           EquityStack’s Black Impact Score is a composite comparison of documented presidential outcomes affecting Black communities. It is built from reviewed actions, outcome summaries, impact direction, and linked evidence rather than campaign promises alone.
@@ -3665,6 +3648,23 @@ export default async function BlackImpactScorePage({ searchParams }) {
           />
         </div>
       </section>
+
+      {!isPublicView ? (
+        <div className="flex flex-wrap gap-3 print:hidden">
+          <Link
+            href="/promises"
+            className="dashboard-button-secondary"
+          >
+            Open promise records
+          </Link>
+          <Link
+            href="/reports"
+            className="dashboard-button-secondary"
+          >
+            Back to Reports
+          </Link>
+        </div>
+      ) : null}
 
       {isPublicShareView ? (
         <SourceAwareEvidenceTrail items={shareEvidenceItems} isPublicView={isPublicView} />

@@ -486,14 +486,14 @@ function buildPromiseCurrentRead({
   outcomeCount,
 }) {
   const impactRead = blackImpactSummary
-    ? `Impact read: ${blackImpactSummary.direction_label}`
+    ? `Impact so far: ${blackImpactSummary.direction_label}`
     : outcomeCount > 0 || linkedPolicyCount > 0
-      ? "Impact read: not yet fully established"
-      : "Impact read: not yet developed";
+      ? "Impact so far: not yet fully established"
+      : "Impact so far: not yet developed";
 
   return [
     promise.status ? `Status: ${promise.status}` : "Status: not yet resolved",
-    promise.confidence_label ? `Confidence: ${promise.confidence_label}` : null,
+    promise.confidence_label ? `Evidence confidence: ${promise.confidence_label}` : null,
     impactRead,
     getPromiseEvidenceBaseLabel({
       researchCoverage,
@@ -1128,6 +1128,10 @@ export default async function PromiseDetailPage({ params }) {
           promise.campaign_or_official,
           promise.confidence_label ? `Confidence: ${promise.confidence_label}` : null,
         ].filter(Boolean)}
+        showStatement={false}
+        showBadges={false}
+        showStatusCard={false}
+        showContextCard={false}
       />
 
       <Panel prominence="primary" className="overflow-hidden">
@@ -1151,7 +1155,7 @@ export default async function PromiseDetailPage({ params }) {
           </Panel>
           <Panel padding="md" className="space-y-3">
             <StatusPill tone={getPromiseStatusTone(promise.status)}>
-              Current read
+              What EquityStack currently knows
             </StatusPill>
             <p className="text-sm leading-7 text-[var(--ink-soft)]">
               {promiseTopline.currentRead}

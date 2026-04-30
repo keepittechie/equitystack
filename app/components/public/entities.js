@@ -867,51 +867,74 @@ export function PromiseResultsTable({ items = [], buildHref }) {
   );
 }
 
-export function PromiseHero({ title, statement, status, president, termLabel, badges = [] }) {
+export function PromiseHero({
+  title,
+  statement,
+  status,
+  president,
+  termLabel,
+  badges = [],
+  showStatement = true,
+  showBadges = true,
+  showStatusCard = true,
+  showContextCard = true,
+}) {
+  const showAside = (showStatusCard && status) || (showContextCard && (president || termLabel));
+
   return (
     <Panel prominence="primary" className="overflow-hidden">
-      <div className="grid gap-0 xl:grid-cols-[minmax(0,1fr)_18rem]">
-        <div className="min-w-0 border-b border-[var(--line)] p-4 xl:border-b-0 xl:border-r">
+      <div className={`grid gap-0 ${showAside ? "xl:grid-cols-[minmax(0,1fr)_18rem]" : ""}`}>
+        <div
+          className={`min-w-0 p-4 ${
+            showAside ? "border-b border-[var(--line)] xl:border-b-0 xl:border-r" : ""
+          }`}
+        >
           <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
             Promise record
           </p>
           <h1 className="page-title mt-3">{title}</h1>
-          {statement ? (
+          {showStatement && statement ? (
             <p className="mt-4 max-w-3xl text-sm leading-6 text-[var(--ink-soft)] md:text-base md:leading-7">
               {statement}
             </p>
           ) : null}
-          <div className="mt-5 flex flex-wrap gap-2">
-            {president ? <StatusPill tone="default">{president}</StatusPill> : null}
-            {termLabel ? <StatusPill tone="default">{termLabel}</StatusPill> : null}
-            {badges.map((badge) => (
-              <StatusPill key={badge} tone="default">
-                {badge}
-              </StatusPill>
-            ))}
-          </div>
-        </div>
-        <aside className="grid content-start gap-3 p-4">
-          {status ? (
-            <MetricCard
-              label="Current status"
-              value={status}
-              description="Promise-tracker classification in the current public record."
-              tone={getPromiseStatusTone(status)}
-              prominence="primary"
-              showDot
-            />
-          ) : null}
-          <Panel padding="md">
-            <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
-              Record context
-            </p>
-            <div className="mt-3 flex flex-wrap gap-2">
+          {showBadges ? (
+            <div className="mt-5 flex flex-wrap gap-2">
               {president ? <StatusPill tone="default">{president}</StatusPill> : null}
               {termLabel ? <StatusPill tone="default">{termLabel}</StatusPill> : null}
+              {badges.map((badge) => (
+                <StatusPill key={badge} tone="default">
+                  {badge}
+                </StatusPill>
+              ))}
             </div>
-          </Panel>
-        </aside>
+          ) : null}
+        </div>
+        {showAside ? (
+          <aside className="grid content-start gap-3 p-4">
+            {showStatusCard && status ? (
+              <MetricCard
+                label="Current status"
+                value={status}
+                description="Promise-tracker classification in the current public record."
+                tone={getPromiseStatusTone(status)}
+                prominence="primary"
+                showDot
+              />
+            ) : null}
+            {showContextCard && (president || termLabel) ? (
+              <Panel padding="md">
+                <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
+                  Record context
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {president ? <StatusPill tone="default">{president}</StatusPill> : null}
+                  {termLabel ? <StatusPill tone="default">{termLabel}</StatusPill> : null}
+                </div>
+              </Panel>
+            ) : null}
+          </aside>
+        ) : null}
       </div>
     </Panel>
   );

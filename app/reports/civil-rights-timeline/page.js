@@ -228,6 +228,22 @@ export default async function CivilRightsTimelinePage() {
           { label: "Civil Rights Timeline" },
         ]}
       />
+      <section className="hero-panel p-4">
+        <p className="eyebrow mb-4">Timeline report</p>
+        <h1 className="page-title">Civil Rights Timeline</h1>
+        <p className="text-base md:text-lg text-[var(--ink-soft)] mt-4 max-w-3xl leading-8">
+          This curated timeline traces how federal civil-rights policy moved through protection,
+          retreat, rebuilding, and modern continuity for Black communities across U.S. history.
+          It is designed as a guided historical view built from Promise Tracker records, not a
+          replacement for the full tracker.
+        </p>
+        <div className="mt-5 flex flex-wrap gap-2">
+          <MetaPill>{totalEntries} timeline records</MetaPill>
+          <MetaPill>{eras.length} eras</MetaPill>
+          <MetaPill>Chronological Promise Tracker view</MetaPill>
+        </div>
+      </section>
+
       <div className="flex flex-wrap gap-3">
         <Link
           href="/reports"
@@ -242,22 +258,6 @@ export default async function CivilRightsTimelinePage() {
           Explore Promise Tracker data
         </Link>
       </div>
-
-      <section className="hero-panel p-4">
-        <p className="eyebrow mb-4">Promise Tracker Report</p>
-        <h1 className="page-title">Civil Rights Timeline</h1>
-        <p className="text-base md:text-lg text-[var(--ink-soft)] mt-4 max-w-3xl leading-8">
-          This curated timeline traces how federal civil-rights policy moved through protection,
-          retreat, rebuilding, and modern continuity for Black communities across U.S. history.
-          It is designed as a guided historical view built from Promise Tracker records, not a
-          replacement for the full tracker.
-        </p>
-        <div className="mt-5 flex flex-wrap gap-2">
-          <MetaPill>{totalEntries} timeline records</MetaPill>
-          <MetaPill>{eras.length} eras</MetaPill>
-          <MetaPill>Chronological Promise Tracker view</MetaPill>
-        </div>
-      </section>
 
       <TrustBar />
 

@@ -788,6 +788,22 @@ function buildWhyItMatters(policy) {
   return `EquityStack classifies this policy as ${direction.toLowerCase()} impact with ${evidence.toLowerCase()} supporting evidence. The record matters because it helps explain how government action shaped Black Americans' rights, resources, exposure to harm, or access to institutions.`;
 }
 
+function buildPolicyCurrentRead(policy) {
+  return sentenceJoin([
+    policy.impact_direction
+      ? `EquityStack currently reads this record as ${String(policy.impact_direction).toLowerCase()} impact.`
+      : "EquityStack has not finalized the impact direction for this record yet.",
+    policy.evidence_summary?.evidence_strength
+      ? `The visible evidence trail currently reads ${String(
+          policy.evidence_summary.evidence_strength
+        ).toLowerCase()}.`
+      : null,
+    policy.completeness_summary?.status
+      ? `Record completeness is ${String(policy.completeness_summary.status).toLowerCase()}.`
+      : null,
+  ]);
+}
+
 function buildPolicyRecordOverview(policy, editorial = null) {
   const categoryLabels = takeLabels(policy.categories, (item) => item.name, 3);
 
@@ -1409,6 +1425,22 @@ export default async function PolicyDetailPage({ params }) {
                 {policy.summary || policy.outcome_summary}
               </p>
             ) : null}
+            <div className="mt-5 grid gap-3 lg:grid-cols-2">
+              <Panel padding="md" className="space-y-3">
+                <StatusPill tone="info">Why it matters</StatusPill>
+                <p className="text-sm leading-7 text-[var(--ink-soft)]">
+                  {buildWhyItMatters(policy)}
+                </p>
+              </Panel>
+              <Panel padding="md" className="space-y-3">
+                <StatusPill tone={getImpactDirectionTone(policy.impact_direction)}>
+                  What EquityStack currently knows
+                </StatusPill>
+                <p className="text-sm leading-7 text-[var(--ink-soft)]">
+                  {buildPolicyCurrentRead(policy)}
+                </p>
+              </Panel>
+            </div>
             {badges.length ? (
               <div className="mt-5 flex flex-wrap gap-2">
                 {badges.map((badge) => (
@@ -1462,33 +1494,6 @@ export default async function PolicyDetailPage({ params }) {
           description={buildWhatItMeans(policy)}
         />
         <div className="space-y-4 p-4">
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            <MetricCard
-              label="Impact direction"
-              value={policy.impact_direction || "Unknown"}
-              description={policy.policy_type || "Policy record"}
-              tone={getImpactDirectionTone(policy.impact_direction)}
-              showDot
-            />
-            <MetricCard
-              label="Impact score"
-              value={formatScore(score)}
-              description="Record-level policy score, separate from presidential aggregate scoring."
-              tone="info"
-            />
-            <MetricCard
-              label="Evidence"
-              value={policy.evidence_summary?.evidence_strength || "Limited"}
-              description={`${countLabel(policy.evidence_summary?.total_sources || 0, "source")} in the visible trail.`}
-              tone={getEvidenceTone(policy.evidence_summary?.evidence_strength)}
-            />
-            <MetricCard
-              label="Completeness"
-              value={policy.completeness_summary?.status || "Unknown"}
-              description={policy.year_enacted ? `Anchored in ${policy.year_enacted}.` : "No enacted year attached."}
-              tone={getCompletenessTone(policy.completeness_summary?.status)}
-            />
-          </div>
           <WhyThisScorePanel
             eyebrow="Reference summary"
             title="Read this record in one pass"
@@ -1531,6 +1536,33 @@ export default async function PolicyDetailPage({ params }) {
               </div>
             </Panel>
           ) : null}
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <MetricCard
+              label="Impact direction"
+              value={policy.impact_direction || "Unknown"}
+              description={policy.policy_type || "Policy record"}
+              tone={getImpactDirectionTone(policy.impact_direction)}
+              showDot
+            />
+            <MetricCard
+              label="Impact score"
+              value={formatScore(score)}
+              description="Record-level policy score, separate from presidential aggregate scoring."
+              tone="info"
+            />
+            <MetricCard
+              label="Evidence"
+              value={policy.evidence_summary?.evidence_strength || "Limited"}
+              description={`${countLabel(policy.evidence_summary?.total_sources || 0, "source")} in the visible trail.`}
+              tone={getEvidenceTone(policy.evidence_summary?.evidence_strength)}
+            />
+            <MetricCard
+              label="Completeness"
+              value={policy.completeness_summary?.status || "Unknown"}
+              description={policy.year_enacted ? `Anchored in ${policy.year_enacted}.` : "No enacted year attached."}
+              tone={getCompletenessTone(policy.completeness_summary?.status)}
+            />
+          </div>
           <WhyThisScorePanel
             eyebrow="Why this score?"
             title="What is doing the most work in this score"
@@ -1873,10 +1905,10 @@ export default async function PolicyDetailPage({ params }) {
                   Suggested explainers
                 </p>
                 <h2 className="text-lg font-semibold text-white">
-                  Start with the closest claim-pattern explainer
+                  Start with the explainer that answers the argument behind this record
                 </h2>
                 <p className="text-sm leading-7 text-[var(--ink-soft)]">
-                  These explainers are surfaced from the policy topic, tags, and likely debate frames attached to this record. They prioritize argument-mechanics explainers when the policy opens into a common claim pattern.
+                  These explainers are surfaced from the policy topic, tags, and common arguments attached to this record. They prioritize argument-mechanics explainers when the page raises a predictable misunderstanding or debate claim.
                 </p>
               </Panel>
               <ExplainerIndexGrid items={suggestedExplainers} />
