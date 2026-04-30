@@ -274,9 +274,9 @@ function ArgumentReadyBreakdown({ breakdown = null }) {
   return (
     <Panel className="overflow-hidden">
       <SectionHeader
-        eyebrow="Conversation use"
-        title="Argument-Ready Breakdown"
-        description="Use this module when you need the shortest defensible version of the explainer for a comment, reply, or discussion before opening the full record."
+        eyebrow="Quick reply help"
+        title="Short version for a comment or discussion"
+        description="Use this section when you want the shortest defensible version of the explainer for a comment, reply, or discussion."
       />
       <div className="space-y-4 p-4">
         {claim || whyMisleading ? (
@@ -578,7 +578,7 @@ export default async function ExplainerDetailPage({ params, searchParams }) {
                 <p className="text-sm leading-7 text-[var(--ink-soft)]">{heroShortAnswer}</p>
                 {heroQuestion ? (
                   <p className="text-xs leading-6 text-[var(--ink-muted)]">
-                    Test question: {heroQuestion}
+                    Question to ask next: {heroQuestion}
                   </p>
                 ) : null}
               </Panel>
@@ -595,9 +595,9 @@ export default async function ExplainerDetailPage({ params, searchParams }) {
           </div>
           <aside className="grid content-start gap-3 p-4">
             <MetricCard
-              label="This page helps with"
+              label="What this page explains"
               value={editorial.lens || "Historical context"}
-              description="Start with the short answer, then use the rest of the page for context and verification."
+              description="Start with the short answer, then use the rest of the page for context, evidence, and related records."
               density="compact"
               showDot
             />
@@ -653,8 +653,8 @@ export default async function ExplainerDetailPage({ params, searchParams }) {
       </section>
 
       <PageRoleCallout
-        title="Use explainers as the answer-first layer"
-        description="Explainers should answer the main legal, historical, or policy question on-page. Linked records, reports, and sources are for verification, comparison, or deeper follow-up when the reader wants more than the direct answer."
+        title="Start with the direct answer"
+        description="This page should answer the main question here first. Linked records, reports, and sources are for checking the evidence or going deeper after that."
         links={[
           { href: "/reports", label: "Reports" },
           { href: "/sources", label: "Sources" },
@@ -667,10 +667,10 @@ export default async function ExplainerDetailPage({ params, searchParams }) {
       <Panel prominence="primary" className="overflow-hidden">
         <SectionHeader
           eyebrow={editorial.lens || "Read this for"}
-          title="What this explainer answers first"
+          title="What this page is explaining"
           description={
             editorial.pagePurpose ||
-            "The best use of an explainer is to answer the core claim clearly, connect it to Black history or policy history, and make verification possible without forcing extra clicks."
+            "Use this section to understand the main claim, why it matters, and what kind of evidence belongs in the answer before opening any other record."
           }
         />
         <div className="space-y-4 p-4">
@@ -682,9 +682,9 @@ export default async function ExplainerDetailPage({ params, searchParams }) {
             ))}
           </div>
           <DiscoveryGuidancePanel
-            eyebrow="How this explainer supports the platform"
-            title="Use linked records only when you want deeper verification"
-            description="This explainer should stand on its own first. The surrounding records, reports, and sources are there when a reader wants more detail or wants to inspect the evidence directly."
+            eyebrow="How to use the linked records"
+            title="Open linked records only if you want more detail"
+            description="This explainer should stand on its own first. The surrounding records, reports, and sources are there when you want deeper follow-up or direct verification."
             items={EXPLAINER_SYSTEM_GUIDANCE}
           />
           <MethodologyCallout description={buildPageMethodNote()} />
@@ -721,7 +721,7 @@ export default async function ExplainerDetailPage({ params, searchParams }) {
           ) : null}
 
           <Panel padding="md" className="space-y-4">
-            <h2 className="text-xl font-semibold text-white">Verification paths attached to this page</h2>
+            <h2 className="text-xl font-semibold text-white">What else is linked from this page</h2>
             <div className="grid gap-3 md:grid-cols-3">
               <MetricCard
                 label="Policies"
@@ -1045,7 +1045,7 @@ export default async function ExplainerDetailPage({ params, searchParams }) {
                     {item.summary}
                   </p>
                   <p className="mt-auto pt-4 text-[12px] font-semibold text-[var(--ink-soft)]">
-                    Read historical context and linked records
+                    Open this explainer
                   </p>
                 </Panel>
               ))}

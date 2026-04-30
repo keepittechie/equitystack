@@ -118,12 +118,12 @@ export default function ExplainerArgumentModeToggle({
   return (
     <Panel className="overflow-hidden">
       <SectionHeader
-        eyebrow="Debate-ready layer"
+        eyebrow="Quick reply help"
         title="Argument mode"
         description={
           isArgumentMode
-            ? "Use this condensed version for quick claims, responses, questions, and copy-ready lines."
-            : "Read the short answer first. Switch modes only if you want the condensed debate-ready version."
+            ? "Use this shorter version when you want a reply, comment, or quick debate response."
+            : "Read the short answer first. Switch modes only if you want a shorter reply version."
         }
         action={
           <div className="flex flex-wrap items-center gap-2">
@@ -146,7 +146,7 @@ export default function ExplainerArgumentModeToggle({
               aria-label="Explainer display mode"
             >
               {[
-                ["explainer", "Explainer view"],
+                ["explainer", "Full explainer"],
                 ["argument", "Argument mode"],
               ].map(([value, label]) => (
                 <button
@@ -264,7 +264,7 @@ export default function ExplainerArgumentModeToggle({
               <StatusPill tone="info">Short answer</StatusPill>
               {primaryClaim?.claim ? (
                 <p className="mt-3 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
-                  Addresses this claim
+                  Main claim
                 </p>
               ) : null}
               {primaryClaim?.claim ? (
@@ -294,7 +294,7 @@ export default function ExplainerArgumentModeToggle({
 
           {previewQuestion ? (
             <Panel padding="md">
-              <StatusPill tone="warning">Question to test the claim</StatusPill>
+              <StatusPill tone="warning">Question to ask next</StatusPill>
               <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
                 {previewQuestion}
               </p>
