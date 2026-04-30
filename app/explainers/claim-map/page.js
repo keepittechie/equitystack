@@ -81,6 +81,18 @@ const CLAIM_CLUSTERS = [
     ],
   },
   {
+    id: "policy-design-public-perception-durability",
+    title: "Policy design, public perception, and political durability",
+    description:
+      "Explain how policy design, racial exclusion, public perception, backlash, and measurable impact shape whether social policies survive politically over time.",
+    slugs: [
+      "new-deal-racial-exclusion-and-policy-support",
+      "universal-vs-targeted-programs-political-support",
+      "policy-feedback-and-backlash-cycles",
+      "narrative-framing-vs-policy-impact",
+    ],
+  },
+  {
     id: "race-merit-institutions",
     title: "Race, merit, and institutions",
     description:
@@ -187,6 +199,42 @@ const CLAIM_PATTERNS = [
     description:
       "A relationship between variables is treated as a complete moral or behavioral explanation.",
     slug: "family-structure-and-poverty-claims",
+  },
+  {
+    name: "Criticism -> failure proof",
+    description:
+      "Heavy criticism is treated as enough evidence that a policy failed without checking implementation or measured outcomes.",
+    slug: "narrative-framing-vs-policy-impact",
+  },
+  {
+    name: "Praise -> effectiveness proof",
+    description:
+      "Positive messaging is treated as enough proof that a policy delivered the promised effect at scale.",
+    slug: "narrative-framing-vs-policy-impact",
+  },
+  {
+    name: "Program design -> support skipped",
+    description:
+      "Political support or resistance is explained as taste or ideology without checking eligibility design, visibility, stigma, or administrative burden.",
+    slug: "universal-vs-targeted-programs-political-support",
+  },
+  {
+    name: "Passage -> politics stop",
+    description:
+      "Enactment is treated as the end of the story, as if a policy cannot reshape coalitions, expectations, or opposition afterward.",
+    slug: "policy-feedback-and-backlash-cycles",
+  },
+  {
+    name: "First reaction -> final verdict",
+    description:
+      "Early backlash or controversy is treated as enough proof that the policy's long-run politics and effects are already settled.",
+    slug: "policy-feedback-and-backlash-cycles",
+  },
+  {
+    name: "Later backlash -> original design erased",
+    description:
+      "Later political conflict is used to flatten the earlier coalition bargains and exclusion rules that shaped the program from the start.",
+    slug: "new-deal-racial-exclusion-and-policy-support",
   },
   {
     name: "Selection bias ignored",
