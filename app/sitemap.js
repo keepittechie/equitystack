@@ -1,0 +1,175 @@
+import {
+  fetchExplainersIndexData,
+  fetchPresidentsOverviewData,
+  fetchPromiseIndexData,
+  fetchReportsHubData,
+  fetchPolicyExplorerData,
+  fetchAdministrationsOverviewData,
+} from "@/lib/public-site-data";
+import { buildPublicBillsDataset } from "@/lib/public-bills";
+import { getFutureBills } from "@/lib/shareable-cards";
+import { buildFutureBillDetailHref } from "@/lib/shareable-card-links";
+import { getResearchCaseSlugs } from "@/lib/research-cases";
+import { getLegislatorDirectory } from "@/lib/services/scorecardService";
+
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://equitystack.org";
+
+function absolute(path) {
+  return `${BASE_URL}${path}`;
+}
+
+function toIsoDate(value) {
+  if (!value) {
+    return undefined;
+  }
+
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? undefined : date;
+}
+
+export default async function sitemap() {
+  const researchCaseSlugs = getResearchCaseSlugs();
+  const [
+    presidents,
+    policies,
+    promises,
+    explainers,
+    reports,
+    administrations,
+    futureBills,
+    legislators,
+  ] =
+    await Promise.all([
+      fetchPresidentsOverviewData({}),
+      fetchPolicyExplorerData({ page_size: 500 }),
+      fetchPromiseIndexData({ page_size: 500 }),
+      fetchExplainersIndexData(),
+      fetchReportsHubData(),
+      fetchAdministrationsOverviewData({}),
+      getFutureBills(),
+      getLegislatorDirectory(),
+    ]);
+  const publicBills = buildPublicBillsDataset(futureBills);
+
+  const staticRoutes = [
+    "/",
+    "/about",
+    "/analysis/black-progress-under-presidents",
+    "/analysis/campaign-promises-to-black-americans",
+    "/analysis/civil-rights-laws-by-president",
+    "/analysis/how-presidents-shaped-black-opportunity",
+    "/analysis/presidential-impact-on-black-americans",
+    "/analysis/presidential-records-on-black-opportunity",
+    "/analysis/presidents-and-black-americans",
+    "/activity",
+    "/agendas/project-2025",
+    "/bills",
+    "/current-administration",
+    "/dashboard",
+    "/future-bills",
+    "/glossary",
+    "/narratives",
+    "/policies",
+    "/presidents",
+    "/promises",
+    "/promises/all",
+    "/administrations",
+    "/reports",
+    "/research",
+    "/research/cases",
+    "/research/how-black-impact-score-works",
+    "/explainers",
+    "/explainers/claim-map",
+    "/scorecards",
+    "/search",
+    "/start",
+    "/start-here",
+    "/timeline",
+    "/transparency/legislative-workflow",
+    "/sources",
+    "/compare",
+    "/compare/presidents",
+    "/compare/policies",
+    "/methodology",
+    "/arguments",
+  ].map((path) => ({
+    url: absolute(path),
+    lastModified: new Date(),
+    changeFrequency: "weekly",
+    priority: path === "/" ? 1 : 0.7,
+  }));
+
+  const dynamicRoutes = [
+    ...(presidents.presidents || []).map((item) => ({
+      url: absolute(`/presidents/${item.slug}`),
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.8,
+    })),
+    ...(policies.items || []).map((item) => ({
+      url: absolute(`/policies/${item.slug}`),
+      lastModified: toIsoDate(item.updated_at || item.latest_source_date || item.date_enacted) || new Date(),
+      changeFrequency: "monthly",
+      priority: 0.75,
+    })),
+    ...(promises.items || []).map((item) => ({
+      url: absolute(`/promises/${item.slug}`),
+      lastModified: toIsoDate(item.updated_at || item.latest_action_date || item.promise_date) || new Date(),
+      changeFrequency: "weekly",
+      priority: 0.75,
+    })),
+    ...(administrations || []).map((item) => ({
+      url: absolute(`/administrations/${item.slug}`),
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.7,
+    })),
+    ...(administrations || []).map((item) => ({
+      url: absolute(`/promises/president/${item.slug}`),
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.7,
+    })),
+    ...(explainers.items || []).map((item) => ({
+      url: absolute(`/explainers/${item.slug}`),
+      lastModified: toIsoDate(item.updated_at || item.created_at) || new Date(),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    })),
+    ...(reports.reports || []).map((item) => ({
+      url: absolute(item.href || `/reports/${item.slug}`),
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.8,
+    })),
+    ...publicBills.map((item) => ({
+      url: absolute(item.detailHref),
+      lastModified:
+        toIsoDate(item.latestActionDate || item.introducedDate || item.updatedAt) || new Date(),
+      changeFrequency: "weekly",
+      priority: 0.7,
+    })),
+    ...(futureBills || []).map((item) => ({
+      url: absolute(buildFutureBillDetailHref(item)),
+      lastModified: toIsoDate(item.latest_tracked_update || item.created_at) || new Date(),
+      changeFrequency: "weekly",
+      priority: 0.7,
+    })),
+    ...researchCaseSlugs.map((slug) => ({
+      url: absolute(`/research/cases/${slug}`),
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.65,
+    })),
+    ...(legislators || []).map((item) => ({
+      url: absolute(`/scorecards/${item.id}`),
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.6,
+    })),
+  ];
+
+  return Array.from(
+    new Map([...staticRoutes, ...dynamicRoutes].map((item) => [item.url, item])).values()
+  );
+}

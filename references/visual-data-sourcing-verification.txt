@@ -1,0 +1,365 @@
+EQUITYSTACK VISUAL DATA SOURCING & VERIFICATION REFERENCE
+
+Purpose
+
+Use this file as the source of truth for sourcing, validating, and attaching visuals used in EquityStack.
+
+This ensures all visuals:
+
+* are credible
+* are verifiable
+* support claims without distortion
+* can withstand scrutiny
+
+This reference works alongside:
+
+* references/visual-system-reference.txt
+* references/safe-dev-framework.txt
+* references/dashboard-structure-fix-prompt.txt
+
+Always read those first when instructed.
+
+==================================================
+CORE RULES
+==========
+
+MANDATORY FIRST STEP:
+Read and follow:
+
+* references/safe-dev-framework.txt
+* references/dashboard-structure-fix-prompt.txt
+* references/visual-system-reference.txt
+
+Do not proceed until all are applied.
+
+* Do not use unverified visuals
+* Do not use screenshots without source traceability
+* Do not use cropped visuals that distort meaning
+* Do not introduce misleading comparisons
+* Do not guess source origins
+
+==================================================
+SOURCE HIERARCHY
+================
+
+Always prefer sources in this order:
+
+1. Government (highest priority)
+
+   * Census Bureau
+   * Bureau of Labor Statistics (BLS)
+   * Department of Justice
+   * Federal Reserve
+   * Congressional reports
+
+2. Academic / Research Institutions
+
+   * Universities
+   * Peer-reviewed studies
+   * Think tanks with cited methodology
+
+3. Primary Data Platforms
+
+   * Data.gov
+   * CDC datasets
+   * Court records
+   * Official election data
+
+4. Reputable Secondary Analysis
+
+   * Major journalism outlets with cited data
+   * Policy analysis orgs
+
+Avoid:
+
+* social media graphics
+* blogs without sources
+* opinion-only visuals
+* unattributed charts
+
+==================================================
+DATA TRACEABILITY RULE
+======================
+
+Every visual must be traceable.
+
+Minimum requirement:
+
+* source name
+* source type (government, academic, etc.)
+* link to original data or document
+
+If traceability cannot be established:
+→ do not use the visual
+
+==================================================
+IMAGE REPRODUCTION RULE
+=======================
+
+Prefer recreating visuals over copying them.
+
+Preferred workflow:
+
+1. find original dataset
+2. recreate chart internally (if possible)
+3. label clearly and accurately
+
+Benefits:
+
+* avoids copyright issues
+* ensures clarity
+* ensures consistency
+
+Only use screenshots when:
+
+* referencing primary documents
+* showing exact wording or legal text
+* recreating is not practical
+
+For system breakdowns:
+
+* prefer native component rendering over exporting a styled infographic image
+* if a static image is necessary, keep it diagrammatic and site-consistent rather than illustrative
+
+==================================================
+CROPPING RULE
+=============
+
+Cropping is allowed only if:
+
+* it improves clarity
+* it does not remove context
+* it does not alter interpretation
+
+Do not:
+
+* crop out contradictory data
+* crop axes or labels
+* isolate misleading sections
+
+If cropping changes meaning:
+→ do not crop
+
+==================================================
+CHART INTEGRITY RULE
+====================
+
+All charts must:
+
+* use correct scale
+* include axis labels
+* avoid truncated axes unless clearly labeled
+* avoid exaggerated visual differences
+
+Do not:
+
+* manipulate scale to amplify effects
+* hide data ranges
+* distort proportions
+
+==================================================
+MAP DATA RULE
+=============
+
+Maps must:
+
+* use accurate geographic boundaries
+* reflect correct demographic or voting data
+* clearly define what is being shown
+
+Include:
+
+* legend or explanation
+* time period (if applicable)
+
+Do not:
+
+* use outdated maps without labeling
+* present maps without context
+
+==================================================
+DOCUMENT SNAPSHOT RULE
+======================
+
+For laws and rulings:
+
+* show exact text
+* highlight relevant section
+* provide plain-language explanation
+
+Must include:
+
+* document name
+* issuing body
+* date
+
+Do not:
+
+* paraphrase without showing source
+* rely only on summaries
+
+==================================================
+SYSTEM BREAKDOWN SYNTHESIS RULE
+===============================
+
+For system breakdowns:
+
+* treat the visual as a mechanism summary derived from cited sources
+* identify the underlying source that anchors the mechanism
+* keep the sequence narrower than the evidence can support
+* avoid presenting synthesized steps as if they were primary-source snapshots
+
+Must include:
+
+* source label
+* source type
+* source URL
+* caption language that signals synthesis rather than quotation
+
+==================================================
+CAPTION VERIFICATION RULE
+=========================
+
+Every caption must:
+
+* match the data shown
+* avoid overclaiming
+* avoid speculation
+* explain relevance clearly
+* distinguish synthesized mechanism summaries from direct document evidence when applicable
+
+Bad:
+"This proves discrimination increased"
+
+Good:
+"This shows X trend. This matters because Y policy change occurred at this point."
+
+Good for a system breakdown:
+"This mechanism summary shows how X policy channel led to Y outcome, based on the cited housing and lending records."
+
+==================================================
+TIMEFRAME CLARITY RULE
+======================
+
+All visuals must clearly indicate:
+
+* time period
+* data range
+
+Do not:
+
+* mix different timeframes without labeling
+* imply trends from incomplete data
+
+==================================================
+MULTI-SOURCE VALIDATION RULE
+============================
+
+For high-impact claims:
+
+* verify using at least 2 independent sources when possible
+
+Examples:
+
+* unemployment trends
+* incarceration rates
+* voting patterns
+
+If sources conflict:
+
+* acknowledge discrepancy
+* do not force alignment
+
+==================================================
+STORAGE & FILE NAMING RULE
+==========================
+
+Store visuals in structured format:
+
+/public/images/evidence/
+/maps/
+/charts/
+/documents/
+
+Naming convention:
+
+[type]-[topic]-[year].png
+
+Examples:
+
+* map-alabama-districts-2024.png
+* chart-black-unemployment-2000-2025.png
+* doc-voting-rights-act-section2.png
+
+==================================================
+METADATA STRUCTURE (OPTIONAL)
+=============================
+
+Each visual can include metadata:
+
+* title
+* type
+* sourceLabel
+* sourceUrl
+* date
+* notes
+
+Example:
+
+{
+title: "Black Unemployment Rate Over Time",
+type: "chart",
+sourceLabel: "Bureau of Labor Statistics",
+sourceUrl: "...",
+date: "2000–2025"
+}
+
+==================================================
+VERIFICATION CHECKLIST
+======================
+
+Before using any visual:
+
+* source is identified
+* data is accurate
+* caption is correct
+* timeframe is clear
+* no distortion introduced
+* visual supports the claim directly
+
+If any fail:
+→ do not include
+
+==================================================
+ANTI-MANIPULATION RULE
+======================
+
+EquityStack does not use visuals to persuade emotionally.
+
+Visuals must:
+
+* inform
+* clarify
+* document
+
+Avoid:
+
+* dramatic framing
+* selective presentation
+* emotional bias visuals
+
+==================================================
+FINAL RULE
+==========
+
+If a visual cannot be defended under scrutiny:
+→ it does not belong in EquityStack
+
+All visuals must be:
+
+* traceable
+* accurate
+* contextualized
+* honest
+
+Credibility is more important than volume.

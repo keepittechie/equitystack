@@ -1,0 +1,693 @@
+import { notFound } from "next/navigation";
+import { ImpactBadge, PromiseStatusBadge } from "@/app/components/policy-badges";
+import PresidentAvatar from "@/app/components/PresidentAvatar";
+import TrustImpactSummaryCard from "@/app/components/TrustImpactSummaryCard";
+import TrackedLink from "@/app/components/telemetry/TrackedLink";
+import DiscoveryGuidancePanel from "@/app/components/public/DiscoveryGuidancePanel";
+import CopyShareLinkButton from "@/app/reports/black-impact-score/CopyShareLinkButton";
+import { fetchInternalJson } from "@/lib/api";
+import { PUBLIC_REVALIDATE_SECONDS, withRevalidate } from "@/lib/cache";
+import { EXPLANATION_CONTENT } from "@/lib/content/explanations";
+import {
+  CURRENT_ADMIN_METHOD_STATEMENT,
+  CURRENT_ADMIN_PUBLIC_SCORE_WAITING_MESSAGE,
+  buildCurrentAdminPublicGuidanceItems,
+  buildCurrentAdminScoreMethodologyItems,
+  categorySlugLabel,
+  describeScoreEligibility,
+  formatScoreEligibilityLabel,
+  formatSourceQualityLabel,
+  formatVisibilityStateLabel,
+  summarizeEvidenceRoles,
+} from "@/lib/currentAdmin/governingActions";
+import { buildPageMetadata } from "@/lib/metadata";
+import { buildPromiseCardHref } from "@/lib/shareable-card-links";
+
+async function getCurrentAdministrationOverview() {
+  return fetchInternalJson("/api/current-administration", {
+    ...withRevalidate(PUBLIC_REVALIDATE_SECONDS),
+    allow404: true,
+    errorMessage: "Failed to fetch current administration overview",
+  });
+}
+
+export async function generateMetadata() {
+  const overview = await getCurrentAdministrationOverview();
+
+  if (!overview) {
+    return buildPageMetadata({
+      title: "Current Administration",
+      description: "The requested current-administration overview could not be found.",
+      path: "/current-administration",
+    });
+  }
+
+  const termLabel = formatTermRange(
+    overview?.president?.term_start,
+    overview?.president?.term_end
+  );
+
+  return buildPageMetadata({
+    title: `${overview.administration_name} (${termLabel}) | Live Overview`,
+    description:
+      "Follow the current administration's reviewed promises, actions, outcomes, and recent verified updates in one public overview.",
+    path: "/current-administration",
+    imagePath: "/current-administration/opengraph-image",
+    type: "article",
+  });
+}
+
+function MetaPill({ children }) {
+  return (
+    <span className="public-pill">
+      {children}
+    </span>
+  );
+}
+
+function SummaryStat({ label, value, tone = "default" }) {
+  const toneClasses =
+    tone === "accent"
+      ? "metric-card border-[rgba(96,165,250,0.26)] bg-[linear-gradient(180deg,rgba(11,20,33,0.96),rgba(15,41,78,0.92))]"
+      : "metric-card";
+
+  return (
+    <div className={`rounded-[1.2rem] px-4 py-4 ${toneClasses}`}>
+      <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">{label}</p>
+      <p className="mt-2 text-2xl font-semibold text-white">{value}</p>
+    </div>
+  );
+}
+
+function formatDate(dateString) {
+  if (!dateString) return null;
+
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) return dateString;
+
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
+
+function formatTermRange(start, end) {
+  const startYear = start ? new Date(start).getFullYear() : null;
+  const endYear = end ? new Date(end).getFullYear() : null;
+
+  if (Number.isFinite(startYear) && Number.isFinite(endYear)) {
+    return `${startYear}-${endYear}`;
+  }
+
+  if (Number.isFinite(startYear)) {
+    return `${startYear}-Present`;
+  }
+
+  return "Current Term";
+}
+
+function humanizeToken(value) {
+  return String(value || "")
+    .replace(/[_-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/\b\w/g, (character) => character.toUpperCase());
+}
+
+function formatCategorySummary(categories = []) {
+  const labels = (Array.isArray(categories) ? categories : [])
+    .map((item) => categorySlugLabel(item?.category_slug || item?.slug))
+    .filter(Boolean);
+  return [...new Set(labels)];
+}
+
+function describeImpactPattern(breakdown = {}) {
+  const ordered = ["Mixed", "Negative", "Positive", "Blocked"].map((direction) => ({
+    direction,
+    count: Number(breakdown[direction] || 0),
+  }));
+
+  const top = [...ordered].sort((left, right) => right.count - left.count)[0];
+  if (!top || top.count <= 0) {
+    return "No documented outcomes are tracked yet.";
+  }
+
+  const peers = ordered.filter((item) => item.count === top.count && item.count > 0);
+  if (peers.length > 1) {
+    return "Current tracked outcomes are split across more than one direction.";
+  }
+
+  if (top.direction === "Mixed") {
+    return "So far, most tracked outcomes are mixed.";
+  }
+
+  if (top.direction === "Negative") {
+    return "Current tracked outcomes lean negative.";
+  }
+
+  if (top.direction === "Positive") {
+    return "Current tracked outcomes lean positive.";
+  }
+
+  return "Most tracked outcomes remain blocked.";
+}
+
+function buildTopicMixLabel(directionCounts = {}) {
+  const parts = ["Positive", "Negative", "Mixed", "Blocked"]
+    .map((direction) => ({
+      direction,
+      count: Number(directionCounts[direction] || 0),
+    }))
+    .filter((item) => item.count > 0)
+    .sort((left, right) => right.count - left.count);
+
+  if (!parts.length) {
+    return "No documented direction yet";
+  }
+
+  return parts
+    .slice(0, 2)
+    .map((item) => `${item.count} ${item.direction.toLowerCase()}`)
+    .join(" · ");
+}
+
+export default async function CurrentAdministrationPage() {
+  const overview = await getCurrentAdministrationOverview();
+
+  if (!overview) {
+    notFound();
+  }
+
+  const pagePath = "/current-administration";
+  const impactPattern = describeImpactPattern(overview.impact_breakdown);
+  const explanation = EXPLANATION_CONTENT.currentAdministration;
+  const termLabel = formatTermRange(
+    overview?.president?.term_start,
+    overview?.president?.term_end
+  );
+  const latestReviewedDate = overview.recent_activity.find((item) => item.latest_action_date)?.latest_action_date;
+  const featuredShareHref = overview.featured_records[0]
+    ? buildPromiseCardHref(overview.featured_records[0])
+    : `/promises/president/${overview.president.slug}?show_all=1`;
+
+  return (
+    <main className="max-w-7xl mx-auto p-6 space-y-4">
+      <section className="hero-panel p-4">
+        <div className="flex items-start justify-between gap-6 flex-wrap">
+          <div className="max-w-4xl">
+            <p className="eyebrow mb-4">Current Administration</p>
+            <h1 className="page-title">
+              {overview.administration_name} ({termLabel})
+            </h1>
+            <p className="mt-5 max-w-3xl text-base leading-8 text-[var(--ink-soft)] md:text-lg">
+              This page tracks the current presidency term through reviewed Promise Tracker records. It shows what has been promised, what actions have happened, and what documented outcomes affecting Black Americans are in the public record so far.
+            </p>
+            <p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--ink-soft)]">
+              {CURRENT_ADMIN_METHOD_STATEMENT}
+            </p>
+            <div className="mt-5 flex flex-wrap gap-2">
+              {overview?.president?.president_party ? (
+                <MetaPill>{overview.president.president_party}</MetaPill>
+              ) : null}
+              <MetaPill>{overview.total_tracked_promises} tracked promises</MetaPill>
+              <MetaPill>{overview.total_promise_only} promise-only</MetaPill>
+              <MetaPill>{overview.total_governing_actions} governing actions</MetaPill>
+              <MetaPill>{overview.total_outcomes} outcomes documented</MetaPill>
+            </div>
+            <div className="mt-5 flex flex-wrap gap-2">
+              <CopyShareLinkButton
+                path="/current-administration"
+                defaultLabel="Share This Overview"
+                copiedLabel="Copied!"
+                trackPayload={{
+                  route_kind: "current_administration",
+                  entity_type: "presidency",
+                  entity_key: overview.president.slug,
+                }}
+              />
+              <TrackedLink
+                href={`/promises/president/${overview.president.slug}?show_all=1`}
+                pagePath={pagePath}
+                eventType="detail_click"
+                routeKind="current_administration"
+                entityType="presidency"
+                entityKey={overview.president.slug}
+                targetPath={`/promises/president/${overview.president.slug}?show_all=1`}
+                className="dashboard-button-secondary"
+              >
+                Open the current-term promise tracker
+              </TrackedLink>
+            </div>
+          </div>
+          <PresidentAvatar
+            presidentSlug={overview?.president?.slug}
+            presidentName={overview?.president?.president || overview?.administration_name}
+            size={96}
+            shape="rounded"
+          />
+        </div>
+      </section>
+
+      <section className="grid gap-4 xl:grid-cols-2">
+        <DiscoveryGuidancePanel
+          eyebrow="How to read these records"
+          title="Promises, governing actions, and scores stay separate on purpose"
+          description="Use these labels to tell whether you are looking at intent, a real government mechanism, or a record that is only partway through the evidence pipeline."
+          items={buildCurrentAdminPublicGuidanceItems()}
+        />
+        <DiscoveryGuidancePanel
+          eyebrow="Why some scores are withheld"
+          title="Current-administration score labels describe evidence stage, not page quality"
+          description="Public but unscored actions are not broken records. They are visible accountability pages that have not yet cleared the population-impact gate for scoring."
+          items={buildCurrentAdminScoreMethodologyItems()}
+        />
+      </section>
+
+      <section className="card-surface p-4">
+        <div className="flex items-start justify-between gap-4 flex-wrap">
+          <div className="max-w-3xl">
+            <h3 className="text-2xl font-semibold">Current term summary</h3>
+            <p className="mt-2 text-xs uppercase tracking-[0.14em] text-[var(--ink-soft)]">
+              {latestReviewedDate
+                ? `Data reflects latest reviewed records through ${formatDate(latestReviewedDate)}`
+                : "Data reflects latest reviewed records"}
+            </p>
+            <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
+              {impactPattern}
+            </p>
+            <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
+              Promise-only items stay visible as tracked but not scored. Governing actions appear separately once EquityStack has a documented mechanism and publishable evidence.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <ImpactBadge impact="Positive" />
+            <ImpactBadge impact="Negative" />
+            <ImpactBadge impact="Mixed" />
+            <ImpactBadge impact="Blocked" />
+          </div>
+        </div>
+
+        <div className="mt-5 grid gap-4 md:grid-cols-3 xl:grid-cols-8">
+          <SummaryStat label="Promises" value={overview.total_tracked_promises} tone="accent" />
+          <SummaryStat label="Promise Only" value={overview.total_promise_only} />
+          <SummaryStat label="Gov. Actions" value={overview.total_governing_actions} />
+          <SummaryStat label="Scored Actions" value={overview.total_scored_governing_actions} />
+          <SummaryStat label="Outcomes" value={overview.total_outcomes} />
+          <SummaryStat label="Positive" value={overview.impact_breakdown.Positive || 0} />
+          <SummaryStat label="Negative" value={overview.impact_breakdown.Negative || 0} />
+          <SummaryStat label="Mixed" value={overview.impact_breakdown.Mixed || 0} />
+        </div>
+      </section>
+
+      <section className="card-surface p-4">
+        <div className="flex items-center justify-between gap-4 flex-wrap">
+          <div>
+            <h2 className="text-2xl font-semibold">Tracked Promises</h2>
+            <p className="mt-1 text-sm text-[var(--ink-soft)]">
+              Promise records remain public when sourced, even before a governing action is scoreable.
+            </p>
+          </div>
+          <TrackedLink
+            href={`/promises/president/${overview.president.slug}?show_all=1`}
+            pagePath={pagePath}
+            eventType="detail_click"
+            routeKind="current_administration"
+            entityType="presidency"
+            entityKey={overview.president.slug}
+            targetPath={`/promises/president/${overview.president.slug}?show_all=1`}
+            className="text-sm accent-link"
+          >
+            Open current-term Promise Tracker
+          </TrackedLink>
+        </div>
+
+        <div className="mt-5 grid gap-4 md:grid-cols-2">
+          {overview.recent_activity.length === 0 ? (
+            <p className="text-sm text-[var(--ink-soft)]">
+              No current-administration activity has been published yet.
+            </p>
+          ) : overview.recent_activity.map((item) => (
+            <article key={item.slug} className="panel-link p-4">
+              <div className="flex items-start justify-between gap-4 flex-wrap">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">
+                    {item.topic || "No topic"}
+                  </p>
+                  <h3 className="mt-3 text-lg font-semibold">{item.title}</h3>
+                </div>
+                <div className="flex items-center gap-3">
+                  <PresidentAvatar
+                    presidentSlug={overview?.president?.slug}
+                    presidentName={overview?.president?.president || overview?.administration_name}
+                    size={42}
+                  />
+                  <PromiseStatusBadge status={item.status} />
+                </div>
+              </div>
+
+              <p className="mt-3 text-sm text-[var(--ink-soft)] leading-6">
+                {item.latest_action_title || item.summary || "Tracked current-administration record"}
+              </p>
+
+              <div className="mt-4 flex flex-wrap gap-2">
+                {item.tracked_but_not_scored ? <MetaPill>Tracked but not scored</MetaPill> : null}
+                {item.latest_action_date ? <MetaPill>{formatDate(item.latest_action_date)}</MetaPill> : null}
+                {item.latest_impact_direction ? (
+                  <ImpactBadge impact={item.latest_impact_direction} />
+                ) : null}
+              </div>
+
+              <TrustImpactSummaryCard
+                record={item}
+                detailHref={`/promises/${item.slug}`}
+                detailLabel="Open Promise Tracker record"
+              />
+
+              <div className="mt-5 flex flex-wrap gap-3">
+                <TrackedLink
+                  href={`/promises/${item.slug}`}
+                  pagePath={pagePath}
+                  eventType="detail_click"
+                  routeKind="current_administration"
+                  entityType="promise"
+                  entityKey={item.slug}
+                  targetPath={`/promises/${item.slug}`}
+                  className="dashboard-button-primary px-4 py-2"
+                >
+                  Open Promise Tracker record
+                </TrackedLink>
+                <TrackedLink
+                  href={buildPromiseCardHref(item)}
+                  pagePath={pagePath}
+                  eventType="share_card_click"
+                  routeKind="current_administration"
+                  entityType="promise"
+                  entityKey={item.slug}
+                  targetPath={buildPromiseCardHref(item)}
+                  className="dashboard-button-secondary px-4 py-2"
+                >
+                  Share Card
+                </TrackedLink>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="card-surface p-4">
+        <div className="flex items-center justify-between gap-4 flex-wrap">
+          <div>
+            <h2 className="text-2xl font-semibold">Governing Actions</h2>
+            <p className="mt-1 text-sm text-[var(--ink-soft)]">
+              These are the public mechanisms EquityStack has tied to the current term: executive orders, agency actions, rules, judicial blocks, and related implementation steps.
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-5 grid gap-4 md:grid-cols-2">
+          {overview.recent_governing_actions.length === 0 ? (
+            <p className="text-sm text-[var(--ink-soft)]">
+              No governing actions have been published yet.
+            </p>
+          ) : overview.recent_governing_actions.map((item) => (
+            <article id={item.slug ? `governing-action-${item.slug}` : undefined} key={item.id} className="panel-link p-4">
+              <div className="flex items-start justify-between gap-4 flex-wrap">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">
+                    {humanizeToken(item.action_type)}
+                  </p>
+                  <h3 className="mt-3 text-lg font-semibold">{item.title}</h3>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <MetaPill>{humanizeToken(item.status)}</MetaPill>
+                  <MetaPill>{formatSourceQualityLabel(item.best_source_quality)}</MetaPill>
+                  <MetaPill>{formatVisibilityStateLabel(item.visibility_state)}</MetaPill>
+                </div>
+              </div>
+
+              <p className="mt-3 text-sm leading-6 text-[var(--ink-soft)]">
+                {item.summary || item.mechanism_label || "Tracked governing action"}
+              </p>
+
+              <div className="mt-4 flex flex-wrap gap-2">
+                {item.action_date || item.effective_date ? (
+                  <MetaPill>{formatDate(item.action_date || item.effective_date)}</MetaPill>
+                ) : null}
+                <MetaPill>{formatScoreEligibilityLabel(item.score_eligibility)}</MetaPill>
+                <MetaPill>{item.linked_promise_count} linked promise{item.linked_promise_count === 1 ? "" : "s"}</MetaPill>
+              </div>
+
+              {summarizeEvidenceRoles(item.sources).length ? (
+                <p className="mt-3 text-sm leading-6 text-[var(--ink-soft)]">
+                  Evidence roles: {summarizeEvidenceRoles(item.sources).join(" • ")}
+                </p>
+              ) : null}
+
+              {formatCategorySummary(item.categories).length ? (
+                <p className="mt-2 text-sm leading-6 text-[var(--ink-soft)]">
+                  Impact domains: {formatCategorySummary(item.categories).join(" • ")}
+                </p>
+              ) : null}
+
+              {item.parent_action_title ? (
+                <p className="mt-3 text-sm leading-6 text-[var(--ink-soft)]">
+                  {humanizeToken(item.chain_relationship_type)}: {item.parent_action_title}
+                </p>
+              ) : null}
+
+              <p className="mt-2 text-xs leading-6 text-[var(--ink-muted)]">
+                {describeScoreEligibility(item.score_eligibility)}
+              </p>
+              {item.score_eligibility !== "scored" ? (
+                <div className="mt-2 space-y-1">
+                  <p className="text-xs leading-6 text-[var(--ink-soft)]">
+                    {CURRENT_ADMIN_PUBLIC_SCORE_WAITING_MESSAGE}
+                  </p>
+                  {item.next_check_hint ? (
+                    <p className="text-xs leading-6 text-[var(--ink-muted)]">
+                      {item.next_check_hint}
+                    </p>
+                  ) : null}
+                </div>
+              ) : null}
+
+              <div className="mt-5 flex flex-wrap gap-3">
+                {item.primary_promise_slug ? (
+                  <TrackedLink
+                    href={`/promises/${item.primary_promise_slug}`}
+                    pagePath={pagePath}
+                    eventType="detail_click"
+                    routeKind="current_administration"
+                    entityType="governing_action"
+                    entityKey={String(item.id)}
+                    targetPath={`/promises/${item.primary_promise_slug}`}
+                    className="dashboard-button-primary px-4 py-2"
+                  >
+                    Open linked promise
+                  </TrackedLink>
+                ) : null}
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
+        <div className="card-surface p-4">
+          <div className="flex items-center justify-between gap-4 flex-wrap">
+            <div>
+              <h2 className="text-2xl font-semibold">Top Impact Areas</h2>
+              <p className="mt-1 text-sm text-[var(--ink-soft)]">
+                The most active topics in the current administration&apos;s tracked record.
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-5 space-y-4">
+            {overview.top_topics.length === 0 ? (
+              <p className="text-sm text-[var(--ink-soft)]">No topic summaries are available yet.</p>
+            ) : overview.top_topics.map((topic) => (
+              <article
+                key={topic.topic}
+                className="card-muted rounded-[1.25rem] px-5 py-4"
+              >
+                <div className="flex items-start justify-between gap-4 flex-wrap">
+                  <div>
+                    <h3 className="text-lg font-semibold">{topic.topic}</h3>
+                    <p className="mt-2 text-sm text-[var(--ink-soft)]">{topic.summary}</p>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <MetaPill>{topic.promise_count} promises</MetaPill>
+                    <MetaPill>{topic.action_count} actions</MetaPill>
+                    <MetaPill>{buildTopicMixLabel(topic.direction_counts)}</MetaPill>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+
+        <section className="card-surface p-4">
+          <h2 className="text-2xl font-semibold">Build, Interpret, Verify</h2>
+          <div className="mt-4 space-y-3 text-sm leading-7 text-[var(--ink-soft)]">
+            <p>{explanation.build}</p>
+            <p>
+              Black Impact Score uses documented outcomes from these records. It does not score
+              promises by themselves.
+            </p>
+          </div>
+
+          <div className="mt-5 rounded-[1.2rem] border border-[var(--line)] bg-[var(--surface-alt)] p-4">
+            <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Interpret</p>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+              {explanation.interpret}
+            </p>
+            <ul className="mt-3 space-y-1 text-sm leading-7 text-[var(--ink-soft)]">
+              {explanation.verify.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      </section>
+
+      <section className="card-surface p-4">
+        <div className="flex items-center justify-between gap-4 flex-wrap">
+          <div>
+            <h2 className="text-2xl font-semibold">Featured Current-Administration Records</h2>
+            <p className="mt-1 text-sm text-[var(--ink-soft)]">
+              A few high-signal records from the current term to open first.
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          {overview.featured_records.length === 0 ? (
+            <p className="text-sm text-[var(--ink-soft)]">No featured records are available yet.</p>
+          ) : overview.featured_records.map((record) => (
+            <article key={record.slug} className="panel-link p-4">
+              <div className="flex items-start justify-between gap-4 flex-wrap">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">
+                    {record.topic || "No topic"}
+                  </p>
+                  <h3 className="mt-3 text-lg font-semibold">{record.title}</h3>
+                </div>
+                <PresidentAvatar
+                  presidentSlug={overview?.president?.slug}
+                  presidentName={overview?.president?.president || overview?.administration_name}
+                  size={42}
+                />
+              </div>
+              <p className="mt-3 text-sm leading-6 text-[var(--ink-soft)]">
+                {record.summary || "Open the record for actions, outcomes, and sources."}
+              </p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <PromiseStatusBadge status={record.status} />
+                {record.impact_direction_for_curation ? (
+                  <ImpactBadge impact={record.impact_direction_for_curation} />
+                ) : null}
+              </div>
+
+              <TrustImpactSummaryCard
+                record={record}
+                detailHref={`/promises/${record.slug}`}
+                detailLabel="Open Promise Tracker record"
+              />
+
+              <div className="mt-5 flex flex-wrap gap-3">
+                <TrackedLink
+                  href={`/promises/${record.slug}`}
+                  pagePath={pagePath}
+                  eventType="detail_click"
+                  routeKind="current_administration"
+                  entityType="promise"
+                  entityKey={record.slug}
+                  targetPath={`/promises/${record.slug}`}
+                  className="text-sm accent-link"
+                >
+                  Open Promise Tracker record
+                </TrackedLink>
+                <TrackedLink
+                  href={buildPromiseCardHref(record)}
+                  pagePath={pagePath}
+                  eventType="share_card_click"
+                  routeKind="current_administration"
+                  entityType="promise"
+                  entityKey={record.slug}
+                  targetPath={buildPromiseCardHref(record)}
+                  className="text-sm accent-link"
+                >
+                  Share Card
+                </TrackedLink>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="card-surface p-4">
+        <div className="flex items-center justify-between gap-4 flex-wrap">
+          <div>
+            <h2 className="text-2xl font-semibold">Next Steps</h2>
+            <p className="mt-1 text-sm text-[var(--ink-soft)]">
+              Move from this overview into records, cards, and the score view.
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-5 grid gap-4 md:grid-cols-3">
+          <TrackedLink
+            href={`/promises/president/${overview.president.slug}?show_all=1`}
+            pagePath={pagePath}
+            eventType="detail_click"
+            routeKind="current_administration"
+            entityType="presidency"
+            entityKey={overview.president.slug}
+            targetPath={`/promises/president/${overview.president.slug}?show_all=1`}
+            className="panel-link p-4"
+          >
+            <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Browse</p>
+            <h3 className="mt-3 text-lg font-semibold">Open current-term Promise Tracker</h3>
+            <p className="mt-2 text-sm leading-6 text-[var(--ink-soft)]">
+              Open the full presidency-term Promise Tracker view for the current administration.
+            </p>
+          </TrackedLink>
+          <TrackedLink
+            href="/reports/black-impact-score"
+            pagePath={pagePath}
+            eventType="detail_click"
+            routeKind="current_administration"
+            entityType="report"
+            entityKey="black-impact-score"
+            targetPath="/reports/black-impact-score"
+            className="panel-link p-4"
+          >
+            <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Score</p>
+            <h3 className="mt-3 text-lg font-semibold">Open Black Impact Score</h3>
+            <p className="mt-2 text-sm leading-6 text-[var(--ink-soft)]">
+              See how documented outcomes from Promise Tracker feed the score view.
+            </p>
+          </TrackedLink>
+          <TrackedLink
+            href={featuredShareHref}
+            pagePath={pagePath}
+            eventType="share_card_click"
+            routeKind="current_administration"
+            entityType="promise"
+            entityKey={overview.featured_records[0]?.slug || overview.president.slug}
+            targetPath={featuredShareHref}
+            className="panel-link p-4"
+          >
+            <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">Share</p>
+            <h3 className="mt-3 text-lg font-semibold">Share a current-administration card</h3>
+            <p className="mt-2 text-sm leading-6 text-[var(--ink-soft)]">
+              Use the card system when you want a concise, shareable knowledge unit.
+            </p>
+          </TrackedLink>
+        </div>
+      </section>
+    </main>
+  );
+}

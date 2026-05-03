@@ -1,0 +1,940 @@
+"use client";
+
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
+import { readAdminJsonResponse } from "@/app/admin/components/readAdminJsonResponse";
+import {
+  getAiStateTone,
+  getConfidenceTone,
+  getTrustStateTone,
+  toCanonicalAiState,
+  toCanonicalConfidence,
+  toCanonicalTrustState,
+} from "@/lib/labels";
+
+const DECISION_OPTIONS = [
+  { value: "pending", label: "Keep pending" },
+  { value: "approve", label: "Approve" },
+  { value: "dismiss", label: "Dismiss" },
+];
+
+const SECTION_CLASS = "rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] p-4 text-[var(--admin-text)] shadow-sm";
+const CARD_CLASS = "rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] p-3 text-[var(--admin-text)] shadow-sm";
+const PANEL_CLASS = "rounded border border-[var(--admin-line)] bg-[var(--admin-surface-muted)] p-3 text-[var(--admin-text)]";
+const TABLE_WRAPPER_CLASS = "overflow-x-auto rounded border border-[var(--admin-line)]";
+const TABLE_HEAD_CLASS = "bg-[var(--admin-surface-muted)] text-left text-[11px] uppercase tracking-wide text-[var(--admin-text-muted)]";
+const TABLE_ROW_CLASS = "align-top odd:bg-[var(--admin-surface)] even:bg-[var(--admin-surface-soft)]";
+
+function cloneActions(actions) {
+  return (actions || []).map((action) => ({
+    ...action,
+    decision:
+      action.status === "dismissed"
+        ? "dismiss"
+        : action.approved
+          ? "approve"
+          : "pending",
+    approval_note: action.approval_note || "",
+  }));
+}
+
+function SummaryCard({ title, report, modeLabel }) {
+  return (
+    <div className={CARD_CLASS}>
+      <p className="text-[11px] text-[var(--admin-text-muted)]">{title}</p>
+      {report ? (
+        <div className="mt-2 space-y-1 text-[12px]">
+          <p className="font-semibold text-[var(--admin-text)]">{modeLabel || report.mode}</p>
+          {"applied_count" in report ? <p>Applied: {report.applied_count}</p> : null}
+          {"skipped_count" in report ? <p>Skipped: {report.skipped_count}</p> : null}
+          {"rows_selected" in report ? <p>Rows selected: {report.rows_selected}</p> : null}
+          {"inserted_new_tracked_bills" in report ? (
+            <p>Inserted new tracked bills: {report.inserted_new_tracked_bills}</p>
+          ) : null}
+          <p>Errors: {report.error_count || 0}</p>
+        </div>
+      ) : (
+        <p className="mt-2 text-[12px] text-[var(--admin-text-soft)]">No report available yet.</p>
+      )}
+    </div>
+  );
+}
+
+function getTrustBannerConfig(summary) {
+  if (!summary) {
+    return null;
+  }
+
+  const trustState =
+    summary.severity === "critical"
+      ? toCanonicalTrustState("low")
+      : summary.severity === "warning"
+        ? toCanonicalTrustState("guarded")
+        : toCanonicalTrustState("high");
+
+  const tone = getTrustStateTone(trustState);
+
+  if (summary.severity === "critical") {
+    return {
+      border: "border-[var(--admin-danger-line)]",
+      bg: "bg-[var(--admin-danger-surface)]",
+      text: "text-[var(--danger)]",
+      label: trustState,
+      tone,
+    };
+  }
+  if (summary.severity === "warning") {
+    return {
+      border: "border-[var(--admin-warning-line)]",
+      bg: "bg-[var(--admin-warning-surface)]",
+      text: "text-[var(--warning)]",
+      label: trustState,
+      tone,
+    };
+  }
+  return {
+    border: "border-[var(--admin-success-line)]",
+    bg: "bg-[var(--admin-success-surface)]",
+    text: "text-[var(--success)]",
+    label: trustState,
+    tone,
+  };
+}
+
+function toStatusLabel(value, fallback = "UNKNOWN") {
+  const normalized = String(value || "").trim();
+  return normalized ? normalized.toUpperCase() : fallback;
+}
+
+function getStatusBadgeClass(status) {
+  const normalized = String(status || "").trim().toLowerCase();
+  if (["fail", "blocked", "error", "critical"].includes(normalized)) {
+    return "border-[var(--admin-danger-line)] bg-[var(--admin-danger-surface)] text-[var(--danger)]";
+  }
+  if (["warn", "warning", "review", "review_needed", "needs_repair", "hold"].includes(normalized)) {
+    return "border-[var(--admin-warning-line)] bg-[var(--admin-warning-surface)] text-[var(--warning)]";
+  }
+  if (["pass", "ready", "allowed", "success", "complete"].includes(normalized)) {
+    return "border-[var(--admin-success-line)] bg-[var(--admin-success-surface)] text-[var(--success)]";
+  }
+  return "border-[var(--admin-line)] bg-[var(--admin-surface-muted)] text-[var(--admin-text-muted)]";
+}
+
+function StatusCard({ title, status, summary, lines = [], hint = null }) {
+  return (
+    <div className={CARD_CLASS}>
+      <div className="flex flex-wrap items-start justify-between gap-2">
+        <p className="text-[11px] text-[var(--admin-text-muted)]">{title}</p>
+        <span
+          className={`rounded border px-2 py-0.5 text-[11px] font-medium uppercase tracking-wide ${getStatusBadgeClass(status)}`}
+        >
+          {toStatusLabel(status)}
+        </span>
+      </div>
+      <p className="mt-2 text-sm font-semibold text-[var(--admin-text)]">{summary}</p>
+      {lines.length ? (
+        <div className="mt-2 space-y-1 text-[11px] text-[var(--admin-text-soft)]">
+          {lines.filter(Boolean).map((line) => (
+            <p key={`${title}:${line}`}>{line}</p>
+          ))}
+        </div>
+      ) : null}
+      {hint ? (
+        <p className="mt-2 text-[11px] text-[var(--admin-text-soft)]">{hint}</p>
+      ) : null}
+    </div>
+  );
+}
+
+export default function LegislativeWorkflowWorkspace({ workspace }) {
+  const router = useRouter();
+  const actionableBundleActions = Array.isArray(workspace.actionable_operator_actions)
+    ? workspace.actionable_operator_actions
+    : workspace.operator_actions || [];
+  const pendingBundleActions = Array.isArray(workspace.pending_operator_actions)
+    ? workspace.pending_operator_actions
+    : actionableBundleActions.filter((action) => !action.approved);
+  const autoApprovedBundleActions = Array.isArray(workspace.auto_approved_operator_actions)
+    ? workspace.auto_approved_operator_actions
+    : actionableBundleActions.filter(
+        (action) => action.approved && (action.auto_triaged || action.approved_by === "auto_triage_review_bundle")
+      );
+  const humanApprovedBundleActions = Array.isArray(workspace.human_approved_operator_actions)
+    ? workspace.human_approved_operator_actions
+    : actionableBundleActions.filter(
+        (action) => action.approved && !(action.auto_triaged || action.approved_by === "auto_triage_review_bundle")
+      );
+  const [actions, setActions] = useState(cloneActions(pendingBundleActions));
+  const [message, setMessage] = useState("");
+  const [isPending, startTransition] = useTransition();
+  const permissions = workspace.action_permissions || {};
+  const reviewBundlePath = workspace.review_bundle?.path;
+  const outcomeSummary = workspace.workflow_outcome_summary || null;
+  const trustBanner = getTrustBannerConfig(outcomeSummary);
+  const reviewQueueCount =
+    outcomeSummary?.manual_review_queue_count || workspace.manual_review_queue?.manual_review_count || 0;
+  const manualReviewItems = Array.isArray(workspace.manual_review_queue?.items)
+    ? workspace.manual_review_queue.items
+    : [];
+  const debugState = workspace.debug_state || null;
+  const healthSummary = workspace.health_report || null;
+  const anomalySummary = workspace.anomaly_report || null;
+  const applyReadiness = workspace.apply_readiness || null;
+  const repairReadiness = workspace.repair_readiness || null;
+  const materializationStatus = workspace.materialization_status || null;
+  const aiState = toCanonicalAiState(outcomeSummary?.ai_status?.run_status || "not_started");
+  const aiStateTone = getAiStateTone(aiState);
+  const confidenceLabel = toCanonicalConfidence(outcomeSummary?.confidence_level || "unknown");
+  const confidenceTone = getConfidenceTone(confidenceLabel);
+
+  function updateAction(actionId, field, value) {
+    setActions((current) =>
+      current.map((action) =>
+        action.action_id === actionId
+          ? {
+              ...action,
+              [field]: value,
+            }
+          : action
+      )
+    );
+  }
+
+  function runAction(url, body, successMessage) {
+    setMessage("");
+    startTransition(async () => {
+      try {
+        const response = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(body),
+        });
+        const payload = await readAdminJsonResponse(response, url);
+        if (!response.ok) {
+          throw new Error(payload.error || "Action failed.");
+        }
+        setMessage(successMessage);
+        router.refresh();
+      } catch (error) {
+        setMessage(error.message);
+      }
+    });
+  }
+
+  function saveApprovals() {
+    runAction(
+      "/api/admin/legislative/approvals",
+      {
+        actionUpdates: actions.map((action) => ({
+          action_id: action.action_id,
+          decision: action.decision,
+          approval_note: action.approval_note,
+        })),
+      },
+      "Legislative approval decisions saved to the canonical review bundle."
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      {outcomeSummary && trustBanner ? (
+        <section
+          className={`rounded border ${trustBanner.border} ${trustBanner.bg} p-4 shadow-sm`}
+        >
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div className="space-y-1">
+              <p className={`text-[11px] font-medium uppercase tracking-wide ${trustBanner.text}`}>
+                {trustBanner.label}
+              </p>
+              <h2 className="text-base font-semibold text-[var(--admin-text)]">
+                {outcomeSummary.user_message}
+              </h2>
+              <p className="max-w-5xl text-[12px] text-[var(--admin-text-soft)]">
+                {outcomeSummary.next_step_message || outcomeSummary.next_step}
+              </p>
+            </div>
+            <div className="rounded border border-[var(--admin-line)]/60 bg-[var(--admin-surface)]/70 px-3 py-2 text-[11px] text-[var(--admin-text-soft)]">
+              <div>AI status: <span className={`font-semibold ${aiStateTone === "danger" ? "text-[var(--danger)]" : aiStateTone === "warning" ? "text-[var(--warning)]" : aiStateTone === "success" ? "text-[var(--success)]" : "text-[var(--admin-text)]"}`}>{aiState}</span></div>
+              <div>Fallback used: <span className="font-semibold text-[var(--admin-text)]">{outcomeSummary.ai_status?.fallback_used || 0}/{outcomeSummary.ai_status?.total_items || 0}</span></div>
+              <div>Confidence: <span className={`font-semibold ${confidenceTone === "danger" ? "text-[var(--danger)]" : confidenceTone === "warning" ? "text-[var(--warning)]" : confidenceTone === "success" ? "text-[var(--success)]" : "text-[var(--admin-text)]"}`}>{confidenceLabel}</span></div>
+            </div>
+          </div>
+          <div className="mt-3 grid gap-3 md:grid-cols-4 text-[12px]">
+            <div className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] p-3">
+              <p className="text-[11px] text-[var(--admin-text-muted)]">AI review</p>
+              <p className="mt-1 font-semibold text-[var(--admin-text)]">
+                {outcomeSummary.ai_status?.ai_success || 0} AI-reviewed / {outcomeSummary.ai_status?.total_items || 0} total
+              </p>
+              <p className="mt-1 text-[11px] text-[var(--admin-text-soft)]">
+                primary {outcomeSummary.ai_status?.primary_model_success || 0}, fallback model {outcomeSummary.ai_status?.fallback_model_success || 0}, heuristic {outcomeSummary.ai_status?.heuristic_fallback || 0}
+              </p>
+            </div>
+            <div className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] p-3">
+              <p className="text-[11px] text-[var(--admin-text-muted)]">Decisions</p>
+              <p className="mt-1 font-semibold text-[var(--admin-text)]">
+                {outcomeSummary.decisions?.kept || 0} kept, {outcomeSummary.decisions?.modified || 0} modified, {outcomeSummary.decisions?.removed || 0} removed
+              </p>
+              <p className="mt-1 text-[11px] text-[var(--admin-text-soft)]">
+                {reviewQueueCount > 0
+                  ? `${reviewQueueCount} actionable item(s) require manual review`
+                  : "No actionable legislative items require manual review"}
+              </p>
+            </div>
+            <div className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] p-3">
+              <p className="text-[11px] text-[var(--admin-text-muted)]">Manual review queue</p>
+              <p className="mt-1 font-semibold text-[var(--admin-text)]">{reviewQueueCount} item(s)</p>
+              <p className="mt-1 break-all font-mono text-[11px] text-[var(--admin-text-soft)]">
+                {workspace.review_bundle?.path || workspace.manual_review_queue?.path || "No canonical review bundle recorded."}
+              </p>
+            </div>
+            <div className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface)] p-3">
+              <p className="text-[11px] text-[var(--admin-text-muted)]">Failure reason</p>
+              <p className="mt-1 font-semibold text-[var(--admin-text)]">
+                {outcomeSummary.ai_status?.ai_failure_reason || "No AI failure recorded"}
+              </p>
+              <p className="mt-1 text-[11px] text-[var(--admin-text-soft)]">
+                Trust state: {trustBanner.label}
+              </p>
+            </div>
+          </div>
+          {debugState ? (
+            <p className="mt-3 text-[11px] text-[var(--admin-text-soft)]">
+              Canonical bundle debug: {debugState.total_actions} total actions,{" "}
+              {debugState.actionable_manual_review} actionable manual review,{" "}
+              {debugState.stale_actions} stale, {debugState.applied_actions} applied, state{" "}
+              {debugState.workflow_state}.
+            </p>
+          ) : null}
+        </section>
+      ) : null}
+
+      {!workspace.review_bundle ? (
+        <section className="rounded border border-zinc-300 bg-[var(--admin-surface)] p-4 shadow-sm">
+          <p className="font-semibold text-[var(--admin-text)]">No legislative review bundle is available yet.</p>
+          <p className="mt-2 text-[12px] text-[var(--admin-text-soft)]">
+            If manual-review items exist, inspect the AI review and manual-review queue artifacts before rerunning the wrapped legislative review step.
+          </p>
+          <div className="mt-3 flex flex-wrap gap-3 text-[12px]">
+            <Link href="/admin/workflows" className="text-[var(--admin-link)] underline underline-offset-2">
+              Open workflows
+            </Link>
+            <a href="#artifact-state" className="text-[var(--admin-link)] underline underline-offset-2">
+              Inspect missing artifact
+            </a>
+          </div>
+        </section>
+      ) : null}
+
+      <section className="grid gap-3 xl:grid-cols-5">
+        <StatusCard
+          title="Workflow health"
+          status={healthSummary?.status}
+          summary={healthSummary?.message || "Run the legislative health check to verify workflow state."}
+          lines={[
+            healthSummary?.generated_at ? `Checked: ${healthSummary.generated_at}` : null,
+            healthSummary?.pipeline_status ? `Pipeline: ${healthSummary.pipeline_status}` : null,
+            healthSummary?.failed_step ? `Failed step: ${healthSummary.failed_step}` : null,
+            healthSummary?.blocked_before_bundle_generation
+              ? "Blocked before bundle generation."
+              : null,
+          ]}
+          hint={healthSummary?.recommendation || "./bin/equitystack legislative health"}
+        />
+        <StatusCard
+          title="Anomaly status"
+          status={anomalySummary?.status}
+          summary={
+            anomalySummary?.message ||
+            "Run the legislative anomaly check to flag suspicious classifications or drift."
+          }
+          lines={[
+            anomalySummary?.generated_at ? `Checked: ${anomalySummary.generated_at}` : null,
+            `Flagged rows: ${anomalySummary?.total_flags || 0}`,
+            anomalySummary?.critical_count
+              ? `${anomalySummary.critical_count} critical flag(s)`
+              : null,
+            anomalySummary?.warning_count
+              ? `${anomalySummary.warning_count} warning flag(s)`
+              : null,
+            ...(anomalySummary?.top_flags || []).map(
+              (flag) => `${flag.label}: ${flag.count}`
+            ),
+          ]}
+          hint={anomalySummary?.recommendation || "./bin/equitystack legislative anomalies"}
+        />
+        <StatusCard
+          title="Apply readiness"
+          status={applyReadiness?.status || applyReadiness?.apply_state}
+          summary={applyReadiness?.message || "Apply readiness is not available yet."}
+          lines={[
+            applyReadiness?.apply_state
+              ? `State: ${applyReadiness.apply_state}`
+              : null,
+            `Manual review required: ${applyReadiness?.manual_review_required || 0}`,
+            `Human-approved pending apply: ${applyReadiness?.human_approved_actions_pending_apply || 0}`,
+            `AI-approved pending apply: ${applyReadiness?.ai_approved_actions_pending_apply || 0}`,
+          ]}
+          hint={applyReadiness?.recommendation || "./bin/equitystack legislative apply --dry-run"}
+        />
+        <StatusCard
+          title="Repair readiness"
+          status={repairReadiness?.status}
+          summary={repairReadiness?.message || "Repair readiness is not available yet."}
+          lines={[
+            `Repair recommended: ${repairReadiness?.repair_recommended ? "Yes" : "No"}`,
+            repairReadiness?.db_available === false
+              ? "DB live-state verification was unavailable during the last repair check."
+              : null,
+          ]}
+          hint={repairReadiness?.recommendation || "./bin/equitystack legislative repair --dry-run"}
+        />
+        <StatusCard
+          title="Materialization readiness"
+          status={materializationStatus?.status}
+          summary={materializationStatus?.message || "Materialization readiness is not available yet."}
+          lines={[
+            materializationStatus?.generated_at
+              ? `Latest report: ${materializationStatus.generated_at}`
+              : null,
+            `Ready: ${materializationStatus?.ready ? "Yes" : "No"}`,
+            materializationStatus?.latest_apply_mode
+              ? `Latest apply mode: ${materializationStatus.latest_apply_mode}`
+              : null,
+          ]}
+          hint={
+            materializationStatus?.recommendation ||
+            "./bin/equitystack legislative materialize-outcomes"
+          }
+        />
+      </section>
+
+      <section className="grid gap-3 xl:grid-cols-5">
+        <div className={CARD_CLASS}>
+          <p className="text-[11px] text-[var(--admin-text-muted)]">Pipeline state</p>
+          <p className="mt-1 text-base font-semibold text-[var(--admin-text)]">{workspace.workflow_status}</p>
+          <p className="mt-1 text-[11px] text-[var(--admin-text-soft)]">
+            {workspace.pipeline_report?.generated_at
+              ? `Latest run: ${workspace.pipeline_report.generated_at}`
+              : "No pipeline run recorded yet."}
+          </p>
+          {workspace.pipeline_report?.failed_step ? (
+            <p className="mt-1 text-[11px] text-[var(--admin-text-soft)]">
+              Failed step: {workspace.pipeline_report.failed_step}
+            </p>
+          ) : null}
+        </div>
+        <div className={CARD_CLASS}>
+          <p className="text-[11px] text-[var(--admin-text-muted)]">Requested model</p>
+          <p className="mt-1 text-base font-semibold text-[var(--admin-text)]">
+            {workspace.requested_model || "Unavailable"}
+          </p>
+          <p className="mt-1 text-[11px] text-[var(--admin-text-soft)]">
+            {workspace.review_runtime?.review_backend
+              ? `Review backend: ${workspace.review_runtime.review_backend}`
+              : "No review backend recorded."}
+          </p>
+        </div>
+        <div className={CARD_CLASS}>
+          <p className="text-[11px] text-[var(--admin-text-muted)]">Approved actions pending apply</p>
+          <p className="mt-1 text-base font-semibold text-[var(--admin-text)]">
+            {workspace.counts.human_approved_operator_actions || 0} human / {workspace.counts.auto_approved_operator_actions || 0} AI
+          </p>
+          <p className="mt-1 text-[11px] text-[var(--admin-text-soft)]">
+            {workspace.counts.pending_operator_actions || 0} bundle action(s) still need an explicit decision.
+          </p>
+        </div>
+        <div className={CARD_CLASS}>
+          <p className="text-[11px] text-[var(--admin-text-muted)]">Manual review queue</p>
+          <p className="mt-1 text-base font-semibold text-[var(--admin-text)]">{reviewQueueCount}</p>
+          <p className="mt-1 text-[11px] text-[var(--admin-text-soft)]">
+            {workspace.manual_review_queue?.source_artifact === "review_bundle"
+              ? "Sourced from the canonical review bundle."
+              : "Sourced from the fallback manual-review queue."}
+          </p>
+        </div>
+        <div className={CARD_CLASS}>
+          <p className="text-[11px] text-[var(--admin-text-muted)]">Resolved / stale actions</p>
+          <p className="mt-1 text-base font-semibold text-[var(--admin-text)]">
+            {workspace.counts.applied_actions || 0} applied / {workspace.counts.stale_actions || 0} stale
+          </p>
+          <p className="mt-1 text-[11px] text-[var(--admin-text-soft)]">
+            Repair and apply reports should reduce stale rows before the next public materialization pass.
+          </p>
+        </div>
+      </section>
+
+      {workspace.review_bundle ? (
+      <section id="bundle-approval" className={`${SECTION_CLASS} space-y-3`}>
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="text-[11px] text-gray-600">Canonical review bundle</p>
+            <p className="break-all font-mono text-[11px]">{reviewBundlePath}</p>
+            <p className="mt-3 text-[12px] text-gray-700">
+              Only bundle actions that still need a human approve or dismiss decision stay in the approval table.
+              AI-approved actions move straight to the apply preview and import gates below.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <button
+              type="button"
+              onClick={saveApprovals}
+              disabled={isPending || !permissions.save_approvals?.allowed}
+              className="rounded border px-3 py-1.5 bg-[var(--admin-surface)] text-[12px]"
+            >
+              Save Approvals
+            </button>
+            <button
+              type="button"
+              onClick={() =>
+                runAction(
+                  "/api/admin/legislative/apply",
+                  { mode: "dry-run" },
+                  "Legislative apply dry-run finished. Review the report before applying."
+                )
+              }
+              disabled={isPending || !permissions.run_apply_dry_run?.allowed}
+              className="rounded border px-3 py-1.5 bg-[var(--admin-surface)] text-[12px]"
+            >
+              Run Apply Dry-Run
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                if (!window.confirm("Apply the approved legislative bundle actions?")) {
+                  return;
+                }
+                runAction(
+                  "/api/admin/legislative/apply",
+                  { mode: "apply", confirmed: true },
+                  "Approved legislative bundle actions applied through the wrapped CLI flow."
+                );
+              }}
+              disabled={isPending || !permissions.apply_bundle?.allowed}
+              className="rounded border border-[var(--admin-link)] bg-[var(--admin-link)] px-3 py-1.5 text-[12px] text-[var(--background)]"
+            >
+              Apply Approved Actions
+            </button>
+            <button
+              type="button"
+              onClick={() =>
+                runAction(
+                  "/api/admin/legislative/import",
+                  { mode: "dry-run" },
+                  "Legislative import dry-run finished. Review the import report before applying."
+                )
+              }
+              disabled={isPending || !permissions.run_import_dry_run?.allowed}
+              className="rounded border px-3 py-1.5 bg-[var(--admin-surface)] text-[12px]"
+            >
+              Run Import Dry-Run
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                if (!window.confirm("Apply the approved tracked-bill import?")) {
+                  return;
+                }
+                runAction(
+                  "/api/admin/legislative/import",
+                  { mode: "apply", confirmed: true },
+                  "Approved tracked-bill import applied through the wrapped CLI flow."
+                );
+              }}
+              disabled={isPending || !permissions.apply_import?.allowed}
+              className="rounded border border-[var(--admin-link)] bg-[var(--admin-link)] px-3 py-1.5 text-[12px] text-[var(--background)]"
+            >
+              Apply Import
+            </button>
+          </div>
+        </div>
+        <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-4 text-[12px]">
+          <div className={PANEL_CLASS}>
+            <p className="font-semibold">Apply dry-run gate</p>
+            {(permissions.run_apply_dry_run?.reasons || []).length ? (
+              <div className="mt-2 space-y-1 text-[11px] text-gray-700">
+                {permissions.run_apply_dry_run.reasons.map((reason) => (
+                  <p key={reason}>{reason}</p>
+                ))}
+              </div>
+            ) : (
+              <p className="mt-2 text-gray-700">Ready to preview approved actions.</p>
+            )}
+          </div>
+          <div className={PANEL_CLASS}>
+            <p className="font-semibold">Apply gate</p>
+            {(permissions.apply_bundle?.reasons || []).length ? (
+              <div className="mt-2 space-y-1 text-[11px] text-gray-700">
+                {permissions.apply_bundle.reasons.map((reason) => (
+                  <p key={reason}>{reason}</p>
+                ))}
+              </div>
+            ) : (
+              <p className="mt-2 text-gray-700">Ready for wrapped apply.</p>
+            )}
+          </div>
+          <div className={PANEL_CLASS}>
+            <p className="font-semibold">Import dry-run gate</p>
+            {(permissions.run_import_dry_run?.reasons || []).length ? (
+              <div className="mt-2 space-y-1 text-[11px] text-gray-700">
+                {permissions.run_import_dry_run.reasons.map((reason) => (
+                  <p key={reason}>{reason}</p>
+                ))}
+              </div>
+            ) : (
+              <p className="mt-2 text-gray-700">Ready to preview tracked-bill import.</p>
+            )}
+          </div>
+          <div className={PANEL_CLASS}>
+            <p className="font-semibold">Import apply gate</p>
+            {(permissions.apply_import?.reasons || []).length ? (
+              <div className="mt-2 space-y-1 text-[11px] text-gray-700">
+                {permissions.apply_import.reasons.map((reason) => (
+                  <p key={reason}>{reason}</p>
+                ))}
+              </div>
+            ) : (
+              <p className="mt-2 text-gray-700">Ready for wrapped import apply.</p>
+            )}
+          </div>
+        </div>
+        {message ? <p className="text-[12px] text-[var(--admin-text-soft)]">{message}</p> : null}
+      </section>
+      ) : null}
+
+      <section className="grid gap-4 xl:grid-cols-[0.9fr_1.1fr]">
+        <div id="workflow-blockers" className={SECTION_CLASS}>
+          <h2 className="text-base font-semibold text-[var(--admin-text)]">Workflow blockers</h2>
+          <div className="mt-3 space-y-2 text-[12px]">
+            {(workspace.blockers || []).length ? (
+              workspace.blockers.map((blocker) => (
+                <div key={blocker} className={PANEL_CLASS}>
+                  {blocker}
+                </div>
+              ))
+            ) : (
+              <p className="text-[var(--admin-text-soft)]">No explicit blockers are recorded right now.</p>
+            )}
+          </div>
+        </div>
+
+        <div className={SECTION_CLASS}>
+          <h2 className="text-base font-semibold text-[var(--admin-text)]">Next safe step</h2>
+          <p className="mt-3 font-semibold text-[var(--admin-text)]">{workspace.next_step.label}</p>
+          <div className="mt-4 space-y-2">
+            {workspace.next_step.commands.map((command) => (
+              <pre
+                key={command}
+                className="overflow-x-auto rounded border border-[var(--admin-line)] bg-[var(--admin-surface-muted)] px-3 py-2 text-[11px] text-[var(--admin-text)]"
+              >
+                <code>{command}</code>
+              </pre>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="workflow-reports" className="grid gap-3 md:grid-cols-2">
+        <SummaryCard title="Latest apply report" report={workspace.apply_report} />
+        <SummaryCard title="Latest import report" report={workspace.import_report} />
+      </section>
+
+      <section id="manual-review-queue" className={SECTION_CLASS}>
+        <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h2 className="text-base font-semibold">Manual review queue</h2>
+            <p className="mt-1 text-[12px] text-gray-600">
+              These are the canonical legislative rows that still need human review before bundle approval or apply can continue.
+            </p>
+          </div>
+          <div className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface-muted)] px-3 py-2 text-[11px] text-[var(--admin-text-soft)]">
+            <div>Queue items: <span className="font-semibold text-[var(--admin-text)]">{reviewQueueCount}</span></div>
+            <div className="mt-1 break-all font-mono text-[var(--admin-text-muted)]">
+              {workspace.review_bundle?.path || workspace.manual_review_queue?.path || "No canonical review bundle recorded."}
+            </div>
+          </div>
+        </div>
+
+        {manualReviewItems.length ? (
+          <div className={TABLE_WRAPPER_CLASS}>
+            <table className="min-w-full text-[12px]">
+              <thead className={TABLE_HEAD_CLASS}>
+                <tr>
+                  <th className="border-b border-[var(--admin-line)] px-3 py-2">Future bill</th>
+                  <th className="border-b border-[var(--admin-line)] px-3 py-2">Current link</th>
+                  <th className="border-b border-[var(--admin-line)] px-3 py-2">Decision</th>
+                  <th className="border-b border-[var(--admin-line)] px-3 py-2">Why manual review</th>
+                  <th className="border-b border-[var(--admin-line)] px-3 py-2">Next step</th>
+                </tr>
+              </thead>
+              <tbody>
+                {manualReviewItems.map((item, index) => (
+                  <tr key={`${item.future_bill_link_id || item.bill_number || item.future_bill_title || "manual"}:${index}`} className={TABLE_ROW_CLASS}>
+                    <td className="border-b border-[var(--admin-line)] px-3 py-2">
+                      <div className="font-medium text-[var(--admin-text)]">
+                        {item.future_bill_title || "Untitled future bill"}
+                      </div>
+                      <div className="mt-1 text-[11px] text-zinc-700">
+                        {item.bill_number || "No bill number"}
+                      </div>
+                    </td>
+                    <td className="border-b border-[var(--admin-line)] px-3 py-2 text-[11px] text-[var(--admin-text-soft)]">
+                      <div>{item.tracked_bill_title || "No tracked bill title"}</div>
+                      <div className="mt-1">risk: {item.original_risk_level || "unknown"}</div>
+                    </td>
+                    <td className="border-b border-[var(--admin-line)] px-3 py-2 text-[11px] text-[var(--admin-text-soft)]">
+                      <div className="font-medium text-[var(--admin-text)]">{item.final_decision || "review_manually"}</div>
+                      <div className="mt-1">match: {item.match_label || "unknown"}</div>
+                      <div className="mt-1">score: {item.total_score ?? "n/a"}</div>
+                    </td>
+                    <td className="border-b border-[var(--admin-line)] px-3 py-2 text-[11px] text-[var(--admin-text-soft)]">
+                      <div className="max-w-[360px]">
+                        {item.llm_reasoning_short || "No short rationale recorded."}
+                      </div>
+                      {(item.why_not_auto_applied || []).length ? (
+                        <ul className="mt-2 space-y-1 text-[11px] text-zinc-600">
+                          {item.why_not_auto_applied.map((reason) => (
+                            <li key={reason}>{reason}</li>
+                          ))}
+                        </ul>
+                      ) : null}
+                    </td>
+                    <td className="border-b border-[var(--admin-line)] px-3 py-2 text-[11px] text-[var(--admin-text-soft)]">
+                      {item.suggested_next_step || "Review and classify in this surface"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface-muted)] p-3 text-[12px] text-[var(--admin-text-soft)]">
+            <p className="font-medium text-[var(--admin-text)]">No actionable legislative items require manual review.</p>
+            <p className="mt-1">
+              Next step: run the legislative workflow again if you expected new review work, or continue to the apply controls if the queue is genuinely clear.
+            </p>
+            <div className="mt-2 flex flex-wrap gap-3">
+              <Link href="/admin/workflows" className="text-[var(--admin-link)] underline underline-offset-2">
+                Open workflows
+              </Link>
+              <a href="#bundle-approval" className="text-[var(--admin-link)] underline underline-offset-2">
+                Open bundle approval
+              </a>
+            </div>
+          </div>
+        )}
+      </section>
+
+      {workspace.review_bundle ? (
+      <section className={SECTION_CLASS}>
+        <div className="mb-3">
+          <h2 className="text-base font-semibold">Bundle approval queue</h2>
+          <p className="mt-1 text-[12px] text-gray-600">
+            Only borderline bundle actions that still need a human approve or dismiss decision are shown here.
+          </p>
+        </div>
+        {actions.length ? (
+        <div className={TABLE_WRAPPER_CLASS}>
+          <table className="min-w-full text-[12px]">
+            <thead className={TABLE_HEAD_CLASS}>
+              <tr>
+                <th className="border-b border-[var(--admin-line)] px-3 py-2">Bundle action</th>
+                <th className="border-b border-[var(--admin-line)] px-3 py-2">Status</th>
+                <th className="border-b border-[var(--admin-line)] px-3 py-2">Decision</th>
+                <th className="border-b border-[var(--admin-line)] px-3 py-2">Inspect / note</th>
+              </tr>
+            </thead>
+            <tbody>
+              {(actions || []).map((action) => (
+                <tr key={action.action_id} className={TABLE_ROW_CLASS}>
+                  <td className="border-b border-[var(--admin-line)] px-3 py-2">
+                    <div className="text-[11px] uppercase tracking-wide text-zinc-500">
+                      Future bill {action.future_bill_id}
+                    </div>
+                    <div className="font-medium">{action.future_bill_title}</div>
+                    <div className="mt-1 text-[11px] text-zinc-700">
+                      {action.action_type} • {action.candidate_bill_number || action.target_id || "n/a"}
+                    </div>
+                  </td>
+                  <td className="border-b border-[var(--admin-line)] px-3 py-2 text-[11px] text-[var(--admin-text-muted)]">
+                    <div>{action.action_priority}</div>
+                    <div className="mt-1">{action.status} / {action.review_state}</div>
+                    <div className="mt-1">{action.approved ? "approved" : "not approved"}</div>
+                  </td>
+                  <td className="border-b border-[var(--admin-line)] px-3 py-2">
+                    <select
+                      value={action.decision}
+                      onChange={(event) => updateAction(action.action_id, "decision", event.target.value)}
+                      className="w-full min-w-[10rem] rounded border px-2 py-1 text-[12px]"
+                    >
+                      {DECISION_OPTIONS.map((option) => (
+                        <option key={`${action.action_id}-${option.value}`} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </td>
+                  <td className="border-b border-[var(--admin-line)] px-3 py-2">
+                    <details className="rounded border bg-[var(--admin-surface)] p-2">
+                      <summary className="cursor-pointer text-[12px] font-medium">Inspect</summary>
+                      <div className="mt-2 space-y-2 text-[11px] text-zinc-700">
+                        <div>
+                          <p className="font-medium">Rationale</p>
+                          <p className="mt-1">{action.rationale || "No rationale provided."}</p>
+                        </div>
+                        <div>
+                          <p className="font-medium">Candidate</p>
+                          <p className="mt-1">
+                            {action.candidate_title || "No candidate title"}{" "}
+                            {action.proposed_link_type ? `• ${action.proposed_link_type}` : ""}
+                          </p>
+                        </div>
+                        <label className="block">
+                          <span className="block font-medium">Approval note</span>
+                          <textarea
+                            value={action.approval_note}
+                            onChange={(event) => updateAction(action.action_id, "approval_note", event.target.value)}
+                            className="mt-1 min-h-20 w-full rounded border px-2 py-1.5 text-[12px]"
+                          />
+                        </label>
+                      </div>
+                    </details>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        ) : (
+          <div className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface-muted)] p-3 text-[12px] text-[var(--admin-text-soft)]">
+            <p className="font-medium text-[var(--admin-text)]">No bundle actions are waiting for a human decision.</p>
+            <p className="mt-1">
+              {autoApprovedBundleActions.length > 0
+                ? `${autoApprovedBundleActions.length} AI-approved action(s) are ready for the apply preview below.`
+                : "No manual bundle-approval work remains in this batch."}
+            </p>
+          </div>
+        )}
+      </section>
+      ) : null}
+
+      {workspace.review_bundle && humanApprovedBundleActions.length ? (
+      <section className={SECTION_CLASS}>
+        <div className="mb-3">
+          <h2 className="text-base font-semibold">Human-Approved Apply Actions</h2>
+          <p className="mt-1 text-[12px] text-gray-600">
+            These actions were explicitly approved in the admin workflow and are waiting on apply preview or apply.
+          </p>
+        </div>
+        <div className={TABLE_WRAPPER_CLASS}>
+          <table className="min-w-full text-[12px]">
+            <thead className={TABLE_HEAD_CLASS}>
+              <tr>
+                <th className="border-b border-[var(--admin-line)] px-3 py-2">Future bill</th>
+                <th className="border-b border-[var(--admin-line)] px-3 py-2">Action</th>
+                <th className="border-b border-[var(--admin-line)] px-3 py-2">Approval context</th>
+              </tr>
+            </thead>
+            <tbody>
+              {humanApprovedBundleActions.map((action) => (
+                <tr key={action.action_id} className={TABLE_ROW_CLASS}>
+                  <td className="border-b border-[var(--admin-line)] px-3 py-2">
+                    <div className="text-[11px] uppercase tracking-wide text-zinc-500">
+                      Future bill {action.future_bill_id}
+                    </div>
+                    <div className="font-medium">{action.future_bill_title}</div>
+                  </td>
+                  <td className="border-b border-[var(--admin-line)] px-3 py-2 text-[11px] text-[var(--admin-text-soft)]">
+                    <div>{action.action_type}</div>
+                    <div className="mt-1">
+                      {action.candidate_bill_number || action.target_id || "n/a"}
+                      {action.proposed_link_type ? ` • ${action.proposed_link_type}` : ""}
+                    </div>
+                    <div className="mt-1">{action.action_priority}</div>
+                  </td>
+                  <td className="border-b border-[var(--admin-line)] px-3 py-2 text-[11px] text-[var(--admin-text-soft)]">
+                    <div>
+                      Approved by {action.approved_by || "admin operator"}
+                      {action.approved_at ? ` on ${action.approved_at}` : ""}
+                    </div>
+                    <div className="mt-1">
+                      {action.approval_note || action.rationale || "Approved in the canonical legislative bundle."}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+      ) : null}
+
+      {workspace.review_bundle && autoApprovedBundleActions.length ? (
+      <section className={SECTION_CLASS}>
+        <div className="mb-3">
+          <h2 className="text-base font-semibold">AI-Approved Apply Actions</h2>
+          <p className="mt-1 text-[12px] text-gray-600">
+            These actions were approved by the legislative automation and are ready for apply preview. They are not waiting on a human decision.
+          </p>
+        </div>
+        <div className={TABLE_WRAPPER_CLASS}>
+          <table className="min-w-full text-[12px]">
+            <thead className={TABLE_HEAD_CLASS}>
+              <tr>
+                <th className="border-b border-[var(--admin-line)] px-3 py-2">Future bill</th>
+                <th className="border-b border-[var(--admin-line)] px-3 py-2">Action</th>
+                <th className="border-b border-[var(--admin-line)] px-3 py-2">Why it was approved</th>
+              </tr>
+            </thead>
+            <tbody>
+              {autoApprovedBundleActions.map((action) => (
+                <tr key={action.action_id} className={TABLE_ROW_CLASS}>
+                  <td className="border-b border-[var(--admin-line)] px-3 py-2">
+                    <div className="text-[11px] uppercase tracking-wide text-zinc-500">
+                      Future bill {action.future_bill_id}
+                    </div>
+                    <div className="font-medium">{action.future_bill_title}</div>
+                  </td>
+                  <td className="border-b border-[var(--admin-line)] px-3 py-2 text-[11px] text-[var(--admin-text-soft)]">
+                    <div>{action.action_type}</div>
+                    <div className="mt-1">
+                      {action.candidate_bill_number || action.target_id || "n/a"}
+                      {action.proposed_link_type ? ` • ${action.proposed_link_type}` : ""}
+                    </div>
+                    <div className="mt-1">{action.action_priority}</div>
+                  </td>
+                  <td className="border-b border-[var(--admin-line)] px-3 py-2 text-[11px] text-[var(--admin-text-soft)]">
+                    {action.rationale || action.auto_triage_reason || "Automation approved this action from the canonical review bundle."}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+      ) : null}
+
+      <section id="artifact-state" className={SECTION_CLASS}>
+        <h2 className="text-base font-semibold text-[var(--admin-text)]">Artifact state</h2>
+        <div className="mt-3 grid gap-3 lg:grid-cols-2 text-[12px]">
+          {Object.values(workspace.artifact_status).map((artifact) => (
+            <div key={artifact.key} className="rounded border p-3">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <p className="font-semibold">{artifact.label}</p>
+                <span className="rounded border px-2 py-0.5 text-[11px] uppercase tracking-wide">
+                  {artifact.exists ? "present" : "missing"}
+                </span>
+              </div>
+              <p className="mt-1 break-all font-mono text-[11px] text-gray-700">{artifact.path}</p>
+              {artifact.generated_at ? (
+                <p className="mt-1 text-[11px] text-gray-600">Updated: {artifact.generated_at}</p>
+              ) : null}
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+}

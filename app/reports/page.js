@@ -1,0 +1,419 @@
+import Link from "next/link";
+import { buildListingMetadata } from "@/lib/metadata";
+import { fetchReportsHubData } from "@/lib/public-site-data";
+import StructuredData from "@/app/components/public/StructuredData";
+import { Breadcrumbs } from "@/app/components/public/chrome";
+import {
+  CitationNote,
+  DashboardFilterBar,
+  ImpactOverviewCards,
+  MethodologyCallout,
+  SectionIntro,
+} from "@/app/components/public/core";
+import { Panel } from "@/app/components/dashboard/primitives";
+import {
+  ReportCardGrid,
+} from "@/app/components/public/entities";
+import ReportLinkedPolicyMovement from "./ReportLinkedPolicyMovement";
+import {
+  cleanText,
+  getReportLinkedMovementRows,
+} from "./report-linked-movement-data";
+import {
+  CategoryImpactChart,
+  DirectionBreakdownChart,
+} from "@/app/components/public/charts";
+import TrustBar from "@/app/components/public/TrustBar";
+import InsightCard from "@/app/components/public/InsightCard";
+import {
+  buildBreadcrumbJsonLd,
+  buildCollectionPageJsonLd,
+  buildDatasetJsonLd,
+  buildItemListJsonLd,
+} from "@/lib/structured-data";
+
+export const dynamic = "force-dynamic";
+
+export async function generateMetadata({ searchParams }) {
+  const resolvedSearchParams = (await searchParams) || {};
+
+  return buildListingMetadata({
+    title: "Black history, civil-rights, and policy impact reports",
+    description:
+      "Browse EquityStack reports on Black history, U.S. presidents, civil-rights policy, legislation, and historical policy impact on Black Americans.",
+    path: "/reports",
+    keywords: [
+      "Black history reports",
+      "civil rights policy report",
+      "policy impact on Black communities",
+    ],
+    searchParams: resolvedSearchParams,
+  });
+}
+
+export default async function ReportsPage({ searchParams }) {
+  const resolvedSearchParams = (await searchParams) || {};
+  const [data, movementData] = await Promise.all([
+    fetchReportsHubData(resolvedSearchParams),
+    getReportLinkedMovementRows({
+      latestLimit: 16,
+      source: "latest",
+      limit: 8,
+      contractPath: "ReportLinkedPolicyMovement.items",
+    }),
+  ]);
+  const reports = data.filteredReports || [];
+  const policyRankings = movementData.policyRankings;
+  const safeReportLinkedPolicyUpdates = movementData.rows;
+  const filteredFeaturedReportCount = data.featuredReports?.length || 0;
+  const totalFeaturedReportCount = data.reportKpis?.featured_count || 0;
+  const filtersActive = Boolean(
+    cleanText(resolvedSearchParams.q) || cleanText(resolvedSearchParams.category)
+  );
+  const featuredReportMetricValue =
+    filtersActive && totalFeaturedReportCount
+      ? `${filteredFeaturedReportCount} of ${totalFeaturedReportCount}`
+      : totalFeaturedReportCount;
+  const strongestCategory = data.reportKpis?.strongest_category || "N/A";
+  const directionData = [
+    {
+      name: "Included",
+      value: data.scores.metadata?.outcomes_included_in_score || 0,
+      color: "#84f7c6",
+    },
+    {
+      name: "Excluded",
+      value: data.scores.metadata?.outcomes_excluded_from_score || 0,
+      color: "#ff8a8a",
+    },
+  ];
+  const categoryChartData = (data.categorySummary || []).slice(0, 8).map((item) => ({
+    name: item.name,
+    score: Number(item.net_weighted_impact || 0),
+  }));
+
+  return (
+    <main className="space-y-4">
+      <StructuredData
+        data={[
+          buildBreadcrumbJsonLd(
+            [{ href: "/", label: "Home" }, { label: "Reports" }],
+            "/reports"
+          ),
+          buildCollectionPageJsonLd({
+            title: "Black history, civil-rights, and policy impact reports",
+            description:
+              "A public report library covering Black history, U.S. presidents, civil-rights policy, promise tracking, and historical policy impact on Black Americans.",
+            path: "/reports",
+            about: [
+              "Black history",
+              "civil rights policy",
+              "U.S. presidents",
+              "historical policy impact",
+            ],
+            keywords: [
+              "Black history reports",
+              "policy impact on Black communities",
+            ],
+          }),
+          buildDatasetJsonLd({
+            title: "EquityStack report layer dataset",
+            description:
+              "Structured analytical summaries, score context, and historical report data presented through the EquityStack reports hub.",
+            path: "/reports",
+            about: ["Black history", "civil rights policy", "policy impact on Black Americans"],
+            keywords: ["Black history reports", "historical policy impact"],
+            variableMeasured: [
+              "Black Impact Score",
+              "Outcome coverage",
+              "Category impact",
+              "Direction breakdown",
+            ],
+          }),
+          buildItemListJsonLd({
+            title: "Reports visible on the EquityStack reports hub",
+            description:
+              "The current visible report cards on the public reports hub.",
+            path: "/reports",
+            items: reports
+              .filter((item) => item?.slug && item?.title)
+              .slice(0, 12)
+              .map((item) => ({
+                href: `/reports/${item.slug}`,
+                name: item.title,
+              })),
+          }),
+        ]}
+      />
+      <Breadcrumbs items={[{ href: "/", label: "Home" }, { label: "Reports" }]} />
+
+      <section className="hero-panel p-4">
+        <SectionIntro
+          as="h1"
+          eyebrow="Analysis hub"
+          title="Read Black history, policy impact, and evidence side by side."
+          description="Reports are the public intelligence layer on top of the browseable database. Use them to move from headline interpretation into policy records, promise evidence, timelines, and methodology without losing the audit trail."
+          actions={
+            <>
+              <Link href="/dashboard" className="dashboard-button-primary">
+                Open dashboard
+              </Link>
+              <Link href="/methodology" className="dashboard-button-secondary">
+                Read methodology
+              </Link>
+            </>
+          }
+        />
+      </section>
+
+      <TrustBar />
+
+      <DashboardFilterBar helpText="Use search and category filters to narrow the featured report cards. Live report-linked records continue below.">
+        <form action="/reports" method="GET" className="flex flex-1 flex-wrap items-end gap-4">
+          <label className="grid gap-2">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+              Search
+            </span>
+            <input
+              type="search"
+              name="q"
+              defaultValue={resolvedSearchParams.q || ""}
+              placeholder="Report title or theme"
+              className="dashboard-field"
+            />
+          </label>
+          <label className="grid gap-2">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+              Category
+            </span>
+            <select
+              name="category"
+              defaultValue={resolvedSearchParams.category || ""}
+              className="dashboard-field"
+            >
+              <option value="">All categories</option>
+              {(data.reportCategories || []).map((item) => (
+                <option key={item} value={item}>
+                  {item}
+                </option>
+              ))}
+            </select>
+          </label>
+          <button type="submit" className="dashboard-button-secondary">
+            Apply filters
+          </button>
+        </form>
+      </DashboardFilterBar>
+
+      <ImpactOverviewCards
+        items={[
+          {
+            label: "Featured reports",
+            value: featuredReportMetricValue,
+            description: filtersActive
+              ? `${filteredFeaturedReportCount} visible after filters. Curated starting points for the main public reporting views.`
+              : "Curated starting points for the main public reporting views.",
+            tone: "accent",
+          },
+          {
+            label: "Report-linked records",
+            value: policyRankings.records?.length || 0,
+            description: "Live records feeding the reporting layer.",
+          },
+          {
+            label: "Presidents scored",
+            value: data.reportKpis?.presidents_scored || 0,
+            description: "Presidential profiles represented in the current score model.",
+          },
+          {
+            label: "Strongest category",
+            value: strongestCategory,
+            description: "Category with the strongest visible net weighted impact in the current report summaries.",
+          },
+        ]}
+      />
+
+      {data.insights?.length ? (
+        <section className="space-y-5">
+          <SectionIntro
+            eyebrow="Dataset observations"
+            title="What the current report layer is highlighting"
+            description="These are short factual readouts derived from the same structured data used by the report hub."
+          />
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {data.insights.map((item, index) => (
+              <InsightCard
+                key={`${item.title}-${index}`}
+                title={item.title}
+                text={item.text}
+              />
+            ))}
+          </div>
+        </section>
+      ) : null}
+
+      <section className="space-y-4">
+        <SectionIntro
+          eyebrow="Featured"
+          title="Start with the flagship views"
+          description="Start with one of these when you need the key takeaway first. Then open presidents, policies, or methodology from the linked report."
+        />
+        <ReportCardGrid
+          items={data.featuredReports || []}
+          emptyTitle="No featured reports match those filters."
+          emptyDescription="Try a broader category or search term."
+        />
+        <Panel padding="md" className="bg-[rgba(18,31,49,0.52)]">
+          <p className="text-sm leading-6 text-[var(--ink-soft)]">
+            Best first click: start with <span className="font-semibold text-white">Black Impact Score</span> for ranked comparison, or use <span className="font-semibold text-white">Civil Rights Timeline</span> when sequence matters more than ranking.
+          </p>
+        </Panel>
+      </section>
+
+      <section className="space-y-4">
+        <SectionIntro
+          eyebrow="Generated reports"
+          title="Generated Reports"
+          description="These report views are generated from the live report-linked movement data below."
+        />
+        <div className="grid gap-4 md:grid-cols-2">
+          <Link href="/reports/top-positive-impact" className="panel-link p-4">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+              Generated report
+            </p>
+            <h3 className="mt-3 text-lg font-semibold text-white">
+              Top Positive Impact Changes
+            </h3>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+              The largest positive shifts in tracked policy and promise outcomes.
+            </p>
+          </Link>
+          <Link href="/reports/stalled-policies" className="panel-link p-4">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+              Generated report
+            </p>
+            <h3 className="mt-3 text-lg font-semibold text-white">
+              Stalled and Blocked Policies
+            </h3>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+              Tracked policies and promises that did not advance or were blocked.
+            </p>
+          </Link>
+        </div>
+      </section>
+
+      <section className="space-y-5">
+        <SectionIntro
+          eyebrow="Most shareable report paths"
+          title="These are the strongest report pages to promote externally first"
+          description="Use these report destinations when you need a serious summary page that can be cited, taught from, or linked before readers drill into underlying records."
+        />
+        <div className="grid gap-4 md:grid-cols-3">
+          <Link href="/reports/black-impact-score" className="panel-link p-4">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">Flagship report</p>
+            <h3 className="mt-3 text-lg font-semibold text-white">Black Impact Score</h3>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+              Best first report for journalists, researchers, and general readers who need a comparative synthesis page before opening presidents or policies.
+            </p>
+          </Link>
+          <Link href="/reports/civil-rights-timeline" className="panel-link p-4">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">Historical report</p>
+            <h3 className="mt-3 text-lg font-semibold text-white">Civil Rights Timeline</h3>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+              Best report when chronology matters and the reader needs the long civil-rights arc rather than one administration snapshot.
+            </p>
+          </Link>
+          <Link href="/reports" className="panel-link p-4">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">Report hub</p>
+            <h3 className="mt-3 text-lg font-semibold text-white">Full reports library</h3>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+              Best page to share when the audience needs a curated report layer rather than one isolated chart, scorecard, or dashboard slice.
+            </p>
+          </Link>
+        </div>
+      </section>
+
+      <section className="space-y-4">
+        <SectionIntro
+          eyebrow="Reference paths"
+          title="Pair reports with methodology, sources, and guided context"
+          description="The strongest outreach-ready pages usually combine a report with the methodology page, the source library, or a guided explainer path."
+        />
+        <div className="grid gap-4 md:grid-cols-3">
+          <Link href="/methodology" className="panel-link p-4">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">Methodology</p>
+            <h3 className="mt-3 text-lg font-semibold text-white">Explain how the report was built</h3>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+              Pair a report with the methodology page when a reader needs to understand score construction, evidence thresholds, and analytical limits.
+            </p>
+          </Link>
+          <Link href="/sources" className="panel-link p-4">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">Sources</p>
+            <h3 className="mt-3 text-lg font-semibold text-white">Verify the evidence base directly</h3>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+              Link the source library when the next question is about documentation, publisher quality, or the breadth of the visible evidence layer.
+            </p>
+          </Link>
+          <Link href="/start" className="panel-link p-4">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-muted)]">Research guide</p>
+            <h3 className="mt-3 text-lg font-semibold text-white">Give first-time readers a guided path</h3>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+              Use the guided research page when the person you are sending here needs historical background before they can use the report layer well.
+            </p>
+          </Link>
+        </div>
+      </section>
+
+      <section className="grid items-start gap-6 2xl:grid-cols-2">
+        <CategoryImpactChart
+          data={categoryChartData}
+          title="Category impact snapshot"
+          description="Reports are easier to read when issue-area concentration is visible. This chart shows where the strongest weighted impact sits right now."
+        />
+        <DirectionBreakdownChart
+          data={directionData}
+          title="Score inclusion snapshot"
+          description="Included and excluded counts give users a fast read on how much of the underlying outcome pool is actually in the public score."
+        />
+      </section>
+
+      <Panel padding="md" className="bg-[rgba(18,31,49,0.52)] text-sm leading-7 text-[var(--ink-soft)]">
+        Charts reflect underlying policy data in the EquityStack database.
+      </Panel>
+
+      <section className="space-y-4">
+        <Panel padding="md" className="space-y-4">
+        <SectionIntro
+          eyebrow="All reports"
+          title={`${reports.length} reports currently visible`}
+          description="Use report cards as the jump layer into deeper analysis. Open one report, then move into the linked records or methodology when you need verification."
+        />
+          <ReportCardGrid items={reports} />
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <MethodologyCallout description="Reports summarize. They do not replace the underlying record. Each report should send users back into policies, promises, timeline entries, and source context when they need to verify a claim." />
+          <CitationNote description="When referencing an EquityStack report externally, cite the report title, EquityStack, the page URL, and your access date. Reports summarize the current structured dataset and should be read alongside underlying records and methodology." />
+          <Panel padding="md" className="bg-[rgba(18,31,49,0.52)]">
+            <h2 className="text-lg font-semibold text-white">About these reports</h2>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+              Reports are generated from structured policy data in EquityStack. They are not opinion pieces. Each report aggregates policy-level analysis, evidence, and score context into a readable public summary.
+            </p>
+          </Panel>
+          </div>
+        </Panel>
+      </section>
+
+      <section className="space-y-4">
+        <SectionIntro
+          eyebrow="Recent updates"
+          title="Latest report-linked policy movement"
+          description="Recent policy updates are the fastest way to move from report context into live policy records."
+        />
+        <ReportLinkedPolicyMovement
+          items={safeReportLinkedPolicyUpdates}
+          emptyTitle="No report-linked policy updates are available yet."
+          emptyDescription="As report findings are connected to live policy records, they will appear here."
+        />
+      </section>
+    </main>
+  );
+}

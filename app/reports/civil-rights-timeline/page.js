@@ -1,0 +1,387 @@
+import Link from "next/link";
+import {
+  PromiseImpactDirectionBadge,
+  PromiseStatusBadge,
+} from "@/app/components/policy-badges";
+import PresidentAvatar from "@/app/components/PresidentAvatar";
+import StructuredData from "@/app/components/public/StructuredData";
+import { Breadcrumbs } from "@/app/components/public/chrome";
+import TrustBar from "@/app/components/public/TrustBar";
+import { ExplainerIndexGrid } from "@/app/components/public/entities";
+import { Panel, SectionHeader } from "@/app/components/dashboard/primitives";
+import { buildPageMetadata } from "@/lib/metadata";
+import { fetchCivilRightsTimeline } from "@/lib/services/promiseService";
+import { fetchExplainersIndexData } from "@/lib/public-site-data";
+import {
+  buildBreadcrumbJsonLd,
+  buildReportJsonLd,
+} from "@/lib/structured-data";
+
+export const dynamic = "force-dynamic";
+
+export const metadata = buildPageMetadata({
+  title: "Civil Rights Timeline",
+  description:
+    "A curated Promise Tracker timeline tracing major federal civil-rights commitments, actions, and outcomes affecting Black communities across U.S. history.",
+  path: "/reports/civil-rights-timeline",
+});
+
+const TIMELINE_LEGEND_STATUSES = [
+  "Delivered",
+  "Partial",
+  "Blocked",
+  "Failed",
+  "In Progress",
+];
+
+const TIMELINE_LEGEND_IMPACTS = ["Positive", "Mixed", "Negative", "Blocked/Unrealized"];
+
+const ERA_HELPER_COPY = {
+  reconstruction:
+    "This section shows early federal attempts to protect Black citizenship, voting, and equal treatment after emancipation.",
+  "reconstruction-retreat":
+    "This section shows how federal protection narrowed, weakened, or was abandoned after early Reconstruction gains, helping explain the path from postwar promise to long-term retrenchment.",
+  "pre-civil-rights-bridge":
+    "This section highlights the smaller but important federal steps that reopened civil-rights enforcement before the major breakthroughs of the 1960s.",
+  "civil-rights-era":
+    "This section tracks the major period of renewed federal enforcement, legislation, and executive action against segregation and exclusion.",
+  "post-civil-rights-continuity":
+    "This section shows how federal civil-rights commitments continued after the peak legislative era through housing, credit, and institutional enforcement.",
+  "modern-continuity":
+    "This section extends the timeline into modern debates over voting rights, policing, courts, and federal accountability.",
+};
+
+const SUGGESTED_EXPLAINER_SLUGS = [
+  "states-rights-vs-civil-rights-claims",
+  "disparate-impact-vs-intent-claims",
+  "party-voting-records-racial-policy",
+];
+
+function MetaPill({ children }) {
+  return (
+    <span className="inline-flex items-center rounded-full border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.06)] px-3 py-1.5 text-xs font-semibold text-[var(--ink-muted)]">
+      {children}
+    </span>
+  );
+}
+
+function formatTimelineDate(value) {
+  if (!value) return "Date not available";
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return value;
+
+  return new Intl.DateTimeFormat("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  }).format(parsed);
+}
+
+function formatYear(value) {
+  if (!value) return null;
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return null;
+  return parsed.getUTCFullYear();
+}
+
+function EraChip({ era }) {
+  return (
+    <a
+      href={`#${era.id}`}
+      className="inline-flex items-center rounded-full border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.05)] px-4 py-2 text-sm font-medium text-[var(--ink-soft)] transition hover:border-[rgba(96,165,250,0.28)] hover:bg-[rgba(255,255,255,0.08)] hover:text-white"
+    >
+      {era.label}
+    </a>
+  );
+}
+
+function TimelineEntry({ item }) {
+  const year = formatYear(item.promise_date);
+
+  return (
+    <article
+      className={`relative rounded-[1.35rem] border p-5 md:p-6 ${
+        item.impact_direction === "Mixed"
+          ? "border-[rgba(251,191,36,0.18)] bg-[linear-gradient(180deg,rgba(42,27,11,0.84),rgba(11,16,25,0.98))]"
+          : "border-[rgba(255,255,255,0.08)] bg-[linear-gradient(180deg,rgba(14,20,31,0.96),rgba(9,14,23,0.98))]"
+      }`}
+    >
+      <div className="absolute left-0 top-6 hidden h-[calc(100%-3rem)] w-px bg-[rgba(255,255,255,0.08)] md:block" />
+      <div className="grid gap-4 md:grid-cols-[156px,minmax(0,1fr)] md:gap-6">
+        <div className="md:pl-6">
+          <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">
+            {year || "Timeline"}
+          </p>
+          <p className="mt-2 text-sm text-[var(--ink-soft)]">{formatTimelineDate(item.promise_date)}</p>
+          <div className="mt-3 flex items-start justify-between gap-3">
+            <p className="text-sm font-medium text-white">{item.president}</p>
+            <PresidentAvatar
+              presidentSlug={item.president_slug}
+              presidentName={item.president}
+              size={72}
+              shape="rounded"
+            />
+          </div>
+          {item.president_party ? (
+            <p className="text-xs text-[var(--ink-soft)]">{item.president_party}</p>
+          ) : null}
+        </div>
+
+        <div>
+          <div className="flex items-start justify-between gap-3 flex-wrap">
+            <div className="max-w-3xl">
+              <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)]">
+                {item.topic || "Civil Rights Timeline"}
+              </p>
+              <h3 className="mt-2 text-xl font-semibold text-white">{item.title}</h3>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <PromiseStatusBadge status={item.status} />
+              <PromiseImpactDirectionBadge impact={item.impact_direction} />
+            </div>
+          </div>
+
+          <p className="mt-4 text-sm leading-7 text-[var(--ink-soft)]">
+            {item.summary || "No summary added yet."}
+          </p>
+
+          <div className="mt-4 flex flex-wrap gap-2">
+            {item.outcome_type ? <MetaPill>{item.outcome_type}</MetaPill> : null}
+            {item.topic ? <MetaPill>{item.topic}</MetaPill> : null}
+          </div>
+
+          <div className="mt-5 flex flex-wrap gap-3 text-sm text-[var(--accent)]">
+            <Link href={`/promises/${item.slug}`} className="accent-link">
+              Open promise record
+            </Link>
+            {item.president_slug ? (
+              <Link href={`/promises/president/${item.president_slug}`} className="accent-link">
+                President view
+              </Link>
+            ) : null}
+            {item.related_policy_id && item.related_policy_title ? (
+              <Link href={`/policies/${item.related_policy_id}`} className="accent-link">
+                Related policy: {item.related_policy_title}
+              </Link>
+            ) : null}
+            {item.related_explainer_slug && item.related_explainer_title ? (
+              <Link href={`/explainers/${item.related_explainer_slug}`} className="accent-link">
+                Related explainer: {item.related_explainer_title}
+              </Link>
+            ) : null}
+          </div>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+export default async function CivilRightsTimelinePage() {
+  const [timeline, explainersIndex] = await Promise.all([
+    fetchCivilRightsTimeline(),
+    fetchExplainersIndexData(),
+  ]);
+  const eras = timeline.eras || [];
+  const totalEntries = timeline.items?.length || 0;
+  const explainersBySlug = new Map(
+    (explainersIndex.items || []).map((item) => [item.slug, item])
+  );
+  const suggestedExplainers = SUGGESTED_EXPLAINER_SLUGS.map((slug) =>
+    explainersBySlug.get(slug)
+  ).filter(Boolean);
+
+  return (
+    <main className="report-shell w-full pt-4 pb-6 space-y-4">
+      <StructuredData
+        data={[
+          buildBreadcrumbJsonLd(
+            [
+              { href: "/", label: "Home" },
+              { href: "/reports", label: "Reports" },
+              { label: "Civil Rights Timeline" },
+            ],
+            "/reports/civil-rights-timeline"
+          ),
+          buildReportJsonLd({
+            title: "Civil Rights Timeline",
+            description:
+              "A chronology-first report tracing major federal civil-rights commitments, rollback, continuity, and policy change affecting Black Americans.",
+            path: "/reports/civil-rights-timeline",
+            about: [
+              "civil rights history",
+              "Black Americans",
+              "timeline",
+              "federal policy",
+            ],
+            keywords: [
+              "civil rights timeline",
+              "civil rights history by administration",
+              "laws affecting Black Americans",
+            ],
+          }),
+        ]}
+      />
+      <Breadcrumbs
+        items={[
+          { href: "/", label: "Home" },
+          { href: "/reports", label: "Reports" },
+          { label: "Civil Rights Timeline" },
+        ]}
+      />
+      <section className="hero-panel p-4">
+        <p className="eyebrow mb-4">Timeline report</p>
+        <h1 className="page-title">Civil Rights Timeline</h1>
+        <p className="text-base md:text-lg text-[var(--ink-soft)] mt-4 max-w-3xl leading-8">
+          This curated timeline traces how federal civil-rights policy moved through protection,
+          retreat, rebuilding, and modern continuity for Black communities across U.S. history.
+          It is designed as a guided historical view built from Promise Tracker records, not a
+          replacement for the full tracker.
+        </p>
+        <div className="mt-5 flex flex-wrap gap-2">
+          <MetaPill>{totalEntries} timeline records</MetaPill>
+          <MetaPill>{eras.length} eras</MetaPill>
+          <MetaPill>Chronological Promise Tracker view</MetaPill>
+        </div>
+      </section>
+
+      <div className="flex flex-wrap gap-3">
+        <Link
+          href="/reports"
+          className="dashboard-button-secondary"
+        >
+          Back to Reports
+        </Link>
+        <Link
+          href="/promises"
+          className="dashboard-button-secondary"
+        >
+          Explore Promise Tracker data
+        </Link>
+      </div>
+
+      <TrustBar />
+
+      <Panel prominence="primary" className="overflow-hidden">
+        <SectionHeader
+          eyebrow="How to read this report"
+          title="Chronology, classification, and civil-rights context in one view"
+          description="Each entry shows what federal commitment was made, what the government did next, and how the documented outcome is classified in the Promise Tracker."
+        />
+        <div className="grid gap-4 p-4 xl:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.85fr)]">
+          <div className="space-y-4">
+            <div className="flex flex-wrap gap-2">
+              {eras.map((era) => (
+                <EraChip key={era.id} era={era} />
+              ))}
+            </div>
+            <p className="text-sm leading-7 text-[var(--ink-soft)]">
+              Use this page to follow continuity across Reconstruction, the Civil Rights Era, and modern accountability records without losing the chronological thread.
+            </p>
+          </div>
+          <div className="grid gap-4">
+            <div className="rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4">
+              <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
+                Status legend
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {TIMELINE_LEGEND_STATUSES.map((status) => (
+                  <PromiseStatusBadge key={status} status={status} />
+                ))}
+              </div>
+            </div>
+            <div className="rounded-lg border border-[var(--line)] bg-[rgba(18,31,49,0.52)] p-4">
+              <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
+                Impact legend
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {TIMELINE_LEGEND_IMPACTS.map((impact) => (
+                  <PromiseImpactDirectionBadge key={impact} impact={impact} />
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </Panel>
+
+      <div className="space-y-6">
+        {eras.map((era) => (
+          <section key={era.id} id={era.id} className="space-y-4 scroll-mt-24">
+            <div className="card-surface rounded-[1.35rem] p-5">
+              <div className="flex items-start justify-between gap-4 flex-wrap">
+                <div className="max-w-3xl">
+                  <p className="eyebrow mb-3">{era.label}</p>
+                  <h2 className="text-2xl font-semibold">{era.label}</h2>
+                  <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">{era.description}</p>
+                  {ERA_HELPER_COPY[era.id] ? (
+                    <p className="text-sm text-[var(--ink-soft)] mt-3 leading-7">
+                      {ERA_HELPER_COPY[era.id]}
+                    </p>
+                  ) : null}
+                </div>
+                <MetaPill>{era.items.length} records</MetaPill>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              {era.items.map((item) => (
+                <TimelineEntry key={item.slug} item={item} />
+              ))}
+            </div>
+          </section>
+        ))}
+      </div>
+
+      <section className="card-surface p-4">
+        <div className="max-w-3xl">
+          <p className="eyebrow mb-3">Continue exploring</p>
+          <h2 className="text-2xl font-semibold">Move from chronology into records, methods, and broader research paths</h2>
+          <p className="mt-3 text-sm text-[var(--ink-soft)] leading-7">
+            Use these next steps when the timeline raises a deeper question about one administration, a specific law, a related promise, or the methodology behind the public record.
+          </p>
+        </div>
+        {suggestedExplainers.length ? (
+          <div className="mt-5 space-y-4">
+            <Panel padding="md" className="space-y-2">
+              <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-muted)]">
+                Suggested explainers
+              </p>
+              <h2 className="text-lg font-semibold text-white">
+                Start with the closest civil-rights debate explainer
+              </h2>
+              <p className="text-sm leading-7 text-[var(--ink-soft)]">
+                These explainers are surfaced because timeline readers often need federal-versus-state context, impact-versus-intent framing, or voting-record context before moving back into the chronology.
+              </p>
+            </Panel>
+            <ExplainerIndexGrid items={suggestedExplainers} />
+          </div>
+        ) : null}
+        <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <Link href="/promises" className="panel-link block rounded-[1.25rem] p-5">
+            <h3 className="text-lg font-semibold">Review promise records</h3>
+            <p className="mt-2 text-sm text-[var(--ink-soft)] leading-7">
+              Open the promise tracker when you want the full record behind a timeline entry rather than the chronological summary.
+            </p>
+          </Link>
+          <Link href="/analysis/civil-rights-laws-by-president" className="panel-link block rounded-[1.25rem] p-5">
+            <h3 className="text-lg font-semibold">Trace civil-rights laws across administrations</h3>
+            <p className="mt-2 text-sm text-[var(--ink-soft)] leading-7">
+              Use the legislation guide when the timeline leads into a broader question about laws, enforcement, and administration context.
+            </p>
+          </Link>
+          <Link href="/methodology" className="panel-link block rounded-[1.25rem] p-5">
+            <h3 className="text-lg font-semibold">Review methodology and interpretation limits</h3>
+            <p className="mt-2 text-sm text-[var(--ink-soft)] leading-7">
+              Read the methodology page before citing the timeline as evidence of a broader historical interpretation.
+            </p>
+          </Link>
+          <Link href="/research" className="panel-link block rounded-[1.25rem] p-5">
+            <h3 className="text-lg font-semibold">Return to the research hub</h3>
+            <p className="mt-2 text-sm text-[var(--ink-soft)] leading-7">
+              Use the research hub when this timeline opens into reports, explainers, thematic guides, or source-backed comparison work.
+            </p>
+          </Link>
+        </div>
+      </section>
+    </main>
+  );
+}

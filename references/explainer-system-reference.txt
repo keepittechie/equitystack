@@ -1,0 +1,369 @@
+EXPLAINER SYSTEM REFERENCE
+
+Purpose
+
+Use this file as the default source of truth when creating or updating EquityStack explainers.
+It documents the current explainer workflow so future explainer tasks do not need a full system rediscovery unless the underlying explainer surfaces change materially.
+
+This reference does NOT override:
+- references/safe-dev-framework.txt
+- references/dashboard-structure-fix-prompt.txt
+
+Always read those first when an explainer task says to do so.
+
+==================================================
+CORE RULES
+==================================================
+
+MANDATORY FIRST STEP:
+Read and follow:
+
+- references/safe-dev-framework.txt
+- references/dashboard-structure-fix-prompt.txt
+
+Do not proceed until all are applied.
+
+- Do not redesign UI.
+- Do not change layout structure.
+- Do not change schemas unless an existing explainer workflow explicitly requires data inserts.
+- Do not change routes.
+- Do not deploy unless explicitly asked.
+- Keep code changes local.
+- Do not touch 10.10.0.13 unless explicitly instructed.
+- DB updates may be applied to 10.10.0.15 when the task explicitly calls for DB inserts or updates.
+
+==================================================
+EXPLAINER SOURCE OF TRUTH
+==================================================
+
+Primary files and what they do:
+
+1. lib/explainer-editorial.js
+- Main editorial overlay for explainer pages.
+- Add the explainer slug entry here.
+- This is where category, tags, related explainers, related policies, structured sections, argument mode, and source-context labels are defined.
+
+2. database/explainer_<slug>.sql
+- Standard DB import/update script for the explainer row, explainer sources, and explainer-policy links.
+- Use the slug in the filename.
+- Keep it idempotent with INSERT ... ON DUPLICATE KEY UPDATE where appropriate.
+
+3. app/explainers/claim-map/page.js
+- Manual explainer clustering and claim-pattern mapping.
+- Update CLAIM_CLUSTERS if the explainer belongs in a visible cluster.
+- Update CLAIM_PATTERNS if the explainer answers a recurring claim pattern that should be discoverable from the map legend.
+
+4. lib/public-site-data.js
+- Shared assembly layer for public explainer data.
+- Important behavior:
+  - fetchExplainersIndexData() enriches public explainers with editorial category and tags.
+  - fetchExplainerDetailData() resolves explicit related explainers from editorial.relatedExplainers.
+  - If editorial.relatedExplainers is empty, the page falls back to same-category related cards.
+
+5. app/explainers/[slug]/page.js
+- Public explainer detail template.
+- The page already renders:
+  - Short answer
+  - Argument mode
+  - Sources and verification
+  - Related explainers
+  - Related policies
+- Do not redesign this page to add a new explainer.
+
+6. app/explainers/page.js
+- Public explainer library page.
+- New explainers appear here automatically once the DB row is published and the editorial entry exists.
+- Editorial category links are derived automatically from editorial categories in lib/explainer-editorial.js.
+
+==================================================
+SHORT ANSWER STANDARD
+==================================================
+
+All explainers must include a Short Answer that:
+
+- can be understood in 10 seconds by a non-expert reader
+- follows this structure:
+
+  1. what the topic is or what happened
+  2. why it matters
+  3. what the claim gets wrong OR what the data does not prove
+
+Example pattern:
+
+"[Topic/event] did X. This matters because Y. However, it does not prove Z."
+
+Rules:
+
+- avoid abstract-first language
+- define key terms in plain language if used
+- avoid multi-clause sentences
+- do not assume prior knowledge
+
+FIRST SENTENCE RULE:
+
+- The first sentence must be concrete and easy to understand
+- Avoid starting with abstract terms like:
+  - policy feedback
+  - coalition dynamics
+  - disparate impact
+- Start with what happened, then introduce the concept if needed
+
+PLACEMENT:
+
+- The Short Answer must appear as the first meaningful content on the page
+- It must appear before:
+  - Argument Mode
+  - Sources
+  - Related explainers
+  - Any metadata or labels
+
+The Short Answer is the most important part of the explainer.
+
+==================================================
+COMPREHENSION PRIORITY RULE
+==================================================
+
+When making tradeoffs:
+
+- prioritize clarity over completeness
+- prioritize plain language over technical phrasing
+- prioritize first-pass understanding over full nuance
+
+Do not remove nuance, but do not lead with it.
+
+The first 10–15 seconds must answer:
+
+- what is this about
+- what happened or what is being claimed
+- why it matters
+
+==================================================
+ONE-CONCEPT RULE
+==================================================
+
+Each explainer must focus on one primary concept, claim pattern, or analytical frame.
+
+Avoid:
+
+- combining multiple unrelated mechanisms
+- covering multiple eras without a clear throughline
+- answering more than one core question
+
+If multiple concepts are needed, create separate explainers and link them.
+
+==================================================
+DEFAULT EXPLAINER WORKFLOW
+==================================================
+
+For a new explainer, do the work in this order:
+
+1. Check for overlap
+2. Add editorial entry
+3. Add DB script
+4. Wire relationships
+5. Update Claim Map if needed
+6. Verify locally
+
+(Keep steps exactly as already defined in your system)
+
+==================================================
+EDITORIAL ENTRY CHECKLIST
+==================================================
+
+Include:
+
+- category
+- tags
+- relatedExplainers
+- relatedPolicies
+- lens
+- pagePurpose
+- whyThisMatters
+- argumentReady
+- questions
+- researchPaths
+- sourceContexts
+- argumentMode
+- structuredSections
+
+Prefer explicit content over generator fallback.
+
+==================================================
+ARGUMENT MODE GENERATION WARNING
+==================================================
+
+Avoid relying on generated or fallback Argument Mode content.
+
+Preferred behavior:
+
+- Write explicit argumentMode content
+- Generated content is temporary only
+
+Signs of generated content:
+
+- generic phrasing
+- repeated debate lines
+- lack of specificity
+
+==================================================
+ARGUMENT MODE CHECKLIST
+==================================================
+
+Include:
+
+- summary
+- quickResponse
+- discussionResponse
+- debateResponse
+- keyPoints
+- commonClaims
+- debateLines
+- shareCards
+
+Rules:
+
+- debateLines must not reuse identical phrasing across explainers
+- shareCards must be unique per explainer
+- avoid duplication across explainers
+
+==================================================
+RELATIONSHIP INTENT RULE
+==================================================
+
+When adding relatedExplainers:
+
+- only include explainers that improve understanding
+- do not add links just to increase count
+- maintain tight conceptual grouping
+
+Preferred:
+
+- 2–5 strong related explainers
+
+==================================================
+RELATED EXPLAINER RULES
+==================================================
+
+- Explicit relatedExplainers overrides fallback behavior
+- Only expand when intentional
+- Preserve useful existing relationships
+
+==================================================
+CLAIM MAP RULES
+==================================================
+
+- Use CLAIM_CLUSTERS and CLAIM_PATTERNS only
+- Do not create new systems
+- Only include real slugs
+- Maintain meaningful grouping
+
+==================================================
+STRUCTURED SECTIONS
+==================================================
+
+- Use existing schema only
+- Do not modify structure
+
+==================================================
+VISUAL EVIDENCE WORKFLOW NOTE
+==================================================
+
+When an explainer uses visual evidence:
+
+- bind the visual to a specific claim in the section text
+- prefer existing evidence components and UI primitives over custom-designed infographic images
+- treat system breakdowns as evidence exhibits, not decorative teaching graphics
+- preserve the explainer's existing section flow: claim, evidence, explanation
+
+==================================================
+SOURCE CONTEXT RULES
+==================================================
+
+- Match DB source titles exactly
+- Use supported labels:
+  - government
+  - academic
+  - primary-data
+  - legal
+  - secondary-analysis
+
+==================================================
+DB SCRIPT PATTERN
+==================================================
+
+Use standard pattern:
+
+- START TRANSACTION
+- INSERT / UPDATE
+- DELETE / INSERT sources
+- COMMIT
+
+==================================================
+VERIFICATION CHECKLIST
+==================================================
+
+- lint passes
+- build passes
+- routes return 200
+- Short Answer renders
+- Argument Mode renders
+- Sources render
+- Related explainers render
+- Claim Map renders (if used)
+
+==================================================
+EXPLAINER QUALITY GATE
+==================================================
+
+Before completion, verify:
+
+- passes 10-second comprehension test
+- Short Answer follows standard
+- no duplicate arguments
+- explicit Argument Mode used
+- 3+ strong sources
+- 2+ meaningful related explainers
+
+If not, revise before finalizing.
+
+==================================================
+LOCAL / PRODUCTION RULES
+==================================================
+
+- Local repo is source of truth
+- Do not deploy to 10.10.0.13
+- Only update DB on 10.10.0.15 when instructed
+
+==================================================
+WHEN TO RE-AUDIT
+==================================================
+
+Re-audit only if:
+
+- page structure changes
+- claim map changes
+- data layer changes
+
+Otherwise reuse this system.
+
+==================================================
+EXPECTED OUTPUT REPORT
+==================================================
+
+Report:
+
+- slug created/updated
+- files modified
+- sources attached
+- relationships updated
+- route checks
+- lint/build results
+
+Confirm:
+
+- safe-dev-framework followed
+- dashboard structure preserved
+- no redesign
+- no schema changes
+- no routing changes
+- no deployment

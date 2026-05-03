@@ -1,0 +1,695 @@
+NARRATIVE ACCOUNTABILITY SYSTEM REFERENCE
+
+Purpose
+
+Use this file as the default source of truth when creating or updating EquityStack Narrative Accountability profiles and slug pages.
+It documents the current public profile workflow so future Narrative Accountability tasks do not need a full system rediscovery unless the route, data shape, or rendering surfaces change materially.
+
+This reference is based on the live Clarence Thomas implementation:
+- slug: `clarence-thomas`
+- listing route: `/narrative-accountability`
+- detail route: `/narrative-accountability/[slug]`
+
+This reference does NOT override:
+- references/safe-dev-framework.txt
+- references/dashboard-structure-fix-prompt.txt
+
+Always read those first when a Narrative Accountability task says to do so.
+
+==================================================
+CORE RULES
+==================================================
+
+MANDATORY FIRST STEP:
+Read and follow:
+
+- references/safe-dev-framework.txt
+- references/dashboard-structure-fix-prompt.txt
+
+Do not proceed until all are applied.
+
+- Do not redesign the UI.
+- Do not change the route structure unless explicitly asked.
+- Do not change global navigation unless explicitly asked.
+- Do not change schemas unless the Narrative Accountability workflow clearly requires a new field.
+- Do not publish a profile unless the task explicitly says to do so.
+- Keep code changes local.
+- Do not deploy unless explicitly asked.
+
+==================================================
+NARRATIVE ACCOUNTABILITY SOURCE OF TRUTH
+==================================================
+
+Primary files and what they do:
+
+1. lib/narrative-accountability/data.js
+- Main source of truth for Narrative Accountability profiles.
+- Stores:
+  - profile metadata
+  - publication state
+  - review notes
+  - statement arrays
+  - receipts
+  - optional ethics-context blocks
+- Also exports helper functions for published vs. unpublished access.
+
+2. lib/narrative-accountability/narrative-tags.js
+- Canonical registry for public narrative-pattern tags.
+- Stores:
+  - `id`
+  - `label`
+  - `description`
+  - optional `narrative_claim_summary`
+  - optional `why_contested`
+  - optional `evidence_context`
+  - optional `review_questions`
+  - optional `why_it_matters`
+  - `related_explainers`
+  - tag-level `caution`
+- This is the source of truth for:
+  - `/narrative-accountability/patterns`
+  - `/narrative-accountability/patterns/[tag]`
+- Do not invent ad hoc tag ids in profile data. Add them here first.
+
+3. lib/narrative-accountability/patternAnalytics.js
+- Derived analytics helpers for pattern pages.
+- Current helper set:
+  - `getNarrativeConcentration(tagId)`
+  - `getNarrativeCoverage(tagId)`
+  - `getNarrativeTimeline(tagId)`
+  - `getNarrativeTimelineByProfile(tagId)`
+- Concentration rules:
+  - published profiles only
+  - visible statements only
+  - exclude `statement_visibility: "editorial_hold"`
+  - return profile-level statement totals plus `share_percent`
+- Coverage rules:
+  - published profiles only
+  - visible statements only
+  - exclude `statement_visibility: "editorial_hold"`
+  - calculate source diversity from unique URL domains
+- Timeline rules:
+  - published profiles only
+  - visible statements only
+  - statements with valid `statement_date` values only
+- `getNarrativeTimeline(tagId)` returns:
+  - `year`
+  - `count`
+  - `max_count`
+  - `density_level`
+
+4. app/narrative-accountability/page.js
+- Public listing page.
+- Must render only profiles where `published === true`.
+- If no profiles are published, the page should show a calm empty-state message rather than an error.
+
+5. app/narrative-accountability/[slug]/page.js
+- Public detail template for a single profile.
+- Uses the published-only lookup path.
+- Unpublished or missing profiles must resolve to `notFound()`.
+- This is the canonical slug-page renderer.
+
+6. app/narrative-accountability/patterns/page.js
+- Public narrative-pattern index.
+- Must render only:
+  - canonical tags from `narrative-tags.js`
+  - visible statements from published profiles
+- Must exclude:
+  - unpublished profiles
+  - `statement_visibility: "editorial_hold"` statements
+
+7. app/narrative-accountability/patterns/[tag]/page.js
+- Public detail page for one narrative pattern.
+- Must return `notFound()` if the tag id does not exist in the canonical registry.
+- May render a safe empty state if a valid tag currently has zero visible published statements.
+
+8. docs/narrative-accountability.md
+- Human-readable documentation for the Narrative Accountability system.
+- Keep this aligned with the current record shape and publication workflow.
+
+9. docs/narrative-accountability-clarence-thomas-readiness.md
+- Example publication-readiness checklist for a real profile.
+- Use this as a model for future pre-publish review artifacts when needed.
+
+10. references/narrative-accountability-commentator-profile-reference.txt
+- Reusable checklist/reference for commentator, author, podcaster, and media-personality profiles.
+- Use this when a profile is driven more by recurring public arguments than by formal government actions.
+
+==================================================
+PUBLICATION GATING RULE
+==================================================
+
+Public routes must only use published profile helpers:
+
+- `getPublishedNarrativeProfiles()`
+- `getPublishedNarrativeProfileBySlug()`
+- `getPublishedNarrativeProfileSlugs()`
+
+Do NOT use the full profile helpers on public routes:
+
+- `getNarrativeProfiles()`
+- `getNarrativeProfileBySlug()`
+
+Public behavior rules:
+
+- `/narrative-accountability` lists only published profiles.
+- `/narrative-accountability/[slug]` must return `notFound()` for unpublished profiles.
+- `generateStaticParams()` must use only published slugs.
+
+Pattern-index behavior rules:
+
+- `/narrative-accountability/patterns` must use the canonical tag registry plus visible statements from published profiles only.
+- `/narrative-accountability/patterns/[tag]` must:
+  - return `notFound()` if the tag id is invalid
+  - exclude unpublished profiles
+  - exclude `statement_visibility: "editorial_hold"` statements
+  - allow a safe empty state when a valid tag currently has zero visible published statements
+
+Current helper pattern:
+
+- `getPublishedNarrativeStatementsByTag(tagId)`
+- `getNarrativeIndex()`
+- `getNarrativePatternHeatmap()`
+- `getNarrativePatternSummaryStats()`
+- `getNarrativeConcentration(tagId)`
+- `getNarrativeCoverage(tagId)`
+- `getNarrativeTimeline(tagId)`
+- `getNarrativeTimelineByProfile(tagId)`
+
+==================================================
+PROFILE DATA SHAPE
+==================================================
+
+Each profile currently supports:
+
+- `slug`
+- `published`
+- `display_name`
+- `platform_or_role`
+- optional `primary_platform`
+- optional `public_role_type`
+- optional `public_claim_caution`
+- optional `portrait_url`
+- optional `portrait_alt`
+- optional `portrait_source_label`
+- optional `portrait_source_url`
+- `short_summary`
+- `narrative_pattern_summary`
+- `claim_categories`
+- `review_notes`
+- `last_reviewed_at`
+- optional `related_profiles`
+- optional `related_explainers`
+- optional `publicly_reported_ethics_concerns`
+- `statements`
+
+The current renderer also expects a derived:
+
+- `statement_count`
+
+That count is produced by helper logic and should reflect only visible statements.
+
+Allowed `public_role_type` values:
+
+- `Judge`
+- `President`
+- `Congress`
+- `Academic`
+- `Commentator`
+- `Author`
+- `Podcaster`
+- `Media Personality`
+- `Activist`
+- `Other`
+
+Commentator-profile support rules:
+
+- The same system should support judges, elected officials, commentators, authors, podcasters, and other public figures.
+- `platform_or_role` is the public-facing label.
+- `public_role_type` is the normalized role classification.
+- `primary_platform` is optional and may capture the main channel such as podcast, television, Substack, YouTube, or publication name.
+- `public_claim_caution` is optional. If omitted, the page should fall back to the standard caution note.
+- For commentator-style profiles, also use `references/narrative-accountability-commentator-profile-reference.txt` before publication.
+
+Related-link rules:
+
+- `related_profiles` may link one Narrative Accountability profile to another by:
+  - institution
+  - claim pattern
+  - accountability issue
+- Only published related profiles may render publicly.
+- Never render the current profile as related to itself.
+
+- `related_explainers` may link a profile to existing EquityStack explainers.
+- Use only explainer slugs that are confirmed to exist.
+- Do not invent explainer routes or render broken links.
+
+==================================================
+PORTRAIT RULES
+==================================================
+
+Narrative Accountability profiles may include an official portrait.
+
+Preferred portrait-source order:
+
+1. Official court portraits for judges and justices
+2. Official White House portraits for presidents and executive officials
+3. Official congressional portraits for members of Congress
+4. Other stable government or public-domain portrait sources when official institutional portraits are unavailable
+
+Do NOT use:
+
+- random media photos
+- campaign images
+- screenshots
+- memes
+- editorial art
+- unstable hotlinked images when the repo can store a local copy instead
+
+Required portrait fields when a portrait is used:
+
+- `portrait_url`
+- `portrait_alt`
+- `portrait_source_label`
+- `portrait_source_url`
+
+Preferred storage rule:
+
+- Store portrait assets locally under `public/` when possible.
+- Use stable official source URLs only as the source reference, not as the primary runtime dependency, when the project already follows a local-asset pattern.
+
+UI consistency rule:
+
+- Listing cards and slug pages must use the same portrait treatment.
+- Keep:
+  - the same aspect ratio
+  - the same border radius
+  - the same object-fit behavior
+  - the same placeholder behavior when no portrait exists
+
+Current implementation pattern:
+
+- Listing page:
+  - show the portrait on each published profile card
+- Slug page:
+  - show the portrait in the hero/header area
+  - optionally show a source line for the official portrait
+- Fallback:
+  - if no portrait exists, render a neutral placeholder that preserves the layout
+
+Do not create per-profile portrait styling exceptions.
+
+==================================================
+STATEMENT DATA SHAPE
+==================================================
+
+Each statement can include:
+
+- `statement_title`
+- `claim_type`
+- `statement_sources`
+- optional `narrative_tags`
+- `exact_quote`
+- `quote_source_url`
+- `source_label`
+- `date_made`
+- optional `statement_date`
+- `context_summary`
+- `claim_being_made`
+- `why_it_is_wrong_label`
+- `why_it_is_wrong`
+- `historical_rebuttal`
+- `data_rebuttal`
+- `receipts`
+- `related_equitystack_explainers`
+- `harm_summary`
+- `severity`
+- `verification_status`
+- optional `statement_visibility`
+
+Important:
+
+- The UI label for `exact_quote` is now `Claim summary / quoted material`.
+- This field may hold either:
+  - a direct quote
+  - a sourced paraphrase
+
+Do not label paraphrases as literal direct quotes.
+
+Narrative-tag rules:
+
+- `narrative_tags` is optional.
+- `statement_date` is optional.
+- Use `statement_date` only when the source provides a clear `YYYY-MM-DD` date.
+- Do not guess or backfill aggressively.
+- Use 1 to 3 canonical ids when a statement clearly maps to a documented claim pattern.
+- Tags describe claim patterns, not people.
+- Do not invent free-form tags in profile data.
+- Do not force every statement to carry a tag if the fit is weak.
+- Held statements may keep `narrative_tags`, but they must remain excluded from public tag counts and public pattern-page rendering.
+- Heatmap rows, heatmap summary stats, pattern-index counts, and pattern-detail counts must use:
+  - published profiles only
+  - visible statements only
+  - canonical tags only
+- `statement_visibility: "editorial_hold"` entries must stay out of:
+  - `/narrative-accountability/patterns`
+  - `/narrative-accountability/patterns/[tag]`
+  - heatmap counts
+  - summary-stat counts
+
+Current canonical tags:
+
+- `systemic-racism-denial`
+- `culture-over-structure`
+- `affirmative-action-dei-harm`
+- `black-voter-dependency`
+- `policing-racial-bias-denial`
+- `colorblind-policy-absolutism`
+- `merit-over-discrimination`
+- `media-racism-exaggeration`
+- `government-dependency-claim`
+- `post-civil-rights-resolution`
+
+Tag-metadata guidance:
+
+- `narrative_claim_summary` should summarize the recurring public argument, not a person.
+- `why_contested` should explain the evidence dispute without attacking a speaker.
+- `evidence_context` should point readers toward the historical, policy, or data context needed to review the claim.
+- `review_questions` should help readers inspect the claim critically without assigning motive.
+
+==================================================
+PATTERN PAGE RULES
+==================================================
+
+Pattern pages should stay visible-only and published-only.
+
+Current public pattern-page structure:
+
+- `/narrative-accountability/patterns`
+  - hero and caution note
+  - summary stat cards
+  - pattern heatmap
+  - canonical pattern cards with counts, evidence focus, related explainers, and evidence-strength summaries
+  - interpretation note:
+    - lower counts may reflect stricter sourcing requirements, not absence of the narrative
+
+- `/narrative-accountability/patterns/[tag]`
+  - tag intro and caution
+  - `Timeline density view`
+  - `Narrative vs. evidence` panel
+  - pattern summary / related explainers / evidence strength
+  - `Who drives this narrative`
+  - visible statement cards grouped by profile
+
+Timeline rules:
+
+- timelines must use published profiles only
+- timelines must use visible statements only
+- timelines must exclude `statement_visibility: "editorial_hold"`
+- timelines must count only statements with valid `statement_date`
+- pattern pages may render a safe empty state when no dated visible statements are available
+- the public empty-state copy is:
+  - `No verified dated statements available for this pattern yet.`
+
+Evidence-strength rules:
+
+- evidence strength must use visible statements only
+- evidence strength must exclude held statements
+- source diversity should use unique URL domains, not raw source totals
+- lower counts should not be described as proof that a narrative is absent
+
+Concentration rules:
+
+- concentration must use visible statement totals for the current tag only
+- concentration must exclude unpublished profiles
+- concentration cards should link back to the published profile route
+
+==================================================
+STATEMENT SOURCE RULES
+==================================================
+
+Use `statement_sources` when a statement depends on more than one source or when the header needs better source clarity.
+
+Each `statement_sources` item can include:
+
+- `label`
+- `url`
+- `date`
+- `source_quality`
+
+Renderer behavior:
+
+- If `statement_sources` exists and has items, it is the authoritative source display.
+- If not, the page falls back to:
+  - `source_label`
+  - `quote_source_url`
+  - `date_made`
+
+Preferred practice:
+
+- For real profiles, use `statement_sources` whenever possible.
+- Avoid compressing multiple sources into one dated source line when the statement is a synthesis.
+- Do not publish a profile unless every visible statement has both:
+  - `statement_sources`
+  - receipts
+
+==================================================
+EDITORIAL HOLD RULE
+==================================================
+
+Statements can be hidden from public rendering with:
+
+- `statement_visibility: "editorial_hold"`
+
+Current behavior:
+
+- held statements are excluded from public rendering
+- held statements are excluded from `statement_count`
+
+Use `editorial_hold` when:
+
+- the statement is not yet publication-ready
+- the sourcing is weaker than the rest of the profile
+- the legal-risk framing still needs review
+
+Current example:
+
+- Clarence Thomas tax-treatment statement is intentionally on `editorial_hold`
+- John Roberts broader-income and system-level enforcement statements are intentionally on `editorial_hold`
+
+==================================================
+SAFETY GUIDANCE
+==================================================
+
+- Every profile must be quote/source based.
+- Avoid motive claims.
+- Avoid personal attacks.
+- Do not label a person a white supremacist unless that description is directly sourced, necessary, and legally safe.
+- Prefer describing the specific public claim pattern instead, for example:
+  - mirroring historical white-supremacist narratives
+  - repeating anti-Black claims
+  - echoing civil-rights backlash frames
+- Keep the emphasis on the public statement, the historical or policy pattern it resembles, and the receipts that support the comparison.
+- Do not publish unsupported identity labels or generalized moral verdicts.
+
+==================================================
+ETHICS CONTEXT RULES
+==================================================
+
+Profiles may include:
+
+- `publicly_reported_ethics_concerns.summary`
+- `publicly_reported_ethics_concerns.items`
+
+Each item may be:
+
+- a legacy plain string
+- or an object with:
+  - `summary`
+  - `receipts`
+
+Preferred practice for real published profiles:
+
+- use object items with receipts
+- do not leave ethics-context bullets unsourced
+
+This section must:
+
+- summarize reporting and oversight materials
+- avoid legal conclusions
+- avoid speculation about private intent
+
+==================================================
+RECEIPT RULES
+==================================================
+
+Each receipt should include:
+
+- `title`
+- `url`
+- `publisher_or_source`
+- `source_quality`
+- optional `note`
+
+Allowed `source_quality` values:
+
+- `Primary`
+- `Court record`
+- `Government data`
+- `Government report`
+- `Academic`
+- `Research analysis`
+- `Investigative reporting`
+- `News reporting`
+- `Commentary`
+
+Receipt standards:
+
+- Every factual public-facing claim should be traceable to at least one receipt.
+- Every URL should be usable.
+- Keep source labels precise and non-theatrical.
+
+==================================================
+LEGAL / TONE SAFETY RULES
+==================================================
+
+Narrative Accountability pages must stay evidence-first.
+
+Do NOT:
+
+- accuse a person of committing a crime unless the page is explicitly documenting an adjudicated finding and the wording is precise
+- claim fraud without a solid formal basis and explicit sourcing
+- claim corruption as a fact
+- infer intent
+- include personal insults
+- publish advocacy instructions
+- overstate what commentary proves
+
+Do:
+
+- attribute reporting clearly
+- distinguish reporting from findings
+- distinguish commentary from legal conclusions
+- frame unresolved legal questions as contested
+- keep public trust and institutional concern language neutral
+
+Safe phrasing examples:
+
+- `publicly reported`
+- `reporting raised questions`
+- `oversight materials said`
+- `commentary has argued`
+- `this does not establish wrongdoing`
+
+==================================================
+SLUG PAGE SECTION ORDER
+==================================================
+
+The current canonical section order is:
+
+1. Breadcrumbs + structured data
+2. Hero panel
+   - display name
+   - role
+   - visible statement count
+   - review date if present
+   - claim categories
+   - public caution note
+3. Narrative Pattern
+4. Review notes
+5. Optional `Publicly Reported Ethics Concerns`
+6. Documented Statements
+   - statement title
+   - claim type / severity / verification status
+   - claim summary / quoted material
+   - statement sources
+   - context
+   - claim being made
+   - evaluation
+   - receipts
+   - impact
+7. Methodology callout + citation note
+
+Do not change this structure unless the task explicitly asks for a new layout.
+
+==================================================
+PUBLIC CAUTION NOTE
+==================================================
+
+Slug pages should display:
+
+`This page evaluates public claims and documented positions. It does not assert private intent.`
+
+That value currently comes from:
+
+- `publicClaimCautionNote` in `lib/narrative-accountability/data.js`
+
+==================================================
+CLARENCE THOMAS EXAMPLE
+==================================================
+
+Use the Clarence Thomas profile as the current live reference for:
+
+- a real published Narrative Accountability profile
+- multi-source statement headers
+- sourced ethics-context items
+- editorial hold exclusion
+- safer claim-summary labeling
+- neutral review-state wording
+
+Important implementation details from the Clarence Thomas page:
+
+- The listing shows only 4 visible statements because one statement is on `editorial_hold`.
+- The tax-treatment statement remains stored in the data layer but is not publicly rendered.
+- Ethics-context items are directly sourced with receipts.
+
+==================================================
+DEFAULT WORKFLOW
+==================================================
+
+For a new or updated real profile, do the work in this order:
+
+1. Draft the profile in `lib/narrative-accountability/data.js`
+2. Keep `published: false` by default
+3. Add or update statement receipts
+4. Add or update `statement_sources`
+5. Add ethics-context receipts if that section is used
+6. Audit wording for legal-risk safety
+7. Validate that unpublished routing still hides the page
+8. Run lint/build
+9. Only then publish if explicitly instructed
+
+==================================================
+PRE-PUBLISH CHECKLIST
+==================================================
+
+Before setting `published: true`, verify:
+
+- every visible statement has a clear source path
+- every factual claim has receipts
+- every ethics-context item is sourced
+- no direct accusation outruns the source record
+- no intent claim is implied
+- any weaker or legally sensitive statement is held back with `editorial_hold`
+- `last_reviewed_at` is set
+- review notes no longer describe the profile as a draft waiting for publication
+- the listing and slug page render correctly
+
+==================================================
+VALIDATION CHECKS
+==================================================
+
+Useful checks:
+
+- `npm run lint`
+- `npm run build`
+
+Useful local data sanity pattern:
+
+- inspect published profile count
+- inspect published slugs
+- confirm visible statement count
+- confirm held statement count
+- confirm ethics items all have receipts
+
+If the task is reference-only, documentation-only, or otherwise non-executable, note that clearly in the final answer.

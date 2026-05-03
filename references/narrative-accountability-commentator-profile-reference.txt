@@ -1,0 +1,339 @@
+NARRATIVE ACCOUNTABILITY COMMENTATOR PROFILE REFERENCE
+
+Purpose
+
+Use this file when creating or reviewing Narrative Accountability profiles for commentators, authors, podcasters, media personalities, activists, or other public narrative figures.
+It is a reusable checklist and workflow reference layered on top of:
+
+- references/safe-dev-framework.txt
+- references/dashboard-structure-fix-prompt.txt
+- references/narrative-accountability-system-reference.txt
+
+This file is for commentator-style profiles specifically.
+It does not replace the main system reference.
+
+==================================================
+WHEN TO USE THIS REFERENCE
+==================================================
+
+Use this file when the profile subject is primarily known for:
+
+- books
+- columns
+- essays
+- podcast appearances
+- interviews
+- lectures
+- TV/radio commentary
+- public debate framing
+
+Use the main Narrative Accountability system reference first when the task involves:
+
+- route behavior
+- published/unpublished gating
+- statement schema
+- related profiles
+- related explainers
+- portrait rendering
+
+==================================================
+COMMENTATOR PROFILE CORE RULES
+==================================================
+
+- Do not publish by default.
+- Start as `published: false`.
+- Use a draft-first workflow.
+- Every visible statement must be source-based.
+- Every visible statement must have:
+  - `statement_sources`
+  - `receipts`
+- Add `narrative_tags` where a statement clearly maps to a canonical public claim pattern.
+- Tags must describe claim patterns, not people.
+- Do not use motive claims.
+- Do not use personal attacks.
+- Do not reduce a person to one ideology label when the safer method is to describe the specific public claim.
+
+Safe framing:
+
+- "This profile tracks public claims..."
+- "This profile evaluates recurring public arguments..."
+- "This statement is contested because..."
+- "This aligns with historically documented anti-Black or civil-rights-backlash narratives..."
+
+Avoid:
+
+- "He is racist"
+- "She is a white supremacist"
+- "He wants..."
+- "She is trying to..."
+- "This proves intent"
+
+If a stronger label is considered:
+
+- use it only if directly sourced
+- verify it is legally and editorially safe
+- prefer describing the claim pattern instead of labeling the person
+
+==================================================
+REQUIRED PROFILE FIELDS
+==================================================
+
+Commentator profiles should confirm or add:
+
+- `slug`
+- `published`
+- `display_name`
+- `platform_or_role`
+- `public_role_type`
+- `primary_platform`
+- `public_claim_caution`
+- `short_summary`
+- `narrative_pattern_summary`
+- `claim_categories`
+- `review_notes`
+- `last_reviewed_at`
+- optional portrait fields
+- optional `related_explainers`
+- optional `related_profiles`
+- `statements`
+
+When applicable, commentator statements should also use:
+
+- `narrative_tags`
+- optional `statement_date`
+
+These fields feed the public pattern layer:
+
+- evidence-strength summaries
+- concentration views
+- timeline density views
+
+Use only canonical tag ids from:
+
+- `lib/narrative-accountability/narrative-tags.js`
+
+Recommended `public_role_type` values for this lane:
+
+- `Academic`
+- `Commentator`
+- `Author`
+- `Podcaster`
+- `Media Personality`
+- `Activist`
+- `Other`
+
+==================================================
+RECOMMENDED CAUTION LANGUAGE
+==================================================
+
+Baseline commentator-safe caution:
+
+"This page evaluates public arguments, recurring claim patterns, and documented statements. It does not assign motive, personal character, or private intent."
+
+Use this when the profile centers:
+
+- ideology claims
+- cultural claims
+- historical interpretation
+- statistical claims
+- anti-civil-rights framing
+
+The caution note should be stronger than the default judge/official note when the profile depends more heavily on recurring arguments than on formal acts.
+
+==================================================
+STATEMENT QUALITY CHECKLIST
+==================================================
+
+Before a commentator statement can remain visible:
+
+1. Is it tied to a specific source?
+- book
+- essay
+- article
+- transcript
+- interview
+- speech
+
+2. Does the source actually support the wording?
+- If not, narrow the paraphrase.
+- Do not summarize multiple claims into one broader claim unless the source clearly does that.
+
+3. Is it a paraphrase or a direct quote?
+- If paraphrase, keep the UI wording as `Claim summary / quoted material`.
+- Do not style a paraphrase as a verbatim quote.
+
+4. Is it missing context?
+- If yes, add context or hold it.
+
+5. Is the claim historically or politically sensitive?
+- If yes, add stronger rebuttal receipts and consider `editorial_hold` if the wording is still too broad.
+
+6. Does the statement fit a canonical tag?
+- If yes, use the tag.
+- If no, leave it untagged rather than stretching the fit.
+- Do not add tags just to increase pattern counts or coverage labels.
+
+7. Does the source provide a clear date?
+- If yes, add `statement_date` in `YYYY-MM-DD` format.
+- If not, leave `statement_date` blank rather than guessing.
+- Do not use upload dates unless they clearly match when the statement was made.
+
+==================================================
+WHEN TO USE EDITORIAL HOLD
+==================================================
+
+Use `statement_visibility: "editorial_hold"` when:
+
+- the claim is plausible but not yet tightly sourced
+- the paraphrase is doing more work than the source
+- a book/interview citation is too weak or too general
+- the claim is legally safe but editorially thin
+- the statement is too easy to misread as a sweeping accusation
+
+Common commentator-profile hold candidates:
+
+- culture/family/generalized social-decline claims
+- extrapolated numerical claims
+- sweeping historical reinterpretations that combine multiple source threads
+- source materials that are more summary than transcript
+
+Default rule:
+
+- if the statement is source-backed but still too broad, narrow it first
+- if it still feels stretched, hold it
+
+==================================================
+REBUTTAL EXPECTATIONS
+==================================================
+
+The rebuttal should not attack the person.
+It should explain why the claim is contested using:
+
+- historical context
+- institutional context
+- policy context
+- data context
+- existing EquityStack explainers when relevant
+
+Good rebuttal pattern:
+
+- `why_it_is_wrong_label`: "Why this is contested"
+- `why_it_is_wrong`: short neutral explanation
+- `historical_rebuttal`: long-run structural/policy context
+- `data_rebuttal`: measurable evidence or bounded research result
+
+Use structural context instead of rhetoric.
+
+Public analytics implication:
+
+- visible commentator statements contribute to public pattern counts, coverage, and concentration
+- held statements stay out of those public metrics
+- do not keep a weak statement visible just to strengthen a pattern page
+
+==================================================
+RELATED EXPLAINER CHECKLIST
+==================================================
+
+Before publication, check whether the profile should link to existing explainers covering:
+
+- affirmative action
+- systemic racism vs cultural explanations
+- family structure and economics
+- equal protection
+- civil-rights enforcement
+- voting rights
+- housing segregation
+- historical policy memory
+
+Rules:
+
+- only use existing explainer slugs
+- do not invent slugs
+- do not link to irrelevant explainers just to fill space
+
+==================================================
+PORTRAIT RULES FOR COMMENTATORS
+==================================================
+
+Commentator profiles often do not have official government portraits.
+
+Use this source order:
+
+1. Official institutional portrait from the commentator's primary institution, if clearly authorized and stable
+2. Stable public-domain archival portrait
+3. No portrait, using the shared placeholder
+
+Do NOT use:
+
+- random news photos
+- screenshots from video clips
+- campaign-style promo art
+- memes
+- social-media grabs
+- unstable hotlinks as the runtime image source
+
+Preferred storage:
+
+- local asset under `public/narrative-accountability/portraits/`
+
+Required attribution fields:
+
+- `portrait_url`
+- `portrait_alt`
+- `portrait_source_label`
+- `portrait_source_url`
+
+If using a public-domain archival image:
+
+- say so in `portrait_alt` and/or `portrait_source_label`
+- point `portrait_source_url` to the source page, not a random repost
+
+==================================================
+PRE-PUBLISH CHECKLIST
+==================================================
+
+Do not set `published: true` until all are true:
+
+- every visible statement has `statement_sources`
+- every visible statement has receipts
+- every visible statement is tied to a specific source
+- no paraphrase stretches past the source
+- no motive claims
+- no personal attacks
+- no unsupported labeling
+- caution note is commentator-safe
+- related explainers are valid
+- any weak or legally sensitive statement is narrowed or placed on `editorial_hold`
+- `last_reviewed_at` is set
+- a readiness memo exists if the profile is high-sensitivity
+- any `statement_date` used in a visible statement is clearly verified
+- visible statements are not being used to pad public pattern metrics without strong sourcing
+
+==================================================
+POST-PUBLISH VALIDATION
+==================================================
+
+After publishing:
+
+- confirm the profile appears on `/narrative-accountability`
+- confirm the slug route builds
+- confirm visible statement count excludes `editorial_hold`
+- confirm unpublished drafts remain hidden
+- run:
+  - `npm run lint`
+  - `npm run build`
+
+==================================================
+MODEL EXAMPLES
+==================================================
+
+Existing judge/official reference models:
+
+- `clarence-thomas`
+- `john-roberts`
+
+Existing commentator-style caution pattern:
+
+- `thomas-sowell`
+
+Use those live profiles as implementation references, but do not clone their exact claim mix into unrelated profiles.
