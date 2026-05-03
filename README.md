@@ -10,13 +10,12 @@ EquityStack exists to make civic accountability measurable, inspectable, and gro
 
 🌐 **Live Site:** https://equitystack.org
 
-![Next.js](https://img.shields.io/badge/Next.js-000?logo=nextdotjs&logoColor=white)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?logo=tailwindcss&logoColor=white)
-![Status](https://img.shields.io/badge/status-active-brightgreen)
-
 ---
 
 ## What EquityStack Does
+![Next.js](https://img.shields.io/badge/Next.js-000?logo=nextdotjs&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?logo=tailwindcss&logoColor=white)
+![Status](https://img.shields.io/badge/status-active-brightgreen)
 
 EquityStack connects:
 
